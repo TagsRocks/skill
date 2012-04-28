@@ -1,0 +1,566 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{CB9F3683-71C9-45B1-A7EC-834CE871A096}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Skill.Editor</RootNamespace>
+    <AssemblyName>SkillEditor</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <SccProjectName>&lt;Project Location In Database&gt;</SccProjectName>
+    <SccLocalPath>&lt;Local Binding Root of Project&gt;</SccLocalPath>
+    <SccAuxPath>&lt;Source Control Database&gt;</SccAuxPath>
+    <SccProvider>Mercurial Source Control Package</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Skill.Editor.App</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Skill.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AvalonDock, Version=1.3.3571.0, Culture=neutral, PublicKeyToken=85a1e0ada7ec13e4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Avalon\AvalonDock.dll</HintPath>
+    </Reference>
+    <Reference Include="AvalonDock.Themes">
+      <HintPath>Avalon\AvalonDock.Themes.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WPFToolkit.Extended, Version=1.6.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\WPFToolkit.Extended.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="AI\Action.cs" />
+    <Compile Include="AI\BehaviorTree.cs" />
+    <Compile Include="AI\Behavior.cs" />
+    <Compile Include="AI\Condition.cs" />
+    <Compile Include="AI\Decorator.cs" />
+    <Compile Include="AI\Composite.cs" />
+    <Compile Include="Animation\AnimationAdditiveBlending.xaml.cs">
+      <DependentUpon>AnimationAdditiveBlending.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Animation\AnimationAimOffset.xaml.cs">
+      <DependentUpon>AnimationAimOffset.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Animation\AnimationAimOffsetProfileEditor.xaml.cs">
+      <DependentUpon>AnimationAimOffsetProfileEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Animation\AnimationBlend4Directional.xaml.cs">
+      <DependentUpon>AnimationBlend4Directional.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Animation\AnimationBlendByIdle.xaml.cs">
+      <DependentUpon>AnimationBlendByIdle.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Animation\AnimationBlendByPosture.xaml.cs">
+      <DependentUpon>AnimationBlendByPosture.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Animation\AnimationBlendBySpeed.xaml.cs">
+      <DependentUpon>AnimationBlendBySpeed.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Animation\AnimationChildrenEditable.cs" />
+    <Compile Include="Animation\AnimationConnection.cs" />
+    <Compile Include="Animation\AnimationNodeRandom.xaml.cs">
+      <DependentUpon>AnimationNodeRandom.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Animation\AnimationOverride.xaml.cs">
+      <DependentUpon>AnimationOverride.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Animation\AnimationSequence.xaml.cs">
+      <DependentUpon>AnimationSequence.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Animation\AnimationNode.cs" />
+    <Compile Include="Animation\AnimationSwitchByIndex.xaml.cs">
+      <DependentUpon>AnimationSwitchByIndex.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Animation\AnimationTree.cs" />
+    <Compile Include="Animation\AnimationTreeCanvas.cs" />
+    <Compile Include="Animation\AnimationTreeProfile.cs" />
+    <Compile Include="Animation\AnimationTreeProfileEditor.xaml.cs">
+      <DependentUpon>AnimationTreeProfileEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Animation\AnimationTreeRoot.xaml.cs">
+      <DependentUpon>AnimationTreeRoot.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Animation\AnimConnectorsEditor.xaml.cs">
+      <DependentUpon>AnimConnectorsEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Animation\FloatCollectionEditor.xaml.cs">
+      <DependentUpon>FloatCollectionEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Animation\EditProfilesButton.xaml.cs">
+      <DependentUpon>EditProfilesButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CG\AnimationTreeClass.cs" />
+    <Compile Include="CG\BehaviorTreeClass.cs" />
+    <Compile Include="CG\Builder.cs" />
+    <Compile Include="CG\Class.cs" />
+    <Compile Include="CG\CodeParser.cs" />
+    <Compile Include="CG\Document.cs" />
+    <Compile Include="CG\IPartialCode.cs" />
+    <Compile Include="CG\Method.cs" />
+    <Compile Include="CG\Modifiers.cs" />
+    <Compile Include="CG\Namespace.cs" />
+    <Compile Include="CG\Property.cs" />
+    <Compile Include="CG\Variable.cs" />
+    <Compile Include="Animation\AnimationTreeEditor.xaml.cs">
+      <DependentUpon>AnimationTreeEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Animation\AnimConnector.xaml.cs">
+      <DependentUpon>AnimConnector.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AI\BehaviorTreeEditor.xaml.cs">
+      <DependentUpon>BehaviorTreeEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AI\BehaviorTreeEditorViewModel.cs" />
+    <Compile Include="Controls\BoolToVisibilityConverter.cs" />
+    <Compile Include="Controls\ButtonImage.xaml.cs">
+      <DependentUpon>ButtonImage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\CompileError.cs" />
+    <Compile Include="Controls\ErrorList.xaml.cs">
+      <DependentUpon>ErrorList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ErrorTypeToVisibilityConverter.cs" />
+    <Compile Include="Controls\ProjectExplorer.xaml.cs">
+      <DependentUpon>ProjectExplorer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ProjectExplorerViewModel.cs" />
+    <Compile Include="Controls\PropertyGrid.xaml.cs">
+      <DependentUpon>PropertyGrid.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\StartPage.xaml.cs">
+      <DependentUpon>StartPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Diagram\BezierCurve.cs" />
+    <Compile Include="Diagram\Connection.cs" />
+    <Compile Include="Diagram\Connector.cs" />
+    <Compile Include="Diagram\ConnectorAdorner.cs" />
+    <Compile Include="Diagram\DiagramCanvas.cs" />
+    <Compile Include="Diagram\DragableContent.cs" />
+    <Compile Include="Diagram\DragThumb.cs" />
+    <Compile Include="Diagram\IDiagramObject.cs" />
+    <Compile Include="Diagram\ISelectable.cs" />
+    <Compile Include="Diagram\RubberbandAdorner.cs" />
+    <Compile Include="Diagram\SelectionService.cs" />
+    <Compile Include="Editor\AnimationTreeNode.cs" />
+    <Compile Include="Editor\BackupRestore.cs" />
+    <Compile Include="Editor\BehaviorTreeNode.cs" />
+    <Compile Include="Editor\CopyObject.cs" />
+    <Compile Include="Editor\EntityNode.cs" />
+    <Compile Include="Editor\FolderNode.cs" />
+    <Compile Include="Editor\IXElement.cs" />
+    <Compile Include="Editor\NewProjectInfo.cs" />
+    <Compile Include="Editor\TabDocument.cs" />
+    <Compile Include="Editor\Project.cs" />
+    <Compile Include="Editor\UnDoRedo.cs" />
+    <Compile Include="Images.cs" />
+    <Compile Include="Editor\ProjectSettings.cs" />
+    <Compile Include="Windows\SaveDialog.xaml.cs">
+      <DependentUpon>SaveDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\RestoreWindow.xaml.cs">
+      <DependentUpon>RestoreWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Validation\ErrorsToMessageConverter.cs" />
+    <Compile Include="Validation\ValidationErrorsToStringConverter.cs" />
+    <Compile Include="Windows\NewBackupWindow.xaml.cs">
+      <DependentUpon>NewBackupWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\ProjectSettingsWindow.xaml.cs">
+      <DependentUpon>ProjectSettingsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\ProjectWizard.xaml.cs">
+      <DependentUpon>ProjectWizard.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Themes\ThemeManager.cs" />
+    <Compile Include="Editor\TreeViewItemViewModel.cs" />
+    <Compile Include="Validation\LocationValidator.cs" />
+    <Compile Include="Validation\VariableNameValidator.cs" />
+    <Page Include="AI\Resources\OrgChartTreeViewItemStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Animation\AnimationAdditiveBlending.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Animation\AnimationAimOffset.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Animation\AnimationAimOffsetProfileEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Animation\AnimationBlend4Directional.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Animation\AnimationBlendByIdle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Animation\AnimationBlendByPosture.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Animation\AnimationBlendBySpeed.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Animation\AnimationNodeRandom.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Animation\AnimationOverride.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Animation\AnimationSequence.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Animation\AnimationSwitchByIndex.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Animation\AnimationTreeEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Animation\AnimationTreeProfileEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Animation\AnimationTreeRoot.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Animation\AnimConnector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AI\BehaviorTreeEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Animation\AnimConnectorsEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Animation\FloatCollectionEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Animation\EditProfilesButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Animation\Resources\AnimationShared.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ButtonImage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ErrorList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ProjectExplorer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\PropertyGrid.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\StartPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Diagram\Resources\Connection.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Diagram\Resources\DragableContent.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\SaveDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\RestoreWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\NewBackupWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Windows\MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="Windows\ProjectSettingsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\ProjectWizard.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Statics.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Default.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Default\Action.png" />
+    <Resource Include="Images\Default\AnimationTree.png" />
+    <Resource Include="Images\Default\BehaviorTree.png" />
+    <Resource Include="Images\Default\Build.png" />
+    <Resource Include="Images\Default\CheckForErrors.png" />
+    <Resource Include="Images\Default\Concurrent.png" />
+    <Resource Include="Images\Default\Condition.png" />
+    <Resource Include="Images\Default\Copy.png" />
+    <Resource Include="Images\Default\Cut.png" />
+    <Resource Include="Images\Default\Decorator.png" />
+    <Resource Include="Images\Default\Delete.png" />
+    <Resource Include="Images\Default\Down.png" />
+    <Resource Include="Images\Default\Edit_Redo.png" />
+    <Resource Include="Images\Default\Edit_Undo.png" />
+    <Resource Include="Images\Default\Folder_Closed.png" />
+    <Resource Include="Images\Default\Folder_Open.png" />
+    <Resource Include="Images\Default\Help.png" />
+    <Resource Include="Images\Default\Loop.png" />
+    <Resource Include="Images\Default\New.png" />
+    <Resource Include="Images\Default\NewProject.png" />
+    <Resource Include="Images\Default\OpenProject.png" />
+    <Resource Include="Images\Default\Paste.png" />
+    <Resource Include="Images\Default\Play.png" />
+    <Resource Include="Images\Default\Priority.png" />
+    <Resource Include="Images\Default\Project.png" />
+    <Resource Include="Images\Default\Properties.png" />
+    <Resource Include="Images\Default\Random.png" />
+    <Resource Include="Images\Default\Save.png" />
+    <Resource Include="Images\Default\SaveAll.png" />
+    <Resource Include="Images\Default\Composite.png" />
+    <Resource Include="Images\Default\Sequence.png" />
+    <Resource Include="Images\Default\Settings.png" />
+    <Resource Include="Images\Default\Up.png" />
+    <Resource Include="ToDo.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Default\Disabled\Action.png" />
+    <Resource Include="Images\Default\Disabled\AnimationTree.png" />
+    <Resource Include="Images\Default\Disabled\BehaviorTree.png" />
+    <Resource Include="Images\Default\Disabled\Build.png" />
+    <Resource Include="Images\Default\Disabled\CheckForErrors.png" />
+    <Resource Include="Images\Default\Disabled\Concurrent.png" />
+    <Resource Include="Images\Default\Disabled\Condition.png" />
+    <Resource Include="Images\Default\Disabled\Copy.png" />
+    <Resource Include="Images\Default\Disabled\Cut.png" />
+    <Resource Include="Images\Default\Disabled\Decorator.png" />
+    <Resource Include="Images\Default\Disabled\Delete.png" />
+    <Resource Include="Images\Default\Disabled\Down.png" />
+    <Resource Include="Images\Default\Disabled\Edit_Redo.png" />
+    <Resource Include="Images\Default\Disabled\Edit_Undo.png" />
+    <Resource Include="Images\Default\Disabled\Folder_Closed.png" />
+    <Resource Include="Images\Default\Disabled\Folder_Open.png" />
+    <Resource Include="Images\Default\Disabled\Help.png" />
+    <Resource Include="Images\Default\Disabled\Loop.png" />
+    <Resource Include="Images\Default\Disabled\New.png" />
+    <Resource Include="Images\Default\Disabled\NewProject.png" />
+    <Resource Include="Images\Default\Disabled\OpenProject.png" />
+    <Resource Include="Images\Default\Disabled\Paste.png" />
+    <Resource Include="Images\Default\Disabled\Play.png" />
+    <Resource Include="Images\Default\Disabled\Priority.png" />
+    <Resource Include="Images\Default\Disabled\Project.png" />
+    <Resource Include="Images\Default\Disabled\Properties.png" />
+    <Resource Include="Images\Default\Disabled\Random.png" />
+    <Resource Include="Images\Default\Disabled\Save.png" />
+    <Resource Include="Images\Default\Disabled\SaveAll.png" />
+    <Resource Include="Images\Default\Disabled\Composite.png" />
+    <Resource Include="Images\Default\Disabled\Sequence.png" />
+    <Resource Include="Images\Default\Disabled\Settings.png" />
+    <Resource Include="Images\Default\Disabled\Up.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Default\EditInfo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Default\Checkbox.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Animation\AnimSequence.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Animation\4Dir.png" />
+    <Resource Include="Images\Animation\Blank.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Animation\Override.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Animation\Posture.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Animation\Idle.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Animation\Aim.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Animation\Additive.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Animation\Root.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Animation\Speed.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\zoom-in.cur" />
+  </ItemGroup>
+  <ItemGroup>
+    <SplashScreen Include="Images\Splash.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Default\backup.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Default\BringForward.png" />
+    <Resource Include="Images\Default\BringToFront.png" />
+    <Resource Include="Images\Default\SendBackward.png" />
+    <Resource Include="Images\Default\SendToBack.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Default\Disabled\BringForward.png" />
+    <Resource Include="Images\Default\Disabled\BringToFront.png" />
+    <Resource Include="Images\Default\Disabled\SendBackward.png" />
+    <Resource Include="Images\Default\Disabled\SendToBack.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Default\Restore.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Default\CSharp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Default\ErrorList.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Default\Error.png" />
+    <Resource Include="Images\Default\Info.png" />
+    <Resource Include="Images\Default\Warning.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Skill.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Controls\Resources\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\StartBg.png" />
+    <Resource Include="Images\StartLogo.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

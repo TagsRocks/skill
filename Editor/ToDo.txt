@@ -1,0 +1,4 @@
+﻿1- implement AccessLimit and TimeLimit decorators
+2- Add EventNode in BehaviorTree
+3- Copy And Paste in AnimationTree has problem
+4- specyfy default value for each properties

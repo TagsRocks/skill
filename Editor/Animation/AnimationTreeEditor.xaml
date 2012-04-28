@@ -1,0 +1,51 @@
+﻿<edit:TabDocument x:Class="Skill.Editor.Animation.AnimationTreeEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" 
+             xmlns:edit="clr-namespace:Skill.Editor"
+             xmlns:diag="clr-namespace:Skill.Editor.Diagram"
+             xmlns:ctr="clr-namespace:Skill.Editor.Controls"
+             xmlns:anim="clr-namespace:Skill.Editor.Animation"
+             d:DesignHeight="473" d:DesignWidth="977" x:Name="ThisEditor" >    
+    <Grid>
+        <ScrollViewer Name="DesignerScrollViewer"
+                                  HorizontalScrollBarVisibility="Visible"
+                                  VerticalScrollBarVisibility="Visible">
+            <anim:AnimationTreeCanvas x:Name="_Canvas" ScrollViewer="{Binding ElementName=DesignerScrollViewer}" Background="LightGray" 
+                                     PreviewMouseRightButtonDown="Canvas_PreviewMouseRightButtonDown" Editor="{Binding ElementName=ThisEditor}" >
+                <anim:AnimationTreeCanvas.ContextMenu >
+                    <ContextMenu >
+                        <MenuItem Header="Sequences" >
+                            <MenuItem Header="AnimationSequence" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimationNodeType.Sequence}" />
+                        </MenuItem>
+                        <MenuItem Header="BlendBy" >
+                            <MenuItem Header="AnimationBlendBySpeed" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimationNodeType.BlendBySpeed}" />
+                            <MenuItem Header="AnimationBlendByPosture" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimationNodeType.BlendByPosture}" />
+                            <MenuItem Header="AnimationBlendByIdle" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimationNodeType.BlendByIdle}" />
+                            <MenuItem Header="AnimationSwitchByIndex" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimationNodeType.SwitchByIndex}" />
+                        </MenuItem>
+                        <MenuItem Header="Directional" >
+                            <MenuItem Header="AnimationBlend4Directional" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimationNodeType.Blend4Directional}" />
+                        </MenuItem>
+                        <MenuItem Header="Random" >
+                            <MenuItem Header="AnimationNodeRandom" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimationNodeType.Random}" />
+                        </MenuItem>
+                        <MenuItem Header="Additive" >
+                            <MenuItem Header="AnimationAdditiveBlending" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimationNodeType.AdditiveBlending}" />
+                        </MenuItem>
+                        <MenuItem Header="Other" >
+                            <MenuItem Header="AnimationOverride" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimationNodeType.Override}" />
+                            <MenuItem Header="AnimationAimOffset" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimationNodeType.AimOffset}" />
+                        </MenuItem>
+                        <Separator/>
+                        <MenuItem Header="Paste" Command="ApplicationCommands.Paste" />
+                    </ContextMenu>
+                </anim:AnimationTreeCanvas.ContextMenu>
+            </anim:AnimationTreeCanvas>
+        </ScrollViewer>
+        <Slider Height="100" HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Vertical"  Margin="1,20" Minimum="{Binding ElementName=_Canvas,Path=MinScale,Mode=OneTime}"
+               Maximum="{Binding ElementName=_Canvas,Path=MaxScale,Mode=OneTime}" Value="{Binding ElementName=_Canvas,Path=Scale,Mode=TwoWay}" />
+    </Grid>
+</edit:TabDocument>
