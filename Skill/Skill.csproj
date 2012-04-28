@@ -94,7 +94,10 @@
     <Compile Include="Managers\CacheSpawner.cs" />
     <Compile Include="Modules\DelayRender.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="bin\Debug\UnityEditor.dll" />
+    <Content Include="bin\Debug\UnityEngine.dll" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
