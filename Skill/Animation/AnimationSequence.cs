@@ -7,8 +7,6 @@ namespace Skill.Animation
 {
     public class AnimationSequence : AnimationNode
     {        
-        internal TimeWatch Timer;
-        internal float IntermediateSpeed;        
         internal bool UpdatePreviousAnimation;
         internal string PreviousAnimation { get; private set; }
 
@@ -20,25 +18,35 @@ namespace Skill.Animation
 
         public string CurrentAnimation { get; private set; }
 
+        public bool UseProfile { get; set; }
+
         private void UpdateAnimation()
         {
-            PreviousAnimation = CurrentAnimation;
-
-            if (!string.IsNullOrEmpty(_Format) && !string.IsNullOrEmpty(_AnimationName))
+            if (UseProfile)
             {
-                CurrentAnimation = string.Format(_Format, _AnimationName);
+                PreviousAnimation = CurrentAnimation;
+
+                if (!string.IsNullOrEmpty(_Format) && !string.IsNullOrEmpty(_AnimationName))
+                {
+                    CurrentAnimation = string.Format(_Format, _AnimationName);
+                }
+                else if (!string.IsNullOrEmpty(_AnimationName))
+                {
+                    CurrentAnimation = _AnimationName;
+                }
+                else
+                    CurrentAnimation = "";
+
+                if (PreviousAnimation != CurrentAnimation)
+                    UpdatePreviousAnimation = true;
+                else
+                    UpdatePreviousAnimation = false;
             }
-            else if (!string.IsNullOrEmpty(_AnimationName))
+            else
             {
                 CurrentAnimation = _AnimationName;
-            }
-            else
-                CurrentAnimation = "";
-
-            if (PreviousAnimation != CurrentAnimation)
-                UpdatePreviousAnimation = true;
-            else
                 UpdatePreviousAnimation = false;
+            }
         }
 
         // Speed at which the animation will be played back.Default is 1.0
@@ -53,11 +61,12 @@ namespace Skill.Animation
 
         internal AnimationSequence()
             : this("")
-        {
+        {            
         }
         public AnimationSequence(string animationName)
             : base(0)
         {
+            UseProfile = true;
             Speed = 1;
             WrapMode = UnityEngine.WrapMode.Default;
             AnimationName = animationName;            
@@ -65,7 +74,6 @@ namespace Skill.Animation
 
         protected override void OnBecameRelevant()
         {
-            Timer.Begin(Length);
             base.OnBecameRelevant();
         }
 

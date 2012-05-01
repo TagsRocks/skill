@@ -44,11 +44,11 @@
     <Reference Include="System.Xml" />
     <Reference Include="UnityEditor, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Unity\UnityEditor.dll</HintPath>
+      <HintPath>Unity\UnityEditor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Unity\UnityEngine.dll</HintPath>
+      <HintPath>Unity\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -95,8 +95,11 @@
     <Compile Include="Modules\DelayRender.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="bin\Debug\UnityEditor.dll" />
-    <Content Include="bin\Debug\UnityEngine.dll" />
+    <Folder Include="bin\Debug\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Unity\UnityEditor.dll" />
+    <Content Include="Unity\UnityEngine.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

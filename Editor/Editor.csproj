@@ -546,19 +546,19 @@
     <Resource Include="Skill.ico" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="bin\Debug\" />
     <Folder Include="Controls\Resources\" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\Logo.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\StartBg.png" />
     <Resource Include="Images\StartLogo.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="bin\Debug\AvalonDock.dll" />
-    <Content Include="bin\Debug\AvalonDock.Themes.dll" />
-    <Content Include="bin\Debug\WPFToolkit.Extended.dll" />
+    <Content Include="Avalon\AvalonDock.dll" />
+    <Content Include="Avalon\AvalonDock.Themes.dll" />
+    <Resource Include="Images\Sp_Fill.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

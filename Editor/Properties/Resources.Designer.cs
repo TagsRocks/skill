@@ -61,7 +61,7 @@ namespace Skill.Editor.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Skill.
+        ///   Looks up a localized string similar to Skill Studio.
         /// </summary>
         internal static string AppTitle {
             get {

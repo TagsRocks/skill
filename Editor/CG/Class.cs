@@ -189,6 +189,7 @@ namespace Skill.Editor.CG
                     if (m.IsPartial)
                         m.Write(writer);
                 }
+                writer.WriteLine();
             }
             else // for now we have only one class per document so
             {
@@ -211,8 +212,7 @@ namespace Skill.Editor.CG
                         m.Write(writer);
                 }
             }
-            
-            writer.WriteLine();
+                       
             writer.WriteLine("}");
         }
     }

@@ -30,7 +30,7 @@ namespace Skill.Animation
             }
         }
 
-        public WeightChangeMode WeightChange { get; private set; }        
+        public WeightChangeMode WeightChange { get; private set; }
 
         // drived class should call it in the begin of update method
         private void CheckForWeightEvents()
@@ -88,8 +88,7 @@ namespace Skill.Animation
         public EventHandler BecameRelevant;
         protected virtual void OnBecameRelevant()
         {
-            IsJustBecameRelevant = true;
-            _ExtraUpdate = false;
+            IsJustBecameRelevant = true;            
             if (BecameRelevant != null) BecameRelevant(this, EventArgs.Empty);
         }
 
@@ -139,19 +138,13 @@ namespace Skill.Animation
             }
         }
 
-        private bool _ExtraUpdate = false;
         protected virtual bool BeginUpdate()
         {
             IsJustBecameRelevant = false;
             IsJustCeaseRelevant = false;
             CheckForWeightEvents();
             if (Weight == 0 && !IsJustCeaseRelevant)
-            {
-                if (!_ExtraUpdate)
-                    _ExtraUpdate = true;
-                else
-                    return false;
-            }                            
+                return false;
             return true;
         }
 
@@ -192,7 +185,7 @@ namespace Skill.Animation
             return new _Enumerator(_Children.GetEnumerator());
         }
 
-        protected float BlendRate { get { if (_BlendTime > 0) return UnityEngine.Time.deltaTime / _BlendTime; else return 1000; } }
+        protected float BlendRate { get { if (_BlendTime > 0) return UnityEngine.Time.deltaTime / _BlendTime; else return 1; } }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {

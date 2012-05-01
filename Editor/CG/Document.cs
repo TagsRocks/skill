@@ -148,15 +148,15 @@ namespace Skill.Editor.CG
             {
                 foreach (var us in _Usings)
                     writer.WriteLine(Using(us));
-            }
+                writer.WriteLine();
+            }            
 
-            writer.WriteLine();
             foreach (var cls in _Classes)
             {
                 cls.WritePartial(writer, oldCode);
+                writer.WriteLine();
             }
-
-            writer.WriteLine();
+            
             foreach (var ns in _Namespaces)
             {
                 ns.WritePartial(writer, oldCode);

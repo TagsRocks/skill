@@ -5,8 +5,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skill", "Skill\Skill.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editor", "Editor\Editor.csproj", "{CB9F3683-71C9-45B1-A7EC-834CE871A096}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrayscaleImageCreator", "GrayscaleImageCreator\GrayscaleImageCreator.csproj", "{7EFA088B-B2AA-4176-B55F-3BBB186C5EA6}"
-EndProject
 Global
 	GlobalSection(MercurialSourceControlSolutionProperties) = preSolution
 		SolutionIsControlled = True
@@ -41,16 +39,6 @@ Global
 		{CB9F3683-71C9-45B1-A7EC-834CE871A096}.Release|Mixed Platforms.Build.0 = Release|x86
 		{CB9F3683-71C9-45B1-A7EC-834CE871A096}.Release|x86.ActiveCfg = Release|x86
 		{CB9F3683-71C9-45B1-A7EC-834CE871A096}.Release|x86.Build.0 = Release|x86
-		{7EFA088B-B2AA-4176-B55F-3BBB186C5EA6}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{7EFA088B-B2AA-4176-B55F-3BBB186C5EA6}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{7EFA088B-B2AA-4176-B55F-3BBB186C5EA6}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{7EFA088B-B2AA-4176-B55F-3BBB186C5EA6}.Debug|x86.ActiveCfg = Debug|x86
-		{7EFA088B-B2AA-4176-B55F-3BBB186C5EA6}.Debug|x86.Build.0 = Debug|x86
-		{7EFA088B-B2AA-4176-B55F-3BBB186C5EA6}.Release|Any CPU.ActiveCfg = Release|x86
-		{7EFA088B-B2AA-4176-B55F-3BBB186C5EA6}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{7EFA088B-B2AA-4176-B55F-3BBB186C5EA6}.Release|Mixed Platforms.Build.0 = Release|x86
-		{7EFA088B-B2AA-4176-B55F-3BBB186C5EA6}.Release|x86.ActiveCfg = Release|x86
-		{7EFA088B-B2AA-4176-B55F-3BBB186C5EA6}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

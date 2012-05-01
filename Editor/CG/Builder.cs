@@ -11,6 +11,8 @@ namespace Skill.Editor.CG
         string _ProjectName;
         string _UnityDirectory;
 
+        private static char[] OldeCodeTimeChars = new char[] {' ','\'','\"','\n','\r','\t' };
+
         public Builder(string projctName, string unityDir)
         {
             this._ProjectName = projctName;
@@ -72,8 +74,8 @@ namespace Skill.Editor.CG
             // writer user file
             if (File.Exists(partialFilename))
             {
-                oldCode = File.ReadAllText(partialFilename);
-                File.Delete(partialFilename);
+                oldCode = File.ReadAllText(partialFilename).Trim(OldeCodeTimeChars);
+                File.Delete(partialFilename);                
             }
 
             file = new FileStream(partialFilename, FileMode.Create, FileAccess.Write);

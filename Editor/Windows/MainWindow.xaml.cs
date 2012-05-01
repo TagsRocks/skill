@@ -91,7 +91,10 @@ namespace Skill.Editor
         #region Constructor
         public MainWindow()
         {
-            InitializeComponent();
+            InitializeComponent();            
+#if RELEASE
+            this.WindowState = System.Windows.WindowState.Maximized;
+#endif
             Instance = this;
             ChangeTitle();
             _DocumentCloseHandler = new EventHandler<CancelEventArgs>(this.TabDocument_Closing);

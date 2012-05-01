@@ -20,11 +20,10 @@ namespace Skill.Editor.Animation
     public enum WrapMode
     {
         Default = 0,
-        Once = 1,
-        Clamp = 2,
-        Loop = 3,
+        Once = 1,        
+        Loop = 2,
         PingPong = 4,
-        ClampForever = 5,
+        ClampForever = 8,
     }
 
     public class AnimationSequence : AnimationNode
@@ -45,6 +44,8 @@ namespace Skill.Editor.Animation
 
         public string AnimationName { get; set; }
 
+        public bool UseProfile { get; set; }
+
         /// <summary> Speed at which the animation will be played back.Default is 1.0 </summary>        
         public float Speed { get; set; }
 
@@ -58,6 +59,7 @@ namespace Skill.Editor.Animation
             data.SetAttributeValue("Speed", this.Speed);
             data.SetAttributeValue("WrapMode", (int)this.WrapMode);
             data.SetAttributeValue("IsPublic", this.IsPublic);
+            data.SetAttributeValue("UseProfile", this.UseProfile);
 
             e.Add(data);
 
@@ -73,6 +75,7 @@ namespace Skill.Editor.Animation
                 this.Speed = data.GetAttributeValueAsFloat("Speed", 1);
                 this.WrapMode = (WrapMode)data.GetAttributeValueAsInt("WrapMode", (int)WrapMode.Default);
                 this.IsPublic = data.GetAttributeValueAsBoolean("IsPublic", false);
+                this.UseProfile = data.GetAttributeValueAsBoolean("UseProfile", true);
             }
             base.ReadAttributes(e);
         }
@@ -135,6 +138,23 @@ namespace Skill.Editor.Animation
                         Editor.History.Insert(new ChangePropertyUnDoRedo(this, "Speed", value, ((AnimationSequence)ViewModel.Model).Speed));
                     }
                     ((AnimationSequence)ViewModel.Model).Speed = value;
+                }
+            }
+        }
+
+        [Description("if false, do not take effect by AnimationTree profiles and always use AnimationName")]
+        public bool UseProfile
+        {
+            get { return ((AnimationSequence)ViewModel.Model).UseProfile; }
+            set
+            {
+                if (((AnimationSequence)ViewModel.Model).UseProfile != value)
+                {
+                    if (Editor != null)
+                    {
+                        Editor.History.Insert(new ChangePropertyUnDoRedo(this, "UseProfile", value, ((AnimationSequence)ViewModel.Model).UseProfile));
+                    }
+                    ((AnimationSequence)ViewModel.Model).UseProfile = value;
                 }
             }
         }

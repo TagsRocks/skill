@@ -14,7 +14,6 @@ namespace Skill.Animation
 
     public sealed class AnimationLayer
     {
-        private bool _CrossFade;
         public List<AnimationSequence> ActiveAnimations { get; private set; }
         public int LayerIndex { get; private set; }
         public LayerMode Mode { get; private set; }
@@ -59,10 +58,8 @@ namespace Skill.Animation
             }
         }
 
-
         internal void Apply(UnityEngine.Animation animationComponent)
         {
-
             foreach (var anim in ActiveAnimations)
             {
                 UnityEngine.AnimationState state = animationComponent[anim.CurrentAnimation];
@@ -73,18 +70,11 @@ namespace Skill.Animation
                     state.wrapMode = anim.WrapMode;
                     state.layer = LayerIndex;
                     state.speed = anim.Speed;
-                    if (anim.WrapMode == UnityEngine.WrapMode.Once || anim.WrapMode == UnityEngine.WrapMode.Clamp || anim.WrapMode == UnityEngine.WrapMode.ClampForever)
-                    {
-                        if (anim.IsJustBecameRelevant)
-                            state.normalizedTime = 0;
-                        if (anim.Timer.IsOver)
-                        {
-                            continue;
-                        }
-                    }
 
                     if (anim.WeightChange != WeightChangeMode.NoChange)
+                    {
                         animationComponent.Blend(anim.CurrentAnimation, anim.Weight, anim.BlendTime);
+                    }
 
                     if (anim.UpdatePreviousAnimation)
                     {
