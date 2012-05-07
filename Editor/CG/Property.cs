@@ -20,6 +20,8 @@ namespace Skill.Editor.CG
         public string Name { get; private set; }
         /// <summary> Value of property (can be name of variable or other value)</summary>
         public string Value { get; private set; }
+        /// <summary> Comment of property </summary>
+        public string Comment { get; set; }
 
         protected string _Get; // allow subclass to change get body code
         protected string _Set;// allow subclass to change set body code
@@ -43,12 +45,20 @@ namespace Skill.Editor.CG
             _Set = string.Format("{0} = value;", this.Value); // default set body code
         }
 
+
         /// <summary>
         /// Write property
         /// </summary>
         /// <param name="writer">Stream to write</param>
         public void Write(System.IO.StreamWriter writer)
         {
+            if (!string.IsNullOrEmpty(Comment))// write comment
+            {
+                writer.WriteLine("/// <summary>");
+                writer.Write("/// ");
+                writer.WriteLine(Comment);
+                writer.WriteLine("/// </summary>");
+            }
             writer.WriteLine(string.Format("{0} {1} {2} ", Modifiers.ToString().ToLower(), Type, Name));
             writer.WriteLine("{");
 

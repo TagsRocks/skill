@@ -18,7 +18,7 @@ namespace Skill.Editor.Animation
         {
             if (Selection.CurrentSelection.Count == 1)
             {
-                AnimationNodeViewModel vm = Selection.CurrentSelection[0] as AnimationNodeViewModel;
+                AnimNodeViewModel vm = Selection.CurrentSelection[0] as AnimNodeViewModel;
                 if (vm != null)
                     System.Windows.Input.ApplicationCommands.Properties.Execute(vm.Properties, null);
                 else
@@ -32,13 +32,13 @@ namespace Skill.Editor.Animation
         }
 
 
-        public AnimationNodeViewModel FindById(int id)
+        public AnimNodeViewModel FindById(int id)
         {
             foreach (var item in Children)
             {
-                if (item is AnimationNodeViewModel)
+                if (item is AnimNodeViewModel)
                 {
-                    AnimationNodeViewModel vm = (AnimationNodeViewModel)item;
+                    AnimNodeViewModel vm = (AnimNodeViewModel)item;
                     if (vm.Model.Id == id) return vm;
                 }
             }

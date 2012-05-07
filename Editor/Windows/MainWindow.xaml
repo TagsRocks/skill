@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        Height="720" Width="1280" WindowStartupLocation="CenterScreen" Icon="/SkillEditor;component/Skill.ico" Name="This" >
+        Height="720" Width="1280" WindowStartupLocation="CenterScreen" Icon="/SkillStudio;component/Skill.ico" Name="This" >
     <Window.InputBindings>
         <KeyBinding Command="{x:Static local:MainWindow.BuildCommand}" Gesture="F5"  />
         <KeyBinding Command="{x:Static local:MainWindow.CheckForErrorsCommand}" Gesture="F6" />
@@ -164,12 +164,12 @@
                 <MenuItem Header="Backup/Restore" IsEnabled="{Binding ElementName=This,Path=IsProjectLoaded}" >
                     <MenuItem Header="New Backup" Click="MnuNewBackup_Click" >
                         <MenuItem.Icon>
-                            <Image Source="/SkillEditor;component/Images/Default/backup.png" />
+                            <Image Source="/SkillStudio;component/Images/Default/backup.png" />
                         </MenuItem.Icon>
                     </MenuItem>
                     <MenuItem Header="Restore" Click="MnuRestore_Click" >
                         <MenuItem.Icon>
-                            <Image Source="/SkillEditor;component/Images/Default/restore.png" />
+                            <Image Source="/SkillStudio;component/Images/Default/restore.png" />
                         </MenuItem.Icon>
                     </MenuItem>
                 </MenuItem>

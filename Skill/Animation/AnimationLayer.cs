@@ -5,83 +5,130 @@ using System.Text;
 
 namespace Skill.Animation
 {
-    public enum LayerMode
-    {
-        CrossFade,
-        BlendAll,
-        Additive
-    }
-
+    /// <summary>
+    /// Manage animation blending of single layer
+    /// </summary>
     public sealed class AnimationLayer
     {
-        public List<AnimationSequence> ActiveAnimations { get; private set; }
+        /// <summary>
+        /// include AnimNodes with weight > 0
+        /// </summary>
+        public List<AnimNodeSequence> ActiveAnimNodes { get; private set; }
+        /// <summary>
+        /// Index of layer. (begin by 0)
+        /// </summary>
         public int LayerIndex { get; private set; }
-        public LayerMode Mode { get; private set; }
+        /// <summary>
+        /// AnimationBlendMode. (Blend or Additive)
+        /// </summary>
+        public UnityEngine.AnimationBlendMode BlendMode { get; private set; }
 
-        public AnimationLayer(int layerIndex, LayerMode mode)
+        /// <summary>
+        /// Create an instance of AnimationLayer
+        /// </summary>
+        /// <param name="layerIndex">Index of layer</param>
+        /// <param name="blendMode">AnimationBlendMode</param>
+        public AnimationLayer(int layerIndex, UnityEngine.AnimationBlendMode blendMode)
         {
-            this.Mode = mode;
+            this.BlendMode = blendMode;
             this.LayerIndex = layerIndex;
-            ActiveAnimations = new List<AnimationSequence>();
+            ActiveAnimNodes = new List<AnimNodeSequence>();
         }
 
-        public void Update()
-        {
-        }
-
-        internal void UpdateAnimation(AnimationSequence anim)
+        /// <summary>
+        /// Make sure given AnimNodeSequence will update at next update
+        /// </summary>
+        /// <param name="anim">AnimNodeSequence to update</param>
+        internal void UpdateAnimation(AnimNodeSequence anim)
         {
             AddToActiveList(anim);
         }
 
-        private void AddToActiveList(AnimationSequence anim)
+        /// <summary>
+        /// Register given AnimNodeSequence to process next update
+        /// </summary>
+        /// <param name="anim"></param>
+        private void AddToActiveList(AnimNodeSequence anim)
         {
             if (anim == null) return;
-            foreach (var item in ActiveAnimations)
+            foreach (var item in ActiveAnimNodes)
             {
                 if (item == anim) return;
             }
-            ActiveAnimations.Add(anim);
+            ActiveAnimNodes.Add(anim);
         }
 
+        /// <summary>
+        /// Remove AnimNodeSequences with weight == 0
+        /// </summary>
         internal void CleanUpActiveList()
         {
             int i = 0;
-            while (i < ActiveAnimations.Count)
+            while (i < ActiveAnimNodes.Count)
             {
-                if (ActiveAnimations[i].Weight == 0.0f)
+                if (ActiveAnimNodes[i].Weight == 0.0f)
                 {
-                    ActiveAnimations.RemoveAt(i);
+                    ActiveAnimNodes.RemoveAt(i);
                     continue;
                 }
                 i++;
             }
         }
 
+        /// <summary>
+        /// Apply changes to UnityEngine.Animation component 
+        /// </summary>
+        /// <param name="animationComponent">UnityEngine.Animation to apply changes to</param>
         internal void Apply(UnityEngine.Animation animationComponent)
         {
-            foreach (var anim in ActiveAnimations)
+            foreach (var anim in ActiveAnimNodes)// iterate throw all active AnimNodeSequences
             {
-                UnityEngine.AnimationState state = animationComponent[anim.CurrentAnimation];
+                UnityEngine.AnimationState state = animationComponent[anim.CurrentAnimation];// access state
                 if (state != null)
                 {
-                    if (Mode == LayerMode.Additive)
-                        state.blendMode = UnityEngine.AnimationBlendMode.Additive;
-                    state.wrapMode = anim.WrapMode;
-                    state.layer = LayerIndex;
-                    state.speed = anim.Speed;
+                    if ((anim.WrapMode == UnityEngine.WrapMode.Once || anim.WrapMode == UnityEngine.WrapMode.ClampForever))
+                    {
+                        if (anim.IsJustBecameRelevant)// if AnimNodeSequence is already enable and was disabled previous frame
+                            state.normalizedTime = 0;// force to start from beginning
+                        if (anim.RelevantTime.Enabled && anim.RelevantTime.IsOver)// if reach end of animation : stop it
+                        {
+                            if (anim.WrapMode == UnityEngine.WrapMode.Once)
+                                state.normalizedTime = 0; // stop at first frame
+                            else
+                                state.normalizedTime = 1; // stop at last frame
+                            state.speed = 0;// freeze animation
+                        }
+                        else // else continue
+                            state.speed = anim.Speed;
+                    }
+                    else // else continue
+                        state.speed = anim.Speed;
 
                     if (anim.WeightChange != WeightChangeMode.NoChange)
                     {
-                        animationComponent.Blend(anim.CurrentAnimation, anim.Weight, anim.BlendTime);
-                    }
+                        // set parameters
+                        state.blendMode = BlendMode;
+                        state.wrapMode = anim.WrapMode;
+                        state.layer = LayerIndex;
+                        state.weight = anim.Weight;
 
-                    if (anim.UpdatePreviousAnimation)
-                    {
-                        if (anim.PreviousAnimation != null)
-                            animationComponent.Blend(anim.PreviousAnimation, 0, anim.BlendTime);
-                        anim.UpdatePreviousAnimation = false;
+                        // disable or enable animation
+                        if (anim.Weight == 0)
+                            state.enabled = false;
+                        else
+                            state.enabled = true;
                     }
+                }
+                // if profile changed in previous frame                
+                if (anim.UpdatePreviousAnimation)
+                {
+                    if (anim.PreviousAnimation != null)
+                    {
+                        UnityEngine.AnimationState preState = animationComponent[anim.PreviousAnimation];
+                        if (preState != null)
+                            animationComponent.Blend(anim.PreviousAnimation, 0, 0.3f);
+                    }
+                    anim.UpdatePreviousAnimation = false;
                 }
             }
         }

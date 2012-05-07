@@ -11,7 +11,10 @@ namespace Skill.Editor.CG
     class BehaviorTreeClass : Class
     {
         #region Variables
-        private static string UserData = "Skill.Controllers.IController controller";
+        private static string[] BehaviorEventHandlerParams = new string[] { "Skill.AI.Behavior sender", "Skill.AI.BehaviorResult result", "Skill.AI.BehaviorTree tree" };
+        private static string[] ConditionHandlerParams = new string[] { "Skill.AI.BehaviorTree tree", "Skill.AI.BehaviorParameterCollection parameters" };
+        private static string[] DecoratorHandlerParams = ConditionHandlerParams;
+        private static string[] ActionHandlerParams = ConditionHandlerParams;
         List<AI.Behavior> _Behaviors;// list of behaviors in hierarchy
         AI.BehaviorTree _Tree;// behavior tree model 
         StringBuilder _CreateTreeMethodBody;
@@ -32,7 +35,7 @@ namespace Skill.Editor.CG
             ProcessNodes();
             AddInherit("Skill.AI.BehaviorTree");
 
-            Method constructor = new Method("", Name, "", "Skill.Controllers.IController controller");
+            Method constructor = new Method("", Name, "", "Skill.Controllers.Controller controller");
             constructor.Modifiers = Modifiers.Public;
             constructor.BaseMethod = ":base(controller)";
             Add(constructor);
@@ -138,7 +141,7 @@ namespace Skill.Editor.CG
                         CreateDecorator((AI.Decorator)b);
                         break;
                     case Skill.Editor.AI.BehaviorType.Composite:
-                        CreateSelector((AI.Composite)b);
+                        CreateComposite((AI.Composite)b);
                         break;
                 }
             }
@@ -191,7 +194,7 @@ namespace Skill.Editor.CG
         {
             if (behavior.Weight != 1)
             {
-                _CreateTreeMethodBody.AppendLine(string.Format("{0}.Weight = {1}f;", Variable.GetName(behavior.Name), behavior.Weight));
+                _CreateTreeMethodBody.AppendLine(SetProperty(behavior.Name, "Weight", behavior.Weight.ToString() + "f"));
             }
         }
 
@@ -200,22 +203,25 @@ namespace Skill.Editor.CG
             // create failure event handler and assign it to failure event
             if (behavior.FailureEvent)
             {
-                Add(new Method("void", behavior.Name + "_Failure", "", UserData) { IsPartial = true });
-                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.Failure += new BehaviorEventHandler({1});", Variable.GetName(behavior.Name), behavior.Name + "_Failure"));
+                string eventName = behavior.Name + "_Failure";
+                Add(new Method("void", eventName, "", BehaviorEventHandlerParams) { IsPartial = true });
+                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.Failure += new BehaviorEventHandler({1});", Variable.GetName(behavior.Name), eventName));
             }
 
             // create success event handler and assign it to success event
             if (behavior.SuccessEvent)
             {
-                Add(new Method("void", behavior.Name + "_Success", "", UserData) { IsPartial = true });
-                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.Success += new BehaviorEventHandler({1});", Variable.GetName(behavior.Name), behavior.Name + "_Success"));
+                string eventName = behavior.Name + "_Success";
+                Add(new Method("void", eventName, "", BehaviorEventHandlerParams) { IsPartial = true });
+                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.Success += new BehaviorEventHandler({1});", Variable.GetName(behavior.Name), eventName));
             }
 
             // create running event handler and assign it to running event
             if (behavior.RunningEvent)
             {
-                Add(new Method("void", behavior.Name + "_Running", "", UserData) { IsPartial = true });
-                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.Running += new BehaviorEventHandler({1});", Variable.GetName(behavior.Name), behavior.Name + "_Running"));
+                string eventName = behavior.Name + "_Running";
+                Add(new Method("void", eventName, "", BehaviorEventHandlerParams) { IsPartial = true });
+                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.Running += new BehaviorEventHandler({1});", Variable.GetName(behavior.Name), eventName));
             }
         }
 
@@ -228,7 +234,7 @@ namespace Skill.Editor.CG
             // set weight
             SetWeight(action);
             // create action handler method
-            Method m = new Method("Skill.AI.BehaviorResult", GetActionHandlerName(action.Name), "return Skill.AI.BehaviorResult.Failure;", UserData);
+            Method m = new Method("Skill.AI.BehaviorResult", GetActionHandlerName(action.Name), "return Skill.AI.BehaviorResult.Failure;", ActionHandlerParams);
             m.IsPartial = true;
             Add(m);
             // create events handlers (success, failure and Running)
@@ -244,7 +250,7 @@ namespace Skill.Editor.CG
             // set weight
             SetWeight(condition);
             // create condition handler method
-            Method m = new Method("bool", GetConditionHandlerName(condition.Name), "return false;", UserData);
+            Method m = new Method("bool", GetConditionHandlerName(condition.Name), "return false;", ConditionHandlerParams);
             m.IsPartial = true;
             Add(m);
             // create events handlers (success, failure and Running)
@@ -263,39 +269,39 @@ namespace Skill.Editor.CG
             // set weight
             SetWeight(decorator);
             // create decorator handler method
-            Method m = new Method("bool", GetDecoratorHandlerName(decorator.Name), "return false;", UserData);
+            Method m = new Method("bool", GetDecoratorHandlerName(decorator.Name), "return false;", DecoratorHandlerParams);
             m.IsPartial = true;
             Add(m);
             // create events handlers (success, failure and Running)
             CreateEvents(decorator);
         }
 
-        private void CreateSelector(AI.Composite selector)
+        private void CreateComposite(AI.Composite composite)
         {
-            switch (selector.CompositeType)
+            switch (composite.CompositeType)
             {
                 case Skill.Editor.AI.CompositeType.Sequence:
-                    CreateSequenceSelector((AI.SequenceSelector)selector);
+                    CreateSequenceSelector((AI.SequenceSelector)composite);
                     break;
                 case Skill.Editor.AI.CompositeType.Concurrent:
-                    CreateConcurrentSelector((AI.ConcurrentSelector)selector);
+                    CreateConcurrentSelector((AI.ConcurrentSelector)composite);
                     break;
                 case Skill.Editor.AI.CompositeType.Random:
-                    CreateRandomSelector((AI.RandomSelector)selector);
+                    CreateRandomSelector((AI.RandomSelector)composite);
                     break;
                 case Skill.Editor.AI.CompositeType.Priority:
-                    CreatePrioritySelector((AI.PrioritySelector)selector);
+                    CreatePrioritySelector((AI.PrioritySelector)composite);
                     break;
                 case Skill.Editor.AI.CompositeType.Loop:
-                    CreateLoopSelector((AI.LoopSelector)selector);
+                    CreateLoopSelector((AI.LoopSelector)composite);
                     break;
                 default:
                     throw new InvalidOperationException("Invalid CompositeType");
             }
             // set weight
-            SetWeight(selector);
+            SetWeight(composite);
             // create events handlers (success, failure and Running)
-            CreateEvents(selector);
+            CreateEvents(composite);
         }
 
         private void CreateSequenceSelector(AI.SequenceSelector sequenceSelector)

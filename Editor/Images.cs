@@ -11,7 +11,7 @@ namespace Skill.Editor
     /// </summary>
     public class Images 
     {        
-        public static string ImageDirectory { get { return "/SkillEditor;component/Images/Default/"; } }
+        public static string ImageDirectory { get { return "/SkillStudio;component/Images/Default/"; } }
 
 
         public static string AnimationTree { get { return Path.Combine(ImageDirectory, "AnimationTree.png"); } }

@@ -20,9 +20,9 @@ namespace Skill.Editor.Animation
 
     
 
-    public class AnimationTreeRoot : AnimationNode
+    public class AnimationTreeRoot : AnimNode
     {
-        public override AnimationNodeType NodeType { get { return AnimationNodeType.Root; } }
+        public override AnimNodeType NodeType { get { return AnimNodeType.Root; } }
 
         public AnimationTreeRoot()
             : base("AnimationTree")
@@ -32,14 +32,14 @@ namespace Skill.Editor.Animation
 
         public AnimationTreeProfile[] Profiles { get; set; }
 
-        public override AnimationNode Clone()
+        public override AnimNode Clone()
         {
             AnimationTreeRoot node = new AnimationTreeRoot();
             node.CopyFrom(this);
             return node;
         }
 
-        public override void CopyFrom(AnimationNode other)
+        public override void CopyFrom(AnimNode other)
         {
             if (other.NodeType != this.NodeType) return;
             base.CopyFrom(other);
@@ -101,7 +101,7 @@ namespace Skill.Editor.Animation
         }
     }
 
-    public class AnimationTreeRootProperties : AnimationNodeProperties
+    public class AnimationTreeRootProperties : AnimNodeProperties
     {
         public AnimationTreeRootProperties(AnimationTreeRootViewModel viewmodel)
             : base(viewmodel)
@@ -109,7 +109,7 @@ namespace Skill.Editor.Animation
 
         }
 
-        //[Description("Profiles in c# string format. contains atleast one {0} to replace with AnimationSequence AnimationName")]
+        //[Description("Profiles in c# string format. contains atleast one {0} to replace with AnimNodeSequence AnimationName")]
         //public List<string> Profiles { get { return ((AnimationTreeRoot)ViewModel.Model).Profiles; } }
 
         [Browsable(false)]
@@ -139,7 +139,7 @@ namespace Skill.Editor.Animation
     /// <summary>
     /// Interaction logic for AnimationTreeRoot.xaml
     /// </summary>
-    public partial class AnimationTreeRootViewModel : AnimationNodeViewModel
+    public partial class AnimationTreeRootViewModel : AnimNodeViewModel
     {
         private ObservableCollection<AnimationTreeProfileViewModel> _Profiles;
         public ObservableCollection<AnimationTreeProfileViewModel> Profiles { get { return _Profiles; } }

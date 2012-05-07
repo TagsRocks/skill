@@ -14,9 +14,9 @@
         </Grid.RowDefinitions>
         <Grid>
             <Grid>
-                <Image Source="/SkillEditor;component/Images/Sp_Fill.png" Stretch="Fill" />
+                <Image Source="/SkillStudio;component/Images/Sp_Fill.png" Stretch="Fill" />
             </Grid>
-            <Image Source="/SkillEditor;component/Images/StartLogo.png" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0" Height="62" />
+            <Image Source="/SkillStudio;component/Images/StartLogo.png" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0" Height="62" />
         </Grid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>

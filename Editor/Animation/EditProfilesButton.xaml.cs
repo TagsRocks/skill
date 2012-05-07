@@ -21,7 +21,7 @@ namespace Skill.Editor.Animation
     /// </summary>
     public partial class EditProfilesButton : UserControl, ITypeEditor
     {
-        private AnimationNodeProperties _Properties = null;
+        private AnimNodeProperties _Properties = null;
 
         public EditProfilesButton()
         {
@@ -32,12 +32,12 @@ namespace Skill.Editor.Animation
         {
             if (this._Properties == null) return;
 
-            if (this._Properties is Skill.Editor.Animation.AnimationAimOffsetProperties)
+            if (this._Properties is Skill.Editor.Animation.AnimNodeAimOffsetProperties)
             {
-                Skill.Editor.Animation.AnimationAimOffsetProperties properties = this._Properties as Skill.Editor.Animation.AnimationAimOffsetProperties;
+                Skill.Editor.Animation.AnimNodeAimOffsetProperties properties = this._Properties as Skill.Editor.Animation.AnimNodeAimOffsetProperties;
                 if (properties != null)
                 {
-                    AnimationAimOffsetProfileEditor editor = new AnimationAimOffsetProfileEditor(properties.Profiles);
+                    AnimNodeAimOffsetProfileEditor editor = new AnimNodeAimOffsetProfileEditor(properties.Profiles);
                     editor.ShowDialog();
                     this._Properties.Editor.SetChanged(true);
                 }
@@ -56,9 +56,9 @@ namespace Skill.Editor.Animation
 
         public FrameworkElement ResolveEditor(Xceed.Wpf.Toolkit.PropertyGrid.PropertyItem propertyItem)
         {
-            if (propertyItem.Instance is Skill.Editor.Animation.AnimationNodeProperties)
+            if (propertyItem.Instance is Skill.Editor.Animation.AnimNodeProperties)
             {
-                this._Properties = propertyItem.Instance as Skill.Editor.Animation.AnimationNodeProperties;
+                this._Properties = propertyItem.Instance as Skill.Editor.Animation.AnimNodeProperties;
             }
             return this;
         }

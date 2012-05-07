@@ -14,27 +14,22 @@ namespace Skill.Editor
     public class ProjectSettings : IXElement
     {
         /// <summary> Location in unity project to generate code files </summary>
-        public string UnityProjectLocaltion { get; set; }
-        /// <summary> Postfix of user code file </summary>
-        public string UserCodePostfix { get; set; }
+        public string UnityProjectLocaltion { get; set; }        
 
         public ProjectSettings()
         {
-            this.UnityProjectLocaltion = "c:\\Unity\\Assets\\Skill";
-            this.UserCodePostfix = "_User";
+            this.UnityProjectLocaltion = "c:\\Unity\\Assets\\Skill";            
         }
 
         public void Load(XElement e)
         {
-            UnityProjectLocaltion = e.Attribute("UnityProjectLocaltion").Value;
-            UserCodePostfix = e.Attribute("UserCodePostfix").Value;
+            UnityProjectLocaltion = e.Attribute("UnityProjectLocaltion").Value;            
         }
 
         public XElement ToXElement()
         {
             XElement settings = new XElement("Settings");
-            settings.SetAttributeValue("UnityProjectLocaltion", UnityProjectLocaltion);
-            settings.SetAttributeValue("UserCodePostfix", UserCodePostfix);
+            settings.SetAttributeValue("UnityProjectLocaltion", UnityProjectLocaltion);            
             return settings;
         }
     }
@@ -84,25 +79,10 @@ namespace Skill.Editor
                     this.OnPropertyChanged(new PropertyChangedEventArgs("UnityProjectLocaltion"));
                 }
             }
-        }
-
-        public string UserCodePostfix
-        {
-            get { return Model.UserCodePostfix; }
-            set
-            {
-                if (value != Model.UserCodePostfix && !string.IsNullOrEmpty(value))
-                {
-                    Model.UserCodePostfix = value;
-                    this.OnPropertyChanged(new PropertyChangedEventArgs("UserCodePostfix"));
-                }
-            }
-        }
-
+        }        
         public void CopyFrom(ProjectSettingsViewModel other)
         {
-            this.UnityProjectLocaltion = other.UnityProjectLocaltion;
-            this.UserCodePostfix = other.UserCodePostfix;
+            this.UnityProjectLocaltion = other.UnityProjectLocaltion;            
         }
     }
     #endregion

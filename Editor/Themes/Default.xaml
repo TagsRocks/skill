@@ -46,122 +46,122 @@
         </Style.Resources>
     </Style>
 
-    <BitmapImage x:Key="ImgNewProject" UriSource="/SkillEditor;component/Images/Default/NewProject.png" />
-    <BitmapImage x:Key="ImgNewProject_D" UriSource="/SkillEditor;component/Images/Default/Disabled/NewProject.png" />    
+    <BitmapImage x:Key="ImgNewProject" UriSource="/SkillStudio;component/Images/Default/NewProject.png" />
+    <BitmapImage x:Key="ImgNewProject_D" UriSource="/SkillStudio;component/Images/Default/Disabled/NewProject.png" />    
 
-    <BitmapImage x:Key="ImgBehaviorTree" UriSource="/SkillEditor;component/Images/Default/BehaviorTree.png" />
-    <BitmapImage x:Key="ImgBehaviorTree_D" UriSource="/SkillEditor;component/Images/Default/Disabled/BehaviorTree.png" />
+    <BitmapImage x:Key="ImgBehaviorTree" UriSource="/SkillStudio;component/Images/Default/BehaviorTree.png" />
+    <BitmapImage x:Key="ImgBehaviorTree_D" UriSource="/SkillStudio;component/Images/Default/Disabled/BehaviorTree.png" />
 
-    <BitmapImage x:Key="ImgAnimationTree" UriSource="/SkillEditor;component/Images/Default/AnimationTree.png" />
-    <BitmapImage x:Key="ImgAnimationTree_D" UriSource="/SkillEditor;component/Images/Default/Disabled/AnimationTree.png" />
+    <BitmapImage x:Key="ImgAnimationTree" UriSource="/SkillStudio;component/Images/Default/AnimationTree.png" />
+    <BitmapImage x:Key="ImgAnimationTree_D" UriSource="/SkillStudio;component/Images/Default/Disabled/AnimationTree.png" />
 
-    <BitmapImage x:Key="ImgBuild" UriSource="/SkillEditor;component/Images/Default/Build.png" />
-    <BitmapImage x:Key="ImgBuild_D" UriSource="/SkillEditor;component/Images/Default/Disabled/Build.png" />
+    <BitmapImage x:Key="ImgBuild" UriSource="/SkillStudio;component/Images/Default/Build.png" />
+    <BitmapImage x:Key="ImgBuild_D" UriSource="/SkillStudio;component/Images/Default/Disabled/Build.png" />
 
-    <BitmapImage x:Key="ImgCheckForErrors" UriSource="/SkillEditor;component/Images/Default/CheckForErrors.png" />
-    <BitmapImage x:Key="ImgCheckForErrors_D" UriSource="/SkillEditor;component/Images/Default/Disabled/CheckForErrors.png" />
+    <BitmapImage x:Key="ImgCheckForErrors" UriSource="/SkillStudio;component/Images/Default/CheckForErrors.png" />
+    <BitmapImage x:Key="ImgCheckForErrors_D" UriSource="/SkillStudio;component/Images/Default/Disabled/CheckForErrors.png" />
 
-    <BitmapImage x:Key="ImgConcurrent"   UriSource="/SkillEditor;component/Images/Default/Concurrent.png" />
-    <BitmapImage x:Key="ImgConcurrent_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/Concurrent.png" />
+    <BitmapImage x:Key="ImgConcurrent"   UriSource="/SkillStudio;component/Images/Default/Concurrent.png" />
+    <BitmapImage x:Key="ImgConcurrent_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Concurrent.png" />
 
-    <BitmapImage x:Key="ImgCondition"   UriSource="/SkillEditor;component/Images/Default/Condition.png" />
-    <BitmapImage x:Key="ImgCondition_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/Condition.png" />
+    <BitmapImage x:Key="ImgCondition"   UriSource="/SkillStudio;component/Images/Default/Condition.png" />
+    <BitmapImage x:Key="ImgCondition_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Condition.png" />
 
-    <BitmapImage x:Key="ImgCopy"   UriSource="/SkillEditor;component/Images/Default/Copy.png" />
-    <BitmapImage x:Key="ImgCopy_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/Copy.png" />
+    <BitmapImage x:Key="ImgCopy"   UriSource="/SkillStudio;component/Images/Default/Copy.png" />
+    <BitmapImage x:Key="ImgCopy_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Copy.png" />
 
-    <BitmapImage x:Key="ImgCut"   UriSource="/SkillEditor;component/Images/Default/Cut.png" />
-    <BitmapImage x:Key="ImgCut_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/Cut.png" />
+    <BitmapImage x:Key="ImgCut"   UriSource="/SkillStudio;component/Images/Default/Cut.png" />
+    <BitmapImage x:Key="ImgCut_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Cut.png" />
 
-    <BitmapImage x:Key="ImgAction"  UriSource="/SkillEditor;component/Images/Default/Action.png" />
-    <BitmapImage x:Key="ImgAction_D"  UriSource="/SkillEditor;component/Images/Default/Disabled/Action.png" />
+    <BitmapImage x:Key="ImgAction"  UriSource="/SkillStudio;component/Images/Default/Action.png" />
+    <BitmapImage x:Key="ImgAction_D"  UriSource="/SkillStudio;component/Images/Default/Disabled/Action.png" />
 
-    <BitmapImage x:Key="ImgDecorator"   UriSource="/SkillEditor;component/Images/Default/Decorator.png" />
-    <BitmapImage x:Key="ImgDecorator_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/Decorator.png" />
+    <BitmapImage x:Key="ImgDecorator"   UriSource="/SkillStudio;component/Images/Default/Decorator.png" />
+    <BitmapImage x:Key="ImgDecorator_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Decorator.png" />
 
-    <BitmapImage x:Key="ImgDelete"   UriSource="/SkillEditor;component/Images/Default/Delete.png" />
-    <BitmapImage x:Key="ImgDelete_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/Delete.png" />
+    <BitmapImage x:Key="ImgDelete"   UriSource="/SkillStudio;component/Images/Default/Delete.png" />
+    <BitmapImage x:Key="ImgDelete_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Delete.png" />
 
-    <BitmapImage x:Key="ImgDown"  UriSource="/SkillEditor;component/Images/Default/Down.png" />
-    <BitmapImage x:Key="ImgDown_D"  UriSource="/SkillEditor;component/Images/Default/Disabled/Down.png" />
+    <BitmapImage x:Key="ImgDown"  UriSource="/SkillStudio;component/Images/Default/Down.png" />
+    <BitmapImage x:Key="ImgDown_D"  UriSource="/SkillStudio;component/Images/Default/Disabled/Down.png" />
 
-    <BitmapImage x:Key="ImgFolderClosed"   UriSource="/SkillEditor;component/Images/Default/Folder_Closed.png" />
-    <BitmapImage x:Key="ImgFolderClosed_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/Folder_Closed.png" />
+    <BitmapImage x:Key="ImgFolderClosed"   UriSource="/SkillStudio;component/Images/Default/Folder_Closed.png" />
+    <BitmapImage x:Key="ImgFolderClosed_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Folder_Closed.png" />
 
-    <BitmapImage x:Key="ImgFolderOpen"   UriSource="/SkillEditor;component/Images/Default/Folder_Open.png" />
-    <BitmapImage x:Key="ImgFolderOpen_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/Folder_Open.png" />
+    <BitmapImage x:Key="ImgFolderOpen"   UriSource="/SkillStudio;component/Images/Default/Folder_Open.png" />
+    <BitmapImage x:Key="ImgFolderOpen_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Folder_Open.png" />
 
-    <BitmapImage x:Key="ImgLoop"   UriSource="/SkillEditor;component/Images/Default/Loop.png" />
-    <BitmapImage x:Key="ImgLoop_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/Loop.png" />
+    <BitmapImage x:Key="ImgLoop"   UriSource="/SkillStudio;component/Images/Default/Loop.png" />
+    <BitmapImage x:Key="ImgLoop_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Loop.png" />
 
-    <BitmapImage x:Key="ImgNew"  UriSource="/SkillEditor;component/Images/Default/New.png" />
-    <BitmapImage x:Key="ImgNew_D"  UriSource="/SkillEditor;component/Images/Default/Disabled/New.png" />
+    <BitmapImage x:Key="ImgNew"  UriSource="/SkillStudio;component/Images/Default/New.png" />
+    <BitmapImage x:Key="ImgNew_D"  UriSource="/SkillStudio;component/Images/Default/Disabled/New.png" />
 
-    <BitmapImage x:Key="ImgOpenProject"   UriSource="/SkillEditor;component/Images/Default/OpenProject.png" />
-    <BitmapImage x:Key="ImgOpenProject_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/OpenProject.png" />
+    <BitmapImage x:Key="ImgOpenProject"   UriSource="/SkillStudio;component/Images/Default/OpenProject.png" />
+    <BitmapImage x:Key="ImgOpenProject_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/OpenProject.png" />
 
-    <BitmapImage x:Key="ImgPaste"  UriSource="/SkillEditor;component/Images/Default/Paste.png" />
-    <BitmapImage x:Key="ImgPaste_D"  UriSource="/SkillEditor;component/Images/Default/Disabled/Paste.png" />
+    <BitmapImage x:Key="ImgPaste"  UriSource="/SkillStudio;component/Images/Default/Paste.png" />
+    <BitmapImage x:Key="ImgPaste_D"  UriSource="/SkillStudio;component/Images/Default/Disabled/Paste.png" />
 
-    <BitmapImage x:Key="ImgPlay"   UriSource="/SkillEditor;component/Images/Default/Play.png" />
-    <BitmapImage x:Key="ImgPlay_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/Play.png" />
+    <BitmapImage x:Key="ImgPlay"   UriSource="/SkillStudio;component/Images/Default/Play.png" />
+    <BitmapImage x:Key="ImgPlay_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Play.png" />
 
-    <BitmapImage x:Key="ImgPriority"   UriSource="/SkillEditor;component/Images/Default/Priority.png" />
-    <BitmapImage x:Key="ImgPriority_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/Priority.png" />
+    <BitmapImage x:Key="ImgPriority"   UriSource="/SkillStudio;component/Images/Default/Priority.png" />
+    <BitmapImage x:Key="ImgPriority_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Priority.png" />
 
-    <BitmapImage x:Key="ImgProject"   UriSource="/SkillEditor;component/Images/Default/Project.png" />
-    <BitmapImage x:Key="ImgProject_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/Project.png" />
+    <BitmapImage x:Key="ImgProject"   UriSource="/SkillStudio;component/Images/Default/Project.png" />
+    <BitmapImage x:Key="ImgProject_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Project.png" />
 
-    <BitmapImage x:Key="ImgProperties"   UriSource="/SkillEditor;component/Images/Default/Properties.png" />
-    <BitmapImage x:Key="ImgProperties_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/Properties.png" />
+    <BitmapImage x:Key="ImgProperties"   UriSource="/SkillStudio;component/Images/Default/Properties.png" />
+    <BitmapImage x:Key="ImgProperties_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Properties.png" />
 
-    <BitmapImage x:Key="ImgRandom"   UriSource="/SkillEditor;component/Images/Default/Random.png" />
-    <BitmapImage x:Key="ImgRandom_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/Random.png" />
+    <BitmapImage x:Key="ImgRandom"   UriSource="/SkillStudio;component/Images/Default/Random.png" />
+    <BitmapImage x:Key="ImgRandom_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Random.png" />
 
-    <BitmapImage x:Key="ImgSave"   UriSource="/SkillEditor;component/Images/Default/Save.png" />
-    <BitmapImage x:Key="ImgSave_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/Save.png" />    
+    <BitmapImage x:Key="ImgSave"   UriSource="/SkillStudio;component/Images/Default/Save.png" />
+    <BitmapImage x:Key="ImgSave_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Save.png" />    
 
-    <BitmapImage x:Key="ImgSaveAll"   UriSource="/SkillEditor;component/Images/Default/SaveAll.png" />
-    <BitmapImage x:Key="ImgSaveAll_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/SaveAll.png" />
+    <BitmapImage x:Key="ImgSaveAll"   UriSource="/SkillStudio;component/Images/Default/SaveAll.png" />
+    <BitmapImage x:Key="ImgSaveAll_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/SaveAll.png" />
 
-    <BitmapImage x:Key="ImgComposite"   UriSource="/SkillEditor;component/Images/Default/Composite.png" />
-    <BitmapImage x:Key="ImgComposite_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/Composite.png" />
+    <BitmapImage x:Key="ImgComposite"   UriSource="/SkillStudio;component/Images/Default/Composite.png" />
+    <BitmapImage x:Key="ImgComposite_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Composite.png" />
 
-    <BitmapImage x:Key="ImgSequence"  UriSource="/SkillEditor;component/Images/Default/Sequence.png" />
-    <BitmapImage x:Key="ImgSequence_D"  UriSource="/SkillEditor;component/Images/Default/Disabled/Sequence.png" />
+    <BitmapImage x:Key="ImgSequence"  UriSource="/SkillStudio;component/Images/Default/Sequence.png" />
+    <BitmapImage x:Key="ImgSequence_D"  UriSource="/SkillStudio;component/Images/Default/Disabled/Sequence.png" />
 
-    <BitmapImage x:Key="ImgUp"   UriSource="/SkillEditor;component/Images/Default/Up.png" />
-    <BitmapImage x:Key="ImgUp_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/Up.png" />
+    <BitmapImage x:Key="ImgUp"   UriSource="/SkillStudio;component/Images/Default/Up.png" />
+    <BitmapImage x:Key="ImgUp_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Up.png" />
 
-    <BitmapImage x:Key="ImgEditUndo"   UriSource="/SkillEditor;component/Images/Default/Edit_Undo.png" />
-    <BitmapImage x:Key="ImgEditUndo_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/Edit_Undo.png" />
+    <BitmapImage x:Key="ImgEditUndo"   UriSource="/SkillStudio;component/Images/Default/Edit_Undo.png" />
+    <BitmapImage x:Key="ImgEditUndo_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Edit_Undo.png" />
 
-    <BitmapImage x:Key="ImgEditRedo"   UriSource="/SkillEditor;component/Images/Default/Edit_Redo.png" />
-    <BitmapImage x:Key="ImgEditRedo_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/Edit_Redo.png" />
+    <BitmapImage x:Key="ImgEditRedo"   UriSource="/SkillStudio;component/Images/Default/Edit_Redo.png" />
+    <BitmapImage x:Key="ImgEditRedo_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Edit_Redo.png" />
 
-    <BitmapImage x:Key="ImgSettings"   UriSource="/SkillEditor;component/Images/Default/Settings.png" />
-    <BitmapImage x:Key="ImgSettings_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/Settings.png" />
+    <BitmapImage x:Key="ImgSettings"   UriSource="/SkillStudio;component/Images/Default/Settings.png" />
+    <BitmapImage x:Key="ImgSettings_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Settings.png" />
 
-    <BitmapImage x:Key="ImgHelp"   UriSource="/SkillEditor;component/Images/Default/Help.png" />
-    <BitmapImage x:Key="ImgHelp_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/Help.png" />
+    <BitmapImage x:Key="ImgHelp"   UriSource="/SkillStudio;component/Images/Default/Help.png" />
+    <BitmapImage x:Key="ImgHelp_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Help.png" />
 
-    <BitmapImage x:Key="ImgBringForward"   UriSource="/SkillEditor;component/Images/Default/BringForward.png" />
-    <BitmapImage x:Key="ImgBringForward_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/BringForward.png" />
+    <BitmapImage x:Key="ImgBringForward"   UriSource="/SkillStudio;component/Images/Default/BringForward.png" />
+    <BitmapImage x:Key="ImgBringForward_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/BringForward.png" />
     
-    <BitmapImage x:Key="ImgBringToFront"   UriSource="/SkillEditor;component/Images/Default/BringToFront.png" />
-    <BitmapImage x:Key="ImgBringToFront_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/BringToFront.png" />
+    <BitmapImage x:Key="ImgBringToFront"   UriSource="/SkillStudio;component/Images/Default/BringToFront.png" />
+    <BitmapImage x:Key="ImgBringToFront_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/BringToFront.png" />
     
-    <BitmapImage x:Key="ImgSendBackward"   UriSource="/SkillEditor;component/Images/Default/SendBackward.png" />
-    <BitmapImage x:Key="ImgSendBackward_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/SendBackward.png" />
+    <BitmapImage x:Key="ImgSendBackward"   UriSource="/SkillStudio;component/Images/Default/SendBackward.png" />
+    <BitmapImage x:Key="ImgSendBackward_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/SendBackward.png" />
     
-    <BitmapImage x:Key="ImgSendToBack"   UriSource="/SkillEditor;component/Images/Default/SendToBack.png" />
-    <BitmapImage x:Key="ImgSendToBack_D"   UriSource="/SkillEditor;component/Images/Default/Disabled/SendToBack.png" />
+    <BitmapImage x:Key="ImgSendToBack"   UriSource="/SkillStudio;component/Images/Default/SendToBack.png" />
+    <BitmapImage x:Key="ImgSendToBack_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/SendToBack.png" />
 
-    <BitmapImage x:Key="ImgEditInfo"   UriSource="/SkillEditor;component/Images/Default/EditInfo.png" />
+    <BitmapImage x:Key="ImgEditInfo"   UriSource="/SkillStudio;component/Images/Default/EditInfo.png" />
 
-    <BitmapImage  x:Key="ImgError" UriSource="/SkillEditor;component/Images/Default/Error.png" />    
-    <BitmapImage  x:Key="ImgWarning" UriSource="/SkillEditor;component/Images/Default/Warning.png" />
-    <BitmapImage  x:Key="ImgMessage" UriSource="/SkillEditor;component/Images/Default/Info.png" />
+    <BitmapImage  x:Key="ImgError" UriSource="/SkillStudio;component/Images/Default/Error.png" />    
+    <BitmapImage  x:Key="ImgWarning" UriSource="/SkillStudio;component/Images/Default/Warning.png" />
+    <BitmapImage  x:Key="ImgMessage" UriSource="/SkillStudio;component/Images/Default/Info.png" />
 
     <Style x:Key="AnimationText" TargetType="TextBlock" >
         <Setter Property="Foreground" Value="White" />
@@ -174,7 +174,7 @@
         <Setter Property="Foreground" Value="Yellow" />
     </Style>
 
-    <Style x:Key="AnimationNodeStyle" TargetType="{x:Type diag:DragableContent}" >
+    <Style x:Key="AnimNodeStyle" TargetType="{x:Type diag:DragableContent}" >
         <Setter Property="Background" Value="#B0B0B0" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
     </Style>

@@ -20,6 +20,8 @@ namespace Skill.Editor.AI
         #endregion
 
         #region Properties
+
+        public Dictionary<string, AccessKey> AccessKeys { get; private set; }
         /// <summary> Root of tree </summary>
         public PrioritySelector Root { get; private set; }
         /// <summary> Name of tree. this name is based on filename and will set after loading from file </summary>
@@ -32,6 +34,7 @@ namespace Skill.Editor.AI
         /// </summary>
         public BehaviorTree()
         {
+            this.AccessKeys = new Dictionary<string, AccessKey>();
             this._Behaviors = new List<Behavior>();
             this.Name = "NewBehaviorTree";
             this.Root = new PrioritySelector();
@@ -121,6 +124,21 @@ namespace Skill.Editor.AI
         }
         #endregion
 
+        #region AccessKey
+        public void AddAccessKey(AccessKey key)
+        {
+            if (!string.IsNullOrEmpty(key.Key))
+            {
+                AccessKeys.Add(key.Key, key);
+            }
+        }
+        public bool RemoveAccessKey(AccessKey key)
+        {
+            return AccessKeys.Remove(key.Key);
+        }
+        #endregion
+
+
         #region Save
         int _Ids = 0;
         void GenerateIds()
@@ -156,6 +174,17 @@ namespace Skill.Editor.AI
                 nodes.Add(n);
             }
             behaviorTree.Add(nodes);
+
+            XElement accessKeys = new XElement("AccessKeys");
+            accessKeys.SetAttributeValue("Count", AccessKeys.Count);
+            foreach (var item in AccessKeys)
+            {
+                XElement n = item.Value.ToXElement();
+                accessKeys.Add(n);
+            }
+
+            behaviorTree.Add(accessKeys);
+
             return behaviorTree;
         }
 
@@ -188,7 +217,7 @@ namespace Skill.Editor.AI
 
         #region Load
 
-        private static Behavior GetBehavior(XElement behavior)
+        private static Behavior CreateBehaviorFrom(XElement behavior)
         {
             Behavior result = null;
             BehaviorType behaviorType;
@@ -203,11 +232,23 @@ namespace Skill.Editor.AI
                         result = new Condition();
                         break;
                     case BehaviorType.Decorator:
-                        result = new Decorator();
+
+                        DecoratorType decoratorType = (DecoratorType)Enum.Parse(typeof(DecoratorType), behavior.GetAttributeValueAsString("DecoratorType", DecoratorType.Default.ToString()), false);
+                        switch (decoratorType)
+                        {
+                            case DecoratorType.Default:
+                                result = new Decorator();
+                                break;
+                            case DecoratorType.AccessLimit:
+                                result = new AccessLimitDecorator();
+                                break;
+                            default:
+                                break;
+                        }
+
                         break;
                     case BehaviorType.Composite:
-
-                        CompositeType selectorType = (CompositeType)Enum.Parse(typeof(CompositeType), behavior.Attribute("CompositeType").Value);
+                        CompositeType selectorType = (CompositeType)Enum.Parse(typeof(CompositeType), behavior.GetAttributeValueAsString("CompositeType", ""), false);
                         switch (selectorType)
                         {
                             case CompositeType.Sequence:
@@ -232,21 +273,59 @@ namespace Skill.Editor.AI
             return result;
         }
 
+        private static AccessKey CreateAccessKeyFrom(XElement node)
+        {
+            AccessKey result = null;
+            AccessKeyType accessKeyType;
+            if (Enum.TryParse<AccessKeyType>(node.Name.ToString(), false, out accessKeyType))
+            {
+                switch (accessKeyType)
+                {
+                    case AccessKeyType.CountLimit:
+                        result = new CountLimitAccessKey();
+                        break;
+                    case AccessKeyType.TimeLimit:
+                        break;
+                }
+            }
+            return result;
+        }
+
         public void Load(XElement e)
         {
             var rootId = e.Attribute("RootId");
-            XElement nodes = e.Elements().First(p => p.Name == "Nodes");
-            int count = int.Parse(nodes.Attribute("Count").Value);
-            Clear();
-            foreach (var item in nodes.Elements())
+            XElement nodes = e.FindChildByName("Nodes");
+            if (nodes != null)
             {
-                Behavior b = GetBehavior(item);
-                if (b != null)
+                int count = nodes.GetAttributeValueAsInt("Count", 0);
+                Clear();
+                foreach (var item in nodes.Elements())
                 {
-                    b.Load(item);
-                    this.Add(b);
+                    Behavior b = CreateBehaviorFrom(item);
+                    if (b != null)
+                    {
+                        b.Load(item);
+                        this.Add(b);
+                    }
                 }
             }
+
+            XElement accessKeys = e.FindChildByName("AccessKeys");
+            if (accessKeys != null)
+            {
+                int count = accessKeys.GetAttributeValueAsInt("Count", 0);
+                AccessKeys.Clear();
+                foreach (var item in accessKeys.Elements())
+                {
+                    AccessKey ak = CreateAccessKeyFrom(item);
+                    if (ak != null)
+                    {
+                        ak.Load(item);
+                        AddAccessKey(ak);
+                    }
+                }
+            }
+
 
             // bind children
             if (rootId != null)

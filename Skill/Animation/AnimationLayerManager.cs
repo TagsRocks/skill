@@ -5,43 +5,53 @@ using System.Text;
 
 namespace Skill.Animation
 {
+    /// <summary>
+    /// Contains AnimationLayers of an AnimationTree
+    /// </summary>
     public class AnimationLayerManager
     {
-        private List<AnimationLayer> _Layers;
+        /// <summary>
+        /// List of AnimationLayer. (do not modify manually)
+        /// </summary>
+        public List<AnimationLayer> Layers { get; private set; }
 
-        internal List<AnimationLayer> Layers { get { return _Layers; } }
-
-        public AnimationLayer DefaultCrossFade { get; private set; }        
-
+        /// <summary>
+        /// Create an instance of AnimationLayerManager
+        /// </summary>
         public AnimationLayerManager()
         {
-            _Layers = new List<AnimationLayer>(10);
-            DefaultCrossFade = NewLayer(LayerMode.CrossFade);            
+            Layers = new List<AnimationLayer>(10);
         }
 
-        public AnimationLayer NewLayer(LayerMode mode)
+        /// <summary>
+        /// Create new layer with specified AnimationBlendMode
+        /// </summary>
+        /// <param name="blendMode">AnimationBlendMode</param>
+        /// <returns>New create and regitered AnimationLayer</returns>
+        public AnimationLayer Create(UnityEngine.AnimationBlendMode blendMode)
         {
-            AnimationLayer layer = new AnimationLayer(_Layers.Count, mode);
-            _Layers.Add(layer);
+            AnimationLayer layer = new AnimationLayer(Layers.Count, blendMode);
+            Layers.Add(layer);
             return layer;
         }
-        public AnimationLayer First(LayerMode mode)
-        {
-            for (int i = 0; i < _Layers.Count; i++)
-            {
-                var layer = _Layers[i];
-                if (layer.Mode == mode) return layer;
-            }
-            return NewLayer(mode);
-        }
-        public AnimationLayer Last(LayerMode mode)
-        {
-            for (int i = _Layers.Count - 1; i >= 0; i--)
-            {
-                var layer = _Layers[i];
-                if (layer.Mode == mode) return layer;
-            }
-            return NewLayer(mode);
-        }
+
+        //public AnimationLayer First(UnityEngine.AnimationBlendMode blendMode)
+        //{
+        //    for (int i = 0; i < Layers.Count; i++)
+        //    {
+        //        var layer = Layers[i];
+        //        if (layer.BlendMode == blendMode) return layer;
+        //    }
+        //    return Create(blendMode);
+        //}
+        //public AnimationLayer Last(UnityEngine.AnimationBlendMode blendMode)
+        //{
+        //    for (int i = Layers.Count - 1; i >= 0; i--)
+        //    {
+        //        var layer = Layers[i];
+        //        if (layer.BlendMode == blendMode) return layer;
+        //    }
+        //    return Create(blendMode);
+        //}
     }
 }

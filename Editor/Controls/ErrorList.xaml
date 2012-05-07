@@ -6,7 +6,7 @@
              xmlns:ctr="clr-namespace:Skill.Editor.Controls"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d" 
-             d:DesignHeight="132" d:DesignWidth="815" Title="Error List" Icon="/SkillEditor;component/Images/Default/ErrorList.png" >
+             d:DesignHeight="132" d:DesignWidth="815" Title="Error List" Icon="/SkillStudio;component/Images/Default/ErrorList.png" >
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="26" />

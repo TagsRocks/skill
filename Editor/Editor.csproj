@@ -9,7 +9,7 @@
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Skill.Editor</RootNamespace>
-    <AssemblyName>SkillEditor</AssemblyName>
+    <AssemblyName>SkillStudio</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -20,6 +20,21 @@
     <SccLocalPath>&lt;Local Binding Root of Project&gt;</SccLocalPath>
     <SccAuxPath>&lt;Source Control Database&gt;</SccAuxPath>
     <SccProvider>Mercurial Source Control Package</SccProvider>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -84,41 +99,41 @@
     <Compile Include="AI\Condition.cs" />
     <Compile Include="AI\Decorator.cs" />
     <Compile Include="AI\Composite.cs" />
-    <Compile Include="Animation\AnimationAdditiveBlending.xaml.cs">
-      <DependentUpon>AnimationAdditiveBlending.xaml</DependentUpon>
+    <Compile Include="Animation\AnimNodeAdditiveBlending.xaml.cs">
+      <DependentUpon>AnimNodeAdditiveBlending.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Animation\AnimationAimOffset.xaml.cs">
-      <DependentUpon>AnimationAimOffset.xaml</DependentUpon>
+    <Compile Include="Animation\AnimNodeAimOffset.xaml.cs">
+      <DependentUpon>AnimNodeAimOffset.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Animation\AnimationAimOffsetProfileEditor.xaml.cs">
-      <DependentUpon>AnimationAimOffsetProfileEditor.xaml</DependentUpon>
+    <Compile Include="Animation\AnimNodeAimOffsetProfileEditor.xaml.cs">
+      <DependentUpon>AnimNodeAimOffsetProfileEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Animation\AnimationBlend4Directional.xaml.cs">
-      <DependentUpon>AnimationBlend4Directional.xaml</DependentUpon>
+    <Compile Include="Animation\AnimNodeBlend4Directional.xaml.cs">
+      <DependentUpon>AnimNodeBlend4Directional.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Animation\AnimationBlendByIdle.xaml.cs">
-      <DependentUpon>AnimationBlendByIdle.xaml</DependentUpon>
+    <Compile Include="Animation\AnimNodeBlendByIdle.xaml.cs">
+      <DependentUpon>AnimNodeBlendByIdle.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Animation\AnimationBlendByPosture.xaml.cs">
-      <DependentUpon>AnimationBlendByPosture.xaml</DependentUpon>
+    <Compile Include="Animation\AnimNodeBlendByPosture.xaml.cs">
+      <DependentUpon>AnimNodeBlendByPosture.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Animation\AnimationBlendBySpeed.xaml.cs">
-      <DependentUpon>AnimationBlendBySpeed.xaml</DependentUpon>
+    <Compile Include="Animation\AnimNodeBlendBySpeed.xaml.cs">
+      <DependentUpon>AnimNodeBlendBySpeed.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Animation\AnimationChildrenEditable.cs" />
+    <Compile Include="Animation\AnimNodeChildrenEditable.cs" />
     <Compile Include="Animation\AnimationConnection.cs" />
-    <Compile Include="Animation\AnimationNodeRandom.xaml.cs">
-      <DependentUpon>AnimationNodeRandom.xaml</DependentUpon>
+    <Compile Include="Animation\AnimNodeRandom.xaml.cs">
+      <DependentUpon>AnimNodeRandom.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Animation\AnimationOverride.xaml.cs">
-      <DependentUpon>AnimationOverride.xaml</DependentUpon>
+    <Compile Include="Animation\AnimNodeOverride.xaml.cs">
+      <DependentUpon>AnimNodeOverride.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Animation\AnimationSequence.xaml.cs">
-      <DependentUpon>AnimationSequence.xaml</DependentUpon>
+    <Compile Include="Animation\AnimNodeSequence.xaml.cs">
+      <DependentUpon>AnimNodeSequence.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Animation\AnimationNode.cs" />
-    <Compile Include="Animation\AnimationSwitchByIndex.xaml.cs">
-      <DependentUpon>AnimationSwitchByIndex.xaml</DependentUpon>
+    <Compile Include="Animation\AnimNode.cs" />
+    <Compile Include="Animation\AnimNodeBlendByIndex.xaml.cs">
+      <DependentUpon>AnimNodeBlendByIndex.xaml</DependentUpon>
     </Compile>
     <Compile Include="Animation\AnimationTree.cs" />
     <Compile Include="Animation\AnimationTreeCanvas.cs" />
@@ -129,8 +144,8 @@
     <Compile Include="Animation\AnimationTreeRoot.xaml.cs">
       <DependentUpon>AnimationTreeRoot.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Animation\AnimConnectorsEditor.xaml.cs">
-      <DependentUpon>AnimConnectorsEditor.xaml</DependentUpon>
+    <Compile Include="Animation\AnimNodeConnectorsEditor.xaml.cs">
+      <DependentUpon>AnimNodeConnectorsEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Animation\FloatCollectionEditor.xaml.cs">
       <DependentUpon>FloatCollectionEditor.xaml</DependentUpon>
@@ -153,8 +168,8 @@
     <Compile Include="Animation\AnimationTreeEditor.xaml.cs">
       <DependentUpon>AnimationTreeEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Animation\AnimConnector.xaml.cs">
-      <DependentUpon>AnimConnector.xaml</DependentUpon>
+    <Compile Include="Animation\AnimNodeConnector.xaml.cs">
+      <DependentUpon>AnimNodeConnector.xaml</DependentUpon>
     </Compile>
     <Compile Include="AI\BehaviorTreeEditor.xaml.cs">
       <DependentUpon>BehaviorTreeEditor.xaml</DependentUpon>
@@ -228,47 +243,47 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Animation\AnimationAdditiveBlending.xaml">
+    <Page Include="Animation\AnimNodeAdditiveBlending.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Animation\AnimationAimOffset.xaml">
+    <Page Include="Animation\AnimNodeAimOffset.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Animation\AnimationAimOffsetProfileEditor.xaml">
+    <Page Include="Animation\AnimNodeAimOffsetProfileEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Animation\AnimationBlend4Directional.xaml">
+    <Page Include="Animation\AnimNodeBlend4Directional.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Animation\AnimationBlendByIdle.xaml">
+    <Page Include="Animation\AnimNodeBlendByIdle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Animation\AnimationBlendByPosture.xaml">
+    <Page Include="Animation\AnimNodeBlendByPosture.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Animation\AnimationBlendBySpeed.xaml">
+    <Page Include="Animation\AnimNodeBlendBySpeed.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Animation\AnimationNodeRandom.xaml">
+    <Page Include="Animation\AnimNodeRandom.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Animation\AnimationOverride.xaml">
+    <Page Include="Animation\AnimNodeOverride.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Animation\AnimationSequence.xaml">
+    <Page Include="Animation\AnimNodeSequence.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Animation\AnimationSwitchByIndex.xaml">
+    <Page Include="Animation\AnimNodeBlendByIndex.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -284,7 +299,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Animation\AnimConnector.xaml">
+    <Page Include="Animation\AnimNodeConnector.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -292,7 +307,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Animation\AnimConnectorsEditor.xaml">
+    <Page Include="Animation\AnimNodeConnectorsEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -546,7 +561,6 @@
     <Resource Include="Skill.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="bin\Debug\" />
     <Folder Include="Controls\Resources\" />
   </ItemGroup>
   <ItemGroup>
@@ -559,6 +573,28 @@
     <Content Include="Avalon\AvalonDock.dll" />
     <Content Include="Avalon\AvalonDock.Themes.dll" />
     <Resource Include="Images\Sp_Fill.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

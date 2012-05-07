@@ -162,7 +162,7 @@ namespace Skill.Editor.CG
         /// </summary>
         /// <param name="writer">stream</param>
         /// <param name="oldCode">old user code</param>
-        public void WritePartial(System.IO.StreamWriter writer,string oldCode)
+        public void WritePartial(System.IO.StreamWriter writer, string oldCode)
         {
             if (string.IsNullOrEmpty(oldCode))
             {
@@ -212,8 +212,14 @@ namespace Skill.Editor.CG
                         m.Write(writer);
                 }
             }
-                       
+
             writer.WriteLine("}");
         }
+
+
+        protected virtual string SetProperty(string variable, string property, object value)
+        {
+            return string.Format("this.{0}.{1} = {2};", Variable.GetName(variable), property, value);
+        }        
     }
 }

@@ -5,32 +5,64 @@ using System.Text;
 
 namespace Skill.AI
 {
+    #region PrioritySelector
+    /// <summary>
+    /// Defines behavior of PrioritySelector
+    /// </summary>
     public enum PriorityType
     {
+        /// <summary>
+        /// Continue by last running node
+        /// </summary>
         RunningNode,
-        HighestPriority,        
+        /// <summary>
+        /// Allways  begin by high priority node
+        /// </summary>
+        HighestPriority,
     }
 
+    /// <summary>
+    /// On each traversal priority selectors check which child to run in priority order until the first one succeeds or returns that it is running.
+    /// One option is to call the last still running node again during the next behavior tree update. The other option is to always restart traversal
+    /// from the highest priority child and implicitly cancel the last running child behavior if it isn’t chosen immediately again.
+    /// </summary>
     public class PrioritySelector : Composite
-    {        
+    {
+        /// <summary>
+        /// Behavior of PrioritySelector (default : RunningNode)
+        /// </summary>
         public PriorityType Priority { get; set; }
-        public override CompositeType CompositeType { get { return AI.CompositeType.Priority; } }        
 
+        /// <summary>
+        /// CompositeType
+        /// </summary>
+        public override CompositeType CompositeType { get { return AI.CompositeType.Priority; } }
+
+        /// <summary>
+        /// Create an instance of PrioritySelector
+        /// </summary>
+        /// <param name="name">Name of Behavior</param>
         public PrioritySelector(string name)
             : base(name)
         {
             Priority = PriorityType.RunningNode;
         }
 
+        /// <summary>
+        /// Behave
+        /// </summary>
+        /// <param name="state">State of BehaviorTree</param>
+        /// <returns>Result</returns>
         protected override BehaviorResult Behave(BehaviorState state)
         {
             if (Priority == PriorityType.HighestPriority || RunningChildIndex < 0)
                 RunningChildIndex = 0;
             BehaviorResult result = BehaviorResult.Failure;
-            for (int i = RunningChildIndex; i < Count; i++)
+            for (int i = RunningChildIndex; i < ChildCount; i++)
             {
-                Behavior node = this[i];
-                result = node.Trace(state);
+                BehaviorContainer node = this[i];
+                state.Parameters = node.Parameters;
+                result = node.Behavior.Trace(state);
                 if (result == BehaviorResult.Running)
                 {
                     RunningChildIndex = i;
@@ -39,11 +71,12 @@ namespace Skill.AI
                 else
                     RunningChildIndex = -1;
                 if (result == BehaviorResult.Success)
-                {                    
+                {
                     break;
                 }
             }
             return result;
         }
-    }
+    } 
+    #endregion
 }

@@ -112,7 +112,6 @@ namespace Skill.Editor
 
             this._ProjectName = MainWindow.Instance.Project.Model.Name;
             this._UnityDirectory = Path.GetFullPath(MainWindow.Instance.Project.ProjectSettingsVM.UnityProjectLocaltion);
-            this._UserCodePostfix = MainWindow.Instance.Project.ProjectSettingsVM.UserCodePostfix;
             this.BackupDirectory = Path.Combine(BackupRoot, _ProjectName);
         }
 

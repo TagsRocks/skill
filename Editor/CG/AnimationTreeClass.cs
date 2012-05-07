@@ -9,7 +9,8 @@ namespace Skill.Editor.CG
     class AnimationTreeClass : Class
     {
         #region Variables
-        List<Animation.AnimationNode> _Nodes;// list of AnimationNode in hierarchy
+        public static string[] AnimNodeEventParams = new string[] { "Skill.Animation.AnimNode sender", "Skill.Animation.AnimationTreeState state" };
+        List<Animation.AnimNode> _Nodes;// list of AnimNode in hierarchy
         private Animation.AnimationTree _Tree;// Animation tree model 
         private StringBuilder _CreateTreeMethodBody;
         #endregion
@@ -20,7 +21,7 @@ namespace Skill.Editor.CG
             : base(tree.Name)
         {
             this._Tree = tree;
-            this._Nodes = new List<Animation.AnimationNode>();
+            this._Nodes = new List<Animation.AnimNode>();
             this._CreateTreeMethodBody = new StringBuilder();
             CreateNodeList();
             ProcessNodes();
@@ -41,13 +42,12 @@ namespace Skill.Editor.CG
                 constructorBody.AppendLine("this.Profile = string.Empty;");
 
 
-            Method constructor = new Method("", Name, constructorBody.ToString(), "Skill.Controllers.IController controller");
+            Method constructor = new Method("", Name, constructorBody.ToString());
             constructor.Modifiers = Modifiers.Public;
-            constructor.BaseMethod = ":base(controller)";
 
             Add(constructor);
 
-            Method createTree = new Method("Skill.Animation.AnimationNode", "CreateTree", this._CreateTreeMethodBody.ToString());
+            Method createTree = new Method("Skill.Animation.AnimNode", "CreateTree", this._CreateTreeMethodBody.ToString());
             createTree.IsPartial = false;
             createTree.SubMethod = SubMethod.Override;
             createTree.Modifiers = Modifiers.Protected;
@@ -77,7 +77,7 @@ namespace Skill.Editor.CG
 
         #region Process
 
-        private AnimationNode Find(int id)
+        private AnimNode Find(int id)
         {
             foreach (var item in _Nodes)
             {
@@ -92,35 +92,35 @@ namespace Skill.Editor.CG
             {
                 switch (node.NodeType)
                 {
-                    case AnimationNodeType.Sequence:
-                        CreateSequence((AnimationSequence)node);
+                    case AnimNodeType.Sequence:
+                        CreateSequence((AnimNodeSequence)node);
                         break;
-                    case Skill.Editor.Animation.AnimationNodeType.Override:
-                        CreateOverride((AnimationOverride)node);
+                    case Skill.Editor.Animation.AnimNodeType.Override:
+                        CreateOverride((AnimNodeOverride)node);
                         break;
-                    case Skill.Editor.Animation.AnimationNodeType.BlendBySpeed:
-                        CreateBlendBySpeed((AnimationBlendBySpeed)node);
+                    case Skill.Editor.Animation.AnimNodeType.BlendBySpeed:
+                        CreateBlendBySpeed((AnimNodeBlendBySpeed)node);
                         break;
-                    case Skill.Editor.Animation.AnimationNodeType.BlendByPosture:
-                        CreateBlendByPosture((AnimationBlendByPosture)node);
+                    case Skill.Editor.Animation.AnimNodeType.BlendByPosture:
+                        CreateBlendByPosture((AnimNodeBlendByPosture)node);
                         break;
-                    case Skill.Editor.Animation.AnimationNodeType.BlendByIdle:
-                        CreateBlendByIdle((AnimationBlendByIdle)node);
+                    case Skill.Editor.Animation.AnimNodeType.BlendByIdle:
+                        CreateBlendByIdle((AnimNodeBlendByIdle)node);
                         break;
-                    case Skill.Editor.Animation.AnimationNodeType.Blend4Directional:
-                        CreateBlend4Directional((AnimationBlend4Directional)node);
+                    case Skill.Editor.Animation.AnimNodeType.Blend4Directional:
+                        CreateBlend4Directional((AnimNodeBlend4Directional)node);
                         break;
-                    case Skill.Editor.Animation.AnimationNodeType.AimOffset:
-                        CreateAimOffset((AnimationAimOffset)node);
+                    case Skill.Editor.Animation.AnimNodeType.AimOffset:
+                        CreateAimOffset((AnimNodeAimOffset)node);
                         break;
-                    case Skill.Editor.Animation.AnimationNodeType.AdditiveBlending:
-                        CreateAdditiveBlending((AnimationAdditiveBlending)node);
+                    case Skill.Editor.Animation.AnimNodeType.AdditiveBlending:
+                        CreateAdditiveBlending((AnimNodeAdditiveBlending)node);
                         break;
-                    case Skill.Editor.Animation.AnimationNodeType.Random:
-                        CreateRandom((AnimationNodeRandom)node);
+                    case Skill.Editor.Animation.AnimNodeType.Random:
+                        CreateRandom((AnimNodeRandom)node);
                         break;
-                    case Skill.Editor.Animation.AnimationNodeType.SwitchByIndex:
-                        CreateSwitchByIndex((AnimationSwitchByIndex)node);
+                    case Skill.Editor.Animation.AnimNodeType.BlendByIndex:
+                        CreateSwitchByIndex((AnimNodeBlendByIndex)node);
                         break;
                 }
             }
@@ -130,9 +130,9 @@ namespace Skill.Editor.CG
 
             foreach (var connection in _Tree.Connections)
             {
-                AnimationNode child = Find(connection.SourceId);
-                AnimationNode parent = Find(connection.SinkId);
-                if (child != null && parent != null && parent.NodeType != AnimationNodeType.Root)
+                AnimNode child = Find(connection.SourceId);
+                AnimNode parent = Find(connection.SinkId);
+                if (child != null && parent != null && parent.NodeType != AnimNodeType.Root)
                 {
                     _CreateTreeMethodBody.AppendLine(string.Format("this.{0}[{1}] = this.{2};", Variable.GetName(parent.Name), connection.SinkConnectorIndex, Variable.GetName(child.Name)));
                 }
@@ -142,10 +142,10 @@ namespace Skill.Editor.CG
             _CreateTreeMethodBody.AppendLine();
 
             // return root
-            AnimationNode root = null;
+            AnimNode root = null;
             foreach (var node in _Nodes)
             {
-                if (node.NodeType == AnimationNodeType.Root)
+                if (node.NodeType == AnimNodeType.Root)
                 {
                     foreach (var connection in _Tree.Connections)
                     {
@@ -165,31 +165,34 @@ namespace Skill.Editor.CG
                 _CreateTreeMethodBody.AppendLine("return null;");
         }
 
-        private void SetProperty(AnimationNode node, string pName, object pValue)
+        private void SetProperty(AnimNode node, string pName, object pValue)
         {
-            _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.{1} = {2};", Variable.GetName(node.Name), pName, pValue));
+            _CreateTreeMethodBody.AppendLine(SetProperty(node.Name, pName, pValue));
         }
 
-        private void SetSharedParameters(AnimationNode node)
+        private void SetSharedParameters(AnimNode node)
         {
             SetProperty(node, "Name", string.Format("\"{0}\"", node.Name));
-            if (node.BlendTime != 0.3f) // default is 0.3f
+            if (node.NodeType != AnimNodeType.Sequence && node.BlendTime != 0.3f) // default is 0.3f
                 SetProperty(node, "BlendTime", node.BlendTime.ToString() + "f");
             CreateEvents(node);
         }
 
-        private void CreateEvents(AnimationNode node)
+        private void CreateEvents(AnimNode node)
         {
-            // create failure event handler and assign it to failure event
+            // create BecameRelevant event handler and assign it to BecameRelevant event
             if (node.BecameRelevant)
             {
-                Add(new Method("void", node.Name + "_BecameRelevant", "", "object sender", "EventArgs e") { IsPartial = true });
-                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.BecameRelevant += new EventHandler({1});", Variable.GetName(node.Name), node.Name + "_BecameRelevant"));
+                string eventName = node.Name + "_BecameRelevant";
+                Add(new Method("void", eventName, "", AnimNodeEventParams) { IsPartial = true });
+                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.BecameRelevant += new EventHandler({1});", Variable.GetName(node.Name), eventName));
             }
+            // create CeaseRelevant event handler and assign it to CeaseRelevant event
             if (node.CeaseRelevant)
             {
-                Add(new Method("void", node.Name + "_CeaseRelevant", "", "object sender", "EventArgs e") { IsPartial = true });
-                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.CeaseRelevant += new EventHandler({1});", Variable.GetName(node.Name), node.Name + "_CeaseRelevant"));
+                string eventName = node.Name + "_CeaseRelevant";
+                Add(new Method("void", eventName, "", AnimNodeEventParams) { IsPartial = true });
+                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.CeaseRelevant += new EventHandler({1});", Variable.GetName(node.Name), eventName));
             }
         }
 
@@ -198,39 +201,47 @@ namespace Skill.Editor.CG
             Add(new Variable(type, name, "null"));
         }
 
-        private void CreateProperty(string type, string name)
+        private void CreateProperty(string type, string name, string comment = null)
         {
             CreateVariable(type, name);
-            Add(new Property(type, name, Variable.GetName(name), false) { Modifiers = Modifiers.Public });
+            Add(new Property(type, name, Variable.GetName(name), false) { Modifiers = Modifiers.Public, Comment = comment });
         }
 
-        private void CreateSequence(AnimationSequence node)
+        private void CreateProperty(string type, AnimNode node)
         {
-            // create action variable
             if (node.IsPublic)
-                CreateProperty("Skill.Animation.AnimationSequence", node.Name);
+                CreateProperty(type, node.Name, node.Comment);
             else
-                CreateVariable("Skill.Animation.AnimationSequence", node.Name);
+                CreateVariable(type, node.Name);
+        }
+
+        private void CreateSequence(AnimNodeSequence node)
+        {
+            // create action variable            
+            CreateProperty("Skill.Animation.AnimNodeSequence", node);
 
 
             // new action inside CreateTree method
-            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Animation.AnimationSequence(\"{1}\");", Variable.GetName(node.Name), node.AnimationName));
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Animation.AnimNodeSequence(\"{1}\");", Variable.GetName(node.Name), node.AnimationName));
 
             // set parameters
             if (node.Speed != 1.0f) // default is o.1f
                 SetProperty(node, "Speed", node.Speed.ToString() + "f");
             SetProperty(node, "WrapMode", "UnityEngine.WrapMode." + node.WrapMode.ToString());
 
+            if (!node.UseTreeProfile) // default is o.1f
+                SetProperty(node, "UseTreeProfile", node.UseTreeProfile.ToString().ToLower());
+
             SetSharedParameters(node);
         }
 
-        private void CreateOverride(AnimationOverride node)
+        private void CreateOverride(AnimNodeOverride node)
         {
             // create action variable
-            CreateProperty("Skill.Animation.AnimationOverride", node.Name);
+            CreateProperty("Skill.Animation.AnimNodeOverride", node);
 
             // new action inside CreateTree method
-            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Animation.AnimationOverride({1});", Variable.GetName(node.Name),node.ChildrenNames.Length));
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Animation.AnimNodeOverride({1});", Variable.GetName(node.Name), node.ChildrenNames.Length));
 
             // set parameters
             if (node.OverridePeriod > 0.0f) // default is 0.0f
@@ -239,22 +250,29 @@ namespace Skill.Editor.CG
             SetSharedParameters(node);
         }
 
-        private void CreateBlendBySpeed(AnimationBlendBySpeed node)
+        private void CreateBlendBySpeed(AnimNodeBlendBySpeed node)
         {
             // create action variable
-            CreateProperty("Skill.Animation.AnimationBlendBySpeed", node.Name);
+            CreateProperty("Skill.Animation.AnimNodeBlendBySpeed", node);
 
             // new action inside CreateTree method
-            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Animation.AnimationBlendBySpeed({1});", Variable.GetName(node.Name), node.Constraints.Count - 1));
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Animation.AnimNodeBlendBySpeed({1});", Variable.GetName(node.Name), node.Constraints.Count - 1));
 
             // set parameters
             if (node.BlendDownTime != 0.3f) // default is 0.3f
                 SetProperty(node, "BlendDownTime", node.BlendDownTime.ToString() + "f");
-            SetProperty(node, "BlendDownDelay", node.BlendDownDelay.ToString() + "f");
+
+            if (node.BlendDownDelay > 0.0f) // default is 0.0f
+                SetProperty(node, "BlendDownDelay", node.BlendDownDelay.ToString() + "f");
 
             if (node.BlendUpTime != 0.3f) // default is 0.3f
                 SetProperty(node, "BlendUpTime", node.BlendUpTime.ToString() + "f");
-            SetProperty(node, "BlendUpDelay", node.BlendUpDelay.ToString() + "f");
+
+            if (node.BlendUpDelay > 0.0f) // default is 0.0f
+                SetProperty(node, "BlendUpDelay", node.BlendUpDelay.ToString() + "f");
+
+            if (node.BlendDownPercent > 0.0f) // default is 0.0f
+                SetProperty(node, "BlendDownPercent", node.BlendDownPercent.ToString() + "f");
 
             for (int i = 0; i < node.Constraints.Count; i++)
             {
@@ -264,13 +282,13 @@ namespace Skill.Editor.CG
             SetSharedParameters(node);
         }
 
-        private void CreateRandom(AnimationNodeRandom node)
+        private void CreateRandom(AnimNodeRandom node)
         {
             // create action variable
-            CreateProperty("Skill.Animation.AnimationNodeRandom", node.Name);
+            CreateProperty("Skill.Animation.AnimNodeRandom", node);
 
             // new action inside CreateTree method
-            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Animation.AnimationNodeRandom({1});", Variable.GetName(node.Name), node.Chances.Count));
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Animation.AnimNodeRandom({1});", Variable.GetName(node.Name), node.Chances.Count));
 
             // set parameters            
             for (int i = 0; i < node.Chances.Count; i++)
@@ -281,60 +299,60 @@ namespace Skill.Editor.CG
             SetSharedParameters(node);
         }
 
-        private void CreateSwitchByIndex(AnimationSwitchByIndex node)
+        private void CreateSwitchByIndex(AnimNodeBlendByIndex node)
         {
             // create action variable
-            CreateProperty("Skill.Animation.AnimationSwitchByIndex", node.Name);
+            CreateProperty("Skill.Animation.AnimNodeBlendByIndex", node);
 
             // new action inside CreateTree method
-            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Animation.AnimationSwitchByIndex({1});", Variable.GetName(node.Name), node.ChildrenNames.Length));
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Animation.AnimNodeBlendByIndex({1});", Variable.GetName(node.Name), node.ChildrenNames.Length));
 
             // set parameters
             SetSharedParameters(node);
         }
 
 
-        private void CreateBlendByPosture(AnimationBlendByPosture node)
+        private void CreateBlendByPosture(AnimNodeBlendByPosture node)
         {
             // create action variable
-            CreateProperty("Skill.Animation.AnimationBlendByPosture", node.Name);
+            CreateProperty("Skill.Animation.AnimNodeBlendByPosture", node);
 
             // new action inside CreateTree method
-            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Animation.AnimationBlendByPosture();", Variable.GetName(node.Name)));
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Animation.AnimNodeBlendByPosture();", Variable.GetName(node.Name)));
 
 
             SetSharedParameters(node);
         }
 
-        private void CreateBlendByIdle(AnimationBlendByIdle node)
+        private void CreateBlendByIdle(AnimNodeBlendByIdle node)
         {
             // create action variable
-            CreateProperty("Skill.Animation.AnimationBlendByIdle", node.Name);
+            CreateProperty("Skill.Animation.AnimNodeBlendByIdle", node);
             // new action inside CreateTree method
-            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Animation.AnimationBlendByIdle();", Variable.GetName(node.Name)));
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Animation.AnimNodeBlendByIdle();", Variable.GetName(node.Name)));
             SetSharedParameters(node);
         }
 
-        private void CreateBlend4Directional(AnimationBlend4Directional node)
+        private void CreateBlend4Directional(AnimNodeBlend4Directional node)
         {
             // create action variable
-            CreateProperty("Skill.Animation.AnimationBlend4Directional", node.Name);
+            CreateProperty("Skill.Animation.AnimNodeBlend4Directional", node);
             // new action inside CreateTree method
-            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Animation.AnimationBlend4Directional();", Variable.GetName(node.Name)));
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Animation.AnimNodeBlend4Directional();", Variable.GetName(node.Name)));
             SetSharedParameters(node);
         }
 
-        private void CreateAimOffset(AnimationAimOffset node)
+        private void CreateAimOffset(AnimNodeAimOffset node)
         {
             // create action variable
-            CreateProperty("Skill.Animation.AnimationAimOffset", node.Name);
+            CreateProperty("Skill.Animation.AnimNodeAimOffset", node);
             // new action inside CreateTree method
-            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Animation.AnimationAimOffset();", Variable.GetName(node.Name)));
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Animation.AnimNodeAimOffset();", Variable.GetName(node.Name)));
 
             // set profiles
             foreach (var profile in node.Profiles)
             {
-                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.Add(new AnimationAimOffsetProfile({1}));", Variable.GetName(node.Name),
+                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.Add(new AnimNodeAimOffsetProfile({1}));", Variable.GetName(node.Name),
                    string.Format("Name = \"{0}\", CenterCenter = \"{1}\", CenterUp = \"{2}\", CenterDown = \"{3}\", LeftCenter = \"{4}\", LeftUp = \"{5}\", LeftDown = \"{6}\", RightCenter = \"{7}\", RightUp = \"{8}\", RightDown = \"{9}\"",
                           profile.Name, profile.CenterCenter, profile.CenterUp, profile.CenterDown, profile.LeftCenter, profile.LeftUp, profile.LeftDown, profile.RightCenter, profile.RightUp, profile.RightDown)));
             }
@@ -344,15 +362,20 @@ namespace Skill.Editor.CG
                 Add(new Method("void", node.Name + "_ProfileChanged", "", "object sender", "EventArgs e") { IsPartial = true });
                 _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.ProfileChanged += new EventHandler({1});", Variable.GetName(node.Name), node.Name + "_ProfileChanged"));
             }
+
+            // set properties
+            if (!node.UseTreeProfile) // default is o.1f
+                SetProperty(node, "UseTreeProfile", node.UseTreeProfile.ToString().ToLower());
+
             SetSharedParameters(node);
         }
 
-        private void CreateAdditiveBlending(AnimationAdditiveBlending node)
+        private void CreateAdditiveBlending(AnimNodeAdditiveBlending node)
         {
             // create action variable
-            CreateProperty("Skill.Animation.AnimationAdditiveBlending", node.Name);
+            CreateProperty("Skill.Animation.AnimNodeAdditiveBlending", node);
             // new action inside CreateTree method
-            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Animation.AnimationAdditiveBlending();", Variable.GetName(node.Name)));
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Animation.AnimNodeAdditiveBlending();", Variable.GetName(node.Name)));
             SetSharedParameters(node);
         }
 

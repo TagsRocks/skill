@@ -5,30 +5,47 @@ using System.Text;
 
 namespace Skill.AI
 {
+    #region LoopSelector
+    /// <summary>
+    /// Loops are like sequences but they loop around when reaching their last child during their traversal instead of returning to their parent node like sequence node do.
+    /// </summary>
     public class LoopSelector : Composite
     {
-        private int _LoopCounter;
+        private int _LoopCounter;// execution number of current node
 
+        /// <summary>
+        /// CompositeType
+        /// </summary>
         public override CompositeType CompositeType { get { return AI.CompositeType.Loop; } }
 
         /// <summary> number of loop (-1 for infinit)</summary>
         public int LoopCount { get; set; }
 
+        /// <summary>
+        /// Create an instance of LoopSelector
+        /// </summary>
+        /// <param name="name">Name of Behavior node</param>
         public LoopSelector(string name)
             : base(name)
         {
             _LoopCounter = -1;
         }
 
+        /// <summary>
+        /// Behave
+        /// </summary>
+        /// <param name="state">State of BehaviorTree</param>
+        /// <returns>esult</returns>
         protected override BehaviorResult Behave(BehaviorState state)
         {
 
             BehaviorResult result = BehaviorResult.Failure;
             if (RunningChildIndex < 0) RunningChildIndex = 0;
-            for (int i = RunningChildIndex; i < Count; i++)
+            for (int i = RunningChildIndex; i < ChildCount; i++)
             {
-                Behavior node = this[i];
-                result = node.Trace(state);
+                BehaviorContainer node = this[i];
+                state.Parameters = node.Parameters;
+                result = node.Behavior.Trace(state);
                 if (result == BehaviorResult.Running)
                 {
                     RunningChildIndex = i;
@@ -55,5 +72,6 @@ namespace Skill.AI
                 _LoopCounter = 0;
             return result;
         }
-    }
+    } 
+    #endregion
 }

@@ -468,12 +468,32 @@ namespace Skill.Editor.AI
                 case BehaviorType.Condition:
                     return new ConditionViewModel(this, (Condition)behavior);
                 case BehaviorType.Decorator:
-                    return new DecoratorViewModel(this, (Decorator)behavior);
+                    return CreateDecoratorViewModel((Decorator)behavior);
                 case BehaviorType.Composite:
                     return CreateSelectorViewModel((Composite)behavior);
             }
             return null;
         }
+
+        /// <summary>
+        /// Create view model based on CompositeType
+        /// </summary>
+        /// <param name="behavior">selector data</param>
+        /// <returns>Create view model</returns>
+        DecoratorViewModel CreateDecoratorViewModel(Decorator decorator)
+        {
+            switch (decorator.Type)
+            {
+                case DecoratorType.Default:
+                    return new DecoratorViewModel(this, decorator);
+                case DecoratorType.AccessLimit:
+                    return new AccessLimitDecoratorViewModel(this, (AccessLimitDecorator)decorator);
+                default:
+                    throw new InvalidCastException("Invalid DecoratorType");
+            }
+        }
+
+
         /// <summary>
         /// Create view model based on CompositeType
         /// </summary>
@@ -741,8 +761,30 @@ namespace Skill.Editor.AI
                 case BehaviorType.Condition:
                     behavior = new Condition();
                     break;
-                case BehaviorType.Decorator:
+            }
+            if (behavior != null)
+            {
+                BehaviorViewModel behaviorVM = CreateViewModel(behavior);
+                return AddBehavior(behaviorVM, false, -1);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Create new child (action,decorator or condition)
+        /// </summary>
+        /// <param name="behaviorType">type f child</param>
+        /// <returns>added child</returns>
+        public BehaviorViewModel AddDecorator(DecoratorType decoratorType)
+        {
+            Behavior behavior = null;
+            switch (decoratorType)
+            {
+                case DecoratorType.Default:
                     behavior = new Decorator();
+                    break;
+                case DecoratorType.AccessLimit:
+                    behavior = new AccessLimitDecorator();
                     break;
             }
             if (behavior != null)

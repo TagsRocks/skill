@@ -18,26 +18,26 @@
                 <anim:AnimationTreeCanvas.ContextMenu >
                     <ContextMenu >
                         <MenuItem Header="Sequences" >
-                            <MenuItem Header="AnimationSequence" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimationNodeType.Sequence}" />
+                            <MenuItem Header="AnimNodeSequence" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimNodeType.Sequence}" />
                         </MenuItem>
                         <MenuItem Header="BlendBy" >
-                            <MenuItem Header="AnimationBlendBySpeed" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimationNodeType.BlendBySpeed}" />
-                            <MenuItem Header="AnimationBlendByPosture" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimationNodeType.BlendByPosture}" />
-                            <MenuItem Header="AnimationBlendByIdle" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimationNodeType.BlendByIdle}" />
-                            <MenuItem Header="AnimationSwitchByIndex" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimationNodeType.SwitchByIndex}" />
+                            <MenuItem Header="AnimNodeBlendBySpeed" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimNodeType.BlendBySpeed}" />
+                            <MenuItem Header="AnimNodeBlendByPosture" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimNodeType.BlendByPosture}" />
+                            <MenuItem Header="AnimNodeBlendByIdle" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimNodeType.BlendByIdle}" />
+                            <MenuItem Header="AnimNodeBlendByIndex" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimNodeType.BlendByIndex}" />
                         </MenuItem>
                         <MenuItem Header="Directional" >
-                            <MenuItem Header="AnimationBlend4Directional" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimationNodeType.Blend4Directional}" />
+                            <MenuItem Header="AnimNodeBlend4Directional" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimNodeType.Blend4Directional}" />
                         </MenuItem>
                         <MenuItem Header="Random" >
-                            <MenuItem Header="AnimationNodeRandom" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimationNodeType.Random}" />
+                            <MenuItem Header="AnimNodeRandom" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimNodeType.Random}" />
                         </MenuItem>
                         <MenuItem Header="Additive" >
-                            <MenuItem Header="AnimationAdditiveBlending" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimationNodeType.AdditiveBlending}" />
+                            <MenuItem Header="AnimNodeAdditiveBlending" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimNodeType.AdditiveBlending}" />
                         </MenuItem>
                         <MenuItem Header="Other" >
-                            <MenuItem Header="AnimationOverride" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimationNodeType.Override}" />
-                            <MenuItem Header="AnimationAimOffset" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimationNodeType.AimOffset}" />
+                            <MenuItem Header="AnimNodeOverride" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimNodeType.Override}" />
+                            <MenuItem Header="AnimNodeAimOffset" Click="Mnu_Create_Click" Tag="{x:Static anim:AnimNodeType.AimOffset}" />
                         </MenuItem>
                         <Separator/>
                         <MenuItem Header="Paste" Command="ApplicationCommands.Paste" />

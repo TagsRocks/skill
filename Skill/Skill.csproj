@@ -26,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Skill.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -52,6 +53,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AI\BehaviorParameter.cs" />
+    <Compile Include="AI\BehaviorType.cs" />
+    <Compile Include="AI\CompositeType.cs" />
+    <Compile Include="Animation\AnimationTreeState.cs" />
+    <Compile Include="Animation\AnimNodeMultilayer.cs" />
     <Compile Include="Managers\CacheBehavior.cs" />
     <Compile Include="MathHelper.cs" />
     <Compile Include="TimeWatch.cs" />
@@ -70,33 +76,30 @@
     <Compile Include="AI\Composite.cs" />
     <Compile Include="AI\SequenceSelector.cs" />
     <Compile Include="Animation\AimHelper.cs" />
-    <Compile Include="Animation\AnimationAdditiveBlending.cs" />
-    <Compile Include="Animation\AnimationAdditiveByChildIndex.cs" />
-    <Compile Include="Animation\AnimationAimOffset.cs" />
-    <Compile Include="Animation\AnimationAimOffsetProfile.cs" />
-    <Compile Include="Animation\AnimationBlendBase.cs" />
-    <Compile Include="Animation\AnimationBlendByIdle.cs" />
-    <Compile Include="Animation\AnimationBlendByPosture.cs" />
-    <Compile Include="Animation\AnimationBlendBySpeed.cs" />
+    <Compile Include="Animation\AnimNodeAdditiveBlending.cs" />
+    <Compile Include="Animation\AnimNodeAimOffset.cs" />
+    <Compile Include="Animation\AnimNodeAimOffsetProfile.cs" />
+    <Compile Include="Animation\AnimNodeBlendBase.cs" />
+    <Compile Include="Animation\AnimNodeBlendByIdle.cs" />
+    <Compile Include="Animation\AnimNodeBlendByPosture.cs" />
+    <Compile Include="Animation\AnimNodeBlendBySpeed.cs" />
     <Compile Include="Animation\AnimationLayer.cs" />
     <Compile Include="Animation\AnimationLayerManager.cs" />
-    <Compile Include="Animation\AnimationNode.cs" />
-    <Compile Include="Animation\AnimationNodeRandom.cs" />
-    <Compile Include="Animation\AnimationOverride.cs" />
-    <Compile Include="Animation\AnimationSequence.cs" />
-    <Compile Include="Animation\AnimationBlend4Directional.cs" />
-    <Compile Include="Animation\AnimationSwitchBase.cs" />
-    <Compile Include="Animation\AnimationSwitchByIndex.cs" />
+    <Compile Include="Animation\AnimNode.cs" />
+    <Compile Include="Animation\AnimNodeRandom.cs" />
+    <Compile Include="Animation\AnimNodeOverride.cs" />
+    <Compile Include="Animation\AnimNodeSequence.cs" />
+    <Compile Include="Animation\AnimNodeBlend4Directional.cs" />
+    <Compile Include="Animation\AnimNodeSingleLayer.cs" />
+    <Compile Include="Animation\AnimNodeBlendByIndex.cs" />
     <Compile Include="Animation\AnimationTree.cs" />
-    <Compile Include="Animation\Posture.cs" />
+    <Compile Include="Animation\AnimPosture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Controllers\IController.cs" />
+    <Compile Include="Controllers\Controller.cs" />
     <Compile Include="Managers\CacheSpawner.cs" />
     <Compile Include="Modules\DelayRender.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="bin\Debug\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="Unity\UnityEditor.dll" />
     <Content Include="Unity\UnityEngine.dll" />

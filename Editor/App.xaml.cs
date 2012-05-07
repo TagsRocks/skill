@@ -22,7 +22,7 @@ namespace Skill.Editor
             //Skill.Editor.Themes.ThemeManager.ApplyTheme(this, theme);
 
             AvalonDock.ThemeFactory.ChangeTheme(new Uri("/AvalonDock.Themes;component/themes/dev2010.xaml", UriKind.RelativeOrAbsolute));
-            base.OnStartup(e);
+            base.OnStartup(e);            
         }
     }
 }

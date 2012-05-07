@@ -8,7 +8,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="50" />
         </Grid.RowDefinitions>
-        <TabControl TabStripPlacement="Left" Grid.Row="0" BorderThickness="0,0,0,1" BorderBrush="Gray">            
+        <TabControl TabStripPlacement="Left" Grid.Row="0" BorderThickness="0,0,0,1" BorderBrush="Gray">
             <TabItem Header="Directories" Width="100">
                 <Grid>
                     <Grid.Resources>
@@ -30,13 +30,11 @@
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="30" />
-                        <RowDefinition Height="30" />                        
+                        <RowDefinition Height="30" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <TextBlock Text="Unity Project Localtion" Grid.Row="0"  Grid.Column="0" />
-                    <TextBlock Text="UserCode Postfix" Grid.Row="1"  Grid.Column="0" />
                     <TextBox Text="{Binding UnityProjectLocaltion}" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Name="_TxtUnityDir"/>
-                    <TextBox Text="{Binding UserCodePostfix}" Grid.Row="1" Grid.Column="1" Width="100" />
                     <Button Content="Browse" Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" Margin="0,0,10,0" Click="BtnBrowseUnityDir_Click"/>
                 </Grid>
             </TabItem>

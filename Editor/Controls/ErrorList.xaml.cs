@@ -225,7 +225,7 @@ namespace Skill.Editor.Controls
                 {
                     Animation.AnimationTree tree = Animation.AnimationTree.Load(fileName);
                     SearchForDuplicateNames(vm, tree);
-                    CheckUnusedAnimationNodes(vm, tree);
+                    CheckUnusedAnimNodes(vm, tree);
                 }
             }
             else
@@ -248,7 +248,7 @@ namespace Skill.Editor.Controls
         }
 
         #region Shared Animation methods
-        private bool IsAnyNodeConnectedTo(Animation.AnimationNode node, Animation.AnimationTree tree)
+        private bool IsAnyNodeConnectedTo(Animation.AnimNode node, Animation.AnimationTree tree)
         {
             foreach (Animation.AnimationConnection connection in tree.Connections)
             {
@@ -261,18 +261,18 @@ namespace Skill.Editor.Controls
         }
         #endregion
 
-        #region Check for Unused AnimationNodes
-        private void CheckUnusedAnimationNodes(EntityNodeViewModel vm, Animation.AnimationTree tree)
+        #region Check for Unused AnimNodes
+        private void CheckUnusedAnimNodes(EntityNodeViewModel vm, Animation.AnimationTree tree)
         {
-            foreach (Animation.AnimationNode node in tree)
+            foreach (Animation.AnimNode node in tree)
             {
                 bool connected = IsAnyNodeConnectedTo(node, tree);
                 if (connected == false)
                 {
-                    if (node.NodeType == Animation.AnimationNodeType.Root)
+                    if (node.NodeType == Animation.AnimNodeType.Root)
                         AddAnimationRootIsNotInvalidError(vm);
-                    else if (node.NodeType != Animation.AnimationNodeType.Sequence)
-                        AddAnimationNodeUnusedWarning(vm, node);
+                    else if (node.NodeType != Animation.AnimNodeType.Sequence)
+                        AddAnimNodeUnusedWarning(vm, node);
                 }
             }
         }
@@ -283,10 +283,10 @@ namespace Skill.Editor.Controls
             _AllErrors.Add(err);
         }
 
-        void AddAnimationNodeUnusedWarning(EntityNodeViewModel node, Animation.AnimationNode animNode)
+        void AddAnimNodeUnusedWarning(EntityNodeViewModel node, Animation.AnimNode animNode)
         {
             CompileError war = new CompileError() { Node = node, Type = ErrorType.Warning };
-            war.Description = string.Format("There is no connection to AnimationNode '{0}'.", animNode.Name);
+            war.Description = string.Format("There is no connection to AnimNode '{0}'.", animNode.Name);
             _AllErrors.Add(war);
         }
         #endregion
@@ -379,7 +379,7 @@ namespace Skill.Editor.Controls
         private void SearchForDuplicateNames(EntityNodeViewModel node, Animation.AnimationTree tree)
         {
             List<string> nameList = new List<string>(tree.Count);
-            foreach (Animation.AnimationNode an in tree)
+            foreach (Animation.AnimNode an in tree)
             {
                 if (nameList.Contains(an.Name)) continue;
                 int count = tree.Count(c => c.Name == an.Name);

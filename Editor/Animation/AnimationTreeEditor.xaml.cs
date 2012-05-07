@@ -74,8 +74,8 @@ namespace Skill.Editor.Animation
             if (_ConnectionsToLoad == null) return;
             foreach (var c in _ConnectionsToLoad)
             {
-                AnimationNodeViewModel sourceNode = _Canvas.FindById(c.SourceId);
-                AnimationNodeViewModel sinkNode = _Canvas.FindById(c.SinkId);
+                AnimNodeViewModel sourceNode = _Canvas.FindById(c.SourceId);
+                AnimNodeViewModel sinkNode = _Canvas.FindById(c.SinkId);
                 if (sinkNode != null && sourceNode != null)
                 {
                     Connector source = sourceNode.Out;
@@ -97,42 +97,42 @@ namespace Skill.Editor.Animation
             base.OnMouseMove(e);
         }
 
-        private AnimationNodeViewModel CreateNode(AnimationNode node)
+        private AnimNodeViewModel CreateNode(AnimNode node)
         {
-            AnimationNodeViewModel vm = null;
+            AnimNodeViewModel vm = null;
             switch (node.NodeType)
             {
-                case AnimationNodeType.Sequence:
-                    vm = new AnimationSequenceViewModel((AnimationSequence)node);
+                case AnimNodeType.Sequence:
+                    vm = new AnimNodeSequenceViewModel((AnimNodeSequence)node);
                     break;
-                case AnimationNodeType.Override:
-                    vm = new AnimationOverrideViewModel((AnimationOverride)node);
+                case AnimNodeType.Override:
+                    vm = new AnimNodeOverrideViewModel((AnimNodeOverride)node);
                     break;
-                case AnimationNodeType.BlendBySpeed:
-                    vm = new AnimationBlendBySpeedViewModel((AnimationBlendBySpeed)node);
+                case AnimNodeType.BlendBySpeed:
+                    vm = new AnimNodeBlendBySpeedViewModel((AnimNodeBlendBySpeed)node);
                     break;
-                case AnimationNodeType.BlendByPosture:
-                    vm = new AnimationBlendByPostureViewModel((AnimationBlendByPosture)node);
+                case AnimNodeType.BlendByPosture:
+                    vm = new AnimNodeBlendByPostureViewModel((AnimNodeBlendByPosture)node);
                     break;
-                case AnimationNodeType.BlendByIdle:
-                    vm = new AnimationBlendByIdleViewModel((AnimationBlendByIdle)node);
+                case AnimNodeType.BlendByIdle:
+                    vm = new AnimNodeBlendByIdleViewModel((AnimNodeBlendByIdle)node);
                     break;
-                case AnimationNodeType.Blend4Directional:
-                    vm = new AnimationBlend4DirectionalViewModel((AnimationBlend4Directional)node);
+                case AnimNodeType.Blend4Directional:
+                    vm = new AnimNodeBlend4DirectionalViewModel((AnimNodeBlend4Directional)node);
                     break;
-                case AnimationNodeType.AimOffset:
-                    vm = new AnimationAimOffsetViewModel((AnimationAimOffset)node);
+                case AnimNodeType.AimOffset:
+                    vm = new AnimNodeAimOffsetViewModel((AnimNodeAimOffset)node);
                     break;
-                case AnimationNodeType.AdditiveBlending:
-                    vm = new AnimationAdditiveBlendingViewModel((AnimationAdditiveBlending)node);
+                case AnimNodeType.AdditiveBlending:
+                    vm = new AnimNodeAdditiveBlendingViewModel((AnimNodeAdditiveBlending)node);
                     break;
-                case AnimationNodeType.Random:
-                    vm = new AnimationNodeRandomViewModel((AnimationNodeRandom)node);
+                case AnimNodeType.Random:
+                    vm = new AnimNodeRandomViewModel((AnimNodeRandom)node);
                     break;
-                case AnimationNodeType.SwitchByIndex:
-                    vm = new AnimationSwitchByIndexViewModel((AnimationSwitchByIndex)node);
+                case AnimNodeType.BlendByIndex:
+                    vm = new AnimNodeBlendByIndexViewModel((AnimNodeBlendByIndex)node);
                     break;
-                case AnimationNodeType.Root:
+                case AnimNodeType.Root:
                     vm = new AnimationTreeRootViewModel((AnimationTreeRoot)node);
                     break;
                 default:
@@ -180,9 +180,9 @@ namespace Skill.Editor.Animation
         private void Mnu_Create_Click(object sender, RoutedEventArgs e)
         {
             MenuItem mnu = sender as MenuItem;
-            if (mnu != null && mnu.Tag is AnimationNodeType)
+            if (mnu != null && mnu.Tag is AnimNodeType)
             {
-                AnimationNodeType nodeType = (AnimationNodeType)mnu.Tag;
+                AnimNodeType nodeType = (AnimNodeType)mnu.Tag;
                 CreateNode(nodeType);
                 SetChanged(true);
             }
@@ -194,42 +194,42 @@ namespace Skill.Editor.Animation
         }
 
 
-        private AnimationNodeViewModel CreateNode(AnimationNodeType nodeType)
+        private AnimNodeViewModel CreateNode(AnimNodeType nodeType)
         {
-            AnimationNodeViewModel vm = null;
+            AnimNodeViewModel vm = null;
             switch (nodeType)
             {
-                case AnimationNodeType.Sequence:
-                    vm = new AnimationSequenceViewModel();
+                case AnimNodeType.Sequence:
+                    vm = new AnimNodeSequenceViewModel();
                     break;
-                case AnimationNodeType.Override:
-                    vm = new AnimationOverrideViewModel();
+                case AnimNodeType.Override:
+                    vm = new AnimNodeOverrideViewModel();
                     break;
-                case AnimationNodeType.BlendBySpeed:
-                    vm = new AnimationBlendBySpeedViewModel();
+                case AnimNodeType.BlendBySpeed:
+                    vm = new AnimNodeBlendBySpeedViewModel();
                     break;
-                case AnimationNodeType.BlendByPosture:
-                    vm = new AnimationBlendByPostureViewModel();
+                case AnimNodeType.BlendByPosture:
+                    vm = new AnimNodeBlendByPostureViewModel();
                     break;
-                case AnimationNodeType.BlendByIdle:
-                    vm = new AnimationBlendByIdleViewModel();
+                case AnimNodeType.BlendByIdle:
+                    vm = new AnimNodeBlendByIdleViewModel();
                     break;
-                case AnimationNodeType.Blend4Directional:
-                    vm = new AnimationBlend4DirectionalViewModel();
+                case AnimNodeType.Blend4Directional:
+                    vm = new AnimNodeBlend4DirectionalViewModel();
                     break;
-                case AnimationNodeType.AimOffset:
-                    vm = new AnimationAimOffsetViewModel();
+                case AnimNodeType.AimOffset:
+                    vm = new AnimNodeAimOffsetViewModel();
                     break;
-                case AnimationNodeType.AdditiveBlending:
-                    vm = new AnimationAdditiveBlendingViewModel();
+                case AnimNodeType.AdditiveBlending:
+                    vm = new AnimNodeAdditiveBlendingViewModel();
                     break;
-                case AnimationNodeType.Random:
-                    vm = new AnimationNodeRandomViewModel();
+                case AnimNodeType.Random:
+                    vm = new AnimNodeRandomViewModel();
                     break;
-                case AnimationNodeType.SwitchByIndex:
-                    vm = new AnimationSwitchByIndexViewModel();
+                case AnimNodeType.BlendByIndex:
+                    vm = new AnimNodeBlendByIndexViewModel();
                     break;
-                case AnimationNodeType.Root:
+                case AnimNodeType.Root:
                     vm = new AnimationTreeRootViewModel();
                     break;
                 default:
@@ -265,9 +265,9 @@ namespace Skill.Editor.Animation
             // set all nodes id to -1
             foreach (var item in _Canvas.Children)
             {
-                if (item is AnimationNodeViewModel)
+                if (item is AnimNodeViewModel)
                 {
-                    AnimationNodeViewModel vm = (AnimationNodeViewModel)item;
+                    AnimNodeViewModel vm = (AnimNodeViewModel)item;
                     vm.Model.Id = id++;
                 }
             }
@@ -282,17 +282,17 @@ namespace Skill.Editor.Animation
                 List<AnimationConnection> connections = new List<AnimationConnection>();
                 foreach (var item in _Canvas.Children)
                 {
-                    if (item is AnimationNodeViewModel)
+                    if (item is AnimNodeViewModel)
                     {
-                        AnimationNodeViewModel vm = (AnimationNodeViewModel)item;
+                        AnimNodeViewModel vm = (AnimNodeViewModel)item;
                         vm.CommiteChangesToModel();
                         _AnimationTree.Add(vm.Model);
                     }
                     else if (item is Skill.Editor.Diagram.Connection)
                     {
                         Skill.Editor.Diagram.Connection connection = (Skill.Editor.Diagram.Connection)item;
-                        AnimationNodeViewModel source = (AnimationNodeViewModel)connection.Source.ParentDragableContent;
-                        AnimationNodeViewModel sink = (AnimationNodeViewModel)connection.Sink.ParentDragableContent;
+                        AnimNodeViewModel source = (AnimNodeViewModel)connection.Source.ParentDragableContent;
+                        AnimNodeViewModel sink = (AnimNodeViewModel)connection.Sink.ParentDragableContent;
                         connections.Add(new AnimationConnection(source.Model.Id, sink.Model.Id, connection.Sink.Index));
                     }
                 }
@@ -373,15 +373,15 @@ namespace Skill.Editor.Animation
 
             bool first = true;
 
-            IEnumerable<AnimationNodeViewModel> selectedItems =
-                _Canvas.Selection.CurrentSelection.OfType<AnimationNodeViewModel>();
+            IEnumerable<AnimNodeViewModel> selectedItems =
+                _Canvas.Selection.CurrentSelection.OfType<AnimNodeViewModel>();
 
             IEnumerable<Connection> selectedConnections =
                 _Canvas.Selection.CurrentSelection.OfType<Connection>();
 
             foreach (var item in selectedItems)
             {
-                if (item.Model.NodeType == AnimationNodeType.Root) continue;
+                if (item.Model.NodeType == AnimNodeType.Root) continue;
                 Rect rect = GetRect(item);
                 if (first)
                 {
@@ -406,7 +406,7 @@ namespace Skill.Editor.Animation
                     copy.CopyArea = Rect.Union(rect, copy.CopyArea);
 
                 if (selectedItems.Contains(item.Source.ParentDragableContent) && selectedItems.Contains(item.Sink.ParentDragableContent))
-                    copy.Items.Add(new AnimationConnection(((AnimationNodeViewModel)item.Source.ParentDragableContent).Model.Id, ((AnimationNodeViewModel)item.Sink.ParentDragableContent).Model.Id, item.Sink.Index));
+                    copy.Items.Add(new AnimationConnection(((AnimNodeViewModel)item.Source.ParentDragableContent).Model.Id, ((AnimNodeViewModel)item.Sink.ParentDragableContent).Model.Id, item.Sink.Index));
             }
 
             return copy;
@@ -449,8 +449,8 @@ namespace Skill.Editor.Animation
 
         private class CopyPair
         {
-            public AnimationNode Original;
-            public AnimationNodeViewModel Copy;
+            public AnimNode Original;
+            public AnimNodeViewModel Copy;
         }
 
         /// <summary> Do paste </summary>
@@ -473,7 +473,7 @@ namespace Skill.Editor.Animation
             center.Y += copy.CopyArea.Height / 2;
 
             List<CopyPair> items = new List<CopyPair>();
-            foreach (var item in copy.Items.OfType<AnimationNode>())
+            foreach (var item in copy.Items.OfType<AnimNode>())
             {
                 CopyPair pair = new CopyPair();
                 pair.Original = item;
@@ -542,9 +542,9 @@ namespace Skill.Editor.Animation
         {
             foreach (IDiagramObject item in _Canvas.Selection.CurrentSelection)
             {
-                if (item is AnimationNodeViewModel)
+                if (item is AnimNodeViewModel)
                 {
-                    if (((AnimationNodeViewModel)item).Model.NodeType == AnimationNodeType.Root)
+                    if (((AnimNodeViewModel)item).Model.NodeType == AnimNodeType.Root)
                         continue;
                 }
                 item.Disconnect();

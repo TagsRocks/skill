@@ -5,13 +5,31 @@ using System.Text;
 
 namespace Skill
 {
+    /// <summary>
+    /// Helper class for track limitation of a job
+    /// </summary>
     public struct TimeWatch
     {
+        /// <summary>
+        /// Start time
+        /// </summary>
         public float StartTime { get; private set; }
+        /// <summary>
+        /// End time
+        /// </summary>
         public float OverTime { get; private set; }
+        /// <summary>
+        /// Length
+        /// </summary>
         public float Length { get; private set; }
+        /// <summary>
+        /// Is enabled (begined)
+        /// </summary>
         public bool Enabled { get; private set; }
 
+        /// <summary>
+        /// Whether current time is greater than OverTime
+        /// </summary>
         public bool IsOver
         {
             get
@@ -19,6 +37,11 @@ namespace Skill
                 return UnityEngine.Time.time >= OverTime;
             }
         }
+
+        /// <summary>
+        /// Begin timer 
+        /// </summary>
+        /// <param name="length">Lenght of timer</param>
         public void Begin(float length)
         {
             this.Length = length;
@@ -26,6 +49,10 @@ namespace Skill
             OverTime = StartTime + Length;
             Enabled = true;
         }
+
+        /// <summary>
+        /// End
+        /// </summary>
         public void End()
         {
             StartTime = 0;

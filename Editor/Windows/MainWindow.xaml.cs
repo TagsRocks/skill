@@ -91,7 +91,7 @@ namespace Skill.Editor
         #region Constructor
         public MainWindow()
         {
-            InitializeComponent();            
+            InitializeComponent();
 #if RELEASE
             this.WindowState = System.Windows.WindowState.Maximized;
 #endif
@@ -400,7 +400,7 @@ namespace Skill.Editor
                 {
                     AI.BehaviorTree tree = AI.BehaviorTree.Load(fileName);
                     CG.Builder builder = new CG.Builder(_ProjectExplorer.ProjectVM.Model.Name, _ProjectExplorer.ProjectVM.ProjectSettingsVM.UnityProjectLocaltion);
-                    builder.Build(tree, vm.GetLocalDirectory(), vm.Name, _ProjectExplorer.ProjectVM.Model.Settings.UserCodePostfix);
+                    builder.Build(tree, vm.GetLocalDirectory(), vm.Name);
                 }
             }
             else if (vm.EntityType == EntityType.AnimationTree)
@@ -410,7 +410,7 @@ namespace Skill.Editor
                 {
                     Animation.AnimationTree tree = Animation.AnimationTree.Load(fileName);
                     CG.Builder builder = new CG.Builder(_ProjectExplorer.ProjectVM.Model.Name, _ProjectExplorer.ProjectVM.ProjectSettingsVM.UnityProjectLocaltion);
-                    builder.Build(tree, vm.GetLocalDirectory(), vm.Name, _ProjectExplorer.ProjectVM.Model.Settings.UserCodePostfix);
+                    builder.Build(tree, vm.GetLocalDirectory(), vm.Name);
                 }
             }
             else

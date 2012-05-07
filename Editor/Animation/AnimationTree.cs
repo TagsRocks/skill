@@ -6,7 +6,7 @@ using System.Xml.Linq;
 
 namespace Skill.Editor.Animation
 {
-    public class AnimationTree : IXElement, ICollection<AnimationNode>
+    public class AnimationTree : IXElement, ICollection<AnimNode>
     {
         #region static Variables
         public static string Extension = ".sat";// extension of editor file
@@ -30,9 +30,9 @@ namespace Skill.Editor.Animation
             {
                 AddRoot();
                 AnimationTreeRoot root = null;
-                foreach (AnimationNode node in this)
+                foreach (AnimNode node in this)
                 {
-                    if (node.NodeType == AnimationNodeType.Root)
+                    if (node.NodeType == AnimNodeType.Root)
                     {
                         root = node as AnimationTreeRoot;
                         break;
@@ -50,7 +50,7 @@ namespace Skill.Editor.Animation
         /// </summary>
         public AnimationTree()
         {
-            this._Nodes = new List<AnimationNode>();
+            this._Nodes = new List<AnimNode>();
             this.Name = "NewAnimationTree";
             this.Scale = 1;
             AddRoot();
@@ -58,7 +58,7 @@ namespace Skill.Editor.Animation
 
         void AddRoot()
         {
-            if (_Nodes.Where(n => n.NodeType == AnimationNodeType.Root).Count() == 0)
+            if (_Nodes.Where(n => n.NodeType == AnimNodeType.Root).Count() == 0)
             {
                 AnimationTreeRoot root = new AnimationTreeRoot();
                 root.X = 100;
@@ -69,8 +69,8 @@ namespace Skill.Editor.Animation
         #endregion
 
         #region ICollection<Behavior>
-        List<AnimationNode> _Nodes;
-        public void Add(AnimationNode item)
+        List<AnimNode> _Nodes;
+        public void Add(AnimNode item)
         {
             if (!Contains(item))
                 _Nodes.Add(item);
@@ -81,12 +81,12 @@ namespace Skill.Editor.Animation
             _Nodes.Clear();
         }
 
-        public bool Contains(AnimationNode item)
+        public bool Contains(AnimNode item)
         {
             return _Nodes.Contains(item);
         }
 
-        public void CopyTo(AnimationNode[] array, int arrayIndex)
+        public void CopyTo(AnimNode[] array, int arrayIndex)
         {
             _Nodes.CopyTo(array, arrayIndex);
         }
@@ -101,12 +101,12 @@ namespace Skill.Editor.Animation
             get { return false; }
         }
 
-        public bool Remove(AnimationNode item)
+        public bool Remove(AnimNode item)
         {
             return _Nodes.Remove(item);
         }
 
-        public IEnumerator<AnimationNode> GetEnumerator()
+        public IEnumerator<AnimNode> GetEnumerator()
         {
             return _Nodes.GetEnumerator();
         }
@@ -116,7 +116,7 @@ namespace Skill.Editor.Animation
             return (_Nodes as System.Collections.IEnumerable).GetEnumerator();
         }
 
-        public AnimationNode Find(int id)
+        public AnimNode Find(int id)
         {
             foreach (var item in this)
             {
@@ -190,45 +190,45 @@ namespace Skill.Editor.Animation
 
         #region Load
 
-        private static AnimationNode GetNode(XElement node)
+        private static AnimNode GetNode(XElement node)
         {
-            AnimationNode result = null;
-            AnimationNodeType nodeType;
-            if (Enum.TryParse<AnimationNodeType>(node.Name.ToString(), false, out nodeType))
+            AnimNode result = null;
+            AnimNodeType nodeType;
+            if (Enum.TryParse<AnimNodeType>(node.Name.ToString(), false, out nodeType))
             {
                 switch (nodeType)
                 {
-                    case AnimationNodeType.Sequence:
-                        result = new AnimationSequence();
+                    case AnimNodeType.Sequence:
+                        result = new AnimNodeSequence();
                         break;
-                    case AnimationNodeType.Override:
-                        result = new AnimationOverride();
+                    case AnimNodeType.Override:
+                        result = new AnimNodeOverride();
                         break;
-                    case AnimationNodeType.BlendBySpeed:
-                        result = new AnimationBlendBySpeed();
+                    case AnimNodeType.BlendBySpeed:
+                        result = new AnimNodeBlendBySpeed();
                         break;
-                    case AnimationNodeType.BlendByPosture:
-                        result = new AnimationBlendByPosture();
+                    case AnimNodeType.BlendByPosture:
+                        result = new AnimNodeBlendByPosture();
                         break;
-                    case AnimationNodeType.BlendByIdle:
-                        result = new AnimationBlendByIdle();
+                    case AnimNodeType.BlendByIdle:
+                        result = new AnimNodeBlendByIdle();
                         break;
-                    case AnimationNodeType.Blend4Directional:
-                        result = new AnimationBlend4Directional();
+                    case AnimNodeType.Blend4Directional:
+                        result = new AnimNodeBlend4Directional();
                         break;
-                    case AnimationNodeType.AimOffset:
-                        result = new AnimationAimOffset();
+                    case AnimNodeType.AimOffset:
+                        result = new AnimNodeAimOffset();
                         break;
-                    case AnimationNodeType.AdditiveBlending:
-                        result = new AnimationAdditiveBlending();
+                    case AnimNodeType.AdditiveBlending:
+                        result = new AnimNodeAdditiveBlending();
                         break;
-                    case AnimationNodeType.Random:
-                        result = new AnimationNodeRandom();
+                    case AnimNodeType.Random:
+                        result = new AnimNodeRandom();
                         break;
-                    case AnimationNodeType.SwitchByIndex:
-                        result = new AnimationSwitchByIndex();
+                    case AnimNodeType.BlendByIndex:
+                        result = new AnimNodeBlendByIndex();
                         break;
-                    case AnimationNodeType.Root:
+                    case AnimNodeType.Root:
                         result = new AnimationTreeRoot();
                         break;
                 }
@@ -248,7 +248,7 @@ namespace Skill.Editor.Animation
             Clear();
             foreach (var item in nodes.Elements())
             {
-                AnimationNode node = GetNode(item);
+                AnimNode node = GetNode(item);
                 if (node != null)
                 {
                     node.Load(item);

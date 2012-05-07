@@ -255,12 +255,37 @@ namespace Skill.Editor.AI
             }
         }
 
+        private void AddDecorator(DecoratorType decoratorType)
+        {
+            if (_ViewModel.IsNewAv)
+            {
+                var selected = GetSelectedItem();
+                if (selected != null)
+                {
+                    var newVM = selected.AddDecorator(decoratorType);
+                    if (newVM != null)
+                        newVM.IsSelected = true;
+                    UpdateConnections();
+                }
+            }
+        }
+
         private void Mnu_NewNonSelector_Click(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem)
             {
                 MenuItem mnu = (MenuItem)sender;
                 AddNonSelector((BehaviorType)mnu.Tag);
+                ResetCut();
+            }
+        }
+
+        private void Mnu_NewDecorator_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem)
+            {
+                MenuItem mnu = (MenuItem)sender;
+                AddDecorator((DecoratorType)mnu.Tag);
                 ResetCut();
             }
         }

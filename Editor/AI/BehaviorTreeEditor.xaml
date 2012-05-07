@@ -40,10 +40,17 @@
                         <my:ButtonImage NormalImage="{StaticResource ImgCondition}" DisableImage="{StaticResource ImgCondition_D}" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Decorator" Click="Mnu_NewNonSelector_Click" Tag="{x:Static vm:BehaviorType.Decorator}"  >
-                    <MenuItem.Icon>
-                        <my:ButtonImage NormalImage="{StaticResource ImgDecorator}" DisableImage="{StaticResource ImgDecorator_D}" />
-                    </MenuItem.Icon>
+                <MenuItem Header="Decorator" >
+                    <MenuItem Header="Decorator" Click="Mnu_NewDecorator_Click" Tag="{x:Static vm:DecoratorType.Default}"  >
+                        <MenuItem.Icon>
+                            <my:ButtonImage NormalImage="{StaticResource ImgDecorator}" DisableImage="{StaticResource ImgDecorator_D}" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="AccessLimitDecorator" Click="Mnu_NewDecorator_Click" Tag="{x:Static vm:DecoratorType.AccessLimit}"  >
+                        <MenuItem.Icon>
+                            <my:ButtonImage NormalImage="{StaticResource ImgDecorator}" DisableImage="{StaticResource ImgDecorator_D}" />
+                        </MenuItem.Icon>
+                    </MenuItem>
                 </MenuItem>
                 <MenuItem Header="Selector" >
                     <MenuItem Header="Sequence" Click="Mnu_NewSelector_Click" Tag="{x:Static vm:CompositeType.Sequence}" >
@@ -139,10 +146,17 @@
                                         <my:ButtonImage NormalImage="{StaticResource ImgCondition}" DisableImage="{StaticResource ImgCondition_D}" />
                                     </MenuItem.Icon>
                                 </MenuItem>
-                                <MenuItem Header="Decorator" Click="Mnu_NewNonSelector_Click" Tag="{x:Static vm:BehaviorType.Decorator}"  >
-                                    <MenuItem.Icon>
-                                        <my:ButtonImage NormalImage="{StaticResource ImgDecorator}" DisableImage="{StaticResource ImgDecorator_D}" />
-                                    </MenuItem.Icon>
+                                <MenuItem Header="Decorator" >
+                                    <MenuItem Header="Decorator" Click="Mnu_NewDecorator_Click" Tag="{x:Static vm:DecoratorType.Default}"  >
+                                        <MenuItem.Icon>
+                                            <my:ButtonImage NormalImage="{StaticResource ImgDecorator}" DisableImage="{StaticResource ImgDecorator_D}" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem Header="AccessLimitDecorator" Click="Mnu_NewDecorator_Click" Tag="{x:Static vm:DecoratorType.AccessLimit}"  >
+                                        <MenuItem.Icon>
+                                            <my:ButtonImage NormalImage="{StaticResource ImgDecorator}" DisableImage="{StaticResource ImgDecorator_D}" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
                                 </MenuItem>
                                 <MenuItem Header="Selector" >
                                     <MenuItem Header="Sequence" Click="Mnu_NewSelector_Click" Tag="{x:Static vm:CompositeType.Sequence}" >
