@@ -12,13 +12,12 @@ namespace Skill.Animation
     {
 
         private AnimationTreeState _State;
-        private AnimationLayerManager _LayerManager; // layers
         private Dictionary<string, string> _Profiles;// list of profiles
 
         /// <summary>
         /// Maximum layer used by this AnimationTree
         /// </summary>
-        public int LayerCount { get { return _LayerManager.Layers.Count; } }
+        public int LayerCount { get { return LayerManager.Layers.Count; } }
         /// <summary>
         /// The root AnimNode
         /// </summary>
@@ -27,6 +26,11 @@ namespace Skill.Animation
         /// User data
         /// </summary>
         public object UserData { get; set; }
+
+        /// <summary>
+        /// LayerManager
+        /// </summary>
+        public AnimationLayerManager LayerManager { get; private set; }
 
 
         private string _CurrentProfile;// current selected profile
@@ -113,8 +117,8 @@ namespace Skill.Animation
             this._Profiles = new Dictionary<string, string>();
 
             Root = CreateTree();
-            _LayerManager = new AnimationLayerManager();
-            Root.SelectLayer(_LayerManager, _LayerManager.Create(UnityEngine.AnimationBlendMode.Blend));
+            LayerManager = new AnimationLayerManager();
+            Root.SelectLayer(LayerManager, LayerManager.Create(UnityEngine.AnimationBlendMode.Blend));
         }
 
         /// <summary>
@@ -143,19 +147,25 @@ namespace Skill.Animation
         /// Initialize UnityEngine.Animation. call this at 'Awake', or 'Start' method of MonoBehavior based class
         /// </summary>
         /// <param name="animationComponent">UnityEngine.Animation to initialize</param>
-        public virtual void Initialize(UnityEngine.Animation animationComponent)
+        /// <param name="syncLayers">Synchronize layers?</param>
+        public virtual void Initialize(UnityEngine.Animation animationComponent, bool syncLayers = true)
         {
             Root.Initialize(animationComponent);
+            if (syncLayers)
+                SyncLayers(animationComponent);
         }
 
         /// <summary>
         /// Sync all layers used in this AnimationTree. (maybe not useful because we do'nt use 'CrossFade' method)
         /// </summary>
         /// <param name="animationComponent">UnityEngine.Animation to sync layers</param>
-        public virtual void SyncLayers(UnityEngine.Animation animationComponent)
+        private void SyncLayers(UnityEngine.Animation animationComponent)
         {
-            for (int i = 0; i < this.LayerCount; i++)
-                animationComponent.SyncLayer(i);
+            foreach (var layer in LayerManager.Layers)
+            {
+                layer.Synchronization = true;
+                animationComponent.SyncLayer(layer.LayerIndex);
+            }
         }
 
         /// <summary>
@@ -165,11 +175,14 @@ namespace Skill.Animation
         public void Update(Controllers.Controller controller = null)
         {
             _State.Controller = controller;
-            foreach (var layer in _LayerManager.Layers)
+            foreach (var layer in LayerManager.Layers)
                 layer.CleanUpActiveList();
 
             Root.Weight = 1;
             Root.Update(_State);
+
+            foreach (var layer in LayerManager.Layers)
+                layer.Update();
         }
 
         /// <summary>
@@ -180,8 +193,8 @@ namespace Skill.Animation
         /// you can apply this AnimationTree to more than one UnityEngine.Animation each frame (instancing)
         /// </remarks>
         public void Apply(UnityEngine.Animation animationComponent)
-        {            
-            foreach (var layer in _LayerManager.Layers)
+        {
+            foreach (var layer in LayerManager.Layers)
             {
                 layer.Apply(animationComponent);
             }

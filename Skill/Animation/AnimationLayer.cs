@@ -10,6 +10,13 @@ namespace Skill.Animation
     /// </summary>
     public sealed class AnimationLayer
     {
+        private AnimNodeSequence _MaxReleavant;
+
+        /// <summary>
+        /// Synchronize animations?
+        /// </summary>
+        public bool Synchronization { get; set; }
+
         /// <summary>
         /// include AnimNodes with weight > 0
         /// </summary>
@@ -33,6 +40,26 @@ namespace Skill.Animation
             this.BlendMode = blendMode;
             this.LayerIndex = layerIndex;
             ActiveAnimNodes = new List<AnimNodeSequence>();
+        }
+
+        /// <summary>
+        /// Update Layer
+        /// </summary>
+        internal void Update()
+        {
+            if (Synchronization)
+            {
+                _MaxReleavant = null;
+                float maxW = 0;
+                foreach (var node in ActiveAnimNodes)
+                {
+                    if (node.Weight > maxW)
+                    {
+                        _MaxReleavant = node;
+                        maxW = node.Weight;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -66,7 +93,7 @@ namespace Skill.Animation
             int i = 0;
             while (i < ActiveAnimNodes.Count)
             {
-                if (ActiveAnimNodes[i].Weight == 0.0f)
+                if (ActiveAnimNodes[i].Weight == 0.0f && !ActiveAnimNodes[i].IsJustCeaseRelevant)
                 {
                     ActiveAnimNodes.RemoveAt(i);
                     continue;
@@ -75,12 +102,56 @@ namespace Skill.Animation
             }
         }
 
+
+        //private void Blend()
+        //{
+        //    if (Current != null)
+        //    {
+        //        if (Previous != null)
+        //        {
+        //            float currLength = Current.Length;
+        //            float preLength = Previous.Length;
+
+        //            float totalW = Current.Weight + Previous.Weight + 1e-6f;
+        //            float preP = Previous.Weight / totalW;
+        //            float currP = Current.Weight / totalW;
+        //            float ratio = currLength / preLength;
+        //            Current.IntermediateSpeed = (1.0f - currP) * ratio + currP;
+        //            Previous.IntermediateSpeed = (1.0f - preP) * (1.0f / ratio) + preP;
+
+        //            if (Current.IntermediateSpeed > Current.Speed)
+        //                Current.IntermediateSpeed = Current.Speed;
+
+        //            if (Previous.Weight <= 0)
+        //            {
+        //                AddToActiveList(Previous);
+        //                Previous = null;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            Current.IntermediateSpeed = Current.Speed;
+        //        }
+        //    }
+        //}
+
+
         /// <summary>
         /// Apply changes to UnityEngine.Animation component 
         /// </summary>
         /// <param name="animationComponent">UnityEngine.Animation to apply changes to</param>
         internal void Apply(UnityEngine.Animation animationComponent)
         {
+            float normalizedTime = 0;
+
+            if (Synchronization && _MaxReleavant != null)
+            {
+                UnityEngine.AnimationState state = animationComponent[_MaxReleavant.CurrentAnimation];
+                if (state != null)
+                    normalizedTime = state.normalizedTime;
+            }
+
+
             foreach (var anim in ActiveAnimNodes)// iterate throw all active AnimNodeSequences
             {
                 UnityEngine.AnimationState state = animationComponent[anim.CurrentAnimation];// access state
@@ -102,7 +173,14 @@ namespace Skill.Animation
                             state.speed = anim.Speed;
                     }
                     else // else continue
+                    {
                         state.speed = anim.Speed;
+                        if (Synchronization && _MaxReleavant != null && _MaxReleavant != anim)
+                        {
+                            if (anim.IsJustBecameRelevant)
+                                state.normalizedTime = normalizedTime;
+                        }
+                    }
 
                     if (anim.WeightChange != WeightChangeMode.NoChange)
                     {

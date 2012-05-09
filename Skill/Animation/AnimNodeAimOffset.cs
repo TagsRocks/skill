@@ -145,7 +145,9 @@ namespace Skill.Animation
             this.UseTreeProfile = true;
             _Profiles = new List<AnimNodeAimOffsetProfile>();
             for (int i = 1; i < ChildCount; i++)
-                this[i] = new AnimNodeSequence();
+            {
+                this[i] = new AnimNodeSequence() { WrapMode = UnityEngine.WrapMode.ClampForever };
+            }
         }
 
         /// <summary>
@@ -154,11 +156,11 @@ namespace Skill.Animation
         /// <param name="blendWeights">previous weight of children</param>
         protected override void CalcBlendWeights(ref float[] blendWeights)
         {
-            NormalNode.Weight = 1;
+            blendWeights[0] = 1;// normal node is 1
             if (_SelectedProfile != null && IsAimEnable)
             {
-                float x = UnityEngine.Mathf.Clamp(AimX + AngleOffsetX, -1, -1);
-                float y = UnityEngine.Mathf.Clamp(AimY + AngleOffsetY, -1, -1);
+                float x = UnityEngine.Mathf.Clamp(AimX + AngleOffsetX, -1, 1);
+                float y = UnityEngine.Mathf.Clamp(AimY + AngleOffsetY, -1, 1);
 
                 if (x < 0)// left side is enable
                 {
@@ -213,7 +215,7 @@ namespace Skill.Animation
             {
                 for (int i = 1; i < this.ChildCount; i++)
                 {
-                    this[i].Weight = 0;
+                    blendWeights[i] = 0;
                 }
             }
         }
@@ -283,7 +285,7 @@ namespace Skill.Animation
                 throw new ArgumentException("profile with same name exist");
             _Profiles.Add(profile);
             if (_SelectedProfile == null)
-                _SelectedProfile = _Profiles[0];
+                Profile = _Profiles[0].Name;
         }
 
         /// <summary>
@@ -302,7 +304,7 @@ namespace Skill.Animation
         public bool Contains(AnimNodeAimOffsetProfile profile)
         {
             return _Profiles.Contains(profile);
-        }        
+        }
 
         /// <summary>
         /// Retrieves number of profiles
@@ -310,7 +312,7 @@ namespace Skill.Animation
         public int ProfileCount
         {
             get { return _Profiles.Count; }
-        }       
+        }
 
         /// <summary>
         /// Remove specified profile
@@ -326,6 +328,6 @@ namespace Skill.Animation
                 else
                     _SelectedProfile = null;
             return result;
-        }        
+        }
     }
 }

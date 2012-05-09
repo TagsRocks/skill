@@ -167,13 +167,20 @@ namespace Skill.Animation
         /// <param name="animationComponent">UnityEngine.Animation</param>
         public override void Initialize(UnityEngine.Animation animationComponent)
         {
-            if (string.IsNullOrEmpty(AnimationName)) return;
+            if (string.IsNullOrEmpty(AnimationName))
+            {
+                UnityEngine.Debug.LogWarning("Please set valid 'AnimationName' to  AnimNodeSequence : " + (string.IsNullOrEmpty(Name) ? "" : Name));
+                return;
+            }
+
             UnityEngine.AnimationState state = animationComponent[AnimationName];
             if (state != null)
             {
                 this._Length = state.length;
                 state.layer = Layer.LayerIndex;
             }
+            else
+                UnityEngine.Debug.LogWarning("Can not find AnimationClip : " + AnimationName);
         }
     }
 }
