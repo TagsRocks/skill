@@ -22,6 +22,25 @@ namespace Skill.Editor
             //Skill.Editor.Themes.ThemeManager.ApplyTheme(this, theme);
 
             AvalonDock.ThemeFactory.ChangeTheme(new Uri("/AvalonDock.Themes;component/themes/dev2010.xaml", UriKind.RelativeOrAbsolute));
+
+            if (e.Args != null && e.Args.Length > 0)            
+            {
+                foreach (var arg in e.Args)
+                {
+                    if (!string.IsNullOrEmpty(arg))
+                    {
+                        if (System.IO.File.Exists(arg))
+                        {                            
+                            if (System.IO.Path.GetExtension(arg) == Project.Extension)
+                            {
+                                Skill.Editor.MainWindow.ProjectAddressToOpen = arg;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
             base.OnStartup(e);            
         }
     }

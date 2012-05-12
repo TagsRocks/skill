@@ -15,6 +15,7 @@ namespace Skill.Editor.CG
         private static string[] ConditionHandlerParams = new string[] { "Skill.AI.BehaviorTree tree", "Skill.AI.BehaviorParameterCollection parameters" };
         private static string[] DecoratorHandlerParams = ConditionHandlerParams;
         private static string[] ActionHandlerParams = ConditionHandlerParams;
+        private static string AccessKeysVariableName = "AccessKeys";
         List<AI.Behavior> _Behaviors;// list of behaviors in hierarchy
         AI.BehaviorTree _Tree;// behavior tree model 
         StringBuilder _CreateTreeMethodBody;
@@ -35,9 +36,15 @@ namespace Skill.Editor.CG
             ProcessNodes();
             AddInherit("Skill.AI.BehaviorTree");
 
+
+            CreateAccessKeys(tree);
+
             Method constructor = new Method("", Name, "", "Skill.Controllers.Controller controller");
             constructor.Modifiers = Modifiers.Public;
             constructor.BaseMethod = ":base(controller)";
+
+
+
             Add(constructor);
 
             Method createTree = new Method("Skill.AI.Behavior", "CreateTree", this._CreateTreeMethodBody.ToString());
@@ -46,6 +53,33 @@ namespace Skill.Editor.CG
             createTree.Modifiers = Modifiers.Protected;
             Add(createTree);
         }
+
+        private void CreateAccessKeys(AI.BehaviorTree tree)
+        {
+            if (tree.AccessKeys.Count > 0)
+            {
+                Add(new Variable("System.Collections.Generic.Dictionary<string,Skill.AI.AccessKey>", AccessKeysVariableName, "null") { IsStatic = true });
+
+                StringBuilder staticConstructorBody = new StringBuilder();
+                staticConstructorBody.AppendLine(string.Format("{0} = new System.Collections.Generic.Dictionary<string,Skill.AI.AccessKey>();", Variable.GetName(AccessKeysVariableName)));
+                foreach (var ak in tree.AccessKeys)
+                {
+                    switch (ak.Value.Type)
+                    {
+                        case Skill.Editor.AI.AccessKeyType.CounterLimit:
+                            staticConstructorBody.AppendLine(string.Format("{0}.Add( \"{1}\" , new CounterLimitAccessKey(\"{2}\",{3}) );", Variable.GetName(AccessKeysVariableName), ak.Key, ak.Key, ((AI.CounterLimitAccessKey)ak.Value).MaxAccessCount));
+                            break;
+                        case Skill.Editor.AI.AccessKeyType.TimeLimit:
+                            staticConstructorBody.AppendLine(string.Format("{0}.Add( \"{1}\" , new TimeLimitAccessKey(\"{2}\",{3}) );", Variable.GetName(AccessKeysVariableName), ak.Key, ak.Key, ((AI.TimeLimitAccessKey)ak.Value).TimeInterval));
+                            break;
+                    }
+                }
+
+                Method staticConstructor = new Method(string.Empty, tree.Name, staticConstructorBody.ToString()) { IsStatic = true, Modifiers = Modifiers.None };
+                Add(staticConstructor);
+            }
+        }
+
         #endregion
 
         #region CreateBehaviorList
@@ -160,7 +194,7 @@ namespace Skill.Editor.CG
                     {
                         AI.Behavior child = Find(childId[0]);
                         if (child != null)
-                            _CreateTreeMethodBody.AppendLine(string.Format("{0}.Child ={1};", Variable.GetName(b.Name), Variable.GetName(child.Name)));
+                            _CreateTreeMethodBody.AppendLine(string.Format("{0}.SetChild({1});", Variable.GetName(b.Name), Variable.GetName(child.Name)));
                     }
                 }
                 // selector has multiple child
@@ -259,6 +293,19 @@ namespace Skill.Editor.CG
 
         private void CreateDecorator(AI.Decorator decorator)
         {
+            switch (decorator.Type)
+            {
+                case Skill.Editor.AI.DecoratorType.Default:
+                    CreateDefaultDecorator(decorator);
+                    break;
+                case Skill.Editor.AI.DecoratorType.AccessLimit:
+                    CreateAccessLimitDecorator((AI.AccessLimitDecorator)decorator);
+                    break;
+            }
+        }
+
+        private void CreateDefaultDecorator(AI.Decorator decorator)
+        {
             // create decorator variable
             Add(new Variable("Skill.AI.Decorator", decorator.Name, "null"));
             // new decorator variable inside CreateTree method
@@ -272,6 +319,21 @@ namespace Skill.Editor.CG
             Method m = new Method("bool", GetDecoratorHandlerName(decorator.Name), "return false;", DecoratorHandlerParams);
             m.IsPartial = true;
             Add(m);
+            // create events handlers (success, failure and Running)
+            CreateEvents(decorator);
+        }
+
+        private void CreateAccessLimitDecorator(AI.AccessLimitDecorator decorator)
+        {
+            // create decorator variable
+            Add(new Variable("Skill.AI.AccessLimitDecorator", decorator.Name, "null"));
+            // new decorator variable inside CreateTree method
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.AccessLimitDecorator(\"{1}\",{2}[\"{3}\"]);", Variable.GetName(decorator.Name), decorator.Name, Variable.GetName(AccessKeysVariableName), decorator.AccessKey));
+            // set property SuccessOnFailHandler
+            if (decorator.SuccessOnFailHandler != false) // default value is false, so it is not necessary to set it
+                _CreateTreeMethodBody.AppendLine(string.Format("{0}.SuccessOnFailHandler = {1};", Variable.GetName(decorator.Name), decorator.SuccessOnFailHandler.ToString().ToLower()));
+            // set weight
+            SetWeight(decorator);
             // create events handlers (success, failure and Running)
             CreateEvents(decorator);
         }

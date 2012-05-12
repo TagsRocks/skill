@@ -20,7 +20,7 @@ namespace Skill.Editor.Animation
     public enum WrapMode
     {
         Default = 0,
-        Once = 1,        
+        Once = 1,
         Loop = 2,
         PingPong = 4,
         ClampForever = 8,
@@ -36,13 +36,16 @@ namespace Skill.Editor.Animation
             this.WrapMode = WrapMode.Default;
             IsPublic = false;
             UseTreeProfile = true;
-        }        
+            Synchronize = false;
+        }
 
         public override AnimNodeType NodeType { get { return AnimNodeType.Sequence; } }
 
         public string AnimationName { get; set; }
 
-        public bool UseTreeProfile { get; set; }        
+        public bool UseTreeProfile { get; set; }
+
+        public bool Synchronize { get; set; }
 
         /// <summary> Speed at which the animation will be played back.Default is 1.0 </summary>        
         public float Speed { get; set; }
@@ -55,8 +58,9 @@ namespace Skill.Editor.Animation
 
             data.SetAttributeValue("AnimationName", string.IsNullOrEmpty(this.AnimationName) ? "" : this.AnimationName);
             data.SetAttributeValue("Speed", this.Speed);
-            data.SetAttributeValue("WrapMode", (int)this.WrapMode);            
+            data.SetAttributeValue("WrapMode", (int)this.WrapMode);
             data.SetAttributeValue("UseTreeProfile", this.UseTreeProfile);
+            data.SetAttributeValue("Synchronize", this.Synchronize);
 
             e.Add(data);
 
@@ -70,8 +74,9 @@ namespace Skill.Editor.Animation
             {
                 this.AnimationName = data.GetAttributeValueAsString("AnimationName", "");
                 this.Speed = data.GetAttributeValueAsFloat("Speed", 1);
-                this.WrapMode = (WrapMode)data.GetAttributeValueAsInt("WrapMode", (int)WrapMode.Default);                
+                this.WrapMode = (WrapMode)data.GetAttributeValueAsInt("WrapMode", (int)WrapMode.Default);
                 this.UseTreeProfile = data.GetAttributeValueAsBoolean("UseTreeProfile", true);
+                this.Synchronize = data.GetAttributeValueAsBoolean("Synchronize", false);
             }
             base.ReadAttributes(e);
         }
@@ -152,6 +157,23 @@ namespace Skill.Editor.Animation
                         Editor.History.Insert(new ChangePropertyUnDoRedo(this, "UseTreeProfile", value, ((AnimNodeSequence)ViewModel.Model).UseTreeProfile));
                     }
                     ((AnimNodeSequence)ViewModel.Model).UseTreeProfile = value;
+                }
+            }
+        }
+
+        [Description("Synchronize animations with other animations in same Layer?")]
+        public bool Synchronize
+        {
+            get { return ((AnimNodeSequence)ViewModel.Model).Synchronize; }
+            set
+            {
+                if (((AnimNodeSequence)ViewModel.Model).Synchronize != value)
+                {
+                    if (Editor != null)
+                    {
+                        Editor.History.Insert(new ChangePropertyUnDoRedo(this, "Synchronize", value, ((AnimNodeSequence)ViewModel.Model).Synchronize));
+                    }
+                    ((AnimNodeSequence)ViewModel.Model).Synchronize = value;
                 }
             }
         }

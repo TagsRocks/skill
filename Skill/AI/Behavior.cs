@@ -139,11 +139,13 @@ namespace Skill.AI
         /// <returns>String</returns>
         public override string ToString() { return Name; }
 
+        
         /// <summary>
-        /// For internal use. when a branch with higher priority executed, let nodes in previous branch reset
+        /// Reset behavior. For internal use. when a branch with higher priority executed, let nodes in previous branch reset
         /// </summary>
-        /// <param name="state"></param>
-        public virtual void Reset(BehaviorState state)
+        /// <param name="state">State of BehaviorTree</param>
+        /// <param name="resetChildren">Reset children too</param>
+        public virtual void Reset(BehaviorState state, bool resetChildren = false)
         {
             Result = BehaviorResult.Failure;
         }

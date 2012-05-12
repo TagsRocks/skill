@@ -38,6 +38,8 @@ namespace Skill.Editor
 
         #endregion
 
+
+        public static string ProjectAddressToOpen { get; set; }
         public static MainWindow Instance { get; private set; }
 
         #region Variables
@@ -99,8 +101,15 @@ namespace Skill.Editor
             ChangeTitle();
             _DocumentCloseHandler = new EventHandler<CancelEventArgs>(this.TabDocument_Closing);
 
-            if (Properties.Settings.Default.ShowSPOnStartup)
+            if (ProjectAddressToOpen != null)
+            {
+                _ProjectExplorer.Open(ProjectAddressToOpen);
+                ProjectAddressToOpen = null;
+            }
+            else if (Properties.Settings.Default.ShowSPOnStartup)
+            {
                 ShowStartPage();
+            }
         }
         #endregion
 

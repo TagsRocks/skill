@@ -216,6 +216,7 @@ namespace Skill.Editor.Controls
                 {
                     AI.BehaviorTree tree = AI.BehaviorTree.Load(fileName);
                     SearchForDuplicateNames(vm, tree);
+                    SearchForInvalidAccessKeys(vm, tree);
                 }
             }
             else if (vm.EntityType == EntityType.AnimationTree)
@@ -365,6 +366,31 @@ namespace Skill.Editor.Controls
                 nameList.Add(b.Name);
             }
             nameList.Clear();
+        }
+
+        private void SearchForInvalidAccessKeys(EntityNodeViewModel vm, AI.BehaviorTree tree)
+        {
+            foreach (AI.Behavior b in tree)
+            {
+                if (b.BehaviorType == AI.BehaviorType.Decorator)
+                {
+                    AI.Decorator decorator = (AI.Decorator)b;
+                    if (decorator.Type == AI.DecoratorType.AccessLimit)
+                    {
+                        AI.AccessLimitDecorator accessLimitDecorator = (AI.AccessLimitDecorator)decorator;
+                        if (!tree.AccessKeys.ContainsKey(accessLimitDecorator.AccessKey))
+                        {
+                            AddInvalidAccessKeyError(vm, accessLimitDecorator.AccessKey, accessLimitDecorator.Name);
+                        }
+                    }
+                }
+            }
+        }
+        void AddInvalidAccessKeyError(EntityNodeViewModel node, string accessKey, string name)
+        {
+            CompileError err = new CompileError() { Node = node, Type = ErrorType.Error };
+            err.Description = string.Format("The provided AccessKey '{0}' for behavior node '{1}' does not exist.", accessKey, name);
+            _AllErrors.Add(err);
         }
         #endregion
 

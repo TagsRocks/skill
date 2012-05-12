@@ -82,7 +82,7 @@ namespace Skill.Editor.AI
         #region Variables
         private string _FileName; // full address of BehaviorTree filename
         private BehaviorTreeEditorViewModel _ViewModel; // view model
-        bool _IsChanged;
+        bool _IsChanged = true;
         BehaviorViewModel _CuttedBehavior;
         #endregion
 
@@ -119,7 +119,7 @@ namespace Skill.Editor.AI
             this._FileName = filename;
             BehaviorTree tree = AI.BehaviorTree.Load(filename);
             _ViewModel.BehaviorTree = new BehaviorTreeViewModel(tree, this.History);
-            ChangeTitle();
+            SetChanged(false);
             History.Change += new EventHandler(History_Change);
             History.UndoChange += new EventHandler(History_UndoChange);
             History.RedoChange += new EventHandler(History_RedoChange);
@@ -149,12 +149,19 @@ namespace Skill.Editor.AI
         // when any change occurs in history, update title
         void History_Change(object sender, EventArgs e)
         {
-            _IsChanged = History.ChangeCount != 0;
-            ChangeTitle();
+            SetChanged(History.ChangeCount != 0);
         }
         #endregion
 
         #region Title
+
+        public void SetChanged(bool changed)
+        {
+            bool titleChanged = changed != _IsChanged;
+            _IsChanged = changed;
+            if (titleChanged)
+                ChangeTitle();
+        }
         private void ChangeTitle()
         {
             string newTitle = System.IO.Path.GetFileNameWithoutExtension(_FileName) + (IsChanged ? "*" : "");
@@ -178,7 +185,7 @@ namespace Skill.Editor.AI
             ApplicationCommands.Properties.Execute(_BTTree.SelectedItem, null);
         }
         private void TreeViewItem_KeyDown(object sender, KeyEventArgs e)
-        {            
+        {
             if (e.Key == Key.Escape)
             {
                 ResetCut();
@@ -190,9 +197,9 @@ namespace Skill.Editor.AI
 
         #region UpdateConnections
         private void UpdateConnections()
-        {            
+        {
             this._ViewModel.BehaviorTree.Root.UpdateConnection();
-        } 
+        }
         #endregion
 
         #region Insert
@@ -208,11 +215,17 @@ namespace Skill.Editor.AI
                     {
                         try
                         {
-                            var newVM = selected.AddBehavior((BehaviorViewModel)textBlock.Tag);
-                            if (newVM != null)
-                                newVM.IsSelected = true;
-                            ResetCut();
-                            UpdateConnections();
+                            string message;
+                            if (selected.CanAddBehavior((BehaviorViewModel)textBlock.Tag, out message))
+                            {
+                                var newVM = selected.AddBehavior((BehaviorViewModel)textBlock.Tag);
+                                if (newVM != null)
+                                    newVM.IsSelected = true;
+                                ResetCut();
+                                UpdateConnections();
+                            }
+                            else
+                                MainWindow.Instance.ShowError(message);
                         }
                         catch (Exception ex)
                         {
@@ -221,35 +234,59 @@ namespace Skill.Editor.AI
                     }
                 }
             }
-        }        
+        }
         #endregion
 
         #region New
-        private void AddNonSelector(BehaviorType behaviorType)
+        private void AddCondition()
         {
             if (_ViewModel.IsNewAv)
             {
                 var selected = GetSelectedItem();
                 if (selected != null)
                 {
-                    var newVM = selected.AddNonSelector(behaviorType);
+                    var newVM = selected.AddCondition();
                     if (newVM != null)
+                    {
+                        _ViewModel.BehaviorTree.CreateNewName(newVM);
                         newVM.IsSelected = true;
+                    }
                     UpdateConnections();
                 }
             }
         }
 
-        private void AddSelector(CompositeType selectorType)
+        private void AddAction()
         {
             if (_ViewModel.IsNewAv)
             {
                 var selected = GetSelectedItem();
                 if (selected != null)
                 {
-                    var newVM = selected.AddSelector(selectorType);
+                    var newVM = selected.AddAction();
                     if (newVM != null)
+                    {
+                        _ViewModel.BehaviorTree.CreateNewName(newVM);
                         newVM.IsSelected = true;
+                    }
+                    UpdateConnections();
+                }
+            }
+        }
+
+        private void AddComposite(CompositeType compositeType)
+        {
+            if (_ViewModel.IsNewAv)
+            {
+                var selected = GetSelectedItem();
+                if (selected != null)
+                {
+                    var newVM = selected.AddComposite(compositeType);
+                    if (newVM != null)
+                    {
+                        _ViewModel.BehaviorTree.CreateNewName(newVM);
+                        newVM.IsSelected = true;
+                    }
                     UpdateConnections();
                 }
             }
@@ -264,18 +301,29 @@ namespace Skill.Editor.AI
                 {
                     var newVM = selected.AddDecorator(decoratorType);
                     if (newVM != null)
+                    {
+                        _ViewModel.BehaviorTree.CreateNewName(newVM);
                         newVM.IsSelected = true;
+                    }
                     UpdateConnections();
                 }
             }
         }
 
-        private void Mnu_NewNonSelector_Click(object sender, RoutedEventArgs e)
+        private void Mnu_NewAction_Click(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem)
             {
-                MenuItem mnu = (MenuItem)sender;
-                AddNonSelector((BehaviorType)mnu.Tag);
+                AddAction();
+                ResetCut();
+            }
+        }
+
+        private void Mnu_NewCondition_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem)
+            {
+                AddCondition();
                 ResetCut();
             }
         }
@@ -290,12 +338,12 @@ namespace Skill.Editor.AI
             }
         }
 
-        private void Mnu_NewSelector_Click(object sender, RoutedEventArgs e)
+        private void Mnu_NewComposite_Click(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem)
             {
                 MenuItem mnu = (MenuItem)sender;
-                AddSelector((CompositeType)mnu.Tag);
+                AddComposite((CompositeType)mnu.Tag);
                 ResetCut();
             }
         }
@@ -374,9 +422,8 @@ namespace Skill.Editor.AI
             if (_ViewModel.BehaviorTree != null)
             {
                 _ViewModel.BehaviorTree.Model.Save(_FileName);
-                _IsChanged = false;
                 History.ResetChangeCount();
-                ChangeTitle();
+                SetChanged(false);
                 ResetCut();
             }
         }
@@ -418,10 +465,19 @@ namespace Skill.Editor.AI
                 {
                     try
                     {
-                        ((BehaviorViewModel)_CuttedBehavior.Parent).RemoveBehavior(_CuttedBehavior);
-                        var newVM = selected.AddBehavior(_CuttedBehavior, false);
-                        if (newVM != null)
-                            newVM.IsSelected = true;
+                        string message;
+                        if (selected.CanAddBehavior(_CuttedBehavior, out message))
+                        {
+                            ((BehaviorViewModel)_CuttedBehavior.Parent).RemoveBehavior(_CuttedBehavior);
+                            var newVM = selected.AddBehavior(_CuttedBehavior, false);
+                            if (newVM != null)
+                            {
+                                newVM.IsSelected = true;
+                            }
+                            UpdateConnections();
+                        }
+                        else
+                            MainWindow.Instance.ShowError(message);
                     }
                     catch (Exception ex)
                     {
@@ -435,26 +491,14 @@ namespace Skill.Editor.AI
         }
         #endregion
 
-        private void BehaviorsTab_GotFocus(object sender, RoutedEventArgs e)
-        {            
-            if (BehaviorTree != null)
-                BehaviorTree.CheckContainersIsInHierarchy();
-        }
 
-        private void BtnDelBContainer_Click(object sender, RoutedEventArgs e)
+        #region AccessKeys
+        private void Mnu_EditAccessKeys(object sender, RoutedEventArgs e)
         {
-            if (BehaviorTree == null) return;
-            Button btn = e.Source as Button;
-            if (btn != null)
-            {
-                BehaviorViewModelContainer bc = btn.Tag as BehaviorViewModelContainer;
-                if (bc != null)
-                {
-                    BehaviorTree.RemoveBehaviorContainer(bc);
-                    e.Handled = true;
-                }
-
-            }
+            AccessKeyEditor editor = new AccessKeyEditor(this._ViewModel.BehaviorTree.Model.AccessKeys);
+            editor.ShowDialog();
+            SetChanged(true);
         }
+        #endregion
     }
 }

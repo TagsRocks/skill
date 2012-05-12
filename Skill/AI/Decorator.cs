@@ -110,6 +110,23 @@ namespace Skill.AI
                 _IsChildRunning = false;
             return result;
         }
-    } 
+
+        /// <summary>
+        /// Reset behavior
+        /// </summary>
+        /// <param name="state">State of BehaviorTree</param>
+        /// <param name="resetChildren">Reset children too</param>
+        public override void Reset(BehaviorState state, bool resetChildren = false)
+        {
+            base.Reset(state);
+            if (resetChildren)
+            {
+                if (Child != null)
+                {
+                    Child.Behavior.Reset(state, resetChildren);
+                }
+            }
+        }
+    }
     #endregion
 }

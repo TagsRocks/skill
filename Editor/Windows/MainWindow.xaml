@@ -237,7 +237,7 @@
                         </ad:DockableContent>-->
                         </ad:DockablePane>
                     </ad:ResizingPanel>
-                    <ad:DockablePane x:Name="DockablePane_Right" ad:ResizingPanel.ResizeWidth="300" >
+                    <ad:DockablePane x:Name="DockablePane_Right" ad:ResizingPanel.ResizeWidth="300" >                        
                         <my:PropertyGrid x:Name="_PropertyGrid" />
                         <my:ProjectExplorer x:Name="_ProjectExplorer" />
                     </ad:DockablePane>

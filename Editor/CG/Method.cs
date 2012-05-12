@@ -37,6 +37,8 @@ namespace Skill.Editor.CG
         public string Body { get; protected set; }
         /// <summary> use in constructor methods write between ) and { </summary>
         public string BaseMethod { get; set; }
+        /// <summary> whether this method is static? </summary>
+        public bool IsStatic { get; set; }
 
         /// <summary>
         /// Create a method
@@ -45,14 +47,14 @@ namespace Skill.Editor.CG
         /// <param name="name">name of method</param>
         /// <param name="body">body</param>
         /// <param name="parameters">parameters</param>
-        public Method(string returnType, string name, string body, params string[] parameters)            
+        public Method(string returnType, string name, string body, params string[] parameters)
         {
             this.Modifiers = Modifiers.Private;
             this.ReturnType = returnType;
             this.Name = name;
             this.Body = body;
             this.Parameters = parameters;
-        }        
+        }
 
 
         /// <summary>
@@ -61,7 +63,11 @@ namespace Skill.Editor.CG
         /// <param name="writer">Stream</param>
         public void Write(System.IO.StreamWriter writer)
         {
-            writer.Write(string.Format("{0} {1} {2} {3}(", Modifiers.ToString().ToLower(), (this.SubMethod != SubMethod.None) ? this.SubMethod.ToString().ToLower() : "", ReturnType, Name));
+            writer.Write(string.Format("{0} {1} {2} {3} {4}(", (Modifiers != CG.Modifiers.None) ? Modifiers.ToString().ToLower() : string.Empty,
+                IsStatic ? "static" : string.Empty,
+                (this.SubMethod != SubMethod.None) ? this.SubMethod.ToString().ToLower() : string.Empty,
+                ReturnType,
+                Name));
 
             if (Parameters != null)
             {

@@ -98,11 +98,11 @@ namespace Skill.Editor.AI
 
     public enum AccessKeyType
     {
-        CountLimit,
+        CounterLimit,
         TimeLimit
     }
 
-    public class AccessKey : IXElement
+    public abstract class AccessKey : IXElement
     {
         [Browsable(false)]
         public AccessKeyType Type { get; private set; }
@@ -137,14 +137,66 @@ namespace Skill.Editor.AI
         /// <param name="e">contains behavior data</param>
         protected virtual void ReadAttributes(XElement e) { }
 
+        public override string ToString()
+        {
+            return string.Format("{0} ( {1} )", Type, Key);
+        }
     }
 
-    public class CountLimitAccessKey : AccessKey
+    public abstract class AccessKeyViewModel : INotifyPropertyChanged
+    {
+        [Browsable(false)]
+        public AccessKey Model { get; private set; }
+
+        [Browsable(false)]
+        public AccessKeyType Type { get { return Model.Type; } }
+
+        [Browsable(false)]
+        public string DisplayName { get { return string.Format("{0} ( {1} )", Type, Key); } }
+
+        public string Key
+        {
+            get { return Model.Key; }
+            set
+            {
+                if (Model.Key != value)
+                {
+                    Model.Key = value;
+                    OnPropertyChanged("Key");
+                    OnPropertyChanged("DisplayName");
+                }
+            }
+        }
+
+
+        public AccessKeyViewModel(AccessKey model)
+        {
+            this.Model = model;
+        }
+
+
+        #region INotifyPropertyChanged Members
+
+        // we could use DependencyProperties as well to inform others of property changes
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string name)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
+        #endregion
+    }
+
+    public class CounterLimitAccessKey : AccessKey
     {
         public int MaxAccessCount { get; set; }
 
-        public CountLimitAccessKey()
-            : base(AccessKeyType.CountLimit)
+        public CounterLimitAccessKey()
+            : base(AccessKeyType.CounterLimit)
         {
             MaxAccessCount = 1;
         }
@@ -160,6 +212,71 @@ namespace Skill.Editor.AI
             base.ReadAttributes(e);
             MaxAccessCount = e.GetAttributeValueAsInt("MaxAccessCount", 1);
         }
+    }
+
+    public class CounterLimitAccessKeyViewModel : AccessKeyViewModel
+    {
+        public int MaxAccessCount
+        {
+            get { return ((CounterLimitAccessKey)Model).MaxAccessCount; }
+            set
+            {
+                if (((CounterLimitAccessKey)Model).MaxAccessCount != value)
+                {
+                    ((CounterLimitAccessKey)Model).MaxAccessCount = value;
+                    OnPropertyChanged("MaxAccessCount");
+                }
+            }
+        }
+
+        public CounterLimitAccessKeyViewModel(CounterLimitAccessKey model)
+            : base(model)
+        {
+        }
+    }
+
+    public class TimeLimitAccessKey : AccessKey
+    {
+        public float TimeInterval { get; set; }
+
+        public TimeLimitAccessKey()
+            : base(AccessKeyType.TimeLimit)
+        {
+            TimeInterval = 1;
+        }
+
+        protected override void WriteAttributes(XElement e)
+        {
+            base.WriteAttributes(e);
+            e.SetAttributeValue("TimeInterval", TimeInterval);
+        }
+
+        protected override void ReadAttributes(XElement e)
+        {
+            base.ReadAttributes(e);
+            TimeInterval = e.GetAttributeValueAsFloat("TimeInterval", 1);
+        }
+    }
+
+    public class TimeLimitAccessKeyViewModel : AccessKeyViewModel
+    {
+        public float TimeInterval
+        {
+            get { return ((TimeLimitAccessKey)Model).TimeInterval; }
+            set
+            {
+                if (((TimeLimitAccessKey)Model).TimeInterval != value)
+                {
+                    ((TimeLimitAccessKey)Model).TimeInterval = value;
+                    OnPropertyChanged("TimeInterval");
+                }
+            }
+        }
+
+        public TimeLimitAccessKeyViewModel(TimeLimitAccessKey model)
+            : base(model)
+        {            
+        }        
     }
     #endregion
 

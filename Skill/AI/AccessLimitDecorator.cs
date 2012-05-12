@@ -64,7 +64,7 @@ namespace Skill.AI
         public CounterLimitAccessKey(string accessKey, int maxAccessCount)
             : base(accessKey)
         {
-            if (maxAccessCount < 1) maxAccessCount = 1; // at least on decorator can hold the key at time
+            if (maxAccessCount < 1) maxAccessCount = 1; // at least one decorator can access the key at time
             this.MaxAccessCount = maxAccessCount;
             this._CurrentAccess = 0;
         }
@@ -87,6 +87,71 @@ namespace Skill.AI
         public override void Unlock()
         {
             if (--this._CurrentAccess < 0) this._CurrentAccess = 0;
+        }
+    }
+    #endregion
+
+    #region TimeLimitAccessKey
+    /// <summary>
+    /// Only first request accepted after TimeInterval and lock untile next TimeInterval
+    /// </summary>
+    public class TimeLimitAccessKey : AccessKey
+    {
+        private bool _Lock;
+        private TimeWatch _TimeTW;
+
+        /// <summary>
+        /// Defines time interval between access to key
+        /// </summary>
+        public float TimeInterval { get; set; }
+
+        /// <summary>
+        /// Create an instance of TimeLimitAccessKey
+        /// </summary>
+        /// <param name="accessKey">The Unique access key in BehaviorTree.</param>
+        /// <param name="timeInterval">time interval between access to key</param>
+        public TimeLimitAccessKey(string accessKey, float timeInterval)
+            : base(accessKey)
+        {
+            if (TimeInterval < 0.1f) timeInterval = 0.1f;
+            _Lock = false;
+        }
+
+        /// <summary>
+        /// Defines how to lock key and if success returns true, otherwise false.
+        /// </summary>
+        /// <returns>True for success, false for fail</returns>
+        public override bool Lock()
+        {
+            if (!_Lock)
+            {
+                if (_TimeTW.Enabled)
+                {
+                    if (_TimeTW.IsOver)
+                    {
+                        _TimeTW.End();
+                        _Lock = true;
+                        return true;
+                    }
+                    else
+                        return false;
+                }
+                else
+                {
+                    _Lock = true;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// This method called by AccessLimitDecorators after finish his work and free key to use by another AccessLimitDecorator.
+        /// </summary>
+        public override void Unlock()
+        {
+            _TimeTW.Begin(TimeInterval);
+            _Lock = false;
         }
     }
     #endregion
@@ -153,15 +218,19 @@ namespace Skill.AI
             }
             return result;
         }
-
+        
         /// <summary>
-        /// when a branch with more periority be valid let this nod to unlock key
+        /// Reset behavior. when a branch with more periority be valid let this nod to unlock key
         /// </summary>
         /// <param name="state">State of BehaviorTree</param>
-        public override void Reset(BehaviorState state)
+        /// <param name="resetChildren">Reset children too</param>
+        public override void Reset(BehaviorState state, bool resetChildren = false)
         {
             if (_Lock)
+            {
                 AccessKey.Unlock();
+                _Lock = false;
+            }
             base.Reset(state);
         }
     }

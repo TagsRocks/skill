@@ -16,6 +16,22 @@ namespace Skill.Animation
         public List<AnimationLayer> Layers { get; private set; }
 
         /// <summary>
+        /// Retrieves number of AnimNodeSequence that updated in current update
+        /// </summary>
+        public int EnableAnimNodeSequenceCount
+        {
+            get
+            {
+                int count = 0;
+                foreach (var layer in Layers)
+                {
+                    count += layer.ActiveAnimNodes.Count;
+                }
+                return count;
+            }
+        }
+
+        /// <summary>
         /// Create an instance of AnimationLayerManager
         /// </summary>
         public AnimationLayerManager()

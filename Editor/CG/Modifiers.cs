@@ -13,7 +13,8 @@ namespace Skill.Editor.CG
         Private,
         Public,
         Protected,
-        Internal
+        Internal,
+        None
     }
 
     

@@ -257,6 +257,8 @@ namespace Skill.Editor.Animation
 
         public bool UseTreeProfile { get; set; }
 
+        public bool IsLoop { get; set; }
+
         protected override void ReadAttributes(XElement e)
         {
             XElement data = e.FindChildByName("AimOffsetData");
@@ -264,6 +266,7 @@ namespace Skill.Editor.Animation
             {
                 this.ProfileChanged = data.GetAttributeValueAsBoolean("ProfileChanged", false);
                 this.UseTreeProfile = data.GetAttributeValueAsBoolean("UseTreeProfile", true);
+                this.IsLoop = data.GetAttributeValueAsBoolean("IsLoop", false);
 
                 XElement profiles = data.FindChildByName("Profiles");
                 if (profiles != null)
@@ -287,6 +290,7 @@ namespace Skill.Editor.Animation
 
             data.SetAttributeValue("ProfileChanged", this.ProfileChanged);
             data.SetAttributeValue("UseTreeProfile", this.UseTreeProfile);
+            data.SetAttributeValue("IsLoop", this.IsLoop);
 
             if (this.Profiles != null)
             {
@@ -383,6 +387,23 @@ namespace Skill.Editor.Animation
                         Editor.History.Insert(new ChangePropertyUnDoRedo(this, "UseTreeProfile", value, ((AnimNodeAimOffset)ViewModel.Model).UseTreeProfile));
                     }
                     ((AnimNodeAimOffset)ViewModel.Model).UseTreeProfile = value;
+                }
+            }
+        }
+
+        [Description("Whether aim animations are loop?")]
+        public bool IsLoop
+        {
+            get { return ((AnimNodeAimOffset)ViewModel.Model).IsLoop; }
+            set
+            {
+                if (((AnimNodeAimOffset)ViewModel.Model).IsLoop != value)
+                {
+                    if (Editor != null)
+                    {
+                        Editor.History.Insert(new ChangePropertyUnDoRedo(this, "IsLoop", value, ((AnimNodeAimOffset)ViewModel.Model).IsLoop));
+                    }
+                    ((AnimNodeAimOffset)ViewModel.Model).IsLoop = value;
                 }
             }
         }

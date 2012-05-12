@@ -470,7 +470,7 @@ namespace Skill.Editor.AI
                 case BehaviorType.Decorator:
                     return CreateDecoratorViewModel((Decorator)behavior);
                 case BehaviorType.Composite:
-                    return CreateSelectorViewModel((Composite)behavior);
+                    return CreateCompositeViewModel((Composite)behavior);
             }
             return null;
         }
@@ -499,20 +499,20 @@ namespace Skill.Editor.AI
         /// </summary>
         /// <param name="behavior">selector data</param>
         /// <returns>Create view model</returns>
-        CompositeViewModel CreateSelectorViewModel(Composite selector)
+        CompositeViewModel CreateCompositeViewModel(Composite composite)
         {
-            switch (selector.CompositeType)
+            switch (composite.CompositeType)
             {
                 case CompositeType.Sequence:
-                    return new SequenceSelectorViewModel(this, (SequenceSelector)selector);
+                    return new SequenceSelectorViewModel(this, (SequenceSelector)composite);
                 case CompositeType.Concurrent:
-                    return new ConcurrentSelectorViewModel(this, (ConcurrentSelector)selector);
+                    return new ConcurrentSelectorViewModel(this, (ConcurrentSelector)composite);
                 case CompositeType.Random:
-                    return new RandomSelectorViewModel(this, (RandomSelector)selector);
+                    return new RandomSelectorViewModel(this, (RandomSelector)composite);
                 case CompositeType.Priority:
-                    return new PrioritySelectorViewModel(this, (PrioritySelector)selector);
+                    return new PrioritySelectorViewModel(this, (PrioritySelector)composite);
                 case CompositeType.Loop:
-                    return new LoopSelectorViewModel(this, (LoopSelector)selector);
+                    return new LoopSelectorViewModel(this, (LoopSelector)composite);
                 default:
                     throw new InvalidCastException("Invalid CompositeType");
             }
@@ -640,7 +640,7 @@ namespace Skill.Editor.AI
             {
                 if (Parent != null)
                 {
-                    if (Parent[0] != this)
+                    if (Parent.Count > 0 && Parent[0] != this)
                         return true;
                     return false;
 
@@ -659,7 +659,7 @@ namespace Skill.Editor.AI
             {
                 if (Parent != null)
                 {
-                    if (Parent[Parent.Count - 1] != this)
+                    if (Parent.Count > 0 && Parent[Parent.Count - 1] != this)
                         return true;
                     return false;
 
@@ -703,6 +703,34 @@ namespace Skill.Editor.AI
             return false;
         }
 
+
+        public bool CanAddBehavior(BehaviorViewModel child, out string message)
+        {
+            // actions and conditions are leaves and can not have any child. also decorators can have only one child
+            if (this.Model.BehaviorType != BehaviorType.Composite && !(this.Model.BehaviorType == BehaviorType.Decorator && Count == 0))
+            {
+                message = "Can not add child to this node anymore";
+                return false;
+            }
+
+            // ignore it if already have this child. check actual model do to duplication
+            if (Contains(child.Model))
+            {
+                message = "Already contains this child";
+                return false;
+            }
+
+            // check to prevent loop in hierarchy. if a node be twise in hierarchy cause too loop in tree
+            if (CheckAddCauseLoop(child))
+            {
+                message = "Adding this child cause to loop in tree";
+                return false;
+            }
+
+            message = null;
+            return true;
+        }
+
         /// <summary>
         /// Add a child behavior. use this method instead of direct Add method.
         /// this method check additional conditions and take care of history
@@ -741,34 +769,35 @@ namespace Skill.Editor.AI
             else
                 this.Add(toAdd);
 
+            Tree.RegisterViewModel(toAdd);
+            
             Tree.History.Insert(new AddBehaviorUnDoRedo(toAdd, this, -1));
             return toAdd;
         }
 
         /// <summary>
-        /// Create new child (action,decorator or condition)
-        /// </summary>
-        /// <param name="behaviorType">type f child</param>
+        /// Create new child (action)
+        /// </summary>        
         /// <returns>added child</returns>
-        public BehaviorViewModel AddNonSelector(BehaviorType behaviorType)
+        public BehaviorViewModel AddAction()
         {
-            Behavior behavior = null;
-            switch (behaviorType)
-            {
-                case BehaviorType.Action:
-                    behavior = new Action();
-                    break;
-                case BehaviorType.Condition:
-                    behavior = new Condition();
-                    break;
-            }
-            if (behavior != null)
-            {
-                BehaviorViewModel behaviorVM = CreateViewModel(behavior);
-                return AddBehavior(behaviorVM, false, -1);
-            }
-            return null;
+            Behavior behavior = new Action();
+            BehaviorViewModel behaviorVM = CreateViewModel(behavior);
+            return AddBehavior(behaviorVM, false, -1);
+
         }
+
+        /// <summary>
+        /// Create new child (condition)
+        /// </summary>        
+        /// <returns>added child</returns>
+        public BehaviorViewModel AddCondition()
+        {
+            Behavior behavior = new Condition();
+            BehaviorViewModel behaviorVM = CreateViewModel(behavior);
+            return AddBehavior(behaviorVM, false, -1);
+        }
+
 
         /// <summary>
         /// Create new child (action,decorator or condition)
@@ -798,33 +827,33 @@ namespace Skill.Editor.AI
         /// <summary>
         /// add new selector child
         /// </summary>
-        /// <param name="selectorType">type of child</param>
+        /// <param name="compositeType">type of child</param>
         /// <returns>added child</returns>
-        public BehaviorViewModel AddSelector(CompositeType selectorType)
+        public BehaviorViewModel AddComposite(CompositeType compositeType)
         {
-            Composite selector = null;
-            switch (selectorType)
+            Composite composite = null;
+            switch (compositeType)
             {
                 case CompositeType.Sequence:
-                    selector = new SequenceSelector();
+                    composite = new SequenceSelector();
                     break;
                 case CompositeType.Concurrent:
-                    selector = new ConcurrentSelector();
+                    composite = new ConcurrentSelector();
                     break;
                 case CompositeType.Random:
-                    selector = new RandomSelector();
+                    composite = new RandomSelector();
                     break;
                 case CompositeType.Priority:
-                    selector = new PrioritySelector();
+                    composite = new PrioritySelector();
                     break;
                 case CompositeType.Loop:
-                    selector = new LoopSelector();
+                    composite = new LoopSelector();
                     break;
             }
 
-            if (selector != null)
+            if (composite != null)
             {
-                BehaviorViewModel selectorVM = CreateSelectorViewModel(selector);
+                BehaviorViewModel selectorVM = CreateCompositeViewModel(composite);
                 return AddBehavior(selectorVM, false, -1);
             }
             return null;
@@ -878,8 +907,7 @@ namespace Skill.Editor.AI
             if (this.Remove(child))
             {
                 this.Model.Remove(child.Model);
-                Tree.History.Insert(new AddBehaviorUnDoRedo(child, this, index, true));
-                Tree.UnRegisterViewModel(child);
+                Tree.History.Insert(new AddBehaviorUnDoRedo(child, this, index, true));                
                 return true;
             }
             return false;

@@ -93,7 +93,7 @@ namespace Skill.Animation
             int i = 0;
             while (i < ActiveAnimNodes.Count)
             {
-                if (ActiveAnimNodes[i].Weight == 0.0f && !ActiveAnimNodes[i].IsJustCeaseRelevant)
+                if (ActiveAnimNodes[i].Weight == 0.0f)
                 {
                     ActiveAnimNodes.RemoveAt(i);
                     continue;
@@ -175,10 +175,16 @@ namespace Skill.Animation
                     else // else continue
                     {
                         state.speed = anim.Speed;
-                        if (Synchronization && _MaxReleavant != null && _MaxReleavant != anim)
+                        if (anim.IsJustBecameRelevant)
                         {
-                            if (anim.IsJustBecameRelevant)
+                            if (Synchronization && anim.Synchronize && _MaxReleavant != null && _MaxReleavant != anim)
+                            {
                                 state.normalizedTime = normalizedTime;
+                            }
+                            else
+                            {
+                                state.normalizedTime = 0;
+                            }
                         }
                     }
 

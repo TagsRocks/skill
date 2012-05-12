@@ -93,6 +93,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AI\AccessKeyEditor.xaml.cs">
+      <DependentUpon>AccessKeyEditor.xaml</DependentUpon>
+    </Compile>
     <Compile Include="AI\Action.cs" />
     <Compile Include="AI\BehaviorTree.cs" />
     <Compile Include="AI\Behavior.cs" />
@@ -239,6 +242,10 @@
     <Compile Include="Editor\TreeViewItemViewModel.cs" />
     <Compile Include="Validation\LocationValidator.cs" />
     <Compile Include="Validation\VariableNameValidator.cs" />
+    <Page Include="AI\AccessKeyEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="AI\Resources\OrgChartTreeViewItemStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

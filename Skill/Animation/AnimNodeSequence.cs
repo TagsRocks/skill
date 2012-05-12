@@ -42,6 +42,14 @@ namespace Skill.Animation
         public bool UseTreeProfile { get; set; }
 
         /// <summary>
+        /// Synchronize animations with other animations in same Layer?
+        /// </summary>
+        /// <remarks>
+        /// it can be used for Direction AnimationClips that has same length.
+        /// </remarks>
+        public bool Synchronize { get; set; }
+
+        /// <summary>
         /// Specify when this animation bacame relevant, and when needs to finish
         /// </summary>
         public TimeWatch RelevantTime;
@@ -119,6 +127,7 @@ namespace Skill.Animation
         public AnimNodeSequence(string animationName)
             : base(0)
         {
+            Synchronize = false;
             UseTreeProfile = true;
             Speed = 1;
             WrapMode = UnityEngine.WrapMode.Default;

@@ -18,6 +18,8 @@ namespace Skill.Editor.CG
         public string Name { get; private set; }
         /// <summary> string that represent iitial value of variable </summary>
         public string InitialValue { get; private set; }
+        /// <summary> whether this variable is static? </summary>
+        public bool IsStatic { get; set; }
 
         /// <summary>
         /// Create a variable
@@ -39,7 +41,11 @@ namespace Skill.Editor.CG
         /// <param name="writer"></param>
         public void Write(System.IO.StreamWriter writer)
         {
-            writer.WriteLine(string.Format("{0} {1} {2}{3};", Modifiers.ToString().ToLower(), Type, GetName(Name), (InitialValue != null) ? " = " + InitialValue : ""));
+            writer.WriteLine(string.Format("{0} {1} {2} {3}{4};",
+                (Modifiers != CG.Modifiers.None) ? Modifiers.ToString().ToLower() : string.Empty,
+                IsStatic ? "static" : string.Empty,
+                Type, GetName(Name),
+                (InitialValue != null) ? " = " + InitialValue : ""));
         }
 
         /// <summary>

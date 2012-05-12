@@ -16,6 +16,7 @@ namespace Skill.Animation
     /// </remarks>
     public class AnimNodeOverride : AnimNodeMultilayer
     {
+        private bool _OverrideOneShot;
         private TimeWatch _Timer;
         private TimeWatch _OverrideTimer;
         private int _OverrideIndex;
@@ -110,25 +111,40 @@ namespace Skill.Animation
                     DisableOverride();
                 }
             }
-            if (OverridePeriod > 0 && !_OverrideTimer.Enabled)
+            if (_OverrideOneShot)
+            {
+                IsOverriding = true;
+                base.Blend();// update to make sure lenght of child is valid
+                if (OverrideNode != null)
+                {
+                    _OverrideTimer.Begin(OverrideNode.Length);
+                    _Timer.End();
+                    _OverrideOneShot = false;
+                }
+                else
+                    IsOverriding = false;
+                return;// avoid update twice
+            }
+            else if (OverridePeriod > 0 && !_OverrideTimer.Enabled)
             {
                 if (_Timer.Enabled)
                 {
                     if (_Timer.IsOver)
                     {
+                        IsOverriding = true;
                         base.Blend();// update to make sure lenght of child is valid
                         if (OverrideNode != null)
                         {
                             _OverrideTimer.Begin(OverrideNode.Length);
-                            IsOverriding = true;
                             _Timer.End();
                             return;// avoid update twice
                         }
+                        else
+                            IsOverriding = false;
                     }
                 }
                 else
                     _Timer.Begin(OverridePeriod);
-
             }
 
             base.Blend();
@@ -170,12 +186,12 @@ namespace Skill.Animation
             if (OverrideNode != null)
             {
                 if (_OverrideTimer.Enabled)
-                    return;
-                else
                 {
-                    _OverrideTimer.Begin(OverrideNode.Length - BlendTime);
-                    IsOverriding = true;
-                    _Timer.End();
+                    return;
+                }
+                else if (!_OverrideOneShot)
+                {
+                    _OverrideOneShot = true;
                 }
             }
         }

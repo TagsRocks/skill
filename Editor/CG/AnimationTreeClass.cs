@@ -352,7 +352,7 @@ namespace Skill.Editor.CG
             // set profiles
             foreach (var profile in node.Profiles)
             {
-                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.Add(new AnimNodeAimOffsetProfile({1}));", Variable.GetName(node.Name),
+                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.AddProfile(new AnimNodeAimOffsetProfile(){{ {1} }});", Variable.GetName(node.Name),
                    string.Format("Name = \"{0}\", CenterCenter = \"{1}\", CenterUp = \"{2}\", CenterDown = \"{3}\", LeftCenter = \"{4}\", LeftUp = \"{5}\", LeftDown = \"{6}\", RightCenter = \"{7}\", RightUp = \"{8}\", RightDown = \"{9}\"",
                           profile.Name, profile.CenterCenter, profile.CenterUp, profile.CenterDown, profile.LeftCenter, profile.LeftUp, profile.LeftDown, profile.RightCenter, profile.RightUp, profile.RightDown)));
             }
@@ -364,8 +364,10 @@ namespace Skill.Editor.CG
             }
 
             // set properties
-            if (!node.UseTreeProfile) // default is o.1f
+            if (!node.UseTreeProfile) // default is true
                 SetProperty(node, "UseTreeProfile", node.UseTreeProfile.ToString().ToLower());
+            if (node.IsLoop) // default is false
+                SetProperty(node, "IsLoop", node.IsLoop.ToString().ToLower());
 
             SetSharedParameters(node);
         }

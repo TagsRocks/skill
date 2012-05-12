@@ -21,7 +21,7 @@ namespace Skill.Editor.AI
 
         #region Properties
 
-        public Dictionary<string, AccessKey> AccessKeys { get; private set; }
+        public System.Collections.Generic.Dictionary<string, AccessKey> AccessKeys { get; private set; }
         /// <summary> Root of tree </summary>
         public PrioritySelector Root { get; private set; }
         /// <summary> Name of tree. this name is based on filename and will set after loading from file </summary>
@@ -146,10 +146,10 @@ namespace Skill.Editor.AI
             // set all nodes id to -1
             foreach (Behavior item in this) item.Id = -1;
             _Ids = 0;
-            GenerateIds(Root); // first set id for nodes that are in hierarchy
-            foreach (Behavior item in this) // then rest of nodes
-                if (item.Id == -1)
-                    item.Id = _Ids++;
+            GenerateIds(Root); // set id for nodes that are in hierarchy
+            //foreach (Behavior item in this) // then rest of nodes
+            //    if (item.Id == -1)
+            //        item.Id = _Ids++;
         }
         void GenerateIds(Behavior behavior)
         {
@@ -170,8 +170,11 @@ namespace Skill.Editor.AI
             // children will be writed in array of ids in selector and an id in decorator
             foreach (var item in this)
             {
-                XElement n = item.ToXElement();
-                nodes.Add(n);
+                if (item.Id > -1)
+                {
+                    XElement n = item.ToXElement();
+                    nodes.Add(n);
+                }
             }
             behaviorTree.Add(nodes);
 
@@ -281,10 +284,11 @@ namespace Skill.Editor.AI
             {
                 switch (accessKeyType)
                 {
-                    case AccessKeyType.CountLimit:
-                        result = new CountLimitAccessKey();
+                    case AccessKeyType.CounterLimit:
+                        result = new CounterLimitAccessKey();
                         break;
                     case AccessKeyType.TimeLimit:
+                        result = new TimeLimitAccessKey();
                         break;
                 }
             }
@@ -345,13 +349,13 @@ namespace Skill.Editor.AI
                             decorator.Add(Find(decorator.LoadedChildId));
                         break;
                     case BehaviorType.Composite:
-                        Composite selector = node as Composite;
-                        if (selector.LoadedChildrenIds != null)
+                        Composite composite = node as Composite;
+                        if (composite.LoadedChildrenIds != null)
                         {
-                            foreach (var id in selector.LoadedChildrenIds)
+                            foreach (var id in composite.LoadedChildrenIds)
                             {
                                 Behavior child = Find(id);
-                                selector.Add(child);
+                                composite.Add(child);
                             }
                         }
                         break;
@@ -374,59 +378,18 @@ namespace Skill.Editor.AI
     }
     #endregion
 
-    #region BehaviorViewModelContainer
-    /// <summary>
-    /// Contains reference to a behavior view model
-    /// this view model may be in hierarchy or not
-    /// unused nodes can be delete in editor if user request that
-    /// </summary>
-    public class BehaviorViewModelContainer : INotifyPropertyChanged
-    {
-        private bool _NotInHierarchy;
-        public bool NotInHierarchy
-        {
-            get { return _NotInHierarchy; }
-            set
-            {
-                if (_NotInHierarchy != value)
-                {
-                    _NotInHierarchy = value;
-                    OnPropertyChanged(new PropertyChangedEventArgs("NotInHierarchy"));
-                }
-            }
-        }
-        public BehaviorViewModel Behavior { get; private set; }
-        public BehaviorViewModelContainer(BehaviorViewModel behavior)
-        {
-            this.Behavior = behavior;
-        }
-
-        #region INotifyPropertyChanged Members
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
-        {
-            if (this.PropertyChanged != null)
-                this.PropertyChanged(this, e);
-        }
-
-        #endregion // INotifyPropertyChanged Members
-    }
-    #endregion
-
     #region BehaviorTreeViewModel
     public class BehaviorTreeViewModel : INotifyPropertyChanged
     {
         #region Properties
         /// <summary> list of all actions in tree</summary>
-        public ObservableCollection<BehaviorViewModelContainer> Actions { get; private set; }
+        public ObservableCollection<BehaviorViewModel> Actions { get; private set; }
         /// <summary> list of all conditions in tree</summary>
-        public ObservableCollection<BehaviorViewModelContainer> Conditions { get; private set; }
+        public ObservableCollection<BehaviorViewModel> Conditions { get; private set; }
         /// <summary> list of all decorators in tree</summary>
-        public ObservableCollection<BehaviorViewModelContainer> Decorators { get; private set; }
+        public ObservableCollection<BehaviorViewModel> Decorators { get; private set; }
         /// <summary> list of all selectors in tree</summary>
-        public ObservableCollection<BehaviorViewModelContainer> Selectors { get; private set; }
+        public ObservableCollection<BehaviorViewModel> Composites { get; private set; }
 
         /// <summary> this list contains root view model as root treeview item</summary>
         public ReadOnlyCollection<BehaviorViewModel> Nodes { get; private set; }
@@ -446,10 +409,10 @@ namespace Skill.Editor.AI
         /// <param name="history">History of TabContent</param>
         public BehaviorTreeViewModel(BehaviorTree tree, UnDoRedo history)
         {
-            this.Actions = new ObservableCollection<BehaviorViewModelContainer>();
-            this.Conditions = new ObservableCollection<BehaviorViewModelContainer>();
-            this.Decorators = new ObservableCollection<BehaviorViewModelContainer>();
-            this.Selectors = new ObservableCollection<BehaviorViewModelContainer>();
+            this.Actions = new ObservableCollection<BehaviorViewModel>();
+            this.Conditions = new ObservableCollection<BehaviorViewModel>();
+            this.Decorators = new ObservableCollection<BehaviorViewModel>();
+            this.Composites = new ObservableCollection<BehaviorViewModel>();
             this.Model = tree;
             this.History = history;
             Root = new PrioritySelectorViewModel(this, tree.Root);
@@ -457,87 +420,67 @@ namespace Skill.Editor.AI
         }
         #endregion
 
-        #region IsInHierarchy
-        public void CheckContainersIsInHierarchy()
-        {
-            foreach (var item in Actions)
-                item.NotInHierarchy = !Model.IsInHierarchy(item.Behavior.Model);
-            foreach (var item in Selectors)
-                item.NotInHierarchy = !Model.IsInHierarchy(item.Behavior.Model);
-            foreach (var item in Decorators)
-                item.NotInHierarchy = !Model.IsInHierarchy(item.Behavior.Model);
-            foreach (var item in Conditions)
-                item.NotInHierarchy = !Model.IsInHierarchy(item.Behavior.Model);
-        }
-        #endregion
-
         #region Register view models
-        /// <summary>
-        /// find container of viewmodel that has save behavior model
-        /// </summary>
-        /// <param name="list">list of ontainers</param>
-        /// <param name="viewModel">view model to check</param>
-        /// <returns>True if find, otherwise false</returns>
-        private BehaviorViewModelContainer Find(ObservableCollection<BehaviorViewModelContainer> list, BehaviorViewModel viewModel)
-        {
-            foreach (var item in list)
-            {
-                if (viewModel.Model == item.Behavior.Model)
-                    return item;
-            }
-            return null;
-        }
 
         int _RegisterCount = -1;
         public void RegisterViewModel(BehaviorViewModel viewModel)
         {
             _RegisterCount++;// root behavior model already added to behavior tree model in constructor of behavior tree
             if (_RegisterCount < 1) return; // cause to do not register root node
-
-
             if (viewModel.Tree != this) return;
 
-            //check if we donot register it before add it to list
-            BehaviorViewModelContainer container = null;
+            //check if we donot register it before add it to list            
             switch (viewModel.Model.BehaviorType)
             {
                 case BehaviorType.Action:
-                    container = Find(this.Actions, viewModel);
-                    if (container == null)
-                        this.Actions.Add(new BehaviorViewModelContainer(viewModel));
+                    if (!this.Actions.Contains(viewModel))
+                        this.Actions.Add(viewModel);
                     break;
                 case BehaviorType.Condition:
-                    container = Find(this.Conditions, viewModel);
-                    if (container == null)
-                        this.Conditions.Add(new BehaviorViewModelContainer(viewModel));
+                    if (!this.Conditions.Contains(viewModel))
+                        this.Conditions.Add(viewModel);
                     break;
                 case BehaviorType.Decorator:
-                    container = Find(this.Decorators, viewModel);
-                    if (container == null)
-                        this.Decorators.Add(new BehaviorViewModelContainer(viewModel));
+                    if (!this.Decorators.Contains(viewModel))
+                        this.Decorators.Add(viewModel);
                     break;
                 case BehaviorType.Composite:
-                    container = Find(this.Selectors, viewModel);
-                    if (container == null)
-                        this.Selectors.Add(new BehaviorViewModelContainer(viewModel));
+                    if (!this.Composites.Contains(viewModel))
+                        this.Composites.Add(viewModel);
                     break;
             }
-            if (container == null)
+            if (!Model.Contains(viewModel.Model))
                 Model.Add(viewModel.Model);
         }
 
-        /// <summary>
-        /// Just clean up view model from invalid data
-        /// </summary>
-        /// <param name="viewModel">viewmodel to unregister</param>
-        public void UnRegisterViewModel(BehaviorViewModel viewModel)
-        {
-            if (viewModel.Tree != this) return;
-            viewModel.Model.Clear();
-            viewModel.Clear();
-            // we do not remove it's container
-            // by this way user can use it later
-        }
+        ///// <summary>
+        ///// Just clean up view model from invalid data
+        ///// </summary>
+        ///// <param name="viewModel">viewmodel to unregister</param>
+        //public void UnRegisterViewModel(BehaviorViewModel viewModel)
+        //{
+        //    if (viewModel.Tree != this) return;            
+
+        //    switch (viewModel.Model.BehaviorType)
+        //    {
+        //        case BehaviorType.Action:
+        //            this.Actions.Remove(viewModel);
+        //            break;
+        //        case BehaviorType.Condition:
+
+        //            this.Conditions.Remove(viewModel);
+        //            break;
+        //        case BehaviorType.Decorator:
+
+        //            this.Decorators.Remove(viewModel);
+        //            break;
+        //        case BehaviorType.Composite:
+        //            this.Composites.Remove(viewModel);
+        //            break;
+        //    }
+        //    Model.Remove(viewModel.Model);
+
+        //}
         #endregion
 
         #region CreateNewName
@@ -559,15 +502,15 @@ namespace Skill.Editor.AI
                     CreateNewName(behaviorVM, Decorators);
                     break;
                 case BehaviorType.Composite:
-                    CreateNewName(behaviorVM, Selectors);
+                    CreateNewName(behaviorVM, Composites);
                     break;
             }
         }
-        void CreateNewName(BehaviorViewModel behaviorVM, ObservableCollection<BehaviorViewModelContainer> list)
+        void CreateNewName(BehaviorViewModel behaviorVM, ObservableCollection<BehaviorViewModel> list)
         {
             int i = 1;
             string name = behaviorVM.Name;
-            while (list.Where(p => p.Behavior.Name == name).Count() > 0)
+            while (list.Where(b => b.Name == name).Count() > 0)
             {
                 name = behaviorVM.Name + i++;
             }
@@ -585,30 +528,7 @@ namespace Skill.Editor.AI
                 this.PropertyChanged(this, e);
         }
 
-        #endregion // INotifyPropertyChanged Members
-
-        public void RemoveBehaviorContainer(BehaviorViewModelContainer container)
-        {
-            if (this.Model.IsInHierarchy(container.Behavior.Model)) return;
-            bool remove = false;
-            switch (container.Behavior.Model.BehaviorType)
-            {
-                case BehaviorType.Action:
-                    remove = Actions.Remove(container);
-                    break;
-                case BehaviorType.Condition:
-                    remove = Conditions.Remove(container);
-                    break;
-                case BehaviorType.Decorator:
-                    remove = Decorators.Remove(container);
-                    break;
-                case BehaviorType.Composite:
-                    remove = Selectors.Remove(container);
-                    break;
-            }
-            if (remove)
-                Model.Remove(container.Behavior.Model);
-        }
+        #endregion // INotifyPropertyChanged Members        
     }
     #endregion
 }

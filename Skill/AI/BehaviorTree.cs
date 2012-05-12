@@ -84,17 +84,27 @@ namespace Skill.AI
         {
             this._LastUpdateTime = UnityEngine.Time.time;
             // let last running action finish it's job
-            if (State.RunningAction != null)
-            {
-                BehaviorResult result = State.RunningAction.Continue(State);
-                if (result == BehaviorResult.Running)
-                {
-                    return;
-                }
-            }
+            //if (State.RunningAction != null)
+            //{
+            //    BehaviorResult result = State.RunningAction.Continue(State);
+            //    if (result == BehaviorResult.Running)
+            //    {
+            //        return;
+            //    }
+            //}
             State.Begin();
             Root.Trace(State);
         }
-    } 
+
+        /// <summary>
+        /// Call this when your agent dies, destroyed, or whenever you do not need BehaviorTree
+        /// this is important because sometimes maybe one Behavior node locked an AccessKey and could not unlock it before next update
+        /// you have to call this to make sure other instance of BehaviorTree can access that AccessKey.
+        /// </summary>
+        public void Reset()
+        {
+            Root.Reset(State, true);
+        }
+    }
     #endregion
 }
