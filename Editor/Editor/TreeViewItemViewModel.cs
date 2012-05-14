@@ -5,7 +5,7 @@ using System.Text;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 
-namespace Skill.Editor
+namespace Skill.Studio
 {
     /// <summary>
     /// Base class for all ViewModel classes displayed by TreeViewItems.  

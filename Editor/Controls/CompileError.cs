@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Skill.Editor.Controls
+namespace Skill.Studio.Controls
 {
     public enum ErrorType
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Skill.Editor
+namespace Skill.Studio
 {
 
     public class AnimationTreeNode : EntityNode
@@ -14,7 +14,7 @@ namespace Skill.Editor
             : base("NewAnimationTree")
         {
 
-        }        
+        }
     }
 
     public class AnimationTreeNodeViewModel : EntityNodeViewModel
@@ -47,7 +47,7 @@ namespace Skill.Editor
             base.Delete();
         }
 
-        public override string LocalFileName { get { return System.IO.Path.Combine(GetLocalDirectory(), Name + Animation.AnimationTree.Extension); } }
+        public override string LocalFileName { get { return LocalFileNameWithoutExtension + Animation.AnimationTree.Extension; } }
 
 
         public override string Name
@@ -57,7 +57,7 @@ namespace Skill.Editor
                 return base.Name;
             }
             set
-            {                
+            {
                 if (value != base.Name)
                 {
                     string sourceFilename = System.IO.Path.Combine(Project.Directory, LocalFileName);

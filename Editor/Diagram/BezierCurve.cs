@@ -5,7 +5,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Media;
 
-namespace Skill.Editor.Diagram
+namespace Skill.Studio.Diagram
 {
     public static class BezierCurve
     {

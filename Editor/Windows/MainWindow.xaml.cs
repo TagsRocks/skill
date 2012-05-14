@@ -16,7 +16,7 @@ using AvalonDock;
 using System.ComponentModel;
 using Microsoft.Win32;
 
-namespace Skill.Editor
+namespace Skill.Studio
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -110,20 +110,101 @@ namespace Skill.Editor
             {
                 ShowStartPage();
             }
+            _DockManager.DeserializationCallback = CustomDeserializationCallbackHandler;
+            _DockManager.Loaded += new RoutedEventHandler(_DockManager_Loaded);
         }
+
+        void _DockManager_Loaded(object sender, RoutedEventArgs e)
+        {
+            RestoreLayout();
+        }
+
+        #endregion
+
+        #region Layout
+
+
+        private void CustomDeserializationCallbackHandler(object sender, DeserializationCallbackEventArgs e)
+        {
+            //string localFileName = FindFirstDocementLocalName(e.Name);
+            //if (localFileName != null)
+            //{
+            //    TabDocument doc = OpenContent(localFileName);
+            //    e.Content = doc;
+            //}
+
+            switch (e.Name)
+            {
+                case "StartPage":
+                    CreateStartPage();
+                    e.Content = _StartPage;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private string FindFirstDocementLocalName(string name)
+        {
+            if (!IsProjectLoaded) return null;
+            return FindFirstDocementLocalName(Project.RootVM, name);
+        }
+
+        private string FindFirstDocementLocalName(EntityNodeViewModel node, string name)
+        {
+            foreach (EntityNodeViewModel child in node)
+            {
+                if (System.IO.Path.GetFileNameWithoutExtension(child.LocalFileName) == name)
+                    return child.LocalFileName;
+                string result = FindFirstDocementLocalName(child, name);
+                if (result != null) return result;
+            }
+            return null;
+        }
+
+
+        public string LayoutFile { get { return System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skill\\Layout.Xml"); } }
+
+        private void SaveLayout()
+        {
+            _DockManager.SaveLayout(LayoutFile);
+        }
+        private void RestoreLayout()
+        {
+            if (IsProjectLoaded)
+            {
+                if (System.IO.File.Exists(LayoutFile))
+                {
+                    try
+                    {
+                        _DockManager.RestoreLayout(LayoutFile);
+                    }
+                    catch (Exception ex)
+                    {
+                        ShowError(ex.Message);
+                        System.IO.File.Delete(LayoutFile);
+                    }
+                }
+            }
+        }
+
         #endregion
 
         #region Start Page
-        private void ShowStartPage()
+
+        private void CreateStartPage()
         {
-            if (_StartPage != null)
-                _StartPage.Show(_DockManager);
-            else
+            if (_StartPage == null)
             {
-                _StartPage = new Controls.StartPage();
-                DocumentPane_Center.Items.Add(_StartPage);
+                _StartPage = new Controls.StartPage() { Name = "StartPage" };
                 _StartPage.Closing += new EventHandler<CancelEventArgs>(_StartPage_Closing);
             }
+        }
+
+        private void ShowStartPage()
+        {
+            CreateStartPage();
+            DocumentPane_DocsCenter.Items.Add(_StartPage);
         }
 
         void _StartPage_Closing(object sender, CancelEventArgs e)
@@ -138,7 +219,7 @@ namespace Skill.Editor
         {
             if (_StartPage != null)
             {
-                DocumentPane_Center.Items.Remove(_StartPage);
+                DocumentPane_DocsCenter.Items.Remove(_StartPage);
                 _StartPage = null;
             }
         }
@@ -162,8 +243,11 @@ namespace Skill.Editor
         {
             if (!CloseAllDocuments())
                 e.Cancel = true;
+            else
+                SaveLayout();
             base.OnClosing(e);
         }
+
         private void MnuExit_Click(object sender, RoutedEventArgs e)
         {
             Close();
@@ -262,7 +346,7 @@ namespace Skill.Editor
         void OpenCmdExecuted(object target, ExecutedRoutedEventArgs e)
         {
             OpenFileDialog open = new OpenFileDialog();
-            open.Filter = Skill.Editor.Project.FilterExtension;
+            open.Filter = Skill.Studio.Project.FilterExtension;
             bool? toOpen = open.ShowDialog(this);
 
             if (toOpen != null && toOpen.HasValue && toOpen.Value)
@@ -386,7 +470,7 @@ namespace Skill.Editor
             if (_ErrorList.GetErrorCount(Controls.ErrorType.Error) == 0)
             {
                 BackupRestore backup = new BackupRestore();
-                backup.CreateAuto();
+                backup.CreateAuto();                
 
                 try
                 {
@@ -599,6 +683,39 @@ namespace Skill.Editor
         }
         #endregion
 
+        #region Copy Skill Dll
+
+        private void CopySkillDll(bool overrWrite = false)
+        {
+            string appDir = AppDomain.CurrentDomain.BaseDirectory;
+
+            string destinaion = System.IO.Path.Combine(Project.ProjectSettingsVM.UnityProjectLocaltion, "Skill.dll");
+
+            if (System.IO.File.Exists(destinaion) && !overrWrite)
+                return;
+
+            string filePath1 = System.IO.Path.Combine(appDir, "Skill.dll");
+
+#if DEBUG
+            string filePath2 = System.IO.Path.Combine(appDir, "../../../Skill/bin/Debug/Skill.dll");
+#else
+            string filePath2 = System.IO.Path.Combine(appDir, "../../../Skill/bin/Release/Skill.dll");
+#endif
+
+            if (System.IO.File.Exists(filePath1))
+            {
+                System.IO.File.Copy(filePath1, destinaion, true);
+            }
+            else if (System.IO.File.Exists(filePath2))
+            {
+                System.IO.File.Copy(filePath2, destinaion, true);
+            }
+            else
+                System.Windows.Forms.MessageBox.Show("Dll not found");
+        }
+
+        #endregion
+
         #region Menu
 
         private void Mnu_ShowProjectExplorer_Click(object sender, RoutedEventArgs e)
@@ -627,33 +744,14 @@ namespace Skill.Editor
 
         private void Mnu_About_Click(object sender, RoutedEventArgs e)
         {
-
+            AboutWindow about = new AboutWindow();
+            about.Owner = this;
+            about.ShowDialog();
         }
 
         private void MnuCopySkillDll_Click(object sender, RoutedEventArgs e)
         {
-            string appDir = AppDomain.CurrentDomain.BaseDirectory;
-
-            string destinaion = System.IO.Path.Combine(Project.ProjectSettingsVM.UnityProjectLocaltion, "Skill.dll");
-
-            string filePath1 = System.IO.Path.Combine(appDir, "Skill.dll");
-
-#if DEBUG
-            string filePath2 = System.IO.Path.Combine(appDir, "../../../Skill/bin/Debug/Skill.dll");
-#else
-            string filePath2 = System.IO.Path.Combine(appDir, "../../../Skill/bin/Release/Skill.dll");
-#endif
-
-            if (System.IO.File.Exists(filePath1))
-            {
-                System.IO.File.Copy(filePath1, destinaion, true);
-            }
-            else if (System.IO.File.Exists(filePath2))
-            {
-                System.IO.File.Copy(filePath2, destinaion, true);
-            }
-            else
-                System.Windows.Forms.MessageBox.Show("Dll not found");
+            CopySkillDll(true);
         }
         #endregion
 
@@ -665,11 +763,11 @@ namespace Skill.Editor
         // get selected active document
         TabDocument GetSelectedDocument()
         {
-            if (DocumentPane_Center == null) return null;
-            if (DocumentPane_Center.SelectedItem != null)
+            if (DocumentPane_DocsCenter == null) return null;
+            if (DocumentPane_DocsCenter.SelectedItem != null)
             {
-                if (DocumentPane_Center.SelectedItem is TabDocument)
-                    return (TabDocument)DocumentPane_Center.SelectedItem;
+                if (DocumentPane_DocsCenter.SelectedItem is TabDocument)
+                    return (TabDocument)DocumentPane_DocsCenter.SelectedItem;
             }
             return null;
         }
@@ -677,7 +775,7 @@ namespace Skill.Editor
         /// Open apropriate document for edit specyfied file
         /// </summary>
         /// <param name="localFilename">local file name in project directory</param>
-        public void OpenContent(string localFilename)
+        public TabDocument OpenContent(string localFilename)
         {
             TabDocument docToShow = null;
             foreach (var item in _Documents)
@@ -697,13 +795,13 @@ namespace Skill.Editor
                 {
                     case ".sbt": // extension of BehaviorTree file
                         AI.BehaviorTreeEditor btreeEditor = new AI.BehaviorTreeEditor(System.IO.Path.Combine(_ProjectExplorer.ProjectVM.Directory, localFilename));
-                        DocumentPane_Center.Items.Add(btreeEditor);
+                        DocumentPane_DocsCenter.Items.Add(btreeEditor);
                         _Documents.Add(btreeEditor);
                         btreeEditor.Closing += _DocumentCloseHandler;
                         break;
                     case ".sat": // extension of AnimationTree file
                         Animation.AnimationTreeEditor aTreeEditor = new Animation.AnimationTreeEditor(System.IO.Path.Combine(_ProjectExplorer.ProjectVM.Directory, localFilename));
-                        DocumentPane_Center.Items.Add(aTreeEditor);
+                        DocumentPane_DocsCenter.Items.Add(aTreeEditor);
                         _Documents.Add(aTreeEditor);
                         aTreeEditor.Closing += _DocumentCloseHandler;
                         break;
@@ -711,8 +809,11 @@ namespace Skill.Editor
             }
             if (docToShow != null)
             {
-                DocumentPane_Center.SelectedItem = docToShow;
+                docToShow.Name = System.IO.Path.GetFileNameWithoutExtension(localFilename);
+                DocumentPane_DocsCenter.SelectedItem = docToShow;
             }
+
+            return docToShow;
         }
 
         /// <summary>
@@ -747,7 +848,7 @@ namespace Skill.Editor
                 doc.Closing -= _DocumentCloseHandler;
                 doc.UnLoad();
                 _Documents.Remove(doc);
-                DocumentPane_Center.Items.Remove(doc);
+                DocumentPane_DocsCenter.Items.Remove(doc);
             }
         }
 

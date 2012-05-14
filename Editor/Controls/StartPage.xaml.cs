@@ -14,7 +14,7 @@ using System.Windows.Shapes;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 
-namespace Skill.Editor.Controls
+namespace Skill.Studio.Controls
 {
     /// <summary>
     /// Interaction logic for StartPage.xaml

@@ -5,7 +5,7 @@ using System.Text;
 using System.IO;
 using System.Collections.ObjectModel;
 
-namespace Skill.Editor
+namespace Skill.Studio
 {
 
     public abstract class BackupItem : TreeViewItemViewModel
@@ -93,8 +93,8 @@ namespace Skill.Editor
     {
         private string _UnityDirectory;
         private string _ProjectName;
-        private string _UserCodePostfix;
 
+        public string CodeFileExtension { get; set; }
 
         public static string BackupRoot
         {
@@ -117,6 +117,7 @@ namespace Skill.Editor
 
         public BackupRestore()
         {
+            CodeFileExtension = ".cs"; // CSharp file
             UpdateData();
         }
 
@@ -164,26 +165,39 @@ namespace Skill.Editor
         public void Create(string backupName)
         {
             if (!Directory.Exists(_UnityDirectory)) return;
-            string searchPattern = "*" + _UserCodePostfix + ".cs";
-            string[] files = Directory.GetFiles(_UnityDirectory, searchPattern, SearchOption.AllDirectories);
-            if (files == null || files.Length == 0) return;
-
+            if (!MainWindow.Instance.IsProjectLoaded) return;
             string destination = Path.Combine(BackupDirectory, backupName);
 
-            foreach (var file in files)
+            Create(destination, MainWindow.Instance.Project.RootVM);
+        }
+
+        private void Create(string destDir, EntityNodeViewModel node)
+        {
+            if (node.EntityType != EntityType.Root && node.EntityType != EntityType.Folder)
             {
-                string localPath = file.Replace(_UnityDirectory, string.Empty).TrimStart(_TrimStartChars);
-                string backupFile = Path.Combine(destination, localPath);
-
-                if (File.Exists(backupFile))
+                string file = System.IO.Path.Combine(_UnityDirectory, node.LocalFileNameWithoutExtension + CodeFileExtension);
+                if (System.IO.File.Exists(file))
                 {
-                    FileInfo fileInfo = new FileInfo(file);
-                    FileInfo backupfileInfo = new FileInfo(backupFile);
+                    string backupFile = Path.Combine(destDir, node.LocalFileNameWithoutExtension + CodeFileExtension);
+                    bool copy = true;
+                    if (File.Exists(backupFile))
+                    {
+                        FileInfo fileInfo = new FileInfo(file);
+                        FileInfo backupfileInfo = new FileInfo(backupFile);
 
-                    if (fileInfo.LastWriteTime <= backupfileInfo.LastWriteTime)
-                        continue;
+                        if (fileInfo.LastWriteTime <= backupfileInfo.LastWriteTime)
+                            copy = false;
+                    }
+                    if (copy)
+                        Copy(file, backupFile);
                 }
-                Copy(file, backupFile);
+            }
+            else
+            {
+                foreach (EntityNodeViewModel vm in node)
+                {
+                    Create(destDir, vm);
+                }
             }
         }
 
@@ -192,7 +206,7 @@ namespace Skill.Editor
         {
             string destination = Path.Combine(BackupDirectory, backupName);
             BackupFolder root = new BackupFolder(null, destination);
-            
+
 
             string searchPattern = "*" + ".cs";
             string[] files = Directory.GetFiles(destination, searchPattern, SearchOption.AllDirectories);
@@ -272,7 +286,7 @@ namespace Skill.Editor
         public void Delete(BackupItem item)
         {
             if (item == null) return;
-            else if (item is BackupFolder) Directory.Delete(item.Path,true);
+            else if (item is BackupFolder) Directory.Delete(item.Path, true);
             else if (item is UserCodeFile) File.Delete(item.Path);
         }
     }

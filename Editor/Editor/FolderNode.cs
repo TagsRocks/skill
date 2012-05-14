@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Skill.Editor
+namespace Skill.Studio
 {
     #region FolderNode
     /// <summary>
@@ -107,7 +107,7 @@ namespace Skill.Editor
             base.Delete();
         }
 
-        public override string LocalFileName { get { return System.IO.Path.Combine(GetLocalDirectory(), Name); } }
+        public override string LocalFileName { get { return LocalFileNameWithoutExtension; } }        
 
         public override EntityNodeViewModel Clone(EntityNodeViewModel copyParent)
         {

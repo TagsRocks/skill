@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 
-namespace Skill.Editor
+namespace Skill.Studio
 {
     public enum CopyType
     {

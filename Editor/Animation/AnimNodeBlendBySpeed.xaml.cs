@@ -11,13 +11,13 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Skill.Editor.Diagram;
+using Skill.Studio.Diagram;
 using System.Xml.Linq;
 using System.ComponentModel;
 using System.Collections;
 using System.Collections.ObjectModel;
 
-namespace Skill.Editor.Animation
+namespace Skill.Studio.Animation
 {
 
     public class AnimNodeBlendBySpeed : AnimNodeChildrenEditable
@@ -310,7 +310,7 @@ namespace Skill.Editor.Animation
 
         protected override StackPanel ConnectorPanel { get { return _ConnectorPanel; } }
 
-        public override Skill.Editor.Diagram.Connector Out { get { return _Out; } }
+        public override Skill.Studio.Diagram.Connector Out { get { return _Out; } }
 
         public override int ChildCount
         {

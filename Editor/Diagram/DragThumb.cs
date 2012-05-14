@@ -7,7 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 
-namespace Skill.Editor.Diagram
+namespace Skill.Studio.Diagram
 {
     public class DragThumb : Thumb
     {

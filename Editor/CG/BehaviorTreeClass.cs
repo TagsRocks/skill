@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Skill.Editor.CG
+namespace Skill.Studio.CG
 {
     /// <summary>
     /// generate code for a behavior tree class
@@ -66,10 +66,10 @@ namespace Skill.Editor.CG
                 {
                     switch (ak.Value.Type)
                     {
-                        case Skill.Editor.AI.AccessKeyType.CounterLimit:
+                        case Skill.Studio.AI.AccessKeyType.CounterLimit:
                             staticConstructorBody.AppendLine(string.Format("{0}.Add( \"{1}\" , new CounterLimitAccessKey(\"{2}\",{3}) );", Variable.GetName(AccessKeysVariableName), ak.Key, ak.Key, ((AI.CounterLimitAccessKey)ak.Value).MaxAccessCount));
                             break;
-                        case Skill.Editor.AI.AccessKeyType.TimeLimit:
+                        case Skill.Studio.AI.AccessKeyType.TimeLimit:
                             staticConstructorBody.AppendLine(string.Format("{0}.Add( \"{1}\" , new TimeLimitAccessKey(\"{2}\",{3}) );", Variable.GetName(AccessKeysVariableName), ak.Key, ak.Key, ((AI.TimeLimitAccessKey)ak.Value).TimeInterval));
                             break;
                     }
@@ -165,16 +165,16 @@ namespace Skill.Editor.CG
             {
                 switch (b.BehaviorType)
                 {
-                    case Skill.Editor.AI.BehaviorType.Action:
+                    case Skill.Studio.AI.BehaviorType.Action:
                         CreateAction((AI.Action)b);
                         break;
-                    case Skill.Editor.AI.BehaviorType.Condition:
+                    case Skill.Studio.AI.BehaviorType.Condition:
                         CreateCondition((AI.Condition)b);
                         break;
-                    case Skill.Editor.AI.BehaviorType.Decorator:
+                    case Skill.Studio.AI.BehaviorType.Decorator:
                         CreateDecorator((AI.Decorator)b);
                         break;
-                    case Skill.Editor.AI.BehaviorType.Composite:
+                    case Skill.Studio.AI.BehaviorType.Composite:
                         CreateComposite((AI.Composite)b);
                         break;
                 }
@@ -295,10 +295,10 @@ namespace Skill.Editor.CG
         {
             switch (decorator.Type)
             {
-                case Skill.Editor.AI.DecoratorType.Default:
+                case Skill.Studio.AI.DecoratorType.Default:
                     CreateDefaultDecorator(decorator);
                     break;
-                case Skill.Editor.AI.DecoratorType.AccessLimit:
+                case Skill.Studio.AI.DecoratorType.AccessLimit:
                     CreateAccessLimitDecorator((AI.AccessLimitDecorator)decorator);
                     break;
             }
@@ -311,8 +311,8 @@ namespace Skill.Editor.CG
             // new decorator variable inside CreateTree method
             _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.Decorator(\"{1}\",{2});", Variable.GetName(decorator.Name), decorator.Name, GetDecoratorHandlerName(decorator.Name)));
             // set property SuccessOnFailHandler
-            if (decorator.SuccessOnFailHandler != false) // default value is false, so it is not necessary to set it
-                _CreateTreeMethodBody.AppendLine(string.Format("{0}.SuccessOnFailHandler = {1};", Variable.GetName(decorator.Name), decorator.SuccessOnFailHandler.ToString().ToLower()));
+            if (decorator.NeverFail != true) // default value is true, so it is not necessary to set it
+                _CreateTreeMethodBody.AppendLine(SetProperty(decorator.Name, "NeverFail", decorator.NeverFail.ToString().ToLower()));
             // set weight
             SetWeight(decorator);
             // create decorator handler method
@@ -330,8 +330,8 @@ namespace Skill.Editor.CG
             // new decorator variable inside CreateTree method
             _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.AccessLimitDecorator(\"{1}\",{2}[\"{3}\"]);", Variable.GetName(decorator.Name), decorator.Name, Variable.GetName(AccessKeysVariableName), decorator.AccessKey));
             // set property SuccessOnFailHandler
-            if (decorator.SuccessOnFailHandler != false) // default value is false, so it is not necessary to set it
-                _CreateTreeMethodBody.AppendLine(string.Format("{0}.SuccessOnFailHandler = {1};", Variable.GetName(decorator.Name), decorator.SuccessOnFailHandler.ToString().ToLower()));
+            if (decorator.NeverFail != true) // default value is true, so it is not necessary to set it
+                _CreateTreeMethodBody.AppendLine(SetProperty(decorator.Name, "NeverFail", decorator.NeverFail.ToString().ToLower()));
             // set weight
             SetWeight(decorator);
             // create events handlers (success, failure and Running)
@@ -342,19 +342,19 @@ namespace Skill.Editor.CG
         {
             switch (composite.CompositeType)
             {
-                case Skill.Editor.AI.CompositeType.Sequence:
+                case Skill.Studio.AI.CompositeType.Sequence:
                     CreateSequenceSelector((AI.SequenceSelector)composite);
                     break;
-                case Skill.Editor.AI.CompositeType.Concurrent:
+                case Skill.Studio.AI.CompositeType.Concurrent:
                     CreateConcurrentSelector((AI.ConcurrentSelector)composite);
                     break;
-                case Skill.Editor.AI.CompositeType.Random:
+                case Skill.Studio.AI.CompositeType.Random:
                     CreateRandomSelector((AI.RandomSelector)composite);
                     break;
-                case Skill.Editor.AI.CompositeType.Priority:
+                case Skill.Studio.AI.CompositeType.Priority:
                     CreatePrioritySelector((AI.PrioritySelector)composite);
                     break;
-                case Skill.Editor.AI.CompositeType.Loop:
+                case Skill.Studio.AI.CompositeType.Loop:
                     CreateLoopSelector((AI.LoopSelector)composite);
                     break;
                 default:
@@ -414,8 +414,8 @@ namespace Skill.Editor.CG
             _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.PrioritySelector(\"{1}\");", Variable.GetName(prioritySelector.Name), prioritySelector.Name));
 
             // set Priority property
-            if (prioritySelector.Priority != AI.PriorityType.RunningNode) // default is RunningNode
-                _CreateTreeMethodBody.AppendLine(string.Format("{0}.Priority = Skill.AI.PriorityType.{1};", Variable.GetName(prioritySelector.Name), prioritySelector.Priority));
+            if (prioritySelector.Priority != AI.PriorityType.HighestPriority) // default is HighestPriority
+                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.Priority = Skill.AI.PriorityType.{1};", Variable.GetName(prioritySelector.Name), prioritySelector.Priority));
         }
 
         private void CreateLoopSelector(AI.LoopSelector loopSelector)

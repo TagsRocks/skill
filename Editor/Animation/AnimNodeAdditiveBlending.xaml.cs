@@ -12,7 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Skill.Editor.Animation
+namespace Skill.Studio.Animation
 {
     public class AnimNodeAdditiveBlending : AnimNode
     {
@@ -47,7 +47,7 @@ namespace Skill.Editor.Animation
     public partial class AnimNodeAdditiveBlendingViewModel : AnimNodeViewModel
     {
 
-        public override Skill.Editor.Diagram.Connector Out { get { return _Out; } }
+        public override Skill.Studio.Diagram.Connector Out { get { return _Out; } }
 
         public AnimNodeAdditiveBlendingViewModel()
             : this(new AnimNodeAdditiveBlending())

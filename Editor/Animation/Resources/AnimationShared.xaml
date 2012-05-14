@@ -1,9 +1,9 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:ctr="clr-namespace:Skill.Editor.Controls"
-                    xmlns:anim="clr-namespace:Skill.Editor.Animation"
-                    xmlns:diag="clr-namespace:Skill.Editor.Diagram"
-                    xmlns:edit="clr-namespace:Skill.Editor"
+                    xmlns:ctr="clr-namespace:Skill.Studio.Controls"
+                    xmlns:anim="clr-namespace:Skill.Studio.Animation"
+                    xmlns:diag="clr-namespace:Skill.Studio.Diagram"
+                    xmlns:edit="clr-namespace:Skill.Studio"
                     >
 
     <ContextMenu x:Key="AnimNodeContextMenu">

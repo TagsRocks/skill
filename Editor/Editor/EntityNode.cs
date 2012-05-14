@@ -5,7 +5,7 @@ using System.Text;
 using System.Xml.Linq;
 using System.ComponentModel;
 
-namespace Skill.Editor
+namespace Skill.Studio
 {
 
 
@@ -257,7 +257,7 @@ namespace Skill.Editor
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public EntityNodeViewModel AddNode(Editor.EntityType type)
+        public EntityNodeViewModel AddNode(Skill.Studio.EntityType type)
         {
             if (EntityType != EntityType.Folder && EntityType != EntityType.Root)
                 return null;
@@ -334,6 +334,7 @@ namespace Skill.Editor
         public virtual void New() { Project.Save(); }
         public virtual void Delete() { if (Parent != null) ((EntityNodeViewModel)Parent).RemoveNode(this); Project.Save(); }
         public virtual string LocalFileName { get { return ""; } }
+        public virtual string LocalFileNameWithoutExtension { get { return System.IO.Path.Combine(GetLocalDirectory(), Name); } }
 
         private void CloseAll(EntityNodeViewModel node)
         {
@@ -361,7 +362,7 @@ namespace Skill.Editor
 
         private void Copy(EntityNodeViewModel source, EntityNodeViewModel clone)
         {
-            if (source.EntityType == Editor.EntityType.Folder)
+            if (source.EntityType == Skill.Studio.EntityType.Folder)
             {
                 string sourceFolder = System.IO.Path.Combine(Project.Directory, LocalFileName);
                 if (System.IO.Directory.Exists(sourceFolder))

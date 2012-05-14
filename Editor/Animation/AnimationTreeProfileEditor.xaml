@@ -1,7 +1,7 @@
-﻿<Window x:Class="Skill.Editor.Animation.AnimationTreeProfileEditor"
+﻿<Window x:Class="Skill.Studio.Animation.AnimationTreeProfileEditor"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:anim="clr-namespace:Skill.Editor.Animation"
+        xmlns:anim="clr-namespace:Skill.Studio.Animation"
         Title="AnimationTree Profiles" Height="300" Width="504" ResizeMode="NoResize" x:Name="This" WindowStartupLocation="CenterScreen" >
     <Grid>
         <Grid.ColumnDefinitions>

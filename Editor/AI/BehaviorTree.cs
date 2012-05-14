@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.Collections.ObjectModel;
 using System.Xml.Linq;
 
-namespace Skill.Editor.AI
+namespace Skill.Studio.AI
 {
     #region BehaviorTree
     /// <summary>
@@ -422,6 +422,12 @@ namespace Skill.Editor.AI
 
         #region Register view models
 
+
+        private bool ContainsModel(ObservableCollection<BehaviorViewModel> list, BehaviorViewModel viewMode)
+        {
+            return list.Count(b => b.Model == viewMode.Model) > 0;
+        }
+
         int _RegisterCount = -1;
         public void RegisterViewModel(BehaviorViewModel viewModel)
         {
@@ -433,19 +439,19 @@ namespace Skill.Editor.AI
             switch (viewModel.Model.BehaviorType)
             {
                 case BehaviorType.Action:
-                    if (!this.Actions.Contains(viewModel))
+                    if (!ContainsModel(this.Actions, viewModel))
                         this.Actions.Add(viewModel);
                     break;
                 case BehaviorType.Condition:
-                    if (!this.Conditions.Contains(viewModel))
+                    if (!ContainsModel(this.Conditions, viewModel))
                         this.Conditions.Add(viewModel);
                     break;
                 case BehaviorType.Decorator:
-                    if (!this.Decorators.Contains(viewModel))
+                    if (!ContainsModel(this.Decorators, viewModel))
                         this.Decorators.Add(viewModel);
                     break;
                 case BehaviorType.Composite:
-                    if (!this.Composites.Contains(viewModel))
+                    if (!ContainsModel(this.Composites, viewModel))
                         this.Composites.Add(viewModel);
                     break;
             }
@@ -528,7 +534,7 @@ namespace Skill.Editor.AI
                 this.PropertyChanged(this, e);
         }
 
-        #endregion // INotifyPropertyChanged Members        
+        #endregion // INotifyPropertyChanged Members
     }
     #endregion
 }

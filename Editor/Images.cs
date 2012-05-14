@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace Skill.Editor
+namespace Skill.Studio
 {
     /// <summary>
     /// Defines address of some useful images

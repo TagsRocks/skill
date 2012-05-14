@@ -13,7 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ComponentModel;
 
-namespace Skill.Editor.Animation
+namespace Skill.Studio.Animation
 {
 
     public class AnimNodeConnectorProperties
@@ -38,7 +38,7 @@ namespace Skill.Editor.Animation
     public partial class AnimNodeConnector : UserControl, INotifyPropertyChanged
     {
 
-        public Skill.Editor.Diagram.Connector Connector { get { return _Connector; } }
+        public Skill.Studio.Diagram.Connector Connector { get { return _Connector; } }
 
         private string _Text;
         public string Text

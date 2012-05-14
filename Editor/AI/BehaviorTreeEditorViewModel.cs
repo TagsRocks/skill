@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 
-namespace Skill.Editor.AI
+namespace Skill.Studio.AI
 {
     class BehaviorTreeEditorViewModel : INotifyPropertyChanged
     {

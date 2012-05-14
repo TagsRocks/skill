@@ -5,7 +5,7 @@ using System.Text;
 using System.Windows.Controls;
 using System.Text.RegularExpressions;
 
-namespace Skill.Editor.Validation
+namespace Skill.Studio.Validation
 {
     /// <summary>
     /// Defines a validator for name of variables (behaviors, animations , ...)

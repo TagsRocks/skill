@@ -1,4 +1,4 @@
-﻿<Window x:Class="Skill.Editor.ProjectWizard"
+﻿<Window x:Class="Skill.Studio.ProjectWizard"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="New Project" Height="220" Width="670" Background="#BCC7D8"  >

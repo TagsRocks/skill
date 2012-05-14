@@ -1,7 +1,7 @@
-﻿<Window x:Class="Skill.Editor.RestoreWindow"
+﻿<Window x:Class="Skill.Studio.RestoreWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:edit="clr-namespace:Skill.Editor"
+        xmlns:edit="clr-namespace:Skill.Studio"
         Title="Restore" Height="300" Width="511" x:Name="ThisWindow" WindowStartupLocation="CenterOwner" >
     <Grid>
         <Grid.RowDefinitions>

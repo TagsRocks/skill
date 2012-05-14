@@ -1,8 +1,8 @@
-﻿<Window x:Class="Skill.Editor.AI.AccessKeyEditor"
+﻿<Window x:Class="Skill.Studio.AI.AccessKeyEditor"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:extToolkit="clr-namespace:Xceed.Wpf.Toolkit.PropertyGrid;assembly=WPFToolkit.Extended"
-        xmlns:ai="clr-namespace:Skill.Editor.AI"
+        xmlns:ai="clr-namespace:Skill.Studio.AI"
         Title="AccessKey Editor" Height="420" Width="620" x:Name="This" WindowStartupLocation="CenterScreen" >
     <Grid>
         <Grid.ColumnDefinitions>

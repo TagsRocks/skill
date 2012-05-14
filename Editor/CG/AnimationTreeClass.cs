@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Skill.Editor.Animation;
+using Skill.Studio.Animation;
 
-namespace Skill.Editor.CG
+namespace Skill.Studio.CG
 {
     class AnimationTreeClass : Class
     {
@@ -95,31 +95,31 @@ namespace Skill.Editor.CG
                     case AnimNodeType.Sequence:
                         CreateSequence((AnimNodeSequence)node);
                         break;
-                    case Skill.Editor.Animation.AnimNodeType.Override:
+                    case Skill.Studio.Animation.AnimNodeType.Override:
                         CreateOverride((AnimNodeOverride)node);
                         break;
-                    case Skill.Editor.Animation.AnimNodeType.BlendBySpeed:
+                    case Skill.Studio.Animation.AnimNodeType.BlendBySpeed:
                         CreateBlendBySpeed((AnimNodeBlendBySpeed)node);
                         break;
-                    case Skill.Editor.Animation.AnimNodeType.BlendByPosture:
+                    case Skill.Studio.Animation.AnimNodeType.BlendByPosture:
                         CreateBlendByPosture((AnimNodeBlendByPosture)node);
                         break;
-                    case Skill.Editor.Animation.AnimNodeType.BlendByIdle:
+                    case Skill.Studio.Animation.AnimNodeType.BlendByIdle:
                         CreateBlendByIdle((AnimNodeBlendByIdle)node);
                         break;
-                    case Skill.Editor.Animation.AnimNodeType.Blend4Directional:
+                    case Skill.Studio.Animation.AnimNodeType.Blend4Directional:
                         CreateBlend4Directional((AnimNodeBlend4Directional)node);
                         break;
-                    case Skill.Editor.Animation.AnimNodeType.AimOffset:
+                    case Skill.Studio.Animation.AnimNodeType.AimOffset:
                         CreateAimOffset((AnimNodeAimOffset)node);
                         break;
-                    case Skill.Editor.Animation.AnimNodeType.AdditiveBlending:
+                    case Skill.Studio.Animation.AnimNodeType.AdditiveBlending:
                         CreateAdditiveBlending((AnimNodeAdditiveBlending)node);
                         break;
-                    case Skill.Editor.Animation.AnimNodeType.Random:
+                    case Skill.Studio.Animation.AnimNodeType.Random:
                         CreateRandom((AnimNodeRandom)node);
                         break;
-                    case Skill.Editor.Animation.AnimNodeType.BlendByIndex:
+                    case Skill.Studio.Animation.AnimNodeType.BlendByIndex:
                         CreateSwitchByIndex((AnimNodeBlendByIndex)node);
                         break;
                 }
@@ -229,8 +229,11 @@ namespace Skill.Editor.CG
                 SetProperty(node, "Speed", node.Speed.ToString() + "f");
             SetProperty(node, "WrapMode", "UnityEngine.WrapMode." + node.WrapMode.ToString());
 
-            if (!node.UseTreeProfile) // default is o.1f
+            if (!node.UseTreeProfile) // default is true
                 SetProperty(node, "UseTreeProfile", node.UseTreeProfile.ToString().ToLower());
+
+            if (node.Synchronize) // default is false
+                SetProperty(node, "Synchronize", node.Synchronize.ToString().ToLower());
 
             SetSharedParameters(node);
         }

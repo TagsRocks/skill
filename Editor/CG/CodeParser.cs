@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Skill.Editor.CG
+namespace Skill.Studio.CG
 {
     class CodeParser
     {

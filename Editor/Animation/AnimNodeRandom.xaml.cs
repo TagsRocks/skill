@@ -15,7 +15,7 @@ using System.Collections.ObjectModel;
 using System.Xml.Linq;
 using System.ComponentModel;
 
-namespace Skill.Editor.Animation
+namespace Skill.Studio.Animation
 {
 
     public class AnimNodeRandom : AnimNode
@@ -213,7 +213,7 @@ namespace Skill.Editor.Animation
         private ObservableCollection<AnimNodeConnectorProperties> _AnimNodeConnectors;
         public ObservableCollection<AnimNodeConnectorProperties> AnimNodeConnectors { get { return _AnimNodeConnectors; } }
 
-        public override Skill.Editor.Diagram.Connector Out { get { return _Out; } }
+        public override Skill.Studio.Diagram.Connector Out { get { return _Out; } }
 
         private int _ChildCount;
         public int ChildCount

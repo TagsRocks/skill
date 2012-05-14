@@ -85,8 +85,7 @@ namespace Skill.AI
             }
             switch (Result)
             {
-                case BehaviorResult.Failure:
-                    state.UnregisterForExecution(registerIndex);// unregister itself and childs from execution sequence
+                case BehaviorResult.Failure:                    
                     OnFailure(state);
                     break;
                 case BehaviorResult.Success:

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace Skill.Editor.CG
+namespace Skill.Studio.CG
 {
     public class Builder
     {

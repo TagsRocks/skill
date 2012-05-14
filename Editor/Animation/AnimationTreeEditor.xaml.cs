@@ -11,9 +11,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Skill.Editor.Diagram;
+using Skill.Studio.Diagram;
 
-namespace Skill.Editor.Animation
+namespace Skill.Studio.Animation
 {
     /// <summary>
     /// Interaction logic for AnimationTreeEditor.xaml
@@ -44,8 +44,8 @@ namespace Skill.Editor.Animation
             Load();
             ChangeTitle();
             History.Change += new EventHandler(History_Change);
-            History.UndoChange += new EventHandler(History_UndoChange);
-            History.RedoChange += new EventHandler(History_RedoChange);
+            History.UndoChange += new UnDoRedoChangeEventHandler(History_UndoChange);
+            History.RedoChange += new UnDoRedoChangeEventHandler(History_RedoChange);
             _Canvas.AddConnection += new EventHandler(_Canvas_AddConnection);
         }
 
@@ -151,11 +151,11 @@ namespace Skill.Editor.Animation
         #region History events
 
         // hook events of History
-        void History_RedoChange(object sender, EventArgs e)
+        void History_RedoChange(UnDoRedo sender, UnDoRedoChangeEventArgs e)
         {
         }
 
-        void History_UndoChange(object sender, EventArgs e)
+        void History_UndoChange(UnDoRedo sender, UnDoRedoChangeEventArgs e)
         {
         }
 
@@ -288,9 +288,9 @@ namespace Skill.Editor.Animation
                         vm.CommiteChangesToModel();
                         _AnimationTree.Add(vm.Model);
                     }
-                    else if (item is Skill.Editor.Diagram.Connection)
+                    else if (item is Skill.Studio.Diagram.Connection)
                     {
-                        Skill.Editor.Diagram.Connection connection = (Skill.Editor.Diagram.Connection)item;
+                        Skill.Studio.Diagram.Connection connection = (Skill.Studio.Diagram.Connection)item;
                         AnimNodeViewModel source = (AnimNodeViewModel)connection.Source.ParentDragableContent;
                         AnimNodeViewModel sink = (AnimNodeViewModel)connection.Sink.ParentDragableContent;
                         connections.Add(new AnimationConnection(source.Model.Id, sink.Model.Id, connection.Sink.Index));

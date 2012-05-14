@@ -15,7 +15,7 @@ using System.Xml.Linq;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace Skill.Editor.Animation
+namespace Skill.Studio.Animation
 {
     public class AnimNodeBlendByIndex : AnimNodeChildrenEditable
     {
@@ -67,7 +67,7 @@ namespace Skill.Editor.Animation
     /// </summary>
     public partial class AnimNodeBlendByIndexViewModel : AnimNodeChildrenEditableViewModel
     {
-        public override Skill.Editor.Diagram.Connector Out { get { return _Out; } }
+        public override Skill.Studio.Diagram.Connector Out { get { return _Out; } }
 
         protected override StackPanel ConnectorPanel { get { return _ConnectorPanel; } }
 

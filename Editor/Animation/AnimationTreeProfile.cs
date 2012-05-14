@@ -6,7 +6,7 @@ using System.Xml.Linq;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 
-namespace Skill.Editor.Animation
+namespace Skill.Studio.Animation
 {
     public class AnimationTreeProfile : IXElement
     {

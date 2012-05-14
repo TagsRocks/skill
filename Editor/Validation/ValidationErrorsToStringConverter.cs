@@ -8,7 +8,7 @@ using System.Globalization;
 using System.Windows.Controls;
 using System.Windows.Markup;
 
-namespace Skill.Editor.Validation
+namespace Skill.Studio.Validation
 {
     [ValueConversion(typeof(ReadOnlyObservableCollection<ValidationError>), typeof(string))]
     public class ValidationErrorsToStringConverter : MarkupExtension, IValueConverter

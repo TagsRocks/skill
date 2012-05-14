@@ -1,8 +1,8 @@
-﻿<Window x:Class="Skill.Editor.NewBackupWindow"
+﻿<Window x:Class="Skill.Studio.NewBackupWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:edit="clr-namespace:Skill.Editor"
-        xmlns:valid="clr-namespace:Skill.Editor.Validation"
+        xmlns:edit="clr-namespace:Skill.Studio"
+        xmlns:valid="clr-namespace:Skill.Studio.Validation"
         Title="Create new backup" Height="140" Width="300" MaxHeight="180" MinWidth="300" x:Name="ThisWindow" WindowStartupLocation="CenterOwner" >    
     <Grid>
         <Grid.RowDefinitions>

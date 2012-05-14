@@ -1,4 +1,4 @@
-﻿<ad:DockableContent xmlns:my="clr-namespace:Skill.Editor.Controls"  x:Class="Skill.Editor.Controls.PropertyGrid"
+﻿<ad:DockableContent xmlns:my="clr-namespace:Skill.Studio.Controls"  x:Class="Skill.Studio.Controls.PropertyGrid"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 

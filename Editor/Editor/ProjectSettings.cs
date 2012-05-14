@@ -5,7 +5,7 @@ using System.Text;
 using System.Xml.Linq;
 using System.ComponentModel;
 
-namespace Skill.Editor
+namespace Skill.Studio
 {
     #region ProjectSettings
     /// <summary>

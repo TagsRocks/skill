@@ -113,7 +113,8 @@ namespace Skill.AI
         public TimeLimitAccessKey(string accessKey, float timeInterval)
             : base(accessKey)
         {
-            if (TimeInterval < 0.1f) timeInterval = 0.1f;
+            this.TimeInterval = timeInterval;
+            if (this.TimeInterval < 0.1f) this.TimeInterval = 0.1f;
             _Lock = false;
         }
 
@@ -207,7 +208,7 @@ namespace Skill.AI
                         _Lock = AccessKey.Lock();// try to lock key
                     if (_Lock)// if success, execute child
                     {
-                        result = base.Behave(state);
+                        result = Child.Behavior.Trace(state);
                     }
                     if (_Lock && result != BehaviorResult.Running)// if finish job, unlock key
                     {
@@ -216,9 +217,11 @@ namespace Skill.AI
                     }
                 }
             }
+            if (NeverFail && result == BehaviorResult.Failure)
+                result = BehaviorResult.Success;
             return result;
         }
-        
+
         /// <summary>
         /// Reset behavior. when a branch with more periority be valid let this nod to unlock key
         /// </summary>

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Skill.Editor.Diagram
+namespace Skill.Studio.Diagram
 {
     public interface IDiagramObject
     {

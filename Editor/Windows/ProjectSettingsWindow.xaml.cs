@@ -12,7 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Microsoft.Win32;
 
-namespace Skill.Editor
+namespace Skill.Studio
 {
     /// <summary>
     /// Interaction logic for ProjectSettingsWindow.xaml

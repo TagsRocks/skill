@@ -5,7 +5,7 @@ using System.Text;
 using System.Windows.Data;
 using System.Windows;
 
-namespace Skill.Editor.Controls
+namespace Skill.Studio.Controls
 {
     [ValueConversion(typeof(bool), typeof(Visibility))]
     public class BoolToVisibilityConverter : IValueConverter

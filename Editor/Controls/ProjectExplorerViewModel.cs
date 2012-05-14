@@ -5,7 +5,7 @@ using System.Text;
 using System.ComponentModel;
 using System.Windows;
 
-namespace Skill.Editor.Controls
+namespace Skill.Studio.Controls
 {
     public class ProjectExplorerViewModel : INotifyPropertyChanged
     {

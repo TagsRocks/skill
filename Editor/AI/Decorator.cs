@@ -5,7 +5,7 @@ using System.Text;
 using System.ComponentModel;
 using System.Xml.Linq;
 
-namespace Skill.Editor.AI
+namespace Skill.Studio.AI
 {
     #region Decorator
 
@@ -32,7 +32,7 @@ namespace Skill.Editor.AI
         public int LoadedChildId { get; private set; }
 
         /// <summary> if true : when handler function fail return success </summary>
-        public bool SuccessOnFailHandler { get; set; }
+        public bool NeverFail { get; set; }
 
         protected Decorator(string name, DecoratorType type)
             : base(name)
@@ -44,10 +44,12 @@ namespace Skill.Editor.AI
         public Decorator()
             : this("NewDecorator", DecoratorType.Default)
         {
+            NeverFail = true;
         }
 
         protected override void ReadAttributes(System.Xml.Linq.XElement e)
         {
+            NeverFail = e.GetAttributeValueAsBoolean("NeverFail", true);
             string child = e.Attribute("Child").Value;
             var childArray = Behavior.ConvertToIndices(child);
             if (childArray != null && childArray.Length > 0)
@@ -61,6 +63,7 @@ namespace Skill.Editor.AI
         {
             e.SetAttributeValue("DecoratorType", this.Type.ToString());
             e.SetAttributeValue("Child", GetChildrenString());
+            e.SetAttributeValue("NeverFail", NeverFail);
             base.WriteAttributes(e);
         }
     }
@@ -71,23 +74,23 @@ namespace Skill.Editor.AI
     {
         public override string ImageName { get { return Images.Decorator; } }
 
-        [DisplayName("SuccessOnFailHandler")]
+        [DisplayName("NeverFail")]
         [Description("if true : when handler function fail return success")]
-        public bool SuccessOnFailHandler
+        public virtual bool NeverFail
         {
-            get { return ((Decorator)Model).SuccessOnFailHandler; }
+            get { return ((Decorator)Model).NeverFail; }
             set
             {
-                if (value != ((Decorator)Model).SuccessOnFailHandler)
+                if (value != ((Decorator)Model).NeverFail)
                 {
-                    ((Decorator)Model).SuccessOnFailHandler = value;
-                    OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs("SuccessOnFailHandler"));
-                    Tree.History.Insert(new ChangePropertyUnDoRedo(this, "SuccessOnFailHandler", value, !value));
+                    ((Decorator)Model).NeverFail = value;
+                    OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs("NeverFail"));
+                    Tree.History.Insert(new ChangePropertyUnDoRedo(this, "NeverFail", value, !value));
                 }
             }
         }
 
-        public DecoratorViewModel(BehaviorViewModel parent, Skill.Editor.AI.Decorator decorator)
+        public DecoratorViewModel(BehaviorViewModel parent, Skill.Studio.AI.Decorator decorator)
             : base(parent, decorator)
         {
         }
@@ -275,8 +278,8 @@ namespace Skill.Editor.AI
 
         public TimeLimitAccessKeyViewModel(TimeLimitAccessKey model)
             : base(model)
-        {            
-        }        
+        {
+        }
     }
     #endregion
 
@@ -325,9 +328,9 @@ namespace Skill.Editor.AI
                     OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs("AccessKey"));
                 }
             }
-        }
+        }        
 
-        public AccessLimitDecoratorViewModel(BehaviorViewModel parent, Skill.Editor.AI.AccessLimitDecorator decorator)
+        public AccessLimitDecoratorViewModel(BehaviorViewModel parent, Skill.Studio.AI.AccessLimitDecorator decorator)
             : base(parent, decorator)
         {
         }

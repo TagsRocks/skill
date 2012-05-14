@@ -8,7 +8,7 @@ using System.Xml.Linq;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 
-namespace Skill.Editor
+namespace Skill.Studio
 {
     #region ProjectRoot
     /// <summary>

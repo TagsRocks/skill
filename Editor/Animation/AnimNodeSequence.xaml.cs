@@ -11,11 +11,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Skill.Editor.Diagram;
+using Skill.Studio.Diagram;
 using System.Xml.Linq;
 using System.ComponentModel;
 
-namespace Skill.Editor.Animation
+namespace Skill.Studio.Animation
 {
     public enum WrapMode
     {
@@ -231,7 +231,7 @@ namespace Skill.Editor.Animation
     /// </summary>
     public partial class AnimNodeSequenceViewModel : AnimNodeViewModel
     {
-        public override Skill.Editor.Diagram.Connector Out { get { return _Out; } }
+        public override Skill.Studio.Diagram.Connector Out { get { return _Out; } }
 
         private string _AnimationName;
         public string AnimationName

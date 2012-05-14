@@ -13,7 +13,7 @@ using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace Skill.Editor.AI
+namespace Skill.Studio.AI
 {
     /// <summary>
     /// Interaction logic for AccessKeyEditor.xaml

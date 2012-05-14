@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Skill.Editor.AI
+namespace Skill.Studio.AI
 {
     #region Action
     /// <summary>
@@ -32,7 +32,7 @@ namespace Skill.Editor.AI
     {
         public override string ImageName { get { return Images.Action; } }
 
-        public ActionViewModel(BehaviorViewModel parent, Skill.Editor.AI.Action action)
+        public ActionViewModel(BehaviorViewModel parent, Skill.Studio.AI.Action action)
             : base(parent, action)
         {
 

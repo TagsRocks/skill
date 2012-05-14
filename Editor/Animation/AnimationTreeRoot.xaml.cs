@@ -15,7 +15,7 @@ using System.ComponentModel;
 using System.Xml.Linq;
 using System.Collections.ObjectModel;
 
-namespace Skill.Editor.Animation
+namespace Skill.Studio.Animation
 {
 
     

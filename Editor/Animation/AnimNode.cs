@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 using System.ComponentModel;
-using Skill.Editor.Diagram;
+using Skill.Studio.Diagram;
 using System.Windows.Controls;
 
-namespace Skill.Editor.Animation
+namespace Skill.Studio.Animation
 {
     public enum AnimNodeType
     {

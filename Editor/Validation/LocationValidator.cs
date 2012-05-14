@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Controls;
 
-namespace Skill.Editor.Validation
+namespace Skill.Studio.Validation
 {
     /// <summary>
     /// Defines validation for a directory

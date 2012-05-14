@@ -11,11 +11,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Skill.Editor.AI;
+using Skill.Studio.AI;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 
-namespace Skill.Editor.AI
+namespace Skill.Studio.AI
 {
     /// <summary>
     /// Interaction logic for BehaviorTreeEditor.xaml
@@ -121,8 +121,8 @@ namespace Skill.Editor.AI
             _ViewModel.BehaviorTree = new BehaviorTreeViewModel(tree, this.History);
             SetChanged(false);
             History.Change += new EventHandler(History_Change);
-            History.UndoChange += new EventHandler(History_UndoChange);
-            History.RedoChange += new EventHandler(History_RedoChange);
+            History.UndoChange += new UnDoRedoChangeEventHandler(History_UndoChange);
+            History.RedoChange += new UnDoRedoChangeEventHandler(History_RedoChange);
         }
         #endregion
 
@@ -136,14 +136,18 @@ namespace Skill.Editor.AI
             _ViewModel.IsPasteAv = false;
         }
         // hook events of History
-        void History_RedoChange(object sender, EventArgs e)
+        void History_RedoChange(UnDoRedo sender, UnDoRedoChangeEventArgs e)
         {
             ResetCut();
+            if (e.Command is AddBehaviorUnDoRedo || e.Command is MoveUpBehaviorUnDoRedo)
+                UpdateConnections();
         }
 
-        void History_UndoChange(object sender, EventArgs e)
+        void History_UndoChange(UnDoRedo sender, UnDoRedoChangeEventArgs e)
         {
             ResetCut();
+            if (e.Command is AddBehaviorUnDoRedo || e.Command is MoveUpBehaviorUnDoRedo)
+                UpdateConnections();
         }
 
         // when any change occurs in history, update title

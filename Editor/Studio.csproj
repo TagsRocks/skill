@@ -8,7 +8,7 @@
     <ProjectGuid>{CB9F3683-71C9-45B1-A7EC-834CE871A096}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Skill.Editor</RootNamespace>
+    <RootNamespace>Skill.Studio</RootNamespace>
     <AssemblyName>SkillStudio</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>
@@ -20,6 +20,7 @@
     <SccLocalPath>&lt;Local Binding Root of Project&gt;</SccLocalPath>
     <SccAuxPath>&lt;Source Control Database&gt;</SccAuxPath>
     <SccProvider>Mercurial Source Control Package</SccProvider>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -32,7 +33,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -56,7 +56,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Skill.Editor.App</StartupObject>
+    <StartupObject>Skill.Studio.App</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Skill.ico</ApplicationIcon>
@@ -221,6 +221,9 @@
     <Compile Include="Editor\UnDoRedo.cs" />
     <Compile Include="Images.cs" />
     <Compile Include="Editor\ProjectSettings.cs" />
+    <Compile Include="Windows\AboutWindow.xaml.cs">
+      <DependentUpon>AboutWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\SaveDialog.xaml.cs">
       <DependentUpon>SaveDialog.xaml</DependentUpon>
     </Compile>
@@ -357,6 +360,10 @@
     <Page Include="Diagram\Resources\DragableContent.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\AboutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\SaveDialog.xaml">
       <SubType>Designer</SubType>

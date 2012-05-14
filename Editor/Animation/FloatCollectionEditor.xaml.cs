@@ -14,7 +14,7 @@ using System.Windows.Shapes;
 using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 using System.Collections.ObjectModel;
 
-namespace Skill.Editor.Animation
+namespace Skill.Studio.Animation
 {
     internal interface IFloatCollectionContainer
     {
@@ -34,7 +34,7 @@ namespace Skill.Editor.Animation
 
         public FrameworkElement ResolveEditor(Xceed.Wpf.Toolkit.PropertyGrid.PropertyItem propertyItem)
         {
-            Skill.Editor.Animation.IFloatCollectionContainer container = propertyItem.Instance as Skill.Editor.Animation.IFloatCollectionContainer;
+            Skill.Studio.Animation.IFloatCollectionContainer container = propertyItem.Instance as Skill.Studio.Animation.IFloatCollectionContainer;
             if (container != null)
                 _ListBox.ItemsSource = container.FloatCollection;
             return this;

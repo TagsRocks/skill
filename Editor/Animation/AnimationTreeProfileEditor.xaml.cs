@@ -13,7 +13,7 @@ using System.Windows.Shapes;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 
-namespace Skill.Editor.Animation
+namespace Skill.Studio.Animation
 {
 
 

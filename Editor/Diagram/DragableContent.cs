@@ -8,7 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.ComponentModel;
 
-namespace Skill.Editor.Diagram
+namespace Skill.Studio.Diagram
 {
     public class DragableContent : UserControl, ISelectable, INotifyPropertyChanged, IDiagramObject
     {

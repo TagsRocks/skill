@@ -67,9 +67,9 @@ namespace Skill.AI
         }
 
         /// <summary>
-        /// set to true if only BehaviorResult.Running is important for you
+        /// set to true if only BehaviorResult.Running is important for you (default is true)
         /// </summary>
-        public bool SuccessOnFailHandler { get; set; }
+        public bool NeverFail { get; set; }
 
         /// <summary>
         /// Create an instance of Decorator
@@ -80,7 +80,7 @@ namespace Skill.AI
             : base(name, BehaviorType.Decorator)
         {
             this._Handler = handler;
-            this.SuccessOnFailHandler = false;
+            this.NeverFail = true;
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Skill.AI
         /// <returns></returns>
         protected override BehaviorResult Behave(BehaviorState state)
         {
-            BehaviorResult result = SuccessOnFailHandler ? BehaviorResult.Success : BehaviorResult.Failure;
+            BehaviorResult result = BehaviorResult.Failure;
             if (Child != null)
             {
                 if (_Handler != null)
@@ -108,6 +108,9 @@ namespace Skill.AI
                 _IsChildRunning = true;
             else
                 _IsChildRunning = false;
+
+            if (NeverFail && result == BehaviorResult.Failure)
+                result = BehaviorResult.Success;
             return result;
         }
 

@@ -8,7 +8,7 @@ using System.Windows.Controls;
 using System.Windows;
 using System.Windows.Media;
 
-namespace Skill.Editor.AI
+namespace Skill.Studio.AI
 {
     #region BehaviorType
     /// <summary>
@@ -345,7 +345,7 @@ namespace Skill.Editor.AI
                         double x = -MarginLeft;
                         double offset = Height / 2;
 
-                        _ConnectionToP = Skill.Editor.Diagram.BezierCurve.GetPathGeometry(new Point(0, offset), new Point(x, y + offset), Diagram.ConnectorOrientation.Left, Diagram.ConnectorOrientation.Right);
+                        _ConnectionToP = Skill.Studio.Diagram.BezierCurve.GetPathGeometry(new Point(0, offset), new Point(x, y + offset), Diagram.ConnectorOrientation.Left, Diagram.ConnectorOrientation.Right);
                     }
                     else
                         _ConnectionToP = new PathGeometry();
@@ -927,7 +927,7 @@ namespace Skill.Editor.AI
     #region UnDoRedo helper classes
     class AddBehaviorUnDoRedo : IUnDoRedoCommand
     {
-        int _Index;
+        int _Index;        
         BehaviorViewModel _NewNode;
         BehaviorViewModel _Parent;
         bool _Reverse;

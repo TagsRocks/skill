@@ -48,32 +48,32 @@ namespace Skill.AI
     {
 
         private int _FailureCount; // number of children that returns BehaviorResult.Failure
-        private bool[] _ChildrenResults;// state of children that finish their jobs and result is not BehaviorResult.Running
+        //private bool[] _ChildrenResults;// state of children that finish their jobs and result is not BehaviorResult.Running
 
 
         /// <summary>
         /// At first time execution, make sure the  _ChildrenResults array is valid
         /// </summary>
-        private void CreateChildrenResults()
-        {
-            if (_ChildrenResults == null || _ChildrenResults.Length != ChildCount)
-            {
-                _ChildrenResults = new bool[ChildCount];
-                ResetChildrenResults();
-            }
-        }
+        //private void CreateChildrenResults()
+        //{
+        //    if (_ChildrenResults == null || _ChildrenResults.Length != ChildCount)
+        //    {
+        //        _ChildrenResults = new bool[ChildCount];
+        //        ResetChildrenResults();
+        //    }
+        //}
 
-        /// <summary>
-        /// Reset _ChildrenResults array
-        /// </summary>
-        private void ResetChildrenResults()
-        {
-            _FailureCount = 0;
-            for (int i = 0; i < _ChildrenResults.Length; i++)
-            {
-                _ChildrenResults[i] = false;
-            }
-        }
+        ///// <summary>
+        ///// Reset _ChildrenResults array
+        ///// </summary>
+        //private void ResetChildrenResults()
+        //{
+        //    _FailureCount = 0;
+        //    for (int i = 0; i < _ChildrenResults.Length; i++)
+        //    {
+        //        _ChildrenResults[i] = false;
+        //    }
+        //}
 
 
         /// <summary> First check for conditions then rest of childs (default true)</summary>
@@ -117,7 +117,8 @@ namespace Skill.AI
         /// <returns>Result</returns>
         protected override BehaviorResult Behave(BehaviorState state)
         {
-            CreateChildrenResults(); // make sure the  _ChildrenResults array is valid
+            _FailureCount = 0;
+            //CreateChildrenResults(); // make sure the  _ChildrenResults array is valid
             BehaviorResult result = BehaviorResult.Success; // by default success
             if (FirstConditions) // first check conditions
                 result = CheckConditions(state);
@@ -127,7 +128,7 @@ namespace Skill.AI
             // itrate throw children an execute them
             for (int i = 0; i < ChildCount; i++)
             {
-                if (_ChildrenResults[i]) continue;// if this child already executed ignore it
+                //if (_ChildrenResults[i]) continue;// if this child already executed ignore it
 
                 BehaviorContainer node = this[i];
                 state.Parameters = node.Parameters;
@@ -163,13 +164,13 @@ namespace Skill.AI
                 // if result of this node is running or result of any previous node is running, set result to running
                 if (r == BehaviorResult.Running || result != BehaviorResult.Running)
                     result = r;
-                if (r != BehaviorResult.Running)
-                    _ChildrenResults[i] = true; // set ; child node at index i executed and finished it's job
+                //if (r != BehaviorResult.Running)
+                //    _ChildrenResults[i] = true; // set ; child node at index i executed and finished it's job
             }
 
 
-            if (result != BehaviorResult.Running)
-                ResetChildrenResults();
+            //if (result != BehaviorResult.Running)
+            //    ResetChildrenResults();
             return result;
         }
 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Skill.Editor.CG
+namespace Skill.Studio.CG
 {
     /// <summary>
     /// defines type of method when method recreate in subclass

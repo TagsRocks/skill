@@ -12,7 +12,7 @@ using System.Xml;
 using System.Windows.Media;
 using System.ComponentModel;
 
-namespace Skill.Editor.Diagram
+namespace Skill.Studio.Diagram
 {
     public class DiagramCanvas : Canvas, INotifyPropertyChanged
     {

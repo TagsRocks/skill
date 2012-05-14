@@ -14,7 +14,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.ComponentModel;
 
-namespace Skill.Editor
+namespace Skill.Studio
 {
     /// <summary>
     /// Interaction logic for RestoreWindow.xaml

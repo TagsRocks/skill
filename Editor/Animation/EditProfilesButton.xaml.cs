@@ -14,7 +14,7 @@ using System.Windows.Shapes;
 using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 using System.Collections.ObjectModel;
 
-namespace Skill.Editor.Animation
+namespace Skill.Studio.Animation
 {
     /// <summary>
     /// Interaction logic for EditProfilesButton.xaml
@@ -32,9 +32,9 @@ namespace Skill.Editor.Animation
         {
             if (this._Properties == null) return;
 
-            if (this._Properties is Skill.Editor.Animation.AnimNodeAimOffsetProperties)
+            if (this._Properties is Skill.Studio.Animation.AnimNodeAimOffsetProperties)
             {
-                Skill.Editor.Animation.AnimNodeAimOffsetProperties properties = this._Properties as Skill.Editor.Animation.AnimNodeAimOffsetProperties;
+                Skill.Studio.Animation.AnimNodeAimOffsetProperties properties = this._Properties as Skill.Studio.Animation.AnimNodeAimOffsetProperties;
                 if (properties != null)
                 {
                     AnimNodeAimOffsetProfileEditor editor = new AnimNodeAimOffsetProfileEditor(properties.Profiles);
@@ -42,9 +42,9 @@ namespace Skill.Editor.Animation
                     this._Properties.Editor.SetChanged(true);
                 }
             }
-            else if (this._Properties is Skill.Editor.Animation.AnimationTreeRootProperties)
+            else if (this._Properties is Skill.Studio.Animation.AnimationTreeRootProperties)
             {
-                Skill.Editor.Animation.AnimationTreeRootProperties properties = this._Properties as Skill.Editor.Animation.AnimationTreeRootProperties;
+                Skill.Studio.Animation.AnimationTreeRootProperties properties = this._Properties as Skill.Studio.Animation.AnimationTreeRootProperties;
                 if (properties != null)
                 {
                     AnimationTreeProfileEditor editor = new AnimationTreeProfileEditor(properties.Profiles);
@@ -56,9 +56,9 @@ namespace Skill.Editor.Animation
 
         public FrameworkElement ResolveEditor(Xceed.Wpf.Toolkit.PropertyGrid.PropertyItem propertyItem)
         {
-            if (propertyItem.Instance is Skill.Editor.Animation.AnimNodeProperties)
+            if (propertyItem.Instance is Skill.Studio.Animation.AnimNodeProperties)
             {
-                this._Properties = propertyItem.Instance as Skill.Editor.Animation.AnimNodeProperties;
+                this._Properties = propertyItem.Instance as Skill.Studio.Animation.AnimNodeProperties;
             }
             return this;
         }

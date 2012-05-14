@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 
-namespace Skill.Editor
+namespace Skill.Studio
 {
     #region IUnDoRedoCommand
     /// <summary>
@@ -14,8 +14,20 @@ namespace Skill.Editor
     {
         void Undo();
         void Redo();
-    } 
+    }
     #endregion
+
+    public class UnDoRedoChangeEventArgs : EventArgs
+    {
+        public IUnDoRedoCommand Command { get; private set; }
+
+        public UnDoRedoChangeEventArgs(IUnDoRedoCommand command)
+        {
+            this.Command = command;
+        }
+    }
+
+    public delegate void UnDoRedoChangeEventHandler(UnDoRedo sender, UnDoRedoChangeEventArgs args);
 
     /// <summary>
     /// Defines a class that take care of changes and change commands
@@ -81,7 +93,7 @@ namespace Skill.Editor
                     _List[i] = null;
                 }
             }
-        } 
+        }
         #endregion
 
 
@@ -91,9 +103,9 @@ namespace Skill.Editor
         /// <summary> Occurs when any change made in class </summary>
         public event EventHandler Change;
         /// <summary> Raised after a redo </summary>
-        public event EventHandler RedoChange;
+        public event UnDoRedoChangeEventHandler RedoChange;
         /// <summary> Raised after a undo </summary>
-        public event EventHandler UndoChange;
+        public event UnDoRedoChangeEventHandler UndoChange;
 
         // make history to unchanged state
         public void ResetChangeCount() { ChangeCount = 0; }
@@ -105,15 +117,15 @@ namespace Skill.Editor
             if (Change != null)
                 Change(this, EventArgs.Empty);
         }
-        private void OnUndoChange()
+        private void OnUndoChange(UnDoRedoChangeEventArgs args)
         {
             if (UndoChange != null)
-                UndoChange(this, EventArgs.Empty);
+                UndoChange(this, args);
         }
-        private void OnRedoChange()
+        private void OnRedoChange(UnDoRedoChangeEventArgs args)
         {
             if (RedoChange != null)
-                RedoChange(this, EventArgs.Empty);
+                RedoChange(this, args);
         }
 
         /// <summary>
@@ -152,7 +164,8 @@ namespace Skill.Editor
                     command.Redo();
                     _UndoCommands.Push(command);
                     ChangeCount++;
-                    OnRedoChange();
+                    UnDoRedoChangeEventArgs args = new UnDoRedoChangeEventArgs(command);
+                    OnRedoChange(args);
                     OnChange();
 
                 }
@@ -175,7 +188,8 @@ namespace Skill.Editor
                     command.Undo();
                     _RedoCommands.Push(command);
                     ChangeCount--;
-                    OnUndoChange();
+                    UnDoRedoChangeEventArgs args = new UnDoRedoChangeEventArgs(command);
+                    OnUndoChange(args);
                     OnChange();
                 }
             }
@@ -245,6 +259,6 @@ namespace Skill.Editor
                 prop.SetValue(_Object, value, null);
             }
         }
-    } 
+    }
     #endregion
 }

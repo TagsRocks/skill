@@ -13,7 +13,7 @@ using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace Skill.Editor.Animation
+namespace Skill.Studio.Animation
 {
     /// <summary>
     /// Interaction logic for AnimNodeAimOffsetProfileEditor.xaml

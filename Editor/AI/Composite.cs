@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 
-namespace Skill.Editor.AI
+namespace Skill.Studio.AI
 {
     #region CompositeType
     /// <summary>
@@ -183,13 +183,14 @@ namespace Skill.Editor.AI
     public enum PriorityType
     {
         /// <summary>
-        /// Continue running node
-        /// </summary>
-        RunningNode,
-        /// <summary>
         /// always start from first node
         /// </summary>
         HighestPriority,
+        /// <summary>
+        /// Continue running node
+        /// </summary>
+        RunningNode,
+        
     }
     public class PrioritySelector : Composite
     {
@@ -201,7 +202,7 @@ namespace Skill.Editor.AI
         public PrioritySelector()
             : base("NewPrioritySelector")
         {
-
+            Priority = PriorityType.HighestPriority;
         }
 
         protected override void WriteAttributes(System.Xml.Linq.XElement e)
@@ -265,15 +266,15 @@ namespace Skill.Editor.AI
     #region SelectorViewModel
     public abstract class CompositeViewModel : BehaviorViewModel
     {
-        public CompositeViewModel(BehaviorViewModel parent, Skill.Editor.AI.Composite selector)
+        public CompositeViewModel(BehaviorViewModel parent, Skill.Studio.AI.Composite selector)
             : base(parent, selector)
         {
         }
-        protected CompositeViewModel(BehaviorTreeViewModel tree, Skill.Editor.AI.Composite selector)
+        protected CompositeViewModel(BehaviorTreeViewModel tree, Skill.Studio.AI.Composite selector)
             : base(tree, selector)
         {
         }
-        public Skill.Editor.AI.CompositeType CompositeType { get { return ((Skill.Editor.AI.Composite)Model).CompositeType; } }
+        public Skill.Studio.AI.CompositeType CompositeType { get { return ((Skill.Studio.AI.Composite)Model).CompositeType; } }
     }
     #endregion
 

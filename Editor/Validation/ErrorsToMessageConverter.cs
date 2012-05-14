@@ -6,7 +6,7 @@ using System.Windows.Data;
 using System.Collections.ObjectModel;
 using System.Windows.Controls;
 
-namespace Skill.Editor.Validation
+namespace Skill.Studio.Validation
 {
     public class ErrorsToMessageConverter : IValueConverter
     {

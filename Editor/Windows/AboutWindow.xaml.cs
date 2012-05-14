@@ -9,24 +9,18 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Skill.Studio.Controls
+namespace Skill.Studio
 {
     /// <summary>
-    /// Interaction logic for Properties.xaml
+    /// Interaction logic for About.xaml
     /// </summary>
-    public partial class PropertyGrid : AvalonDock.DockableContent
+    public partial class AboutWindow : Window
     {
-        public PropertyGrid()
+        public AboutWindow()
         {
             InitializeComponent();
-        }
-
-        public void SetViewModel(object viewModel)
-        {
-            _PropertyGrid.SelectedObject = viewModel;
         }
     }
 }

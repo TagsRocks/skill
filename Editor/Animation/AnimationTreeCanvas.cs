@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Skill.Editor.Diagram;
+using Skill.Studio.Diagram;
 using System.Windows;
 
-namespace Skill.Editor.Animation
+namespace Skill.Studio.Animation
 {
     public class AnimationTreeCanvas : DiagramCanvas
     {

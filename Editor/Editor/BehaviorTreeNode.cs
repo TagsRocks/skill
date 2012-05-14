@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Skill.Editor
+namespace Skill.Studio
 {
     #region BehaviorTreeNode
     public class BehaviorTreeNode : EntityNode
@@ -51,7 +51,7 @@ namespace Skill.Editor
             base.Delete();
         }
 
-        public override string LocalFileName { get { return System.IO.Path.Combine(GetLocalDirectory(), Name + AI.BehaviorTree.Extension); } }
+        public override string LocalFileName { get { return LocalFileNameWithoutExtension + AI.BehaviorTree.Extension; } }
 
 
         public override string Name

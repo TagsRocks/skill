@@ -11,10 +11,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Skill.Editor.Diagram;
+using Skill.Studio.Diagram;
 using System.Xml.Linq;
 
-namespace Skill.Editor.Animation
+namespace Skill.Studio.Animation
 {
     public class AnimNodeBlendByIdle : AnimNode
     {
@@ -48,7 +48,7 @@ namespace Skill.Editor.Animation
     /// </summary>
     public partial class AnimNodeBlendByIdleViewModel : AnimNodeViewModel
     {
-        public override Skill.Editor.Diagram.Connector Out { get { return _Out; } }
+        public override Skill.Studio.Diagram.Connector Out { get { return _Out; } }
 
         public AnimNodeBlendByIdleViewModel()
             : this(new AnimNodeBlendByIdle())

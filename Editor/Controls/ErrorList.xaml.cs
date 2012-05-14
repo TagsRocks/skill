@@ -15,7 +15,7 @@ using AvalonDock;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace Skill.Editor.Controls
+namespace Skill.Studio.Controls
 {
     /// <summary>
     /// Interaction logic for ErrorList.xaml

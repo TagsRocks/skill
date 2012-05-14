@@ -5,7 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Controls;
 
-namespace Skill.Editor.Diagram
+namespace Skill.Studio.Diagram
 {
     public class ConnectorAdorner : Adorner
     {

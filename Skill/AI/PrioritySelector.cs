@@ -12,13 +12,14 @@ namespace Skill.AI
     public enum PriorityType
     {
         /// <summary>
-        /// Continue by last running node
-        /// </summary>
-        RunningNode,
-        /// <summary>
         /// Allways  begin by high priority node
         /// </summary>
         HighestPriority,
+        /// <summary>
+        /// Continue by last running node
+        /// </summary>
+        RunningNode,
+
     }
 
     /// <summary>
@@ -29,7 +30,7 @@ namespace Skill.AI
     public class PrioritySelector : Composite
     {
         /// <summary>
-        /// Behavior of PrioritySelector (default : RunningNode)
+        /// Behavior of PrioritySelector (default : HighestPriority)
         /// </summary>
         public PriorityType Priority { get; set; }
 
@@ -45,7 +46,7 @@ namespace Skill.AI
         public PrioritySelector(string name)
             : base(name)
         {
-            Priority = PriorityType.RunningNode;
+            Priority = PriorityType.HighestPriority;
         }
 
         /// <summary>
@@ -77,6 +78,6 @@ namespace Skill.AI
             }
             return result;
         }
-    } 
+    }
     #endregion
 }

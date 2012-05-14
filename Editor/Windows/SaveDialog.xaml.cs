@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace Skill.Editor
+namespace Skill.Studio
 {
     /// <summary>
     /// Interaction logic for SaveDialog.xaml

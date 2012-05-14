@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Skill.Editor.AI
+namespace Skill.Studio.AI
 {
     #region Condition
     /// <summary>
@@ -26,7 +26,7 @@ namespace Skill.Editor.AI
     {
         public override string ImageName { get { return Images.Condition; } }
 
-        public ConditionViewModel(BehaviorViewModel parent, Skill.Editor.AI.Condition condition)
+        public ConditionViewModel(BehaviorViewModel parent, Skill.Studio.AI.Condition condition)
             : base(parent, condition)
         {
 

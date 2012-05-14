@@ -14,7 +14,7 @@ using System.Windows.Shapes;
 using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 using System.Collections.ObjectModel;
 
-namespace Skill.Editor.Animation
+namespace Skill.Studio.Animation
 {
     internal interface IAnimNodeConnectorContainer
     {
@@ -39,7 +39,7 @@ namespace Skill.Editor.Animation
             //binding.Mode = propertyItem.IsReadOnly ? BindingMode.OneWay : BindingMode.TwoWay;
             //BindingOperations.SetBinding(this, FloatCollectionEditor.ValueProperty, binding);
 
-            Skill.Editor.Animation.IAnimNodeConnectorContainer container = propertyItem.Instance as Skill.Editor.Animation.IAnimNodeConnectorContainer;
+            Skill.Studio.Animation.IAnimNodeConnectorContainer container = propertyItem.Instance as Skill.Studio.Animation.IAnimNodeConnectorContainer;
             if (container != null)
                 _ListBox.ItemsSource = container.Connectors;
             return this;
