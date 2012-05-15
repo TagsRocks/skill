@@ -11,11 +11,7 @@ namespace Skill.Animation
     public sealed class AnimationLayer
     {
         private AnimNodeSequence _MaxReleavant;
-
-        /// <summary>
-        /// Synchronize animations?
-        /// </summary>
-        public bool Synchronization { get; set; }
+        private bool _Synchronization;
 
         /// <summary>
         /// include AnimNodes with weight > 0
@@ -43,11 +39,20 @@ namespace Skill.Animation
         }
 
         /// <summary>
+        /// Prepare for update
+        /// </summary>
+        internal void BeginUpdate()
+        {
+            _Synchronization = false;
+            CleanUpActiveList();
+        }
+
+        /// <summary>
         /// Update Layer
         /// </summary>
         internal void Update()
         {
-            if (Synchronization)
+            if (_Synchronization)
             {
                 _MaxReleavant = null;
                 float maxW = 0;
@@ -82,13 +87,14 @@ namespace Skill.Animation
             {
                 if (item == anim) return;
             }
+            _Synchronization |= anim.Synchronize;
             ActiveAnimNodes.Add(anim);
         }
 
         /// <summary>
         /// Remove AnimNodeSequences with weight == 0
         /// </summary>
-        internal void CleanUpActiveList()
+        private void CleanUpActiveList()
         {
             int i = 0;
             while (i < ActiveAnimNodes.Count)
@@ -144,7 +150,7 @@ namespace Skill.Animation
         {
             float normalizedTime = 0;
 
-            if (Synchronization && _MaxReleavant != null)
+            if (_Synchronization && _MaxReleavant != null)
             {
                 UnityEngine.AnimationState state = animationComponent[_MaxReleavant.CurrentAnimation];
                 if (state != null)
@@ -177,7 +183,7 @@ namespace Skill.Animation
                         state.speed = anim.Speed;
                         if (anim.IsJustBecameRelevant)
                         {
-                            if (Synchronization && anim.Synchronize && _MaxReleavant != null && _MaxReleavant != anim)
+                            if (_Synchronization && anim.Synchronize && _MaxReleavant != null && _MaxReleavant != anim)
                             {
                                 state.normalizedTime = normalizedTime;
                             }

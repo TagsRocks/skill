@@ -50,7 +50,7 @@ namespace Skill.AI
             this.RunningAction = null;
         }
 
-        private Behavior[] _ExecutionSequence = new Behavior[100];// 100 is maximum level of tree (i hope).
+        private Behavior[] _ExecutionSequence = new Behavior[200];// 200 is maximum node trace in tree (i hope).
         private int _CurrnetExecutionIndex = -1;
 
 
@@ -118,6 +118,69 @@ namespace Skill.AI
                 }
                 else
                     break;
+            }
+        }
+
+
+        private bool IsChildOf(Behavior parent, Behavior child)
+        {
+            if (parent.Type == BehaviorType.Composite)
+            {
+                if (((Composite)parent).Count(c => c.Behavior == child) > 0)
+                    return true;
+            }
+            else if (parent.Type == BehaviorType.Decorator)
+            {
+                if (((Decorator)parent).Child.Behavior == child)
+                    return true;
+            }
+            return false;
+        }
+
+        private string GetTabSpace(int tabCount)
+        {
+            string s = string.Empty;
+            for (int i = 0; i < tabCount; i++)
+            {
+                s += "\t";
+            }
+            return s;
+        }
+
+        /// <summary>
+        /// Write ExecutionSequence to UnityEngin.Debug.Log
+        /// </summary>
+        public void LogExecutionSequence()
+        {
+            int i = 1;
+            foreach (var item in _ExecutionSequence)
+            {
+                if (item == null) break;
+                UnityEngine.Debug.Log(string.Format("{0} - {1}", i++, item.ToString()));
+            }
+        }
+
+
+        /// <summary>
+        /// Write ExecutionSequence to UnityEngin.Debug.Log in tree style
+        /// </summary>
+        public void LogExecutionSequenceTree()
+        {
+            int tabCounter = 0;
+            Stack<Behavior> parentStack = new Stack<Behavior>();
+            int i = 1;
+            foreach (var item in _ExecutionSequence)
+            {
+                if (item == null) break;
+                while (parentStack.Count > 0 && !IsChildOf(parentStack.Peek(), item))
+                {
+                    tabCounter = Math.Max(-1, tabCounter - 1);
+                    parentStack.Pop();
+                }
+
+                tabCounter++;
+                UnityEngine.Debug.Log(string.Format("{0} - {1}{2}", i++, GetTabSpace(tabCounter), item.ToString()));
+                parentStack.Push(item);
             }
         }
     }

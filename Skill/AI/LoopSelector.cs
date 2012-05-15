@@ -59,7 +59,7 @@ namespace Skill.AI
             if (result == BehaviorResult.Success) // cause loop next update and begin from child 0
             {
                 _LoopCounter++;
-                if (LoopCount != -1 && LoopCount >= _LoopCounter)
+                if (LoopCount != -1 && _LoopCounter >= LoopCount)
                 {
                     result = BehaviorResult.Success;
                     _LoopCounter = 0;
@@ -72,6 +72,6 @@ namespace Skill.AI
                 _LoopCounter = 0;
             return result;
         }
-    } 
+    }
     #endregion
 }
