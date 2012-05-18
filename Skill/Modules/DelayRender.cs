@@ -9,19 +9,24 @@ namespace Skill.Modules
     public class DelayRender : MonoBehaviour
     {
         public float Delay = 0.05f;
-        private float _SpawnTime = 0.0f;
+        private Skill.TimeWatch _StartTW;
 
         void OnEnable()
         {
-            _SpawnTime = Time.time;
-            this.renderer.enabled = false;
+            _StartTW.Begin(Delay);
+            if (this.renderer != null)
+                this.renderer.enabled = false;
         }
 
         void Update()
         {
-            if (this.renderer.enabled) return;
-            if (Time.time > (_SpawnTime + Delay))
-                this.renderer.enabled = true;
+            if (_StartTW.EnabledAndOver)
+            {
+                if (this.renderer != null)
+                    this.renderer.enabled = true;
+                enabled = false;
+                _StartTW.End();
+            }
         }
     }
 

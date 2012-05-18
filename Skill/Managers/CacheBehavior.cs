@@ -4,20 +4,20 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-//namespace Skill.Managers
-//{
-public sealed class CacheBehavior : MonoBehaviour
-{    
-    public int CacheId { get; set; }    
-
-    void Awake()
+namespace Skill.Managers
+{
+    public sealed class CacheBehavior : MonoBehaviour
     {
-        enabled = false;
-    }
+        public int CacheId { get; set; }
 
-    void Update()
-    {
-        enabled = false;
+        void Awake()
+        {
+            enabled = false;
+        }
+
+        void Update()
+        {
+            enabled = false;
+        }
     }
 }
-//}

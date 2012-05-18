@@ -28,6 +28,11 @@ namespace Skill
         public bool Enabled { get; private set; }
 
         /// <summary>
+        /// Is enabled (begined) and current time is greater than OverTime
+        /// </summary>
+        public bool EnabledAndOver { get { return Enabled && IsOver; } }
+
+        /// <summary>
         /// Whether current time is greater than OverTime
         /// </summary>
         public bool IsOver

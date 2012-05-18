@@ -34,12 +34,10 @@ namespace Skill.Studio.Controls
             _CbShowOnStartup.IsChecked = Properties.Settings.Default.ShowSPOnStartup;
 
             _CbCloseAfterLoad.Click += new RoutedEventHandler(_CbCloseAfterLoad_Click);
-            _CbShowOnStartup.Click += new RoutedEventHandler(_CbShowOnStartup_Click);
-
-            LoadRecents();
+            _CbShowOnStartup.Click += new RoutedEventHandler(_CbShowOnStartup_Click);            
         }
 
-        void LoadRecents()
+        public void LoadRecents()
         {
             RecentProjects.Clear();
             if (Properties.Settings.Default.RecentProjects != null)

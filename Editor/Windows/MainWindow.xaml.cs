@@ -94,7 +94,7 @@ namespace Skill.Studio
         public MainWindow()
         {
             InitializeComponent();
-#if RELEASE
+#if !DEBUG
             this.WindowState = System.Windows.WindowState.Maximized;
 #endif
             Instance = this;
@@ -199,6 +199,7 @@ namespace Skill.Studio
                 _StartPage = new Controls.StartPage() { Name = "StartPage" };
                 _StartPage.Closing += new EventHandler<CancelEventArgs>(_StartPage_Closing);
             }
+            _StartPage.LoadRecents();
         }
 
         private void ShowStartPage()
@@ -265,29 +266,31 @@ namespace Skill.Studio
                     docNames.Add(name);
                 }
             }
-            if (docNames.Count == 0) return true;
-
-            SaveDialog dialog = new SaveDialog();
-            dialog.Owner = this;
-            foreach (var item in docNames) dialog.AddItem(item);
-            dialog.ShowDialog();
-
-            if (dialog.Result == MessageBoxResult.Cancel)
+            bool saveAll = false;
+            if (docNames.Count > 0)
             {
-                return false;
-            }
-            else
-            {
-                foreach (var doc in _Documents)
+                SaveDialog dialog = new SaveDialog();
+                dialog.Owner = this;
+                foreach (var item in docNames) dialog.AddItem(item);
+                dialog.ShowDialog();
+
+                if (dialog.Result == MessageBoxResult.Cancel)
                 {
-                    if (dialog.Result == MessageBoxResult.Yes && doc.IsChanged)
-                    {
-                        doc.Save();
-                    }
-                    doc.UnLoad();
+                    return false;
                 }
-                _Documents.Clear();
+                saveAll = dialog.Result == MessageBoxResult.Yes;
             }
+
+            foreach (var doc in _Documents)
+            {
+                if (saveAll && doc.IsChanged)
+                {
+                    doc.Save();
+                }
+                doc.UnLoad();
+            }
+            _Documents.Clear();
+            ApplicationCommands.Properties.Execute(null, null);
             return true;
         }
         #endregion
@@ -331,6 +334,7 @@ namespace Skill.Studio
                         CloseStartPage();
                     AddToRecent(wizard.ProjectInfo.Location);
                     IsProjectLoaded = true;
+                    CopySkillDll(true);
                 }
                 ChangeTitle();
             }
@@ -470,7 +474,7 @@ namespace Skill.Studio
             if (_ErrorList.GetErrorCount(Controls.ErrorType.Error) == 0)
             {
                 BackupRestore backup = new BackupRestore();
-                backup.CreateAuto();                
+                backup.CreateAuto();
 
                 try
                 {
@@ -685,21 +689,27 @@ namespace Skill.Studio
 
         #region Copy Skill Dll
 
-        private void CopySkillDll(bool overrWrite = false)
+        private void CopySkillDll(bool overWrite = false)
         {
-            string appDir = AppDomain.CurrentDomain.BaseDirectory;
+            CopyFile("Skill.dll", overWrite);
+            CopyFile("Skill.xml", overWrite);
+        }
 
-            string destinaion = System.IO.Path.Combine(Project.ProjectSettingsVM.UnityProjectLocaltion, "Skill.dll");
+        private void CopyFile(string filename, bool overWrite)
+        {
+            string destinaion = System.IO.Path.Combine(Project.ProjectSettingsVM.UnityProjectLocaltion, "Designer", filename);
 
-            if (System.IO.File.Exists(destinaion) && !overrWrite)
+            if (System.IO.File.Exists(destinaion) && !overWrite)
                 return;
 
-            string filePath1 = System.IO.Path.Combine(appDir, "Skill.dll");
+            string appDir = AppDomain.CurrentDomain.BaseDirectory;
+
+            string filePath1 = System.IO.Path.Combine(appDir, filename);
 
 #if DEBUG
-            string filePath2 = System.IO.Path.Combine(appDir, "../../../Skill/bin/Debug/Skill.dll");
+            string filePath2 = System.IO.Path.Combine(appDir, "../../../Skill/bin/Debug", filename);
 #else
-            string filePath2 = System.IO.Path.Combine(appDir, "../../../Skill/bin/Release/Skill.dll");
+            string filePath2 = System.IO.Path.Combine(appDir, "../../../Skill/bin/Release, filename);
 #endif
 
             if (System.IO.File.Exists(filePath1))
@@ -711,7 +721,8 @@ namespace Skill.Studio
                 System.IO.File.Copy(filePath2, destinaion, true);
             }
             else
-                System.Windows.Forms.MessageBox.Show("Dll not found");
+                System.Windows.Forms.MessageBox.Show(filename + " not found");
+
         }
 
         #endregion

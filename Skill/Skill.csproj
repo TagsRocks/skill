@@ -59,6 +59,7 @@
     <Compile Include="Animation\AnimationTreeState.cs" />
     <Compile Include="Animation\AnimNodeMultilayer.cs" />
     <Compile Include="Managers\CacheBehavior.cs" />
+    <Compile Include="Managers\EventManager.cs" />
     <Compile Include="MathHelper.cs" />
     <Compile Include="TimeWatch.cs" />
     <Compile Include="AI\AccessLimitDecorator.cs" />

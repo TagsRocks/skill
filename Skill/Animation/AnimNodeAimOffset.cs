@@ -36,12 +36,27 @@ namespace Skill.Animation
         public const int RightDownIndex = 9;
 
 
+        private float _AimWeight;
         private bool _IsLoop;
         private UnityEngine.Vector2 _Aim; // current aim vector
         private UnityEngine.Vector2 _AngleOffset; // current aim offset vector
 
         private List<AnimNodeAimOffsetProfile> _Profiles; // list of profiles
         private AnimNodeAimOffsetProfile _SelectedProfile = null; // selected profile
+
+
+        /// <summary>
+        /// Get or set weight of node (0.0f - 1.0f)
+        /// </summary>
+        public float AimWeight
+        {
+            get { return _AimWeight; }
+            private set
+            {
+                _AimWeight = value;
+                if (_AimWeight < 0) _AimWeight = 0; else if (_AimWeight > 1) _AimWeight = 1;
+            }
+        }
 
         /// <summary>
         /// Whether use AnimationTree profiling method?
@@ -179,9 +194,15 @@ namespace Skill.Animation
         /// <param name="blendWeights">previous weight of children</param>
         protected override void CalcBlendWeights(ref float[] blendWeights)
         {
+            if (IsAimEnable)
+                AimWeight += BlendRate;
+            else
+                AimWeight -= BlendRate;
+
             blendWeights[0] = 1;// normal node is 1
             if (_SelectedProfile != null && IsAimEnable)
             {
+
                 float x = UnityEngine.Mathf.Clamp(AimX + AngleOffsetX, -1, 1);
                 float y = UnityEngine.Mathf.Clamp(AimY + AngleOffsetY, -1, 1);
 
@@ -193,20 +214,20 @@ namespace Skill.Animation
                         blendWeights[LeftUpIndex] = 0;
                         blendWeights[CenterUpIndex] = 0;
 
-                        blendWeights[LeftCenterIndex] = (-x) * (1.0f + y);
-                        blendWeights[LeftDownIndex] = (-x) * (-y);
-                        blendWeights[CenterCenterIndex] = (1.0f + x) * (1.0f + y);
-                        blendWeights[CenterDownIndex] = (1.0f + x) * (-y);
+                        blendWeights[LeftCenterIndex] = ((-x) * (1.0f + y)) * _AimWeight;
+                        blendWeights[LeftDownIndex] = ((-x) * (-y)) * _AimWeight;
+                        blendWeights[CenterCenterIndex] = ((1.0f + x) * (1.0f + y)) * _AimWeight;
+                        blendWeights[CenterDownIndex] = ((1.0f + x) * (-y)) * _AimWeight;
                     }
                     else // left up side is enable
                     {
                         blendWeights[LeftDownIndex] = 0;
                         blendWeights[CenterDownIndex] = 0;
 
-                        blendWeights[LeftCenterIndex] = (-x) * (1.0f - y);
-                        blendWeights[LeftUpIndex] = (-x) * (y);
-                        blendWeights[CenterCenterIndex] = (1.0f + x) * (1.0f - y);
-                        blendWeights[CenterUpIndex] = (1.0f + x) * (y);
+                        blendWeights[LeftCenterIndex] = ((-x) * (1.0f - y)) * _AimWeight;
+                        blendWeights[LeftUpIndex] = ((-x) * (y)) * _AimWeight;
+                        blendWeights[CenterCenterIndex] = ((1.0f + x) * (1.0f - y)) * _AimWeight;
+                        blendWeights[CenterUpIndex] = ((1.0f + x) * (y)) * _AimWeight;
                     }
                 }
                 else// right side is enable
@@ -217,20 +238,20 @@ namespace Skill.Animation
                         blendWeights[RightUpIndex] = 0;
                         blendWeights[CenterUpIndex] = 0;
 
-                        blendWeights[RightCenterIndex] = (x) + (1.0f * y);
-                        blendWeights[RightDownIndex] = (x) * (-y);
-                        blendWeights[CenterCenterIndex] = (1.0f - x) * (1.0f + y);
-                        blendWeights[CenterDownIndex] = (1.0f - x) * (-y);
+                        blendWeights[RightCenterIndex] = ((x) + (1.0f * y)) * _AimWeight;
+                        blendWeights[RightDownIndex] = ((x) * (-y)) * _AimWeight;
+                        blendWeights[CenterCenterIndex] = ((1.0f - x) * (1.0f + y)) * _AimWeight;
+                        blendWeights[CenterDownIndex] = ((1.0f - x) * (-y)) * _AimWeight;
                     }
                     else // right up side is enable
                     {
                         blendWeights[RightDownIndex] = 0;
                         blendWeights[CenterDownIndex] = 0;
 
-                        blendWeights[RightCenterIndex] = (x) * (1.0f - y);
-                        blendWeights[RightUpIndex] = (x) * (y);
-                        blendWeights[CenterCenterIndex] = (1.0f - x) * (1.0f - y);
-                        blendWeights[CenterUpIndex] = (1.0f - x) * (y);
+                        blendWeights[RightCenterIndex] = ((x) * (1.0f - y)) * _AimWeight;
+                        blendWeights[RightUpIndex] = ((x) * (y)) * _AimWeight;
+                        blendWeights[CenterCenterIndex] = ((1.0f - x) * (1.0f - y)) * _AimWeight;
+                        blendWeights[CenterUpIndex] = ((1.0f - x) * (y)) * _AimWeight;
                     }
                 }
             }
@@ -238,7 +259,7 @@ namespace Skill.Animation
             {
                 for (int i = 1; i < this.ChildCount; i++)
                 {
-                    blendWeights[i] = 0;
+                    blendWeights[i] *= _AimWeight;
                 }
             }
         }

@@ -192,6 +192,7 @@ namespace Skill.Animation
                 else if (!_OverrideOneShot)
                 {
                     _OverrideOneShot = true;
+                    IsOverriding = true;
                 }
             }
         }
