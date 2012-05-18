@@ -709,7 +709,7 @@ namespace Skill.Studio
 #if DEBUG
             string filePath2 = System.IO.Path.Combine(appDir, "../../../Skill/bin/Debug", filename);
 #else
-            string filePath2 = System.IO.Path.Combine(appDir, "../../../Skill/bin/Release, filename);
+            string filePath2 = System.IO.Path.Combine(appDir, "../../../Skill/bin/Release", filename);
 #endif
 
             if (System.IO.File.Exists(filePath1))
