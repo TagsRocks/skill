@@ -157,6 +157,22 @@ namespace Skill.AI
                 }
             }
         }
+
+        public bool IsInSequenceChild(Behavior behavior1, Behavior behavior2)
+        {
+            bool found1 = false;
+            foreach (var ct in _Children)
+            {
+                if (!found1)
+                {
+                    if (ct.Behavior == behavior1)
+                        found1 = true;
+                }
+                else if (ct.Behavior == behavior2)
+                    return true;
+            }
+            return false;
+        }
     }
     #endregion
 }

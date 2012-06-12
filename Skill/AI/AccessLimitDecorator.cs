@@ -116,6 +116,7 @@ namespace Skill.AI
             this.TimeInterval = timeInterval;
             if (this.TimeInterval < 0.1f) this.TimeInterval = 0.1f;
             _Lock = false;
+            _TimeTW.Begin(TimeInterval);
         }
 
         /// <summary>

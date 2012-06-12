@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Skill.Studio.Properties {
+namespace Skill.Editor.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Skill.Studio.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Skill.Studio.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Skill.Editor.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,36 +61,12 @@ namespace Skill.Studio.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Skill Studio.
+        ///   Looks up a localized string similar to Skill Studio is a Visual Code Generator for Unity.
+        ///By now it can generate BehaviorTree and AnimationTree..
         /// </summary>
-        internal static string AppTitle {
+        internal static string AppDescription {
             get {
-                return ResourceManager.GetString("AppTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Save.
-        /// </summary>
-        internal static string Save {
-            get {
-                return ResourceManager.GetString("Save", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Save project?.
-        /// </summary>
-        internal static string SaveProjectMsg {
-            get {
-                return ResourceManager.GetString("SaveProjectMsg", resourceCulture);
-            }
-        }
-        
-        internal static byte[] zoom_in {
-            get {
-                object obj = ResourceManager.GetObject("zoom_in", resourceCulture);
-                return ((byte[])(obj));
+                return ResourceManager.GetString("AppDescription", resourceCulture);
             }
         }
     }

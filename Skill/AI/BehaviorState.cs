@@ -79,35 +79,36 @@ namespace Skill.AI
 
             // this means : the execution sequence is different from previous execution sequence
             if (_ExecutionSequence[_CurrnetExecutionIndex] != null && behavior != _ExecutionSequence[_CurrnetExecutionIndex])
-                CallFailForSequence();// so call fail method for rest of previous sequence
+            {
+                bool reset = true;
+                // check to avoid reset when given behavior is next child (and running child) of composite
+                int parentIndex = _CurrnetExecutionIndex - 1;
+                if (parentIndex >= 0)
+                {
+                    Behavior parent = _ExecutionSequence[parentIndex];
+                    if (parent.Type == BehaviorType.Composite)
+                    {
+                        Composite composit = (Composite)parent;
+                        if (composit.IsInSequenceChild(_ExecutionSequence[_CurrnetExecutionIndex], behavior))
+                        {
+                            reset = false;
+                        }
+                    }
+                }
+                if (reset)
+                    CallResetForSequence();// so call fail method for rest of previous sequence
+                else
+                    _ExecutionSequence[_CurrnetExecutionIndex + 1] = null;
+            }
             _ExecutionSequence[_CurrnetExecutionIndex] = behavior; // register behavior in current sequece
             return _CurrnetExecutionIndex;
 
-        }
-
-
-        /// <summary>
-        /// if result of execution be Failur call this at end of Trace method
-        /// </summary>
-        /// <param name="registerIndex">index of behavior in sequence. (got it by RegisterForExecution method)</param>
-        internal void UnregisterForExecution(int registerIndex)
-        {
-            for (int i = registerIndex; i < _ExecutionSequence.Length; i++)
-            {
-                if (_ExecutionSequence[i] != null)
-                {
-                    _ExecutionSequence[i] = null;
-                }
-                else
-                    break;
-            }
-            _CurrnetExecutionIndex = registerIndex - 1;
-        }
+        }	        
 
         /// <summary>
         /// call fail method for rest of execution sequence
         /// </summary>
-        private void CallFailForSequence()
+        private void CallResetForSequence()
         {
             for (int i = _CurrnetExecutionIndex; i < _ExecutionSequence.Length; i++)
             {

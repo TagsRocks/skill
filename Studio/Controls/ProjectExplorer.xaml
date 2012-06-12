@@ -1,0 +1,144 @@
+﻿<ad:DockableContent x:Class="Skill.Studio.Controls.ProjectExplorer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ad="clr-namespace:AvalonDock;assembly=AvalonDock"
+             xmlns:sk="clr-namespace:Skill.Studio"
+             xmlns:my="clr-namespace:Skill.Studio.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300" Title="Project Explorer" x:Name="This" >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="26" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Background="{StaticResource ResourceKey=ToolbarBackColor}" Orientation="Horizontal">
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                    <Setter Property="Width" Value="22"/>
+                    <Setter Property="Height" Value="22"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="Margin" Value="2,0" />
+                </Style>
+                <Style TargetType="{x:Type Image}">
+                    <Setter Property="Width" Value="16"/>
+                    <Setter Property="Height" Value="16"/>
+                </Style>
+            </StackPanel.Resources>
+        </StackPanel>
+        <TreeView Grid.Row="1" ItemsSource="{Binding  CurrentProject.Nodes}" BorderThickness="0" Name="_NodesTree"
+                  SelectedItemChanged="NodesTree_SelectedItemChanged" TreeViewItem.Selected="TreeViewItem_Selected" >
+            <TreeView.ContextMenu  >
+                <ContextMenu UseLayoutRounding="True" >
+                    <ContextMenu.Resources>
+                        <Style TargetType="{x:Type Image}">
+                            <Setter Property="Width" Value="16"/>
+                            <Setter Property="Height" Value="16"/>
+                        </Style>
+                    </ContextMenu.Resources>
+
+                    <MenuItem Header="Build" Visibility="{Binding Path=CanBuild, Converter={StaticResource BToVisConverter}, ConverterParameter=False}" Click="Mnu_Build_Click" >
+                        <MenuItem.Icon>
+                            <my:ButtonImage NormalImage="{StaticResource ImgBuild}" DisableImage="{StaticResource ImgBuild_D}" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator Visibility="{Binding Path=CanOpen, Converter={StaticResource BToVisConverter}, ConverterParameter=False}" />
+                    <MenuItem Header="Open" Visibility="{Binding Path=CanOpen, Converter={StaticResource BToVisConverter}, ConverterParameter=False}" Click="Mnu_Open_Click" >
+                        <MenuItem.Icon>
+                            <my:ButtonImage NormalImage="{StaticResource ImgOpenFile}" DisableImage="{StaticResource ImgOpenFile_D}" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Header="Add" Visibility="{Binding Path=CanAdd, Converter={StaticResource BToVisConverter}, ConverterParameter=False}" >
+                        <MenuItem Header="New Item" Click="Mnu_AddItem_Click" >
+                            <MenuItem.Icon>
+                                <my:ButtonImage NormalImage="{StaticResource ImgNewItem}" DisableImage="{StaticResource ImgNewItem_D}" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Existing Item" Click="Mnu_AddExistingItem_Click" >
+                            <MenuItem.Icon>
+                                <my:ButtonImage NormalImage="{StaticResource ImgExistingItem}" DisableImage="{StaticResource ImgExistingItem_D}" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="New Folder" Click="Mnu_Add_Click" Tag="{x:Static sk:EntityType.Folder}" >
+                            <MenuItem.Icon>
+                                <my:ButtonImage NormalImage="{StaticResource ImgFolderClosed}" DisableImage="{StaticResource ImgFolderClosed_D}" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator/>
+                        <MenuItem Header="Behavior Tree" Click="Mnu_Add_Click" Tag="{x:Static sk:EntityType.BehaviorTree}" >
+                            <MenuItem.Icon>
+                                <my:ButtonImage NormalImage="{StaticResource ImgBehaviorTree}" DisableImage="{StaticResource ImgBehaviorTree_D}" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Animation Tree" Click="Mnu_Add_Click" Tag="{x:Static sk:EntityType.AnimationTree}" >
+                            <MenuItem.Icon>
+                                <my:ButtonImage NormalImage="{StaticResource ImgAnimationTree}" DisableImage="{StaticResource ImgAnimationTree_D}" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Header="Cut" IsEnabled="{Binding CanCut}" Click="Mnu_Cut_Click" >
+                        <MenuItem.Icon>
+                            <my:ButtonImage NormalImage="{StaticResource ImgCut}" DisableImage="{StaticResource ImgCut_D}" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Copy" IsEnabled="{Binding CanCopy}" Click="Mnu_Copy_Click" >
+                        <MenuItem.Icon>
+                            <my:ButtonImage NormalImage="{StaticResource ImgCopy}" DisableImage="{StaticResource ImgCopy_D}" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Paste" IsEnabled="{Binding CanPaste}"  Click="Mnu_Paste_Click" >
+                        <MenuItem.Icon>
+                            <my:ButtonImage NormalImage="{StaticResource ImgPaste}" DisableImage="{StaticResource ImgPaste_D}" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Delete" IsEnabled="{Binding CanDelete}"  Click="Mnu_Delete_Click" >
+                        <MenuItem.Icon>
+                            <my:ButtonImage NormalImage="{StaticResource ImgDelete}" DisableImage="{StaticResource ImgDelete_D}" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Rename" IsEnabled="{Binding CanRename}" Click="Mnu_Rename_Click" />
+                    <Separator Visibility="{Binding Path=CanProperties, Converter={StaticResource BToVisConverter}, ConverterParameter=False}" />
+                    <MenuItem Header="Properties" Visibility="{Binding Path=CanProperties, Converter={StaticResource BToVisConverter}, ConverterParameter=False}" Click="Mnu_Properties_Click" >
+                        <MenuItem.Icon>
+                            <my:ButtonImage NormalImage="{StaticResource ImgProperties}" DisableImage="{StaticResource ImgProperties_D}" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+
+                </ContextMenu>
+            </TreeView.ContextMenu>
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource TreeViewItemStyle}"    >
+                    <EventSetter Event="TreeViewItem.PreviewMouseRightButtonDown" Handler="TreeViewItem_PreviewMouseRightButtonDown"/>
+                    <EventSetter Event="TreeViewItem.MouseDoubleClick" Handler="TreeViewItem_MouseDoubleClick"/>                    
+                    <EventSetter Event="TreeViewItem.KeyDown" Handler="TreeViewItem_KeyDown"/>
+                </Style>
+            </TreeView.ItemContainerStyle>
+            <TreeView.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type sk:EntityNodeViewModel}"
+                    ItemsSource="{Binding}">
+                    <Grid>
+                        <StackPanel Orientation="Horizontal" Height="16" >
+                            <Image Width="16" Height="16" Margin="3,0" Source="{Binding ImageName}" />
+                            <Grid MouseLeftButtonUp="TreeViewItem_MouseLeftButtonUp" >
+                                <TextBlock Text="{Binding Name}" Visibility="{Binding Editing, Converter={StaticResource BToVisConverter}, ConverterParameter=True}" />
+                                <TextBox Name="_TxtName" Text="{Binding Name}" Visibility="{Binding Editing, Converter={StaticResource BToVisConverter}, ConverterParameter=False}" 
+                               Height="16" BorderThickness="0" Margin="-2,0,0,0" Padding="0" />
+                            </Grid>
+                        </StackPanel>
+                        <Rectangle Fill="#E9E9E9" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="{Binding Cutting, Converter={StaticResource BToVisConverter}, ConverterParameter=False}" Opacity="0.5" />
+                    </Grid>
+                </HierarchicalDataTemplate>
+
+                <LinearGradientBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" EndPoint="0,1" StartPoint="0,0">
+                    <GradientStop Color="#f2f8ff" Offset="0.05"/>
+                    <GradientStop Color="#d0e5ff" Offset="1"/>
+                </LinearGradientBrush>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="Black" />
+            </TreeView.Resources>
+        </TreeView>
+    </Grid>
+</ad:DockableContent>

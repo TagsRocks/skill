@@ -1,0 +1,99 @@
+﻿<ad:DockableContent x:Class="Skill.Studio.Controls.ErrorList"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:ad="clr-namespace:AvalonDock;assembly=AvalonDock"
+             xmlns:ctr="clr-namespace:Skill.Studio.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" 
+             d:DesignHeight="132" d:DesignWidth="815" Title="Error List" Icon="/SkillStudio;component/Images/Default/ErrorList.png" >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="26" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <ToolBar Background="{StaticResource ResourceKey=ToolbarBackColor}" >
+            <ToggleButton Name="_BtnErrors" Margin="2,0" IsChecked="True" Click="_BtnErrors_Click" >
+                <StackPanel Orientation="Horizontal" >
+                    <Image Width="16" Height="16"  Source="{StaticResource ImgError}" />
+                    <TextBlock Name="_TxtErrors"  Text="Errors" Margin="2,0" />
+                </StackPanel>
+            </ToggleButton>
+            <Separator Width="1" Background="Gray" />
+            <ToggleButton Name="_BtnWarnings" Margin="2,0" IsChecked="True" Click="_BtnWarnings_Click" >
+                <StackPanel Orientation="Horizontal" >
+                    <Image Width="16" Height="16"  Source="{StaticResource ImgWarning}" />
+                    <TextBlock Name="_TxtWarnings" Text="Warnings" Margin="2,0" />
+                </StackPanel>
+            </ToggleButton>
+            <Separator Width="1" Background="Gray" />
+            <ToggleButton  Name="_BtnMessages" Width="70" Margin="2,0" Click="_BtnMessages_Click" >
+                <StackPanel Orientation="Horizontal" >
+                    <Image Width="16" Height="16"  Source="{StaticResource ImgMessage}" />
+                    <TextBlock Name="_TxtMessages" Text="Messages" Margin="2,0" />
+                </StackPanel>
+            </ToggleButton>
+        </ToolBar>
+        <ListView Grid.Row="1" Name="_ListView" >
+            <ListView.Resources>
+                <ctr:ErrorTypeToVisibilityConverter x:Key="EToVConverter" />                
+            </ListView.Resources>
+            <ListView.View>
+                <GridView AllowsColumnReorder="True"  >
+                    <GridView.Columns >
+                        <GridViewColumn   >
+                            <GridViewColumn.Header  >
+                                <GridViewColumnHeader MinWidth="24"  Click="SortCategory_Click"  ToolTip="Category" />
+                            </GridViewColumn.Header>
+                            <GridViewColumn.CellTemplate >
+                                <DataTemplate >
+                                    <DataTemplate.Resources>
+                                        <Style TargetType="Image" >
+                                            <Setter Property="Width" Value="16"/>
+                                            <Setter Property="Height" Value="16"/>
+                                        </Style>
+                                    </DataTemplate.Resources>
+                                    <Grid>
+                                        <Image Source="{StaticResource ImgError}" Visibility="{Binding Path=Type, Converter={StaticResource EToVConverter}, ConverterParameter={x:Static ctr:ErrorType.Error}}"  />
+                                        <Image Source="{StaticResource ImgWarning}" Visibility="{Binding Path=Type, Converter={StaticResource EToVConverter}, ConverterParameter={x:Static ctr:ErrorType.Warning}}"  />
+                                        <Image Source="{StaticResource ImgMessage}" Visibility="{Binding Path=Type, Converter={StaticResource EToVConverter}, ConverterParameter={x:Static ctr:ErrorType.Message}}"  />
+                                    </Grid>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn >
+                            <GridViewColumn.Header>
+                                <GridViewColumnHeader MinWidth="24"  Click="SortOrder_Click"  ToolTip="Default Order" />
+                            </GridViewColumn.Header>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Path=Order}" Foreground="Black" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn >
+                            <GridViewColumn.Header>
+                                <GridViewColumnHeader MinWidth="400"  Click="SortDescription_Click"  Content="Description" />
+                            </GridViewColumn.Header>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Path=Description}" Foreground="Black" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn >
+                            <GridViewColumn.Header>
+                                <GridViewColumnHeader MinWidth="200"  Click="SortFile_Click"  Content="File" />
+                            </GridViewColumn.Header>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Path=File}" Foreground="Black" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView.Columns>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</ad:DockableContent>

@@ -1,0 +1,69 @@
+﻿<Window x:Class="Skill.Studio.Animation.Editor.AnimationTreeProfilesEditor"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ctrl="clr-namespace:Skill.Studio.Controls"
+        xmlns:anim="clr-namespace:Skill.Studio.Animation"
+        Title="AnimationTree Profile Editor" x:Name="This" Height="300" Width="400" Background="{StaticResource WindowBg}" WindowStartupLocation="CenterOwner" >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="38" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="40" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30" />                
+                <RowDefinition Height="*" />                
+            </Grid.RowDefinitions>
+            <TextBlock Text="Profiles" VerticalAlignment="Center" Grid.Column="0" Margin="6,0" />
+            <ListBox Grid.Row="1" Margin="4" Name="_LbProfiles" SelectionChanged="LbProfiles_SelectionChanged" KeyDown="LbProfiles_KeyDown" Grid.Column="0" HorizontalContentAlignment="Stretch" >
+                <ListBox.Resources>
+                    <DataTemplate DataType="{x:Type anim:AnimationTreeProfileViewModel}">
+                        <Grid >
+                            <Grid.Resources >
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="Padding" Value="4,0"/>                                   
+                                </Style>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="Padding" Value="4,0"/>                                    
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Name : " Grid.Column="0"  />
+                            <TextBox Text="{Binding Name}" Grid.Column="1"  />
+                            <TextBlock Text="Format : " Grid.Column="2" />
+                            <TextBox Text="{Binding Format}" Grid.Column="3"  />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.Resources>
+            </ListBox>                                    
+            <StackPanel Grid.Row="1" Grid.Column="1">
+                <Button Margin="4" HorizontalAlignment="Left" Width="28" Height="28" Click="BtnAddProfile_Click" Padding="0" >
+                    <Image Source="{StaticResource ImgAdd2}" />
+                </Button>
+                <Button Margin="4" HorizontalAlignment="Left" Width="28" Height="28" Click="BtnDelProfile_Click" IsEnabled="{Binding ElementName=This,Path=HasSelected}" Padding="0" >
+                    <ctrl:ButtonImage NormalImage="{StaticResource ImgDelete2}" DisableImage="{StaticResource ImgDelete2_D}" />
+                </Button>
+            </StackPanel>
+        </Grid>
+        <Grid Background="{StaticResource ButtonPanelBg}" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="100" />
+            </Grid.ColumnDefinitions>
+            <Button Content="Ok" Width="90" VerticalAlignment="Center" Grid.Column="1"  Click="BtnOk_Click"/>
+            <Button Content="Cancel" Width="90" VerticalAlignment="Center" Grid.Column="2" Click="BtnCancel_Click"/>
+        </Grid>
+    </Grid>
+</Window>
