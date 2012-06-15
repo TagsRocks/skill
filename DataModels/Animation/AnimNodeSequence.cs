@@ -44,6 +44,9 @@ namespace Skill.DataModels.Animation
         /// <summary> Speed at which the animation will be played back.Default is 1.0 </summary>        
         public float Speed { get; set; }
 
+        /// <summary> Length of Animation </summary>        
+        public float Length { get; set; }
+
         public WrapMode WrapMode { get; set; }
 
         protected override void WriteAttributes(XElement e)
@@ -52,6 +55,7 @@ namespace Skill.DataModels.Animation
 
             data.SetAttributeValue("AnimationName", string.IsNullOrEmpty(this.AnimationName) ? "" : this.AnimationName);
             data.SetAttributeValue("Speed", this.Speed);
+            data.SetAttributeValue("Length", this.Length);
             data.SetAttributeValue("WrapMode", (int)this.WrapMode);
             data.SetAttributeValue("UseTreeProfile", this.UseTreeProfile);
             data.SetAttributeValue("Synchronize", this.Synchronize);
@@ -83,6 +87,7 @@ namespace Skill.DataModels.Animation
             {
                 this.AnimationName = data.GetAttributeValueAsString("AnimationName", "");
                 this.Speed = data.GetAttributeValueAsFloat("Speed", 1);
+                this.Length = data.GetAttributeValueAsFloat("Length", 0);
                 this.WrapMode = (WrapMode)data.GetAttributeValueAsInt("WrapMode", (int)WrapMode.Default);
                 this.UseTreeProfile = data.GetAttributeValueAsBoolean("UseTreeProfile", true);
                 this.Synchronize = data.GetAttributeValueAsBoolean("Synchronize", false);
@@ -109,6 +114,7 @@ namespace Skill.DataModels.Animation
             AnimNodeSequence sequence = other as AnimNodeSequence;
             this.AnimationName = sequence.AnimationName;
             this.Speed = sequence.Speed;
+            this.Length = sequence.Length;
             this.WrapMode = sequence.WrapMode;
             this.UseTreeProfile = sequence.UseTreeProfile;
         }

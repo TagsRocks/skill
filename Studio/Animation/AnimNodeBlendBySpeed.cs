@@ -21,74 +21,6 @@ using Skill.DataModels.Animation;
 namespace Skill.Studio.Animation
 {
 
-    public class FloatContainer : INotifyPropertyChanged
-    {
-        private float _Property;
-        public float Property
-        {
-            get { return _Property; }
-            set
-            {
-                if (_Property != value)
-                {
-                    _Property = value;
-                    OnPropertyChanged("Property");
-                }
-            }
-        }
-
-        public FloatContainer(float value)
-        {
-            Property = value;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged(string name)
-        {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-        }
-    }
-
-    public class Constraints : ObservableCollection<FloatContainer>
-    {
-        public Constraints(float[] constraints)
-        {
-
-        }
-
-        public Constraints()
-        {
-            SetCount(3);
-        }
-
-        public void SetCount(int count)
-        {
-            if (count < 3) count = 3;
-            float v = 0;
-            if (Count > 0)
-                v = this[Count - 1].Property + 1;
-
-            if (Count < count)
-            {
-                while (Count < count)
-                {
-                    Add(new FloatContainer(v));
-                    v++;
-                }
-            }
-            else if (Count > count)
-            {
-                while (Count > count)
-                {
-                    int index = Count - 1;
-                    RemoveAt(index);
-                }
-            }
-
-        }
-    }
-
     public class AnimNodeBlendBySpeedViewModel : AnimNodeViewModel
     {
         public AnimNodeBlendBySpeedViewModel(AnimationTreeViewModel tree, AnimNodeBlendBySpeed model)
@@ -191,18 +123,11 @@ namespace Skill.Studio.Animation
             }
         }
 
-
-        //[Description("minimum and maximum value of constraints for each child(index 0 , 1 are constraints for child index 0 and so on ...)")]
-        //[System.ComponentModel.Editor(typeof(FloatCollectionEditor), typeof(FloatCollectionEditor))]
-        //public Constraints Constraints
-        //{
-        //    get { return new Constraints(((AnimNodeBlendBySpeed)ViewModel.Model).Constraints); }
-        //}
-
-        //[Browsable(false)]
-        //public ObservableCollection<FloatContainer> FloatCollection
-        //{
-        //    get { return Constraints; }
-        //}
+        [Description("minimum and maximum value of constraints for each child(index 0 , 1 are constraints for child index 0 and so on ...)")]
+        [Editor(typeof(Editor.AnimNodeBlendBySpeedInputsPropertyEditor), typeof(Editor.AnimNodeBlendBySpeedInputsPropertyEditor))]
+        public string Connectors
+        {
+            get { return "Connectors"; }
+        }
     }
 }

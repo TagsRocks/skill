@@ -1,0 +1,90 @@
+﻿<Window x:Class="Skill.Studio.Animation.Editor.AnimNodeAimOffsetProfileEditor"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:anim="clr-namespace:Skill.Studio.Animation"
+        xmlns:animedit="clr-namespace:Skill.Studio.Animation.Editor"
+        Title="AnimNodeAimOffsetProfileEditor" Height="600" Width="700" Background="{StaticResource WindowBg}" x:Name="This" WindowStartupLocation="CenterOwner" >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="38" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="350" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid Background="{StaticResource ControlBg}" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="90" />
+                <RowDefinition Height="150" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <GroupBox Header="Profiles" Margin="5" >
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Profile " VerticalAlignment="Center" Margin="2,6"  />
+                    <ComboBox Grid.Column="1" VerticalAlignment="Center" x:Name="_CmbProfiles" SelectionChanged="CmbProfiles_SelectionChanged" Margin="2,3" >
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type anim:AnimNodeAimOffsetProfileViewModel}">
+                                <TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <Button Grid.Column="2" Content="New"  VerticalAlignment="Center" Margin="2,3" Click="BtnAddProfile_Click"  />
+                    <Button Grid.Column="3" Content="Delete"  VerticalAlignment="Center" Margin="2,3" Click="BtnDelProfile_Click" IsEnabled="{Binding HasSelectedProfile}" />
+                    <TextBlock Text="Name " Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" />
+                    <TextBox Text="{Binding ElementName=This, Path=SelectedProfile.Name}" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" />
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="AimDirection" Margin="5"  Grid.Row="1" >
+                <Grid>
+                    <Grid.Resources>
+                        <Style TargetType="ToggleButton" >
+                            <Setter Property="Margin" Value="6,0" />
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                        </Style>
+                    </Grid.Resources>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <ToggleButton Grid.Row="0" Grid.Column="0" Content="Left Up" x:Name="_BtnLeftUp" Tag="1" Click="BtnAimDirection_Click" />
+                    <ToggleButton Grid.Row="1" Grid.Column="0" Content="Left Center" x:Name="_BtnLeftCenter" Tag="2" Click="BtnAimDirection_Click" />
+                    <ToggleButton Grid.Row="2" Grid.Column="0" Content="Left Down" x:Name="_BtnLeftDown" Tag="3" Click="BtnAimDirection_Click" />
+
+                    <ToggleButton Grid.Row="0" Grid.Column="1" Content="Center Up" x:Name="_BtnCenterUp" Tag="4" Click="BtnAimDirection_Click" />
+                    <ToggleButton Grid.Row="1" Grid.Column="1" Content="Center Center" x:Name="_BtnCenterCenter" Tag="5" Click="BtnAimDirection_Click" />
+                    <ToggleButton Grid.Row="2" Grid.Column="1" Content="Center Down" x:Name="_BtnCenterDown" Tag="6" Click="BtnAimDirection_Click" />
+
+                    <ToggleButton Grid.Row="0" Grid.Column="2" Content="Right Up" x:Name="_BtnRightUp" Tag="7" Click="BtnAimDirection_Click" />
+                    <ToggleButton Grid.Row="1" Grid.Column="2" Content="Right Center" x:Name="_BtnRightCenter" Tag="8" Click="BtnAimDirection_Click" />
+                    <ToggleButton Grid.Row="2" Grid.Column="2" Content="Right Down" x:Name="_BtnRightDown" Tag="9" Click="BtnAimDirection_Click" />
+                </Grid>
+            </GroupBox>
+        </Grid>
+
+        <animedit:AnimNodeSequenceClipSelectorControl Grid.Column="2" x:Name="_ClipSelector" />
+        <Grid Background="{StaticResource ButtonPanelBg}" Grid.Row="1" Grid.ColumnSpan="3" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="100" />
+            </Grid.ColumnDefinitions>
+            <Button Content="Close" Width="90" VerticalAlignment="Center" Grid.Column="1"  Click="BtnClose_Click"/>
+        </Grid>
+    </Grid>
+</Window>

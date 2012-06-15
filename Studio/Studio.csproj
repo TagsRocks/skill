@@ -142,6 +142,10 @@
     <Compile Include="Animation\Editor\AnimConnector.cs" />
     <Compile Include="Animation\Editor\AnimDragThumb.cs" />
     <Compile Include="Animation\Editor\AnimConnectorAdorner.cs" />
+    <Compile Include="Animation\Editor\AnimNodeAimOffsetProfileEditor.xaml.cs">
+      <DependentUpon>AnimNodeAimOffsetProfileEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Animation\Editor\AnimNodeBlendBySpeedInputsPropertyEditor.cs" />
     <Compile Include="Animation\Editor\AnimNodeInputsEditor.xaml.cs">
       <DependentUpon>AnimNodeInputsEditor.xaml</DependentUpon>
     </Compile>
@@ -150,6 +154,17 @@
       <DependentUpon>AnimNodeRandomInputsEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Animation\Editor\AnimNodeRandomInputsPropertyEditor.cs" />
+    <Compile Include="Animation\Editor\AnimNodeBlendBySpeedInputsEditor.xaml.cs">
+      <DependentUpon>AnimNodeBlendBySpeedInputsEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Animation\Editor\AnimNodeSequenceClipSelector.xaml.cs">
+      <DependentUpon>AnimNodeSequenceClipSelector.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Animation\Editor\AnimNodeSequenceClipSelectorControl.xaml.cs">
+      <DependentUpon>AnimNodeSequenceClipSelectorControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Animation\Editor\AnimNodeSequenceClipPropertyEditor.cs" />
+    <Compile Include="Animation\Editor\AnimNodeAimOffsetProfilePropertyEditor.cs" />
     <Compile Include="Animation\Editor\RubberbandAdorner.cs" />
     <Compile Include="Animation\Editor\Selection.cs" />
     <Compile Include="Animation\Editor\SelectSkinMeshWindow.xaml.cs">
@@ -162,9 +177,19 @@
     <Compile Include="Animation\Editor\SkinMeshEditor.xaml.cs">
       <DependentUpon>SkinMeshEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Compiler\AnimationTreeCompiler.cs" />
+    <Compile Include="Compiler\BehaviorTreeCompiler.cs" />
+    <Compile Include="Compiler\DataCompiler.cs" />
+    <Compile Include="Compiler\ProjectCompiler.cs" />
+    <Compile Include="Compiler\SaveGameCompiler.cs" />
+    <Compile Include="Compiler\SharedAccessKeysCompiler.cs" />
+    <Compile Include="Compiler\SkinMeshCompiler.cs" />
     <Compile Include="Diagram\BezierCurve.cs" />
     <Compile Include="Diagram\ConnectorOrientation.cs" />
     <Compile Include="Diagram\ISelectable.cs" />
+    <Compile Include="IO\Editor\ClassNamePropertyEditor.xaml.cs">
+      <DependentUpon>ClassNamePropertyEditor.xaml</DependentUpon>
+    </Compile>
     <Compile Include="IO\Editor\SaveGameEditor.xaml.cs">
       <DependentUpon>SaveGameEditor.xaml</DependentUpon>
     </Compile>
@@ -195,7 +220,7 @@
     <Compile Include="Controls\ButtonImage.xaml.cs">
       <DependentUpon>ButtonImage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\CompileError.cs" />
+    <Compile Include="Compiler\CompileError.cs" />
     <Compile Include="Controls\ErrorList.xaml.cs">
       <DependentUpon>ErrorList.xaml</DependentUpon>
     </Compile>
@@ -271,6 +296,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Animation\Editor\AnimNodeAimOffsetProfileEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Animation\Editor\AnimNodeInputsEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -279,11 +308,27 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Animation\Editor\AnimNodeBlendBySpeedInputsEditor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Animation\Editor\AnimNodeSequenceClipSelector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Animation\Editor\AnimNodeSequenceClipSelectorControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Animation\Editor\SelectSkinMeshWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Animation\Editor\SkinMeshEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="IO\Editor\ClassNamePropertyEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -552,6 +597,7 @@
   <ItemGroup>
     <Content Include="Avalon\AvalonDock.dll" />
     <Content Include="Avalon\AvalonDock.Themes.dll" />
+    <Resource Include="Compiler\ErrorTemplates.txt" />
     <Content Include="WPFToolkit.Extended.dll" />
     <Resource Include="Images\Default\Disabled\Remove2.png" />
     <Resource Include="Images\Default\Remove2.png" />

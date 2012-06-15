@@ -1,14 +1,14 @@
 ﻿<Window x:Class="Skill.Studio.ProjectWizard"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="New Project" Height="220" Width="670" Background="#BCC7D8"  >
+        Title="Project Wizard" Height="220" Width="670" Background="{StaticResource WindowBg}" WindowStartupLocation="CenterOwner"  >
     <Grid >
         <Grid.RowDefinitions>
             <RowDefinition Height="10" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="36" />
+            <RowDefinition Height="38" />
         </Grid.RowDefinitions>
-        <Grid Background="#BCC7D8" Grid.Row="1" >
+        <Grid Grid.Row="1" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" MinWidth="200" />
@@ -29,7 +29,7 @@
             <Button Content="Browse..." Grid.Row="1" Grid.Column="2" Width="85" Height="24" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="14,0" Click="Btn_BrowseLocation_Click" />
             <Button Content="Browse..." Grid.Row="2" Grid.Column="2" Width="85" Height="24" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="14,0" Click="Btn_BrowseUPlocation_Click" />
         </Grid>
-        <Grid Grid.Row="2" Background="#293A56" >
+        <Grid Grid.Row="2" Background="{StaticResource ButtonPanelBg}" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="100" />

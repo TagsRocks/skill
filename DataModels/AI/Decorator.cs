@@ -28,7 +28,7 @@ namespace Skill.DataModels.AI
         public Behavior Child { get { if (Count > 0) return this[0]; return null; } }
 
         /// <summary> when decorator loaded from file read this value from file. this value is not valid until decorator loaded from file </summary>
-        public int LoadedChildId { get; private set; }
+        //public int LoadedChildId { get; private set; }
 
         /// <summary> if true : when handler function fail return success </summary>
         public bool NeverFail { get; set; }
@@ -36,7 +36,7 @@ namespace Skill.DataModels.AI
         protected Decorator(string name, DecoratorType type)
             : base(name)
         {
-            this.LoadedChildId = -1;
+            //this.LoadedChildId = -1;
             this.Type = type;
         }
 
@@ -51,10 +51,10 @@ namespace Skill.DataModels.AI
             NeverFail = e.GetAttributeValueAsBoolean("NeverFail", true);
             string child = e.Attribute("Child").Value;
             var childArray = Behavior.ConvertToIndices(child);
-            if (childArray != null && childArray.Length > 0)
-                this.LoadedChildId = childArray[0];
-            else
-                this.LoadedChildId = -1;
+            //if (childArray != null && childArray.Length > 0)
+            //    this.LoadedChildId = childArray[0];
+            //else
+            //    this.LoadedChildId = -1;
             base.ReadAttributes(e);
         }
 

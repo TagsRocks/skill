@@ -156,5 +156,37 @@ namespace Skill.Studio.Animation.Editor
         {
             return System.Windows.Application.Current.TryFindResource(key) as Brush;
         }
+
+
+
+        private static Brush _BoneSelectedBrush;
+        public static Brush BoneSelectedBrush
+        {
+            get
+            {
+                if (_BoneSelectedBrush == null)
+                {
+                    _BoneSelectedBrush = FindBrush("BoneSelectedBrush");
+                    if (_BoneSelectedBrush == null)
+                        _BoneSelectedBrush = Brushes.LightGray;
+                }
+                return _BoneSelectedBrush;
+            }
+        }
+
+        private static Brush _BoneDefaultBrush;
+        public static Brush BoneDefaultBrush
+        {
+            get
+            {
+                if (_BoneDefaultBrush == null)
+                {
+                    _BoneDefaultBrush = FindBrush("BoneDefaultBrush");
+                    if (_BoneDefaultBrush == null)
+                        _BoneDefaultBrush = Brushes.Transparent;
+                }
+                return _BoneDefaultBrush;
+            }
+        }
     }
 }

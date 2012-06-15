@@ -85,11 +85,11 @@ namespace Skill.CodeGeneration.CSharp
             {
                 if (HasSet)
                 {
-                    writer.WriteLine(string.Format("{0} {1} {2} { get { {3} } set { {4} } }", Modifiers.ToString().ToLower(), Type, Name, _Get, _Set));
+                    writer.WriteLine(string.Format("{0} {1} {2} {{ get {{ {3} }} set {{ {4} }} }}", Modifiers.ToString().ToLower(), Type, Name, _Get, _Set));
                 }
                 else
                 {
-                    writer.WriteLine(string.Format("{0} {1} {2} { get { {3} } }", Modifiers.ToString().ToLower(), Type, Name, _Get));
+                    writer.WriteLine(string.Format("{0} {1} {2} {{ get {{ {3} }} }}", Modifiers.ToString().ToLower(), Type, Name, _Get));
                 }
             }
         }

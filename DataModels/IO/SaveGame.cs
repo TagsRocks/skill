@@ -8,24 +8,27 @@ namespace Skill.DataModels.IO
 {
     public class SaveGame : SaveClass
     {
-        public List<SaveClass> Classes { get; private set; }
+        public SaveClass[] Classes { get; set; }
 
         public SaveGame()
+            : base("NewSaveGame")
         {
-            this.Classes = new List<SaveClass>();
+
         }
 
         protected override void ReadAttributes(XElement e)
         {
-            this.Clear();
             XElement classes = e.FindChildByName("Classes");
             if (classes != null)
             {
+                int count = classes.GetAttributeValueAsInt("Count", 0);
+                int i = 0;
+                this.Classes = new SaveClass[count];
                 foreach (var element in classes.Elements())
                 {
                     SaveClass c = new SaveClass();
                     c.Load(element);
-                    this.Classes.Add(c);
+                    this.Classes[i++] = c;
                 }
             }
             base.ReadAttributes(e);
@@ -33,14 +36,16 @@ namespace Skill.DataModels.IO
 
         protected override void WriteAttributes(XElement e)
         {
-            XElement classes = new XElement("Classes");
-            foreach (var item in this.Classes)
+            if (Classes != null)
             {
-                classes.Add(item.ToXElement());
+                XElement classes = new XElement("Classes");
+                classes.SetAttributeValue("Count", Classes.Length);
+                foreach (var item in this.Classes)
+                {
+                    classes.Add(item.ToXElement());
+                }
+                e.Add(classes);
             }
-            e.Add(classes);
-
-            e.Add(classes);
             base.WriteAttributes(e);
         }
     }

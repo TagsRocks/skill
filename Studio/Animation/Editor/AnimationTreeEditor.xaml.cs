@@ -216,6 +216,8 @@ namespace Skill.Studio.Animation.Editor
             List<AnimNodeToCopy> animNodesToCopy = new List<AnimNodeToCopy>();
             foreach (AnimNodeViewModel animnode in Selection.SelectedObjects)
             {
+                if (animnode.NodeType == AnimNodeType.Root) continue;
+
                 xMin = Math.Min(xMin, animnode.X);
                 yMin = Math.Min(yMin, animnode.Y);
                 animNodesToCopy.Add(new AnimNodeToCopy() { Id = animNodesToCopy.Count, Source = animnode });
@@ -246,11 +248,16 @@ namespace Skill.Studio.Animation.Editor
                 XElement e = node.Source.Model.ToXElement();
                 e.SetAttributeValue("Id", node.Id);
 
+                XElement ui = e.FindChildByName("UI");
                 if (!samePosition)
-                {
-                    XElement ui = e.FindChildByName("UI");
+                {                    
                     ui.SetAttributeValue("X", node.Source.X - xMin);
                     ui.SetAttributeValue("Y", node.Source.Y - yMin);
+                }
+                else
+                {
+                    ui.SetAttributeValue("X", node.Source.X + 30);
+                    ui.SetAttributeValue("Y", node.Source.Y + 30);
                 }
                 nodes.Add(e);
             }
@@ -324,7 +331,7 @@ namespace Skill.Studio.Animation.Editor
             return null;
         }
 
-        private void PasteFromClipboard()
+        private List<AnimNodeViewModel> PasteFromClipboard(bool addToSelection = true)
         {
 
             if (Clipboard.ContainsData(Skill.DataModels.SkillDataFormats.AnimNode))
@@ -384,14 +391,17 @@ namespace Skill.Studio.Animation.Editor
                                 this.AnimationTree.Add(nodesToPaste.ToArray(), connectionsToPaste.ToArray());
 
 
-                                Selection.Clear();
-                                foreach (var item in nodesToPaste)
+                                if (addToSelection)
                                 {
-                                    Selection.Add(item);
+                                    Selection.Clear();
+                                    foreach (var item in nodesToPaste)
+                                    {
+                                        Selection.Add(item);
+                                    }
+                                    _RefreshSelection = true;
                                 }
-                                _RefreshSelection = true;
-
                             }
+                            return nodesToPaste;
                         }
                     }
                     catch (Exception)
@@ -399,6 +409,7 @@ namespace Skill.Studio.Animation.Editor
                     }
                 }
             }
+            return null;
         }
 
         void DeleteCmdCanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -467,7 +478,21 @@ namespace Skill.Studio.Animation.Editor
             }
         }
 
-        #endregion       
+        #endregion
+
+        #region KeyDown
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            if ((Keyboard.Modifiers & ModifierKeys.Control) != ModifierKeys.None)
+            {
+                if (e.Key == Key.D && e.IsDown && !e.IsRepeat)
+                {
+                    DuplicateSelection();
+                }
+            }
+            base.OnKeyDown(e);
+        }
+        #endregion
 
         #region AddConnection
         public void AddConnection(AnimConnector sourceConnector, AnimConnector sinkConnector)
@@ -517,6 +542,16 @@ namespace Skill.Studio.Animation.Editor
             }
         }
         #endregion
-        
+
+
+        #region Duplicate
+
+        public void DuplicateSelection()
+        {
+            CopySelectionToClipboard(true);
+            PasteFromClipboard();
+        }
+
+        #endregion
     }
 }

@@ -6,30 +6,37 @@ using System.Xml.Linq;
 
 namespace Skill.DataModels.IO
 {
-    public class SaveClass : IXElement, ICollection<SaveProperty>
+    public class SaveClass : IXElement
     {
         public string Name { get; set; }
+        public SaveProperty[] Properties { get; set; }
 
         public SaveClass()
+            :this("NewClass")
         {
+
+        }
+
+        public SaveClass(string name)
+        {
+            this.Name = name;
         }
 
         public XElement ToXElement()
         {
             XElement saveclass = new XElement("SaveClass");
-            saveclass.SetAttributeValue("Name", Name);
-
-            XElement properties = new XElement("Properties");
-
-            foreach (var item in this)
+            saveclass.SetAttributeValue("Name", Name != null ? Name : "");
+            if (this.Properties != null)
             {
-                properties.Add(item.ToXElement());
+                XElement properties = new XElement("Properties");
+                properties.SetAttributeValue("Count", this.Properties.Length);
+                foreach (var item in this.Properties)
+                {
+                    properties.Add(item.ToXElement());
+                }
+                saveclass.Add(properties);
             }
-
-            saveclass.Add(properties);
-
             WriteAttributes(saveclass);
-
             return saveclass;
         }
         /// <summary> subclasses can add aditional data to save in file </summary>
@@ -39,19 +46,19 @@ namespace Skill.DataModels.IO
         public void Load(XElement e)
         {
             this.Name = e.GetAttributeValueAsString("Name", this.Name);
-
-            this.Clear();
-
             XElement properties = e.FindChildByName("Properties");
             if (properties != null)
             {
+                int count = properties.GetAttributeValueAsInt("Count", 0);
+                this.Properties = new SaveProperty[count];
+                int i = 0;
                 foreach (var element in properties.Elements())
                 {
                     SaveProperty p = CreateProperty(element);
                     if (p != null)
                     {
                         p.Load(element);
-                        this.Add(p);
+                        this.Properties[i++] = p;
                     }
                 }
             }
@@ -88,50 +95,6 @@ namespace Skill.DataModels.IO
                 default:
                     return null;
             }
-        }
-
-
-        #region ICollection<SaveGameProperty> member
-        private List<SaveProperty> _Children = new List<SaveProperty>();
-        public void Add(SaveProperty item)
-        {
-            _Children.Add(item);
-        }
-
-        public void Clear()
-        {
-            _Children.Clear();
-        }
-
-        public bool Contains(SaveProperty item)
-        {
-            return _Children.Contains(item);
-        }
-
-        public void CopyTo(SaveProperty[] array, int arrayIndex)
-        {
-            _Children.CopyTo(array, arrayIndex);
-        }
-
-        public int Count { get { return _Children.Count; } }
-
-        public bool IsReadOnly { get { return false; } }
-
-        public bool Remove(SaveProperty item)
-        {
-            return _Children.Remove(item);
-        }
-
-        public IEnumerator<SaveProperty> GetEnumerator()
-        {
-            return _Children.GetEnumerator();
-        }
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return (_Children as System.Collections.IEnumerable).GetEnumerator();
-        }
-
-        #endregion
+        }        
     }
 }

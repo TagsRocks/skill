@@ -138,7 +138,7 @@ namespace Skill.Studio.Animation
                 {
                     if (Tree.Editor.History != null)
                     {
-                        Tree.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "IsPublic", value, Model.Name));
+                        Tree.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "IsPublic", value, Model.IsPublic));
                     }
                     Model.IsPublic = value;
                     OnPropertyChanged("IsPublic");

@@ -215,4 +215,7 @@
     <SolidColorBrush Color="#087300" x:Key="AnimAdditiveContnetBrush" />
     <SolidColorBrush Color="#434343" x:Key="AnimRootContnetBrush" />
 
+    <SolidColorBrush Color="LightGray" x:Key="BoneSelectedBrush" />
+    <SolidColorBrush Color="Transparent" x:Key="BoneDefaultBrush" />
+    
 </ResourceDictionary>

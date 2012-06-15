@@ -262,8 +262,7 @@ namespace Skill.Studio.AI
 
     #region UnDoRedo helper classes
     class AddAccessKeyUnDoRedo : IUnDoRedoCommand
-    {
-        int _Index;
+    {        
         AccessKeyViewModel _Newkey;
         SharedAccessKeysViewModel _Container;
         bool _Reverse;

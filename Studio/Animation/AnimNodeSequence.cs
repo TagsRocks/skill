@@ -22,10 +22,26 @@ namespace Skill.Studio.Animation
     public class AnimNodeSequenceViewModel : AnimNodeViewModel
     {
         public AnimNodeSequenceViewModel(AnimationTreeViewModel tree, AnimNodeSequence model)
-            : base(tree, model)
+            : base(tree, model != null ? model : new AnimNodeSequence())
         {
-            AnimationName = model.AnimationName;
+            MixingTransforms = new List<string>();
+            if (model.MixingTransforms != null)
+            {
+                foreach (var item in model.MixingTransforms)
+                {
+                    this.MixingTransforms.Add(item);
+                }
+            }
         }
+
+        public override void CommiteChangesToModel()
+        {
+            ((AnimNodeSequence)Model).MixingTransforms = MixingTransforms.ToArray();
+            base.CommiteChangesToModel();
+        }
+
+        [Browsable(false)]
+        public List<string> MixingTransforms { get; private set; }
 
         [Browsable(false)]
         public override string ImageName { get { return Editor.AnimationImages.Sequence; } }
@@ -34,6 +50,8 @@ namespace Skill.Studio.Animation
         public override System.Windows.Media.Brush ContentBrush { get { return Editor.StaticBrushes.AnimSequenceContnetBrush; } }
 
         [Description("Name of AnimationClip")]
+        [DisplayName("AnimationClip")]
+        [Editor(typeof(Editor.AnimNodeSequenceClipPropertyEditor), typeof(Editor.AnimNodeSequenceClipPropertyEditor))]
         public string AnimationName
         {
             get { return ((AnimNodeSequence)Model).AnimationName; }
@@ -47,6 +65,7 @@ namespace Skill.Studio.Animation
                     }
                     ((AnimNodeSequence)Model).AnimationName = value;
                     Inputs[0].Name = AnimationName;
+                    OnPropertyChanged("AnimationName");
                 }
             }
         }
@@ -130,6 +149,6 @@ namespace Skill.Studio.Animation
                     ((AnimNodeSequence)Model).WrapMode = value;
                 }
             }
-        }        
+        }
     }
 }

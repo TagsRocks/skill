@@ -21,9 +21,7 @@ using Skill.DataModels;
 namespace Skill.Studio.Animation
 {
     public class AnimNodeAimOffsetViewModel : AnimNodeViewModel
-    {
-        public ObservableCollection<AnimNodeAimOffsetProfileViewModel> Profiles { get; private set; }
-
+    {        
         public AnimNodeAimOffsetViewModel(AnimationTreeViewModel tree, AnimNodeAimOffset model)
             : base(tree, model)
         {
@@ -32,7 +30,7 @@ namespace Skill.Studio.Animation
             {
                 for (int i = 0; i < model.Profiles.Length; i++)
                 {
-                    AnimNodeAimOffsetProfileViewModel vm = new AnimNodeAimOffsetProfileViewModel(model.Profiles[i]);
+                    AnimNodeAimOffsetProfileViewModel vm = new AnimNodeAimOffsetProfileViewModel(this, model.Profiles[i]);
                     Profiles.Add(vm);
                 }
             }
@@ -43,10 +41,15 @@ namespace Skill.Studio.Animation
             ((AnimNodeAimOffset)Model).Profiles = new AnimNodeAimOffsetProfile[this.Profiles.Count];
             for (int i = 0; i < this.Profiles.Count; i++)
             {
+                this.Profiles[i].CommiteChangesToModel();
                 ((AnimNodeAimOffset)Model).Profiles[i] = this.Profiles[i].Model;
-            }
+            }            
             base.CommiteChangesToModel();
         }
+
+        [DisplayName("Profiles")]
+        [Editor(typeof(Editor.AnimNodeAimOffsetProfilePropertyEditor), typeof(Editor.AnimNodeAimOffsetProfilePropertyEditor))]
+        public ObservableCollection<AnimNodeAimOffsetProfileViewModel> Profiles { get; private set; }
 
         [Browsable(false)]
         public override string ImageName { get { return Editor.AnimationImages.Aim; } }
@@ -72,27 +75,7 @@ namespace Skill.Studio.Animation
                 }
             }
         }
-
-        //[Description("Edit profiles( like 'Rifle', 'Pistol', ...)")]
-        //[System.ComponentModel.Editor(typeof(EditProfilesButton), typeof(EditProfilesButton))]
-        //public ObservableCollection<AnimNodeAimOffsetProfileViewModel> Profiles
-        //{
-        //    get
-        //    {
-        //        if (((AnimNodeAimOffsetViewModel)ViewModel).Profiles.Count == 0)
-        //        {
-        //            if (((AnimNodeAimOffset)ViewModel.Model).Profiles != null && ((AnimNodeAimOffset)ViewModel.Model).Profiles.Length > 0)
-        //            {
-        //                for (int i = 0; i < ((AnimNodeAimOffset)ViewModel.Model).Profiles.Length; i++)
-        //                {
-        //                    ((AnimNodeAimOffsetViewModel)ViewModel).Profiles.Add(new AnimNodeAimOffsetProfileViewModel(((AnimNodeAimOffset)ViewModel.Model).Profiles[i]));
-        //                }
-        //            }
-        //        }
-
-        //        return ((AnimNodeAimOffsetViewModel)ViewModel).Profiles;
-        //    }
-        //}
+        
 
         [Description("Whether children AnimationSequences use AnimationTree profile method or not")]
         public bool UseTreeProfile

@@ -49,7 +49,7 @@
     <Compile Include="AI\Parameter.cs" />
     <Compile Include="AI\SharedAccessKeys.cs" />
     <Compile Include="Animation\AnimationTreeRoot.cs" />
-    <Compile Include="Animation\InputConnector.cs" />
+    <Compile Include="Animation\Connector.cs" />
     <Compile Include="Animation\SkinMesh.cs" />
     <Compile Include="Animation\AnimationConnection.cs" />
     <Compile Include="Animation\AnimationTree.cs" />

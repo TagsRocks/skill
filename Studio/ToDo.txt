@@ -1,14 +1,5 @@
 ﻿1- Add EventNode in BehaviorTree
-2- Copy And Paste in AnimationTree has problem
-3- specyfy default value for each properties
-4- Reset Event for Behaviors
-
-
-5- Define SharedAccessKeys for Behaviors
-6- Variable binding in AnimationTree
-7- Define AnimationBranch class
-8- Define Skekelton class
-9- SkinMesh Exporter for unity
-10- Define AnimationSet
-11- Define AnimationSet Exporter for unity
-12- Multithread building
+2- specyfy default value for each properties
+3- Reset Event for Behaviors
+4- Variable binding in AnimationTree
+5- Multithread building

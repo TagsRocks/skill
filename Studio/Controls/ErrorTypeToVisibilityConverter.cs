@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Data;
 using System.Windows;
+using Skill.Studio.Compiler;
 
 namespace Skill.Studio.Controls
 {

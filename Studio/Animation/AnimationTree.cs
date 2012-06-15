@@ -79,6 +79,36 @@ namespace Skill.Studio.Animation
 
         public ObservableCollection<AnimationConnectionViewModel> Connections { get { return _Connections; } }
 
+        private SkinMeshViewModel _SkinMesh;
+        public SkinMeshViewModel SkinMesh
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(Model.SkinMesh))
+                {
+                    if (MainWindow.Instance.IsProjectLoaded)
+                    {
+                        SkinMeshNodeViewModel skinMeshNode = MainWindow.Instance.Project.GetNode(Model.SkinMesh) as SkinMeshNodeViewModel;
+                        if (skinMeshNode != null)
+                        {
+                            if (_SkinMesh == null || _SkinMesh.Model != skinMeshNode.SavedData)
+                            {
+                                Skill.DataModels.Animation.SkinMesh skinMesh = skinMeshNode.SavedData as Skill.DataModels.Animation.SkinMesh;
+                                if (skinMesh != null)
+                                {
+                                    _SkinMesh = new SkinMeshViewModel(skinMesh);
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                    _SkinMesh = null;
+
+                return _SkinMesh;
+            }
+        }
+
         #endregion
 
         #region Constructor

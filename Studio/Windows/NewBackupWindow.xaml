@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:edit="clr-namespace:Skill.Studio"
         xmlns:valid="clr-namespace:Skill.Studio.Validation"
-        Title="Create new backup" Height="140" Width="300" MaxHeight="180" MinWidth="300" x:Name="ThisWindow" WindowStartupLocation="CenterOwner" >    
-    <Grid>
+        Title="Create new backup" Height="140" Width="300" MaxHeight="180" MinWidth="300" x:Name="ThisWindow" WindowStartupLocation="CenterOwner" Background="{StaticResource WindowBg}" >    
+    <Grid >
         <Grid.RowDefinitions>
             <RowDefinition Height="32" />
             <RowDefinition Height="*" />
@@ -19,7 +19,7 @@
             <TextBox Grid.Column="1" Text="NewBackup" Name="_TxtBackupName" Margin="0,2,5,0" VerticalAlignment="Center" />                                            
         </Grid>
         <TextBlock Grid.Row="1" Margin="2" Foreground="Red" FontWeight="Bold" Name="_TxtError" />
-        <Grid Grid.Row="2" >
+        <Grid Grid.Row="2" Background="{StaticResource ButtonPanelBg}" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="90" />
                 <ColumnDefinition Width="90" />

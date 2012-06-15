@@ -21,11 +21,16 @@ namespace Skill.DataModels.IO
 
     public abstract class SaveProperty : IXElement
     {
-        public abstract PropertyType Type { get; }        
+        public abstract PropertyType Type { get; }
         public string Name { get; set; }
         public CollectionType CollectionType { get; set; }
         public int ArrayLength { get; set; }
         public string Comment { get; set; }
+
+        public SaveProperty(string name)
+        {
+            this.Name = name;
+        }
 
         public XElement ToXElement()
         {
@@ -42,7 +47,7 @@ namespace Skill.DataModels.IO
                 p.Add(comment);
             }
             WriteAttributes(p);
-           
+
             return p;
         }
         /// <summary> subclasses can add aditional data to save in file </summary>
@@ -74,6 +79,12 @@ namespace Skill.DataModels.IO
         public override PropertyType Type { get { return PropertyType.Primitive; } }
         public PrimitiveType PrimitiveType { get; set; }
 
+        public PrimitiveProperty()
+            : base("NewPrimitiveProperty")
+        {
+
+        }
+
         protected override void WriteAttributes(XElement e)
         {
             e.SetAttributeValue("PrimitiveType", (int)this.PrimitiveType);
@@ -91,6 +102,12 @@ namespace Skill.DataModels.IO
     {
         public override PropertyType Type { get { return PropertyType.Class; } }
         public string ClassName { get; set; }
+
+        public ClassProperty()
+            : base("NewClassProperty")
+        {
+
+        }
 
         protected override void WriteAttributes(XElement e)
         {

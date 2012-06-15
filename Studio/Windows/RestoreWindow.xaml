@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:edit="clr-namespace:Skill.Studio"
-        Title="Restore" Height="300" Width="511" x:Name="ThisWindow" WindowStartupLocation="CenterOwner" >
+        Title="Restore" Height="300" Width="511" x:Name="ThisWindow" WindowStartupLocation="CenterOwner" Background="{StaticResource WindowBg}" >
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />

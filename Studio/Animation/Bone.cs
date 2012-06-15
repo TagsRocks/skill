@@ -5,6 +5,7 @@ using System.Text;
 using Skill.DataModels.Animation;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Windows.Media;
 
 namespace Skill.Studio.Animation
 {
@@ -25,6 +26,131 @@ namespace Skill.Studio.Animation
         [Browsable(false)]
         public SkinMeshViewModel SkinMesh { get; private set; }
 
+
+        /// <summary> Address of bone </summary>
+        [Browsable(false)]
+        public string Address { get; private set; }
+
+        private bool _IsChecked;
+        /// <summary> Helper variable for editor </summary>
+        [Browsable(false)]
+        public bool IsChecked
+        {
+            get { return _IsChecked; }
+            set
+            {
+                BoneViewModel parentBone = Parent as BoneViewModel;
+                if (parentBone != null)
+                {
+                    if (parentBone.Background != Editor.StaticBrushes.BoneSelectedBrush)
+                        CheckedEnable = true;
+                    else
+                        CheckedEnable = false;
+                    if (value && !_IsChecked && parentBone.Background == Editor.StaticBrushes.BoneSelectedBrush)
+                    {
+                        CheckedEnable = false;
+                        return;
+                    }                    
+                }
+                else
+                    CheckedEnable = true;
+                if (_IsChecked != value)
+                {
+                    _IsChecked = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("IsChecked"));
+                }
+
+                if (parentBone != null)
+                {
+                    if (_IsChecked)
+                        Background = Editor.StaticBrushes.BoneSelectedBrush;
+                    else
+                        Background = parentBone.Background;
+                }
+                else
+                {
+                    if (_IsChecked)
+                        Background = Editor.StaticBrushes.BoneSelectedBrush;
+                    else
+                        Background = Editor.StaticBrushes.BoneDefaultBrush;
+                }
+
+                foreach (BoneViewModel bone in this)
+                {
+                    bone.SetChildrenState(_IsChecked);
+                }
+            }
+        }
+
+        private bool _CheckedEnable;
+        /// <summary> Helper variable for editor </summary>
+        [Browsable(false)]
+        public bool CheckedEnable
+        {
+            get { return _CheckedEnable; }
+            set
+            {
+                if (_CheckedEnable != value)
+                {
+                    _CheckedEnable = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("CheckedEnable"));
+                }
+            }
+        }
+
+
+        private void SetChildrenState(bool isRootChecked)
+        {
+            if (isRootChecked && _IsChecked)
+            {
+                _IsChecked = false;
+                OnPropertyChanged(new PropertyChangedEventArgs("IsChecked"));
+            }
+            if (isRootChecked)
+            {
+                Background = Editor.StaticBrushes.BoneSelectedBrush;
+                CheckedEnable = false;
+            }
+            else
+            {
+                Background = Editor.StaticBrushes.BoneDefaultBrush;
+                CheckedEnable = true;
+            }
+
+            foreach (BoneViewModel bone in this)
+            {
+                bone.SetChildrenState(isRootChecked);
+            }
+        }
+
+        private void SetChildBg(Brush bg)
+        {
+            this.Background = bg;
+            foreach (BoneViewModel bone in this)
+            {
+                bone.SetChildBg(bg);
+            }
+        }
+
+        private Brush _Background;
+        [Browsable(false)]
+        public Brush Background
+        {
+            get
+            {
+                if (_Background == null)
+                    _Background = Editor.StaticBrushes.BoneDefaultBrush;
+                return _Background;
+            }
+            set
+            {
+                if (_Background != value)
+                {
+                    _Background = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("Background"));
+                }
+            }
+        }
 
         #region Constructors
         /// <summary>
@@ -48,8 +174,12 @@ namespace Skill.Studio.Animation
         private BoneViewModel(SkinMeshViewModel skinmesh, BoneViewModel parent, Bone bone)
             : base(parent)
         {
+            this.CheckedEnable = true;
+            this.IsExpanded = true;
             this.Model = bone;
             this.SkinMesh = skinmesh;
+            string parentAddress = parent != null ? parent.Address : "";
+            this.Address = string.Format("{0}/{1}", parentAddress, this.Name);
             LoadChildren();
         }
 

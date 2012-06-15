@@ -471,7 +471,7 @@ namespace Skill.Studio
         public void BuildNode(EntityNodeViewModel vm)
         {
             CheckErrors();
-            if (_ErrorList.GetErrorCount(Controls.ErrorType.Error) == 0)
+            if (_ErrorList.GetErrorCount(Skill.Studio.Compiler.ErrorType.Error) == 0)
             {
                 BackupRestore backup = new BackupRestore();
                 backup.CreateAuto();

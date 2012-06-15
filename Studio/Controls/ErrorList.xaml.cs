@@ -16,6 +16,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Skill.DataModels.Animation;
 using Skill.DataModels.AI;
+using Skill.Studio.Compiler;
 
 namespace Skill.Studio.Controls
 {
@@ -40,8 +41,16 @@ namespace Skill.Studio.Controls
         #endregion
 
         #region Variables
-        private ObservableCollection<CompileError> _AllErrors;
+        private List<CompileError> _AllErrors;
         private SortType _Sort;
+        #endregion
+
+        #region Compilers
+        private ProjectCompiler _ProjectCompiler;
+        private BehaviorTreeCompiler _BehaviorTreeCompiler;
+        private AnimationTreeCompiler _AnimationTreeCompiler;
+        private SkinMeshCompiler _SkinMeshCompiler;
+        private SaveGameCompiler _SaveGameCompiler;        
         #endregion
 
         #region Properties
@@ -81,9 +90,15 @@ namespace Skill.Studio.Controls
         {
             InitializeComponent();
             Errors = new ObservableCollection<CompileError>();
-            _AllErrors = new ObservableCollection<CompileError>();
+            _AllErrors = new List<CompileError>();
             _ListView.ItemsSource = Errors;
             _Sort = SortType.AscendingOrder;
+
+            this._ProjectCompiler = new ProjectCompiler(_AllErrors);
+            this._BehaviorTreeCompiler = new BehaviorTreeCompiler(_AllErrors);
+            this._AnimationTreeCompiler = new AnimationTreeCompiler(_AllErrors);
+            this._SkinMeshCompiler = new SkinMeshCompiler(_AllErrors);
+            this._SaveGameCompiler = new SaveGameCompiler(_AllErrors);
         }
 
         #endregion
@@ -195,51 +210,46 @@ namespace Skill.Studio.Controls
             if (MainWindow.Instance.Project == null) return;
             CompileError.ResetCounter();
             _AllErrors.Clear();
-            CheckProjectErrors();
-            CheckProjectNodeErrors();
+            CheckErrors();
             SortErrors();
             SetButtonTexts();
         }
 
-        private void CheckProjectNodeErrors()
+        private void CheckErrors()
         {
-            var project = MainWindow.Instance.Project;
-            if (project == null) return;
-            CheckForErrors(MainWindow.Instance.Project.Root);
-
+            CheckErrors(MainWindow.Instance.Project.Root);
         }
 
-        private void CheckForErrors(EntityNodeViewModel vm)
+        private void CheckErrors(EntityNodeViewModel vm)
         {
-            if (vm.EntityType == EntityType.BehaviorTree)
+            switch (vm.EntityType)
             {
-                string fileName = System.IO.Path.Combine(MainWindow.Instance.Project.Directory, vm.LocalPath);
-                if (System.IO.File.Exists(fileName))
-                {
-                    //BehaviorTree tree = BehaviorTree.Load(fileName);
-                    //SearchForDuplicateNames(vm, tree);
-                    //SearchForInvalidAccessKeys(vm, tree);
-                }
+                case EntityType.Root:
+                    _ProjectCompiler.Compile(vm);
+                    break;
+                case EntityType.BehaviorTree:
+                    _BehaviorTreeCompiler.Compile(vm);
+                    break;
+                case EntityType.SharedAccessKeys:
+                    _BehaviorTreeCompiler.AccessKeysCompiler.Compile(vm);
+                    break;
+                case EntityType.AnimationTree:
+                    _AnimationTreeCompiler.Compile(vm);
+                    break;
+                case EntityType.SkinMesh:
+                    _SkinMeshCompiler.Compile(vm);
+                    break;
+                case EntityType.SaveGame:
+                    _SaveGameCompiler.Compile(vm);
+                    break;
+                default:
+                    break;
             }
-            else if (vm.EntityType == EntityType.AnimationTree)
+            foreach (EntityNodeViewModel item in vm)
             {
-                string fileName = System.IO.Path.Combine(MainWindow.Instance.Project.Directory, vm.LocalPath);
-                if (System.IO.File.Exists(fileName))
-                {
-                    //AnimationTree tree = AnimationTree.Load(fileName);
-                    //SearchForDuplicateNames(vm, tree);
-                    //CheckUnusedAnimNodes(vm, tree);
-                }
-            }
-            else
-            {
-                foreach (EntityNodeViewModel item in vm)
-                {
-                    CheckForErrors(item);
-                }
+                CheckErrors(item);
             }
         }
-
 
         private void SetButtonTexts()
         {
@@ -249,175 +259,6 @@ namespace Skill.Studio.Controls
             _TxtWarnings.Text = (warCount > 0) ? string.Format("Warnings ({0})", warCount) : "Warnings";
             _TxtMessages.Text = (msgCount > 0) ? string.Format("Messages ({0})", msgCount) : "Messages";
         }
-
-        #region Shared Animation methods
-        private bool IsAnyNodeConnectedTo(AnimNode node, AnimationTree tree)
-        {
-            foreach (AnimationConnection connection in tree.Connections)
-            {
-                if (connection.Sink.Id == node.Id)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-        #endregion
-
-        #region Check for Unused AnimNodes
-        private void CheckUnusedAnimNodes(EntityNodeViewModel vm, AnimationTree tree)
-        {
-            foreach (AnimNode node in tree)
-            {
-                bool connected = IsAnyNodeConnectedTo(node, tree);
-                if (connected == false)
-                {
-                    if (node.NodeType == AnimNodeType.Root)
-                        AddAnimationRootIsNotInvalidError(vm);
-                    else if (node.NodeType != AnimNodeType.Sequence)
-                        AddAnimNodeUnusedWarning(vm, node);
-                }
-            }
-        }
-        void AddAnimationRootIsNotInvalidError(EntityNodeViewModel node)
-        {
-            CompileError err = new CompileError() { Node = node, Type = ErrorType.Error };
-            err.Description = string.Format("Root of AnimationTree does not assigned.");
-            _AllErrors.Add(err);
-        }
-
-        void AddAnimNodeUnusedWarning(EntityNodeViewModel node, AnimNode animNode)
-        {
-            CompileError war = new CompileError() { Node = node, Type = ErrorType.Warning };
-            war.Description = string.Format("There is no connection to AnimNode '{0}'.", animNode.Name);
-            _AllErrors.Add(war);
-        }
-        #endregion
-
-        #region Search for duplicate entities in project
-
-        private void CheckProjectErrors()
-        {
-            var project = MainWindow.Instance.Project;
-            if (project == null) return;
-
-            SearchForDuplicateNames(project.Root);
-        }
-
-        class NodeCount
-        {
-            public EntityNodeViewModel Node { get; set; }
-            public int count { get; set; }
-        }
-
-        void AddDuplicateNodeError(NodeCount nc)
-        {
-            CompileError err = new CompileError() { Node = nc.Node, Type = ErrorType.Error };
-            err.Description = string.Format("There are {0} file in project with same name ({1}).", nc.count, nc.Node.Name);
-            _AllErrors.Add(err);
-        }
-
-        private void SearchForDuplicateNames(ProjectRootNodeViewModel vm)
-        {
-            List<NodeCount> nodes = new List<NodeCount>();
-            AddChilds(vm, nodes);
-            foreach (var nc in nodes)
-            {
-                if (nc.count > 1)
-                    AddDuplicateNodeError(nc);
-            }
-        }
-
-        private void AddChilds(EntityNodeViewModel vm, List<NodeCount> nodes)
-        {
-            foreach (EntityNodeViewModel child in vm)
-            {
-                if (child.EntityType != EntityType.Folder)
-                {
-                    NodeCount nc = nodes.FirstOrDefault(n => n.Node.Name == child.Name);
-                    if (nc != null)
-                        nc.count++;
-                    else
-                    {
-                        nc = new NodeCount() { Node = child, count = 1 };
-                        nodes.Add(nc);
-                    }
-                }
-                AddChilds(child, nodes);
-            }
-        }
-        #endregion
-
-        #region SearchForDuplicateNames in BehaviorTree
-        void AddDuplicateBehaviorTreeNodeError(EntityNodeViewModel node, string name, int count)
-        {
-            CompileError err = new CompileError() { Node = node, Type = ErrorType.Error };
-            err.Description = string.Format("There are {0} behavior node in BehaviorTree with same name ({1}).", count, name);
-            _AllErrors.Add(err);
-        }
-
-        private void SearchForDuplicateNames(EntityNodeViewModel node, BehaviorTree tree)
-        {
-            //List<string> nameList = new List<string>(tree.Count);
-            //foreach (Behavior b in tree)
-            //{
-            //    if (nameList.Contains(b.Name)) continue;
-            //    int count = tree.Count(c => c.Name == b.Name);
-            //    if (count > 1)
-            //        AddDuplicateBehaviorTreeNodeError(node, b.Name, count);
-            //    nameList.Add(b.Name);
-            //}
-            //nameList.Clear();
-        }
-
-        private void SearchForInvalidAccessKeys(EntityNodeViewModel vm, BehaviorTree tree)
-        {
-            //foreach (Behavior b in tree)
-            //{
-            //    if (b.BehaviorType == BehaviorType.Decorator)
-            //    {
-            //        Skill.DataModels.AI.Decorator decorator = (Skill.DataModels.AI.Decorator)b;
-            //        if (decorator.Type == DecoratorType.AccessLimit)
-            //        {
-            //            AccessLimitDecorator accessLimitDecorator = (AccessLimitDecorator)decorator;
-            //            if (!tree.AccessKeys.Keys.ContainsKey(accessLimitDecorator.AccessKey))
-            //            {
-            //                AddInvalidAccessKeyError(vm, accessLimitDecorator.AccessKey, accessLimitDecorator.Name);
-            //            }
-            //        }
-            //    }
-            //}
-        }
-        void AddInvalidAccessKeyError(EntityNodeViewModel node, string accessKey, string name)
-        {
-            CompileError err = new CompileError() { Node = node, Type = ErrorType.Error };
-            err.Description = string.Format("The provided AccessKey '{0}' for behavior node '{1}' does not exist.", accessKey, name);
-            _AllErrors.Add(err);
-        }
-        #endregion
-
-        #region SearchForDuplicateNames in AnimationTree
-        void AddDuplicateAnimationTreeNodeError(EntityNodeViewModel node, string name, int count)
-        {
-            CompileError err = new CompileError() { Node = node, Type = ErrorType.Error };
-            err.Description = string.Format("There are {0} animation node in AnimationTree with same name ({1}).", count, name);
-            _AllErrors.Add(err);
-        }
-
-        private void SearchForDuplicateNames(EntityNodeViewModel node, AnimationTree tree)
-        {
-            List<string> nameList = new List<string>(tree.Count);
-            foreach (AnimNode an in tree)
-            {
-                if (nameList.Contains(an.Name)) continue;
-                int count = tree.Count(c => c.Name == an.Name);
-                if (count > 1)
-                    AddDuplicateAnimationTreeNodeError(node, an.Name, count);
-                nameList.Add(an.Name);
-            }
-            nameList.Clear();
-        }
-        #endregion
 
         #endregion
     }

@@ -46,7 +46,7 @@
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding Path=Index, StringFormat=Index \{0\}}" Grid.Column="0"  />
+                            <TextBlock Text="{Binding Path=Index, StringFormat=Connector\{0\}}" Grid.Column="0"  />
                             <TextBlock Text="Name : " Grid.Column="1"  />
                             <TextBox Text="{Binding Name}" Grid.Column="2"  />
                             <TextBlock Text="Chance : " Grid.Column="3"  />

@@ -70,9 +70,25 @@ namespace Skill.Studio.Animation
             {
                 if (value != Model.WrapMode)
                 {
-                    SkinMesh.History.Insert(new ChangePropertyUnDoRedo(this, "WrapMode", value, Model.Name));
+                    SkinMesh.History.Insert(new ChangePropertyUnDoRedo(this, "WrapMode", value, Model.WrapMode));
                     Model.WrapMode = value;
                     this.OnPropertyChanged("WrapMode");
+                }
+            }
+        }
+
+        [DisplayName("Length")]
+        [Description("Length of AnimationClip.")]
+        public float Length
+        {
+            get { return Model.Length; }
+            set
+            {
+                if (value != Model.Length)
+                {
+                    SkinMesh.History.Insert(new ChangePropertyUnDoRedo(this, "Length", value, Model.Length));
+                    Model.Length = value;
+                    this.OnPropertyChanged("Length");
                 }
             }
         }

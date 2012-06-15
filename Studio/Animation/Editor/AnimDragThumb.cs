@@ -22,7 +22,7 @@ namespace Skill.Studio.Animation.Editor
             DependencyProperty.Register("ViewModel", typeof(AnimNodeViewModel), typeof(AnimDragThumb), new UIPropertyMetadata(null));
 
 
-        public AnimationTreeCanvas ParentCanvas { get { return AnimationTreeCanvas.GetCanvas(this); } }        
+        public AnimationTreeCanvas ParentCanvas { get { return AnimationTreeCanvas.GetCanvas(this); } }
 
         public AnimDragThumb()
         {
@@ -34,7 +34,19 @@ namespace Skill.Studio.Animation.Editor
 
             if (ViewModel != null && ViewModel.IsSelected)
             {
-                AnimationTreeCanvas canvas = ParentCanvas;                                
+                AnimationTreeCanvas canvas = ParentCanvas;
+
+                //if ((Keyboard.Modifiers & ModifierKeys.Shift) != ModifierKeys.None)
+                //{
+                //    if (!canvas.Editor.IsDuplicating)
+                //        canvas.Editor.DuplicateSelection();
+                //}
+
+                //if (canvas.Editor.IsDuplicating)
+                //{
+                //    canvas.Editor.MoveDuplicated(e.HorizontalChange, e.VerticalChange);
+                //}
+
 
                 double minLeft = double.MaxValue;
                 double minTop = double.MaxValue;
@@ -68,6 +80,7 @@ namespace Skill.Studio.Animation.Editor
                         vm.Y = top + deltaVertical;
                     }
                 }
+
 
                 if (canvas != null)
                     canvas.InvalidateMeasure();

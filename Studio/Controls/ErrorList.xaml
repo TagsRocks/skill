@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:ad="clr-namespace:AvalonDock;assembly=AvalonDock"
              xmlns:ctr="clr-namespace:Skill.Studio.Controls"
+             xmlns:cmp="clr-namespace:Skill.Studio.Compiler"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d" 
              d:DesignHeight="132" d:DesignWidth="815" Title="Error List" Icon="/SkillStudio;component/Images/Default/ErrorList.png" >
@@ -54,9 +55,9 @@
                                         </Style>
                                     </DataTemplate.Resources>
                                     <Grid>
-                                        <Image Source="{StaticResource ImgError}" Visibility="{Binding Path=Type, Converter={StaticResource EToVConverter}, ConverterParameter={x:Static ctr:ErrorType.Error}}"  />
-                                        <Image Source="{StaticResource ImgWarning}" Visibility="{Binding Path=Type, Converter={StaticResource EToVConverter}, ConverterParameter={x:Static ctr:ErrorType.Warning}}"  />
-                                        <Image Source="{StaticResource ImgMessage}" Visibility="{Binding Path=Type, Converter={StaticResource EToVConverter}, ConverterParameter={x:Static ctr:ErrorType.Message}}"  />
+                                        <Image Source="{StaticResource ImgError}" Visibility="{Binding Path=Type, Converter={StaticResource EToVConverter}, ConverterParameter={x:Static cmp:ErrorType.Error}}"  />
+                                        <Image Source="{StaticResource ImgWarning}" Visibility="{Binding Path=Type, Converter={StaticResource EToVConverter}, ConverterParameter={x:Static cmp:ErrorType.Warning}}"  />
+                                        <Image Source="{StaticResource ImgMessage}" Visibility="{Binding Path=Type, Converter={StaticResource EToVConverter}, ConverterParameter={x:Static cmp:ErrorType.Message}}"  />
                                     </Grid>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
