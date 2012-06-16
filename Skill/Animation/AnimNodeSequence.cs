@@ -41,6 +41,9 @@ namespace Skill.Animation
         /// </summary>
         public bool UseTreeProfile { get; set; }
 
+        /// <summary> MixingTransforms </summary>
+        public string[] MixingTransforms { get; set; }
+
         /// <summary>
         /// Synchronize animations with other animations in same Layer?
         /// </summary>
@@ -187,6 +190,24 @@ namespace Skill.Animation
             {
                 this._Length = state.length;
                 state.layer = Layer.LayerIndex;
+
+                if (MixingTransforms != null)
+                {
+                    foreach (var item in MixingTransforms)
+                    {
+                        if (string.IsNullOrEmpty(item))
+                            UnityEngine.Debug.LogWarning("Empty MixingTransform");
+                        else
+                        {
+                            UnityEngine.Transform tr = animationComponent.transform.Find(item);
+                            if (tr != null)
+                                state.AddMixingTransform(tr);
+                            else
+                                UnityEngine.Debug.LogWarning("Invalid MixingTransform : " + item);
+                        }
+                    }
+                }
+
             }
             else
                 UnityEngine.Debug.LogWarning("Can not find AnimationClip : " + AnimationName);

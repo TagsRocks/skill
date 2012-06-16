@@ -66,9 +66,6 @@ namespace Skill.Studio.Compiler
                         AddError(string.Format("There are {0} Property in Class {1} with same name ({2}).", count, cl.Name, p.Name));
                 }
 
-                if (p.CollectionType == CollectionType.Array && p.ArrayLength <= 0)
-                    AddError(string.Format("The property {0} of class {1} has invalid ArrayLength.(must be more than 0)", p.Name, cl.Name));
-
                 if (p.Type == PropertyType.Class)
                 {
                     if (_SaveGame.Classes.Count(c => c.Name == ((ClassProperty)p).ClassName) <= 0)

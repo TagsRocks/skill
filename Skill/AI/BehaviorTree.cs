@@ -103,7 +103,7 @@ namespace Skill.AI
         /// </summary>
         public void Reset()
         {
-            Root.Reset(State, true);
+            Root.ResetBehavior(State, true);
         }
     }
     #endregion

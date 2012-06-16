@@ -498,6 +498,10 @@ namespace Skill.Studio
             {
                 Builder.Build((Skill.DataModels.Animation.AnimationTree)vm.SavedData, vm.GetLocalDirectory(), vm.Name);
             }
+            else if (vm.EntityType == EntityType.SaveGame)
+            {
+                Builder.Build((Skill.DataModels.IO.SaveGame)vm.SavedData, vm.GetLocalDirectory(), vm.Name);
+            }
             else
             {
                 foreach (EntityNodeViewModel item in vm)
@@ -741,7 +745,7 @@ namespace Skill.Studio
                         break;
                     case EntityType.AnimationTree:
                         docToShow = new Animation.Editor.AnimationTreeEditor((AnimationTreeNodeViewModel)vm);
-                        break;                    
+                        break;
                     case EntityType.SkinMesh:
                         docToShow = new Animation.Editor.SkinMeshEditor((SkinMeshNodeViewModel)vm);
                         break;

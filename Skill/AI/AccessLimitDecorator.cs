@@ -228,14 +228,14 @@ namespace Skill.AI
         /// </summary>
         /// <param name="state">State of BehaviorTree</param>
         /// <param name="resetChildren">Reset children too</param>
-        public override void Reset(BehaviorState state, bool resetChildren = false)
+        public override void ResetBehavior(BehaviorState state, bool resetChildren = false)
         {
             if (_Lock)
             {
                 AccessKey.Unlock();
                 _Lock = false;
             }
-            base.Reset(state);
+            base.ResetBehavior(state);
         }
     }
     #endregion

@@ -13,6 +13,7 @@ namespace Skill.CodeGeneration
         string Extension { get; }
         void Generate(BehaviorTree bTree);
         void Generate(AnimationTree aTree);
+        void Generate(Skill.DataModels.IO.SaveGame saveGame);
         void Write(StreamWriter writer);
         void WritePartial(StreamWriter writer, string oldCode);
     }

@@ -34,6 +34,10 @@ namespace Skill.AI
         /// Occurs when execution result of behavior is BehaviorResult.Running
         /// </summary>
         public event BehaviorEventHandler Running;
+        /// <summary>
+        /// Occurs when behavior reset
+        /// </summary>
+        public event BehaviorEventHandler Reset;
 
         /// <summary>
         /// Name of Behavior
@@ -85,10 +89,12 @@ namespace Skill.AI
             }
             switch (Result)
             {
-                case BehaviorResult.Failure:                    
+                case BehaviorResult.Failure:
+                    state.UnRegisterForExecution(this);
                     OnFailure(state);
                     break;
                 case BehaviorResult.Success:
+                    state.UnRegisterForExecution(this);
                     OnSuccess(state);
                     break;
                 case BehaviorResult.Running:
@@ -126,6 +132,15 @@ namespace Skill.AI
         }
 
         /// <summary>
+        /// On Reset
+        /// </summary>
+        /// <param name="state">State of BehaviorTree</param>
+        protected virtual void OnReset(BehaviorState state)
+        {
+            if (Reset != null) Reset(this, Result, state.BehaviorTree);
+        }
+
+        /// <summary>
         /// Let subclass implement behaveior
         /// </summary>
         /// <param name="state">State of BehaviorTre</param>
@@ -138,15 +153,16 @@ namespace Skill.AI
         /// <returns>String</returns>
         public override string ToString() { return Name; }
 
-        
+
         /// <summary>
         /// Reset behavior. For internal use. when a branch with higher priority executed, let nodes in previous branch reset
         /// </summary>
         /// <param name="state">State of BehaviorTree</param>
         /// <param name="resetChildren">Reset children too</param>
-        public virtual void Reset(BehaviorState state, bool resetChildren = false)
+        public virtual void ResetBehavior(BehaviorState state, bool resetChildren = false)
         {
             Result = BehaviorResult.Failure;
+            OnReset(state);
         }
 
     }

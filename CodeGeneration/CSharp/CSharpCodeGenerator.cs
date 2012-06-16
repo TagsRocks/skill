@@ -35,6 +35,10 @@ namespace Skill.CodeGeneration.CSharp
             AnimationTreeClass atClass = new AnimationTreeClass(aTree);
             _Document.Add(atClass);
         }
+        public void Generate(Skill.DataModels.IO.SaveGame saveGame)
+        {
+            _Document = new Document();
+        }
 
 
         public void Write(StreamWriter writer)

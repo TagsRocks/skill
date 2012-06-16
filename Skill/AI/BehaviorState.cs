@@ -53,6 +53,9 @@ namespace Skill.AI
         private Behavior[] _ExecutionSequence = new Behavior[200];// 200 is maximum node trace in tree (i hope).
         private int _CurrnetExecutionIndex = -1;
 
+        private Behavior[] _Stack = new Behavior[200];// 200 is maximum node trace in tree (i hope).
+        private int _StackTop = -1;
+
 
         /// <summary>
         /// BehaviorTree call this method at begin of each update
@@ -60,6 +63,7 @@ namespace Skill.AI
         internal void Begin()
         {
             _CurrnetExecutionIndex = -1;
+            _StackTop = -1;
         }
 
         /// <summary>
@@ -76,46 +80,41 @@ namespace Skill.AI
         internal int RegisterForExecution(Behavior behavior)
         {
             _CurrnetExecutionIndex++;// move to next place
+            _ExecutionSequence[_CurrnetExecutionIndex] = behavior;
+            _StackTop++;
 
             // this means : the execution sequence is different from previous execution sequence
-            if (_ExecutionSequence[_CurrnetExecutionIndex] != null && behavior != _ExecutionSequence[_CurrnetExecutionIndex])
+            if (_Stack[_StackTop] != null && behavior != _Stack[_StackTop])
             {
-                bool reset = true;
-                // check to avoid reset when given behavior is next child (and running child) of composite
-                int parentIndex = _CurrnetExecutionIndex - 1;
-                if (parentIndex >= 0)
-                {
-                    Behavior parent = _ExecutionSequence[parentIndex];
-                    if (parent.Type == BehaviorType.Composite)
-                    {
-                        Composite composit = (Composite)parent;
-                        if (composit.IsInSequenceChild(_ExecutionSequence[_CurrnetExecutionIndex], behavior))
-                        {
-                            reset = false;
-                        }
-                    }
-                }
-                if (reset)
-                    CallResetForSequence();// so call fail method for rest of previous sequence
-                else
-                    _ExecutionSequence[_CurrnetExecutionIndex + 1] = null;
+                CallResetForSequence(_StackTop);// so call fail method for rest of previous sequence                
             }
-            _ExecutionSequence[_CurrnetExecutionIndex] = behavior; // register behavior in current sequece
-            return _CurrnetExecutionIndex;
+            _Stack[_StackTop] = behavior; // register behavior in current sequece
+            return _StackTop;
 
-        }	        
+        }
+
+        internal void UnRegisterForExecution(Behavior behavior)
+        {
+            if (_Stack[_StackTop] == behavior)
+            {
+                _Stack[_StackTop] = null;
+                _StackTop--;
+            }
+            else
+                throw new InvalidProgramException("Invalid Behavior To UnRegister");
+        }
 
         /// <summary>
         /// call fail method for rest of execution sequence
         /// </summary>
-        private void CallResetForSequence()
+        private void CallResetForSequence(int startIndex)
         {
-            for (int i = _CurrnetExecutionIndex; i < _ExecutionSequence.Length; i++)
+            for (int i = startIndex; i < _Stack.Length; i++)
             {
-                if (_ExecutionSequence[i] != null)
+                if (_Stack[i] != null)
                 {
-                    _ExecutionSequence[i].Reset(this);
-                    _ExecutionSequence[i] = null;
+                    _Stack[i].ResetBehavior(this);
+                    _Stack[i] = null;
                 }
                 else
                     break;
@@ -153,11 +152,10 @@ namespace Skill.AI
         /// </summary>
         public void LogExecutionSequence()
         {
-            int i = 1;
-            foreach (var item in _ExecutionSequence)
+            for (int i = 0; i <= _CurrnetExecutionIndex; i++)
             {
-                if (item == null) break;
-                UnityEngine.Debug.Log(string.Format("{0} - {1}", i++, item.ToString()));
+                if (_ExecutionSequence[i] == null) break;
+                UnityEngine.Debug.Log(string.Format("{0} - {1} : {2}", i + 1, _ExecutionSequence[i].ToString(), _ExecutionSequence[i].Result));
             }
         }
 
@@ -169,19 +167,18 @@ namespace Skill.AI
         {
             int tabCounter = 0;
             Stack<Behavior> parentStack = new Stack<Behavior>();
-            int i = 1;
-            foreach (var item in _ExecutionSequence)
+            for (int i = 0; i <= _CurrnetExecutionIndex; i++)
             {
-                if (item == null) break;
-                while (parentStack.Count > 0 && !IsChildOf(parentStack.Peek(), item))
+                if (_ExecutionSequence[i] == null) break;
+                while (parentStack.Count > 0 && !IsChildOf(parentStack.Peek(), _ExecutionSequence[i]))
                 {
                     tabCounter = Math.Max(-1, tabCounter - 1);
                     parentStack.Pop();
                 }
 
                 tabCounter++;
-                UnityEngine.Debug.Log(string.Format("{0} - {1}{2}", i++, GetTabSpace(tabCounter), item.ToString()));
-                parentStack.Push(item);
+                UnityEngine.Debug.Log(string.Format("{0} - {1}{2} : {3}", i++, GetTabSpace(tabCounter), _ExecutionSequence[i].ToString(), _ExecutionSequence[i].Result));
+                parentStack.Push(_ExecutionSequence[i]);
             }
         }
     }

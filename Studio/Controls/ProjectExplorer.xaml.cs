@@ -256,7 +256,7 @@ namespace Skill.Studio.Controls
             var selected = GetSelectedEntity();
             if (selected != null)
             {
-                CanBuild = true;
+                CanBuild = (selected.EntityType != EntityType.SkinMesh);
                 CanAdd = (selected.EntityType == EntityType.Folder || selected.EntityType == EntityType.Root);
                 CanOpen = !CanAdd;
                 CanCopy = (selected.EntityType != EntityType.Root);
@@ -343,7 +343,7 @@ namespace Skill.Studio.Controls
                         {
                             newNode.IsSelected = true;
                             EnterRename(newNode);
-                            _ForceSelectText = true;                            
+                            _ForceSelectText = true;
                         }
                     }
 

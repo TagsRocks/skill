@@ -11,7 +11,7 @@ namespace Skill.Studio
     {
         private static ICodeGenerator _CodeGenerator = new Skill.CodeGeneration.CSharp.CSharpCodeGenerator();
         private static char[] OldeCodeTimeChars = new char[] { ' ', '\'', '\"', '\n', '\r', '\t' };
-        
+
         private static void CreateDirectory(string dir)
         {
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
@@ -24,10 +24,15 @@ namespace Skill.Studio
 
         }
 
-
         public static void Build(Skill.DataModels.Animation.AnimationTree tree, string localDir, string name)
         {
             _CodeGenerator.Generate(tree);
+            CreateFile(_CodeGenerator, localDir, name);
+        }
+
+        public static void Build(Skill.DataModels.IO.SaveGame saveGame, string localDir, string name)
+        {
+            _CodeGenerator.Generate(saveGame);
             CreateFile(_CodeGenerator, localDir, name);
         }
 
@@ -64,5 +69,5 @@ namespace Skill.Studio
             writer.Close();
             file.Close();
         }
-    }    
+    }
 }

@@ -59,6 +59,11 @@
     <Compile Include="AI\CompositeType.cs" />
     <Compile Include="Animation\AnimationTreeState.cs" />
     <Compile Include="Animation\AnimNodeMultilayer.cs" />
+    <Compile Include="IO\BinaryLoadStream.cs" />
+    <Compile Include="IO\BinarySaveStream.cs" />
+    <Compile Include="IO\ISavableClass.cs" />
+    <Compile Include="IO\XmlLoadStream.cs" />
+    <Compile Include="IO\XmlSaveStream.cs" />
     <Compile Include="Managers\CacheBehavior.cs" />
     <Compile Include="Managers\EventManager.cs" />
     <Compile Include="MathHelper.cs" />

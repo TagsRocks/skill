@@ -47,57 +47,22 @@ namespace Skill.Studio.IO
             }
         }
 
-        public CollectionType CollectionType
+        public bool IsCollection
         {
             get
             {
-                return Model.CollectionType;
+                return Model.IsCollection;
             }
             set
             {
-                if (Model.CollectionType != value)
+                if (Model.IsCollection != value)
                 {
                     if (OwnerClass.SaveGame.Editor.History != null)
                     {
-                        OwnerClass.SaveGame.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "CollectionType", value, Model.CollectionType));
+                        OwnerClass.SaveGame.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "IsCollection", value, !value));
                     }
-                    Model.CollectionType = value;
-                    OnPropertyChanged("CollectionType");
-                    if (value == DataModels.IO.CollectionType.Array)
-                    {
-                        if (ArrayLength <= 0)
-                        {
-                            Model.ArrayLength = 1;
-                            OnPropertyChanged("ArrayLength");
-                        }
-                    }
-                    else if (value == DataModels.IO.CollectionType.List)
-                    {
-                        Model.ArrayLength = 0;
-                        OnPropertyChanged("ArrayLength");
-                    }
-                    OnPropertyChanged("DisplayName");
-                }
-            }
-        }
-
-
-        public int ArrayLength
-        {
-            get
-            {
-                return Model.ArrayLength;
-            }
-            set
-            {
-                if (Model.ArrayLength != value)
-                {
-                    if (OwnerClass.SaveGame.Editor.History != null)
-                    {
-                        OwnerClass.SaveGame.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "ArrayLength", value, Model.ArrayLength));
-                    }
-                    Model.ArrayLength = value;
-                    OnPropertyChanged("ArrayLength");
+                    Model.IsCollection = value;
+                    OnPropertyChanged("IsCollection");
                     OnPropertyChanged("DisplayName");
                 }
             }
@@ -177,16 +142,10 @@ namespace Skill.Studio.IO
         {
             get
             {
-                switch (CollectionType)
-                {
-                    case CollectionType.None:
-                        return string.Format("{0} : {1}", Name, PrimitiveType);
-                    case CollectionType.List:
-                        return string.Format("{0} : List<{1}>", Name, PrimitiveType);
-                    case CollectionType.Array:
-                        return string.Format("{0} : {1}[{2}]", Name, PrimitiveType, ArrayLength);
-                }
-                return Name;
+                if (IsCollection)
+                    return string.Format("public List<{0}> {1}", PrimitiveType, Name);
+                else
+                    return string.Format("public {0} {1}", PrimitiveType, Name);
             }
         }
     }
@@ -228,16 +187,11 @@ namespace Skill.Studio.IO
         {
             get
             {
-                switch (CollectionType)
-                {
-                    case CollectionType.None:
-                        return string.Format("{0} : class {1}", Name, ClassName);
-                    case CollectionType.List:
-                        return string.Format("{0} : List<class {1}>", Name, ClassName);
-                    case CollectionType.Array:
-                        return string.Format("{0} : class {1}[{2}]", Name, ClassName, ArrayLength);
-                }
-                return Name;
+                if (IsCollection)
+                    return string.Format("public List<class {0}> {1}", ClassName, Name);
+                else
+                    return string.Format("public class {0} {1}", ClassName, Name);
+
             }
         }
     }

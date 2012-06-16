@@ -65,11 +65,10 @@ IO:
 	SaveGame :
 		Errors :
 			1- Invalid name of SaveProperty (null or empty).
-			2- Two or more SaveProperty of one SaveClass with same name.
-			3- SaveProperty of type Array with zero or less than zero value for ArrayLength.
-			4- ClassProperty with invalid ClassName.
-			5- Two or more SaveClasses With Same name;
-			6- Invalid name of SaveClass (null or empty).
+			2- Two or more SaveProperty of one SaveClass with same name.			
+			3- ClassProperty with invalid ClassName.
+			4- Two or more SaveClasses With Same name;
+			5- Invalid name of SaveClass (null or empty).
 
 		Warnings :			
 			1- SaveClass With no property.
