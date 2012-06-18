@@ -80,8 +80,8 @@ namespace Skill.Studio.Animation
                     bone.SetChildrenState(_IsChecked);
                 }
             }
-        }
-
+        }        
+        
         private bool _CheckedEnable;
         /// <summary> Helper variable for editor </summary>
         [Browsable(false)]

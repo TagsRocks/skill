@@ -99,7 +99,6 @@ namespace Skill.Studio.AI
                     }
                     if (valid)
                         OnPropertyChanged("Value");
-
                 }
             }
         }

@@ -24,19 +24,26 @@ namespace Skill.Studio
 
         }
 
+        public static void Build(Skill.DataModels.AI.SharedAccessKeys keys, string localDir, string name)
+        {
+            _CodeGenerator.Generate(keys);
+            CreateFile(_CodeGenerator, localDir, name,false);
+
+        }
+
         public static void Build(Skill.DataModels.Animation.AnimationTree tree, string localDir, string name)
         {
             _CodeGenerator.Generate(tree);
             CreateFile(_CodeGenerator, localDir, name);
         }
 
-        public static void Build(Skill.DataModels.IO.SaveGame saveGame, string localDir, string name)
+        public static void Build(Skill.DataModels.IO.SaveData saveGame, string localDir, string name)
         {
             _CodeGenerator.Generate(saveGame);
-            CreateFile(_CodeGenerator, localDir, name);
+            CreateFile(_CodeGenerator, localDir, name,false);
         }
 
-        private static void CreateFile(ICodeGenerator generator, string localDir, string name)
+        private static void CreateFile(ICodeGenerator generator, string localDir, string name, bool hasUserCode = true)
         {
             string destinationDir = MainWindow.Instance.Project.GetOutputPath(localDir);
             string destinationDesignerDir = MainWindow.Instance.Project.GetDesignerOutputPath(localDir);
@@ -54,18 +61,20 @@ namespace Skill.Studio
             writer.Close();
             file.Close();
 
-            string oldCode = null;
-
-            // writer user file
-            if (File.Exists(userFilename))
+            if (hasUserCode)
             {
-                oldCode = File.ReadAllText(userFilename).Trim(OldeCodeTimeChars);
-                File.Delete(userFilename);
-            }
+                string oldCode = null;
+                // writer user file
+                if (File.Exists(userFilename))
+                {
+                    oldCode = File.ReadAllText(userFilename).Trim(OldeCodeTimeChars);
+                    File.Delete(userFilename);
+                }
 
-            file = new FileStream(userFilename, FileMode.Create, FileAccess.Write);
-            writer = new StreamWriter(file);
-            generator.WritePartial(writer, oldCode);
+                file = new FileStream(userFilename, FileMode.Create, FileAccess.Write);
+                writer = new StreamWriter(file);
+                generator.WritePartial(writer, oldCode);
+            }
             writer.Close();
             file.Close();
         }

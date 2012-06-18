@@ -333,8 +333,7 @@ namespace Skill.Studio.AI
                     Tree.History.Insert(new ChangePropertyUnDoRedo(this, "Name", value, Model.Name));
                     Model.Name = value;
                     this.OnPropertyChanged(new PropertyChangedEventArgs("Name"));
-                    if (Model.BehaviorType != BehaviorType.Composite)
-                        this.OnPropertyChanged(new PropertyChangedEventArgs("DisplayName"));
+                    this.OnPropertyChanged(new PropertyChangedEventArgs("DisplayName"));
                 }
             }
         }

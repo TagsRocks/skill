@@ -494,13 +494,17 @@ namespace Skill.Studio
             {
                 Builder.Build((Skill.DataModels.AI.BehaviorTree)vm.SavedData, vm.GetLocalDirectory(), vm.Name);
             }
+            else if (vm.EntityType == EntityType.SharedAccessKeys)
+            {
+                Builder.Build((Skill.DataModels.AI.SharedAccessKeys)vm.SavedData, vm.GetLocalDirectory(), vm.Name);
+            }
             else if (vm.EntityType == EntityType.AnimationTree)
             {
                 Builder.Build((Skill.DataModels.Animation.AnimationTree)vm.SavedData, vm.GetLocalDirectory(), vm.Name);
             }
-            else if (vm.EntityType == EntityType.SaveGame)
+            else if (vm.EntityType == EntityType.SaveData)
             {
-                Builder.Build((Skill.DataModels.IO.SaveGame)vm.SavedData, vm.GetLocalDirectory(), vm.Name);
+                Builder.Build((Skill.DataModels.IO.SaveData)vm.SavedData, vm.GetLocalDirectory(), vm.Name);
             }
             else
             {
@@ -589,7 +593,7 @@ namespace Skill.Studio
         private void CopyDlls(bool overWrite = false)
         {
             CopyEditorFile("Editor.dll", overWrite);
-            CopyFile("DataModels.dll", overWrite);
+            CopyEditorFile("DataModels.dll", overWrite);
             CopyFile("Skill.dll", overWrite);
             CopyFile("Skill.xml", overWrite);
         }
@@ -749,8 +753,8 @@ namespace Skill.Studio
                     case EntityType.SkinMesh:
                         docToShow = new Animation.Editor.SkinMeshEditor((SkinMeshNodeViewModel)vm);
                         break;
-                    case EntityType.SaveGame:
-                        docToShow = new IO.Editor.SaveGameEditor((SaveGameNodeViewModel)vm);
+                    case EntityType.SaveData:
+                        docToShow = new IO.Editor.SaveDataEditor((SaveDataNodeViewModel)vm);
                         break;
                     default:
                         break;

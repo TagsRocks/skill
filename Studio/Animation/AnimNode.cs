@@ -23,6 +23,10 @@ namespace Skill.Studio.Animation
         [Browsable(false)]
         public virtual Visibility OutVisible { get { return Visibility.Visible; } }
 
+        /// <summary> Whether input connectors are visible or not (for Sequence node this value is false)</summary>
+        [Browsable(false)]
+        public virtual Visibility InputsVisible { get { return Visibility.Visible; } }        
+
         /// <summary> Model </summary>
         [Browsable(false)]
         public AnimNode Model { get; private set; }

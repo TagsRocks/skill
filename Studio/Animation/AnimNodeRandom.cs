@@ -28,7 +28,7 @@ namespace Skill.Studio.Animation
         }
 
         [Browsable(false)]
-        public override string ImageName { get { return Editor.AnimationImages.Blank; } }
+        public override string ImageName { get { return Editor.AnimationImages.Random; } }
 
         [Description("Edit Connectors")]
         [Editor(typeof(Editor.AnimNodeRandomInputsPropertyEditor), typeof(Editor.AnimNodeRandomInputsPropertyEditor))]

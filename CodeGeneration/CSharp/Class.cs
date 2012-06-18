@@ -13,14 +13,20 @@ namespace Skill.CodeGeneration.CSharp
         List<Method> _Methods; // method list
         List<Property> _Properties;// property list
         List<Variable> _Variables;// variable list
+        List<Class> _Classes;// class list
         List<string> _InheritClasses;// inherit classes
 
         /// <summary> Name of class </summary>
         public string Name { get; private set; }
         /// <summary> Whether class is public </summary>
         public bool IsPublic { get; set; }
+        /// <summary> Whether class is Static </summary>
+        public bool IsStatic { get; set; }
         /// <summary> Whether class is partial </summary>
         public bool IsPartial { get; set; }
+
+        /// <summary> Comment of class </summary>
+        public string Comment { get; private set; }
 
         /// <summary>
         /// Create a class
@@ -29,12 +35,13 @@ namespace Skill.CodeGeneration.CSharp
         public Class(string name)
         {
             this.Name = name;
-            _Methods = new List<Method>();
-            _Properties = new List<Property>();
-            _Variables = new List<Variable>();
-            _InheritClasses = new List<string>();
-            IsPublic = true;
-            IsPartial = true;
+            this._Classes = new List<Class>(); 
+            this._Methods = new List<Method>();
+            this._Properties = new List<Property>();
+            this._Variables = new List<Variable>();
+            this._InheritClasses = new List<string>();
+            this.IsPublic = true;
+            this.IsPartial = true;
         }
 
         /// <summary>
@@ -54,6 +61,25 @@ namespace Skill.CodeGeneration.CSharp
         public bool RemoveInherit(string inheritClassName)
         {
             return _InheritClasses.Remove(inheritClassName);
+        }
+
+        /// <summary>
+        /// Add a class
+        /// </summary>
+        /// <param name="cl">Class to add</param>
+        public void Add(Class cl)
+        {
+            if (!_Classes.Contains(cl))
+                _Classes.Add(cl);
+        }
+        /// <summary>
+        /// Remove specyfied Class
+        /// </summary>
+        /// <param name="cl">Class to remove</param>
+        /// <returns>True if success, othrwise false</returns>
+        public bool Remove(Class cl)
+        {
+            return _Classes.Remove(cl);
         }
 
         /// <summary>
@@ -119,7 +145,9 @@ namespace Skill.CodeGeneration.CSharp
         /// <param name="writer">stream</param>
         public void Write(System.IO.StreamWriter writer)
         {
+            CommentWriter.Write(writer, Comment);
             if (IsPublic) writer.Write("public ");
+            if (IsStatic) writer.Write("static ");
             if (IsPartial) writer.Write("partial ");
             writer.Write(string.Format("class {0}", Name));
             if (_InheritClasses.Count > 0)
@@ -134,6 +162,14 @@ namespace Skill.CodeGeneration.CSharp
             }
             writer.WriteLine();
             writer.WriteLine("{");
+
+            if (_Classes.Count > 0)
+            {
+                writer.WriteLine();
+                writer.WriteLine("// Internal class");
+                foreach (var cl in _Classes)
+                    cl.Write(writer);
+            }
 
             writer.WriteLine();
             writer.WriteLine("// Variables");
@@ -220,6 +256,22 @@ namespace Skill.CodeGeneration.CSharp
         protected virtual string SetProperty(string variable, string property, object value)
         {
             return string.Format("this.{0}.{1} = {2};", Variable.GetName(variable), property, value);
-        }        
+        }
+
+        protected string CreateStringArray(string[] array)
+        {
+            StringBuilder result = new StringBuilder();
+
+            result.Append("new string[]{ ");
+
+            foreach (var str in array)
+            {
+                result.Append(string.Format("\"{0}\", ", str));
+            }
+
+            result.Append(" }");
+
+            return result.ToString();
+        }
     }
 }

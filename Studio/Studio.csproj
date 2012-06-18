@@ -190,13 +190,13 @@
     <Compile Include="IO\Editor\ClassNamePropertyEditor.xaml.cs">
       <DependentUpon>ClassNamePropertyEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="IO\Editor\SaveGameEditor.xaml.cs">
-      <DependentUpon>SaveGameEditor.xaml</DependentUpon>
+    <Compile Include="IO\Editor\SaveDataEditor.xaml.cs">
+      <DependentUpon>SaveDataEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="IO\SaveClass.cs" />
-    <Compile Include="IO\SaveGame.cs" />
+    <Compile Include="IO\SaveData.cs" />
     <Compile Include="IO\SaveProperty.cs" />
-    <Compile Include="Root\SaveGameNode.cs" />
+    <Compile Include="Root\SaveDataNode.cs" />
     <Compile Include="Root\SkinMeshNode.cs" />
     <Compile Include="Root\SharedAccessKeysNode.cs" />
     <Compile Include="Windows\AddItemWindow.xaml.cs">
@@ -332,7 +332,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="IO\Editor\SaveGameEditor.xaml">
+    <Page Include="IO\Editor\SaveDataEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -476,6 +476,8 @@
     <Resource Include="Images\Default\Sequence.png" />
     <Resource Include="Images\Default\Settings.png" />
     <Resource Include="Images\Default\Up.png" />
+    <None Include="Resources\Hand.cur" />
+    <None Include="Resources\zoom.cur" />
     <Resource Include="ToDo.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -598,6 +600,8 @@
     <Content Include="Avalon\AvalonDock.dll" />
     <Content Include="Avalon\AvalonDock.Themes.dll" />
     <Resource Include="Compiler\ErrorTemplates.txt" />
+    <Resource Include="Images\Animation\ByIndex.png" />
+    <Resource Include="Images\Animation\Random.png" />
     <Content Include="WPFToolkit.Extended.dll" />
     <Resource Include="Images\Default\Disabled\Remove2.png" />
     <Resource Include="Images\Default\Remove2.png" />
@@ -605,7 +609,7 @@
     <Resource Include="Images\Default\Add2.png" />
     <Resource Include="Images\Default\PublicProperty.png" />
     <Resource Include="Images\Default\PublicClass.png" />
-    <Resource Include="Images\Default\SaveGame.png" />
+    <Resource Include="Images\Default\SaveData.png" />
     <Resource Include="Images\Default\Delete2.png" />
     <Resource Include="Images\Default\Disabled\Delete2.png" />
     <Resource Include="Images\Default\Disabled\Bone.png" />

@@ -9,6 +9,7 @@ namespace Skill.DataModels.IO
     public class SaveClass : IXElement
     {
         public string Name { get; set; }
+        public string Comment { get; set; }
         public SaveProperty[] Properties { get; set; }
 
         public SaveClass()
@@ -36,6 +37,14 @@ namespace Skill.DataModels.IO
                 }
                 saveclass.Add(properties);
             }
+
+            if (!string.IsNullOrEmpty(Comment))
+            {
+                XElement comment = new XElement("Comment");
+                comment.SetValue(Comment);
+                saveclass.Add(comment);
+            }
+
             WriteAttributes(saveclass);
             return saveclass;
         }
@@ -62,6 +71,13 @@ namespace Skill.DataModels.IO
                     }
                 }
             }
+
+            XElement comment = e.FindChildByName("Comment");
+            if (comment != null)
+            {
+                Comment = comment.Value;
+            }
+
             ReadAttributes(e);
         }
 

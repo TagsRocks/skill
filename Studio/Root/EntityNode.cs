@@ -21,7 +21,7 @@ namespace Skill.Studio
         SharedAccessKeys,
         AnimationTree,
         SkinMesh,
-        SaveGame
+        SaveData
     }
     #endregion
 
@@ -34,7 +34,7 @@ namespace Skill.Studio
         public static string SkinMesh = ".ssk";
         public static string AnimationSet = ".sas";
 
-        public static string SaveGame = ".ssg";
+        public static string SaveData = ".ssg";
 
         public static string GetExtension(EntityType type)
         {
@@ -48,8 +48,8 @@ namespace Skill.Studio
                     return AnimationTree;
                 case EntityType.SkinMesh:
                     return SkinMesh;
-                case EntityType.SaveGame:
-                    return SaveGame;
+                case EntityType.SaveData:
+                    return SaveData;
             }
             return string.Empty;
         }
@@ -116,8 +116,8 @@ namespace Skill.Studio
                         case EntityType.SkinMesh:
                             node = new SkinMeshNode();
                             break;
-                        case EntityType.SaveGame:
-                            node = new SaveGameNode();
+                        case EntityType.SaveData:
+                            node = new SaveDataNode();
                             break;
                         default:
                             break;
@@ -313,8 +313,8 @@ namespace Skill.Studio
                     return new SharedAccessKeysNodeViewModel(this, (SharedAccessKeysNode)node);
                 case EntityType.SkinMesh:
                     return new SkinMeshNodeViewModel(this, (SkinMeshNode)node);
-                case EntityType.SaveGame:
-                    return new SaveGameNodeViewModel(this, (SaveGameNode)node);
+                case EntityType.SaveData:
+                    return new SaveDataNodeViewModel(this, (SaveDataNode)node);
                 default:
                     throw new InvalidOperationException("Invalid EntityType");
             }            
@@ -395,8 +395,8 @@ namespace Skill.Studio
                 case EntityType.SkinMesh:
                     node = new SkinMeshNode();
                     break;
-                case EntityType.SaveGame:
-                    node = new SaveGameNode();
+                case EntityType.SaveData:
+                    node = new SaveDataNode();
                     break;
             }
             if (node != null)
@@ -487,7 +487,7 @@ namespace Skill.Studio
         public abstract void New();
         public abstract object LoadData();
         public abstract EntityNodeViewModel Clone(EntityNodeViewModel copyParent);
-        public abstract void SaveData(object data);
+        public virtual void SaveData(object data) { _SavedData = null; }
 
     }
     #endregion

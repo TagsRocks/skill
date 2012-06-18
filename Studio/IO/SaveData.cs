@@ -8,18 +8,18 @@ using Skill.DataModels.IO;
 
 namespace Skill.Studio.IO
 {
-    public class SaveGameViewModel : SaveClassViewModel, IDataViewModel
+    public class SaveDataViewModel : SaveClassViewModel, IDataViewModel
     {
         [Browsable(false)]
         public ObservableCollection<SaveClassViewModel> Classes { get; private set; }
 
         [Browsable(false)]
-        public Editor.SaveGameEditor Editor { get; set; }
+        public Editor.SaveDataEditor Editor { get; set; }
 
-        public SaveGameViewModel(SaveGame model)
+        public SaveDataViewModel(SaveData model)
             : base(null, model)
         {
-            base.SaveGame = this;
+            base.SaveData = this;
             this.Classes = new ObservableCollection<SaveClassViewModel>();
             if (model.Classes != null)
             {
@@ -37,7 +37,7 @@ namespace Skill.Studio.IO
 
             SaveClassViewModel cVM = new SaveClassViewModel(this, c);
             this.Classes.Add(cVM);
-            SaveGame.History.Insert(new AddSaveClassUnDoRedo(cVM, this, this.Classes.Count - 1));
+            SaveData.History.Insert(new AddSaveClassUnDoRedo(cVM, this, this.Classes.Count - 1));
         }
 
         public void RemoveClassAt(int index)
@@ -46,7 +46,7 @@ namespace Skill.Studio.IO
             {
                 SaveClassViewModel cl = this.Classes[index];
                 this.Classes.RemoveAt(index);
-                SaveGame.History.Insert(new AddSaveClassUnDoRedo(cl, this, index, true));
+                SaveData.History.Insert(new AddSaveClassUnDoRedo(cl, this, index, true));
             }
         }
 
@@ -66,11 +66,11 @@ namespace Skill.Studio.IO
 
         public override void CommiteChanges()
         {
-            ((SaveGame)Model).Classes = new SaveClass[this.Classes.Count];
+            ((SaveData)Model).Classes = new SaveClass[this.Classes.Count];
             for (int i = 0; i < this.Classes.Count; i++)
             {
                 this.Classes[i].CommiteChanges();
-                ((SaveGame)Model).Classes[i] = this.Classes[i].Model;
+                ((SaveData)Model).Classes[i] = this.Classes[i].Model;
             }
             base.CommiteChanges();
         }
@@ -94,13 +94,13 @@ namespace Skill.Studio.IO
         {
             int _Index;
             SaveClassViewModel _NewClass;
-            SaveGameViewModel _SaveGame;
+            SaveDataViewModel _SaveData;
             bool _Reverse;
 
-            public AddSaveClassUnDoRedo(SaveClassViewModel newClass, SaveGameViewModel sg, int index, bool reverse = false)
+            public AddSaveClassUnDoRedo(SaveClassViewModel newClass, SaveDataViewModel sg, int index, bool reverse = false)
             {
                 this._NewClass = newClass;
-                this._SaveGame = sg;
+                this._SaveData = sg;
                 this._Reverse = reverse;
                 this._Index = index;
             }
@@ -108,17 +108,17 @@ namespace Skill.Studio.IO
             public void Undo()
             {
                 if (_Reverse)
-                    _SaveGame.Classes.Insert(_Index, _NewClass);
+                    _SaveData.Classes.Insert(_Index, _NewClass);
                 else
-                    _SaveGame.Classes.Remove(_NewClass);
+                    _SaveData.Classes.Remove(_NewClass);
             }
 
             public void Redo()
             {
                 if (_Reverse)
-                    _SaveGame.Classes.Remove(_NewClass);
+                    _SaveData.Classes.Remove(_NewClass);
                 else
-                    _SaveGame.Classes.Insert(_Index, _NewClass);
+                    _SaveData.Classes.Insert(_Index, _NewClass);
             }
         }
         #endregion

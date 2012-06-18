@@ -52,8 +52,12 @@ namespace Skill.Studio.AI.Editor
         {
             if (_CmbAddress.SelectedItem != null && _CmbKey.SelectedItem != null)
             {
-                _Decorator.Address = _CmbAddress.SelectedItem as string;
-                _Decorator.AccessKey = _CmbKey.SelectedItem as string;
+                string address = _CmbAddress.SelectedItem as string;
+                if (address == "Internal")
+                    address = "";
+                string key = _CmbKey.SelectedItem as string;
+                _Decorator.Address = address;
+                _Decorator.AccessKey = key;
                 Close();
             }
             else

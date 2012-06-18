@@ -76,12 +76,21 @@ namespace Skill.AI
         /// </summary>
         /// <param name="child">Child behavior node</param>
         /// <param name="parameters">optional parameters for behavior</param>
-        public virtual void Add(Behavior child, BehaviorParameterCollection parameters = null)
+        public virtual void Add(Behavior child, BehaviorParameterCollection parameters)
         {
             if (child != null)
             {
                 _Children.Add(new BehaviorContainer(child, parameters));
             }
+        }
+
+        /// <summary>
+        /// Add child. Remember to add children in correct priority
+        /// </summary>
+        /// <param name="child">Child behavior node</param>        
+        public virtual void Add(Behavior child)
+        {
+            this.Add(child, null);
         }
 
         /// <summary>

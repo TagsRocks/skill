@@ -6,12 +6,12 @@ using System.Xml.Linq;
 
 namespace Skill.DataModels.IO
 {
-    public class SaveGame : SaveClass
+    public class SaveData : SaveClass
     {
         public SaveClass[] Classes { get; set; }
 
-        public SaveGame()
-            : base("NewSaveGame")
+        public SaveData()
+            : base("NewSaveData")
         {
 
         }

@@ -43,7 +43,7 @@
     <Compile Include="CSharp\AnimationTreeClass.cs" />
     <Compile Include="CSharp\BehaviorTreeClass.cs" />
     <Compile Include="CSharp\Class.cs" />
-    <Compile Include="CSharp\CodeParser.cs" />
+    <Compile Include="CSharp\CommentWriter.cs" />
     <Compile Include="CSharp\CSharpCodeGenerator.cs" />
     <Compile Include="CSharp\Document.cs" />
     <Compile Include="CSharp\IPartialCode.cs" />
@@ -51,6 +51,9 @@
     <Compile Include="CSharp\Modifiers.cs" />
     <Compile Include="CSharp\Namespace.cs" />
     <Compile Include="CSharp\Property.cs" />
+    <Compile Include="CSharp\SaveClassClass.cs" />
+    <Compile Include="CSharp\SaveGameClass.cs" />
+    <Compile Include="CSharp\SharedAccessKeysClass.cs" />
     <Compile Include="CSharp\Variable.cs" />
     <Compile Include="ICodeGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

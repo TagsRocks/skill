@@ -10,39 +10,39 @@ namespace Skill.Studio
 {
 
     #region SaveDataNode
-    public class SaveGameNode : EntityNode
+    public class SaveDataNode : EntityNode
     {
-        public override EntityType EntityType { get { return EntityType.SaveGame; } }
+        public override EntityType EntityType { get { return EntityType.SaveData; } }
 
-        public SaveGameNode()
-            : base("NewSaveGame")
+        public SaveDataNode()
+            : base("NewSaveData")
         {
 
         }
     }
     #endregion
 
-    public class SaveGameNodeViewModel : EntityNodeViewModel
+    public class SaveDataNodeViewModel : EntityNodeViewModel
     {
-        public SaveGameNodeViewModel(EntityNodeViewModel parent, SaveGameNode save)
+        public SaveDataNodeViewModel(EntityNodeViewModel parent, SaveDataNode save)
             : base(parent, save)
         {
         }
 
-        public override string ImageName { get { return Images.SaveGame; } }
+        public override string ImageName { get { return Images.SaveData; } }
 
         public override void New()
         {
-            SaveGame saveGame = new SaveGame();
+            SaveData saveGame = new SaveData();
             saveGame.Name = Name;
             SaveData(saveGame);
         }
 
         public override EntityNodeViewModel Clone(EntityNodeViewModel copyParent)
         {
-            SaveGameNode cloneModel = new SaveGameNode();
+            SaveDataNode cloneModel = new SaveDataNode();
             cloneModel.Name = Name;
-            SaveGameNodeViewModel sg = new SaveGameNodeViewModel(copyParent, cloneModel);
+            SaveDataNodeViewModel sg = new SaveDataNodeViewModel(copyParent, cloneModel);
             return sg;
         }
 
@@ -51,7 +51,7 @@ namespace Skill.Studio
         {
             if (data != null)
             {
-                SaveGame saveGame = data as SaveGame;
+                SaveData saveGame = data as SaveData;
                 if (saveGame != null)
                 {
                     saveGame.Name = this.Name;
@@ -64,6 +64,7 @@ namespace Skill.Studio
                     datafile.Save(filename);
                 }
             }
+            base.SaveData(data);
         }
 
         public override object LoadData()
@@ -71,7 +72,7 @@ namespace Skill.Studio
             string filename = AbsolutePath;
             if (System.IO.File.Exists(filename))
             {
-                SaveGame saveGame = new SaveGame();
+                SaveData saveGame = new SaveData();
                 DataFile data = new DataFile(filename);
                 saveGame.Load(data.Root);
                 return saveGame;

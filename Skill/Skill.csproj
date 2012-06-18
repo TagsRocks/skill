@@ -61,7 +61,7 @@
     <Compile Include="Animation\AnimNodeMultilayer.cs" />
     <Compile Include="IO\BinaryLoadStream.cs" />
     <Compile Include="IO\BinarySaveStream.cs" />
-    <Compile Include="IO\ISavableClass.cs" />
+    <Compile Include="IO\ISavable.cs" />
     <Compile Include="IO\XmlLoadStream.cs" />
     <Compile Include="IO\XmlSaveStream.cs" />
     <Compile Include="Managers\CacheBehavior.cs" />

@@ -10,7 +10,7 @@ namespace Skill.CodeGeneration.CSharp
     {
         #region Variables
         public static string[] AnimNodeEventParams = new string[] { "Skill.Animation.AnimNode sender", "Skill.Animation.AnimationTreeState state" };
-        List<AnimNode> _Nodes;// list of AnimNode in hierarchy
+        //List<AnimNode> _Nodes;// list of AnimNode in hierarchy
         private AnimationTree _Tree;// Animation tree model 
         private StringBuilder _CreateTreeMethodBody;
         #endregion
@@ -21,9 +21,9 @@ namespace Skill.CodeGeneration.CSharp
             : base(tree.Name)
         {
             this._Tree = tree;
-            this._Nodes = new List<AnimNode>();
+            //this._Nodes = new List<AnimNode>();
             this._CreateTreeMethodBody = new StringBuilder();
-            CreateNodeList();
+            //CreateNodeList();
             ProcessNodes();
             AddInherit("Skill.Animation.AnimationTree");
 
@@ -53,33 +53,13 @@ namespace Skill.CodeGeneration.CSharp
             createTree.Modifiers = Modifiers.Protected;
             Add(createTree);
         }
-        #endregion
-
-        #region CreateNodeList
-        private void CreateNodeList()
-        {
-            foreach (var node in _Tree)
-            {
-                if (IsInHierarchy(node.Id))
-                    _Nodes.Add(node);
-            }
-        }
-        private bool IsInHierarchy(int nodeId)
-        {
-            foreach (var connection in _Tree.Connections)
-            {
-                if (connection.Source.Id == nodeId || connection.Sink.Id == nodeId)
-                    return true;
-            }
-            return false;
-        }
-        #endregion
+        #endregion        
 
         #region Process
 
         private AnimNode Find(int id)
         {
-            foreach (var item in _Nodes)
+            foreach (var item in _Tree)
             {
                 if (item.Id == id) return item;
             }
@@ -88,7 +68,7 @@ namespace Skill.CodeGeneration.CSharp
 
         private void ProcessNodes()
         {
-            foreach (var node in _Nodes)
+            foreach (var node in _Tree)
             {
                 switch (node.NodeType)
                 {
@@ -130,11 +110,11 @@ namespace Skill.CodeGeneration.CSharp
 
             foreach (var connection in _Tree.Connections)
             {
-                AnimNode child = Find(connection.Source.Id);
-                AnimNode parent = Find(connection.Sink.Id);
-                if (child != null && parent != null && parent.NodeType != AnimNodeType.Root)
+                //AnimNode child = Find(connection.Source.Id);
+                //AnimNode parent = Find(connection.Sink.Id);
+                if (connection.Source != null && connection.Sink != null && connection.Sink.NodeType != AnimNodeType.Root)
                 {
-                    _CreateTreeMethodBody.AppendLine(string.Format("this.{0}[{1}] = this.{2};", Variable.GetName(parent.Name), connection.SinkConnectorIndex, Variable.GetName(child.Name)));
+                    _CreateTreeMethodBody.AppendLine(string.Format("this.{0}[{1}] = this.{2};", Variable.GetName(connection.Sink.Name), connection.SinkConnectorIndex, Variable.GetName(connection.Source.Name)));
                 }
             }
 
@@ -143,15 +123,15 @@ namespace Skill.CodeGeneration.CSharp
 
             // return root
             AnimNode root = null;
-            foreach (var node in _Nodes)
+            foreach (var node in _Tree)
             {
                 if (node.NodeType == AnimNodeType.Root)
                 {
                     foreach (var connection in _Tree.Connections)
                     {
-                        if (connection.Sink.Id == node.Id)
+                        if (connection.Sink == node)
                         {
-                            root = Find(connection.Source.Id);
+                            root = connection.Source;
                             break;
                         }
                     }
@@ -215,6 +195,8 @@ namespace Skill.CodeGeneration.CSharp
                 CreateVariable(type, node.Name);
         }
 
+
+
         private void CreateSequence(AnimNodeSequence node)
         {
             // create action variable            
@@ -234,6 +216,9 @@ namespace Skill.CodeGeneration.CSharp
 
             if (node.Synchronize) // default is false
                 SetProperty(node, "Synchronize", node.Synchronize.ToString().ToLower());
+
+            if (node.MixingTransforms != null && node.MixingTransforms.Length > 0) // default is null            
+                SetProperty(node, "MixingTransforms", CreateStringArray(node.MixingTransforms));
 
             SetSharedParameters(node);
         }
@@ -357,7 +342,10 @@ namespace Skill.CodeGeneration.CSharp
             {
                 _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.AddProfile(new AnimNodeAimOffsetProfile(){{ {1} }});", Variable.GetName(node.Name),
                    string.Format("Name = \"{0}\", CenterCenter = \"{1}\", CenterUp = \"{2}\", CenterDown = \"{3}\", LeftCenter = \"{4}\", LeftUp = \"{5}\", LeftDown = \"{6}\", RightCenter = \"{7}\", RightUp = \"{8}\", RightDown = \"{9}\"",
-                          profile.Name, profile.CenterCenter, profile.CenterUp, profile.CenterDown, profile.LeftCenter, profile.LeftUp, profile.LeftDown, profile.RightCenter, profile.RightUp, profile.RightDown)));
+                          profile.Name,
+                          profile.CenterCenter.AnimationName, profile.CenterUp.AnimationName, profile.CenterDown.AnimationName,
+                          profile.LeftCenter.AnimationName, profile.LeftUp.AnimationName, profile.LeftDown.AnimationName,
+                          profile.RightCenter.AnimationName, profile.RightUp.AnimationName, profile.RightDown.AnimationName)));
             }
 
             if (node.ProfileChanged)

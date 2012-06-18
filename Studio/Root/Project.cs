@@ -397,7 +397,7 @@ namespace Skill.Studio
         }
         private void DeleteDirectory(string path)
         {
-            if (System.IO.Directory.Exists(path)) System.IO.Directory.Delete(path);
+            if (System.IO.Directory.Exists(path)) System.IO.Directory.Delete(path,true);
         }
 
         /// <summary>

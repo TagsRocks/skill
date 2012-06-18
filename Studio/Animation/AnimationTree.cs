@@ -209,6 +209,7 @@ namespace Skill.Studio.Animation
         {
             if (!Contains(item))
             {
+                item.Model.Name = GetValidName(item.Model.Name);
                 _Nodes.Add(item);
                 Model.Add(item.Model);
 
@@ -221,6 +222,7 @@ namespace Skill.Studio.Animation
         {
             foreach (var item in nodes)
             {
+                item.Model.Name = GetValidName(item.Model.Name);
                 _Nodes.Add(item);
                 Model.Add(item.Model);
             }

@@ -109,5 +109,167 @@ namespace Skill.IO
 
             return new Vector4(x, y, z, w);
         }
+
+        public T ReadSavable<T>(CreateISavable<T> creator) where T : ISavable
+        {
+            T newItem = creator();
+            newItem.Load(this);
+            return newItem;
+        }
+
+        public T[] ReadSavableArray<T>(CreateISavable<T> creator) where T : ISavable
+        {
+            int length = ReadInt();
+            T[] array = new T[length];
+
+            for (int i = 0; i < length; i++)
+            {
+                T newItem = creator();
+                newItem.Load(this);
+                array[i] = newItem;
+            }
+            return array;
+        }
+
+        public int[] ReadIntArray()
+        {
+            int length = ReadInt();
+            int[] array = new int[length];
+            for (int i = 0; i < length; i++)
+            {
+                array[i] = ReadInt();
+            }
+            return array;
+        }
+        public float[] ReadFloatArray()
+        {
+            int length = ReadInt();
+            float[] array = new float[length];
+            for (int i = 0; i < length; i++)
+            {
+                array[i] = ReadFloat();
+            }
+            return array;
+        }
+        public bool[] ReadBooleanArray()
+        {
+            int length = ReadInt();
+            bool[] array = new bool[length];
+            for (int i = 0; i < length; i++)
+            {
+                array[i] = ReadBoolean();
+            }
+            return array;
+        }
+        public string[] ReadStringArray()
+        {
+            int length = ReadInt();
+            string[] array = new string[length];
+            for (int i = 0; i < length; i++)
+            {
+                array[i] = ReadString();
+            }
+            return array;
+        }
+        public Bounds[] ReadBoundsArray()
+        {
+            int length = ReadInt();
+            Bounds[] array = new Bounds[length];
+            for (int i = 0; i < length; i++)
+            {
+                array[i] = ReadBounds();
+            }
+            return array;
+        }
+        public Color[] ReadColorArray()
+        {
+            int length = ReadInt();
+            Color[] array = new Color[length];
+            for (int i = 0; i < length; i++)
+            {
+                array[i] = ReadColor();
+            }
+            return array;
+        }
+        public Matrix4x4[] ReadMatrix4x4Array()
+        {
+            int length = ReadInt();
+            Matrix4x4[] array = new Matrix4x4[length];
+            for (int i = 0; i < length; i++)
+            {
+                array[i] = ReadMatrix4x4();
+            }
+            return array;
+        }
+        public Plane[] ReadPlaneArray()
+        {
+            int length = ReadInt();
+            Plane[] array = new Plane[length];
+            for (int i = 0; i < length; i++)
+            {
+                array[i] = ReadPlane();
+            }
+            return array;
+        }
+        public Quaternion[] ReadQuaternionArray()
+        {
+            int length = ReadInt();
+            Quaternion[] array = new Quaternion[length];
+            for (int i = 0; i < length; i++)
+            {
+                array[i] = ReadQuaternion();
+            }
+            return array;
+        }
+        public Ray[] ReadRayArray()
+        {
+            int length = ReadInt();
+            Ray[] array = new Ray[length];
+            for (int i = 0; i < length; i++)
+            {
+                array[i] = ReadRay();
+            }
+            return array;
+        }
+        public Rect[] ReadRectArray()
+        {
+            int length = ReadInt();
+            Rect[] array = new Rect[length];
+            for (int i = 0; i < length; i++)
+            {
+                array[i] = ReadRect();
+            }
+            return array;
+        }
+        public Vector2[] ReadVector2Array()
+        {
+            int length = ReadInt();
+            Vector2[] array = new Vector2[length];
+            for (int i = 0; i < length; i++)
+            {
+                array[i] = ReadVector2();
+            }
+            return array;
+        }
+        public Vector3[] ReadVector3Array()
+        {
+            int length = ReadInt();
+            Vector3[] array = new Vector3[length];
+            for (int i = 0; i < length; i++)
+            {
+                array[i] = ReadVector3();
+            }
+            return array;
+        }
+        public Vector4[] ReadVector4Array()
+        {
+            int length = ReadInt();
+            Vector4[] array = new Vector4[length];
+            for (int i = 0; i < length; i++)
+            {
+                array[i] = ReadVector4();
+            }
+            return array;
+        }
     }
 }

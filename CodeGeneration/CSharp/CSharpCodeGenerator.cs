@@ -25,6 +25,15 @@ namespace Skill.CodeGeneration.CSharp
             BehaviorTreeClass btClass = new BehaviorTreeClass(bTree);
             _Document.Add(btClass);
         }
+        public void Generate(Skill.DataModels.AI.SharedAccessKeys sharedAccessKeys)
+        {
+            _Document = new Document();
+            _Document.AddDefaultUsings();
+            _Document.AddUsingSkillAI();
+
+            SharedAccessKeysClass saClass = new SharedAccessKeysClass(sharedAccessKeys);
+            _Document.Add(saClass);
+        }
 
         public void Generate(AnimationTree aTree)
         {
@@ -35,9 +44,17 @@ namespace Skill.CodeGeneration.CSharp
             AnimationTreeClass atClass = new AnimationTreeClass(aTree);
             _Document.Add(atClass);
         }
-        public void Generate(Skill.DataModels.IO.SaveGame saveGame)
+
+        
+
+        public void Generate(Skill.DataModels.IO.SaveData saveGame)
         {
             _Document = new Document();
+            _Document.AddDefaultUsings();
+            _Document.AddUsingSkillIO();
+
+            SaveDataClass sgClass = new SaveDataClass(saveGame);
+            _Document.Add(sgClass);
         }
 
 

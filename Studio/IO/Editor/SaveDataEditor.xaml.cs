@@ -15,23 +15,23 @@ using System.Windows.Shapes;
 namespace Skill.Studio.IO.Editor
 {
     /// <summary>
-    /// Interaction logic for SaveGameEditor.xaml
+    /// Interaction logic for SaveDataEditor.xaml
     /// </summary>
-    public partial class SaveGameEditor : TabDocument
+    public partial class SaveDataEditor : TabDocument
     {
 
         #region Propeties
 
-        private bool _HasSaveGameMemberSelected;
-        public bool HasSaveGameMemberSelected
+        private bool _HasSaveDataMemberSelected;
+        public bool HasSaveDataMemberSelected
         {
-            get { return _HasSaveGameMemberSelected; }
+            get { return _HasSaveDataMemberSelected; }
             set
             {
-                if (_HasSaveGameMemberSelected != value)
+                if (_HasSaveDataMemberSelected != value)
                 {
-                    _HasSaveGameMemberSelected = value;
-                    RaisePropertyChanged("HasSaveGameMemberSelected");
+                    _HasSaveDataMemberSelected = value;
+                    RaisePropertyChanged("HasSaveDataMemberSelected");
                 }
             }
         }
@@ -64,11 +64,11 @@ namespace Skill.Studio.IO.Editor
             }
         }
 
-        public SaveGameViewModel SaveGame { get; private set; }
+        public SaveDataViewModel SaveData { get; private set; }
         #endregion
 
 
-        public SaveGameEditor()
+        public SaveDataEditor()
             : this(null)
         {
         }
@@ -77,23 +77,23 @@ namespace Skill.Studio.IO.Editor
         /// Create an AnimationTreeEditor
         /// </summary>
         /// <param name="viewModel"></param>
-        public SaveGameEditor(SaveGameNodeViewModel viewModel)
+        public SaveDataEditor(SaveDataNodeViewModel viewModel)
             : base(viewModel)
         {
             InitializeComponent();
             if (viewModel != null)
             {
-                Skill.DataModels.IO.SaveGame sg = viewModel.LoadData() as Skill.DataModels.IO.SaveGame;
+                Skill.DataModels.IO.SaveData sg = viewModel.LoadData() as Skill.DataModels.IO.SaveData;
                 if (sg != null)
                 {
-                    Data = SaveGame = new SaveGameViewModel(sg) { Editor = this };
-                    _LbClasses.ItemsSource = SaveGame.Classes;
-                    _LbSaveGameMembers.ItemsSource = SaveGame.Properties;
+                    Data = SaveData = new SaveDataViewModel(sg) { Editor = this };
+                    _LbClasses.ItemsSource = SaveData.Classes;
+                    _LbSaveDataMembers.ItemsSource = SaveData.Properties;
                 }
             }
 
-            _CmbClassProperties.ItemsSource = _CmbSaveGameMembers.ItemsSource = new Skill.DataModels.IO.PropertyType[] { Skill.DataModels.IO.PropertyType.Primitive, Skill.DataModels.IO.PropertyType.Class };
-            _CmbClassProperties.SelectedIndex = _CmbSaveGameMembers.SelectedIndex = 0;
+            _CmbClassProperties.ItemsSource = _CmbSaveDataMembers.ItemsSource = new Skill.DataModels.IO.PropertyType[] { Skill.DataModels.IO.PropertyType.Primitive, Skill.DataModels.IO.PropertyType.Class };
+            _CmbClassProperties.SelectedIndex = _CmbSaveDataMembers.SelectedIndex = 0;
         }
 
         private void Lb_ItemDoubleClick(object sender, MouseButtonEventArgs e)
@@ -101,37 +101,37 @@ namespace Skill.Studio.IO.Editor
             ApplicationCommands.Properties.Execute(sender, null);
         }
 
-        #region SaveGame members
+        #region SaveData members
 
-        private void BtnAddSaveGameMember_Click(object sender, RoutedEventArgs e)
+        private void BtnAddSaveDataMember_Click(object sender, RoutedEventArgs e)
         {
-            Skill.DataModels.IO.PropertyType type = (Skill.DataModels.IO.PropertyType)_CmbSaveGameMembers.SelectedItem;
-            SaveGame.AddProperty(type);
+            Skill.DataModels.IO.PropertyType type = (Skill.DataModels.IO.PropertyType)_CmbSaveDataMembers.SelectedItem;
+            SaveData.AddProperty(type);
         }
 
-        private void LbSaveGameMembers_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void LbSaveDataMembers_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            HasSaveGameMemberSelected = _LbSaveGameMembers.SelectedItem != null;
-            ApplicationCommands.Properties.Execute(_LbSaveGameMembers.SelectedItem, null);
+            HasSaveDataMemberSelected = _LbSaveDataMembers.SelectedItem != null;
+            ApplicationCommands.Properties.Execute(_LbSaveDataMembers.SelectedItem, null);
         }
 
-        private void LbSaveGameMembers_KeyDown(object sender, KeyEventArgs e)
+        private void LbSaveDataMembers_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Delete)
-                DeleteSaveGameMemeber();
+                DeleteSaveDataMemeber();
         }
 
-        private void BtnDelSaveGameMember_Click(object sender, RoutedEventArgs e)
+        private void BtnDelSaveDataMember_Click(object sender, RoutedEventArgs e)
         {
-            DeleteSaveGameMemeber();
+            DeleteSaveDataMemeber();
         }
 
-        private void DeleteSaveGameMemeber()
+        private void DeleteSaveDataMemeber()
         {
-            if (HasSaveGameMemberSelected)
+            if (HasSaveDataMemberSelected)
             {
-                if (_LbSaveGameMembers.SelectedIndex >= 0)
-                    SaveGame.RemovePropertyAt(_LbSaveGameMembers.SelectedIndex);
+                if (_LbSaveDataMembers.SelectedIndex >= 0)
+                    SaveData.RemovePropertyAt(_LbSaveDataMembers.SelectedIndex);
             }
         }
         #endregion
@@ -139,7 +139,7 @@ namespace Skill.Studio.IO.Editor
         #region Class
         private void BtnAddClass_Click(object sender, RoutedEventArgs e)
         {
-            SaveGame.AddClass();
+            SaveData.AddClass();
         }
 
         private void LbClasses_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -171,7 +171,7 @@ namespace Skill.Studio.IO.Editor
             if (HasClassSelected)
             {
                 if (_LbClasses.SelectedIndex >= 0)
-                    SaveGame.RemoveClassAt(_LbClasses.SelectedIndex);
+                    SaveData.RemoveClassAt(_LbClasses.SelectedIndex);
             }
         }
         #endregion

@@ -32,59 +32,62 @@ namespace Skill.Studio.Animation.Editor
         void DragThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
 
-            if (ViewModel != null && ViewModel.IsSelected)
+            if ((Keyboard.Modifiers & ModifierKeys.Alt) == 0)
             {
-                AnimationTreeCanvas canvas = ParentCanvas;
-
-                //if ((Keyboard.Modifiers & ModifierKeys.Shift) != ModifierKeys.None)
-                //{
-                //    if (!canvas.Editor.IsDuplicating)
-                //        canvas.Editor.DuplicateSelection();
-                //}
-
-                //if (canvas.Editor.IsDuplicating)
-                //{
-                //    canvas.Editor.MoveDuplicated(e.HorizontalChange, e.VerticalChange);
-                //}
-
-
-                double minLeft = double.MaxValue;
-                double minTop = double.MaxValue;
-
-                foreach (var item in ViewModel.Tree.Editor.Selection.SelectedObjects)
+                if (ViewModel != null && ViewModel.IsSelected)
                 {
-                    if (item is AnimNodeViewModel)
+                    AnimationTreeCanvas canvas = ParentCanvas;
+
+                    //if ((Keyboard.Modifiers & ModifierKeys.Shift) != ModifierKeys.None)
+                    //{
+                    //    if (!canvas.Editor.IsDuplicating)
+                    //        canvas.Editor.DuplicateSelection();
+                    //}
+
+                    //if (canvas.Editor.IsDuplicating)
+                    //{
+                    //    canvas.Editor.MoveDuplicated(e.HorizontalChange, e.VerticalChange);
+                    //}
+
+
+                    double minLeft = double.MaxValue;
+                    double minTop = double.MaxValue;
+
+                    foreach (var item in ViewModel.Tree.Editor.Selection.SelectedObjects)
                     {
-                        AnimNodeViewModel vm = item as AnimNodeViewModel;
+                        if (item is AnimNodeViewModel)
+                        {
+                            AnimNodeViewModel vm = item as AnimNodeViewModel;
 
-                        minLeft = double.IsNaN(vm.X) ? 0 : Math.Min(vm.X, minLeft);
-                        minTop = double.IsNaN(vm.Y) ? 0 : Math.Min(vm.Y, minTop);
+                            minLeft = double.IsNaN(vm.X) ? 0 : Math.Min(vm.X, minLeft);
+                            minTop = double.IsNaN(vm.Y) ? 0 : Math.Min(vm.Y, minTop);
+                        }
                     }
-                }
 
-                double deltaHorizontal = Math.Max(-minLeft, e.HorizontalChange);
-                double deltaVertical = Math.Max(-minTop, e.VerticalChange);
+                    double deltaHorizontal = Math.Max(-minLeft, e.HorizontalChange);
+                    double deltaVertical = Math.Max(-minTop, e.VerticalChange);
 
-                foreach (var item in ViewModel.Tree.Editor.Selection.SelectedObjects)
-                {
-                    if (item is AnimNodeViewModel)
+                    foreach (var item in ViewModel.Tree.Editor.Selection.SelectedObjects)
                     {
-                        AnimNodeViewModel vm = item as AnimNodeViewModel;
-                        double left = vm.X;
-                        double top = vm.Y;
+                        if (item is AnimNodeViewModel)
+                        {
+                            AnimNodeViewModel vm = item as AnimNodeViewModel;
+                            double left = vm.X;
+                            double top = vm.Y;
 
-                        if (double.IsNaN(left)) left = 0;
-                        if (double.IsNaN(top)) top = 0;
+                            if (double.IsNaN(left)) left = 0;
+                            if (double.IsNaN(top)) top = 0;
 
-                        vm.X = left + deltaHorizontal;
-                        vm.Y = top + deltaVertical;
+                            vm.X = left + deltaHorizontal;
+                            vm.Y = top + deltaVertical;
+                        }
                     }
+
+
+                    if (canvas != null)
+                        canvas.InvalidateMeasure();
+                    e.Handled = true;
                 }
-
-
-                if (canvas != null)
-                    canvas.InvalidateMeasure();
-                e.Handled = true;
             }
         }
     }

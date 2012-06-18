@@ -62,7 +62,7 @@ Animation:
 
 IO:
 
-	SaveGame :
+	SaveData :
 		Errors :
 			1- Invalid name of SaveProperty (null or empty).
 			2- Two or more SaveProperty of one SaveClass with same name.			
@@ -72,4 +72,4 @@ IO:
 
 		Warnings :			
 			1- SaveClass With no property.
-			2- SaveGame With no property.
+			2- SaveData With no property.

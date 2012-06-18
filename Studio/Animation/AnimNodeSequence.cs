@@ -41,6 +41,9 @@ namespace Skill.Studio.Animation
         }
 
         [Browsable(false)]
+        public override Visibility InputsVisible { get { return Visibility.Hidden; } }
+
+        [Browsable(false)]
         public List<string> MixingTransforms { get; private set; }
 
         [Browsable(false)]

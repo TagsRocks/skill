@@ -12,6 +12,8 @@ namespace Skill.DataModels.AI
         #region Properties
         /// <summary> Collection of AccessKeys  </summary>
         public System.Collections.Generic.Dictionary<string, AccessKey> Keys { get; private set; }
+        /// <summary> Name of file </summary>
+        public string Name { get; set; }
         #endregion
 
         #region Constructor
@@ -20,6 +22,7 @@ namespace Skill.DataModels.AI
         /// </summary>
         public SharedAccessKeys()
         {
+            this.Name = "AccessKeys";
             this.Keys = new Dictionary<string, AccessKey>();
         }
         #endregion
@@ -45,6 +48,7 @@ namespace Skill.DataModels.AI
         public XElement ToXElement()
         {
             XElement accessKeys = new XElement("AccessKeys");
+            accessKeys.SetAttributeValue("Name", Name);
             accessKeys.SetAttributeValue("Count", Keys.Count);
             foreach (var item in Keys)
             {
@@ -59,6 +63,7 @@ namespace Skill.DataModels.AI
         public void Load(XElement e)
         {
             int count = e.GetAttributeValueAsInt("Count", 0);
+            this.Name = e.GetAttributeValueAsString("Name", this.Name);
             Keys.Clear();
             foreach (var item in e.Elements())
             {

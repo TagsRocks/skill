@@ -21,15 +21,21 @@
                 <ListBoxItem Content="Animation" Tag="{x:Static ss:ItemCategory.Animation}" />
                 <ListBoxItem Content="IO" Tag="{x:Static ss:ItemCategory.IO}" />
             </ListBox>
-            <ListBox Grid.Column="2"  x:Name="_LbItems">
+            <ListBox Grid.Column="2"  x:Name="_LbItems" HorizontalContentAlignment="Stretch" >
                 <ListBox.Resources>
                     <DataTemplate DataType="{x:Type ss:NewItemViewModel}" >
-                        <Grid>
-                            <StackPanel Orientation="Horizontal" Height="36" >
+                        <Grid Margin="2,0" >
+                            <Border BorderBrush="#e5c365" BorderThickness="1"  Visibility="Hidden"  Name="_Bg"  CornerRadius="5" Background="{StaticResource MenuBgBrush}" />
+                            <StackPanel Margin="10,0,0,0" Orientation="Horizontal" Height="36" >
                                 <Image Width="32" Height="32" VerticalAlignment="Center" Margin="2,0" Source="{Binding ImageName}" />
                                 <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="{Binding Name}" />
                             </StackPanel>                            
                         </Grid>
+                        <DataTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter  TargetName="_Bg"  Property="Visibility" Value="Visible" />
+                            </Trigger>
+                        </DataTemplate.Triggers>
                     </DataTemplate>
                 </ListBox.Resources>
 

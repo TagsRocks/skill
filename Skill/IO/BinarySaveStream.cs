@@ -86,5 +86,177 @@ namespace Skill.IO
             Write(vector.y);
             Write(vector.z);
         }
+
+        public void Write<T>(T savable) where T : ISavable
+        {
+            savable.Save(this);
+        }
+
+        public void Write<T>(T[] savables) where T : ISavable
+        {
+            int length = 0;
+            if (savables != null)
+                length = savables.Length;
+            Write(length);
+            for (int i = 0; i < length; i++)
+            {
+                Write(savables[i]);
+            }
+        }
+
+        public void Write(int[] primitives)
+        {
+            int length = 0;
+            if (primitives != null)
+                length = primitives.Length;
+            Write(length);
+            for (int i = 0; i < length; i++)
+            {
+                Write(primitives[i]);
+            }
+        }
+        public void Write(float[] primitives)
+        {
+            int length = 0;
+            if (primitives != null)
+                length = primitives.Length;
+            Write(length);
+            for (int i = 0; i < length; i++)
+            {
+                Write(primitives[i]);
+            }
+        }
+        public void Write(bool[] primitives)
+        {
+            int length = 0;
+            if (primitives != null)
+                length = primitives.Length;
+            Write(length);
+            for (int i = 0; i < length; i++)
+            {
+                Write(primitives[i]);
+            }
+        }
+        public void Write(string[] primitives)
+        {
+            int length = 0;
+            if (primitives != null)
+                length = primitives.Length;
+            Write(length);
+            for (int i = 0; i < length; i++)
+            {
+                Write(primitives[i]);
+            }
+        }
+        public void Write(Bounds[] primitives)
+        {
+            int length = 0;
+            if (primitives != null)
+                length = primitives.Length;
+            Write(length);
+            for (int i = 0; i < length; i++)
+            {
+                Write(primitives[i]);
+            }
+        }
+        public void Write(Color[] primitives)
+        {
+            int length = 0;
+            if (primitives != null)
+                length = primitives.Length;
+            Write(length);
+            for (int i = 0; i < length; i++)
+            {
+                Write(primitives[i]);
+            }
+        }
+        public void Write(Matrix4x4[] primitives)
+        {
+            int length = 0;
+            if (primitives != null)
+                length = primitives.Length;
+            Write(length);
+            for (int i = 0; i < length; i++)
+            {
+                Write(primitives[i]);
+            }
+        }
+        public void Write(Plane[] primitives)
+        {
+            int length = 0;
+            if (primitives != null)
+                length = primitives.Length;
+            Write(length);
+            for (int i = 0; i < length; i++)
+            {
+                Write(primitives[i]);
+            }
+        }
+        public void Write(Quaternion[] primitives)
+        {
+            int length = 0;
+            if (primitives != null)
+                length = primitives.Length;
+            Write(length);
+            for (int i = 0; i < length; i++)
+            {
+                Write(primitives[i]);
+            }
+        }
+        public void Write(Ray[] primitives)
+        {
+            int length = 0;
+            if (primitives != null)
+                length = primitives.Length;
+            Write(length);
+            for (int i = 0; i < length; i++)
+            {
+                Write(primitives[i]);
+            }
+        }
+        public void Write(Rect[] primitives)
+        {
+            int length = 0;
+            if (primitives != null)
+                length = primitives.Length;
+            Write(length);
+            for (int i = 0; i < length; i++)
+            {
+                Write(primitives[i]);
+            }
+        }
+        public void Write(Vector2[] primitives)
+        {
+            int length = 0;
+            if (primitives != null)
+                length = primitives.Length;
+            Write(length);
+            for (int i = 0; i < length; i++)
+            {
+                Write(primitives[i]);
+            }
+        }
+        public void Write(Vector3[] primitives)
+        {
+            int length = 0;
+            if (primitives != null)
+                length = primitives.Length;
+            Write(length);
+            for (int i = 0; i < length; i++)
+            {
+                Write(primitives[i]);
+            }
+        }
+        public void Write(Vector4[] primitives)
+        {
+            int length = 0;
+            if (primitives != null)
+                length = primitives.Length;
+            Write(length);
+            for (int i = 0; i < length; i++)
+            {
+                Write(primitives[i]);
+            }
+        }
     }
 }

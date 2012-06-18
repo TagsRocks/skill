@@ -99,19 +99,19 @@ namespace Skill.Studio.Compiler
                     {
                         AddError(string.Format("The provided AccessKey '{0}' for behavior node '{1}' does not exist.", accessLimitDecorator.AccessKey, accessLimitDecorator.Name));
                     }
+                }
+                else
+                {
+                    SharedAccessKeysNodeViewModel sharedAccessKeysVM = Node.Project.GetNode(accessLimitDecorator.Address) as SharedAccessKeysNodeViewModel;
+                    if (sharedAccessKeysVM == null)
+                        AddError(string.Format("The SharedAccessKeys address '{0}' for behavior node '{1}' does not exist.", accessLimitDecorator.Address, accessLimitDecorator.Name));
                     else
                     {
-                        SharedAccessKeysNodeViewModel sharedAccessKeysVM = Node.Project.GetNode(accessLimitDecorator.Address) as SharedAccessKeysNodeViewModel;
-                        if (sharedAccessKeysVM == null)
+                        SharedAccessKeys model = sharedAccessKeysVM.SavedData as SharedAccessKeys;
+                        if (model == null)
                             AddError(string.Format("The SharedAccessKeys address '{0}' for behavior node '{1}' does not exist.", accessLimitDecorator.Address, accessLimitDecorator.Name));
-                        else
-                        {
-                            SharedAccessKeys model = sharedAccessKeysVM.SavedData as SharedAccessKeys;
-                            if (model == null)
-                                AddError(string.Format("The SharedAccessKeys address '{0}' for behavior node '{1}' does not exist.", accessLimitDecorator.Address, accessLimitDecorator.Name));
-                            else if (!model.Keys.ContainsKey(accessLimitDecorator.AccessKey))
-                                AddError(string.Format("The provided AccessKey '{0}' for behavior node '{1}' does not exist.", accessLimitDecorator.AccessKey, accessLimitDecorator.Name));
-                        }
+                        else if (!model.Keys.ContainsKey(accessLimitDecorator.AccessKey))
+                            AddError(string.Format("The provided AccessKey '{0}' for behavior node '{1}' does not exist.", accessLimitDecorator.AccessKey, accessLimitDecorator.Name));
                     }
                 }
             }

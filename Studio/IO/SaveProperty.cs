@@ -36,9 +36,9 @@ namespace Skill.Studio.IO
                 if (value == null) value = "";
                 if (Model.Name != value)
                 {
-                    if (OwnerClass.SaveGame.Editor.History != null)
+                    if (OwnerClass.SaveData.Editor.History != null)
                     {
-                        OwnerClass.SaveGame.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "Name", value, Model.Name));
+                        OwnerClass.SaveData.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "Name", value, Model.Name));
                     }
                     Model.Name = value;
                     OnPropertyChanged("Name");
@@ -47,22 +47,22 @@ namespace Skill.Studio.IO
             }
         }
 
-        public bool IsCollection
+        public bool IsArray
         {
             get
             {
-                return Model.IsCollection;
+                return Model.IsArray;
             }
             set
             {
-                if (Model.IsCollection != value)
+                if (Model.IsArray != value)
                 {
-                    if (OwnerClass.SaveGame.Editor.History != null)
+                    if (OwnerClass.SaveData.Editor.History != null)
                     {
-                        OwnerClass.SaveGame.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "IsCollection", value, !value));
+                        OwnerClass.SaveData.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "IsArray", value, !value));
                     }
-                    Model.IsCollection = value;
-                    OnPropertyChanged("IsCollection");
+                    Model.IsArray = value;
+                    OnPropertyChanged("IsArray");
                     OnPropertyChanged("DisplayName");
                 }
             }
@@ -79,9 +79,9 @@ namespace Skill.Studio.IO
                 if (value == null) value = "";
                 if (Model.Comment != value)
                 {
-                    if (OwnerClass.SaveGame.Editor.History != null)
+                    if (OwnerClass.SaveData.Editor.History != null)
                     {
-                        OwnerClass.SaveGame.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "Comment", value, Model.Comment));
+                        OwnerClass.SaveData.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "Comment", value, Model.Comment));
                     }
                     Model.Comment = value;
                     OnPropertyChanged("Comment");
@@ -127,9 +127,9 @@ namespace Skill.Studio.IO
             {
                 if (((PrimitiveProperty)Model).PrimitiveType != value)
                 {
-                    if (OwnerClass.SaveGame.Editor.History != null)
+                    if (OwnerClass.SaveData.Editor.History != null)
                     {
-                        OwnerClass.SaveGame.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "PrimitiveType", value, ((PrimitiveProperty)Model).PrimitiveType));
+                        OwnerClass.SaveData.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "PrimitiveType", value, ((PrimitiveProperty)Model).PrimitiveType));
                     }
                     ((PrimitiveProperty)Model).PrimitiveType = value;
                     OnPropertyChanged("PrimitiveType");
@@ -142,8 +142,8 @@ namespace Skill.Studio.IO
         {
             get
             {
-                if (IsCollection)
-                    return string.Format("public List<{0}> {1}", PrimitiveType, Name);
+                if (IsArray)
+                    return string.Format("public {0}[] {1}", PrimitiveType, Name);
                 else
                     return string.Format("public {0} {1}", PrimitiveType, Name);
             }
@@ -172,9 +172,9 @@ namespace Skill.Studio.IO
                 if (value == null) value = "";
                 if (((ClassProperty)Model).ClassName != value)
                 {
-                    if (OwnerClass.SaveGame.Editor.History != null)
+                    if (OwnerClass.SaveData.Editor.History != null)
                     {
-                        OwnerClass.SaveGame.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "ClassName", value, ((ClassProperty)Model).ClassName));
+                        OwnerClass.SaveData.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "ClassName", value, ((ClassProperty)Model).ClassName));
                     }
                     ((ClassProperty)Model).ClassName = value;
                     OnPropertyChanged("ClassName");
@@ -187,8 +187,8 @@ namespace Skill.Studio.IO
         {
             get
             {
-                if (IsCollection)
-                    return string.Format("public List<class {0}> {1}", ClassName, Name);
+                if (IsArray)
+                    return string.Format("public class {0}[] {1}", ClassName, Name);
                 else
                     return string.Format("public class {0} {1}", ClassName, Name);
 

@@ -23,7 +23,7 @@ namespace Skill.DataModels.IO
     {
         public abstract PropertyType Type { get; }
         public string Name { get; set; }
-        public bool IsCollection { get; set; }        
+        public bool IsArray { get; set; }        
         public string Comment { get; set; }
 
         public SaveProperty(string name)
@@ -37,7 +37,7 @@ namespace Skill.DataModels.IO
             XElement p = new XElement("Property");
             p.SetAttributeValue("PropertyType", (int)Type);
             p.SetAttributeValue("Name", Name);
-            p.SetAttributeValue("IsCollection", IsCollection);            
+            p.SetAttributeValue("IsArray", IsArray);            
             if (!string.IsNullOrEmpty(Comment))
             {
                 XElement comment = new XElement("Comment");
@@ -55,7 +55,7 @@ namespace Skill.DataModels.IO
         public void Load(XElement e)
         {
             this.Name = e.GetAttributeValueAsString("Name", this.Name);
-            this.IsCollection = e.GetAttributeValueAsBoolean("IsCollection", false);            
+            this.IsArray = e.GetAttributeValueAsBoolean("IsArray", false);            
             XElement comment = e.FindChildByName("Comment");
             if (comment != null)
             {

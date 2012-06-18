@@ -51,6 +51,8 @@ namespace Skill.Studio
                 SharedAccessKeys sa = data as SharedAccessKeys;
                 if (sa != null)
                 {
+                    sa.Name = this.Name;
+
                     string filename = AbsolutePath;
                     Project.CreateDirectory(filename);
 
@@ -59,6 +61,7 @@ namespace Skill.Studio
                     datafile.Save(filename);
                 }
             }
+            base.SaveData(data);
         }
 
         public override object LoadData()

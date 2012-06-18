@@ -30,14 +30,13 @@
         <TreeView Grid.Row="1" ItemsSource="{Binding  CurrentProject.Nodes}" BorderThickness="0" Name="_NodesTree"
                   SelectedItemChanged="NodesTree_SelectedItemChanged" TreeViewItem.Selected="TreeViewItem_Selected" >
             <TreeView.ContextMenu  >
-                <ContextMenu UseLayoutRounding="True" >
+                <ContextMenu UseLayoutRounding="True" Height="Auto" >
                     <ContextMenu.Resources>
                         <Style TargetType="{x:Type Image}">
                             <Setter Property="Width" Value="16"/>
                             <Setter Property="Height" Value="16"/>
                         </Style>
                     </ContextMenu.Resources>
-
                     <MenuItem Header="Build" Visibility="{Binding Path=CanBuild, Converter={StaticResource BToVisConverter}, ConverterParameter=False}" Click="Mnu_Build_Click" >
                         <MenuItem.Icon>
                             <my:ButtonImage NormalImage="{StaticResource ImgBuild}" DisableImage="{StaticResource ImgBuild_D}" />
@@ -49,7 +48,7 @@
                             <my:ButtonImage NormalImage="{StaticResource ImgOpenFile}" DisableImage="{StaticResource ImgOpenFile_D}" />
                         </MenuItem.Icon>
                     </MenuItem>
-                    <Separator />
+                    <Separator Visibility="{Binding Path=CanAdd, Converter={StaticResource BToVisConverter}, ConverterParameter=False}" />
                     <MenuItem Header="Add" Visibility="{Binding Path=CanAdd, Converter={StaticResource BToVisConverter}, ConverterParameter=False}" >
                         <MenuItem Header="New Item" Click="Mnu_AddItem_Click" >
                             <MenuItem.Icon>
@@ -106,13 +105,12 @@
                             <my:ButtonImage NormalImage="{StaticResource ImgProperties}" DisableImage="{StaticResource ImgProperties_D}" />
                         </MenuItem.Icon>
                     </MenuItem>
-
                 </ContextMenu>
             </TreeView.ContextMenu>
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource TreeViewItemStyle}"    >
                     <EventSetter Event="TreeViewItem.PreviewMouseRightButtonDown" Handler="TreeViewItem_PreviewMouseRightButtonDown"/>
-                    <EventSetter Event="TreeViewItem.MouseDoubleClick" Handler="TreeViewItem_MouseDoubleClick"/>                    
+                    <EventSetter Event="TreeViewItem.MouseDoubleClick" Handler="TreeViewItem_MouseDoubleClick"/>
                     <EventSetter Event="TreeViewItem.KeyDown" Handler="TreeViewItem_KeyDown"/>
                 </Style>
             </TreeView.ItemContainerStyle>

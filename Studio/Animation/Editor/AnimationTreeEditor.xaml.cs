@@ -448,32 +448,35 @@ namespace Skill.Studio.Animation.Editor
 
 
         #region PreviewMouseDown
-
+        
         private void AnimNode_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            // update selection
-            ContentPresenter presenter = sender as ContentPresenter;
-            if (presenter != null)
+            if (e.LeftButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed)
             {
-                AnimNodeViewModel vm = presenter.Content as AnimNodeViewModel;
-                if (vm != null)
+                // update selection
+                ContentPresenter presenter = sender as ContentPresenter;
+                if (presenter != null)
                 {
-                    if ((Keyboard.Modifiers & (ModifierKeys.Shift | ModifierKeys.Control)) != ModifierKeys.None)
+                    AnimNodeViewModel vm = presenter.Content as AnimNodeViewModel;
+                    if (vm != null)
                     {
-                        if (vm.IsSelected)
+                        if ((Keyboard.Modifiers & (ModifierKeys.Shift | ModifierKeys.Control)) != ModifierKeys.None)
                         {
-                            Selection.Remove(vm);
+                            if (vm.IsSelected)
+                            {
+                                Selection.Remove(vm);
+                            }
+                            else
+                            {
+                                Selection.Add(vm);
+                            }
                         }
-                        else
+                        else if (!vm.IsSelected)
                         {
-                            Selection.Add(vm);
+                            Selection.Select(vm);
                         }
+                        Focus();
                     }
-                    else if (!vm.IsSelected)
-                    {
-                        Selection.Select(vm);
-                    }
-                    Focus();
                 }
             }
         }

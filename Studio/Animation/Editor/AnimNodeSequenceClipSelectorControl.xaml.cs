@@ -20,7 +20,6 @@ namespace Skill.Studio.Animation.Editor
     /// </summary>
     public partial class AnimNodeSequenceClipSelectorControl : UserControl, INotifyPropertyChanged
     {
-
         private AnimNodeSequenceViewModel _AnimNodeSequence;
         public AnimNodeSequenceViewModel AnimNodeSequence
         {
@@ -68,7 +67,7 @@ namespace Skill.Studio.Animation.Editor
                 SkinMesh = _AnimNodeSequence.Tree.SkinMesh;
                 bool found = false;
                 if (SkinMesh != null)
-                {
+                {                    
                     LoadBonesChecked(SkinMesh.Root);
                     for (int i = 0; i < SkinMesh.Animations.Count; i++)
                     {
@@ -159,7 +158,6 @@ namespace Skill.Studio.Animation.Editor
                 }
             }
         }
-
 
     }
 }

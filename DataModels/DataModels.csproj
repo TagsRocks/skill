@@ -70,7 +70,7 @@
     <Compile Include="Color.cs" />
     <Compile Include="DataFile.cs" />
     <Compile Include="IO\SaveClass.cs" />
-    <Compile Include="IO\SaveGame.cs" />
+    <Compile Include="IO\SaveData.cs" />
     <Compile Include="IO\SaveProperty.cs" />
     <Compile Include="IXElement.cs" />
     <Compile Include="Matrix4x4.cs" />

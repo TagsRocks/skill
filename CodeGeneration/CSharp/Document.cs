@@ -67,6 +67,11 @@ namespace Skill.CodeGeneration.CSharp
         {
             AddUsing("Skill.Animation");
         }
+        /// <summary> Add using Skill.IO </summary>
+        public void AddUsingSkillIO()
+        {
+            AddUsing("Skill.IO");
+        }
         /// <summary> Add default usings </summary>
         public void AddDefaultUsings()
         {
@@ -160,5 +165,6 @@ namespace Skill.CodeGeneration.CSharp
                 ns.WritePartial(writer, oldCode);
             }
         }
+        
     }
 }

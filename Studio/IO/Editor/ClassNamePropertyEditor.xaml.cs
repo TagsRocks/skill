@@ -30,12 +30,12 @@ namespace Skill.Studio.IO.Editor
         {
             _Property = propertyItem.Instance as ClassPropertyViewModel;
 
-            _CmbClasses.ItemsSource = _Property.OwnerClass.SaveGame.Classes;
+            _CmbClasses.ItemsSource = _Property.OwnerClass.SaveData.Classes;
 
             bool found = false;
-            for (int i = 0; i < _Property.OwnerClass.SaveGame.Classes.Count; i++)
+            for (int i = 0; i < _Property.OwnerClass.SaveData.Classes.Count; i++)
             {
-                if (_Property.ClassName == _Property.OwnerClass.SaveGame.Classes[i].Name)
+                if (_Property.ClassName == _Property.OwnerClass.SaveData.Classes[i].Name)
                 {
                     _CmbClasses.SelectedIndex = i;
                     found = true;

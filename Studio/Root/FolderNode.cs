@@ -70,6 +70,7 @@ namespace Skill.Studio
             string dir = Project.GetProjectPath(LocalPath);            
             if (!System.IO.Directory.Exists(dir))
                 System.IO.Directory.CreateDirectory(dir);
+            base.SaveData(data);
         }
 
         public override void New()

@@ -14,7 +14,7 @@ namespace Skill.Studio.IO
         public SaveClass Model { get; private set; }
 
         [Browsable(false)]
-        public SaveGameViewModel SaveGame { get; protected set; }
+        public SaveDataViewModel SaveData { get; protected set; }
 
         [Browsable(false)]
         public ObservableCollection<SavePropertyViewModel> Properties { get; private set; }
@@ -30,9 +30,9 @@ namespace Skill.Studio.IO
                 if (value == null) value = "";
                 if (Model.Name != value)
                 {
-                    if (SaveGame.Editor.History != null)
+                    if (SaveData.Editor.History != null)
                     {
-                        SaveGame.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "Name", value, Model.Name));
+                        SaveData.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "Name", value, Model.Name));
                     }
                     Model.Name = value;
                     OnPropertyChanged("Name");
@@ -41,9 +41,30 @@ namespace Skill.Studio.IO
             }
         }
 
-        public SaveClassViewModel(SaveGameViewModel saveGame, SaveClass model)
+        public string Comment
         {
-            this.SaveGame = saveGame;
+            get
+            {
+                return Model.Comment;
+            }
+            set
+            {
+                if (value == null) value = "";
+                if (Model.Comment != value)
+                {
+                    if (SaveData.Editor.History != null)
+                    {
+                        SaveData.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "Comment", value, Model.Comment));
+                    }
+                    Model.Comment = value;
+                    OnPropertyChanged("Comment");
+                }
+            }
+        }
+
+        public SaveClassViewModel(SaveDataViewModel saveGame, SaveClass model)
+        {
+            this.SaveData = saveGame;
             this.Model = model;
             this.Properties = new ObservableCollection<SavePropertyViewModel>();
             if (Model.Properties != null)
@@ -80,7 +101,7 @@ namespace Skill.Studio.IO
         {
             SavePropertyViewModel newP = CreateProperty(type);
             this.Properties.Add(newP);
-            SaveGame.History.Insert(new AddSavePropertyUnDoRedo(newP, this, this.Properties.Count - 1));
+            SaveData.History.Insert(new AddSavePropertyUnDoRedo(newP, this, this.Properties.Count - 1));
         }
 
         public void RemovePropertyAt(int index)
@@ -89,7 +110,7 @@ namespace Skill.Studio.IO
             {
                 SavePropertyViewModel p = this.Properties[index];
                 this.Properties.RemoveAt(index);
-                SaveGame.History.Insert(new AddSavePropertyUnDoRedo(p, this, index, true));
+                SaveData.History.Insert(new AddSavePropertyUnDoRedo(p, this, index, true));
             }
         }
 

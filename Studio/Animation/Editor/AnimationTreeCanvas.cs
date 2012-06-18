@@ -19,6 +19,7 @@ namespace Skill.Studio.Animation.Editor
         public const double MaxScale = 1f;
 
         private Cursor _ZoomCursor = null;
+        private Cursor _HandCursor = null;
 
         private Point? _RubberbandSelectionStartPoint = null;
         private RubberbandAdorner _RubberbandAdorner;
@@ -36,8 +37,7 @@ namespace Skill.Studio.Animation.Editor
                 if (value < MinScale)
                     value = MinScale;
                 else if (value > MaxScale)
-                    value = MaxScale;
-                _PreScale = _Scale;
+                    value = MaxScale;                
                 _Scale = value;
                 OnPropertyChanged("Scale");
                 if (Editor != null)
@@ -90,8 +90,12 @@ namespace Skill.Studio.Animation.Editor
 
             this.MouseWheel += new MouseWheelEventHandler(DiagramCanvas_MouseWheel);
 
-            MemoryStream stream = new MemoryStream(Properties.Resources.zoom_in);
+            MemoryStream stream = new MemoryStream(Properties.Resources.zoom);
             this._ZoomCursor = new Cursor(stream);
+            stream.Close();
+
+            stream = new MemoryStream(Properties.Resources.Hand);
+            this._HandCursor = new Cursor(stream);
             stream.Close();
         }
 
@@ -102,10 +106,9 @@ namespace Skill.Studio.Animation.Editor
 
         }
         private void Zoom()
-        {
-            if (Editor == null || Editor.ScrollViewer == null) return;
-            double scale = Scale;
-            double deltaScale = scale / _PreScale;
+        {            
+            if (Editor == null || Editor.ScrollViewer == null) return;            
+            double deltaScale = Scale / _PreScale;
 
             double halfViewportHeight = this.Editor.ScrollViewer.ViewportHeight / 2;
             double newVerticalOffset = ((this.Editor.ScrollViewer.VerticalOffset + halfViewportHeight) * deltaScale - halfViewportHeight);
@@ -114,16 +117,17 @@ namespace Skill.Studio.Animation.Editor
             double newHorizontalOffset = ((this.Editor.ScrollViewer.HorizontalOffset + halfViewportWidth) * deltaScale - halfViewportWidth);
 
 
-            this._ScaleTransform.ScaleX = scale;
-            this._ScaleTransform.ScaleY = scale;
+            this._ScaleTransform.ScaleX = Scale;
+            this._ScaleTransform.ScaleY = Scale;
 
             this.Editor.ScrollViewer.ScrollToHorizontalOffset(newHorizontalOffset);
             this.Editor.ScrollViewer.ScrollToVerticalOffset(newVerticalOffset);
+            _PreScale = _Scale;
         }
 
 
 
-        Point? _StartDrag = null;
+        Point? _StartDrag = null;        
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
@@ -135,10 +139,9 @@ namespace Skill.Studio.Animation.Editor
                 {
                     _StartDrag = e.GetPosition(this);
                     if (e.MiddleButton == MouseButtonState.Pressed)
-                        Cursor = Cursors.SizeAll;
+                        Cursor = this._HandCursor;
                     else
                         Cursor = this._ZoomCursor;
-
                 }
                 else
                 {
@@ -159,8 +162,8 @@ namespace Skill.Studio.Animation.Editor
 
         private void Move(double deltaX, double deltaY)
         {
-            Editor.ScrollViewer.ScrollToHorizontalOffset(Editor.ScrollViewer.HorizontalOffset - deltaX * 0.6);
-            Editor.ScrollViewer.ScrollToVerticalOffset(Editor.ScrollViewer.VerticalOffset - deltaY * 0.6);
+            Editor.ScrollViewer.ScrollToHorizontalOffset(Editor.ScrollViewer.HorizontalOffset - deltaX * 0.8);
+            Editor.ScrollViewer.ScrollToVerticalOffset(Editor.ScrollViewer.VerticalOffset - deltaY * 0.8);
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -178,7 +181,7 @@ namespace Skill.Studio.Animation.Editor
 
                     if (e.MiddleButton == MouseButtonState.Pressed)
                     {
-                        Cursor = Cursors.SizeAll;
+                        Cursor = this._HandCursor;
                         Move(this.Scale * deltaX, this.Scale * deltaY);
                         InvalidateMeasure();
                         e.Handled = true;
@@ -186,7 +189,7 @@ namespace Skill.Studio.Animation.Editor
                     else
                     {
                         Cursor = this._ZoomCursor;
-                        this.Scale += this.Scale * deltaX * 0.0005;
+                        this.Scale += deltaX * 0.0005;
                         e.Handled = true;
                     }
                 }

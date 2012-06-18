@@ -37,15 +37,14 @@ namespace Skill.CodeGeneration.CSharp
             ProcessNodes();
             AddInherit("Skill.AI.BehaviorTree");
 
-
-            CreateAccessKeys(tree);
+            if (tree.AccessKeys != null)
+            {
+                this.Add(new SharedAccessKeysClass(this._Tree.AccessKeys));
+            }
 
             Method constructor = new Method("", Name, "", "Skill.Controllers.Controller controller");
             constructor.Modifiers = Modifiers.Public;
             constructor.BaseMethod = ":base(controller)";
-
-
-
             Add(constructor);
 
             Method createTree = new Method("Skill.AI.Behavior", "CreateTree", this._CreateTreeMethodBody.ToString());
@@ -53,32 +52,6 @@ namespace Skill.CodeGeneration.CSharp
             createTree.SubMethod = SubMethod.Override;
             createTree.Modifiers = Modifiers.Protected;
             Add(createTree);
-        }
-
-        private void CreateAccessKeys(BehaviorTree tree)
-        {
-            //if (tree.AccessKeys.Count > 0)
-            //{
-            //    Add(new Variable("System.Collections.Generic.Dictionary<string,Skill.AI.AccessKey>", AccessKeysVariableName, "null") { IsStatic = true });
-
-            //    StringBuilder staticConstructorBody = new StringBuilder();
-            //    staticConstructorBody.AppendLine(string.Format("{0} = new System.Collections.Generic.Dictionary<string,Skill.AI.AccessKey>();", Variable.GetName(AccessKeysVariableName)));
-            //    foreach (var ak in tree.AccessKeys)
-            //    {
-            //        switch (ak.Value.Type)
-            //        {
-            //            case AccessKeyType.CounterLimit:
-            //                staticConstructorBody.AppendLine(string.Format("{0}.Add( \"{1}\" , new CounterLimitAccessKey(\"{2}\",{3}) );", Variable.GetName(AccessKeysVariableName), ak.Key, ak.Key, ((CounterLimitAccessKey)ak.Value).MaxAccessCount));
-            //                break;
-            //            case AccessKeyType.TimeLimit:
-            //                staticConstructorBody.AppendLine(string.Format("{0}.Add( \"{1}\" , new TimeLimitAccessKey(\"{2}\",{3}) );", Variable.GetName(AccessKeysVariableName), ak.Key, ak.Key, ((TimeLimitAccessKey)ak.Value).TimeInterval));
-            //                break;
-            //        }
-            //    }
-
-            //    Method staticConstructor = new Method(string.Empty, tree.Name, staticConstructorBody.ToString()) { IsStatic = true, Modifiers = Modifiers.None };
-            //    Add(staticConstructor);
-            //}
         }
 
         #endregion
@@ -155,6 +128,34 @@ namespace Skill.CodeGeneration.CSharp
             return null;
         }
 
+        private string CreateParameters(Skill.DataModels.AI.ParameterCollection parameters)
+        {
+            StringBuilder result = new StringBuilder();
+
+            result.Append("new Skill.AI.BehaviorParameterCollection( new BehaviorParameter[] { ");
+
+            foreach (var p in parameters)
+            {
+                switch (p.Type)
+                {
+                    case ParameterType.Int:
+                        result.Append(string.Format("new BehaviorParameter(\"{0}\",{1}),", p.Name, p.Value));
+                        break;
+                    case ParameterType.Bool:
+                        result.Append(string.Format("new BehaviorParameter(\"{0}\",{1}),", p.Name, p.Value.ToString().ToLower()));
+                        break;
+                    case ParameterType.Float:
+                        result.Append(string.Format("new BehaviorParameter(\"{0}\",{1}f),", p.Name, p.Value));
+                        break;
+                    case ParameterType.String:
+                        result.Append(string.Format("new BehaviorParameter(\"{0}\",\"{1}\"),", p.Name, p.Value));
+                        break;
+                }
+            }
+
+            result.Append("} )");
+            return result.ToString();
+        }
 
         /// <summary>
         /// Process behaviors and create variables, properties and methods
@@ -184,41 +185,51 @@ namespace Skill.CodeGeneration.CSharp
             // left one line empty
             _CreateTreeMethodBody.AppendLine();
 
-            // add child of each behaviors(Decorator and Selectors)
+            // add child of each behaviors(Decorator and Composites)
             foreach (var b in _Behaviors)
             {
-                // decorator has one child
                 if (b.BehaviorType == BehaviorType.Decorator)
                 {
-                    int[] childId = Behavior.ConvertToIndices(b.GetChildrenString());
-                    if (childId != null && childId.Length > 0)
+                    for (int i = 0; i < b.Count; i++)
                     {
-                        Behavior child = Find(childId[0]);
+                        Behavior child = b[i];
                         if (child != null)
-                            _CreateTreeMethodBody.AppendLine(string.Format("{0}.SetChild({1});", Variable.GetName(b.Name), Variable.GetName(child.Name)));
+                        {
+                            ParameterCollection parameters = b.GetParameters(i);
+                            if (parameters != null && parameters.Count > 0)
+                                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.SetChild({1},{2});", Variable.GetName(b.Name), Variable.GetName(child.Name), CreateParameters(parameters)));
+                            else
+                                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.SetChild({1},null);", Variable.GetName(b.Name), Variable.GetName(child.Name)));
+                            break;
+                        }
                     }
                 }
-                // selector has multiple child
+                // Composite has multiple child
                 else if (b.BehaviorType == BehaviorType.Composite)
                 {
-                    int[] childrenIds = Behavior.ConvertToIndices(b.GetChildrenString());
-                    if (childrenIds != null && childrenIds.Length > 0)
+                    for (int i = 0; i < b.Count; i++)
                     {
-                        foreach (var childId in childrenIds)
+                        Behavior child = b[i];
+                        if (child != null)
                         {
-                            Behavior child = Find(childId);
-                            if (child != null)
-                                _CreateTreeMethodBody.AppendLine(string.Format("{0}.Add({1});", Variable.GetName(b.Name), Variable.GetName(child.Name)));
+                            ParameterCollection parameters = b.GetParameters(i);
+                            if (parameters != null && parameters.Count > 0)
+                                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.Add({1},{2});", Variable.GetName(b.Name), Variable.GetName(child.Name), CreateParameters(parameters)));
+                            else
+                                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.Add({1},null);", Variable.GetName(b.Name), Variable.GetName(child.Name)));
+
                         }
                     }
                 }
             }
+
             // then return root of tree
-            var root = Find(_Tree.Root.Id);
-            if (root != null)
+            if (_Tree.Root != null)
             {
-                _CreateTreeMethodBody.AppendLine(string.Format("return {0};", Variable.GetName(root.Name)));
+                _CreateTreeMethodBody.AppendLine(string.Format("return {0};", Variable.GetName(_Tree.Root.Name)));
             }
+            else
+                _CreateTreeMethodBody.AppendLine("return null;");
         }
 
         /// <summary>
@@ -257,6 +268,14 @@ namespace Skill.CodeGeneration.CSharp
                 string eventName = behavior.Name + "_Running";
                 Add(new Method("void", eventName, "", BehaviorEventHandlerParams) { IsPartial = true });
                 _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.Running += new BehaviorEventHandler({1});", Variable.GetName(behavior.Name), eventName));
+            }
+
+            // create running event handler and assign it to running event
+            if (behavior.ResetEvent)
+            {
+                string resetName = behavior.Name + "_Reset";
+                Add(new Method("void", resetName, "", BehaviorEventHandlerParams) { IsPartial = true });
+                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.Reset += new BehaviorEventHandler({1});", Variable.GetName(behavior.Name), resetName));
             }
         }
 
@@ -328,8 +347,18 @@ namespace Skill.CodeGeneration.CSharp
         {
             // create decorator variable
             Add(new Variable("Skill.AI.AccessLimitDecorator", decorator.Name, "null"));
+
             // new decorator variable inside CreateTree method
-            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.AccessLimitDecorator(\"{1}\",{2}[\"{3}\"]);", Variable.GetName(decorator.Name), decorator.Name, Variable.GetName(AccessKeysVariableName), decorator.AccessKey));
+
+            if (string.IsNullOrEmpty(decorator.Address) || decorator.Address.Equals("Internal", StringComparison.OrdinalIgnoreCase))
+            {
+                _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.AccessLimitDecorator(\"{1}\",{2}.{3});", Variable.GetName(decorator.Name), decorator.Name, _Tree.AccessKeys.Name, decorator.AccessKey));
+            }
+            else
+            {
+                string className = System.IO.Path.GetFileNameWithoutExtension(decorator.Address);
+                _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.AccessLimitDecorator(\"{1}\",{2}.{3});", Variable.GetName(decorator.Name), decorator.Name, className, decorator.AccessKey));
+            }
             // set property SuccessOnFailHandler
             if (decorator.NeverFail != true) // default value is true, so it is not necessary to set it
                 _CreateTreeMethodBody.AppendLine(SetProperty(decorator.Name, "NeverFail", decorator.NeverFail.ToString().ToLower()));
@@ -383,20 +412,20 @@ namespace Skill.CodeGeneration.CSharp
             _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.ConcurrentSelector(\"{1}\");", Variable.GetName(concurrentSelector.Name), concurrentSelector.Name));
 
             // set FirstConditions Property
-            if (concurrentSelector.FirstConditions != true) // default is true
-                _CreateTreeMethodBody.AppendLine(string.Format("{0}.FirstConditions = {1};", Variable.GetName(concurrentSelector.Name), concurrentSelector.FirstConditions));
+            if (concurrentSelector.FirstConditions != true) // default is true            
+                _CreateTreeMethodBody.AppendLine(SetProperty(concurrentSelector.Name, "FirstConditions", concurrentSelector.FirstConditions.ToString().ToLower()));
 
             // set BreakOnConditionFailure Property
-            if (concurrentSelector.BreakOnConditionFailure != false) // default is false
-                _CreateTreeMethodBody.AppendLine(string.Format("{0}.BreakOnConditionFailure = {1};", Variable.GetName(concurrentSelector.Name), concurrentSelector.BreakOnConditionFailure));
+            if (concurrentSelector.BreakOnConditionFailure != false) // default is false                
+                _CreateTreeMethodBody.AppendLine(SetProperty(concurrentSelector.Name, "BreakOnConditionFailure", concurrentSelector.BreakOnConditionFailure.ToString().ToLower()));
 
             // set SuccessPolicy Property
-            if (concurrentSelector.SuccessPolicy != SuccessPolicy.SucceedOnAll) // default is SucceedOnAll
-                _CreateTreeMethodBody.AppendLine(string.Format("{0}.SuccessPolicy = Skill.AI.SuccessPolicy.{1};", Variable.GetName(concurrentSelector.Name), concurrentSelector.SuccessPolicy));
+            if (concurrentSelector.SuccessPolicy != SuccessPolicy.SucceedOnAll) // default is SucceedOnAll                
+                _CreateTreeMethodBody.AppendLine(SetProperty(concurrentSelector.Name, "SuccessPolicy", string.Format("Skill.AI.SuccessPolicy.{0}", concurrentSelector.SuccessPolicy)));
 
             // set FailurePolicy Property
-            if (concurrentSelector.FailurePolicy != FailurePolicy.FailOnAll) // default is FailOnAll
-                _CreateTreeMethodBody.AppendLine(string.Format("{0}.FailurePolicy = Skill.AI.FailurePolicy.{1};", Variable.GetName(concurrentSelector.Name), concurrentSelector.FailurePolicy));
+            if (concurrentSelector.FailurePolicy != FailurePolicy.FailOnAll) // default is FailOnAll                
+                _CreateTreeMethodBody.AppendLine(SetProperty(concurrentSelector.Name, "FailurePolicy", string.Format("Skill.AI.FailurePolicy.{0}", concurrentSelector.FailurePolicy)));
         }
 
         private void CreateRandomSelector(RandomSelector randomSelector)
@@ -415,8 +444,8 @@ namespace Skill.CodeGeneration.CSharp
             _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.PrioritySelector(\"{1}\");", Variable.GetName(prioritySelector.Name), prioritySelector.Name));
 
             // set Priority property
-            if (prioritySelector.Priority != PriorityType.HighestPriority) // default is HighestPriority
-                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.Priority = Skill.AI.PriorityType.{1};", Variable.GetName(prioritySelector.Name), prioritySelector.Priority));
+            if (prioritySelector.Priority != PriorityType.HighestPriority) // default is HighestPriority                
+                _CreateTreeMethodBody.AppendLine(SetProperty(prioritySelector.Name, "Priority", string.Format("Skill.AI.PriorityType.{0}", prioritySelector.Priority)));
         }
 
         private void CreateLoopSelector(LoopSelector loopSelector)
@@ -427,8 +456,8 @@ namespace Skill.CodeGeneration.CSharp
             _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.LoopSelector(\"{1}\");", Variable.GetName(loopSelector.Name), loopSelector.Name));
 
             // set LoopCount property
-            if (loopSelector.LoopCount != -1) // default is -1 (infinity)
-                _CreateTreeMethodBody.AppendLine(string.Format("{0}.LoopCount = {1};", Variable.GetName(loopSelector.Name), loopSelector.LoopCount));
+            if (loopSelector.LoopCount != -1) // default is -1 (infinity)                
+                _CreateTreeMethodBody.AppendLine(SetProperty(loopSelector.Name, "LoopCount", loopSelector.LoopCount));
         }
 
         #endregion

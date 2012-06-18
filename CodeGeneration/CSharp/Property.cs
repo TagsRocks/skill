@@ -24,6 +24,8 @@ namespace Skill.CodeGeneration.CSharp
         public string Comment { get; set; }
         /// <summary> whether result of property seperated in multilines or single line</summary>
         public bool Multiline { get; private set; }
+        /// <summary> whether this property is static? </summary>
+        public bool IsStatic { get; set; }
 
         protected string _Get; // allow subclass to change get body code
         protected string _Set;// allow subclass to change set body code
@@ -54,16 +56,10 @@ namespace Skill.CodeGeneration.CSharp
         /// <param name="writer">Stream to write</param>
         public void Write(System.IO.StreamWriter writer)
         {
-            if (!string.IsNullOrEmpty(Comment))// write comment
-            {
-                writer.WriteLine("/// <summary>");
-                writer.Write("/// ");
-                writer.WriteLine(Comment);
-                writer.WriteLine("/// </summary>");
-            }
+            CommentWriter.Write(writer, Comment);
             if (Multiline)
             {
-                writer.WriteLine(string.Format("{0} {1} {2} ", Modifiers.ToString().ToLower(), Type, Name));
+                writer.WriteLine(string.Format("{0} {1} {2} {3} ", Modifiers.ToString().ToLower(), IsStatic ? "static" : string.Empty, Type, Name));
                 writer.WriteLine("{");
 
                 writer.WriteLine("get");
@@ -85,11 +81,15 @@ namespace Skill.CodeGeneration.CSharp
             {
                 if (HasSet)
                 {
-                    writer.WriteLine(string.Format("{0} {1} {2} {{ get {{ {3} }} set {{ {4} }} }}", Modifiers.ToString().ToLower(), Type, Name, _Get, _Set));
+                    writer.WriteLine(string.Format("{0} {1} {2} {3} {{ get {{ {4} }} set {{ {5} }} }}", Modifiers.ToString().ToLower(),
+                        IsStatic ? "static" : string.Empty,
+                        Type, Name, _Get, _Set));
                 }
                 else
                 {
-                    writer.WriteLine(string.Format("{0} {1} {2} {{ get {{ {3} }} }}", Modifiers.ToString().ToLower(), Type, Name, _Get));
+                    writer.WriteLine(string.Format("{0} {1} {2} {3} {{ get {{ {4} }} }}", Modifiers.ToString().ToLower(),
+                        IsStatic ? "static" : string.Empty,
+                        Type, Name, _Get));
                 }
             }
         }

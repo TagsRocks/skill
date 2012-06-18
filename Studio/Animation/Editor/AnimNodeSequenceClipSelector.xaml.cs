@@ -35,5 +35,11 @@ namespace Skill.Studio.Animation.Editor
         {
             Close();
         }
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            _Selector.AnimNodeSequence = null;
+            base.OnClosing(e);
+        }
     }
 }

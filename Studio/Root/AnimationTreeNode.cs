@@ -64,6 +64,7 @@ namespace Skill.Studio
                     datafile.Save(filename);
                 }
             }
+            base.SaveData(data);
         }        
 
         public override object LoadData()

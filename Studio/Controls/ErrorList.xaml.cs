@@ -50,7 +50,7 @@ namespace Skill.Studio.Controls
         private BehaviorTreeCompiler _BehaviorTreeCompiler;
         private AnimationTreeCompiler _AnimationTreeCompiler;
         private SkinMeshCompiler _SkinMeshCompiler;
-        private SaveGameCompiler _SaveGameCompiler;        
+        private SaveDataCompiler _SaveDataCompiler;        
         #endregion
 
         #region Properties
@@ -98,7 +98,7 @@ namespace Skill.Studio.Controls
             this._BehaviorTreeCompiler = new BehaviorTreeCompiler(_AllErrors);
             this._AnimationTreeCompiler = new AnimationTreeCompiler(_AllErrors);
             this._SkinMeshCompiler = new SkinMeshCompiler(_AllErrors);
-            this._SaveGameCompiler = new SaveGameCompiler(_AllErrors);
+            this._SaveDataCompiler = new SaveDataCompiler(_AllErrors);
         }
 
         #endregion
@@ -239,8 +239,8 @@ namespace Skill.Studio.Controls
                 case EntityType.SkinMesh:
                     _SkinMeshCompiler.Compile(vm);
                     break;
-                case EntityType.SaveGame:
-                    _SaveGameCompiler.Compile(vm);
+                case EntityType.SaveData:
+                    _SaveDataCompiler.Compile(vm);
                     break;
                 default:
                     break;

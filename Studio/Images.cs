@@ -16,7 +16,7 @@ namespace Skill.Studio
         public static string SharedAccessKeys { get { return Path.Combine(ImageDirectory, "SharedAccessKeys.png"); } }        
         public static string SkinMesh { get { return Path.Combine(ImageDirectory, "SkinMesh.png"); } }
         public static string AnimationSet { get { return Path.Combine(ImageDirectory, "AnimationSet.png"); } }
-        public static string SaveGame { get { return Path.Combine(ImageDirectory, "SaveGame.png"); } }
+        public static string SaveData { get { return Path.Combine(ImageDirectory, "SaveData.png"); } }
 
         public static string Bone { get { return Path.Combine(ImageDirectory, "Bone.png"); } }
 

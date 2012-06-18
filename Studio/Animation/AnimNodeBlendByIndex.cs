@@ -28,7 +28,7 @@ namespace Skill.Studio.Animation
         }
 
         [Browsable(false)]
-        public override string ImageName { get { return Editor.AnimationImages.Blank; } }
+        public override string ImageName { get { return Editor.AnimationImages.ByIndex; } }
 
         [Browsable(false)]
         public override System.Windows.Media.Brush ContentBrush { get { return Editor.StaticBrushes.AnimBlendContnetBrush; } }

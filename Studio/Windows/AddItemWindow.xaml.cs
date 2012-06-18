@@ -59,7 +59,7 @@ namespace Skill.Studio
             _Items.Add(new NewItemViewModel() { Name = "SharedAccessKeys", EntityType = Studio.EntityType.SharedAccessKeys, ImageName = Images.SharedAccessKeys, Category = ItemCategory.AI });
             _Items.Add(new NewItemViewModel() { Name = "AnimationTree", EntityType = Studio.EntityType.AnimationTree, ImageName = Images.AnimationTree, Category = ItemCategory.Animation });
             _Items.Add(new NewItemViewModel() { Name = "SkinMesh", EntityType = Studio.EntityType.SkinMesh, ImageName = Images.SkinMesh, Category = ItemCategory.Animation });
-            _Items.Add(new NewItemViewModel() { Name = "SaveData", EntityType = Studio.EntityType.SaveGame, ImageName = Images.SaveGame, Category = ItemCategory.IO});
+            _Items.Add(new NewItemViewModel() { Name = "SaveData", EntityType = Studio.EntityType.SaveData, ImageName = Images.SaveData, Category = ItemCategory.IO});
         }
 
         private void BtnAdd_Click(object sender, RoutedEventArgs e)

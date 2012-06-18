@@ -6,19 +6,19 @@ using Skill.DataModels.IO;
 
 namespace Skill.Studio.Compiler
 {
-    public class SaveGameCompiler : DataCompiler
+    public class SaveDataCompiler : DataCompiler
     {
-        private SaveGame _SaveGame;
+        private SaveData _SaveData;
 
-        public SaveGameCompiler(ICollection<CompileError> errors)
-            : base(EntityType.SaveGame, errors)
+        public SaveDataCompiler(ICollection<CompileError> errors)
+            : base(EntityType.SaveData, errors)
         {
         }
 
         protected override void Compile()
         {
-            this._SaveGame = Node.SavedData as SaveGame;
-            if (this._SaveGame == null) return;
+            this._SaveData = Node.SavedData as SaveData;
+            if (this._SaveData == null) return;
             CheckForErrors();
             CheckForWarnings();
         }
@@ -27,16 +27,16 @@ namespace Skill.Studio.Compiler
 
         private void CheckForErrors()
         {
-            CheckForErrors(_SaveGame);
-            List<string> nameList = new List<string>(_SaveGame.Classes.Length);
-            foreach (var cl in _SaveGame.Classes)
+            CheckForErrors(_SaveData);
+            List<string> nameList = new List<string>(_SaveData.Classes.Length);
+            foreach (var cl in _SaveData.Classes)
             {
                 CheckForErrors(cl);
 
 
                 if (!nameList.Contains(cl.Name))
                 {
-                    int count = _SaveGame.Classes.Count(c => c.Name == cl.Name);
+                    int count = _SaveData.Classes.Count(c => c.Name == cl.Name);
                     if (count > 1)
                         AddError(string.Format("There are {0} Class with same name ({1}).", count, cl.Name));
                     nameList.Add(cl.Name);
@@ -68,7 +68,7 @@ namespace Skill.Studio.Compiler
 
                 if (p.Type == PropertyType.Class)
                 {
-                    if (_SaveGame.Classes.Count(c => c.Name == ((ClassProperty)p).ClassName) <= 0)
+                    if (_SaveData.Classes.Count(c => c.Name == ((ClassProperty)p).ClassName) <= 0)
                         AddError(string.Format("The property {0} of class {1} has invalid ClassName.", p.Name, cl.Name));
                 }
             }
@@ -79,8 +79,8 @@ namespace Skill.Studio.Compiler
 
         private void CheckForWarnings()
         {
-            CheckForNoPropertyWarning(_SaveGame);
-            foreach (var cl in _SaveGame.Classes)
+            CheckForNoPropertyWarning(_SaveData);
+            foreach (var cl in _SaveData.Classes)
             {
                 CheckForNoPropertyWarning(cl);
             }

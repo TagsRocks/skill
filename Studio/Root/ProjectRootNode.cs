@@ -44,7 +44,8 @@ namespace Skill.Studio
         }
 
         public override void SaveData(object data)
-        {            
+        {
+            base.SaveData(data);
         }
     }
     #endregion

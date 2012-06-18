@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Skill.IO
 {
-    public delegate T CreateISavable<T>() where T : ISavableClass;
+    public delegate T CreateISavable<T>() where T : ISavable;
 
     public class XmlLoadStream
     {
@@ -334,92 +334,275 @@ namespace Skill.IO
             return vector;
         }
 
-        public List<T> ReadList<T>(XmlElement e, CreateISavable<T> creator) where T : ISavableClass
+        public T ReadSavable<T>(XmlElement e, CreateISavable<T> creator) where T : ISavable
         {
-            List<T> list = new List<T>();
-
-            XmlElement element = e.FirstChild as XmlElement;
-            while (element != null)
-            {
-                T newItem = creator();
-                newItem.Load(element);
-                list.Add(newItem);
-                element = element.NextSibling as XmlElement;
-            }
-            return list;
+            T newItem = creator();
+            newItem.Load(e, this);
+            return newItem;
         }
 
-        public List<T> ReadList<T>(XmlElement e)
+        public T[] ReadSavableArray<T>(XmlElement e, CreateISavable<T> creator) where T : ISavable
         {
-            Type parameterType = typeof(T);
-            System.Collections.IList list = null;
-
-            if (parameterType == typeof(int))
-                list = new List<int>();
-            else if (parameterType == typeof(float))
-                list = new List<float>();
-            else if (parameterType == typeof(bool))
-                list = new List<bool>();
-            else if (parameterType == typeof(string))
-                list = new List<string>();
-            else if (parameterType == typeof(Vector2))
-                list = new List<Vector2>();
-            else if (parameterType == typeof(Vector3))
-                list = new List<Vector3>();
-            else if (parameterType == typeof(Vector4))
-                list = new List<Vector4>();
-            else if (parameterType == typeof(Bounds))
-                list = new List<Bounds>();
-            else if (parameterType == typeof(Color))
-                list = new List<Color>();
-            else if (parameterType == typeof(Matrix4x4))
-                list = new List<Matrix4x4>();
-            else if (parameterType == typeof(Plane))
-                list = new List<Plane>();
-            else if (parameterType == typeof(Quaternion))
-                list = new List<Quaternion>();
-            else if (parameterType == typeof(Ray))
-                list = new List<Ray>();
-            else if (parameterType == typeof(Rect))
-                list = new List<Rect>();
-
+            string lenghtStr = e.GetAttribute("Lenght");
+            int length = 0;
+            if (!int.TryParse(lenghtStr, out length))
+                length = 0;
+            T[] array = new T[length];
 
             XmlElement element = e.FirstChild as XmlElement;
+            int index = 0;
             while (element != null)
             {
-                if (parameterType == typeof(int))
-                    ((List<int>)list).Add(ReadInt(element));
-                else if (parameterType == typeof(float))
-                    ((List<float>)list).Add(ReadFloat(element));
-                else if (parameterType == typeof(bool))
-                    ((List<bool>)list).Add(ReadBoolean(element));
-                else if (parameterType == typeof(string))
-                    ((List<string>)list).Add(ReadString(element));
-                else if (parameterType == typeof(Vector2))
-                    ((List<Vector2>)list).Add(ReadVector2(element));
-                else if (parameterType == typeof(Vector3))
-                    ((List<Vector3>)list).Add(ReadVector3(element));
-                else if (parameterType == typeof(Vector4))
-                    ((List<Vector4>)list).Add(ReadVector4(element));
-                else if (parameterType == typeof(Bounds))
-                    ((List<Bounds>)list).Add(ReadBounds(element));
-                else if (parameterType == typeof(Color))
-                    ((List<Color>)list).Add(ReadColor(element));
-                else if (parameterType == typeof(Matrix4x4))
-                    ((List<Matrix4x4>)list).Add(ReadMatrix4x4(element));
-                else if (parameterType == typeof(Plane))
-                    ((List<Plane>)list).Add(ReadPlane(element));
-                else if (parameterType == typeof(Quaternion))
-                    ((List<Quaternion>)list).Add(ReadQuaternion(element));
-                else if (parameterType == typeof(Ray))
-                    ((List<Ray>)list).Add(ReadRay(element));
-                else if (parameterType == typeof(Rect))
-                    ((List<Rect>)list).Add(ReadRect(element));
+                if (element.Name != XmlSaveStream.NoData)
+                {
+                    T newItem = creator();
+                    newItem.Load(element, this);
+                    array[index] = newItem;
+                }
+                element = element.NextSibling as XmlElement;
+                index++;
+            }
+            return array;
+        }
 
+
+        public int[] ReadIntArray(XmlElement e)
+        {
+            string lenghtStr = e.GetAttribute("Lenght");
+            int length = 0;
+            if (!int.TryParse(lenghtStr, out length))
+                length = 0;
+            int[] array = new int[length];
+
+            XmlElement element = e.FirstChild as XmlElement;
+            int index = 0;
+            while (element != null)
+            {
+                array[index++] = ReadInt(element);
                 element = element.NextSibling as XmlElement;
             }
+            return array;
+        }
+        public float[] ReadFloatArray(XmlElement e)
+        {
+            string lenghtStr = e.GetAttribute("Lenght");
+            int length = 0;
+            if (!int.TryParse(lenghtStr, out length))
+                length = 0;
+            float[] array = new float[length];
 
-            return (List<T>)list;
+            XmlElement element = e.FirstChild as XmlElement;
+            int index = 0;
+            while (element != null)
+            {
+                array[index++] = ReadFloat(element);
+                element = element.NextSibling as XmlElement;
+            }
+            return array;
+        }
+        public bool[] ReadBooleanArray(XmlElement e)
+        {
+            string lenghtStr = e.GetAttribute("Lenght");
+            int length = 0;
+            if (!int.TryParse(lenghtStr, out length))
+                length = 0;
+            bool[] array = new bool[length];
+
+            XmlElement element = e.FirstChild as XmlElement;
+            int index = 0;
+            while (element != null)
+            {
+                array[index++] = ReadBoolean(element);
+                element = element.NextSibling as XmlElement;
+            }
+            return array;
+        }
+        public string[] ReadStringArray(XmlElement e)
+        {
+            string lenghtStr = e.GetAttribute("Lenght");
+            int length = 0;
+            if (!int.TryParse(lenghtStr, out length))
+                length = 0;
+            string[] array = new string[length];
+
+            XmlElement element = e.FirstChild as XmlElement;
+            int index = 0;
+            while (element != null)
+            {
+                array[index++] = ReadString(element);
+                element = element.NextSibling as XmlElement;
+            }
+            return array;
+        }
+        public Bounds[] ReadBoundsArray(XmlElement e)
+        {
+            string lenghtStr = e.GetAttribute("Lenght");
+            int length = 0;
+            if (!int.TryParse(lenghtStr, out length))
+                length = 0;
+            Bounds[] array = new Bounds[length];
+
+            XmlElement element = e.FirstChild as XmlElement;
+            int index = 0;
+            while (element != null)
+            {
+                array[index++] = ReadBounds(element);
+                element = element.NextSibling as XmlElement;
+            }
+            return array;
+        }
+        public Color[] ReadColorArray(XmlElement e)
+        {
+            string lenghtStr = e.GetAttribute("Lenght");
+            int length = 0;
+            if (!int.TryParse(lenghtStr, out length))
+                length = 0;
+            Color[] array = new Color[length];
+
+            XmlElement element = e.FirstChild as XmlElement;
+            int index = 0;
+            while (element != null)
+            {
+                array[index++] = ReadColor(element);
+                element = element.NextSibling as XmlElement;
+            }
+            return array;
+        }
+        public Matrix4x4[] ReadMatrix4x4Array(XmlElement e)
+        {
+            string lenghtStr = e.GetAttribute("Lenght");
+            int length = 0;
+            if (!int.TryParse(lenghtStr, out length))
+                length = 0;
+            Matrix4x4[] array = new Matrix4x4[length];
+
+            XmlElement element = e.FirstChild as XmlElement;
+            int index = 0;
+            while (element != null)
+            {
+                array[index++] = ReadMatrix4x4(element);
+                element = element.NextSibling as XmlElement;
+            }
+            return array;
+        }
+        public Plane[] ReadPlaneArray(XmlElement e)
+        {
+            string lenghtStr = e.GetAttribute("Lenght");
+            int length = 0;
+            if (!int.TryParse(lenghtStr, out length))
+                length = 0;
+            Plane[] array = new Plane[length];
+
+            XmlElement element = e.FirstChild as XmlElement;
+            int index = 0;
+            while (element != null)
+            {
+                array[index++] = ReadPlane(element);
+                element = element.NextSibling as XmlElement;
+            }
+            return array;
+        }
+        public Quaternion[] ReadQuaternionArray(XmlElement e)
+        {
+            string lenghtStr = e.GetAttribute("Lenght");
+            int length = 0;
+            if (!int.TryParse(lenghtStr, out length))
+                length = 0;
+            Quaternion[] array = new Quaternion[length];
+
+            XmlElement element = e.FirstChild as XmlElement;
+            int index = 0;
+            while (element != null)
+            {
+                array[index++] = ReadQuaternion(element);
+                element = element.NextSibling as XmlElement;
+            }
+            return array;
+        }
+        public Ray[] ReadRayArray(XmlElement e)
+        {
+            string lenghtStr = e.GetAttribute("Lenght");
+            int length = 0;
+            if (!int.TryParse(lenghtStr, out length))
+                length = 0;
+            Ray[] array = new Ray[length];
+
+            XmlElement element = e.FirstChild as XmlElement;
+            int index = 0;
+            while (element != null)
+            {
+                array[index++] = ReadRay(element);
+                element = element.NextSibling as XmlElement;
+            }
+            return array;
+        }
+        public Rect[] ReadRectArray(XmlElement e)
+        {
+            string lenghtStr = e.GetAttribute("Lenght");
+            int length = 0;
+            if (!int.TryParse(lenghtStr, out length))
+                length = 0;
+            Rect[] array = new Rect[length];
+
+            XmlElement element = e.FirstChild as XmlElement;
+            int index = 0;
+            while (element != null)
+            {
+                array[index++] = ReadRect(element);
+                element = element.NextSibling as XmlElement;
+            }
+            return array;
+        }
+        public Vector2[] ReadVector2Array(XmlElement e)
+        {
+            string lenghtStr = e.GetAttribute("Lenght");
+            int length = 0;
+            if (!int.TryParse(lenghtStr, out length))
+                length = 0;
+            Vector2[] array = new Vector2[length];
+
+            XmlElement element = e.FirstChild as XmlElement;
+            int index = 0;
+            while (element != null)
+            {
+                array[index++] = ReadVector2(element);
+                element = element.NextSibling as XmlElement;
+            }
+            return array;
+        }
+        public Vector3[] ReadVector3Array(XmlElement e)
+        {
+            string lenghtStr = e.GetAttribute("Lenght");
+            int length = 0;
+            if (!int.TryParse(lenghtStr, out length))
+                length = 0;
+            Vector3[] array = new Vector3[length];
+
+            XmlElement element = e.FirstChild as XmlElement;
+            int index = 0;
+            while (element != null)
+            {
+                array[index++] = ReadVector3(element);
+                element = element.NextSibling as XmlElement;
+            }
+            return array;
+        }
+        public Vector4[] ReadVector4Array(XmlElement e)
+        {
+            string lenghtStr = e.GetAttribute("Lenght");
+            int length = 0;
+            if (!int.TryParse(lenghtStr, out length))
+                length = 0;
+            Vector4[] array = new Vector4[length];
+
+            XmlElement element = e.FirstChild as XmlElement;
+            int index = 0;
+            while (element != null)
+            {
+                array[index++] = ReadVector4(element);
+                element = element.NextSibling as XmlElement;
+            }
+            return array;
         }
     }
 }

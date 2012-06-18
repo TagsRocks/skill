@@ -16,5 +16,7 @@ namespace Skill.Studio.Animation.Editor
         public const string BlendByIdle = "/SkillStudio;component/Images/Animation/Idle.png";
         public const string BlendByPosture = "/SkillStudio;component/Images/Animation/Posture.png";
         public const string Root = "/SkillStudio;component/Images/Animation/Root.png";
+        public const string ByIndex = "/SkillStudio;component/Images/Animation/ByIndex.png";
+        public const string Random = "/SkillStudio;component/Images/Animation/Random.png";
     }
 }

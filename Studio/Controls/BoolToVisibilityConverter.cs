@@ -19,9 +19,9 @@ namespace Skill.Studio.Controls
                     bool.TryParse(parameter.ToString(), out inverse);
 
                 if (inverse)
-                    return ((bool)value) ? Visibility.Hidden : Visibility.Visible;
+                    return ((bool)value) ? Visibility.Collapsed : Visibility.Visible;
                 else
-                    return ((bool)value) ? Visibility.Visible : Visibility.Hidden;
+                    return ((bool)value) ? Visibility.Visible : Visibility.Collapsed;
 
             }
             return Visibility.Hidden;

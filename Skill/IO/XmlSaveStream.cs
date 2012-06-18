@@ -8,6 +8,8 @@ namespace Skill.IO
 {
     public class XmlSaveStream
     {
+        public const string NoData = "___NoData___";
+
         public XmlDocument Document { get; private set; }
 
         public XmlSaveStream()
@@ -15,12 +17,12 @@ namespace Skill.IO
             Document = new XmlDocument();
         }
 
-        public XmlSaveStream(ISavableClass savable)
+        public XmlSaveStream(ISavable savable)
         {
             Document = new XmlDocument();
             XmlDeclaration xmlDeclaration = Document.CreateXmlDeclaration("1.0", "utf-8", null);
-
-            XmlElement rootNode = savable.ToXmlElement(this);
+            XmlElement rootNode = Document.CreateElement("SaveData");
+            savable.Save(rootNode, this);
             Document.InsertBefore(xmlDeclaration, Document.DocumentElement);
             Document.AppendChild(rootNode);
         }
@@ -226,21 +228,240 @@ namespace Skill.IO
             return e;
         }
 
-        public XmlElement Create(string propertyName, IEnumerable<ISavableClass> savables)
+        public XmlElement Create<T>(string propertyName, T savable) where T : ISavable
         {
             XmlElement e = Document.CreateElement(propertyName);
+            savable.Save(e, this);
+            return e;
+        }
 
-            foreach (var item in savables)
+        public XmlElement Create<T>(string propertyName, T[] savables) where T : ISavable
+        {
+            XmlElement e = Document.CreateElement(propertyName);
+            int length = 0;
+            if (savables != null) length = savables.Length;
+            e.SetAttribute("Lenght", length.ToString());
+            for (int i = 0; i < length; i++)
             {
-                if (item != null)
-                {
-                    XmlElement element = item.ToXmlElement(this);
-                    e.AppendChild(element);
-                }
+                XmlElement element = null;
+                if (savables[i] != null)
+                    element = Create<T>(string.Format("Item{0}", i), savables[i]);
+                else
+                    element = Document.CreateElement(NoData);
+                e.AppendChild(element);
             }
             return e;
         }
 
+        public XmlElement Create(string propertyName, int[] primitives)
+        {
+            XmlElement e = Document.CreateElement(propertyName);
+            int length = 0;
+            if (primitives != null) length = primitives.Length;
+            e.SetAttribute("Lenght", length.ToString());
 
+            for (int i = 0; i < length; i++)
+            {
+                XmlElement element = Create("Element" + i, primitives[i]);
+                e.AppendChild(element);
+            }
+
+            return e;
+        }
+        public XmlElement Create(string propertyName, float[] primitives)
+        {
+            XmlElement e = Document.CreateElement(propertyName);
+            int length = 0;
+            if (primitives != null) length = primitives.Length;
+            e.SetAttribute("Lenght", length.ToString());
+
+            for (int i = 0; i < length; i++)
+            {
+                XmlElement element = Create("Element" + i, primitives[i]);
+                e.AppendChild(element);
+            }
+
+            return e;
+        }
+        public XmlElement Create(string propertyName, bool[] primitives)
+        {
+            XmlElement e = Document.CreateElement(propertyName);
+            int length = 0;
+            if (primitives != null) length = primitives.Length;
+            e.SetAttribute("Lenght", length.ToString());
+
+            for (int i = 0; i < length; i++)
+            {
+                XmlElement element = Create("Element" + i, primitives[i]);
+                e.AppendChild(element);
+            }
+
+            return e;
+        }
+        public XmlElement Create(string propertyName, string[] primitives)
+        {
+            XmlElement e = Document.CreateElement(propertyName);
+            int length = 0;
+            if (primitives != null) length = primitives.Length;
+            e.SetAttribute("Lenght", length.ToString());
+
+            for (int i = 0; i < length; i++)
+            {
+                XmlElement element = Create("Element" + i, primitives[i]);
+                e.AppendChild(element);
+            }
+
+            return e;
+        }
+        public XmlElement Create(string propertyName, Bounds[] primitives)
+        {
+            XmlElement e = Document.CreateElement(propertyName);
+            int length = 0;
+            if (primitives != null) length = primitives.Length;
+            e.SetAttribute("Lenght", length.ToString());
+
+            for (int i = 0; i < length; i++)
+            {
+                XmlElement element = Create("Element" + i, primitives[i]);
+                e.AppendChild(element);
+            }
+
+            return e;
+        }
+        public XmlElement Create(string propertyName, Color[] primitives)
+        {
+            XmlElement e = Document.CreateElement(propertyName);
+            int length = 0;
+            if (primitives != null) length = primitives.Length;
+            e.SetAttribute("Lenght", length.ToString());
+
+            for (int i = 0; i < length; i++)
+            {
+                XmlElement element = Create("Element" + i, primitives[i]);
+                e.AppendChild(element);
+            }
+
+            return e;
+        }
+        public XmlElement Create(string propertyName, Matrix4x4[] primitives)
+        {
+            XmlElement e = Document.CreateElement(propertyName);
+            int length = 0;
+            if (primitives != null) length = primitives.Length;
+            e.SetAttribute("Lenght", length.ToString());
+
+            for (int i = 0; i < length; i++)
+            {
+                XmlElement element = Create("Element" + i, primitives[i]);
+                e.AppendChild(element);
+            }
+
+            return e;
+        }
+        public XmlElement Create(string propertyName, Plane[] primitives)
+        {
+            XmlElement e = Document.CreateElement(propertyName);
+            int length = 0;
+            if (primitives != null) length = primitives.Length;
+            e.SetAttribute("Lenght", length.ToString());
+
+            for (int i = 0; i < length; i++)
+            {
+                XmlElement element = Create("Element" + i, primitives[i]);
+                e.AppendChild(element);
+            }
+
+            return e;
+        }
+        public XmlElement Create(string propertyName, Quaternion[] primitives)
+        {
+            XmlElement e = Document.CreateElement(propertyName);
+            int length = 0;
+            if (primitives != null) length = primitives.Length;
+            e.SetAttribute("Lenght", length.ToString());
+
+            for (int i = 0; i < length; i++)
+            {
+                XmlElement element = Create("Element" + i, primitives[i]);
+                e.AppendChild(element);
+            }
+
+            return e;
+        }
+        public XmlElement Create(string propertyName, Ray[] primitives)
+        {
+            XmlElement e = Document.CreateElement(propertyName);
+            int length = 0;
+            if (primitives != null) length = primitives.Length;
+            e.SetAttribute("Lenght", length.ToString());
+
+            for (int i = 0; i < length; i++)
+            {
+                XmlElement element = Create("Element" + i, primitives[i]);
+                e.AppendChild(element);
+            }
+
+            return e;
+        }
+        public XmlElement Create(string propertyName, Rect[] primitives)
+        {
+            XmlElement e = Document.CreateElement(propertyName);
+            int length = 0;
+            if (primitives != null) length = primitives.Length;
+            e.SetAttribute("Lenght", length.ToString());
+
+            for (int i = 0; i < length; i++)
+            {
+                XmlElement element = Create("Element" + i, primitives[i]);
+                e.AppendChild(element);
+            }
+
+            return e;
+        }
+        public XmlElement Create(string propertyName, Vector2[] primitives)
+        {
+            XmlElement e = Document.CreateElement(propertyName);
+            int length = 0;
+            if (primitives != null) length = primitives.Length;
+            e.SetAttribute("Lenght", length.ToString());
+
+            for (int i = 0; i < length; i++)
+            {
+                XmlElement element = Create("Element" + i, primitives[i]);
+                e.AppendChild(element);
+            }
+
+            return e;
+        }
+        public XmlElement Create(string propertyName, Vector3[] primitives)
+        {
+            XmlElement e = Document.CreateElement(propertyName);
+            int length = 0;
+            if (primitives != null) length = primitives.Length;
+            e.SetAttribute("Lenght", length.ToString());
+
+            for (int i = 0; i < length; i++)
+            {
+                XmlElement element = Create("Element" + i, primitives[i]);
+                e.AppendChild(element);
+            }
+
+            return e;
+        }
+        public XmlElement Create(string propertyName, Vector4[] primitives)
+        {
+            XmlElement e = Document.CreateElement(propertyName);
+            int length = 0;
+            if (primitives != null) length = primitives.Length;
+            e.SetAttribute("Lenght", length.ToString());
+
+            for (int i = 0; i < length; i++)
+            {
+                XmlElement element = Create("Element" + i, primitives[i]);
+                e.AppendChild(element);
+            }
+
+            return e;
+        }
     }
 }
