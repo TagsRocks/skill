@@ -18,7 +18,7 @@ using Skill.DataModels.Animation;
 
 namespace Skill.Studio.Animation
 {
-
+    [DisplayName("AnimNodeBlendByIndex")]
     public partial class AnimNodeBlendByIndexViewModel : AnimNodeViewModel
     {
 

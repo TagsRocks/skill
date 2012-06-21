@@ -7,7 +7,9 @@ namespace Skill.AI
 {
     #region LoopSelector
     /// <summary>
-    /// Loops are like sequences but they loop around when reaching their last child during their traversal instead of returning to their parent node like sequence node do.
+    /// Loops are like sequences but they loop around when reaching their last child during their traversal.
+    /// if reach last child and it returns Success. this node returns Running and continue from first child at next update.
+    /// we do this to avoid fall into infinit loop
     /// </summary>
     public class LoopSelector : Composite
     {

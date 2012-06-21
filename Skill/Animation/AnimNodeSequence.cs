@@ -57,6 +57,9 @@ namespace Skill.Animation
         /// </summary>
         public TimeWatch RelevantTime;
 
+        /// <summary>
+        /// Update AnimationName and Format and check whether it needs to update previous animation
+        /// </summary>
         private void UpdateAnimation()
         {
             if (UseTreeProfile)

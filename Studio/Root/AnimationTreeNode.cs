@@ -26,8 +26,8 @@ namespace Skill.Studio
     {
         public AnimationTreeNodeViewModel(EntityNodeViewModel parent, AnimationTreeNode anim)
             : base(parent, anim)
-        {            
-        }        
+        {
+        }
 
         public override string ImageName { get { return Images.AnimationTree; } }
 
@@ -46,7 +46,7 @@ namespace Skill.Studio
             return atree;
         }
 
-        
+
         public override void SaveData(object data)
         {
             if (data != null)
@@ -65,7 +65,7 @@ namespace Skill.Studio
                 }
             }
             base.SaveData(data);
-        }        
+        }
 
         public override object LoadData()
         {
@@ -75,6 +75,7 @@ namespace Skill.Studio
                 AnimationTree animationTree = new AnimationTree();
                 DataFile data = new DataFile(filename);
                 animationTree.Load(data.Root);
+                animationTree.Name = System.IO.Path.GetFileNameWithoutExtension(filename);
                 return animationTree;
             }
             return null;

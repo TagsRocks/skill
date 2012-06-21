@@ -26,6 +26,9 @@ namespace Skill.Studio.Animation.Editor
         #region Commands
         static RoutedCommand _PasteCommand = new RoutedCommand();
         public static RoutedCommand PasteCommand { get { return _PasteCommand; } }
+
+        static RoutedCommand _DuplicateCommand = new RoutedCommand();
+        public static RoutedCommand DuplicateCommand { get { return _DuplicateCommand; } }
         #endregion
 
         #region Variables
@@ -250,7 +253,7 @@ namespace Skill.Studio.Animation.Editor
 
                 XElement ui = e.FindChildByName("UI");
                 if (!samePosition)
-                {                    
+                {
                     ui.SetAttributeValue("X", node.Source.X - xMin);
                     ui.SetAttributeValue("Y", node.Source.Y - yMin);
                 }
@@ -446,9 +449,8 @@ namespace Skill.Studio.Animation.Editor
         }
         #endregion
 
-
         #region PreviewMouseDown
-        
+
         private void AnimNode_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed)
@@ -481,20 +483,6 @@ namespace Skill.Studio.Animation.Editor
             }
         }
 
-        #endregion
-
-        #region KeyDown
-        protected override void OnKeyDown(KeyEventArgs e)
-        {
-            if ((Keyboard.Modifiers & ModifierKeys.Control) != ModifierKeys.None)
-            {
-                if (e.Key == Key.D && e.IsDown && !e.IsRepeat)
-                {
-                    DuplicateSelection();
-                }
-            }
-            base.OnKeyDown(e);
-        }
         #endregion
 
         #region AddConnection
@@ -548,6 +536,17 @@ namespace Skill.Studio.Animation.Editor
 
 
         #region Duplicate
+
+        void DuplicateCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = Selection.SelectedObjects.Count > 0;
+            e.Handled = true;
+        }
+        void DuplicateCommandExecuted(object target, ExecutedRoutedEventArgs e)
+        {
+            DuplicateSelection();
+            e.Handled = true;
+        }
 
         public void DuplicateSelection()
         {

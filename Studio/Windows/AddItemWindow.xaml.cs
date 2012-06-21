@@ -64,6 +64,11 @@ namespace Skill.Studio
 
         private void BtnAdd_Click(object sender, RoutedEventArgs e)
         {
+            Add();
+        }
+
+        private void Add()
+        {
             if (string.IsNullOrEmpty(_TxtNewItemName.Text))
             {
                 System.Windows.MessageBox.Show("Enter valid name", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -115,7 +120,7 @@ namespace Skill.Studio
                     RefreshVisibleList(cat);
                 }
             }
-        }
+        }                
     }
 
     public class NewItemViewModel

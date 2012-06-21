@@ -61,6 +61,7 @@ namespace Skill.Studio
 
                     DataFile datafile = new DataFile();
                     datafile.Document.Add(saveGame.ToXElement());
+
                     datafile.Save(filename);
                 }
             }
@@ -75,6 +76,9 @@ namespace Skill.Studio
                 SaveData saveGame = new SaveData();
                 DataFile data = new DataFile(filename);
                 saveGame.Load(data.Root);
+
+                saveGame.Name = System.IO.Path.GetFileNameWithoutExtension(filename);
+
                 return saveGame;
             }
             return null;

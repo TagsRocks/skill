@@ -6,6 +6,9 @@ using Skill.DataModels.AI;
 
 namespace Skill.CodeGeneration.CSharp
 {
+    /// <summary>
+    /// Generate c# code for SharedAccessKeys
+    /// </summary>
     class SharedAccessKeysClass : Class
     {
         private SharedAccessKeys _Keys;
@@ -13,7 +16,7 @@ namespace Skill.CodeGeneration.CSharp
         /// <summary>
         /// Create a BehaviorTreeClass
         /// </summary>
-        /// <param name="tree">BehaviorTree model</param>
+        /// <param name="keys">SharedAccessKeys model</param>
         public SharedAccessKeysClass(SharedAccessKeys keys)
             : base(keys.Name)
         {
@@ -27,22 +30,22 @@ namespace Skill.CodeGeneration.CSharp
 
         private void CreateAccessKeys()
         {
-            if (_Keys.Keys.Count > 0)
+            if (_Keys.Keys != null)
             {
                 StringBuilder staticConstructorBody = new StringBuilder();
                 foreach (var ak in _Keys.Keys)
                 {
-                    switch (ak.Value.Type)
+                    switch (ak.Type)
                     {
                         case AccessKeyType.CounterLimit:
                             this.Add(new Variable("Skill.AI.CounterLimitAccessKey", ak.Key) { IsStatic = true });
                             this.Add(new Property("Skill.AI.CounterLimitAccessKey", ak.Key, Variable.GetName(ak.Key), false) { IsStatic = true });
-                            staticConstructorBody.AppendLine(string.Format("{0} = new Skill.AI.CounterLimitAccessKey(\"{1}\",{2});", Variable.GetName(ak.Key), ak.Key, ((CounterLimitAccessKey)ak.Value).MaxAccessCount));
+                            staticConstructorBody.AppendLine(string.Format("{0} = new Skill.AI.CounterLimitAccessKey(\"{1}\",{2});", Variable.GetName(ak.Key), ak.Key, ((CounterLimitAccessKey)ak).MaxAccessCount));
                             break;
                         case AccessKeyType.TimeLimit:
                             this.Add(new Variable("Skill.AI.TimeLimitAccessKey", ak.Key) { IsStatic = true });
                             this.Add(new Property("Skill.AI.TimeLimitAccessKey", ak.Key, Variable.GetName(ak.Key), false) { IsStatic = true });
-                            staticConstructorBody.AppendLine(string.Format("{0} = new Skill.AI.TimeLimitAccessKey(\"{1}\",{2});", Variable.GetName(ak.Key), ak.Key, ((TimeLimitAccessKey)ak.Value).TimeInterval));
+                            staticConstructorBody.AppendLine(string.Format("{0} = new Skill.AI.TimeLimitAccessKey(\"{1}\",{2});", Variable.GetName(ak.Key), ak.Key, ((TimeLimitAccessKey)ak).TimeInterval));
                             break;
                     }
                 }

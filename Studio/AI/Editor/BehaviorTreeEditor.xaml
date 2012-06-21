@@ -10,7 +10,7 @@
              xmlns:my="clr-namespace:Skill.Studio.Controls"             
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="700" x:Name="BTEditor" Title="BehaviorTree Editor">
-    
+
     <sk:TabDocument.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Undo"
                   Executed="UndoCmdExecuted"
@@ -112,28 +112,32 @@
             <MenuItem Header="Insert" IsEnabled="{Binding Path=IsNewAv}" >
                 <MenuItem.Resources>
                     <DataTemplate DataType="{x:Type  vm:BehaviorViewModel}">
-                        <StackPanel Orientation="Horizontal">
-                            <Image Width="16" Height="16" Margin="2" Source="{Binding ImageName}"/>
-                            <TextBlock Text="{Binding Name}" MouseLeftButtonUp="Mnu_Insert_Click" Tag="{Binding}" />
-                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" >
+                            <Image Width="16" Height="16" Margin="2" Source="{Binding ImageName}"  />
+                            <TextBlock Text="{Binding Name}" Tag="{Binding}" />
+                        </StackPanel>                        
                     </DataTemplate>
+                    <Style x:Key="MenuClickStyle" >
+                        <Setter Property="MenuItem.Tag" Value="{Binding}" />
+                        <EventSetter Event="MenuItem.Click" Handler="Mnu_Insert_Click" />
+                    </Style>
                 </MenuItem.Resources>
-                <MenuItem Header="Actions" ItemsSource="{Binding BehaviorTree.Actions}" >
+                <MenuItem Header="Actions" ItemsSource="{Binding BehaviorTree.Actions}" ItemContainerStyle="{StaticResource MenuClickStyle}" >
                     <MenuItem.Icon>
                         <my:ButtonImage NormalImage="{StaticResource ImgAction}" DisableImage="{StaticResource ImgAction_D}" />
-                    </MenuItem.Icon>
+                    </MenuItem.Icon>                    
                 </MenuItem>
-                <MenuItem Header="Conditions" ItemsSource="{Binding BehaviorTree.Conditions}" >
+                <MenuItem Header="Conditions" ItemsSource="{Binding BehaviorTree.Conditions}" ItemContainerStyle="{StaticResource MenuClickStyle}" >
                     <MenuItem.Icon>
                         <my:ButtonImage NormalImage="{StaticResource ImgCondition}" DisableImage="{StaticResource ImgCondition_D}" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Decorators" ItemsSource="{Binding BehaviorTree.Decorators}" >
+                <MenuItem Header="Decorators" ItemsSource="{Binding BehaviorTree.Decorators}" ItemContainerStyle="{StaticResource MenuClickStyle}" >
                     <MenuItem.Icon>
                         <my:ButtonImage NormalImage="{StaticResource ImgDecorator}" DisableImage="{StaticResource ImgDecorator_D}" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Composites" ItemsSource="{Binding BehaviorTree.Composites}" >
+                <MenuItem Header="Composites" ItemsSource="{Binding BehaviorTree.Composites}" ItemContainerStyle="{StaticResource MenuClickStyle}" >
                     <MenuItem.Icon>
                         <my:ButtonImage NormalImage="{StaticResource ImgComposite}" DisableImage="{StaticResource ImgComposite_D}" />
                     </MenuItem.Icon>
@@ -206,7 +210,6 @@
                             <ResourceDictionary 
                                 Source="Resources/OrgChartTreeViewItemStyle.xaml" />
                         </ResourceDictionary.MergedDictionaries>
-
                         <HierarchicalDataTemplate DataType="{x:Type vm:BehaviorViewModel}" ItemsSource="{Binding}">
                             <Grid>
                                 <StackPanel Orientation="Horizontal" Height="16" >
@@ -215,10 +218,8 @@
                                 </StackPanel>
                             </Grid>
                         </HierarchicalDataTemplate>
-
                     </ResourceDictionary>
                 </TreeView.Resources>
-
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource OrgChartTreeViewItemStyle}">
                         <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded, Mode=TwoWay}"/>
@@ -226,7 +227,6 @@
                         <EventSetter Event="TreeViewItem.KeyDown" Handler="TreeViewItem_KeyDown"/>
                     </Style>
                 </TreeView.ItemContainerStyle>
-
                 <TreeView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <Grid HorizontalAlignment="Center" IsItemsHost="True" />

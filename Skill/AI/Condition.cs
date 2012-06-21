@@ -6,7 +6,7 @@ using System.Text;
 namespace Skill.AI
 {
     /// <summary>
-    /// Represents the method that will handle execution of condition by user
+    /// Represents the method to handle execution of condition by user
     /// </summary>
     /// <param name="tree">BehaviorTree</param>
     /// <param name="parameters">Parameters for condition</param>

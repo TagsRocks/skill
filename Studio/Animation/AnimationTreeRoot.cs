@@ -9,6 +9,7 @@ using System.ComponentModel;
 
 namespace Skill.Studio.Animation
 {
+    [DisplayName("AnimationTree")]
     public class AnimationTreeRootViewModel : AnimNodeViewModel
     {
 

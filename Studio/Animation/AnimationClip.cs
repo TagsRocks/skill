@@ -9,6 +9,7 @@ namespace Skill.Studio.Animation
 {
 
     #region AnimationClipViewModel
+    [DisplayName("AnimationClip")]
     public class AnimationClipViewModel : INotifyPropertyChanged
     {
 
@@ -61,6 +62,7 @@ namespace Skill.Studio.Animation
             }
         }
 
+        [DefaultValue(WrapMode.Default)]
         [DisplayName("WrapMode")]
         [Description("WrapMode of AnimationClip.")]
         public WrapMode WrapMode

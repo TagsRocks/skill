@@ -9,6 +9,9 @@ using System.Collections.ObjectModel;
 namespace Skill.Studio.AI
 {
     #region ParameterViewModel
+
+    [DisplayName("Parameter")]
+    [Description("Parameter to use by Behaviors")]
     public class ParameterViewModel : INotifyPropertyChanged
     {
         [Browsable(false)]

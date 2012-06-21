@@ -18,7 +18,7 @@ using System.ComponentModel;
 
 namespace Skill.Studio.Animation
 {
-
+    [DisplayName("AnimNodeBlend4Directional")]
     public class AnimNodeBlend4DirectionalViewModel : AnimNodeViewModel
     {
         public AnimNodeBlend4DirectionalViewModel(AnimationTreeViewModel tree, AnimNodeBlend4Directional model)

@@ -72,6 +72,9 @@ namespace Skill.Studio
                 SharedAccessKeys sharedAccessKeys = new SharedAccessKeys();
                 DataFile data = new DataFile(filename);
                 sharedAccessKeys.Load(data.Root);
+
+                sharedAccessKeys.Name = System.IO.Path.GetFileNameWithoutExtension(filename);
+
                 return sharedAccessKeys;
             }
             return null;

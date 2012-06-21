@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 
 namespace Skill.Studio.IO
 {
+    [DisplayName("Class")]
     public class SaveClassViewModel : INotifyPropertyChanged
     {
         [Browsable(false)]
@@ -19,6 +20,7 @@ namespace Skill.Studio.IO
         [Browsable(false)]
         public ObservableCollection<SavePropertyViewModel> Properties { get; private set; }
 
+        [Description("Name of class")]
         public string Name
         {
             get
@@ -36,11 +38,13 @@ namespace Skill.Studio.IO
                     }
                     Model.Name = value;
                     OnPropertyChanged("Name");
-                    OnPropertyChanged("DisplayName");
+                    OnPropertyChanged("CodeString");
                 }
             }
         }
 
+        [DefaultValue("")]
+        [Description("Comment of class")]
         public string Comment
         {
             get
@@ -138,7 +142,7 @@ namespace Skill.Studio.IO
         }
 
         [Browsable(false)]
-        public string DisplayName { get { return string.Format("class {0}", Name); } }
+        public string CodeString { get { return string.Format("class {0}", Name); } }
 
 
         #region INotifyPropertyChanged Members

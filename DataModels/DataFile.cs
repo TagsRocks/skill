@@ -16,7 +16,7 @@ namespace Skill.DataModels
         /// </summary>
         public DataFile()
         {
-            Document = new XDocument();
+            Document = new XDocument( new XDeclaration("1.0","utf-8","yes"));            
         }
 
         /// <summary>

@@ -7,10 +7,17 @@ using Skill.DataModels;
 
 namespace Skill.CodeGeneration.CSharp
 {
+    /// <summary>
+    /// Generate C# code for SaveClass
+    /// </summary>
     class SaveClassClass : Class
     {
         private SaveClass _SaveClass;
 
+        /// <summary>
+        /// Create an instance of SaveClassClass
+        /// </summary>
+        /// <param name="saveClass">SaveClass model</param>
         public SaveClassClass(SaveClass saveClass)
             : base(saveClass.Name)
         {
@@ -23,8 +30,10 @@ namespace Skill.CodeGeneration.CSharp
             constructor.Modifiers = Modifiers.Public;
             Add(constructor);
 
+            // create static creator method
+            CreateCreatorMethod();
 
-            CreateStaticClassCreatorMethod();
+            // create variables and properties
             CreateProperties();
 
 
@@ -34,14 +43,21 @@ namespace Skill.CodeGeneration.CSharp
             CreateBinaryLoadMethod();
         }
 
-        private static string GetStaticClassCreatorMethodName(string clasName) { return string.Format("Create{0}", clasName); }
+        #region Create static CreatorMethod
+        private static string GetStaticCreatorMethodName(string clasName) { return string.Format("Create{0}", clasName); }
 
-        private void CreateStaticClassCreatorMethod()
+        private void CreateCreatorMethod()
         {
-            Method m = new Method(this.Name, GetStaticClassCreatorMethodName(this.Name), string.Format("return new {0}();", this.Name)) { IsStatic = true, Modifiers = Modifiers.Public };
+            Method m = new Method(this.Name, GetStaticCreatorMethodName(this.Name), string.Format("return new {0}();", this.Name)) { IsStatic = true, Modifiers = Modifiers.Public };
             Add(m);
-        }
+        } 
+        #endregion
 
+        /// <summary>
+        /// Covert PrimitiveType to valid c# code
+        /// </summary>
+        /// <param name="pt">PrimitiveType to conver</param>
+        /// <returns>PrimitiveType in c# code</returns>
         private string ConvertToString(PrimitiveType pt)
         {
             switch (pt)
@@ -56,6 +72,9 @@ namespace Skill.CodeGeneration.CSharp
             }
         }
 
+        /// <summary>
+        /// Create variables and properties        
+        /// </summary>
         private void CreateProperties()
         {
             foreach (var p in _SaveClass.Properties)
@@ -95,6 +114,7 @@ namespace Skill.CodeGeneration.CSharp
             }
         }
 
+
         private void CreateXmlSaveMethod()
         {
             StringBuilder toXmlElementBody = new StringBuilder();
@@ -133,7 +153,7 @@ namespace Skill.CodeGeneration.CSharp
         }
 
 
-        private string GetXmlLoadStreamMethodName(PrimitiveType primitive, bool isArray)
+        private string GetLoadMethodName(PrimitiveType primitive, bool isArray)
         {
             string result = "";
             switch (primitive)
@@ -186,7 +206,7 @@ namespace Skill.CodeGeneration.CSharp
             return result;
         }
 
-        private string GetXmlLoadStreamSavableMethodName(string className, bool isArray)
+        private string GetSavableMethodName(string className, bool isArray)
         {
             string result = "ReadSavable";
             if (isArray)
@@ -215,12 +235,12 @@ namespace Skill.CodeGeneration.CSharp
                 {
                     case PropertyType.Primitive:
                         PrimitiveProperty pp = (PrimitiveProperty)p;
-                        loadXmlBody.AppendLine(string.Format("this.{0} = stream.{1}( element );", Variable.GetName(p.Name), GetXmlLoadStreamMethodName(pp.PrimitiveType, pp.IsArray)));
+                        loadXmlBody.AppendLine(string.Format("this.{0} = stream.{1}( element );", Variable.GetName(p.Name), GetLoadMethodName(pp.PrimitiveType, pp.IsArray)));
                         break;
                     case PropertyType.Class:
                         ClassProperty cp = (ClassProperty)p;
                         loadXmlBody.AppendLine(string.Format("this.{0} = stream.{1}( element , {2}.{3} );", Variable.GetName(p.Name),
-                            GetXmlLoadStreamSavableMethodName(cp.ClassName, cp.IsArray), cp.ClassName, GetStaticClassCreatorMethodName(cp.ClassName)));
+                            GetSavableMethodName(cp.ClassName, cp.IsArray), cp.ClassName, GetStaticCreatorMethodName(cp.ClassName)));
                         break;
                 }
 
@@ -246,12 +266,12 @@ namespace Skill.CodeGeneration.CSharp
                 {
                     case PropertyType.Primitive:
                         PrimitiveProperty pp = (PrimitiveProperty)p;
-                        loadMethodBody.AppendLine(string.Format("this.{0} = stream.{1}();", Variable.GetName(p.Name), GetXmlLoadStreamMethodName(pp.PrimitiveType, pp.IsArray)));
+                        loadMethodBody.AppendLine(string.Format("this.{0} = stream.{1}();", Variable.GetName(p.Name), GetLoadMethodName(pp.PrimitiveType, pp.IsArray)));
                         break;
                     case PropertyType.Class:
                         ClassProperty cp = (ClassProperty)p;
                         loadMethodBody.AppendLine(string.Format("this.{0} = stream.{1}( {2}.{3} );", Variable.GetName(p.Name),
-                            GetXmlLoadStreamSavableMethodName(cp.ClassName, cp.IsArray), cp.ClassName, GetStaticClassCreatorMethodName(cp.ClassName)));
+                            GetSavableMethodName(cp.ClassName, cp.IsArray), cp.ClassName, GetStaticCreatorMethodName(cp.ClassName)));
                         break;
                 }                
             }            

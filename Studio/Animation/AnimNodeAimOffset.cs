@@ -20,6 +20,7 @@ using Skill.DataModels;
 
 namespace Skill.Studio.Animation
 {
+    [DisplayName("AnimNodeAimOffset")]
     public class AnimNodeAimOffsetViewModel : AnimNodeViewModel
     {        
         public AnimNodeAimOffsetViewModel(AnimationTreeViewModel tree, AnimNodeAimOffset model)
@@ -47,6 +48,7 @@ namespace Skill.Studio.Animation
             base.CommiteChangesToModel();
         }
 
+        [Description("Edit profiles of AnimNodeAimOffset")]
         [DisplayName("Profiles")]
         [Editor(typeof(Editor.AnimNodeAimOffsetProfilePropertyEditor), typeof(Editor.AnimNodeAimOffsetProfilePropertyEditor))]
         public ObservableCollection<AnimNodeAimOffsetProfileViewModel> Profiles { get; private set; }
@@ -57,7 +59,7 @@ namespace Skill.Studio.Animation
         [Browsable(false)]
         public override System.Windows.Media.Brush ContentBrush { get { return Editor.StaticBrushes.AnimOtherContnetBrush; } }
 
-
+        [DefaultValue(false)]
         [Category("Events")]
         [Description("If true code generator create an method and hook it to ProfileChanged event")]
         public bool ProfileChanged
@@ -75,8 +77,8 @@ namespace Skill.Studio.Animation
                 }
             }
         }
-        
 
+        [DefaultValue(true)]
         [Description("Whether children AnimationSequences use AnimationTree profile method or not")]
         public bool UseTreeProfile
         {
@@ -94,6 +96,7 @@ namespace Skill.Studio.Animation
             }
         }
 
+        [DefaultValue(false)]
         [Description("Whether children aim sequence animations are loop?")]
         public bool IsLoop
         {

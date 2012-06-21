@@ -19,11 +19,14 @@ namespace Skill.Studio.AI
             : base(tree, selector)
         {
         }
+
+        [Browsable(false)]
         public CompositeType CompositeType { get { return ((Composite)Model).CompositeType; } }
     }
     #endregion
 
     #region SequenceSelectorViewModel
+    [DisplayName("SequenceSelector")]
     public class SequenceSelectorViewModel : CompositeViewModel
     {
         public override string ImageName { get { return Images.Sequence; } }
@@ -36,6 +39,7 @@ namespace Skill.Studio.AI
     #endregion
 
     #region RandomSelectorViewModel
+    [DisplayName("RandomSelector")]
     public class RandomSelectorViewModel : CompositeViewModel
     {
         public override string ImageName { get { return Images.Random; } }
@@ -47,8 +51,10 @@ namespace Skill.Studio.AI
     #endregion
 
     #region ConcurrentSelectorViewModel
+    [DisplayName("ConcurrentSelector")]
     public class ConcurrentSelectorViewModel : CompositeViewModel
     {
+        [DefaultValue(true)]
         [Category("Concurrency")]
         [DisplayName("FirstConditions")]
         [Description("First check conditions then rest of children")]
@@ -66,6 +72,7 @@ namespace Skill.Studio.AI
             }
         }
 
+        [DefaultValue(false)]
         [Category("Concurrency")]
         [DisplayName("BreakOnConditionFailure")]
         [Description("If true : when a condition child fails, return failure")]
@@ -83,6 +90,7 @@ namespace Skill.Studio.AI
             }
         }
 
+        [DefaultValue(FailurePolicy.FailOnOne)]
         [Category("Concurrency")]
         [DisplayName("FailurePolicy")]
         [Description("Policy of Failure")]
@@ -101,6 +109,7 @@ namespace Skill.Studio.AI
         }
 
 
+        [DefaultValue(SuccessPolicy.SucceedOnAll)]
         [Category("Concurrency")]
         [DisplayName("SuccessPolicy")]
         [Description("Policy of Success")]
@@ -128,9 +137,10 @@ namespace Skill.Studio.AI
     #endregion
 
     #region PrioritySelectorViewModel
+    [DisplayName("PrioritySelector")]
     public class PrioritySelectorViewModel : CompositeViewModel
     {
-
+        [DefaultValue(PriorityType.HighestPriority)]
         [Category("Priority")]
         [DisplayName("Priority Type")]
         [Description("How to evaluate children")]
@@ -161,9 +171,10 @@ namespace Skill.Studio.AI
     #endregion
 
     #region LoopSelectorViewModel
+    [DisplayName("LoopSelector")]
     public class LoopSelectorViewModel : CompositeViewModel
     {
-
+        [DefaultValue(1)]
         [Category("Loop")]
         [DisplayName("LoopCount")]
         [Description("Number of loops (-1 for infinit)")]

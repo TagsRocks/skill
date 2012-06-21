@@ -413,14 +413,7 @@ namespace Skill.Studio.Controls
                     }
                 }
             }
-        }
-
-        private void Mnu_AddExistingItem_Click(object sender, RoutedEventArgs e)
-        {
-            if (CanAdd)
-            {
-            }
-        }
+        }     
         #endregion
 
         #region Rename

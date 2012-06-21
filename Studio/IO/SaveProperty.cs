@@ -7,6 +7,7 @@ using Skill.DataModels.IO;
 
 namespace Skill.Studio.IO
 {
+    [DisplayName("Property")]
     public abstract class SavePropertyViewModel : INotifyPropertyChanged
     {
         [Browsable(false)]
@@ -23,8 +24,9 @@ namespace Skill.Studio.IO
         public PropertyType Type { get { return Model.Type; } }
 
         [Browsable(false)]
-        public abstract string DisplayName { get; }
+        public abstract string CodeString { get; }
 
+        [Description("Name of property in class definition")]
         public string Name
         {
             get
@@ -42,11 +44,13 @@ namespace Skill.Studio.IO
                     }
                     Model.Name = value;
                     OnPropertyChanged("Name");
-                    OnPropertyChanged("DisplayName");
+                    OnPropertyChanged("CodeString");
                 }
             }
         }
 
+        [DefaultValue(false)]
+        [Description("Whether this property is a single value or array of values")]
         public bool IsArray
         {
             get
@@ -63,11 +67,13 @@ namespace Skill.Studio.IO
                     }
                     Model.IsArray = value;
                     OnPropertyChanged("IsArray");
-                    OnPropertyChanged("DisplayName");
+                    OnPropertyChanged("CodeString");
                 }
             }
         }
 
+        [DefaultValue("")]
+        [Description("User comment for property")]
         public string Comment
         {
             get
@@ -108,7 +114,7 @@ namespace Skill.Studio.IO
     }
 
 
-
+    [DisplayName("Primitive Property")]
     public class PrimitivePropertyViewModel : SavePropertyViewModel
     {
         public PrimitivePropertyViewModel(SaveClassViewModel ownerClass, PrimitiveProperty model)
@@ -117,6 +123,7 @@ namespace Skill.Studio.IO
 
         }
 
+        [Description("Choose type of property")]
         public Skill.DataModels.PrimitiveType PrimitiveType
         {
             get
@@ -133,23 +140,38 @@ namespace Skill.Studio.IO
                     }
                     ((PrimitiveProperty)Model).PrimitiveType = value;
                     OnPropertyChanged("PrimitiveType");
-                    OnPropertyChanged("DisplayName");
+                    OnPropertyChanged("CodeString");
                 }
             }
         }
 
-        public override string DisplayName
+        private static string GetPrimitiveTypeString(Skill.DataModels.PrimitiveType pt )
+        {
+            switch (pt)
+            {
+                case Skill.DataModels.PrimitiveType.Int:
+                case Skill.DataModels.PrimitiveType.Float:
+                case Skill.DataModels.PrimitiveType.Bool:
+                case Skill.DataModels.PrimitiveType.String:
+                    return pt.ToString().ToLower();
+                default:
+                    return pt.ToString();
+            }
+        }
+
+        public override string CodeString
         {
             get
             {
                 if (IsArray)
-                    return string.Format("public {0}[] {1}", PrimitiveType, Name);
+                    return string.Format("public {0}[] {1}", GetPrimitiveTypeString(PrimitiveType), Name);
                 else
-                    return string.Format("public {0} {1}", PrimitiveType, Name);
+                    return string.Format("public {0} {1}", GetPrimitiveTypeString(PrimitiveType), Name);
             }
         }
     }
 
+    [DisplayName("Class Property")]
     public class ClassPropertyViewModel : SavePropertyViewModel
     {
 
@@ -159,7 +181,7 @@ namespace Skill.Studio.IO
 
         }
 
-        [Description("Name of class")]
+        [Description("Name of class that this property refer to.")]
         [Editor(typeof(Editor.ClassNamePropertyEditor), typeof(Editor.ClassNamePropertyEditor))]
         public string ClassName
         {
@@ -178,12 +200,13 @@ namespace Skill.Studio.IO
                     }
                     ((ClassProperty)Model).ClassName = value;
                     OnPropertyChanged("ClassName");
-                    OnPropertyChanged("DisplayName");
+                    OnPropertyChanged("CodeString");
                 }
             }
         }
 
-        public override string DisplayName
+        [Browsable(false)]
+        public override string CodeString
         {
             get
             {

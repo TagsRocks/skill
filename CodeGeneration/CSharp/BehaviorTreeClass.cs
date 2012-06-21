@@ -7,7 +7,7 @@ using Skill.DataModels.AI;
 namespace Skill.CodeGeneration.CSharp
 {
     /// <summary>
-    /// generate code for a behavior tree class
+    /// generate C# code for a BehaviorTree class
     /// </summary>
     class BehaviorTreeClass : Class
     {
@@ -16,7 +16,7 @@ namespace Skill.CodeGeneration.CSharp
         private static string[] ConditionHandlerParams = new string[] { "Skill.AI.BehaviorTree tree", "Skill.AI.BehaviorParameterCollection parameters" };
         private static string[] DecoratorHandlerParams = ConditionHandlerParams;
         private static string[] ActionHandlerParams = ConditionHandlerParams;
-        private static string AccessKeysVariableName = "AccessKeys";
+        
         List<Behavior> _Behaviors;// list of behaviors in hierarchy
         BehaviorTree _Tree;// behavior tree model 
         StringBuilder _CreateTreeMethodBody;

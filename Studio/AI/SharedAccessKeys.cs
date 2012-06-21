@@ -24,6 +24,7 @@ namespace Skill.Studio.AI
         [Browsable(false)]
         public SharedAccessKeysViewModel Container { get; private set; }
 
+        [Description("Unique name of key")]
         public string Key
         {
             get { return Model.Key; }
@@ -66,6 +67,8 @@ namespace Skill.Studio.AI
 
     public class CounterLimitAccessKeyViewModel : AccessKeyViewModel
     {
+        [DefaultValue(1)]
+        [Description("Maximum number of Behaviors allow access this key")]
         public int MaxAccessCount
         {
             get { return ((CounterLimitAccessKey)Model).MaxAccessCount; }
@@ -90,6 +93,7 @@ namespace Skill.Studio.AI
 
     public class TimeLimitAccessKeyViewModel : AccessKeyViewModel
     {
+        [Description("The time interval between each access")]
         public float TimeInterval
         {
             get { return ((TimeLimitAccessKey)Model).TimeInterval; }
@@ -119,7 +123,7 @@ namespace Skill.Studio.AI
 
         public ObservableCollection<AccessKeyViewModel> Keys { get; private set; }
 
-        public SharedAccessKeys Model { get; private set; }        
+        public SharedAccessKeys Model { get; private set; }
 
         #endregion
 
@@ -134,7 +138,7 @@ namespace Skill.Studio.AI
 
         private void LoadKeysFromModel()
         {
-            foreach (var key in Model.Keys.Values)
+            foreach (var key in Model.Keys)
             {
                 AccessKeyViewModel keyVM = CreateAccessKeyViewModel(key);
                 if (keyVM != null)
@@ -195,7 +199,6 @@ namespace Skill.Studio.AI
                         return false;
                 }
                 this.Keys.Add(keyVM);
-                this.Model.Keys.Add(keyVM.Key, keyVM.Model);
                 if (History != null)
                     History.Insert(new AddAccessKeyUnDoRedo(keyVM, this));
                 return true;
@@ -219,7 +222,6 @@ namespace Skill.Studio.AI
                 {
                     if (History != null)
                         History.Insert(new AddAccessKeyUnDoRedo(keyVMToRemove, this, true));
-                    this.Model.Keys.Remove(keyVM.Key);
                     return true;
                 }
             }
@@ -248,7 +250,11 @@ namespace Skill.Studio.AI
 
         public void CommiteChanges()
         {
-
+            Model.Keys = new AccessKey[this.Keys.Count];
+            for (int i = 0; i < this.Keys.Count; i++)
+            {
+                Model.Keys[i] = this.Keys[i].Model;
+            }
         }
 
         public object GetDataModel()
@@ -257,12 +263,12 @@ namespace Skill.Studio.AI
         }
 
         #endregion
-        
+
     }
 
     #region UnDoRedo helper classes
     class AddAccessKeyUnDoRedo : IUnDoRedoCommand
-    {        
+    {
         AccessKeyViewModel _Newkey;
         SharedAccessKeysViewModel _Container;
         bool _Reverse;

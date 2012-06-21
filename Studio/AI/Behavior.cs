@@ -20,12 +20,6 @@ namespace Skill.Studio.AI
     public abstract class BehaviorViewModel : TreeViewItemViewModel
     {
         #region Properties
-
-        private ObservableCollection<ParameterCollectionViewModel> _Parameters;
-
-        #endregion
-
-        #region Properties
         /// <summary>
         /// Actual behavior data
         /// </summary>
@@ -148,7 +142,7 @@ namespace Skill.Studio.AI
             get
             {
                 if (ShowParameters && Parent != null && Model.BehaviorType != BehaviorType.Composite)
-                    return string.Format("{0} {1}", Name, ((BehaviorViewModel)Parent).GetParameters(this).ToString());
+                    return string.Format("{0} {1}", Name, ((BehaviorViewModel)Parent).GetParametersString(this));
                 else
                     return Name;
             }
@@ -204,7 +198,6 @@ namespace Skill.Studio.AI
         private BehaviorViewModel(BehaviorTreeViewModel tree, BehaviorViewModel parent, Behavior behavior)
             : base(parent)
         {
-            this._Parameters = new ObservableCollection<ParameterCollectionViewModel>();
             this.Model = behavior;
             this.Tree = tree;
             this.Tree.RegisterViewModel(this);
@@ -219,8 +212,8 @@ namespace Skill.Studio.AI
             //iterate throw children and create appropriate view model
             for (int i = 0; i < Model.Count; i++)
             {
-                base.Add(CreateViewModel(Model[i]));
-                _Parameters.Add(new ParameterCollectionViewModel(Model.GetParameters(i)));
+                BehaviorViewModel child = CreateViewModel(Model[i]);
+                base.Add(child);
             }
         }
 
@@ -295,9 +288,9 @@ namespace Skill.Studio.AI
         /// </summary>
         /// <param name="index">index of child behavior</param>
         /// <returns>parametres</returns>
-        public ParameterCollectionViewModel GetParameters(int index)
+        public ParameterCollection GetParameters(int index)
         {
-            return _Parameters[index];
+            return Model.GetParameters(index);
         }
 
         /// <summary>
@@ -305,12 +298,25 @@ namespace Skill.Studio.AI
         /// </summary>
         /// <param name="childBehavior">child behavior</param>
         /// <returns>parameters</returns>
-        public ParameterCollectionViewModel GetParameters(BehaviorViewModel childBehavior)
+        public ParameterCollection GetParameters(BehaviorViewModel childBehavior)
         {
             int index = IndexOf(childBehavior);
             if (index >= 0)
-                return _Parameters[index];
+                return GetParameters(index);
             return null;
+        }
+
+        /// <summary>
+        /// Retrieves parameters for specified behavior
+        /// </summary>
+        /// <param name="childBehavior">child behavior</param>
+        /// <returns>parameters</returns>
+        public string GetParametersString(BehaviorViewModel childBehavior)
+        {
+            int index = IndexOf(childBehavior);
+            if (index >= 0)
+                return this.Model.GetParameters(index).ToString();
+            return "";
         }
         #endregion
 
@@ -334,10 +340,20 @@ namespace Skill.Studio.AI
                     Model.Name = value;
                     this.OnPropertyChanged(new PropertyChangedEventArgs("Name"));
                     this.OnPropertyChanged(new PropertyChangedEventArgs("DisplayName"));
+
+                    foreach (var vm in Tree.GetSharedModel(Model))
+                    {
+                        if (vm != this)
+                        {
+                            vm.OnPropertyChanged(new PropertyChangedEventArgs("Name"));
+                            vm.OnPropertyChanged(new PropertyChangedEventArgs("DisplayName"));
+                        }
+                    }
                 }
             }
         }
 
+        [DefaultValue("")]
         [DisplayName("Comment")]
         [Description("User comment for Behavior.")]
         public string Comment
@@ -354,6 +370,7 @@ namespace Skill.Studio.AI
             }
         }
 
+        [DefaultValue(false)]
         [Category("Events")]
         [DisplayName("Success")]
         [Description("If true code generator create an method and hook it to success event")]
@@ -371,7 +388,7 @@ namespace Skill.Studio.AI
             }
         }
 
-
+        [DefaultValue(false)]
         [Category("Events")]
         [DisplayName("Failure")]
         [Description("If true code generator create an method and hook it to failure event")]
@@ -389,6 +406,7 @@ namespace Skill.Studio.AI
             }
         }
 
+        [DefaultValue(false)]
         [Category("Events")]
         [DisplayName("Running")]
         [Description("If true code generator create an method and hook it to running event")]
@@ -406,6 +424,7 @@ namespace Skill.Studio.AI
             }
         }
 
+        [DefaultValue(false)]
         [Category("Events")]
         [DisplayName("Reset")]
         [Description("If true code generator create an method and hook it to reset event")]
@@ -423,6 +442,7 @@ namespace Skill.Studio.AI
             }
         }
 
+        [DefaultValue(1)]
         [DisplayName("Weight")]
         [Description("Weight of node when behavior is child of a random selector")]
         public float Weight
@@ -556,7 +576,7 @@ namespace Skill.Studio.AI
         /// we can use one behavior more than once in behavior tree, so create a duplicate from view model
         /// but not from model and add it to tree
         /// </remarks>
-        public BehaviorViewModel AddBehavior(BehaviorViewModel child, ParameterCollectionViewModel parameters = null, bool duplicate = true, int index = -1)
+        public BehaviorViewModel AddBehavior(BehaviorViewModel child, ParameterCollection parameters, bool duplicate, int index = -1)
         {
             BehaviorViewModel toAdd = null;
             if (duplicate)
@@ -568,16 +588,24 @@ namespace Skill.Studio.AI
                 index = Count;
 
             if (parameters == null)
-                parameters = new ParameterCollectionViewModel(new ParameterCollection());
+                parameters = new ParameterCollection();
 
-            Tree.CreateNewName(toAdd);
-
-            this.Model.Insert(index, toAdd.Model, parameters.Model);
+            this.Model.Insert(index, toAdd.Model, parameters);
             this.Insert(index, toAdd);
-            _Parameters.Insert(index, parameters);
 
             Tree.RegisterViewModel(toAdd);
             toAdd.ShowParameters = this.ShowParameters;
+
+            foreach (var vm in Tree.GetSharedModel(Model))
+            {
+                if (vm != this)
+                {
+                    BehaviorViewModel newVM = CreateViewModel(child.Model);
+                    newVM.ShowParameters = this.ShowParameters;
+                    vm.Insert(index, newVM);
+                }
+            }
+
             Tree.History.Insert(new AddBehaviorUnDoRedo(toAdd, parameters, this, -1));
             return toAdd;
         }
@@ -590,6 +618,7 @@ namespace Skill.Studio.AI
         {
             Behavior behavior = new Skill.DataModels.AI.Action();
             BehaviorViewModel behaviorVM = CreateViewModel(behavior);
+            Tree.CreateNewName(behaviorVM);
             return AddBehavior(behaviorVM, null, false, -1);
 
         }
@@ -602,6 +631,7 @@ namespace Skill.Studio.AI
         {
             Behavior behavior = new Skill.DataModels.AI.Condition();
             BehaviorViewModel behaviorVM = CreateViewModel(behavior);
+            Tree.CreateNewName(behaviorVM);
             return AddBehavior(behaviorVM, null, false, -1);
         }
 
@@ -626,6 +656,7 @@ namespace Skill.Studio.AI
             if (behavior != null)
             {
                 BehaviorViewModel behaviorVM = CreateViewModel(behavior);
+                Tree.CreateNewName(behaviorVM);
                 return AddBehavior(behaviorVM, null, false, -1);
             }
             return null;
@@ -661,6 +692,7 @@ namespace Skill.Studio.AI
             if (composite != null)
             {
                 BehaviorViewModel selectorVM = CreateCompositeViewModel(composite);
+                Tree.CreateNewName(selectorVM);
                 return AddBehavior(selectorVM, null, false, -1);
             }
             return null;
@@ -679,8 +711,15 @@ namespace Skill.Studio.AI
                 {
                     // decrease index one unit
                     this.Move(index, index - 1);
-                    this._Parameters.Move(index, index - 1);
                     this.Model.Move(index, index - 1);
+                    foreach (var vm in Tree.GetSharedModel(Model))
+                    {
+                        if (vm != this)
+                        {
+                            vm.Move(index, index - 1);
+                        }
+                    }
+
                     Tree.History.Insert(new MoveUpBehaviorUnDoRedo(child, this));
                 }
             }
@@ -698,8 +737,14 @@ namespace Skill.Studio.AI
                 if (index >= 0)
                 {
                     this.Move(index, index + 1);
-                    this._Parameters.Move(index, index + 1);
                     this.Model.Move(index, index + 1);
+                    foreach (var vm in Tree.GetSharedModel(Model))
+                    {
+                        if (vm != this)
+                        {
+                            vm.Move(index, index + 1);
+                        }
+                    }
                     Tree.History.Insert(new MoveUpBehaviorUnDoRedo(child, this, true));
                 }
             }
@@ -712,12 +757,27 @@ namespace Skill.Studio.AI
         /// <returns>true if sucess, otherwise false</returns>
         public bool RemoveBehavior(BehaviorViewModel child)
         {
+            ParameterCollection parameters = null;
             int index = this.IndexOf(child);
             if (this.Remove(child))
             {
+                parameters = this.Model.GetParameters(index);
                 this.Model.Remove(child.Model);
-                Tree.History.Insert(new AddBehaviorUnDoRedo(child, _Parameters[index], this, index, true));
-                this._Parameters.RemoveAt(index);
+                foreach (var vm in Tree.GetSharedModel(Model)) // remove child from same behaviors
+                {
+                    if (vm != this)
+                    {
+                        foreach (BehaviorViewModel item in vm)
+                        {
+                            if (item.Model == child.Model)
+                            {
+                                vm.Remove(item);
+                                break;
+                            }
+                        }
+                    }
+                }
+                Tree.History.Insert(new AddBehaviorUnDoRedo(child, parameters, this, index, true));
                 return true;
             }
             return false;
@@ -728,7 +788,7 @@ namespace Skill.Studio.AI
         #region ToString
         public override string ToString()
         {
-            return Name + " " + base.ToString();
+            return Name;
         }
         #endregion
     }
@@ -739,10 +799,10 @@ namespace Skill.Studio.AI
     {
         int _Index;
         BehaviorViewModel _NewNode;
-        ParameterCollectionViewModel _NewParameters;
+        ParameterCollection _NewParameters;
         BehaviorViewModel _Parent;
         bool _Reverse;
-        public AddBehaviorUnDoRedo(BehaviorViewModel newNode, ParameterCollectionViewModel newParameters, BehaviorViewModel parent, int index, bool reverse = false)
+        public AddBehaviorUnDoRedo(BehaviorViewModel newNode, ParameterCollection newParameters, BehaviorViewModel parent, int index, bool reverse = false)
         {
             this._NewParameters = newParameters;
             this._NewNode = newNode;

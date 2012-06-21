@@ -88,6 +88,7 @@ namespace Skill.DataModels.AI
 
             XElement behaviorTree = new XElement("BehaviorTree");
             behaviorTree.SetAttributeValue("Name", Name);
+            behaviorTree.SetAttributeValue("RootId", Root.Id);
             XElement behaviorsElement = new XElement("Behaviors");
 
             // write each behavior without children hierarchy
@@ -106,39 +107,41 @@ namespace Skill.DataModels.AI
 
             // write hierarchy
             XElement hierarchy = new XElement("Hierarchy");
-            hierarchy.Add(CreateHierarchy(Root));
+
+            foreach (var behavior in list)
+            {
+                if (behavior.Count > 0)
+                {
+                    XElement behaviorChildren = new XElement("BehaviorChildren");
+                    behaviorChildren.SetAttributeValue("Id", behavior.Id);
+
+                    for (int i = 0; i < behavior.Count; i++)
+                    {
+                        XElement container = new XElement("BehaviorContainer");
+                        container.SetAttributeValue("ChildId", behavior[i].Id);
+                        container.Add(behavior.GetParameters(i).ToXElement());
+                        behaviorChildren.Add(container);
+                    }
+
+                    hierarchy.Add(behaviorChildren);
+                }
+            }
+
             behaviorTree.Add(hierarchy);
 
 
             return behaviorTree;
         }
 
-        private XElement CreateHierarchy(Behavior behavior)
-        {
-            XElement behaviorElement = new XElement("Behavior");
-            behaviorElement.SetAttributeValue("Id", behavior.Id);
-
-
-            for (int i = 0; i < behavior.Count; i++)
-            {
-                XElement bcElement = new XElement("BehaviorContainer");
-
-                XElement bElement = CreateHierarchy(behavior[i]);
-                bcElement.Add(bElement);
-
-                bcElement.Add(behavior.GetParameters(i).ToXElement());
-
-                behaviorElement.Add(bcElement);
-            }
-
-            return behaviorElement;
-        }
-
-
         #endregion
 
         #region Load
 
+        /// <summary>
+        /// Detect Behavior data from Given XElement  and load it
+        /// </summary>
+        /// <param name="behavior">XElement contains Behavior data</param>
+        /// <returns>Loaded Behavior</returns>
         public static Behavior CreateBehaviorFrom(XElement behavior)
         {
             Behavior result = null;
@@ -205,7 +208,6 @@ namespace Skill.DataModels.AI
             return result;
         }
 
-
         private static Behavior FindById(List<Behavior> list, int id)
         {
             foreach (var item in list)
@@ -240,39 +242,43 @@ namespace Skill.DataModels.AI
                 AccessKeys.Load(accessKeys);
 
             // load hierarchy            
-
             XElement hierarchy = e.FindChildByName("Hierarchy");
             if (hierarchy != null)
             {
-                Root = LoadHierarchy(list, hierarchy.Elements().First()) as PrioritySelector;
-            }
-
-        }
-
-        private Behavior LoadHierarchy(List<Behavior> list, XElement behaviorElement)
-        {
-            int id = behaviorElement.GetAttributeValueAsInt("Id", -1);
-            Behavior behavior = FindById(list, id);
-
-            if (behavior != null)
-            {
-                foreach (var bcElement in behaviorElement.Elements())
+                foreach (var behaviorChildrenElement in hierarchy.Elements())
                 {
-                    XElement bElement = bcElement.FindChildByName("Behavior");
-                    Behavior childBehavior = LoadHierarchy(list, bElement);
-
-                    XElement parametersElement = bcElement.FindChildByName("Parameters");
-                    if (parametersElement != null)
+                    int behaviorId = behaviorChildrenElement.GetAttributeValueAsInt("Id", -2);
+                    Behavior behavior = FindById(list, behaviorId);
+                    if (behavior != null)
                     {
-                        ParameterCollection parameters = new ParameterCollection();
-                        parameters.Load(parametersElement);
-                        behavior.Add(childBehavior, parameters);
+                        foreach (var containerElement in behaviorChildrenElement.Elements())
+                        {
+                            int childId = containerElement.GetAttributeValueAsInt("ChildId", -2);
+                            Behavior child = FindById(list, childId);
+                            if (child != null)
+                            {
+                                XElement parametersElement = containerElement.FindChildByName("Parameters");
+                                if (parametersElement != null)
+                                {
+                                    ParameterCollection parameters = new ParameterCollection();
+                                    parameters.Load(parametersElement);
+                                    behavior.Add(child, parameters);
+                                }
+                                else
+                                    behavior.Add(child);
+                            }
+                        }
                     }
-                    else
-                        behavior.Add(childBehavior);
+
                 }
             }
-            return behavior;
+
+
+            // find root
+            int rootId = e.GetAttributeValueAsInt("RootId", 0);
+            Behavior root = FindById(list, rootId);
+            if (root != null)
+                this.Root = root as PrioritySelector;
         }
         #endregion
 

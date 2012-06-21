@@ -18,7 +18,7 @@ using System.ComponentModel;
 
 namespace Skill.Studio.Animation
 {
-
+    [DisplayName("AnimNodeBlendByIdle")]
     public class AnimNodeBlendByIdleViewModel : AnimNodeViewModel
     {
         public AnimNodeBlendByIdleViewModel(AnimationTreeViewModel tree, AnimNodeBlendByIdle model)

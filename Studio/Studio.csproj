@@ -105,7 +105,6 @@
     <Compile Include="AI\Editor\SharedAccessKeysEditorControl.xaml.cs">
       <DependentUpon>SharedAccessKeysEditorControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AI\Dictionary.cs" />
     <Compile Include="AI\SharedAccessKeys.cs" />
     <Compile Include="AI\Editor\SharedAccessKeysEditor.xaml.cs">
       <DependentUpon>SharedAccessKeysEditor.xaml</DependentUpon>
@@ -190,6 +189,7 @@
     <Compile Include="IO\Editor\ClassNamePropertyEditor.xaml.cs">
       <DependentUpon>ClassNamePropertyEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="IO\Editor\CodeTextBlock.cs" />
     <Compile Include="IO\Editor\SaveDataEditor.xaml.cs">
       <DependentUpon>SaveDataEditor.xaml</DependentUpon>
     </Compile>

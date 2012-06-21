@@ -8,6 +8,7 @@ using System.ComponentModel;
 
 namespace Skill.Studio.Animation
 {
+
     public class SkinMeshViewModel : IDataViewModel
     {
         #region Properties

@@ -37,7 +37,7 @@ namespace Skill.Studio.Animation.Editor
                 if (value < MinScale)
                     value = MinScale;
                 else if (value > MaxScale)
-                    value = MaxScale;                
+                    value = MaxScale;
                 _Scale = value;
                 OnPropertyChanged("Scale");
                 if (Editor != null)
@@ -106,8 +106,8 @@ namespace Skill.Studio.Animation.Editor
 
         }
         private void Zoom()
-        {            
-            if (Editor == null || Editor.ScrollViewer == null) return;            
+        {
+            if (Editor == null || Editor.ScrollViewer == null) return;
             double deltaScale = Scale / _PreScale;
 
             double halfViewportHeight = this.Editor.ScrollViewer.ViewportHeight / 2;
@@ -127,7 +127,7 @@ namespace Skill.Studio.Animation.Editor
 
 
 
-        Point? _StartDrag = null;        
+        Point? _StartDrag = null;
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
@@ -174,26 +174,30 @@ namespace Skill.Studio.Animation.Editor
             {
                 this._RubberbandSelectionStartPoint = null;
                 Point p = e.GetPosition(this);
-                if (_StartDrag != null)
-                {
-                    double deltaX = p.X - _StartDrag.Value.X;
-                    double deltaY = p.Y - _StartDrag.Value.Y;
 
-                    if (e.MiddleButton == MouseButtonState.Pressed)
+                if (!(double.IsInfinity(p.X) || double.IsNaN(p.X) || double.IsInfinity(p.Y) || double.IsNaN(p.Y)))
+                {
+                    if (_StartDrag != null)
                     {
-                        Cursor = this._HandCursor;
-                        Move(this.Scale * deltaX, this.Scale * deltaY);
-                        InvalidateMeasure();
-                        e.Handled = true;
+                        double deltaX = p.X - _StartDrag.Value.X;
+                        double deltaY = p.Y - _StartDrag.Value.Y;
+
+                        if (e.MiddleButton == MouseButtonState.Pressed)
+                        {
+                            Cursor = this._HandCursor;
+                            Move(this.Scale * deltaX, this.Scale * deltaY);
+                            InvalidateMeasure();
+                            e.Handled = true;
+                        }
+                        else
+                        {
+                            Cursor = this._ZoomCursor;
+                            this.Scale += this.Scale * deltaX * 0.0005;
+                            e.Handled = true;
+                        }
                     }
-                    else
-                    {
-                        Cursor = this._ZoomCursor;
-                        this.Scale += deltaX * 0.0005;
-                        e.Handled = true;
-                    }
+                    _StartDrag = p;
                 }
-                _StartDrag = p;
             }
             else
             {

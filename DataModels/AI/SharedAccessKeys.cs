@@ -6,12 +6,14 @@ using System.Xml.Linq;
 
 namespace Skill.DataModels.AI
 {
-
+    /// <summary>
+    /// Defines Acceess keys to share between BehaviorTrees
+    /// </summary>
     public class SharedAccessKeys : IXElement
     {
         #region Properties
         /// <summary> Collection of AccessKeys  </summary>
-        public System.Collections.Generic.Dictionary<string, AccessKey> Keys { get; private set; }
+        public AccessKey[] Keys { get; set; }
         /// <summary> Name of file </summary>
         public string Name { get; set; }
         #endregion
@@ -23,24 +25,6 @@ namespace Skill.DataModels.AI
         public SharedAccessKeys()
         {
             this.Name = "AccessKeys";
-            this.Keys = new Dictionary<string, AccessKey>();
-        }
-        #endregion
-
-
-        #region Add & Remove
-        public bool AddAccessKey(AccessKey key)
-        {
-            if (!string.IsNullOrEmpty(key.Key))
-            {
-                Keys.Add(key.Key, key);
-                return true;
-            }
-            return false;
-        }
-        public bool RemoveAccessKey(AccessKey key)
-        {
-            return Keys.Remove(key.Key);
         }
         #endregion
 
@@ -49,11 +33,15 @@ namespace Skill.DataModels.AI
         {
             XElement accessKeys = new XElement("AccessKeys");
             accessKeys.SetAttributeValue("Name", Name);
-            accessKeys.SetAttributeValue("Count", Keys.Count);
-            foreach (var item in Keys)
+
+            if (this.Keys != null)
             {
-                XElement n = item.Value.ToXElement();
-                accessKeys.Add(n);
+                accessKeys.SetAttributeValue("Count", Keys.Length);
+                foreach (var item in Keys)
+                {
+                    XElement n = item.ToXElement();
+                    accessKeys.Add(n);
+                }
             }
             return accessKeys;
         }
@@ -64,14 +52,15 @@ namespace Skill.DataModels.AI
         {
             int count = e.GetAttributeValueAsInt("Count", 0);
             this.Name = e.GetAttributeValueAsString("Name", this.Name);
-            Keys.Clear();
+            Keys = new AccessKey[count];
+            int index = 0;
             foreach (var item in e.Elements())
             {
                 AccessKey ak = CreateAccessKeyFrom(item);
                 if (ak != null)
                 {
                     ak.Load(item);
-                    AddAccessKey(ak);
+                    Keys[index++] = ak;
                 }
             }
 

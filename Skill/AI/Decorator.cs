@@ -7,7 +7,7 @@ namespace Skill.AI
 {
     #region DecoratorHandler
     /// <summary>
-    /// Represents the method that will handle execution of Decorator by user
+    /// Represents the method to handle execution of Decorator by user
     /// </summary>
     /// <param name="tree">BehaviorTree</param>
     /// <param name="parameters">Parameters for condition</param>

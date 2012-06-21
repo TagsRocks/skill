@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Skill.DataModels
 {
+    /// <summary>
+    /// Defines Primitive Types
+    /// </summary>
     public enum PrimitiveType
     {
         Int,
@@ -24,6 +27,9 @@ namespace Skill.DataModels
         Vector4,
     }
 
+    /// <summary>
+    /// instance of this class contains Primitive data
+    /// </summary>
     public interface IPrimitive
     {
         PrimitiveType PrimitiveType { get; }

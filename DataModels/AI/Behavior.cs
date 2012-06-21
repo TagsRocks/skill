@@ -128,11 +128,12 @@ namespace Skill.DataModels.AI
                 XElement comment = new XElement("Comment");
                 comment.SetValue(Comment);
                 behavior.Add(comment);
-            }
+            }            
+
             behavior.Add(events);
             WriteAttributes(behavior); // allow subclass to add additional data
             return behavior;
-        }
+        }        
         #endregion
 
         #region Load
@@ -347,6 +348,11 @@ namespace Skill.DataModels.AI
             return (_Behaviors as System.Collections.IEnumerable).GetEnumerator();
         }
         #endregion
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
     #endregion
 }

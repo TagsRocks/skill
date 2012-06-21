@@ -54,12 +54,7 @@
                             <MenuItem.Icon>
                                 <my:ButtonImage NormalImage="{StaticResource ImgNewItem}" DisableImage="{StaticResource ImgNewItem_D}" />
                             </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem Header="Existing Item" Click="Mnu_AddExistingItem_Click" >
-                            <MenuItem.Icon>
-                                <my:ButtonImage NormalImage="{StaticResource ImgExistingItem}" DisableImage="{StaticResource ImgExistingItem_D}" />
-                            </MenuItem.Icon>
-                        </MenuItem>
+                        </MenuItem>                        
                         <MenuItem Header="New Folder" Click="Mnu_Add_Click" Tag="{x:Static sk:EntityType.Folder}" >
                             <MenuItem.Icon>
                                 <my:ButtonImage NormalImage="{StaticResource ImgFolderClosed}" DisableImage="{StaticResource ImgFolderClosed_D}" />

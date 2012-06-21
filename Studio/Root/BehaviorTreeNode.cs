@@ -80,6 +80,9 @@ namespace Skill.Studio
                 BehaviorTree behaviorTree = new BehaviorTree();
                 DataFile data = new DataFile(filename);
                 behaviorTree.Load(data.Root);
+
+                behaviorTree.Name = System.IO.Path.GetFileNameWithoutExtension(filename);
+
                 return behaviorTree;
             }
             return null;

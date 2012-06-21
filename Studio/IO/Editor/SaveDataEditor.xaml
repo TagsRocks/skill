@@ -6,6 +6,7 @@
              xmlns:sk="clr-namespace:Skill.Studio"
              xmlns:ctrl="clr-namespace:Skill.Studio.Controls"
              xmlns:io="clr-namespace:Skill.Studio.IO"
+             xmlns:ioedit="clr-namespace:Skill.Studio.IO.Editor"
              mc:Ignorable="d" 
              d:DesignHeight="341" d:DesignWidth="748" >
     <sk:TabDocument.CommandBindings>
@@ -52,7 +53,7 @@
             <ListBox Grid.Row="2" Margin="4" Name="_LbSaveDataMembers" SelectionChanged="LbSaveDataMembers_SelectionChanged" KeyDown="LbSaveDataMembers_KeyDown" Grid.Column="0">
                 <ListBox.Resources>
                     <DataTemplate DataType="{x:Type io:SavePropertyViewModel}">
-                        <TextBlock Text="{Binding DisplayName}" />
+                        <ioedit:CodeTextBlock Code="{Binding CodeString}" FontFamily="Consolas" />
                     </DataTemplate>
                 </ListBox.Resources>
                 <ListBox.ItemContainerStyle>
@@ -92,7 +93,7 @@
                 <ListBox Grid.Row="1" Margin="4" Name="_LbClasses" SelectionChanged="LbClasses_SelectionChanged" KeyDown="LbClasses_KeyDown" Grid.Column="0">
                     <ListBox.Resources>
                         <DataTemplate DataType="{x:Type io:SaveClassViewModel}">
-                            <TextBlock Text="{Binding DisplayName}" />
+                            <ioedit:CodeTextBlock Code="{Binding CodeString}" FontFamily="Consolas" />
                         </DataTemplate>
                     </ListBox.Resources>
                     <ListBox.ItemContainerStyle>
@@ -139,7 +140,7 @@
                 <ListBox Grid.Row="2" Margin="4" Name="_LbClassPoperties" SelectionChanged="LbClassPoperties_SelectionChanged" KeyDown="_LbClassPoperties_KeyDown" Grid.Column="0">
                     <ListBox.Resources>
                         <DataTemplate DataType="{x:Type io:SavePropertyViewModel}">
-                            <TextBlock Text="{Binding DisplayName}" />
+                            <ioedit:CodeTextBlock Code="{Binding CodeString}" FontFamily="Consolas" />
                         </DataTemplate>
                     </ListBox.Resources>
                     <ListBox.ItemContainerStyle>

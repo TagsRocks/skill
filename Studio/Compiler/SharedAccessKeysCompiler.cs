@@ -31,38 +31,41 @@ namespace Skill.Studio.Compiler
 
         private void CheckForErrors()
         {
-            List<string> nameList = new List<string>(_SharedAccessKeys.Keys.Count);
-            foreach (var item in _SharedAccessKeys.Keys)
+            if (_SharedAccessKeys.Keys != null)
             {
-                if (string.IsNullOrEmpty(item.Key))
-                    AddError("There is an AccessKey with empty name.");
-                else
+                List<string> nameList = new List<string>(_SharedAccessKeys.Keys.Length);
+                foreach (var item in _SharedAccessKeys.Keys)
                 {
-                    if (!nameList.Contains(item.Key))
+                    if (string.IsNullOrEmpty(item.Key))
+                        AddError("There is an AccessKey with empty name.");
+                    else
                     {
-                        int count = _SharedAccessKeys.Keys.Count(c => c.Key == item.Key);
-                        if (count > 1)
-                            AddError(string.Format("There are {0} AccessKeys with same name ({1}).", count, item.Key));
-                        nameList.Add(item.Key);
-                    }
+                        if (!nameList.Contains(item.Key))
+                        {
+                            int count = _SharedAccessKeys.Keys.Count(c => c.Key == item.Key);
+                            if (count > 1)
+                                AddError(string.Format("There are {0} AccessKeys with same name ({1}).", count, item.Key));
+                            nameList.Add(item.Key);
+                        }
 
 
-                    switch (item.Value.Type)
-                    {
-                        case AccessKeyType.CounterLimit:
-                            if (((CounterLimitAccessKey)item.Value).MaxAccessCount <= 0)
-                                AddError(string.Format("Invalid 'MaxAccessCount' of AccessKey {0} (must be greater than 0).", item.Value.Key));
-                            break;
-                        case AccessKeyType.TimeLimit:
-                            if (((TimeLimitAccessKey)item.Value).TimeInterval <= 0)
-                                AddError(string.Format("Invalid 'TimeInterval' of AccessKey {0} (must be greater than 0).", item.Value.Key));
-                            break;
-                        default:
-                            break;
+                        switch (item.Type)
+                        {
+                            case AccessKeyType.CounterLimit:
+                                if (((CounterLimitAccessKey)item).MaxAccessCount <= 0)
+                                    AddError(string.Format("Invalid 'MaxAccessCount' of AccessKey {0} (must be greater than 0).", item.Key));
+                                break;
+                            case AccessKeyType.TimeLimit:
+                                if (((TimeLimitAccessKey)item).TimeInterval <= 0)
+                                    AddError(string.Format("Invalid 'TimeInterval' of AccessKey {0} (must be greater than 0).", item.Key));
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
+                nameList.Clear();
             }
-            nameList.Clear();
         }
     }
 }

@@ -7,6 +7,7 @@ using System.ComponentModel;
 
 namespace Skill.Studio.Animation
 {
+    [DisplayName("AnimNodeAdditiveBlending")]
     public class AnimNodeAdditiveBlendingViewModel : AnimNodeViewModel
     {
         public AnimNodeAdditiveBlendingViewModel(AnimationTreeViewModel tree, AnimNodeAdditiveBlending model)

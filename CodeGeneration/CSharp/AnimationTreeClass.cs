@@ -6,6 +6,9 @@ using Skill.DataModels.Animation;
 
 namespace Skill.CodeGeneration.CSharp
 {
+    /// <summary>
+    /// Generate a c# class for AnimationTree
+    /// </summary>
     class AnimationTreeClass : Class
     {
         #region Variables
@@ -17,19 +20,25 @@ namespace Skill.CodeGeneration.CSharp
 
 
         #region Constructor
+
+        /// <summary>
+        /// Create an instance of AnimationTreeClass
+        /// </summary>
+        /// <param name="tree">AnimationTree model</param>
         public AnimationTreeClass(AnimationTree tree)
             : base(tree.Name)
         {
-            this._Tree = tree;
-            //this._Nodes = new List<AnimNode>();
+            this._Tree = tree;            
             this._CreateTreeMethodBody = new StringBuilder();
-            //CreateNodeList();
+
+            // look at each AnimNode in tree and create apropriate variables and properties for them
             ProcessNodes();
+
             AddInherit("Skill.Animation.AnimationTree");
 
 
             StringBuilder constructorBody = new StringBuilder();
-            // create profiles
+            // create profiles in constructor
             if (tree.Profiles != null && tree.Profiles.Length > 0)
             {
                 foreach (var profile in tree.Profiles)
@@ -41,12 +50,12 @@ namespace Skill.CodeGeneration.CSharp
             else
                 constructorBody.AppendLine("this.Profile = string.Empty;");
 
-
+            // create constructor
             Method constructor = new Method("", Name, constructorBody.ToString());
             constructor.Modifiers = Modifiers.Public;
-
             Add(constructor);
 
+            // create protected CreateTree method
             Method createTree = new Method("Skill.Animation.AnimNode", "CreateTree", this._CreateTreeMethodBody.ToString());
             createTree.IsPartial = false;
             createTree.SubMethod = SubMethod.Override;
@@ -56,16 +65,7 @@ namespace Skill.CodeGeneration.CSharp
         #endregion        
 
         #region Process
-
-        private AnimNode Find(int id)
-        {
-            foreach (var item in _Tree)
-            {
-                if (item.Id == id) return item;
-            }
-            return null;
-        }
-
+        
         private void ProcessNodes()
         {
             foreach (var node in _Tree)
@@ -109,9 +109,7 @@ namespace Skill.CodeGeneration.CSharp
             _CreateTreeMethodBody.AppendLine();
 
             foreach (var connection in _Tree.Connections)
-            {
-                //AnimNode child = Find(connection.Source.Id);
-                //AnimNode parent = Find(connection.Sink.Id);
+            {                
                 if (connection.Source != null && connection.Sink != null && connection.Sink.NodeType != AnimNodeType.Root)
                 {
                     _CreateTreeMethodBody.AppendLine(string.Format("this.{0}[{1}] = this.{2};", Variable.GetName(connection.Sink.Name), connection.SinkConnectorIndex, Variable.GetName(connection.Source.Name)));
@@ -122,7 +120,7 @@ namespace Skill.CodeGeneration.CSharp
             _CreateTreeMethodBody.AppendLine();
 
             // return root
-            AnimNode root = null;
+            AnimNode root = null;            
             foreach (var node in _Tree)
             {
                 if (node.NodeType == AnimNodeType.Root)
@@ -144,6 +142,7 @@ namespace Skill.CodeGeneration.CSharp
             else
                 _CreateTreeMethodBody.AppendLine("return null;");
         }
+
 
         private void SetProperty(AnimNode node, string pName, object pValue)
         {
@@ -181,6 +180,7 @@ namespace Skill.CodeGeneration.CSharp
             Add(new Variable(type, name, "null"));
         }
 
+        // create variable and property
         private void CreateProperty(string type, string name, string comment = null)
         {
             CreateVariable(type, name);

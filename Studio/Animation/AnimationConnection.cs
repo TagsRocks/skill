@@ -223,32 +223,7 @@ namespace Skill.Studio.Animation
         }
 
         #endregion
-
-        //protected override void OnMouseDown(System.Windows.Input.MouseButtonEventArgs e)
-        //{
-        //    base.OnMouseDown(e);
-
-        //    // usual selection business            
-        //    if (ParentCanvas != null)
-        //    {
-        //        if ((Keyboard.Modifiers & (ModifierKeys.Shift | ModifierKeys.Control)) != ModifierKeys.None)
-        //            if (this.IsSelected)
-        //            {
-        //                ParentCanvas.Selection.RemoveFromSelection(this);
-        //            }
-        //            else
-        //            {
-        //                ParentCanvas.Selection.Add(this);
-        //            }
-        //        else if (!this.IsSelected)
-        //        {
-        //            ParentCanvas.Selection.Select(this);
-        //        }
-
-        //        Focus();
-        //    }
-        //    e.Handled = false;
-        //}
+        
 
         void OnConnectorPropertyChanged(object sender, PropertyChangedEventArgs e)
         {

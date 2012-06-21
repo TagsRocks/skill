@@ -132,7 +132,8 @@ namespace Skill.Studio.Animation
 
         #region Browsable Properties
 
-        [Description("Whether code generator create a public property for this node.")]
+        [DefaultValue(true)]
+        [Description("Code generator generates a public property for this node.")]
         public virtual bool IsPublic
         {
             get { return Model.IsPublic; }
@@ -151,7 +152,7 @@ namespace Skill.Studio.Animation
             }
         }
 
-        [Description("Name animation node and variable in code generation")]
+        [Description("Name of animation node and variable in code generation")]
         public virtual string Name
         {
             get { return Model.Name; }
@@ -169,6 +170,7 @@ namespace Skill.Studio.Animation
             }
         }
 
+        [DefaultValue(0.3f)]
         [Description("Blend Time of animation node.")]
         public virtual float BlendTime
         {
@@ -190,6 +192,7 @@ namespace Skill.Studio.Animation
             }
         }
 
+        [DefaultValue(false)]
         [Description("If true code generator create an method and hook it to BecameRelevant event")]
         [Category("Events")]
         public virtual bool BecameRelevant
@@ -209,6 +212,7 @@ namespace Skill.Studio.Animation
             }
         }
 
+        [DefaultValue(false)]
         [Description("If true code generator create an method and hook it to CeaseRelevant event")]
         [Category("Events")]
         public virtual bool CeaseRelevant
@@ -228,6 +232,7 @@ namespace Skill.Studio.Animation
             }
         }
 
+        [DefaultValue("")]
         [Description("User comment for this Animation Node")]
         public virtual string Comment
         {

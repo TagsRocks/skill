@@ -9,8 +9,8 @@ using Skill.DataModels.Animation;
 
 namespace Skill.Studio.Animation
 {
-    
 
+    [DisplayName("AnimationTreeProfile.")]
     public class AnimationTreeProfileViewModel : INotifyPropertyChanged
     {        
         [Browsable(false)]
@@ -26,6 +26,7 @@ namespace Skill.Studio.Animation
             this.Model = model;            
         }        
 
+        [Description("Unique name of profile.")]
         public string Name
         {
             get { return Model.Name; }
@@ -39,6 +40,8 @@ namespace Skill.Studio.Animation
                 }
             }
         }
+
+        [Description("Format of profile. contains at least one {0}.")]
         public string Format
         {
             get { return Model.Format; }

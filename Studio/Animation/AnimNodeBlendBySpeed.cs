@@ -20,7 +20,7 @@ using Skill.DataModels.Animation;
 
 namespace Skill.Studio.Animation
 {
-
+    [DisplayName("AnimNodeBlendBySpeed")]
     public class AnimNodeBlendBySpeedViewModel : AnimNodeViewModel
     {
         public AnimNodeBlendBySpeedViewModel(AnimationTreeViewModel tree, AnimNodeBlendBySpeed model)
@@ -34,6 +34,8 @@ namespace Skill.Studio.Animation
         [Browsable(false)]
         public override System.Windows.Media.Brush ContentBrush { get { return Editor.StaticBrushes.AnimBlendContnetBrush; } }
 
+        [DefaultValue(0.3f)]
+        [Category("BlendBySpeed")]
         [Description("How fast to blend when going up an index.")]
         public float BlendUpTime
         {
@@ -52,6 +54,8 @@ namespace Skill.Studio.Animation
 
         }
 
+        [DefaultValue(0.3f)]
+        [Category("BlendBySpeed")]
         [Description("How fast to blend when going down an index.")]
         public float BlendDownTime
         {
@@ -69,6 +73,8 @@ namespace Skill.Studio.Animation
             }
         }
 
+        [DefaultValue(0)]
+        [Category("BlendBySpeed")]
         [Description("Time delay before blending up an index.")]
         public float BlendUpDelay
         {
@@ -87,6 +93,8 @@ namespace Skill.Studio.Animation
             }
         }
 
+        [DefaultValue(0)]
+        [Category("BlendBySpeed")]
         [Description("Time delay before blending down an index.")]
         public float BlendDownDelay
         {
@@ -105,6 +113,8 @@ namespace Skill.Studio.Animation
             }
         }
 
+        [DefaultValue(0)]
+        [Category("BlendBySpeed")]
         [Description("Where abouts in the constraint bounds should the blend start blending down.")]
         public float BlendDownPercent
         {
@@ -123,7 +133,8 @@ namespace Skill.Studio.Animation
             }
         }
 
-        [Description("minimum and maximum value of constraints for each child(index 0 , 1 are constraints for child index 0 and so on ...)")]
+        [Category("BlendBySpeed")]
+        [Description("Edit Connectors and Constraints : minimum and maximum value of constraints for each child(index 0 , 1 are constraints for child index 0 and so on ...)")]
         [Editor(typeof(Editor.AnimNodeBlendBySpeedInputsPropertyEditor), typeof(Editor.AnimNodeBlendBySpeedInputsPropertyEditor))]
         public string Connectors
         {

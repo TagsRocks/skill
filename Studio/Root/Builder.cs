@@ -27,7 +27,7 @@ namespace Skill.Studio
         public static void Build(Skill.DataModels.AI.SharedAccessKeys keys, string localDir, string name)
         {
             _CodeGenerator.Generate(keys);
-            CreateFile(_CodeGenerator, localDir, name,false);
+            CreateFile(_CodeGenerator, localDir, name);
 
         }
 
@@ -40,10 +40,10 @@ namespace Skill.Studio
         public static void Build(Skill.DataModels.IO.SaveData saveGame, string localDir, string name)
         {
             _CodeGenerator.Generate(saveGame);
-            CreateFile(_CodeGenerator, localDir, name,false);
+            CreateFile(_CodeGenerator, localDir, name);
         }
 
-        private static void CreateFile(ICodeGenerator generator, string localDir, string name, bool hasUserCode = true)
+        private static void CreateFile(ICodeGenerator generator, string localDir, string name)
         {
             string destinationDir = MainWindow.Instance.Project.GetOutputPath(localDir);
             string destinationDesignerDir = MainWindow.Instance.Project.GetDesignerOutputPath(localDir);
@@ -61,7 +61,7 @@ namespace Skill.Studio
             writer.Close();
             file.Close();
 
-            if (hasUserCode)
+            if (_CodeGenerator.HasPartial)
             {
                 string oldCode = null;
                 // writer user file

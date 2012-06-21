@@ -19,6 +19,7 @@ using Skill.DataModels.Animation;
 namespace Skill.Studio.Animation
 {
 
+    [DisplayName("AnimNodeSequence")]
     public class AnimNodeSequenceViewModel : AnimNodeViewModel
     {
         public AnimNodeSequenceViewModel(AnimationTreeViewModel tree, AnimNodeSequence model)
@@ -52,7 +53,13 @@ namespace Skill.Studio.Animation
         [Browsable(false)]
         public override System.Windows.Media.Brush ContentBrush { get { return Editor.StaticBrushes.AnimSequenceContnetBrush; } }
 
-        [Description("Name of AnimationClip")]
+
+        [DefaultValue(false)]
+        [Description("Code generator generates a public property for this node.")]
+        public override bool IsPublic { get { return base.IsPublic; } set { base.IsPublic = value; } }
+
+        [Category("Sequence")]
+        [Description("Edit Name of AnimationClip and MixingTransforms")]
         [DisplayName("AnimationClip")]
         [Editor(typeof(Editor.AnimNodeSequenceClipPropertyEditor), typeof(Editor.AnimNodeSequenceClipPropertyEditor))]
         public string AnimationName
@@ -73,6 +80,8 @@ namespace Skill.Studio.Animation
             }
         }
 
+        [DefaultValue(1)]
+        [Category("Sequence")]
         [Description("Speed at which the animation will be played back.Default is 1.0")]
         public float Speed
         {
@@ -90,6 +99,8 @@ namespace Skill.Studio.Animation
             }
         }
 
+        [DefaultValue(true)]
+        [Category("Sequence")]
         [Description("if false, do not take effect by AnimationTree profiles and always use AnimationName")]
         public bool UseTreeProfile
         {
@@ -107,7 +118,9 @@ namespace Skill.Studio.Animation
             }
         }
 
-        [Description("Synchronize animations with other animations in same Layer?")]
+        [DefaultValue(false)]
+        [Category("Sequence")]
+        [Description("Synchronize animations with other animations in same Layer.(set true for sequences connected to AnimNode4Direction)")]
         public bool Synchronize
         {
             get { return ((AnimNodeSequence)Model).Synchronize; }
@@ -137,6 +150,8 @@ namespace Skill.Studio.Animation
             }
         }
 
+        [DefaultValue(WrapMode.Default)]
+        [Category("Sequence")]
         [Description("WrapMode")]
         public WrapMode WrapMode
         {

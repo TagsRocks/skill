@@ -7,6 +7,7 @@ using Skill.DataModels.Animation;
 
 namespace Skill.Studio.Animation
 {
+    [DisplayName("AnimNodeAimOffsetProfile")]
     public class AnimNodeAimOffsetProfileViewModel : INotifyPropertyChanged
     {
         public AnimNodeAimOffsetProfile Model { get; private set; }
@@ -40,6 +41,7 @@ namespace Skill.Studio.Animation
             this.RightDown.CommiteChangesToModel();
         }
 
+        [Description("Unique name of profile ")]
         public string Name
         {
             get { return Model.Name; }

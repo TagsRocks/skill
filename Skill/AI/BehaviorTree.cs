@@ -7,7 +7,7 @@ namespace Skill.AI
 {
     #region BehaviorTree
     /// <summary>
-    /// Base class of BehaviorTree that manage execution of nodes
+    /// Base class of BehaviorTree that manage execution of Behaviors
     /// </summary>
     public abstract class BehaviorTree
     {
@@ -19,7 +19,7 @@ namespace Skill.AI
         public Behavior Root { get; private set; }
 
         /// <summary> 
-        /// To enable update time interval set this to more than zero (default is 0)
+        /// To enable update time interval set this to more than zero (default is 0.2f)
         /// still call updates each frame, tree reject it automatically
         /// </summary>
         public float UpdateTimeInterval { get; set; }
@@ -58,7 +58,7 @@ namespace Skill.AI
             this.Controller = controller;
             this.State = new BehaviorState(this);
             this._LastUpdateTime = 0;
-            this.UpdateTimeInterval = 0;
+            this.UpdateTimeInterval = 0.2f;
             Root = CreateTree();
             if (Root == null)
                 throw new InvalidProgramException("You must provide valid root in subclass");

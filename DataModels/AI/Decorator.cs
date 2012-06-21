@@ -8,6 +8,9 @@ namespace Skill.DataModels.AI
 {
     #region Decorator
 
+    /// <summary>
+    /// Defines types of Decorator
+    /// </summary>
     public enum DecoratorType
     {
         Default,
@@ -19,6 +22,9 @@ namespace Skill.DataModels.AI
     /// </summary>
     public class Decorator : Behavior
     {
+        /// <summary>
+        /// Type of decorator
+        /// </summary>
         public DecoratorType Type { get; private set; }
 
         /// <summary> Type of behavior node</summary>
@@ -27,16 +33,13 @@ namespace Skill.DataModels.AI
         /// <summary> Retrieves child node </summary>
         public Behavior Child { get { if (Count > 0) return this[0]; return null; } }
 
-        /// <summary> when decorator loaded from file read this value from file. this value is not valid until decorator loaded from file </summary>
-        //public int LoadedChildId { get; private set; }
-
         /// <summary> if true : when handler function fail return success </summary>
         public bool NeverFail { get; set; }
 
         protected Decorator(string name, DecoratorType type)
             : base(name)
         {
-            //this.LoadedChildId = -1;
+            this.NeverFail = true;
             this.Type = type;
         }
 
@@ -51,10 +54,6 @@ namespace Skill.DataModels.AI
             NeverFail = e.GetAttributeValueAsBoolean("NeverFail", true);
             string child = e.Attribute("Child").Value;
             var childArray = Behavior.ConvertToIndices(child);
-            //if (childArray != null && childArray.Length > 0)
-            //    this.LoadedChildId = childArray[0];
-            //else
-            //    this.LoadedChildId = -1;
             base.ReadAttributes(e);
         }
 
@@ -71,16 +70,24 @@ namespace Skill.DataModels.AI
 
     #region AccessKey
 
+    /// <summary>
+    /// Defines types of AccessKey
+    /// </summary>
     public enum AccessKeyType
     {
-        CounterLimit,
-        TimeLimit
+        CounterLimit,// limit count of behavior can access the key
+        TimeLimit // the key will lock untile TimeInterval after each access
     }
 
+    /// <summary>
+    /// Defines base class for AccessKeys
+    /// </summary>
     public abstract class AccessKey : IXElement
     {
+        /// <summary> Type of AccessKey </summary>
         public AccessKeyType Type { get; private set; }
 
+        /// <summary> Unique name for key </summary>
         public string Key { get; set; }
 
         public AccessKey(AccessKeyType type)
@@ -118,8 +125,14 @@ namespace Skill.DataModels.AI
         }
     }
 
+    /// <summary>
+    // limit count of behavior can access the key
+    /// </summary>
     public class CounterLimitAccessKey : AccessKey
     {
+        /// <summary>
+        /// Maximum number of behavior that can access this key
+        /// </summary>
         public int MaxAccessCount { get; set; }
 
         public CounterLimitAccessKey()
@@ -141,9 +154,14 @@ namespace Skill.DataModels.AI
         }
     }
 
-
+    /// <summary>
+    /// The key will lock untile TimeInterval after each access
+    /// </summary>
     public class TimeLimitAccessKey : AccessKey
     {
+        /// <summary>
+        /// The Time Interval between each access
+        /// </summary>
         public float TimeInterval { get; set; }
 
         public TimeLimitAccessKey()
@@ -168,9 +186,18 @@ namespace Skill.DataModels.AI
     #endregion
 
     #region AccessLimitDecorator
+    /// <summary>
+    /// This decorator needs access to an accesskey to execute
+    /// </summary>
     public class AccessLimitDecorator : Decorator
     {
+        /// <summary>
+        /// AccessKey
+        /// </summary>
         public string AccessKey { get; set; }
+        /// <summary>
+        /// Address of SharedAccesskeys class
+        /// </summary>
         public string Address { get; set; }
 
         public AccessLimitDecorator()

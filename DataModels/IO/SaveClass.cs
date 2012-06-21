@@ -6,23 +6,40 @@ using System.Xml.Linq;
 
 namespace Skill.DataModels.IO
 {
+    /// <summary>
+    /// Defines a class with properties
+    /// </summary>
     public class SaveClass : IXElement
     {
+        /// <summary> Name of Class </summary>
         public string Name { get; set; }
+        /// <summary> Comment of Class </summary>
         public string Comment { get; set; }
+        /// <summary> properties of Class </summary>
         public SaveProperty[] Properties { get; set; }
 
+        /// <summary>
+        /// Create an instance of SaveClass
+        /// </summary>
         public SaveClass()
             :this("NewClass")
         {
 
         }
 
+        /// <summary>
+        /// Create an instance of SaveClass
+        /// </summary>
+        /// <param name="name">Name of class</param>
         public SaveClass(string name)
         {
             this.Name = name;
         }
 
+        /// <summary>
+        /// Convert data in XElement to save in file
+        /// </summary>
+        /// <returns>XElement</returns>
         public XElement ToXElement()
         {
             XElement saveclass = new XElement("SaveClass");
@@ -52,6 +69,10 @@ namespace Skill.DataModels.IO
         /// <param name="e"></param>
         protected virtual void WriteAttributes(XElement e) { }
 
+        /// <summary>
+        /// Load data for Xelement that loaded from file
+        /// </summary>
+        /// <param name="e">XElement containing data</param>
         public void Load(XElement e)
         {
             this.Name = e.GetAttributeValueAsString("Name", this.Name);
@@ -87,6 +108,11 @@ namespace Skill.DataModels.IO
         /// <param name="e">contains behavior data</param>
         protected virtual void ReadAttributes(XElement e) { }
 
+        /// <summary>
+        /// Create a SaveProperty from given XElement
+        /// </summary>
+        /// <param name="e">XElement</param>
+        /// <returns>SaveProperty</returns>
         private static SaveProperty CreateProperty(XElement e)
         {
             SaveProperty result = null;
@@ -100,6 +126,11 @@ namespace Skill.DataModels.IO
             return result;
         }
 
+        /// <summary>
+        /// Create a SaveProperty by type
+        /// </summary>
+        /// <param name="type">Type of property</param>
+        /// <returns>SaveProperty</returns>
         public static SaveProperty CreateProperty(PropertyType type)
         {
             switch (type)

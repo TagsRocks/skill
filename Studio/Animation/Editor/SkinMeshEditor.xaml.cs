@@ -83,7 +83,7 @@ namespace Skill.Studio.Animation.Editor
             if (vm != null)
             {
                 SkinMesh sk = vm.LoadData() as SkinMesh;
-                Data = SkinMesh = new SkinMeshViewModel(sk);                
+                Data = SkinMesh = new SkinMeshViewModel(sk);
             }
 
             History.RedoChange += new UnDoRedoChangeEventHandler(History_RedoChange);
@@ -387,7 +387,18 @@ namespace Skill.Studio.Animation.Editor
             CanAddClip = _LbAnimations.SelectedItem != null;
             ApplicationCommands.Properties.Execute(_LbAnimations.SelectedItem, null);
         }
-        #endregion
 
+
+        private void BtnClearClip_Click(object sender, RoutedEventArgs e)
+        {
+            int index = 0;
+            foreach (AnimationClipViewModel clipVM in _SkinMesh.Animations)
+            {
+                SkinMesh.Animations.Remove(clipVM);
+                History.Insert(new AddAnimationClipUnDoRedo(clipVM, SkinMesh, index++, true));
+            }
+        }
+
+        #endregion
     }
 }

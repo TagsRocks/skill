@@ -12,7 +12,8 @@ namespace Skill.Animation
     /// for example :
     /// almost in reload AnimationClips only hand bones involved and other bones do not have keys.
     /// you can use this node to override hand animations so the lower body can play another animation
-    /// be sure that lower body bones do not have any keys in AnimationClip
+    /// be sure that lower body bones do not have any keys in AnimationClip or set MixingTransforms for bones
+    /// Another usage of this nodeis when you want to play an IdleBreak animation sometimes
     /// </remarks>
     public class AnimNodeOverride : AnimNodeMultilayer
     {

@@ -18,7 +18,7 @@ using System.ComponentModel;
 
 namespace Skill.Studio.Animation
 {
-
+    [DisplayName("AnimNodeBlendByPosture")]
     public class AnimNodeBlendByPostureViewModel : AnimNodeViewModel
     {
         public AnimNodeBlendByPostureViewModel(AnimationTreeViewModel tree, AnimNodeBlendByPosture model)

@@ -5,8 +5,9 @@ using System.Text;
 
 namespace Skill.AI
 {
-    /// <summary>
-    /// select a random child by chance for execution.
+    /// <summary>    
+    /// Select random child by chance for execution and continue executing that until result of chlid be Running. 
+    /// if result is Failure or success, selected another random child on next exevution
     /// </summary>
     public class RandomSelector : Composite
     {
@@ -66,7 +67,7 @@ namespace Skill.AI
         /// <summary>
         /// Behave
         /// </summary>
-        /// <param name="state">State od BehaviorTre</param>
+        /// <param name="state">State od BehaviorTree</param>
         /// <returns>Result</returns>
         protected override BehaviorResult Behave(BehaviorState state)
         {

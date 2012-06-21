@@ -10,8 +10,10 @@ using System.Windows.Media;
 namespace Skill.Studio.Animation
 {
     #region BoneViewModel
+    [DisplayName("Bone")]
     public class BoneViewModel : TreeViewItemViewModel
     {
+        [Browsable(false)]
         public override string ImageName { get { return Images.Bone; } }
 
         /// <summary>

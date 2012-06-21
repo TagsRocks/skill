@@ -91,7 +91,7 @@ namespace Skill.Studio.AI.Editor
                     if (sharedAccessKeys != null)
                     {
                         List<string> keys = new List<string>();
-                        foreach (var item in sharedAccessKeys.Keys.Values)
+                        foreach (var item in sharedAccessKeys.Keys)
                         {
                             keys.Add(item.Key);
                         }

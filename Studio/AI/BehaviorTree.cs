@@ -68,19 +68,43 @@ namespace Skill.Studio.AI
             this.Nodes = new ReadOnlyCollection<BehaviorViewModel>(new BehaviorViewModel[] { Root });
             this.AccessKeys = new SharedAccessKeysViewModel(Model.AccessKeys);
         }
+
         #endregion
 
         #region Register view models
 
-        private bool ContainsModel(ObservableCollection<BehaviorViewModel> list, BehaviorViewModel viewMode)
+        public List<BehaviorViewModel> GetSharedModel(Behavior model)
         {
-            return list.Count(b => b.Model == viewMode.Model) > 0;
+            List<BehaviorViewModel> list = new List<BehaviorViewModel>();
+            GetSharedModel(list, Root, model);
+            return list;
+        }
+        private void GetSharedModel(List<BehaviorViewModel> list, BehaviorViewModel Vm, Behavior model)
+        {
+            foreach (BehaviorViewModel item in Vm)
+            {
+                if (item.Model == model)
+                    list.Add(item);
+                GetSharedModel(list, item, model);
+            }
         }
 
+        private BehaviorViewModel FindViewModelByModel(ObservableCollection<BehaviorViewModel> list, Behavior model)
+        {
+            foreach (var vm in list)
+            {
+                if (vm.Model == model)
+                    return vm;
+            }
+            return null;
+        }
+
+        int _AvoidRootRegister = 0;
         public void RegisterViewModel(BehaviorViewModel viewModel)
         {
+            _AvoidRootRegister++;
             // root behavior model already added to behavior tree model in constructor of behavior tree
-            if (viewModel == Root)
+            if (_AvoidRootRegister == 1)
                 return;
 
             if (viewModel.Tree != this) return;
@@ -89,19 +113,19 @@ namespace Skill.Studio.AI
             switch (viewModel.Model.BehaviorType)
             {
                 case BehaviorType.Action:
-                    if (!ContainsModel(this.Actions, viewModel))
+                    if (FindViewModelByModel(this.Actions, viewModel.Model) == null)
                         this.Actions.Add(viewModel);
                     break;
                 case BehaviorType.Condition:
-                    if (!ContainsModel(this.Conditions, viewModel))
+                    if (FindViewModelByModel(this.Conditions, viewModel.Model) == null)
                         this.Conditions.Add(viewModel);
                     break;
                 case BehaviorType.Decorator:
-                    if (!ContainsModel(this.Decorators, viewModel))
+                    if (FindViewModelByModel(this.Decorators, viewModel.Model) == null)
                         this.Decorators.Add(viewModel);
                     break;
                 case BehaviorType.Composite:
-                    if (!ContainsModel(this.Composites, viewModel))
+                    if (FindViewModelByModel(this.Composites, viewModel.Model) == null)
                         this.Composites.Add(viewModel);
                     break;
             }
@@ -139,7 +163,7 @@ namespace Skill.Studio.AI
             {
                 name = behaviorVM.Name + i++;
             }
-            behaviorVM.Name = name;
+            behaviorVM.Model.Name = name;
         }
         #endregion
 

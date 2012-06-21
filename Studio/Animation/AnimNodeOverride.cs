@@ -18,6 +18,7 @@ using Skill.DataModels.Animation;
 
 namespace Skill.Studio.Animation
 {
+    [DisplayName("AnimNodeOverride")]
     public class AnimNodeOverrideViewModel : AnimNodeViewModel
     {
         public AnimNodeOverrideViewModel(AnimationTreeViewModel tree, AnimNodeOverride model)
@@ -38,6 +39,8 @@ namespace Skill.Studio.Animation
             get { return "Connectors"; }
         }
 
+        [DefaultValue(0)]
+        [Category("Override")]
         [Description("if more than zero then AnimNodeOverride node automatically enable overriding at specified time.")]
         public float OverridePeriod
         {

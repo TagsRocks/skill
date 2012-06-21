@@ -25,7 +25,7 @@
                 <ListBox.Resources>
                     <DataTemplate DataType="{x:Type ss:NewItemViewModel}" >
                         <Grid Margin="2,0" >
-                            <Border BorderBrush="#e5c365" BorderThickness="1"  Visibility="Hidden"  Name="_Bg"  CornerRadius="5" Background="{StaticResource MenuBgBrush}" />
+                            <Border BorderBrush="#e5c365" BorderThickness="1"  Visibility="Hidden"  Name="_Bg"  CornerRadius="2" Background="{StaticResource MenuBgBrush}" />
                             <StackPanel Margin="10,0,0,0" Orientation="Horizontal" Height="36" >
                                 <Image Width="32" Height="32" VerticalAlignment="Center" Margin="2,0" Source="{Binding ImageName}" />
                                 <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="{Binding Name}" />
@@ -51,8 +51,8 @@
                 <ColumnDefinition Width="100" />
                 <ColumnDefinition Width="100" />
             </Grid.ColumnDefinitions>
-            <Button Content="Add" Width="90" VerticalAlignment="Center" Grid.Column="1"  Click="BtnAdd_Click"/>
-            <Button Content="Cancel" Width="90" VerticalAlignment="Center" Grid.Column="2" Click="BtnCancel_Click"/>
+            <Button Content="Add" Width="90" VerticalAlignment="Center" Grid.Column="1"  Click="BtnAdd_Click" IsDefault="True" />
+            <Button Content="Cancel" Width="90" VerticalAlignment="Center" Grid.Column="2" Click="BtnCancel_Click" IsCancel="True" />
         </Grid>
     </Grid>
 </Window>

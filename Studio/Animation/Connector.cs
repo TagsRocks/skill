@@ -7,6 +7,7 @@ using Skill.DataModels.Animation;
 
 namespace Skill.Studio.Animation
 {
+    [DisplayName("Connector")]
     public class ConnectorViewModel : INotifyPropertyChanged
     {
         [Browsable(false)]
@@ -37,6 +38,7 @@ namespace Skill.Studio.Animation
             }
         }
       
+        [Description("Name of Connector")]
         public string Name
         {
             get { return Model.Name; }
@@ -54,9 +56,11 @@ namespace Skill.Studio.Animation
             }
         }
 
+        [Browsable(false)]
         public AnimNodeViewModel AnimNode { get; private set; }
 
         private Editor.AnimConnector _Connector;
+        [Browsable(false)]
         public Editor.AnimConnector Connector { get { return _Connector; }
             set
             {
@@ -68,6 +72,7 @@ namespace Skill.Studio.Animation
             }
         }
 
+        [Browsable(false)]
         public Connector Model { get; private set; }
 
         public ConnectorViewModel(AnimNodeViewModel animNode, Connector model)

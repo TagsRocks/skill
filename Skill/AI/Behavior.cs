@@ -8,7 +8,7 @@ namespace Skill.AI
 
     #region BehaviorEventHandler
     /// <summary>
-    /// Represents the method that will handle behavior events.
+    /// Represents the method to handle behavior events.
     /// </summary>
     /// <param name="sender">Sender behavior</param>
     /// <param name="result">Result of behavior after execution</param>
@@ -35,7 +35,7 @@ namespace Skill.AI
         /// </summary>
         public event BehaviorEventHandler Running;
         /// <summary>
-        /// Occurs when behavior reset
+        /// Occurs when behavior is reset
         /// </summary>
         public event BehaviorEventHandler Reset;
 
@@ -77,7 +77,8 @@ namespace Skill.AI
         /// <returns>Result of execution</returns>
         internal BehaviorResult Trace(BehaviorState state)
         {
-            int registerIndex = state.RegisterForExecution(this); // register in execution sequence
+            //int registerIndex = 
+            state.RegisterForExecution(this); // register in execution sequence
             try
             {
                 Result = Behave(state);// let subclass behave

@@ -95,7 +95,7 @@ namespace Skill.Studio.Compiler
 
                 if (string.IsNullOrEmpty(accessLimitDecorator.Address))
                 {
-                    if (!_Tree.AccessKeys.Keys.ContainsKey(accessLimitDecorator.AccessKey))
+                    if (_Tree.AccessKeys.Keys.Count(c => c.Key == accessLimitDecorator.AccessKey) < 1)
                     {
                         AddError(string.Format("The provided AccessKey '{0}' for behavior node '{1}' does not exist.", accessLimitDecorator.AccessKey, accessLimitDecorator.Name));
                     }
@@ -110,7 +110,7 @@ namespace Skill.Studio.Compiler
                         SharedAccessKeys model = sharedAccessKeysVM.SavedData as SharedAccessKeys;
                         if (model == null)
                             AddError(string.Format("The SharedAccessKeys address '{0}' for behavior node '{1}' does not exist.", accessLimitDecorator.Address, accessLimitDecorator.Name));
-                        else if (!model.Keys.ContainsKey(accessLimitDecorator.AccessKey))
+                        else if (model.Keys.Count(c => c.Key == accessLimitDecorator.AccessKey) < 1)
                             AddError(string.Format("The provided AccessKey '{0}' for behavior node '{1}' does not exist.", accessLimitDecorator.AccessKey, accessLimitDecorator.Name));
                     }
                 }

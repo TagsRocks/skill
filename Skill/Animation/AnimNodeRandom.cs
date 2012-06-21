@@ -26,7 +26,7 @@ namespace Skill.Animation
 
     /// <summary>
     /// This blend node allows the Anim Tree to randomly blend between inputs set by the user.
-    /// select random node BecameRelevant
+    /// select random node when BecameRelevant and continue to update that until cease relevant.
     /// </summary>
     public class AnimNodeRandom : AnimNodeBlendByIndex
     {
@@ -72,6 +72,10 @@ namespace Skill.Animation
             base.OnBecameRelevant(state);
         }
 
+        /// <summary>
+        /// Select a child index based i\on there chances
+        /// </summary>
+        /// <returns></returns>
         private int PickRandomChildIndex()
         {
             float total = TotalChance;

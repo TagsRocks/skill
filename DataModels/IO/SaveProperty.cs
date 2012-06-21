@@ -6,30 +6,38 @@ using System.Xml.Linq;
 
 namespace Skill.DataModels.IO
 {
+    /// <summary>
+    /// Defines type of property for SaveClass
+    /// </summary>
     public enum PropertyType
     {
         Primitive,
         Class
     }
 
-    public enum CollectionType
-    {
-        None,
-        List,
-        Array
-    }
-
+    /// <summary>
+    /// Defines base class for SaveClass properties
+    /// </summary>
     public abstract class SaveProperty : IXElement
     {
+        /// <summary>  Type of property </summary>
         public abstract PropertyType Type { get; }
+        /// <summary>  Name of property in SaveClass </summary>
         public string Name { get; set; }
-        public bool IsArray { get; set; }        
+        /// <summary>  Whether this property is array</summary>
+        public bool IsArray { get; set; }
+        /// <summary>  Comment of property </summary>
         public string Comment { get; set; }
 
+        /// <summary>
+        /// Create a SaveProperty
+        /// </summary>
+        /// <param name="name"></param>
         public SaveProperty(string name)
         {
             this.Name = name;
         }
+
 
         public XElement ToXElement()
         {
@@ -71,11 +79,23 @@ namespace Skill.DataModels.IO
         protected virtual void ReadAttributes(XElement e) { }
     }
 
+
+    /// <summary>
+    /// A property of Primitive types
+    /// </summary>
     public class PrimitiveProperty : SaveProperty
     {
+        /// <summary>
+        /// Type of property
+        /// </summary>
         public override PropertyType Type { get { return PropertyType.Primitive; } }
+
+        /// <summary> PrimitiveType </summary>
         public PrimitiveType PrimitiveType { get; set; }
 
+        /// <summary>
+        /// Create a PrimitiveProperty
+        /// </summary>
         public PrimitiveProperty()
             : base("NewPrimitiveProperty")
         {
@@ -95,11 +115,22 @@ namespace Skill.DataModels.IO
         }
     }
 
+    /// <summary>
+    /// A property of type Savable class
+    /// </summary>
     public class ClassProperty : SaveProperty
     {
+        /// <summary>
+        /// Type of property
+        /// </summary>
         public override PropertyType Type { get { return PropertyType.Class; } }
+
+        /// <summary> Name of class that this property refer to </summary>
         public string ClassName { get; set; }
 
+        /// <summary>
+        /// Create a ClassProperty
+        /// </summary>
         public ClassProperty()
             : base("NewClassProperty")
         {

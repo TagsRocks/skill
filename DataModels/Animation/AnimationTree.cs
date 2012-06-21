@@ -15,6 +15,9 @@ namespace Skill.DataModels.Animation
         /// <summary> array of connections. create internally when loading file and set before save  </summary>
         public AnimationConnection[] Connections { get; set; }
 
+        /// <summary> Properties to generate with code generator </summary>
+        public AnimationTreeProperty[] Properties { get; set; }
+
         public double Scale { get; set; }
         public double HorizontalOffset { get; set; }
         public double VerticalOffset { get; set; }
@@ -167,7 +170,19 @@ namespace Skill.DataModels.Animation
                 }
             }
             animationTree.Add(connections);
-            AddRoot();
+
+
+            if (this.Properties != null)
+            {
+                XElement properties = new XElement("Properties");
+                foreach (var p in this.Properties)
+                {
+                    if (p != null)
+                        properties.Add(p.ToXElement());
+                }
+
+                animationTree.Add(properties);
+            }
 
             return animationTree;
         }
@@ -291,6 +306,22 @@ namespace Skill.DataModels.Animation
                 }
             }
             this.Connections = animationConnections.ToArray();
+
+
+
+            List<AnimationTreeProperty> propertyList = new List<AnimationTreeProperty>();
+            XElement properties = e.FindChildByName("Properties");
+            if (properties != null)
+            {
+                foreach (var pElement in properties.Elements())
+                {
+                    AnimationTreeProperty p = new AnimationTreeProperty();
+                    p.Load(pElement);
+                    propertyList.Add(p);
+                }
+            }
+            this.Properties = propertyList.ToArray();
+
         }
         #endregion
     }

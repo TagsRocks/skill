@@ -10,24 +10,29 @@ namespace Skill.Studio.AI
 {
 
     #region DecoratorViewModel
+    [DisplayName("Decorator")]
     public class DecoratorViewModel : BehaviorViewModel
     {
+        [Browsable(false)]
         public override string ImageName { get { return Images.Decorator; } }
 
         [Browsable(false)]
         public DecoratorType DecoratorType { get { return ((Decorator)Model).Type; } }
 
         [System.ComponentModel.Editor(typeof(Editor.ParametersPropertyEditor), typeof(Editor.ParametersPropertyEditor))]
+        [DisplayName("Parameters")]
+        [Description("Parameters to pass to handler method")]
         public ParameterCollectionViewModel Parameters
         {
             get
             {
-                return ((BehaviorViewModel)Parent).GetParameters(this);
+                return new ParameterCollectionViewModel(((BehaviorViewModel)Parent).GetParameters(this));
             }
         }
 
+        [DefaultValue(true)]
         [DisplayName("NeverFail")]
-        [Description("if true : when handler function fail return success")]
+        [Description("if true : when handler function fail return success. the result will be Running or Success")]
         public virtual bool NeverFail
         {
             get { return ((Decorator)Model).NeverFail; }
@@ -52,14 +57,15 @@ namespace Skill.Studio.AI
 
 
     #region AccessLimitDecoratorViewModel
+    [DisplayName("AccessLimitDecorator")]
     public class AccessLimitDecoratorViewModel : DecoratorViewModel
     {
         public override string ImageName { get { return Images.Decorator; } }
-        
-        
+
+
 
         [DisplayName("AccessKey")]
-        [Description("The key for decorator.")]
+        [Description("The Accesskey for decorator.")]
         [Editor(typeof(Editor.AccessKeyPropertyEditor), typeof(Editor.AccessKeyPropertyEditor))]
         public string AccessKey
         {

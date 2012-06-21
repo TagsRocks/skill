@@ -52,7 +52,7 @@
     <Compile Include="CSharp\Namespace.cs" />
     <Compile Include="CSharp\Property.cs" />
     <Compile Include="CSharp\SaveClassClass.cs" />
-    <Compile Include="CSharp\SaveGameClass.cs" />
+    <Compile Include="CSharp\SaveDataClass.cs" />
     <Compile Include="CSharp\SharedAccessKeysClass.cs" />
     <Compile Include="CSharp\Variable.cs" />
     <Compile Include="ICodeGenerator.cs" />

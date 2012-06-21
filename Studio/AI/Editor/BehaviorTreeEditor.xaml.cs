@@ -33,14 +33,7 @@ namespace Skill.Studio.AI.Editor
         /// <returns>selected Behavior</returns>
         private BehaviorViewModel GetSelectedItem()
         {
-            if (_BTTree.SelectedItem != null)
-            {
-                if (_BTTree.SelectedItem is BehaviorViewModel)
-                {
-                    return (BehaviorViewModel)_BTTree.SelectedItem;
-                }
-            }
-            return null;
+            return _BTTree.SelectedItem as BehaviorViewModel;
         }
         #endregion
 
@@ -236,32 +229,62 @@ namespace Skill.Studio.AI.Editor
         {
             if (IsNewAv)
             {
-                if (sender is TextBlock)
+                MenuItem menu = sender as MenuItem;
+                if (menu != null)
                 {
-                    TextBlock textBlock = (TextBlock)sender;
-                    var selected = GetSelectedItem();
-                    if (selected != null)
+                    BehaviorViewModel insertItem = menu.Tag as BehaviorViewModel;
+                    if (insertItem != null)
                     {
-                        try
+                        var selected = GetSelectedItem();
+                        if (selected != null)
                         {
-                            string message;
-                            if (selected.CanAddBehavior((BehaviorViewModel)textBlock.Tag, out message))
+                            try
                             {
-                                var newVM = selected.AddBehavior((BehaviorViewModel)textBlock.Tag);
-                                if (newVM != null)
-                                    newVM.IsSelected = true;
-                                UpdateConnections();
+                                string message;
+                                if (selected.CanAddBehavior(insertItem, out message))
+                                {
+                                    var newVM = selected.AddBehavior(insertItem, null, true);
+                                    if (newVM != null)
+                                        newVM.IsSelected = true;
+                                    UpdateConnections();
+                                }
+                                else
+                                    MainWindow.Instance.ShowError(message);
                             }
-                            else
-                                MainWindow.Instance.ShowError(message);
-                        }
-                        catch (Exception ex)
-                        {
-                            MainWindow.Instance.ShowError(ex.Message);
+                            catch (Exception ex)
+                            {
+                                MainWindow.Instance.ShowError(ex.Message);
+                            }
                         }
                     }
                 }
             }
+        }
+
+        private TextBlock FindTexkBlock(MenuItem menu)
+        {
+            int childCount = VisualTreeHelper.GetChildrenCount(menu);
+            for (int i = 0; i < childCount; i++)
+            {
+                var child = VisualTreeHelper.GetChild(menu, i);
+                if (child is TextBlock) return child as TextBlock;
+                TextBlock textBlock = FindTexkBlock(child);
+                if (textBlock != null) return textBlock;
+            }
+            return null;
+        }
+
+        private TextBlock FindTexkBlock(DependencyObject obj)
+        {
+            int childCount = VisualTreeHelper.GetChildrenCount(obj);
+            for (int i = 0; i < childCount; i++)
+            {
+                var child = VisualTreeHelper.GetChild(obj, i);
+                if (child is TextBlock) return child as TextBlock;
+                TextBlock textBlock = FindTexkBlock(child);
+                if (textBlock != null) return textBlock;
+            }
+            return null;
         }
         #endregion
 
@@ -341,6 +364,7 @@ namespace Skill.Studio.AI.Editor
             {
                 AddAction();
             }
+            else System.Windows.MessageBox.Show("Menu Item not clicked");
         }
 
         private void Mnu_NewCondition_Click(object sender, RoutedEventArgs e)
@@ -349,6 +373,7 @@ namespace Skill.Studio.AI.Editor
             {
                 AddCondition();
             }
+            else System.Windows.MessageBox.Show("Menu Item not clicked");
         }
 
         private void Mnu_NewDecorator_Click(object sender, RoutedEventArgs e)
@@ -358,6 +383,7 @@ namespace Skill.Studio.AI.Editor
                 MenuItem mnu = (MenuItem)sender;
                 AddDecorator((DecoratorType)mnu.Tag);
             }
+            else System.Windows.MessageBox.Show("Menu Item not clicked");
         }
 
         private void Mnu_NewComposite_Click(object sender, RoutedEventArgs e)
@@ -367,6 +393,7 @@ namespace Skill.Studio.AI.Editor
                 MenuItem mnu = (MenuItem)sender;
                 AddComposite((CompositeType)mnu.Tag);
             }
+            else System.Windows.MessageBox.Show("Menu Item not clicked");
         }
         #endregion
 
@@ -450,7 +477,7 @@ namespace Skill.Studio.AI.Editor
             bcElement.Add(bvm.Model.ToXElement());
             if (bvm.Parent != null)
             {
-                XElement parameters = ((BehaviorViewModel)bvm.Parent).GetParameters(bvm).Model.ToXElement();
+                XElement parameters = ((BehaviorViewModel)bvm.Parent).GetParameters(bvm).ToXElement();
                 bcElement.Add(parameters);
             }
 
@@ -518,7 +545,7 @@ namespace Skill.Studio.AI.Editor
                     {
                         XDocument document = XDocument.Parse(text);
                         History.IsEnable = false;
-                        ParameterCollectionViewModel parameters = null;
+                        ParameterCollection parameters = null;
                         BehaviorViewModel bvm = GetHierarchyBehavior(selected, document.Elements().First(), out parameters);
 
                         History.IsEnable = true;
@@ -539,7 +566,7 @@ namespace Skill.Studio.AI.Editor
         }
 
 
-        private BehaviorViewModel GetHierarchyBehavior(BehaviorViewModel parent, XElement bcElement, out ParameterCollectionViewModel parameters)
+        private BehaviorViewModel GetHierarchyBehavior(BehaviorViewModel parent, XElement bcElement, out ParameterCollection parameters)
         {
             BehaviorViewModel bvm = null;
             parameters = null;
@@ -562,9 +589,8 @@ namespace Skill.Studio.AI.Editor
                 XElement parametersElement = bcElement.FindChildByName("Parameters");
                 if (parametersElement != null)
                 {
-                    ParameterCollection ps = new ParameterCollection();
-                    ps.Load(parametersElement);
-                    parameters = new ParameterCollectionViewModel(ps);
+                    parameters = new ParameterCollection();
+                    parameters.Load(parametersElement);
                 }
 
                 XElement childrenElement = bcElement.FindChildByName("Children");
@@ -572,10 +598,13 @@ namespace Skill.Studio.AI.Editor
                 {
                     foreach (var childElement in childrenElement.Elements())
                     {
-                        ParameterCollectionViewModel childps;
+                        ParameterCollection childps;
                         BehaviorViewModel childVM = GetHierarchyBehavior(bvm, childElement, out childps);
                         if (childVM != null)
+                        {
+                            BehaviorTree.CreateNewName(childVM);
                             bvm.AddBehavior(childVM, childps, false);
+                        }
                     }
                 }
             }
@@ -613,6 +642,7 @@ namespace Skill.Studio.AI.Editor
         }
 
         #endregion
+
 
     }
 }

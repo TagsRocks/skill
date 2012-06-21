@@ -63,20 +63,34 @@ namespace Skill.DataModels.AI
     #endregion
 
     #region ParameterCollection
+
+    /// <summary>
+    /// A Collection of parameters. each collection defines all parameters for one Behavior
+    /// </summary>
     public class ParameterCollection : ICollection<Parameter>, IXElement
     {
         private List<Parameter> _Parameters;
 
+        /// <summary>
+        /// Create an instance of ParameterCollection
+        /// </summary>
         public ParameterCollection()
         {
             _Parameters = new List<Parameter>();
         }
 
+        /// <summary>
+        /// Add new parameter
+        /// </summary>
+        /// <param name="item">Parameter to add</param>
         public void Add(Parameter item)
         {
             _Parameters.Add(item);
         }
 
+        /// <summary>
+        /// Remove all Parameters
+        /// </summary>
         public void Clear()
         {
             _Parameters.Clear();
@@ -93,6 +107,9 @@ namespace Skill.DataModels.AI
             _Parameters.CopyTo(array, arrayIndex);
         }
 
+        /// <summary>
+        /// Number of Parameters in collection
+        /// </summary>
         public int Count
         {
             get { return _Parameters.Count; }
@@ -103,6 +120,11 @@ namespace Skill.DataModels.AI
             get { return false; }
         }
 
+        /// <summary>
+        /// Remove a Parameter
+        /// </summary>
+        /// <param name="item">Parameter to remove</param>
+        /// <returns>True for success, otherwise false</returns>
         public bool Remove(Parameter item)
         {
             return _Parameters.Remove(item);
@@ -118,6 +140,10 @@ namespace Skill.DataModels.AI
             return (_Parameters as System.Collections.IEnumerable).GetEnumerator();
         }
 
+        /// <summary>
+        /// Create an XElement and fill it with Parameters
+        /// </summary>
+        /// <returns>Xelement containing Parameter data</returns>
         public XElement ToXElement()
         {
             XElement parameters = new XElement("Parameters");
@@ -130,6 +156,10 @@ namespace Skill.DataModels.AI
             return parameters;
         }
 
+        /// <summary>
+        /// Load Parameters from XElement
+        /// </summary>
+        /// <param name="e"></param>
         public void Load(XElement e)
         {
             Clear();
@@ -139,6 +169,29 @@ namespace Skill.DataModels.AI
                 p.Load(item);
                 this.Add(p);
             }
+        }
+
+        /// <summary>
+        /// Return all Parameters as single line of string
+        /// </summary>
+        /// <returns>Parameters as string</returns>
+        public override string ToString()
+        {
+            StringBuilder builder = new StringBuilder();
+
+            builder.Append('(');
+
+            for (int i = 0; i < Count; i++)
+            {
+                Parameter item = _Parameters[i];
+                builder.Append(item.ToString());
+                if (i < Count - 1)
+                    builder.Append(", ");
+            }
+
+            builder.Append(')');
+
+            return builder.ToString();
         }
     }
     #endregion
