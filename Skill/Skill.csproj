@@ -67,6 +67,7 @@
     <Compile Include="Managers\CacheBehavior.cs" />
     <Compile Include="Managers\EventManager.cs" />
     <Compile Include="MathHelper.cs" />
+    <Compile Include="Smoothing.cs" />
     <Compile Include="TimeWatch.cs" />
     <Compile Include="AI\AccessLimitDecorator.cs" />
     <Compile Include="AI\Action.cs" />

@@ -602,6 +602,8 @@
     <Resource Include="Compiler\ErrorTemplates.txt" />
     <Resource Include="Images\Animation\ByIndex.png" />
     <Resource Include="Images\Animation\Random.png" />
+    <Resource Include="Images\Default\AccessLimitDecorator.png" />
+    <Resource Include="Images\Default\Disabled\AccessLimitDecorator.png" />
     <Content Include="WPFToolkit.Extended.dll" />
     <Resource Include="Images\Default\Disabled\Remove2.png" />
     <Resource Include="Images\Default\Remove2.png" />

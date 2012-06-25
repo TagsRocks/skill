@@ -72,6 +72,7 @@ namespace Skill.Managers
     /// 
     /// other behaviors could call OnHit method to notify interested behaviors
     /// </example>       
+    [UnityEngine.AddComponentMenu("Skill/Managers/EventManager")]
     public class EventManager : UnityEngine.MonoBehaviour
     {
         /// <summary>

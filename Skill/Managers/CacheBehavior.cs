@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Skill.Managers
 {
+    [AddComponentMenu("Skill/Managers/CacheBehavior")]
     public sealed class CacheBehavior : MonoBehaviour
     {
         public int CacheId { get; set; }

@@ -73,7 +73,7 @@
                     </MenuItem>
                     <MenuItem Header="AccessLimitDecorator" Click="Mnu_NewDecorator_Click" Tag="{x:Static dmai:DecoratorType.AccessLimit}"  >
                         <MenuItem.Icon>
-                            <my:ButtonImage NormalImage="{StaticResource ImgDecorator}" DisableImage="{StaticResource ImgDecorator_D}" />
+                            <my:ButtonImage NormalImage="{StaticResource ImgACDecorator}" DisableImage="{StaticResource ImgACDecorator_D}" />
                         </MenuItem.Icon>
                     </MenuItem>
                 </MenuItem>

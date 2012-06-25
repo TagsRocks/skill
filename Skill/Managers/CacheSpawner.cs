@@ -131,6 +131,7 @@ namespace Skill.Managers
         }
     }
 
+    [AddComponentMenu("Skill/Managers/CacheSpawner")]
     public class CacheSpawner : MonoBehaviour
     {
         public float CleanInterval = 20;

@@ -96,6 +96,9 @@
     <BitmapImage x:Key="ImgAction"  UriSource="/SkillStudio;component/Images/Default/Action.png" />
     <BitmapImage x:Key="ImgAction_D"  UriSource="/SkillStudio;component/Images/Default/Disabled/Action.png" />
 
+    <BitmapImage x:Key="ImgACDecorator"   UriSource="/SkillStudio;component/Images/Default/AccessLimitDecorator.png" />
+    <BitmapImage x:Key="ImgACDecorator_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/AccessLimitDecorator.png" />
+    
     <BitmapImage x:Key="ImgDecorator"   UriSource="/SkillStudio;component/Images/Default/Decorator.png" />
     <BitmapImage x:Key="ImgDecorator_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Decorator.png" />
 

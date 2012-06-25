@@ -60,7 +60,7 @@ namespace Skill.Studio.AI
     [DisplayName("AccessLimitDecorator")]
     public class AccessLimitDecoratorViewModel : DecoratorViewModel
     {
-        public override string ImageName { get { return Images.Decorator; } }
+        public override string ImageName { get { return Images.AccessLimitDecorator; } }
 
 
 

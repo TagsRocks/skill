@@ -29,6 +29,9 @@ namespace Skill.Studio
         public static string Action { get { return Path.Combine(ImageDirectory, "Action.png"); } }
         public static string Action_D { get { return Path.Combine(ImageDirectory, "Action_D.png"); } }
 
+        public static string AccessLimitDecorator { get { return Path.Combine(ImageDirectory, "AccessLimitDecorator.png"); } }
+        public static string AccessLimitDecorator_D { get { return Path.Combine(ImageDirectory, "AccessLimitDecorator_D.png"); } }
+
         public static string Decorator { get { return Path.Combine(ImageDirectory, "Decorator.png"); } }
         public static string Decorator_D { get { return Path.Combine(ImageDirectory, "Decorator_D.png"); } }
 
