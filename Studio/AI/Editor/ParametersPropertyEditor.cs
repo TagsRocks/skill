@@ -41,14 +41,11 @@ namespace Skill.Studio.AI.Editor
                     ParametersEditorWindow window = new ParametersEditorWindow(parameters);
                     window.Owner = MainWindow.Instance;
                     window.ShowDialog();
-                    if (window.IsChanged)
-                    {
-                        if (_Behavior.Tree.Editor != null)
-                            _Behavior.Tree.Editor.SetChanged(true);
 
-                        _Behavior.RaiseChangeDisplayName();
-                    }
+                    if (_Behavior.Tree.Editor != null)
+                        _Behavior.Tree.Editor.SetChanged(true);
 
+                    _Behavior.RaiseChangeDisplayName();
                 }
             }
         }

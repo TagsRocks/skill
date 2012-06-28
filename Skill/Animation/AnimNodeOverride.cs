@@ -28,7 +28,24 @@ namespace Skill.Animation
         /// <summary>
         /// Get or set active overriding node by index (index is between '1' - 'ChildCount -1' )
         /// </summary>
-        public int OverrideIndex { get { return _OverrideIndex; } set { _OverrideIndex = value; if (_OverrideIndex < 1) _OverrideIndex = 1; else if (_OverrideIndex >= ChildCount) _OverrideIndex = ChildCount - 1; } }
+        public int OverrideIndex
+        {
+            get { return _OverrideIndex; }
+            set
+            {
+                _OverrideIndex = value;
+                if (_OverrideIndex < 1)
+                {
+                    IsOverriding = false;
+                    _OverrideIndex = 1;
+                }
+                else if (_OverrideIndex >= ChildCount)
+                {
+                    IsOverriding = false;
+                    _OverrideIndex = ChildCount - 1;
+                }
+            }
+        }
 
         private bool _Overriding;
         /// <summary>
@@ -184,6 +201,28 @@ namespace Skill.Animation
         /// </summary>
         public void OverrideOneShot()
         {
+            if (OverrideNode != null)
+            {
+                if (_OverrideTimer.Enabled)
+                {
+                    return;
+                }
+                else if (!_OverrideOneShot)
+                {
+                    _OverrideOneShot = true;
+                    IsOverriding = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Used when OverridePeriod is zero
+        /// For example you can play reload one shot
+        /// </summary>
+        /// <param name="overrideIndex"> overriding node by index (index is between '1' - 'ChildCount -1' ) </param>
+        public void OverrideOneShot(int overrideIndex)
+        {
+            OverrideIndex = overrideIndex;
             if (OverrideNode != null)
             {
                 if (_OverrideTimer.Enabled)

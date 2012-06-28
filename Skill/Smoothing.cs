@@ -27,7 +27,7 @@ namespace Skill
         /// <summary> Approximately the time it will take to reach the target. A smaller value will reach the target faster.</summary>
         public float SmoothTime = 0.3f;
         /// <summary> Optionally allows you to clamp the maximum speed. </summary>
-        public float MaxSpeed = 5;
+        public float MaxSpeed = Mathf.Infinity;
         /// <summary> The factor of Time.deltaTime( The time since the last call to this function ). </summary>
         public float DeltaTimeFactor = 1;
     }

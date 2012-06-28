@@ -164,32 +164,55 @@ namespace Skill.Studio.Animation
             _SkinMesh.ReplaceRoot(_NewRoot);
         }
     }
-
+    
     class AddAnimationsUnDoRedo : IUnDoRedoCommand
     {
+        private bool _Inverse;
         AnimationClipViewModel[] _NewAnimations;
         SkinMeshViewModel _SkinMesh;
 
-        public AddAnimationsUnDoRedo(AnimationClipViewModel[] newAnimations, SkinMeshViewModel skinmesh)
+        public AddAnimationsUnDoRedo(AnimationClipViewModel[] newAnimations, SkinMeshViewModel skinmesh, bool inverse = false)
         {
             this._NewAnimations = newAnimations;
             this._SkinMesh = skinmesh;
+            this._Inverse = inverse;
         }
 
         public void Undo()
         {
-            foreach (var anim in _NewAnimations)
+            if (_Inverse)
             {
-                _SkinMesh.Animations.Remove(anim);
+                foreach (var anim in _NewAnimations)
+                {
+                    if (!_SkinMesh.Animations.Contains(anim))
+                        _SkinMesh.Animations.Add(anim);
+                }
+            }
+            else
+            {
+                foreach (var anim in _NewAnimations)
+                {
+                    _SkinMesh.Animations.Remove(anim);
+                }
             }
         }
 
         public void Redo()
         {
-            foreach (var anim in _NewAnimations)
+            if (_Inverse)
             {
-                if (!_SkinMesh.Animations.Contains(anim))
-                    _SkinMesh.Animations.Add(anim);
+                foreach (var anim in _NewAnimations)
+                {
+                    _SkinMesh.Animations.Remove(anim);
+                }
+            }
+            else
+            {
+                foreach (var anim in _NewAnimations)
+                {
+                    if (!_SkinMesh.Animations.Contains(anim))
+                        _SkinMesh.Animations.Add(anim);
+                }
             }
         }
     }

@@ -238,7 +238,7 @@ namespace Skill.Animation
                         blendWeights[RightUpIndex] = 0;
                         blendWeights[CenterUpIndex] = 0;
 
-                        blendWeights[RightCenterIndex] = ((x) + (1.0f * y)) * _AimWeight;
+                        blendWeights[RightCenterIndex] = ((x) * (1.0f + y)) * _AimWeight;
                         blendWeights[RightDownIndex] = ((x) * (-y)) * _AimWeight;
                         blendWeights[CenterCenterIndex] = ((1.0f - x) * (1.0f + y)) * _AimWeight;
                         blendWeights[CenterDownIndex] = ((1.0f - x) * (-y)) * _AimWeight;
@@ -276,6 +276,26 @@ namespace Skill.Animation
             blendWeights[RightUpIndex] = 0;
             blendWeights[RightDownIndex] = 0;
             blendWeights[RightCenterIndex] = 0;
+        }
+
+        private void Normalize4(ref float[] blendWeights, int index1, int index2, int index3, int index4)
+        {
+            float sum = blendWeights[index1] + blendWeights[index2] + blendWeights[index3] + blendWeights[index4];
+
+            if (_AimWeight > 0 && _AimWeight < 1)
+            {
+                blendWeights[index1] = (blendWeights[index1] / sum) * _AimWeight;
+                blendWeights[index2] = (blendWeights[index2] / sum) * _AimWeight;
+                blendWeights[index3] = (blendWeights[index3] / sum) * _AimWeight;
+                blendWeights[index4] = (blendWeights[index4] / sum) * _AimWeight;
+            }
+            else
+            {
+                blendWeights[index1] = blendWeights[index1] / sum;
+                blendWeights[index2] = blendWeights[index2] / sum;
+                blendWeights[index3] = blendWeights[index3] / sum;
+                blendWeights[index4] = blendWeights[index4] / sum;
+            }
         }
 
         /// <summary>

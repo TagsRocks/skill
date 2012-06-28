@@ -22,6 +22,7 @@ namespace Skill.Studio.Animation
         public AnimationConnectionViewModel(AnimationTreeViewModel tree, AnimationConnection model)
         {
             this._ConnectorPropertyChangedHandler = OnConnectorPropertyChanged;
+            this._ConnectorPositionChangedHandler = Connector_PositionChanged;
             this.Tree = tree;
             this.Model = model;
             this.Source = Tree.FindByModel(model.Source);
@@ -54,6 +55,11 @@ namespace Skill.Studio.Animation
             {
                 if (_Source != value)
                 {
+                    if (_Source != null)
+                    {
+                        _Source.PropertyChanged -= _ConnectorPropertyChangedHandler;
+                    }
+
                     _Source = value;
                     if (_Source != null)
                     {
@@ -83,6 +89,11 @@ namespace Skill.Studio.Animation
             {
                 if (_Sink != value)
                 {
+                    if (_Sink != null)
+                    {
+                        _Sink.PropertyChanged -= _ConnectorPropertyChangedHandler;
+                    }
+
                     _Sink = value;
 
                     if (_Sink != null)
@@ -223,13 +234,13 @@ namespace Skill.Studio.Animation
         }
 
         #endregion
-        
+
 
         void OnConnectorPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             // whenever the 'Position' property of the source or sink Connector 
             // changes we must update the connection path geometry
-            if (e.PropertyName.Equals("X") || e.PropertyName.Equals("Y"))
+            if ((SourceConnector == null || SinkConnector == null) && (e.PropertyName.Equals("X") || e.PropertyName.Equals("Y")))
             {
                 UpdatePathGeometry();
                 UpdateAnchorPosition();
@@ -241,6 +252,49 @@ namespace Skill.Studio.Animation
                     IsSelected = Source.IsSelected;
                 }
             }
+        }
+
+        private Editor.AnimConnector _SourceConnector;
+        private Editor.AnimConnector SourceConnector
+        {
+            get { return _SourceConnector; }
+            set
+            {
+                if (_SourceConnector != null)
+                {
+                    _SourceConnector.PositionChanged -= _ConnectorPositionChangedHandler;
+                }
+                _SourceConnector = value;
+                if (_SourceConnector != null)
+                {
+                    _SourceConnector.PositionChanged += _ConnectorPositionChangedHandler;
+                }
+            }
+        }
+
+        private Editor.AnimConnector _SinkConnector;
+        private Editor.AnimConnector SinkConnector
+        {
+            get { return _SinkConnector; }
+            set
+            {
+                if (_SinkConnector != null)
+                {
+                    _SinkConnector.PositionChanged -= _ConnectorPositionChangedHandler;
+                }
+                _SinkConnector = value;
+                if (_SinkConnector != null)
+                {
+                    _SinkConnector.PositionChanged += _ConnectorPositionChangedHandler;
+                }
+            }
+        }
+
+        private EventHandler _ConnectorPositionChangedHandler;
+        void Connector_PositionChanged(object sender, EventArgs e)
+        {
+            UpdatePathGeometry();
+            UpdateAnchorPosition();
         }
 
         private PathFigure _PathFigure;
@@ -257,19 +311,21 @@ namespace Skill.Studio.Animation
                     _PathFigure.Segments.Add(_BezierSegment);
                 }
 
-                Editor.AnimConnector sourceConnector = _Source.OutConnector.Connector;
-                Editor.AnimConnector sinkConnector = _Sink.GetConnector(SinkConnectorIndex);
+                if (SourceConnector == null)
+                    SourceConnector = _Source.OutConnector.Connector;
+                if (SinkConnector == null)
+                    SinkConnector = _Sink.GetConnector(SinkConnectorIndex);
 
-                if (sourceConnector == null || sinkConnector == null) return;
+                if (SourceConnector == null || SinkConnector == null) return;
 
-                Point targetPosition = sinkConnector.Position;
-                Point sourcePosition = sourceConnector.Position;
+                Point targetPosition = SinkConnector.Position;
+                Point sourcePosition = SourceConnector.Position;
 
                 double deltaX = System.Math.Abs(targetPosition.X - sourcePosition.X) * 0.5;
                 double deltaY = System.Math.Abs(targetPosition.Y - sourcePosition.Y) * 0.5;
 
-                Point startBezierPoint = BezierCurve.GetBezierPoint(deltaX, deltaY, sourceConnector.Orientation, sourcePosition);
-                Point endBezierPoint = BezierCurve.GetBezierPoint(deltaX, deltaY, sinkConnector.Orientation, targetPosition);
+                Point startBezierPoint = BezierCurve.GetBezierPoint(deltaX, deltaY, SourceConnector.Orientation, sourcePosition);
+                Point endBezierPoint = BezierCurve.GetBezierPoint(deltaX, deltaY, SinkConnector.Orientation, targetPosition);
 
                 _PathFigure.StartPoint = sourcePosition;
                 _BezierSegment.Point1 = startBezierPoint;

@@ -205,7 +205,7 @@ namespace Skill.Studio.AI
 
         public void CommiteChanges()
         {
-
+            this.AccessKeys.CommiteChanges();            
         }
         #endregion
     }

@@ -378,6 +378,8 @@ namespace Skill.Studio
         #endregion
 
         #region Project Settings
+
+        private Controls.ProjectPropertiesControl _ProjectProperties;
         void ShowSettingsCmdCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = IsProjectLoaded;
@@ -386,14 +388,20 @@ namespace Skill.Studio
         {
             if (IsProjectLoaded)
             {
-                ProjectSettingsWindow projectSettingsWindow = new ProjectSettingsWindow();
-                projectSettingsWindow.Owner = this;
-                projectSettingsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-                projectSettingsWindow.Settings = _ProjectExplorer.CurrentProject.SettingsModel;
-                projectSettingsWindow.ShowDialog();
-                _ProjectExplorer.CurrentProject.Save();
+                _ProjectProperties = new Controls.ProjectPropertiesControl(Project);
+                _ProjectProperties.Closing += new EventHandler<CancelEventArgs>(ProjectProperties_Closing);
+                DocumentPane_DocsCenter.Items.Add(_ProjectProperties);
             }
             e.Handled = true;
+        }
+
+        void ProjectProperties_Closing(object sender, CancelEventArgs e)
+        {
+            if (sender == _ProjectProperties)
+            {
+                DocumentPane_DocsCenter.Items.Remove(_ProjectProperties);
+                _ProjectProperties = null;
+            }
         }
         #endregion
 

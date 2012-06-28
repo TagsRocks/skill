@@ -165,7 +165,7 @@ namespace Skill.Studio.Animation
                         Tree.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "Name", value, Model.Name));
                     }
                     Model.Name = value;
-                    OnPropertyChanged("Name");
+                    OnPropertyChanged("Name");                    
                 }
             }
         }

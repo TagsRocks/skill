@@ -115,6 +115,8 @@ namespace Skill.Studio
     {
         #region Properties
 
+        public string Name { get { return Model.Name; } }
+
         public string DesignerName { get { return "Designer"; } }
 
         /// <summary> Directory of project </summary>
@@ -151,7 +153,7 @@ namespace Skill.Studio
         /// <summary> Project model</summary>
         public Project Model { get; private set; }
         /// <summary> Project Settings model</summary>
-        public ProjectSettingsViewModel SettingsModel { get; private set; }
+        public ProjectSettingsViewModel Settings { get; private set; }
         /// <summary> Root of project </summary>
         public ProjectRootNodeViewModel Root { get; private set; }
         /// <summary> Contains root node to bind to treeview</summary>
@@ -166,7 +168,7 @@ namespace Skill.Studio
         public ProjectViewModel(Project project)
         {
             this.Model = project;
-            this.SettingsModel = new ProjectSettingsViewModel(project.Settings);
+            this.Settings = new ProjectSettingsViewModel(project.Settings);
             this.Root = new ProjectRootNodeViewModel(this, Model.Root);
             this.Nodes = new ReadOnlyCollection<EntityNodeViewModel>(new EntityNodeViewModel[] { Root });
         }
@@ -336,7 +338,7 @@ namespace Skill.Studio
         /// <returns>path</returns>
         public string GetOutputPath(string localPath)
         {
-            return System.IO.Path.Combine(this.SettingsModel.OutputLocaltion, localPath);
+            return System.IO.Path.Combine(this.Settings.OutputLocaltion, localPath);
         }
 
         /// <summary>
@@ -346,7 +348,7 @@ namespace Skill.Studio
         /// <returns>path</returns>
         public string GetDesignerOutputPath(string localPath)
         {
-            return System.IO.Path.Combine(this.SettingsModel.OutputLocaltion, DesignerName, localPath);
+            return System.IO.Path.Combine(this.Settings.OutputLocaltion, DesignerName, localPath);
         }
 
         /// <summary>
@@ -356,10 +358,10 @@ namespace Skill.Studio
         /// <returns>path</returns>
         public string GetEditorOutputPath(string localPath)
         {
-            int index = this.SettingsModel.OutputLocaltion.IndexOf("assets", StringComparison.OrdinalIgnoreCase);
+            int index = this.Settings.OutputLocaltion.IndexOf("assets", StringComparison.OrdinalIgnoreCase);
             if (index >= 0)
             {
-                string assetsDir = this.SettingsModel.OutputLocaltion.Substring(0, index + 6); // 6 : lenght of assets
+                string assetsDir = this.Settings.OutputLocaltion.Substring(0, index + 6); // 6 : lenght of assets
                 return System.IO.Path.Combine(assetsDir, "Editor", localPath);
             }
 

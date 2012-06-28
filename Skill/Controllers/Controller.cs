@@ -13,5 +13,19 @@ namespace Skill.Controllers
         public Skill.Animation.AnimationTree Animation { get; protected set; }
 
         public AnimPosture Posture { get; protected set; }
+
+
+
+        protected virtual void OnDie(object userData)
+        {
+            if (Behavior != null)
+                Behavior.Reset();
+        }
+
+        protected virtual void OnDestroy()
+        {
+            if (Behavior != null)
+                Behavior.Reset();
+        }
     }
 }

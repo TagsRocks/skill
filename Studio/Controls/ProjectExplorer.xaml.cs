@@ -413,7 +413,7 @@ namespace Skill.Studio.Controls
                     }
                 }
             }
-        }     
+        }
         #endregion
 
         #region Rename
@@ -562,7 +562,7 @@ namespace Skill.Studio.Controls
                 var selected = GetSelectedEntity();
                 if (selected != null && selected.EntityType == EntityType.Root)
                 {
-                    ApplicationCommands.Properties.Execute(selected, null);
+                    MainWindow.ShowSettingsCommand.Execute(selected, null);
                 }
             }
         }

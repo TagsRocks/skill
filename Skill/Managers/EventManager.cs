@@ -71,9 +71,8 @@ namespace Skill.Managers
     /// </code>
     /// 
     /// other behaviors could call OnHit method to notify interested behaviors
-    /// </example>       
-    [UnityEngine.AddComponentMenu("Skill/Managers/EventManager")]
-    public class EventManager : UnityEngine.MonoBehaviour
+    /// </example>          
+    public abstract class EventManager : UnityEngine.MonoBehaviour
     {
         /// <summary>
         /// Get specified EventManager
@@ -92,6 +91,60 @@ namespace Skill.Managers
         public virtual void Update()
         {
             enabled = false;
+        }
+
+
+
+    }
+
+    /// <summary>
+    /// Handle a ray or somthing Hit this GameObject
+    /// </summary>
+    /// <param name="other">The collider that hit by this gameobject</param>
+    /// <param name="userData">custom userdata</param>
+    public delegate void OnHitHandler(UnityEngine.Collider other, object userData);
+
+    /// <summary>
+    /// Handle this agent is dead
+    /// </summary>    
+    /// <param name="userData">custom userdata</param>
+    public delegate void OnDefaultHandler(object userData);
+
+    /// <summary>
+    /// Implement some common events
+    /// </summary>
+    [UnityEngine.AddComponentMenu("Skill/Managers/DefaultEventManager")]
+    public class DefaultEventManager : EventManager
+    {
+        /// <summary>
+        /// Occurs when a ray or somthing Hit this GameObject
+        /// </summary>
+        public event OnHitHandler Hit;
+
+        /// <summary>
+        /// Call this method to notify all Components in GameObject about hitting something
+        /// </summary>
+        /// <param name="other">The collider that hit by this gameobject</param>
+        /// <param name="userData">custom userdata</param>
+        public void OnHit(UnityEngine.Collider other, object userData)
+        {
+            if (Hit != null)
+                Hit(other, userData);
+        }
+
+        /// <summary>
+        /// Occurs when this GameObject is dead
+        /// </summary>
+        public event OnDefaultHandler Die;
+
+        /// <summary>
+        /// Call this method to notify all Components in GameObject that this agent is dead
+        /// </summary>        
+        /// <param name="userData">custom userdata</param>
+        public void OnDie(object userData)
+        {
+            if (Die != null)
+                Die(userData);
         }
     }
 

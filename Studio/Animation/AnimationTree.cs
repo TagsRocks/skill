@@ -152,6 +152,11 @@ namespace Skill.Studio.Animation
                         connectionToRemove = connection;
                         break;
                     }
+                    if (connection.Source == newConnection.Source)
+                    {
+                        connectionToRemove = connection;
+                        break;
+                    }
                 }
 
                 if (connectionToRemove != null)

@@ -183,6 +183,9 @@
     <Compile Include="Compiler\SaveGameCompiler.cs" />
     <Compile Include="Compiler\SharedAccessKeysCompiler.cs" />
     <Compile Include="Compiler\SkinMeshCompiler.cs" />
+    <Compile Include="Controls\ProjectPropertiesControl.xaml.cs">
+      <DependentUpon>ProjectPropertiesControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Diagram\BezierCurve.cs" />
     <Compile Include="Diagram\ConnectorOrientation.cs" />
     <Compile Include="Diagram\ISelectable.cs" />
@@ -262,9 +265,6 @@
     <Compile Include="Windows\NewBackupWindow.xaml.cs">
       <DependentUpon>NewBackupWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Windows\ProjectSettingsWindow.xaml.cs">
-      <DependentUpon>ProjectSettingsWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Windows\ProjectWizard.xaml.cs">
       <DependentUpon>ProjectWizard.xaml</DependentUpon>
     </Compile>
@@ -325,6 +325,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Animation\Editor\SkinMeshEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ProjectPropertiesControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -400,10 +404,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Windows\ProjectSettingsWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Windows\ProjectWizard.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -111,7 +111,7 @@ namespace Skill.Studio
                 throw new InvalidOperationException("Can not create instance of backup file when no project loaded");
 
             this._ProjectName = MainWindow.Instance.Project.Model.Name;
-            this._UnityDirectory = Path.GetFullPath(MainWindow.Instance.Project.SettingsModel.OutputLocaltion);
+            this._UnityDirectory = Path.GetFullPath(MainWindow.Instance.Project.Settings.OutputLocaltion);
             this.BackupDirectory = Path.Combine(BackupRoot, _ProjectName);
         }
 

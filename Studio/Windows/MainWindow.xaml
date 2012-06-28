@@ -135,7 +135,7 @@
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator />
-                <MenuItem Header="Project Settings" Command="{x:Static local:MainWindow.ShowSettingsCommand}" >
+                <MenuItem Header="Project Properties" Command="{x:Static local:MainWindow.ShowSettingsCommand}" >
                     <MenuItem.Icon>
                         <my:ButtonImage NormalImage="{StaticResource ImgSettings}" DisableImage="{StaticResource ImgSettings_D}" />
                     </MenuItem.Icon>

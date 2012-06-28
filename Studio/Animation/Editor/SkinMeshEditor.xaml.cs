@@ -320,7 +320,7 @@ namespace Skill.Studio.Animation.Editor
                 }
             }
         }
-        #endregion
+        #endregion       
 
         #region Animation from Clipboard
         private void BtnAddClipsFromClipboard_Click(object sender, RoutedEventArgs e)
@@ -341,7 +341,8 @@ namespace Skill.Studio.Animation.Editor
                             {
                                 AnimationClip clip = new AnimationClip();
                                 clip.Load(element);
-                                animations.Add(new AnimationClipViewModel(SkinMesh, clip));
+                                if (SkinMesh.Animations.Count(a => a.Name == clip.Name) == 0)
+                                    animations.Add(new AnimationClipViewModel(SkinMesh, clip));
                             }
                             if (animations.Count > 0)
                             {
@@ -391,12 +392,12 @@ namespace Skill.Studio.Animation.Editor
 
         private void BtnClearClip_Click(object sender, RoutedEventArgs e)
         {
-            int index = 0;
-            foreach (AnimationClipViewModel clipVM in _SkinMesh.Animations)
-            {
-                SkinMesh.Animations.Remove(clipVM);
-                History.Insert(new AddAnimationClipUnDoRedo(clipVM, SkinMesh, index++, true));
-            }
+            AnimationClipViewModel[] anims = SkinMesh.Animations.ToArray();
+            SkinMesh.Animations.Clear();
+
+            if (anims != null && anims.Length > 0)
+                History.Insert(new AddAnimationsUnDoRedo(anims, SkinMesh, true));
+
         }
 
         #endregion

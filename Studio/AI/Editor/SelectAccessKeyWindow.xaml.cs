@@ -36,12 +36,17 @@ namespace Skill.Studio.AI.Editor
 
                 if (!string.IsNullOrEmpty(_Decorator.AccessKey))
                 {
-                    for (int i = 0; i < addressList.Count; i++)
+                    if (string.IsNullOrEmpty(_Decorator.Address) || _Decorator.Address == "Internal")
+                        _CmbAddress.SelectedIndex = 0;
+                    else
                     {
-                        if (addressList[i] == _Decorator.Address)
+                        for (int i = 0; i < addressList.Count; i++)
                         {
-                            _CmbAddress.SelectedIndex = i;
-                            break;
+                            if (addressList[i] == _Decorator.Address)
+                            {
+                                _CmbAddress.SelectedIndex = i;
+                                break;
+                            }
                         }
                     }
                 }

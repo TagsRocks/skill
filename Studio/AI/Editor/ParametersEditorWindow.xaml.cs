@@ -20,9 +20,7 @@ namespace Skill.Studio.AI.Editor
     /// </summary>
     public partial class ParametersEditorWindow : Window, INotifyPropertyChanged
     {
-        private ParameterCollectionViewModel _Parameters;
-
-        public bool IsChanged { get; private set; }
+        private ParameterCollectionViewModel _Parameters;        
 
         private bool _HasSelected;
         public bool HasSelected
@@ -48,7 +46,7 @@ namespace Skill.Studio.AI.Editor
             if (parameters != null)
             {
                 _Parameters = parameters;
-                _LbParameters.ItemsSource = _Parameters.Parameters;
+                _LbParameters.ItemsSource = _Parameters.Parameters;                
             }
         }
 
@@ -85,8 +83,7 @@ namespace Skill.Studio.AI.Editor
                         break;
                 }
 
-                _Parameters.Add(new ParameterViewModel(p));
-                IsChanged = true;
+                _Parameters.Add(new ParameterViewModel(p));                
             }
         }
 
@@ -111,8 +108,7 @@ namespace Skill.Studio.AI.Editor
         private void DeleteSelected()
         {
             if (_LbParameters.SelectedItem != null)
-                _Parameters.Remove(_LbParameters.SelectedItem as ParameterViewModel);
-            IsChanged = true;
+                _Parameters.Remove(_LbParameters.SelectedItem as ParameterViewModel);            
         }
         private void BtnClose_Click(object sender, RoutedEventArgs e)
         {

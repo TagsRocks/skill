@@ -45,10 +45,10 @@
         <ContextMenu x:Key="ConnectorContextMenu"  >
             <MenuItem Header="Break Connection" DataContext="{Binding}" Click="Mnu_BreakConnection_Click" />
         </ContextMenu>
-        
+
     </sk:TabDocument.Resources>
     <sk:TabDocument.InputBindings>
-        <KeyBinding Command="{x:Static animedit:AnimationTreeEditor.DuplicateCommand}" Gesture="CTRL+D" />        
+        <KeyBinding Command="{x:Static animedit:AnimationTreeEditor.DuplicateCommand}" Gesture="CTRL+D" />
     </sk:TabDocument.InputBindings>
     <sk:TabDocument.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Undo"
@@ -84,27 +84,27 @@
                         <animedit:AnimationTreeCanvas Editor="{Binding ElementName=This}" Background="LightGray" PreviewMouseRightButtonDown="Canvas_PreviewMouseRightButtonDown">
                             <animedit:AnimationTreeCanvas.ContextMenu >
                                 <ContextMenu >
-                                    <MenuItem Header="Sequences" >
-                                        <MenuItem Header="AnimNodeSequence" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.Sequence}" />
-                                    </MenuItem>
+                                    <ContextMenu.Resources>
+                                        <Style TargetType="Image">
+                                            <Setter Property="Width" Value="16" />
+                                            <Setter Property="Height" Value="16" />
+                                        </Style>
+                                    </ContextMenu.Resources>
+                                    <MenuItem Header="Sequence" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.Sequence}" Icon="{StaticResource ImgAnimNodeSequence}" />
+                                    <MenuItem Header="Random" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.Random}" Icon="{StaticResource ImgAnimNodeRandom}" />
+                                    <MenuItem Header="Additive" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.AdditiveBlending}" Icon="{StaticResource ImgAnimNodeAdditive}" />
                                     <MenuItem Header="BlendBy" >
-                                        <MenuItem Header="AnimNodeBlendBySpeed" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.BlendBySpeed}" />
-                                        <MenuItem Header="AnimNodeBlendByPosture" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.BlendByPosture}" />
-                                        <MenuItem Header="AnimNodeBlendByIdle" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.BlendByIdle}" />
-                                        <MenuItem Header="AnimNodeBlendByIndex" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.BlendByIndex}" />
+                                        <MenuItem Header="Speed" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.BlendBySpeed}" Icon="{StaticResource ImgAnimNodeBlendBySpeed}" />
+                                        <MenuItem Header="Posture" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.BlendByPosture}" Icon="{StaticResource ImgAnimNodeBlendByPosture}" />
+                                        <MenuItem Header="Idle" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.BlendByIdle}" Icon="{StaticResource ImgAnimNodeBlendByIdle}" />
+                                        <MenuItem Header="Index" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.BlendByIndex}" Icon="{StaticResource ImgAnimNodeBlendByIndex}" />
                                     </MenuItem>
                                     <MenuItem Header="Directional" >
-                                        <MenuItem Header="AnimNodeBlend4Directional" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.Blend4Directional}" />
-                                    </MenuItem>
-                                    <MenuItem Header="Random" >
-                                        <MenuItem Header="AnimNodeRandom" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.Random}" />
-                                    </MenuItem>
-                                    <MenuItem Header="Additive" >
-                                        <MenuItem Header="AnimNodeAdditiveBlending" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.AdditiveBlending}" />
-                                    </MenuItem>
+                                        <MenuItem Header="4Directional" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.Blend4Directional}" Icon="{StaticResource ImgAnimNode4Directional}" />
+                                    </MenuItem>                                    
                                     <MenuItem Header="Other" >
-                                        <MenuItem Header="AnimNodeOverride" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.Override}" />
-                                        <MenuItem Header="AnimNodeAimOffset" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.AimOffset}" />
+                                        <MenuItem Header="Override" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.Override}" Icon="{StaticResource ImgAnimNodeOverride}" />
+                                        <MenuItem Header="AimOffset" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.AimOffset}" Icon="{StaticResource ImgAnimNodeAimOffset}" />
                                     </MenuItem>
                                     <Separator/>
                                     <MenuItem Header="Paste" Command="{x:Static animedit:AnimationTreeEditor.PasteCommand}" />
@@ -138,7 +138,7 @@
                                         <MenuItem.Icon>
                                             <ctr:ButtonImage NormalImage="{StaticResource ImgDelete}" DisableImage="{StaticResource ImgDelete_D}" />
                                         </MenuItem.Icon>
-                                    </MenuItem>                                    
+                                    </MenuItem>
                                 </ContextMenu>
                             </Border.ContextMenu>
                             <Grid>
@@ -245,6 +245,6 @@
                     </Style>
                 </ItemsControl.ItemContainerStyle>
             </ItemsControl>
-        </ScrollViewer>        
+        </ScrollViewer>
     </Grid>
 </sk:TabDocument>
