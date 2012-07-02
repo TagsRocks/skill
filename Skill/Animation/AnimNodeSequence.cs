@@ -116,7 +116,7 @@ namespace Skill.Animation
                     return _Length / Speed;
                 return 0;
             }
-        }
+        }        
 
         /// <summary>
         /// Create an instance of AnimNodeSequence
@@ -174,6 +174,11 @@ namespace Skill.Animation
         public override void SelectLayer(AnimationLayerManager manager, AnimationLayer parentSuggestLayer)
         {
             this.Layer = parentSuggestLayer;
+        }
+
+        internal override void SetFormat(string format)
+        {
+            this.Format = format;
         }
 
         /// <summary>

@@ -48,6 +48,7 @@ Animation:
 			15- zero or less zero Chance of AnimNodeRandom child.
 			16- UnAsigned AnimationClip of AnimNodeSequence.						
 			17- Invalid name of AnimationClip (null or empty).						
+			18- TreeAddress of AnimNodeSubTree is invalid
 
 		Warnings :
 			1- UnAssigned Connector ( at least two connector for BlendByPosture).

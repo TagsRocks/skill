@@ -127,6 +127,7 @@
     <Compile Include="Animation\AnimNodeOverride.cs" />
     <Compile Include="Animation\AnimNodeRandom.cs" />
     <Compile Include="Animation\AnimNodeSequence.cs" />
+    <Compile Include="Animation\AnimNodeSubTree.cs" />
     <Compile Include="Animation\Bone.cs" />
     <Compile Include="Animation\Editor\AnimationImages.cs" />
     <Compile Include="Animation\Editor\AnimationTreeCanvas.cs" />
@@ -164,6 +165,10 @@
     </Compile>
     <Compile Include="Animation\Editor\AnimNodeSequenceClipPropertyEditor.cs" />
     <Compile Include="Animation\Editor\AnimNodeAimOffsetProfilePropertyEditor.cs" />
+    <Compile Include="Animation\Editor\TreeAddressPropertyEditor.cs" />
+    <Compile Include="Animation\Editor\SelectAnimTreeWindow.xaml.cs">
+      <DependentUpon>SelectAnimTreeWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Animation\Editor\RubberbandAdorner.cs" />
     <Compile Include="Animation\Editor\Selection.cs" />
     <Compile Include="Animation\Editor\SelectSkinMeshWindow.xaml.cs">
@@ -319,6 +324,10 @@
     <Page Include="Animation\Editor\AnimNodeSequenceClipSelectorControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Animation\Editor\SelectAnimTreeWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Animation\Editor\SelectSkinMeshWindow.xaml">
       <SubType>Designer</SubType>

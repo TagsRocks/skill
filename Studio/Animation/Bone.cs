@@ -52,7 +52,7 @@ namespace Skill.Studio.Animation
                     {
                         CheckedEnable = false;
                         return;
-                    }                    
+                    }
                 }
                 else
                     CheckedEnable = true;
@@ -82,8 +82,8 @@ namespace Skill.Studio.Animation
                     bone.SetChildrenState(_IsChecked);
                 }
             }
-        }        
-        
+        }
+
         private bool _CheckedEnable;
         /// <summary> Helper variable for editor </summary>
         [Browsable(false)]
@@ -180,8 +180,12 @@ namespace Skill.Studio.Animation
             this.IsExpanded = true;
             this.Model = bone;
             this.SkinMesh = skinmesh;
-            string parentAddress = parent != null ? parent.Address : "";
-            this.Address = string.Format("{0}/{1}", parentAddress, this.Name);
+
+            if (parent == null)
+                this.Address = this.Name;
+            else
+                this.Address = string.Format("{0}/{1}", parent.Address, this.Name);
+
             LoadChildren();
         }
 

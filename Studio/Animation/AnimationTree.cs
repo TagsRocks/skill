@@ -143,25 +143,23 @@ namespace Skill.Studio.Animation
         {
             if (!_Connections.Contains(newConnection))
             {
-                // by now it is possible to find one connection to remove because only one connection can connect to each input
-                AnimationConnectionViewModel connectionToRemove = null;
+
+                List<AnimationConnectionViewModel> connectionsToRemove = new List<AnimationConnectionViewModel>();
                 foreach (var connection in this._Connections)
                 {
                     if (connection.SinkConnectorIndex == newConnection.SinkConnectorIndex && connection.Sink == newConnection.Sink)
                     {
-                        connectionToRemove = connection;
-                        break;
+                        connectionsToRemove.Add(connection);
                     }
                     if (connection.Source == newConnection.Source)
                     {
-                        connectionToRemove = connection;
-                        break;
+                        connectionsToRemove.Add(connection);
                     }
                 }
 
-                if (connectionToRemove != null)
+                foreach (var connection in connectionsToRemove)
                 {
-                    this.Remove(connectionToRemove);
+                    this.Remove(connection);
                 }
 
                 _Connections.Add(newConnection);
@@ -355,6 +353,9 @@ namespace Skill.Studio.Animation
                     break;
                 case AnimNodeType.Root:
                     result = new AnimationTreeRootViewModel(this, (AnimationTreeRoot)model);
+                    break;
+                case AnimNodeType.SubTree:
+                    result = new AnimNodeSubTreeViewModel(this, (AnimNodeSubTree)model);
                     break;
             }
 

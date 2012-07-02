@@ -222,7 +222,8 @@ namespace Skill.Animation
         /// <summary>
         /// Retrieves lenght of active sub branch
         /// </summary>
-        public abstract float Length { get; }
+        public abstract float Length { get; }        
+
 
         /// <summary>
         /// Allow each node to get apropriate AnimationLayer
@@ -326,6 +327,22 @@ namespace Skill.Animation
             if (!string.IsNullOrEmpty(Name))
                 return Name;
             return base.ToString();
+        }
+
+
+        /// <summary>
+        /// update format of all AnimNodeSequences in tree
+        /// </summary>
+        /// <param name="format">Format</param>        
+        internal virtual void SetFormat(string format)
+        {
+            foreach (var child in this)
+            {
+                if (child != null)
+                {
+                    child.SetFormat(format);
+                }
+            }
         }
     }
 }

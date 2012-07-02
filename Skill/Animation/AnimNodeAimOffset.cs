@@ -58,10 +58,28 @@ namespace Skill.Animation
             }
         }
 
+        private bool _UseTreeProfile;
         /// <summary>
         /// Whether use AnimationTree profiling method?
         /// </summary>
-        public bool UseTreeProfile { get; set; }
+        public bool UseTreeProfile
+        {
+            get { return _UseTreeProfile; }
+            set
+            {
+                if (_UseTreeProfile != value)
+                {
+                    _UseTreeProfile = value;
+                    foreach (var p in _Profiles)
+                    {
+                        for (int i = 0; i < 9; i++)
+                        {
+                            p[i].UseTreeProfile = value;
+                        }
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Whether aim animations are loop? (default is false).
@@ -77,9 +95,12 @@ namespace Skill.Animation
                 if (_IsLoop != value)
                 {
                     _IsLoop = value;
-                    for (int i = 1; i < ChildCount; i++)
+                    foreach (var p in _Profiles)
                     {
-                        ((AnimNodeSequence)this[i]).WrapMode = _IsLoop ? UnityEngine.WrapMode.Loop : UnityEngine.WrapMode.ClampForever;
+                        for (int i = 0; i < 9; i++)
+                        {
+                            p[i].WrapMode = _IsLoop ? UnityEngine.WrapMode.Loop : UnityEngine.WrapMode.ClampForever;
+                        }
                     }
                 }
             }
@@ -126,33 +147,12 @@ namespace Skill.Animation
             {
                 for (int i = 1; i < ChildCount; i++)
                 {
-                    AnimNodeSequence child = (AnimNodeSequence)this[i];
-                    child.UseTreeProfile = UseTreeProfile;
-                    child.AnimationName = _SelectedProfile.Animations[i - 1];
+                    this[i] = _SelectedProfile[i - 1];
                 }
             }
 
             if (ProfileChanged != null) ProfileChanged(this, EventArgs.Empty);
         }
-
-        /// <summary> Retrieves CenterCenter child node </summary>
-        public AnimNodeSequence CenterCenterNode { get { return (AnimNodeSequence)this[CenterCenterIndex]; } private set { this[CenterCenterIndex] = value; } }
-        /// <summary> Retrieves CenterUp child node </summary>
-        public AnimNodeSequence CenterUpNode { get { return (AnimNodeSequence)this[CenterUpIndex]; } private set { this[CenterUpIndex] = value; } }
-        /// <summary> Retrieves CenterDown child node </summary>
-        public AnimNodeSequence CenterDownNode { get { return (AnimNodeSequence)this[CenterDownIndex]; } private set { this[CenterDownIndex] = value; } }
-        /// <summary> Retrieves LeftCenter child node </summary>
-        public AnimNodeSequence LeftCenterNode { get { return (AnimNodeSequence)this[LeftCenterIndex]; } private set { this[LeftCenterIndex] = value; } }
-        /// <summary> Retrieves LeftUp child node </summary>
-        public AnimNodeSequence LeftUpNode { get { return (AnimNodeSequence)this[LeftUpIndex]; } private set { this[LeftUpIndex] = value; } }
-        /// <summary> Retrieves LeftDown child node </summary>
-        public AnimNodeSequence LeftDownNode { get { return (AnimNodeSequence)this[LeftDownIndex]; } private set { this[LeftDownIndex] = value; } }
-        /// <summary> Retrieves RightCenter child node </summary>
-        public AnimNodeSequence RightCenterNode { get { return (AnimNodeSequence)this[RightCenterIndex]; } private set { this[RightCenterIndex] = value; } }
-        /// <summary> Retrieves RightUp child node </summary>
-        public AnimNodeSequence RightUpNode { get { return (AnimNodeSequence)this[RightUpIndex]; } private set { this[RightUpIndex] = value; } }
-        /// <summary> Retrieves RightDown child node </summary>
-        public AnimNodeSequence RightDownNode { get { return (AnimNodeSequence)this[RightDownIndex]; } private set { this[RightDownIndex] = value; } }
 
         /// <summary>
         /// Whether anim layer is enable?
@@ -180,12 +180,39 @@ namespace Skill.Animation
             : base(10)
         {
             this._IsLoop = false;
-            this.UseTreeProfile = true;
+            this._UseTreeProfile = true;
             _Profiles = new List<AnimNodeAimOffsetProfile>();
-            for (int i = 1; i < ChildCount; i++)
+        }
+
+        /// <summary>
+        /// Initialize and collect information from animationComponent
+        /// </summary>
+        /// <param name="animationComponent">UnityEngine.Animation</param>
+        public override void Initialize(UnityEngine.Animation animationComponent)
+        {
+            foreach (var p in _Profiles)
             {
-                this[i] = new AnimNodeSequence() { WrapMode = UnityEngine.WrapMode.ClampForever };
+                if (p == _SelectedProfile) continue;
+                for (int i = 0; i < 9; i++)
+                {
+                    p[i].Initialize(animationComponent);
+                }
             }
+
+            base.Initialize(animationComponent);
+        }
+
+        internal override void SetFormat(string format)
+        {
+            foreach (var p in _Profiles)
+            {
+                if (p == _SelectedProfile) continue;
+                for (int i = 0; i < 9; i++)
+                {
+                    p[i].SetFormat(format);
+                }
+            }
+            base.SetFormat(format);
         }
 
         /// <summary>
@@ -276,26 +303,6 @@ namespace Skill.Animation
             blendWeights[RightUpIndex] = 0;
             blendWeights[RightDownIndex] = 0;
             blendWeights[RightCenterIndex] = 0;
-        }
-
-        private void Normalize4(ref float[] blendWeights, int index1, int index2, int index3, int index4)
-        {
-            float sum = blendWeights[index1] + blendWeights[index2] + blendWeights[index3] + blendWeights[index4];
-
-            if (_AimWeight > 0 && _AimWeight < 1)
-            {
-                blendWeights[index1] = (blendWeights[index1] / sum) * _AimWeight;
-                blendWeights[index2] = (blendWeights[index2] / sum) * _AimWeight;
-                blendWeights[index3] = (blendWeights[index3] / sum) * _AimWeight;
-                blendWeights[index4] = (blendWeights[index4] / sum) * _AimWeight;
-            }
-            else
-            {
-                blendWeights[index1] = blendWeights[index1] / sum;
-                blendWeights[index2] = blendWeights[index2] / sum;
-                blendWeights[index3] = blendWeights[index3] / sum;
-                blendWeights[index4] = blendWeights[index4] / sum;
-            }
         }
 
         /// <summary>

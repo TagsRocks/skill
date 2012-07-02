@@ -15,5 +15,6 @@
     <Image x:Key="ImgAnimNodeBlendByPosture" Source="/SkillStudio;component/Images/Animation/Posture.png" />
     <Image x:Key="ImgAnimNodeRandom" Source="/SkillStudio;component/Images/Animation/Random.png" />
     <Image x:Key="ImgAnimNodeBlendBySpeed" Source="/SkillStudio;component/Images/Animation/Speed.png" />
+    <Image x:Key="ImgSubTree" Source="/SkillStudio;component/Images/Animation/Root.png" />    
 
 </ResourceDictionary>

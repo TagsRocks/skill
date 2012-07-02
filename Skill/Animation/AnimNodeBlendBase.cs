@@ -37,7 +37,8 @@ namespace Skill.Animation
                     return maxChild.Length;
                 return 0;
             }
-        }
+        }        
+
 
         /// <summary>
         /// How long to take to get to the blend target.
@@ -76,8 +77,8 @@ namespace Skill.Animation
             }
         }
 
-        
-        
+
+
         /// <summary>
         /// subclasses should implement this and provide valid weight (0.0 - 0.1) for each child 
         /// </summary>

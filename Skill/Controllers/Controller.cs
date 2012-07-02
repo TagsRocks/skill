@@ -14,6 +14,7 @@ namespace Skill.Controllers
 
         public AnimPosture Posture { get; protected set; }
 
+        public Spawner Spawner { get; internal set; }
 
 
         protected virtual void OnDie(object userData)

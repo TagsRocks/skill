@@ -32,6 +32,7 @@ namespace Skill.Studio.Animation
         public AnimationConnectionViewModel(AnimationTreeViewModel tree, AnimNodeViewModel source, AnimNodeViewModel sink, int sinkConnectorIndex)
         {
             this._ConnectorPropertyChangedHandler = OnConnectorPropertyChanged;
+            this._ConnectorPositionChangedHandler = Connector_PositionChanged;
             this.Tree = tree;
             this.Model = new AnimationConnection(source.Model, sink.Model, sinkConnectorIndex);
             this.Source = source;

@@ -32,6 +32,7 @@ namespace Skill.Animation
         /// Whether actor is idle?
         /// </summary>
         public bool IsIdle { get; set; }
+        
 
         /// <summary>
         /// Retrieves lenght of active sub branch

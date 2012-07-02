@@ -58,6 +58,7 @@
     <Compile Include="AI\CompositeType.cs" />
     <Compile Include="Animation\AnimationTreeState.cs" />
     <Compile Include="Animation\AnimNodeMultilayer.cs" />
+    <Compile Include="Controllers\Spawner.cs" />
     <Compile Include="IO\BinaryLoadStream.cs" />
     <Compile Include="IO\BinarySaveStream.cs" />
     <Compile Include="IO\ISavable.cs" />

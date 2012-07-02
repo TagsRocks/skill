@@ -61,9 +61,10 @@ namespace Skill.Animation
         /// remember to disable IsOverriding when actor is not idle
         /// </remarks>
         public float OverridePeriod { get; set; }
+        
 
         /// <summary>
-        /// Retrieves lenght of active sub branch
+        /// Lenght of active branch
         /// </summary>
         public override float Length
         {

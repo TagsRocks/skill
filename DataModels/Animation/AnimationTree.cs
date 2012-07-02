@@ -230,6 +230,9 @@ namespace Skill.DataModels.Animation
                 case AnimNodeType.Root:
                     result = new AnimationTreeRoot();
                     break;
+                case AnimNodeType.SubTree:
+                    result = new AnimNodeSubTree();
+                    break;
             }
             return result;
         }

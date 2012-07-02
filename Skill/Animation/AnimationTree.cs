@@ -80,30 +80,7 @@ namespace Skill.Animation
                         {
                             format = "{0}";
                         }
-                        SetFormat(format, Root);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// update format of all AnimNodeSequences in tree
-        /// </summary>
-        /// <param name="format">Format</param>
-        /// <param name="node">Node to set format</param>
-        private void SetFormat(string format, AnimNode node)
-        {
-            if (node is AnimNodeSequence)
-            {
-                ((AnimNodeSequence)node).Format = format;
-            }
-            else if (node.ChildCount > 0)
-            {
-                foreach (var child in node)
-                {
-                    if (child != null)
-                    {
-                        SetFormat(format, child);
+                        Root.SetFormat(format);
                     }
                 }
             }
@@ -157,7 +134,7 @@ namespace Skill.Animation
         /// <param name="animationComponent">UnityEngine.Animation to initialize</param>        
         public virtual void Initialize(UnityEngine.Animation animationComponent)
         {
-            Root.Initialize(animationComponent);            
+            Root.Initialize(animationComponent);
         }
 
         /// <summary>
@@ -167,7 +144,7 @@ namespace Skill.Animation
         public void SyncLayers(UnityEngine.Animation animationComponent)
         {
             foreach (var layer in LayerManager.Layers)
-            {                
+            {
                 animationComponent.SyncLayer(layer.LayerIndex);
             }
         }
@@ -198,6 +175,7 @@ namespace Skill.Animation
         /// </remarks>
         public void Apply(UnityEngine.Animation animationComponent)
         {
+            animationComponent.clip = null;
             foreach (var layer in LayerManager.Layers)
             {
                 layer.Apply(animationComponent);

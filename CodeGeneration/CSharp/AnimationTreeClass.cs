@@ -28,7 +28,7 @@ namespace Skill.CodeGeneration.CSharp
         public AnimationTreeClass(AnimationTree tree)
             : base(tree.Name)
         {
-            this._Tree = tree;            
+            this._Tree = tree;
             this._CreateTreeMethodBody = new StringBuilder();
 
             // look at each AnimNode in tree and create apropriate variables and properties for them
@@ -62,10 +62,10 @@ namespace Skill.CodeGeneration.CSharp
             createTree.Modifiers = Modifiers.Protected;
             Add(createTree);
         }
-        #endregion        
+        #endregion
 
         #region Process
-        
+
         private void ProcessNodes()
         {
             foreach (var node in _Tree)
@@ -102,6 +102,9 @@ namespace Skill.CodeGeneration.CSharp
                     case AnimNodeType.BlendByIndex:
                         CreateSwitchByIndex((AnimNodeBlendByIndex)node);
                         break;
+                    case AnimNodeType.SubTree:
+                        CreateSubTree((AnimNodeSubTree)node);
+                        break;
                 }
             }
 
@@ -109,10 +112,17 @@ namespace Skill.CodeGeneration.CSharp
             _CreateTreeMethodBody.AppendLine();
 
             foreach (var connection in _Tree.Connections)
-            {                
+            {
                 if (connection.Source != null && connection.Sink != null && connection.Sink.NodeType != AnimNodeType.Root)
                 {
-                    _CreateTreeMethodBody.AppendLine(string.Format("this.{0}[{1}] = this.{2};", Variable.GetName(connection.Sink.Name), connection.SinkConnectorIndex, Variable.GetName(connection.Source.Name)));
+                    if (connection.Source.NodeType == AnimNodeType.SubTree)
+                    {
+                        _CreateTreeMethodBody.AppendLine(string.Format("this.{0}[{1}] = this.{2}.Root;", Variable.GetName(connection.Sink.Name), connection.SinkConnectorIndex, Variable.GetName(connection.Source.Name)));
+                    }
+                    else
+                    {
+                        _CreateTreeMethodBody.AppendLine(string.Format("this.{0}[{1}] = this.{2};", Variable.GetName(connection.Sink.Name), connection.SinkConnectorIndex, Variable.GetName(connection.Source.Name)));
+                    }
                 }
             }
 
@@ -120,7 +130,7 @@ namespace Skill.CodeGeneration.CSharp
             _CreateTreeMethodBody.AppendLine();
 
             // return root
-            AnimNode root = null;            
+            AnimNode root = null;
             foreach (var node in _Tree)
             {
                 if (node.NodeType == AnimNodeType.Root)
@@ -138,10 +148,23 @@ namespace Skill.CodeGeneration.CSharp
             }
 
             if (root != null)
-                _CreateTreeMethodBody.AppendLine(string.Format("return this.{0};", Variable.GetName(root.Name)));
+            {
+                if (root.NodeType == AnimNodeType.SubTree)
+                {
+                    _CreateTreeMethodBody.AppendLine(string.Format("return this.{0}.Root;", Variable.GetName(root.Name)));
+                }
+                else
+                {
+                    _CreateTreeMethodBody.AppendLine(string.Format("return this.{0};", Variable.GetName(root.Name)));
+                }
+            }
             else
+            {
                 _CreateTreeMethodBody.AppendLine("return null;");
+            }
         }
+
+
 
 
         private void SetProperty(AnimNode node, string pName, object pValue)
@@ -340,12 +363,53 @@ namespace Skill.CodeGeneration.CSharp
             // set profiles
             foreach (var profile in node.Profiles)
             {
-                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.AddProfile(new AnimNodeAimOffsetProfile(){{ {1} }});", Variable.GetName(node.Name),
-                   string.Format("Name = \"{0}\", CenterCenter = \"{1}\", CenterUp = \"{2}\", CenterDown = \"{3}\", LeftCenter = \"{4}\", LeftUp = \"{5}\", LeftDown = \"{6}\", RightCenter = \"{7}\", RightUp = \"{8}\", RightDown = \"{9}\"",
-                          profile.Name,
-                          profile.CenterCenter.AnimationName, profile.CenterUp.AnimationName, profile.CenterDown.AnimationName,
-                          profile.LeftCenter.AnimationName, profile.LeftUp.AnimationName, profile.LeftDown.AnimationName,
-                          profile.RightCenter.AnimationName, profile.RightUp.AnimationName, profile.RightDown.AnimationName)));
+                StringBuilder profileStr = new StringBuilder();
+                profileStr.Append(string.Format("this.{0}.AddProfile(new AnimNodeAimOffsetProfile(){{ Name = \"{1}\" ", Variable.GetName(node.Name), profile.Name));
+
+                if (!string.IsNullOrEmpty(profile.CenterCenter.AnimationName))
+                    profileStr.Append(string.Format(", CenterCenter = \"{0}\"", profile.CenterCenter.AnimationName));
+                if (!string.IsNullOrEmpty(profile.CenterUp.AnimationName))
+                    profileStr.Append(string.Format(", CenterUp = \"{0}\"", profile.CenterUp.AnimationName));
+                if (!string.IsNullOrEmpty(profile.CenterDown.AnimationName))
+                    profileStr.Append(string.Format(", CenterDown = \"{0}\"", profile.CenterDown.AnimationName));
+
+                if (!string.IsNullOrEmpty(profile.LeftCenter.AnimationName))
+                    profileStr.Append(string.Format(", LeftCenter = \"{0}\"", profile.LeftCenter.AnimationName));
+                if (!string.IsNullOrEmpty(profile.LeftUp.AnimationName))
+                    profileStr.Append(string.Format(", LeftUp = \"{0}\"", profile.LeftUp.AnimationName));
+                if (!string.IsNullOrEmpty(profile.LeftDown.AnimationName))
+                    profileStr.Append(string.Format(", LeftDown = \"{0}\"", profile.LeftDown.AnimationName));
+
+                if (!string.IsNullOrEmpty(profile.RightCenter.AnimationName))
+                    profileStr.Append(string.Format(", RightCenter = \"{0}\"", profile.RightCenter.AnimationName));
+                if (!string.IsNullOrEmpty(profile.RightUp.AnimationName))
+                    profileStr.Append(string.Format(", RightUp = \"{0}\"", profile.RightUp.AnimationName));
+                if (!string.IsNullOrEmpty(profile.RightDown.AnimationName))
+                    profileStr.Append(string.Format(", RightDown = \"{0}\"", profile.RightDown.AnimationName));
+
+                if (profile.CenterCenter.MixingTransforms != null && profile.CenterCenter.MixingTransforms.Length > 0)
+                    profileStr.Append(string.Format(", CenterCenterMTs = {0}", base.CreateStringArray(profile.CenterCenter.MixingTransforms)));
+                if (profile.CenterUp.MixingTransforms != null && profile.CenterUp.MixingTransforms.Length > 0)
+                    profileStr.Append(string.Format(", CenterUpMTs = {0}", base.CreateStringArray(profile.CenterUp.MixingTransforms)));
+                if (profile.CenterDown.MixingTransforms != null && profile.CenterDown.MixingTransforms.Length > 0)
+                    profileStr.Append(string.Format(", CenterDownMTs = {0}", base.CreateStringArray(profile.CenterDown.MixingTransforms)));
+
+                if (profile.LeftCenter.MixingTransforms != null && profile.LeftCenter.MixingTransforms.Length > 0)
+                    profileStr.Append(string.Format(", LeftCenterMTs = {0}", base.CreateStringArray(profile.LeftCenter.MixingTransforms)));
+                if (profile.LeftUp.MixingTransforms != null && profile.LeftUp.MixingTransforms.Length > 0)
+                    profileStr.Append(string.Format(", LeftUpMTs = {0}", base.CreateStringArray(profile.LeftUp.MixingTransforms)));
+                if (profile.LeftDown.MixingTransforms != null && profile.LeftDown.MixingTransforms.Length > 0)
+                    profileStr.Append(string.Format(", LeftDownMTs = {0}", base.CreateStringArray(profile.LeftDown.MixingTransforms)));
+
+                if (profile.RightCenter.MixingTransforms != null && profile.RightCenter.MixingTransforms.Length > 0)
+                    profileStr.Append(string.Format(", RightCenterMTs = {0}", base.CreateStringArray(profile.RightCenter.MixingTransforms)));
+                if (profile.RightUp.MixingTransforms != null && profile.RightUp.MixingTransforms.Length > 0)
+                    profileStr.Append(string.Format(", RightUpMTs = {0}", base.CreateStringArray(profile.RightUp.MixingTransforms)));
+                if (profile.RightDown.MixingTransforms != null && profile.RightDown.MixingTransforms.Length > 0)
+                    profileStr.Append(string.Format(", RightDownMTs = {0}", base.CreateStringArray(profile.RightDown.MixingTransforms)));
+
+                profileStr.Append("});");
+                _CreateTreeMethodBody.AppendLine(profileStr.ToString());
             }
 
             if (node.ProfileChanged)
@@ -370,6 +434,17 @@ namespace Skill.CodeGeneration.CSharp
             // new action inside CreateTree method
             _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Animation.AnimNodeAdditiveBlending();", Variable.GetName(node.Name)));
             SetSharedParameters(node);
+        }
+
+        private void CreateSubTree(AnimNodeSubTree node)
+        {
+            string className = System.IO.Path.GetFileNameWithoutExtension(node.TreeAddress);
+
+            // create action variable
+            CreateProperty(className, node);
+
+            // new inside CreateTree method
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new {1}();", Variable.GetName(node.Name), className));
         }
 
         #endregion

@@ -96,7 +96,7 @@ namespace Skill.Studio.Compiler
                 {
                     if (node.NodeType == AnimNodeType.Root)
                         AddError("Root of AnimationTree does not assigned.");
-                    else if (node.NodeType != AnimNodeType.Sequence)
+                    else if (node.NodeType != AnimNodeType.Sequence && node.NodeType != AnimNodeType.SubTree)
                         AddWarning(string.Format("There is no connection to AnimNode '{0}'.", node.Name));
                 }
             }
@@ -202,6 +202,12 @@ namespace Skill.Studio.Compiler
                 {
                     AnimNodeSequence sequence = item as AnimNodeSequence;
                     CheckAnimationClip(sequence);
+                }
+                else if (item.NodeType == AnimNodeType.SubTree)
+                {
+                    AnimationTreeNodeViewModel at = Node.Project.GetNode(((AnimNodeSubTree)item).TreeAddress) as AnimationTreeNodeViewModel;
+                    if (at == null)
+                        AddError(string.Format("AnimationTree address of AnimNodeSubTree {0} does not exist.", item.Name));
                 }
             }
             nameList.Clear();

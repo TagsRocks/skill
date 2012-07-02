@@ -112,7 +112,7 @@ namespace Skill.Animation
                 }
 
                 blendWeights[i] = f;
-            }            
+            }
         }
     }
 }

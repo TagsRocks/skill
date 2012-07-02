@@ -50,6 +50,7 @@
     <Compile Include="AI\SharedAccessKeys.cs" />
     <Compile Include="Animation\AnimationTreeProperty.cs" />
     <Compile Include="Animation\AnimationTreeRoot.cs" />
+    <Compile Include="Animation\AnimNodeSubTree.cs" />
     <Compile Include="Animation\Connector.cs" />
     <Compile Include="Animation\SkinMesh.cs" />
     <Compile Include="Animation\AnimationConnection.cs" />

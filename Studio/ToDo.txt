@@ -1,4 +1,3 @@
 ﻿1- Add EventNode in BehaviorTree
 2- Variable binding in AnimationTree
-2- Multithread building
-4- set MixingTransforms of AnimOffset in CodeGEnerator
+3- Multithread building

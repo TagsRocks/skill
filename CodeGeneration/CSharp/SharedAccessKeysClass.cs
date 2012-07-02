@@ -45,7 +45,7 @@ namespace Skill.CodeGeneration.CSharp
                         case AccessKeyType.TimeLimit:
                             this.Add(new Variable("Skill.AI.TimeLimitAccessKey", ak.Key) { IsStatic = true });
                             this.Add(new Property("Skill.AI.TimeLimitAccessKey", ak.Key, Variable.GetName(ak.Key), false) { IsStatic = true });
-                            staticConstructorBody.AppendLine(string.Format("{0} = new Skill.AI.TimeLimitAccessKey(\"{1}\",{2});", Variable.GetName(ak.Key), ak.Key, ((TimeLimitAccessKey)ak).TimeInterval));
+                            staticConstructorBody.AppendLine(string.Format("{0} = new Skill.AI.TimeLimitAccessKey(\"{1}\",{2}f);", Variable.GetName(ak.Key), ak.Key, ((TimeLimitAccessKey)ak).TimeInterval.ToString("F")));
                             break;
                     }
                 }

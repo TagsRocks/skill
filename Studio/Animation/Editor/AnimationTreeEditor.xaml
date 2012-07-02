@@ -104,8 +104,9 @@
                                     </MenuItem>                                    
                                     <MenuItem Header="Other" >
                                         <MenuItem Header="Override" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.Override}" Icon="{StaticResource ImgAnimNodeOverride}" />
-                                        <MenuItem Header="AimOffset" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.AimOffset}" Icon="{StaticResource ImgAnimNodeAimOffset}" />
+                                        <MenuItem Header="AimOffset" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.AimOffset}" Icon="{StaticResource ImgAnimNodeAimOffset}" />                                        
                                     </MenuItem>
+                                    <MenuItem Header="SubTree" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.SubTree}" Icon="{StaticResource ImgSubTree}" />
                                     <Separator/>
                                     <MenuItem Header="Paste" Command="{x:Static animedit:AnimationTreeEditor.PasteCommand}" />
                                 </ContextMenu>

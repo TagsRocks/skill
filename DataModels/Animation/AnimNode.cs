@@ -19,7 +19,8 @@ namespace Skill.DataModels.Animation
         AimOffset,
         AdditiveBlending,
         Random,
-        Root
+        Root,
+        SubTree
     }
 
     public abstract class AnimNode : IXElement
