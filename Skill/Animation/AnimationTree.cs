@@ -172,9 +172,12 @@ namespace Skill.Animation
         /// <param name="animationComponent">UnityEngine.Animation to update</param>                       
         /// <remarks>
         /// you can apply this AnimationTree to more than one UnityEngine.Animation each frame (instancing)
+        /// Make sure default AnimationClip of Animation setted to 'none' in editor
         /// </remarks>
         public void Apply(UnityEngine.Animation animationComponent)
         {
+            if (animationComponent.clip != null)
+                animationComponent[animationComponent.clip.name].enabled = false;
             animationComponent.clip = null;
             foreach (var layer in LayerManager.Layers)
             {

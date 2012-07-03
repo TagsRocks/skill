@@ -168,7 +168,7 @@
                                             <animedit:AnimConnector ContextMenu="{StaticResource ConnectorContextMenu}" DockPanel.Dock="Left" ViewModel="{Binding OutConnector}" Orientation="Left" Margin="-20,0,0,0" VerticalAlignment="Center"  />
                                             <TextBlock Style="{StaticResource AnimationText}" Margin="4,0,0,0" Text="{Binding OutConnector.Name}" VerticalAlignment="Center" IsHitTestVisible="False" />
                                         </DockPanel>
-                                        <ItemsControl Grid.Column="1" ItemsSource="{Binding Path=Inputs}" Visibility="{Binding InputsVisible}" >
+                                        <ItemsControl Grid.Column="1" ItemsSource="{Binding Path=Inputs}">
                                             <ItemsControl.ItemsPanel>
                                                 <ItemsPanelTemplate>
                                                     <StackPanel   />
@@ -177,7 +177,7 @@
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate >
                                                     <DockPanel Height="24" >
-                                                        <animedit:AnimConnector ContextMenu="{StaticResource ConnectorContextMenu}" ViewModel="{Binding}" DockPanel.Dock="Right" Orientation="Right" Margin="0,0,-20,0" />
+                                                        <animedit:AnimConnector ContextMenu="{StaticResource ConnectorContextMenu}" ViewModel="{Binding}" DockPanel.Dock="Right" Orientation="Right" Margin="0,0,-20,0" Visibility="{Binding Visible}" />
                                                         <TextBlock Style="{StaticResource AnimationText}" Text="{Binding Name}" TextAlignment="Right" />
                                                     </DockPanel>
                                                 </DataTemplate>

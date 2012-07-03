@@ -102,13 +102,13 @@ namespace Skill.Managers
     /// </summary>
     /// <param name="other">The collider that hit by this gameobject</param>
     /// <param name="userData">custom userdata</param>
-    public delegate void OnHitHandler(UnityEngine.Collider other, object userData);
+    public delegate void HitHandler(UnityEngine.Collider other, object userData);
 
     /// <summary>
     /// Handle this agent is dead
     /// </summary>    
     /// <param name="userData">custom userdata</param>
-    public delegate void OnDefaultHandler(object userData);
+    public delegate void DefaultHandler(object userData);
 
     /// <summary>
     /// Implement some common events
@@ -119,7 +119,7 @@ namespace Skill.Managers
         /// <summary>
         /// Occurs when a ray or somthing Hit this GameObject
         /// </summary>
-        public event OnHitHandler Hit;
+        public event HitHandler Hit;
 
         /// <summary>
         /// Call this method to notify all Components in GameObject about hitting something
@@ -135,7 +135,7 @@ namespace Skill.Managers
         /// <summary>
         /// Occurs when this GameObject is dead
         /// </summary>
-        public event OnDefaultHandler Die;
+        public event DefaultHandler Die;
 
         /// <summary>
         /// Call this method to notify all Components in GameObject that this agent is dead

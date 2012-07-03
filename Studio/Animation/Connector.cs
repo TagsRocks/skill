@@ -37,7 +37,7 @@ namespace Skill.Studio.Animation
                 }
             }
         }
-      
+
         [Description("Name of Connector")]
         public string Name
         {
@@ -61,7 +61,9 @@ namespace Skill.Studio.Animation
 
         private Editor.AnimConnector _Connector;
         [Browsable(false)]
-        public Editor.AnimConnector Connector { get { return _Connector; }
+        public Editor.AnimConnector Connector
+        {
+            get { return _Connector; }
             set
             {
                 if (_Connector != value)
@@ -74,6 +76,10 @@ namespace Skill.Studio.Animation
 
         [Browsable(false)]
         public Connector Model { get; private set; }
+
+        /// <summary> Whether input connectors are visible or not (for Sequence node this value is false)</summary>
+        [Browsable(false)]
+        public virtual System.Windows.Visibility Visible { get { return AnimNode.InputsVisible; } }
 
         public ConnectorViewModel(AnimNodeViewModel animNode, Connector model)
         {
