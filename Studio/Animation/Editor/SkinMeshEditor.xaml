@@ -67,9 +67,11 @@
                     <RowDefinition Height="36" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <StackPanel Orientation="Horizontal" >
-                    <Button Content="Create from clipboard" VerticalAlignment="Center" Height="24" Margin="4" Click="BtnCreateSkeletonFromClipboard_Click"  />
-                </StackPanel>
+                <ToolBar>
+                    <Button ToolTip="Replace from clipboard" VerticalAlignment="Center" Margin="4" Click="BtnCreateSkeletonFromClipboard_Click"  >
+                        <Image Source="{StaticResource ImgPaste}" Width="16" Height="16" />
+                    </Button>
+                </ToolBar>
                 <TreeView ItemsSource="{Binding ElementName=This,Path=SkinMesh.Nodes}" BorderThickness="0" Name="_BoneTree" 
                   SelectedItemChanged="BoneTree_SelectedItemChanged" ContextMenu="{StaticResource TVContextMenu}" Grid.Row="1" Margin="4" >
                     <TreeView.CommandBindings>
@@ -119,12 +121,26 @@
                     <RowDefinition Height="36" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <StackPanel Orientation="Horizontal" >
-                    <Button Content="Add from clipboard" VerticalAlignment="Center" Height="24" Margin="4" Click="BtnAddClipsFromClipboard_Click" />
-                    <Button Content="Add" VerticalAlignment="Center" Height="24" Width="60" Margin="2,4" Click="BtnAddClip_Click" />
-                    <Button Content="Remove" VerticalAlignment="Center" Height="24" Width="60" Margin="2,4" Click="BtnRemoveClip_Click" IsEnabled="{Binding ElementName=This,Path=CanAddClip}" />
-                    <Button Content="Clear" VerticalAlignment="Center" Height="24" Width="60" Margin="2,4" Click="BtnClearClip_Click" />
-                </StackPanel>
+                <ToolBar>
+                    <Button ToolTip="Paste from clipboard" VerticalAlignment="Center" Margin="2" Click="BtnAddClipsFromClipboard_Click" >
+                        <Image Source="{StaticResource ImgPaste}" Width="16" Height="16" />
+                    </Button>
+                    <Separator/>
+                    <Button ToolTip="Add" VerticalAlignment="Center" Margin="2" Click="BtnAddClip_Click" >
+                        <Image Source="{StaticResource ImgAdd2}" Width="16" Height="16" />
+                    </Button>
+                    <Button ToolTip="Remove" VerticalAlignment="Center" Margin="2" Click="BtnRemoveClip_Click" IsEnabled="{Binding ElementName=This,Path=CanAddClip}" >
+                        <ctrl:ButtonImage NormalImage="{StaticResource ImgRemove2}" DisableImage="{StaticResource ImgRemove2_D}" Width="16" Height="16" />
+                    </Button>
+                    <Button ToolTip="Clear" VerticalAlignment="Center" Margin="2" Click="BtnClearClip_Click" >
+                        <Image Source="{StaticResource ImgDelete2}" Width="16" Height="16" />
+                    </Button>
+                    <Separator/>
+                    <Button ToolTip="Remove string from all animations" VerticalAlignment="Center" Margin="2,2,0,2" Click="BtnRemoveString_Click" >
+                        <Image Source="{StaticResource ImgDelete}" Width="16" Height="16" />
+                    </Button>
+                    <TextBox x:Name="_TxtRemoveString" Text="Rifle" VerticalAlignment="Center" Margin="0,2,2,2" MinWidth="80" BorderThickness="1" BorderBrush="Gray" />
+                </ToolBar>
                 <ListBox Grid.Row="2" Margin="2" ItemsSource="{Binding ElementName=This,Path=SkinMesh.Animations}" x:Name="_LbAnimations" SelectionChanged="LbAnimations_SelectionChanged" >
                     <ListBox.Resources>
                         <DataTemplate DataType="{x:Type anim:AnimationClipViewModel}" >

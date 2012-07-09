@@ -600,9 +600,6 @@
     <Folder Include="Controls\Resources\" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\Logo.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\StartLogo.png" />
   </ItemGroup>
   <ItemGroup>

@@ -16,6 +16,7 @@ namespace Skill.Studio.Animation
         public AnimationTreeRootViewModel(AnimationTreeViewModel tree, AnimationTreeRoot model)
             : base(tree, model)
         {
+            model.Name = "Root";
         }
 
         [Description("Assigned SkinMesh")]

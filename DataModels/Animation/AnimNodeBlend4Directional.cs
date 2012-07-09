@@ -13,7 +13,7 @@ namespace Skill.DataModels.Animation
             : base("AnimNodeBlend4Directional")
         {
             base.Inputs = new Connector[4];
-            base.Inputs[0] = new Connector() { Index = 0, Name = "Foreward" };
+            base.Inputs[0] = new Connector() { Index = 0, Name = "Forward" };
             base.Inputs[1] = new Connector() { Index = 1, Name = "Backward" };
             base.Inputs[2] = new Connector() { Index = 2, Name = "Left" };
             base.Inputs[3] = new Connector() { Index = 3, Name = "Right" };

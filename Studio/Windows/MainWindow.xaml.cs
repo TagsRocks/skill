@@ -154,6 +154,10 @@ namespace Skill.Studio
 
         private void SaveLayout()
         {
+            string layoutFilename = LayoutFile;
+            string dir = System.IO.Path.GetDirectoryName(layoutFilename);
+            if (!System.IO.Directory.Exists(dir))
+                System.IO.Directory.CreateDirectory(dir);
             _DockManager.SaveLayout(LayoutFile);
         }
         private void RestoreLayout()

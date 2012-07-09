@@ -401,5 +401,18 @@ namespace Skill.Studio.Animation.Editor
         }
 
         #endregion
+
+        #region Remove String
+        private void BtnRemoveString_Click(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(_TxtRemoveString.Text))
+            {
+                foreach (var clip in this._SkinMesh.Animations)
+                {
+                    clip.Name = clip.Name.Replace(_TxtRemoveString.Text, "");
+                }
+            }
+        } 
+        #endregion
     }
 }

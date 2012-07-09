@@ -6,7 +6,7 @@ using Skill.Animation;
 
 namespace Skill.Controllers
 {
-    public class Controller : MonoBehaviour
+    public class Controller : MonoBehaviour, Managers.IEventManagerHooker
     {
         public Skill.AI.BehaviorTree Behavior { get; protected set; }
 
@@ -16,6 +16,10 @@ namespace Skill.Controllers
 
         public Spawner Spawner { get; internal set; }
 
+        protected virtual void Awake()
+        {
+            HookEvents();
+        }
 
         protected virtual void OnDie(object userData)
         {
@@ -27,6 +31,11 @@ namespace Skill.Controllers
         {
             if (Behavior != null)
                 Behavior.Reset();
+            UnhookEvents();
         }
+
+
+        public virtual void HookEvents() { }
+        public virtual void UnhookEvents() { }
     }
 }

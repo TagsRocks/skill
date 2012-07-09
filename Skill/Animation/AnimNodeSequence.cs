@@ -193,7 +193,7 @@ namespace Skill.Animation
                 return;
             }
 
-            UnityEngine.AnimationState state = animationComponent[AnimationName];
+            UnityEngine.AnimationState state = animationComponent[CurrentAnimation];
             if (state != null)
             {
                 this._Length = state.length;
