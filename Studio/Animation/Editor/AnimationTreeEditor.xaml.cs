@@ -432,11 +432,11 @@ namespace Skill.Studio.Animation.Editor
                 {
                     nodesToDelete.Add(vm);
 
-                    var qurey = this.AnimationTree.Connections.Where(c => c.Source == vm);
+                    var qurey = this.AnimationTree.Connections.Where(c => c.Source == vm || c.Sink == vm);
                     foreach (var connection in qurey)
                     {
                         connectionsToDelete.Add(connection);
-                    }
+                    }                    
                 }
             }
 

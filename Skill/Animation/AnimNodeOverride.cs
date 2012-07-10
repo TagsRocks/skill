@@ -118,11 +118,9 @@ namespace Skill.Animation
             base.OnCeaseRelevant(state);
         }
 
-        /// <summary>
-        /// Blend between children
-        /// </summary>
-        protected override void Blend()
-        {
+
+        internal override void Update(AnimationTreeState state)
+        {                    
             if (_OverrideTimer.Enabled)
             {
                 if (_OverrideTimer.IsOver)
@@ -133,7 +131,7 @@ namespace Skill.Animation
             if (_OverrideOneShot)
             {
                 IsOverriding = true;
-                base.Blend();// update to make sure lenght of child is valid
+                base.Update(state);// update to make sure lenght of child is valid
                 if (OverrideNode != null)
                 {
                     _OverrideTimer.Begin(OverrideNode.Length);
@@ -151,7 +149,7 @@ namespace Skill.Animation
                     if (_Timer.IsOver)
                     {
                         IsOverriding = true;
-                        base.Blend();// update to make sure lenght of child is valid
+                        base.Update(state);// update to make sure lenght of child is valid
                         if (OverrideNode != null)
                         {
                             _OverrideTimer.Begin(OverrideNode.Length);
@@ -166,7 +164,7 @@ namespace Skill.Animation
                     _Timer.Begin(OverridePeriod);
             }
 
-            base.Blend();
+            base.Update(state);
         }
         /// <summary>
         /// Calculate weight of children between 0.0f - 1.0f

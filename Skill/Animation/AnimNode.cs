@@ -172,7 +172,7 @@ namespace Skill.Animation
         /// Update AnimationNode
         /// </summary>
         /// <param name="state">State of AnimationTree</param>
-        public void Update(AnimationTreeState state)
+        internal virtual void Update(AnimationTreeState state)
         {
             if (BeginUpdate(state))
             {
