@@ -30,8 +30,23 @@ namespace Skill.Studio.Controls
         public ProjectPropertiesControl(ProjectViewModel project)
         {
             this.Project = project;
+            this.Project.Settings.History = History;
             this.DataContext = project;
             InitializeComponent();
+
+            SetChanged(false);
+            History.Change += new EventHandler(History_Change);
+        }
+
+        void History_Change(object sender, EventArgs e)
+        {
+            SetChanged(History.ChangeCount != 0);
+        }
+
+        protected override void ChangeTitle()
+        {
+            string newTitle = Project.Name + (IsChanged ? "*" : "");
+            if (this.Title != newTitle) this.Title = newTitle;
         }
 
         private void BtnBrowseUnityDir_Click(object sender, RoutedEventArgs e)
@@ -49,6 +64,19 @@ namespace Skill.Studio.Controls
                     }
                 }
             }
+        }
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            if (History.ChangeCount != 0)
+                this.Project.Save();
+            this.Project.Settings.History = null;
+            base.OnClosing(e);
+        }
+
+        private void OutputText_Changed(object sender, TextChangedEventArgs e)
+        {
+            Project.Settings.OutputLocaltion = ((TextBox)sender).Text;
         }
     }
 }

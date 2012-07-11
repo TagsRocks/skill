@@ -6,7 +6,15 @@
              xmlns:ctr="clr-namespace:Skill.Studio.Controls"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="400" d:DesignWidth="700" Title="{Binding Name}" >
+             d:DesignHeight="400" d:DesignWidth="700" >
+    <sk:TabDocument.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Undo"
+                  Executed="UndoCmdExecuted"
+                  CanExecute="UndoCmdCanExecute"/>
+        <CommandBinding Command="ApplicationCommands.Redo"
+                  Executed="RedoCmdExecuted"
+                  CanExecute="RedoCmdCanExecute"/>
+    </sk:TabDocument.CommandBindings>
     <Grid Background="{StaticResource ControlBg}" >
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -37,7 +45,7 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <TextBlock Text="Unity Project Localtion" Grid.Row="0"  Grid.Column="0" />
-                    <TextBox Text="{Binding Settings.OutputLocaltion}" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Name="_TxtUnityDir"/>
+                    <TextBox Text="{Binding Settings.OutputLocaltion}" TextChanged="OutputText_Changed" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Name="_TxtUnityDir"/>
                     <Button Content="Browse" Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" Margin="0,0,10,0" Click="BtnBrowseUnityDir_Click"/>
                 </Grid>
             </TabItem>

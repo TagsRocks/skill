@@ -15,22 +15,22 @@ namespace Skill.Studio
     public class ProjectSettings : IXElement
     {
         /// <summary> Location in unity project to generate code files </summary>
-        public string OutputLocaltion { get; set; }        
+        public string OutputLocaltion { get; set; }
 
         public ProjectSettings()
         {
-            this.OutputLocaltion = "c:\\Unity\\Assets\\Skill";            
+            this.OutputLocaltion = "c:\\Unity\\Assets\\Skill";
         }
 
         public void Load(XElement e)
         {
-            OutputLocaltion = e.Attribute("OutputLocaltion").Value;            
+            OutputLocaltion = e.Attribute("OutputLocaltion").Value;
         }
 
         public XElement ToXElement()
         {
             XElement settings = new XElement("Settings");
-            settings.SetAttributeValue("OutputLocaltion", OutputLocaltion);            
+            settings.SetAttributeValue("OutputLocaltion", OutputLocaltion);
             return settings;
         }
     }
@@ -39,16 +39,18 @@ namespace Skill.Studio
     #region ProjectSettingsViewModel
     public class ProjectSettingsViewModel : INotifyPropertyChanged
     {
-        
+
         #region Properties
         /// <summary> ProjectSettings Model </summary>
         public ProjectSettings Model { get; private set; }
+        /// <summary> History </summary>
+        public UnDoRedo History { get; set; }
         #endregion
 
         #region Constructor
         public ProjectSettingsViewModel(ProjectSettings settings)
         {
-            this.Model = settings;            
+            this.Model = settings;
         }
         #endregion
 
@@ -76,14 +78,16 @@ namespace Skill.Studio
                         System.Windows.MessageBox.Show("Invalid directory");
                         return;
                     }
+                    if (History != null)
+                        History.Insert(new ChangePropertyUnDoRedo(this, "OutputLocaltion", value, Model.OutputLocaltion));
                     Model.OutputLocaltion = value;
                     this.OnPropertyChanged(new PropertyChangedEventArgs("OutputLocaltion"));
                 }
             }
-        }        
+        }
         public void CopyFrom(ProjectSettingsViewModel other)
         {
-            this.OutputLocaltion = other.OutputLocaltion;            
+            this.OutputLocaltion = other.OutputLocaltion;
         }
     }
     #endregion
