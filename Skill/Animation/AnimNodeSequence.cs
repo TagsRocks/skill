@@ -133,6 +133,7 @@ namespace Skill.Animation
         public AnimNodeSequence(string animationName)
             : base(0)
         {
+            _InitializedAnimations = new List<string>();
             Synchronize = false;
             UseTreeProfile = true;
             Speed = 1;
@@ -181,21 +182,26 @@ namespace Skill.Animation
             this.Format = format;
         }
 
+        private List<string> _InitializedAnimations;
+
         /// <summary>
         /// Initialize and collect information from animationComponent
         /// </summary>
         /// <param name="animationComponent">UnityEngine.Animation</param>
         public override void Initialize(UnityEngine.Animation animationComponent)
         {
-            if (string.IsNullOrEmpty(AnimationName))
+            if (string.IsNullOrEmpty(CurrentAnimation))
             {
-                UnityEngine.Debug.LogWarning("Please set valid 'AnimationName' to  AnimNodeSequence : " + (string.IsNullOrEmpty(Name) ? "" : Name));
+                UnityEngine.Debug.LogWarning("Please set valid 'AnimationName' to  AnimNodeSequence : " + (string.IsNullOrEmpty(Name) ? "" : CurrentAnimation));
                 return;
             }
+
+            if (_InitializedAnimations.Contains(CurrentAnimation)) return;
 
             UnityEngine.AnimationState state = animationComponent[CurrentAnimation];
             if (state != null)
             {
+                _InitializedAnimations.Add(CurrentAnimation);
                 this._Length = state.length;
                 state.layer = Layer.LayerIndex;
 
@@ -218,7 +224,7 @@ namespace Skill.Animation
 
             }
             else
-                UnityEngine.Debug.LogWarning("Can not find AnimationClip : " + AnimationName);
+                UnityEngine.Debug.LogWarning("Can not find AnimationClip : " + CurrentAnimation);
         }
     }
 }

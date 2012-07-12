@@ -194,7 +194,7 @@ namespace Skill.Animation
                         }
                     }
 
-                    if (anim.WeightChange != WeightChangeMode.NoChange)
+                    if (anim.WeightChange != WeightChangeMode.NoChange || anim.UpdatePreviousAnimation)
                     {
                         // set parameters
                         state.blendMode = BlendMode;
