@@ -10,6 +10,13 @@ namespace Skill.Animation
     /// </summary>
     public class AnimNodeSequence : AnimNode
     {
+
+        private class AnimationInfo
+        {
+            public string Name;
+            public float Length;
+        }
+
         /// <summary>
         /// whether animation layer needs to update PreviousAnimation. when AnimationTree profile changed
         /// </summary>
@@ -81,6 +88,9 @@ namespace Skill.Animation
                     UpdatePreviousAnimation = true;
                 else
                     UpdatePreviousAnimation = false;
+
+                var info = FindInfo(CurrentAnimation);
+                if (info != null) _Length = info.Length;
             }
             else
             {
@@ -116,7 +126,7 @@ namespace Skill.Animation
                     return _Length / Speed;
                 return 0;
             }
-        }        
+        }
 
         /// <summary>
         /// Create an instance of AnimNodeSequence
@@ -133,7 +143,7 @@ namespace Skill.Animation
         public AnimNodeSequence(string animationName)
             : base(0)
         {
-            _InitializedAnimations = new List<string>();
+            _InitializedAnimations = new List<AnimationInfo>();
             Synchronize = false;
             UseTreeProfile = true;
             Speed = 1;
@@ -182,7 +192,16 @@ namespace Skill.Animation
             this.Format = format;
         }
 
-        private List<string> _InitializedAnimations;
+        private List<AnimationInfo> _InitializedAnimations;
+
+        private AnimationInfo FindInfo(string name)
+        {
+            foreach (var item in _InitializedAnimations)
+            {
+                if (item.Name == name) return item;
+            }
+            return null;
+        }
 
         /// <summary>
         /// Initialize and collect information from animationComponent
@@ -196,12 +215,12 @@ namespace Skill.Animation
                 return;
             }
 
-            if (_InitializedAnimations.Contains(CurrentAnimation)) return;
+            if (FindInfo(CurrentAnimation) != null) return;
 
             UnityEngine.AnimationState state = animationComponent[CurrentAnimation];
             if (state != null)
             {
-                _InitializedAnimations.Add(CurrentAnimation);
+                _InitializedAnimations.Add(new AnimationInfo() { Name = CurrentAnimation, Length = state.length });
                 this._Length = state.length;
                 state.layer = Layer.LayerIndex;
 
