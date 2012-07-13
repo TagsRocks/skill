@@ -369,78 +369,7 @@ namespace Skill.Studio.AI
                 }
             }
         }
-
-        [DefaultValue(false)]
-        [Category("Events")]
-        [DisplayName("Success")]
-        [Description("If true code generator create an method and hook it to success event")]
-        public bool SuccessEvent
-        {
-            get { return Model.SuccessEvent; }
-            set
-            {
-                if (value != Model.SuccessEvent)
-                {
-                    Model.SuccessEvent = value;
-                    this.OnPropertyChanged(new PropertyChangedEventArgs("SuccessEvent"));
-                    Tree.History.Insert(new ChangePropertyUnDoRedo(this, "SuccessEvent", value, !value));
-                }
-            }
-        }
-
-        [DefaultValue(false)]
-        [Category("Events")]
-        [DisplayName("Failure")]
-        [Description("If true code generator create an method and hook it to failure event")]
-        public bool FailureEvent
-        {
-            get { return Model.FailureEvent; }
-            set
-            {
-                if (value != Model.FailureEvent)
-                {
-                    Model.FailureEvent = value;
-                    this.OnPropertyChanged(new PropertyChangedEventArgs("FailureEvent"));
-                    Tree.History.Insert(new ChangePropertyUnDoRedo(this, "FailureEvent", value, !value));
-                }
-            }
-        }
-
-        [DefaultValue(false)]
-        [Category("Events")]
-        [DisplayName("Running")]
-        [Description("If true code generator create an method and hook it to running event")]
-        public bool RunningEvent
-        {
-            get { return Model.RunningEvent; }
-            set
-            {
-                if (value != Model.RunningEvent)
-                {
-                    Model.RunningEvent = value;
-                    this.OnPropertyChanged(new PropertyChangedEventArgs("RunningEvent"));
-                    Tree.History.Insert(new ChangePropertyUnDoRedo(this, "RunningEvent", value, !value));
-                }
-            }
-        }
-
-        [DefaultValue(false)]
-        [Category("Events")]
-        [DisplayName("Reset")]
-        [Description("If true code generator create an method and hook it to reset event")]
-        public bool ResetEvent
-        {
-            get { return Model.ResetEvent; }
-            set
-            {
-                if (value != Model.ResetEvent)
-                {
-                    Model.ResetEvent = value;
-                    this.OnPropertyChanged(new PropertyChangedEventArgs("ResetEvent"));
-                    Tree.History.Insert(new ChangePropertyUnDoRedo(this, "ResetEvent", value, !value));
-                }
-            }
-        }
+               
 
         [DefaultValue(1)]
         [DisplayName("Weight")]

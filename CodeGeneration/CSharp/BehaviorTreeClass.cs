@@ -12,8 +12,8 @@ namespace Skill.CodeGeneration.CSharp
     class BehaviorTreeClass : Class
     {
         #region Variables
-        private static string[] BehaviorEventHandlerParams = new string[] { "Skill.AI.Behavior sender", "Skill.AI.BehaviorResult result", "Skill.AI.BehaviorTree tree" };
-        private static string[] ConditionHandlerParams = new string[] { "Skill.AI.BehaviorTree tree", "Skill.AI.BehaviorParameterCollection parameters" };
+        private static string[] ActionResetEventHandlerParams = new string[] { "Skill.AI.Action action" };
+        private static string[] ConditionHandlerParams = new string[] { "Skill.AI.BehaviorParameterCollection parameters" };
         private static string[] DecoratorHandlerParams = ConditionHandlerParams;
         private static string[] ActionHandlerParams = ConditionHandlerParams;
         
@@ -242,42 +242,7 @@ namespace Skill.CodeGeneration.CSharp
             {
                 _CreateTreeMethodBody.AppendLine(SetProperty(behavior.Name, "Weight", behavior.Weight.ToString() + "f"));
             }
-        }
-
-        private void CreateEvents(Behavior behavior)
-        {
-            // create failure event handler and assign it to failure event
-            if (behavior.FailureEvent)
-            {
-                string eventName = behavior.Name + "_Failure";
-                Add(new Method("void", eventName, "", BehaviorEventHandlerParams) { IsPartial = true });
-                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.Failure += new BehaviorEventHandler({1});", Variable.GetName(behavior.Name), eventName));
-            }
-
-            // create success event handler and assign it to success event
-            if (behavior.SuccessEvent)
-            {
-                string eventName = behavior.Name + "_Success";
-                Add(new Method("void", eventName, "", BehaviorEventHandlerParams) { IsPartial = true });
-                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.Success += new BehaviorEventHandler({1});", Variable.GetName(behavior.Name), eventName));
-            }
-
-            // create running event handler and assign it to running event
-            if (behavior.RunningEvent)
-            {
-                string eventName = behavior.Name + "_Running";
-                Add(new Method("void", eventName, "", BehaviorEventHandlerParams) { IsPartial = true });
-                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.Running += new BehaviorEventHandler({1});", Variable.GetName(behavior.Name), eventName));
-            }
-
-            // create running event handler and assign it to running event
-            if (behavior.ResetEvent)
-            {
-                string resetName = behavior.Name + "_Reset";
-                Add(new Method("void", resetName, "", BehaviorEventHandlerParams) { IsPartial = true });
-                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.Reset += new BehaviorEventHandler({1});", Variable.GetName(behavior.Name), resetName));
-            }
-        }
+        }        
 
         private void CreateAction(Skill.DataModels.AI.Action action)
         {
@@ -291,8 +256,14 @@ namespace Skill.CodeGeneration.CSharp
             Method m = new Method("Skill.AI.BehaviorResult", GetActionHandlerName(action.Name), "return Skill.AI.BehaviorResult.Failure;", ActionHandlerParams);
             m.IsPartial = true;
             Add(m);
-            // create events handlers (success, failure and Running)
-            CreateEvents(action);
+
+            // create reset event handler and assign it to Reset event
+            if (action.ResetEvent)
+            {
+                string resetName = action.Name + "_Reset";
+                Add(new Method("void", resetName, "", ActionResetEventHandlerParams) { IsPartial = true });
+                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.Reset += new ActionResetEventHandler({1});", Variable.GetName(action.Name), resetName));
+            }
         }
 
         private void CreateCondition(Condition condition)
@@ -306,9 +277,7 @@ namespace Skill.CodeGeneration.CSharp
             // create condition handler method
             Method m = new Method("bool", GetConditionHandlerName(condition.Name), "return false;", ConditionHandlerParams);
             m.IsPartial = true;
-            Add(m);
-            // create events handlers (success, failure and Running)
-            CreateEvents(condition);
+            Add(m);            
         }
 
         private void CreateDecorator(Decorator decorator)
@@ -338,9 +307,7 @@ namespace Skill.CodeGeneration.CSharp
             // create decorator handler method
             Method m = new Method("bool", GetDecoratorHandlerName(decorator.Name), "return false;", DecoratorHandlerParams);
             m.IsPartial = true;
-            Add(m);
-            // create events handlers (success, failure and Running)
-            CreateEvents(decorator);
+            Add(m);            
         }
 
         private void CreateAccessLimitDecorator(AccessLimitDecorator decorator)
@@ -363,9 +330,7 @@ namespace Skill.CodeGeneration.CSharp
             if (decorator.NeverFail != true) // default value is true, so it is not necessary to set it
                 _CreateTreeMethodBody.AppendLine(SetProperty(decorator.Name, "NeverFail", decorator.NeverFail.ToString().ToLower()));
             // set weight
-            SetWeight(decorator);
-            // create events handlers (success, failure and Running)
-            CreateEvents(decorator);
+            SetWeight(decorator);            
         }
 
         private void CreateComposite(Composite composite)
@@ -391,9 +356,7 @@ namespace Skill.CodeGeneration.CSharp
                     throw new InvalidOperationException("Invalid CompositeType");
             }
             // set weight
-            SetWeight(composite);
-            // create events handlers (success, failure and Running)
-            CreateEvents(composite);
+            SetWeight(composite);            
         }
 
         private void CreateSequenceSelector(SequenceSelector sequenceSelector)

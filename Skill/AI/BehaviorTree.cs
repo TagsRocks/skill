@@ -94,6 +94,11 @@ namespace Skill.AI
             //}
             State.Begin();
             Root.Trace(State);
+
+            if (State.Exception != null)
+            {
+                UnityEngine.Debug.LogWarning(State.Exception.ToString());
+            }
         }
 
         /// <summary>
@@ -103,7 +108,7 @@ namespace Skill.AI
         /// </summary>
         public void Reset()
         {
-            Root.ResetBehavior(State, true);
+            Root.ResetBehavior(true);
         }
     }
     #endregion

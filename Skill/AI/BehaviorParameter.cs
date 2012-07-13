@@ -50,13 +50,23 @@ namespace Skill.AI
         /// <summary>
         /// Retrieves parameter by name
         /// </summary>
-        /// <param name="name">Name of parameter</param>
+        /// <param name="parameterName">Name of parameter</param>
+        /// <returns></returns>
+        public object this[string parameterName]
+        {
+            get { return GetValue(parameterName); }
+        }
+
+        /// <summary>
+        /// Retrieves parameter by name
+        /// </summary>
+        /// <param name="parameterName">Name of parameter</param>
         /// <returns>Parameter</returns>
-        public object GetValue(string name)
+        public object GetValue(string parameterName)
         {
             foreach (var item in this)
             {
-                if (item.Name == name)
+                if (item.Name == parameterName)
                     return item.Value;
             }
             return null;

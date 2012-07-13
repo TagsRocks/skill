@@ -84,7 +84,7 @@ namespace Skill.AI
             _StackTop++;
 
             // this means : the execution sequence is different from previous execution sequence
-            if (_Stack[_StackTop] != null && behavior != _Stack[_StackTop])
+            if (_Stack[_StackTop] != null && behavior != _Stack[_StackTop] && behavior.Type == BehaviorType.Action)
             {
                 CallResetForSequence(_StackTop);// so call fail method for rest of previous sequence                
             }
@@ -113,7 +113,7 @@ namespace Skill.AI
             {
                 if (_Stack[i] != null)
                 {
-                    _Stack[i].ResetBehavior(this);
+                    _Stack[i].ResetBehavior();
                     _Stack[i] = null;
                 }
                 else

@@ -27,6 +27,25 @@ namespace Skill.Studio.AI
             }
         }
 
+        [DefaultValue(false)]
+        [Category("Events")]
+        [DisplayName("Reset")]
+        [Description("If true code generator create an method and hook it to reset event")]
+        public bool ResetEvent
+        {
+            get { return ((Skill.DataModels.AI.Action)Model).ResetEvent; }
+            set
+            {
+                if (value != ((Skill.DataModels.AI.Action)Model).ResetEvent)
+                {
+                    ((Skill.DataModels.AI.Action)Model).ResetEvent = value;
+                    this.OnPropertyChanged(new PropertyChangedEventArgs("ResetEvent"));
+                    Tree.History.Insert(new ChangePropertyUnDoRedo(this, "ResetEvent", value, !value));
+                }
+            }
+        }
+
+
         public ActionViewModel(BehaviorViewModel parent, Skill.DataModels.AI.Action action)
             : base(parent, action)
         {

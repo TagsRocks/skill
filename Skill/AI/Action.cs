@@ -5,15 +5,23 @@ using System.Text;
 
 namespace Skill.AI
 {
+
+    #region ActionResetEventHandler
+    /// <summary>
+    /// Represents the method to handle Action reset events.
+    /// </summary>
+    /// <param name="action">Sender behavior</param>        
+    public delegate void ActionResetEventHandler(Action action);
+    #endregion
+
     #region Action
 
     /// <summary>
     /// Represents the method that will handle execution of action by user
-    /// </summary>
-    /// <param name="tree">BehaviorTree</param>
+    /// </summary>    
     /// <param name="parameters">Parameters for action</param>
     /// <returns>State of action</returns>
-    public delegate BehaviorResult ActionHandler(BehaviorTree tree, BehaviorParameterCollection parameters);
+    public delegate BehaviorResult ActionHandler(BehaviorParameterCollection parameters);
 
     /// <summary>
     /// Actions which finally implement an actors or game world state changes, for example to plan a path and move on it, to sense for the nearest enemies,
@@ -24,6 +32,10 @@ namespace Skill.AI
     public class Action : Behavior
     {
         private ActionHandler _Handler = null;// handler        
+
+        /// Occurs when behavior is reset
+        /// </summary>
+        public event ActionResetEventHandler Reset;
 
         /// <summary>
         /// Create an instance of Action
@@ -46,7 +58,8 @@ namespace Skill.AI
             BehaviorResult result = BehaviorResult.Failure;// by default failure
 
             // execute handler and get result back
-            if (_Handler != null) result = _Handler(state.BehaviorTree, state.Parameters);
+            state.RunningAction = this;
+            if (_Handler != null) result = _Handler(state.Parameters);
 
             // if action needs to run next frame store it's reference
             if (result == BehaviorResult.Running)
@@ -56,7 +69,25 @@ namespace Skill.AI
             return result;
         }
 
-        
+        /// <summary>
+        /// On Reset
+        /// </summary>        
+        protected virtual void OnReset()
+        {
+            if (Reset != null) Reset(this);
+        }
+
+        /// <summary>
+        /// Reset behavior. For internal use. when a branch with higher priority executed, let nodes in previous branch reset
+        /// </summary>        
+        /// <param name="resetChildren">Reset children too</param>
+        internal override void ResetBehavior(bool resetChildren = false)
+        {
+            OnReset();
+            base.ResetBehavior();
+        }
+
+
         /// <summary>
         /// for internal use when behavior tree let action continue (when result is BehaviorResult.Running)
         /// </summary>
@@ -66,6 +97,6 @@ namespace Skill.AI
         {
             return Behave(state);
         }
-    } 
+    }
     #endregion
 }

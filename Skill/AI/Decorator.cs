@@ -8,11 +8,10 @@ namespace Skill.AI
     #region DecoratorHandler
     /// <summary>
     /// Represents the method to handle execution of Decorator by user
-    /// </summary>
-    /// <param name="tree">BehaviorTree</param>
-    /// <param name="parameters">Parameters for condition</param>
+    /// </summary>    
+    /// <param name="parameters">Parameters for handler</param>
     /// <returns>true for success, false for failure</returns>
-    public delegate bool DecoratorHandler(BehaviorTree tree, BehaviorParameterCollection parameters);
+    public delegate bool DecoratorHandler(BehaviorParameterCollection parameters);
     #endregion
 
     #region DecoratorType
@@ -95,14 +94,22 @@ namespace Skill.AI
             {
                 if (_Handler != null)
                 {
-                    state.Parameters = Child.Parameters;
                     if (_IsChildRunning)// continue execution of child
+                    {
+                        state.Parameters = Child.Parameters;
                         result = Child.Behavior.Trace(state);
-                    else if (_Handler(state.BehaviorTree, state.Parameters))
+                    }
+                    else if (_Handler(state.Parameters))
+                    {
+                        state.Parameters = Child.Parameters;
                         result = Child.Behavior.Trace(state);
+                    }
                 }
                 else
+                {
+                    state.Parameters = Child.Parameters;
                     result = Child.Behavior.Trace(state);
+                }
             }
             if (result == BehaviorResult.Running)
                 _IsChildRunning = true;
@@ -116,17 +123,16 @@ namespace Skill.AI
 
         /// <summary>
         /// Reset behavior
-        /// </summary>
-        /// <param name="state">State of BehaviorTree</param>
+        /// </summary>        
         /// <param name="resetChildren">Reset children too</param>
-        public override void ResetBehavior(BehaviorState state, bool resetChildren = false)
+        internal override void ResetBehavior(bool resetChildren = false)
         {
-            base.ResetBehavior(state);
+            base.ResetBehavior();
             if (resetChildren)
             {
                 if (Child != null)
                 {
-                    Child.Behavior.ResetBehavior(state, resetChildren);
+                    Child.Behavior.ResetBehavior(resetChildren);
                 }
             }
         }

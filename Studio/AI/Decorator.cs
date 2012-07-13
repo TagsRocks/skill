@@ -22,7 +22,7 @@ namespace Skill.Studio.AI
         [System.ComponentModel.Editor(typeof(Editor.ParametersPropertyEditor), typeof(Editor.ParametersPropertyEditor))]
         [DisplayName("Parameters")]
         [Description("Parameters to pass to handler method")]
-        public ParameterCollectionViewModel Parameters
+        public virtual ParameterCollectionViewModel Parameters
         {
             get
             {
@@ -62,6 +62,14 @@ namespace Skill.Studio.AI
     {
         public override string ImageName { get { return Images.AccessLimitDecorator; } }
 
+        [Browsable(false)]
+        public override ParameterCollectionViewModel Parameters
+        {
+            get
+            {
+                return base.Parameters;
+            }
+        }
 
 
         [DisplayName("AccessKey")]

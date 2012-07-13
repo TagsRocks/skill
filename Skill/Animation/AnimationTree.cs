@@ -134,9 +134,12 @@ namespace Skill.Animation
         /// <param name="animationComponent">UnityEngine.Animation to initialize</param>        
         public virtual void Initialize(UnityEngine.Animation animationComponent)
         {
+            Root.Initialize(animationComponent);
+
             string currentProfile = Profile;
             foreach (var p in _Profiles)
             {
+                if (p.Key == currentProfile) continue;
                 Profile = p.Key;
                 Root.Initialize(animationComponent);
             }

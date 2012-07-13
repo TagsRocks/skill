@@ -35,18 +35,6 @@ namespace Skill.DataModels.AI
         /// <summary> Id of behavior </summary>
         public int Id { get; set; }
 
-        /// <summary> If true code generator create an method and hook it to success event </summary>
-        public bool SuccessEvent { get; set; }
-
-        /// <summary> If true code generator create an method and hook it to failure event </summary>
-        public bool FailureEvent { get; set; }
-
-        /// <summary> If true code generator create an method and hook it to running event </summary>
-        public bool RunningEvent { get; set; }
-
-        /// <summary> If true code generator create an method and hook it to reset event </summary>
-        public bool ResetEvent { get; set; }
-
         /// <summary> Weight of node when behavior is child of a random selector </summary>
         public float Weight { get; set; }
 
@@ -117,23 +105,18 @@ namespace Skill.DataModels.AI
             behavior.SetAttributeValue("BehaviorType", BehaviorType.ToString());
             behavior.SetAttributeValue("Name", Name);
             behavior.SetAttributeValue("Id", Id);
-            XElement events = new XElement("Events");
-            events.SetAttributeValue("Failure", FailureEvent);
-            events.SetAttributeValue("Success", SuccessEvent);
-            events.SetAttributeValue("Running", RunningEvent);
-            events.SetAttributeValue("Reset", ResetEvent);
+            behavior.SetAttributeValue("Weight", Weight);
 
             if (!string.IsNullOrEmpty(Comment))
             {
                 XElement comment = new XElement("Comment");
                 comment.SetValue(Comment);
                 behavior.Add(comment);
-            }            
+            }
 
-            behavior.Add(events);
             WriteAttributes(behavior); // allow subclass to add additional data
             return behavior;
-        }        
+        }
         #endregion
 
         #region Load
@@ -157,17 +140,9 @@ namespace Skill.DataModels.AI
         /// <param name="e">contains behavior data</param>
         public void Load(XElement e)
         {
-            Name = e.Attribute("Name").Value;
-            Id = int.Parse(e.Attribute("Id").Value);
-
-            XElement events = FindChild(e, "Events");
-            if (events != null)
-            {
-                this.FailureEvent = events.GetAttributeValueAsBoolean("Failure", false);
-                this.SuccessEvent = events.GetAttributeValueAsBoolean("Success", false);
-                this.RunningEvent = events.GetAttributeValueAsBoolean("Running", false);
-                this.ResetEvent = events.GetAttributeValueAsBoolean("Reset", false);
-            }
+            Name = e.GetAttributeValueAsString("Name", Name);
+            Id = int.Parse(e.GetAttributeValueAsString("Id", "-1"));
+            Weight = e.GetAttributeValueAsFloat("Weight", 1);
 
             XElement comment = FindChild(e, "Comment");
             if (comment != null)

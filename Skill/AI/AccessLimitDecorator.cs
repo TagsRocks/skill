@@ -209,6 +209,7 @@ namespace Skill.AI
                         _Lock = AccessKey.Lock();// try to lock key
                     if (_Lock)// if success, execute child
                     {
+                        state.Parameters = Child.Parameters;
                         result = Child.Behavior.Trace(state);
                     }
                     if (_Lock && result != BehaviorResult.Running)// if finish job, unlock key
@@ -226,16 +227,16 @@ namespace Skill.AI
         /// <summary>
         /// Reset behavior. when a branch with more periority be valid let this nod to unlock key
         /// </summary>
-        /// <param name="state">State of BehaviorTree</param>
+       /// <param name="state">State of BehaviorTree</param>
         /// <param name="resetChildren">Reset children too</param>
-        public override void ResetBehavior(BehaviorState state, bool resetChildren = false)
+        internal override void ResetBehavior(bool resetChildren = false)
         {
             if (_Lock)
             {
                 AccessKey.Unlock();
                 _Lock = false;
             }
-            base.ResetBehavior(state);
+            base.ResetBehavior();
         }
     }
     #endregion

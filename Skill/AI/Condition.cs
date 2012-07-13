@@ -7,11 +7,10 @@ namespace Skill.AI
 {
     /// <summary>
     /// Represents the method to handle execution of condition by user
-    /// </summary>
-    /// <param name="tree">BehaviorTree</param>
+    /// </summary>    
     /// <param name="parameters">Parameters for condition</param>
     /// <returns>true for success, false for failure</returns>
-    public delegate bool ConditionHandler(BehaviorTree tree, BehaviorParameterCollection parameters);
+    public delegate bool ConditionHandler(BehaviorParameterCollection parameters);
 
     /// <summary>
     /// Check that certain actor or game world states hold true.(leaf node)
@@ -47,7 +46,7 @@ namespace Skill.AI
             BehaviorResult result = BehaviorResult.Failure;
             if (_Handler != null)
             {
-                bool b = _Handler(state.BehaviorTree, state.Parameters);
+                bool b = _Handler(state.Parameters);
                 if (Reverse)
                     result = b ? BehaviorResult.Failure : BehaviorResult.Success;
                 else

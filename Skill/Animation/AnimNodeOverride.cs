@@ -222,18 +222,7 @@ namespace Skill.Animation
         public void OverrideOneShot(int overrideIndex)
         {
             OverrideIndex = overrideIndex;
-            if (OverrideNode != null)
-            {
-                if (_OverrideTimer.Enabled)
-                {
-                    return;
-                }
-                else if (!_OverrideOneShot)
-                {
-                    _OverrideOneShot = true;
-                    IsOverriding = true;
-                }
-            }
+            OverrideOneShot();
         }
     }
 }

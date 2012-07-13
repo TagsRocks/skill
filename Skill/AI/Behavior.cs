@@ -5,40 +5,11 @@ using System.Text;
 
 namespace Skill.AI
 {
-
-    #region BehaviorEventHandler
-    /// <summary>
-    /// Represents the method to handle behavior events.
-    /// </summary>
-    /// <param name="sender">Sender behavior</param>
-    /// <param name="result">Result of behavior after execution</param>
-    /// <param name="tree">BehaviorTree</param>
-    public delegate void BehaviorEventHandler(Behavior sender, BehaviorResult result, BehaviorTree tree);
-    #endregion
-
-
     /// <summary>
     /// Defines base class for all behavior nodes in BehaviorTree
     /// </summary>
     public abstract class Behavior
     {
-        /// <summary>
-        /// Occurs when execution result of behavior is BehaviorResult.Success
-        /// </summary>
-        public event BehaviorEventHandler Success;
-        /// <summary>
-        /// Occurs when execution result of behavior is BehaviorResult.Failure
-        /// </summary>
-        public event BehaviorEventHandler Failure;
-        /// <summary>
-        /// Occurs when execution result of behavior is BehaviorResult.Running
-        /// </summary>
-        public event BehaviorEventHandler Running;
-        /// <summary>
-        /// Occurs when behavior is reset
-        /// </summary>
-        public event BehaviorEventHandler Reset;
-
         /// <summary>
         /// Name of Behavior
         /// </summary>
@@ -88,58 +59,13 @@ namespace Skill.AI
                 state.Exception = e;// store exception
                 Result = BehaviorResult.Failure; // set result to failure
             }
-            switch (Result)
-            {
-                case BehaviorResult.Failure:
-                    state.UnRegisterForExecution(this);
-                    OnFailure(state);
-                    break;
-                case BehaviorResult.Success:
-                    state.UnRegisterForExecution(this);
-                    OnSuccess(state);
-                    break;
-                case BehaviorResult.Running:
-                    OnRunning(state);
-                    break;
-                default:
-                    break;
-            }
+
+            if (Result != BehaviorResult.Running)
+                state.UnRegisterForExecution(this);
             return Result;
         }
 
-        /// <summary>
-        /// On Success
-        /// </summary>
-        /// <param name="state">State of BehaviorTree</param>
-        protected virtual void OnSuccess(BehaviorState state)
-        {
-            if (Success != null) Success(this, Result, state.BehaviorTree);
-        }
-        /// <summary>
-        /// On Failure
-        /// </summary>
-        /// <param name="state">State of BehaviorTree</param>
-        protected virtual void OnFailure(BehaviorState state)
-        {
-            if (Failure != null) Failure(this, Result, state.BehaviorTree);
-        }
-        /// <summary>
-        /// On Running
-        /// </summary>
-        /// <param name="state">State of BehaviorTree</param>
-        protected virtual void OnRunning(BehaviorState state)
-        {
-            if (Running != null) Running(this, Result, state.BehaviorTree);
-        }
 
-        /// <summary>
-        /// On Reset
-        /// </summary>
-        /// <param name="state">State of BehaviorTree</param>
-        protected virtual void OnReset(BehaviorState state)
-        {
-            if (Reset != null) Reset(this, Result, state.BehaviorTree);
-        }
 
         /// <summary>
         /// Let subclass implement behaveior
@@ -157,13 +83,11 @@ namespace Skill.AI
 
         /// <summary>
         /// Reset behavior. For internal use. when a branch with higher priority executed, let nodes in previous branch reset
-        /// </summary>
-        /// <param name="state">State of BehaviorTree</param>
+        /// </summary>        
         /// <param name="resetChildren">Reset children too</param>
-        public virtual void ResetBehavior(BehaviorState state, bool resetChildren = false)
+        internal virtual void ResetBehavior(bool resetChildren = false)
         {
             Result = BehaviorResult.Failure;
-            OnReset(state);
         }
 
     }
