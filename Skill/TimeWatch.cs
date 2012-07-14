@@ -19,9 +19,9 @@ namespace Skill
         /// </summary>
         public float OverTime { get; private set; }
         /// <summary>
-        /// Length
+        /// Get and set Length
         /// </summary>
-        public float Length { get; private set; }
+        public float Length { get; set; }
         /// <summary>
         /// Is enabled (begined)
         /// </summary>

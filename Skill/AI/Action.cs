@@ -57,8 +57,7 @@ namespace Skill.AI
         {
             BehaviorResult result = BehaviorResult.Failure;// by default failure
 
-            // execute handler and get result back
-            state.RunningAction = this;
+            // execute handler and get result back            
             if (_Handler != null) result = _Handler(state.Parameters);
 
             // if action needs to run next frame store it's reference

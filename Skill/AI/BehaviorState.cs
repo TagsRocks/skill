@@ -51,10 +51,7 @@ namespace Skill.AI
         }
 
         private Behavior[] _ExecutionSequence = new Behavior[200];// 200 is maximum node trace in tree (i hope).
-        private int _CurrnetExecutionIndex = -1;
-
-        private Behavior[] _Stack = new Behavior[200];// 200 is maximum node trace in tree (i hope).
-        private int _StackTop = -1;
+        private int _CurrnetExecutionIndex = -1;        
 
 
         /// <summary>
@@ -62,8 +59,7 @@ namespace Skill.AI
         /// </summary>
         internal void Begin()
         {
-            _CurrnetExecutionIndex = -1;
-            _StackTop = -1;
+            _CurrnetExecutionIndex = -1;            
         }
 
         /// <summary>
@@ -77,50 +73,20 @@ namespace Skill.AI
         /// if the result be Running then it hold the key until next update (at least)
         /// if in next update a branch before that be executed we lost the key and never unlock it        
         /// </remarks>
-        internal int RegisterForExecution(Behavior behavior)
+        internal void RegisterForExecution(Behavior behavior)
         {
             _CurrnetExecutionIndex++;// move to next place
-            _ExecutionSequence[_CurrnetExecutionIndex] = behavior;
-            _StackTop++;
+            _ExecutionSequence[_CurrnetExecutionIndex] = behavior;            
 
-            // this means : the execution sequence is different from previous execution sequence
-            if (_Stack[_StackTop] != null && behavior != _Stack[_StackTop] && behavior.Type == BehaviorType.Action)
+            if (behavior.Type == BehaviorType.Action)
             {
-                CallResetForSequence(_StackTop);// so call fail method for rest of previous sequence                
-            }
-            _Stack[_StackTop] = behavior; // register behavior in current sequece
-            return _StackTop;
-
-        }
-
-        internal void UnRegisterForExecution(Behavior behavior)
-        {
-            if (_Stack[_StackTop] == behavior)
-            {
-                _Stack[_StackTop] = null;
-                _StackTop--;
-            }
-            else
-                throw new InvalidProgramException("Invalid Behavior To UnRegister");
-        }
-
-        /// <summary>
-        /// call fail method for rest of execution sequence
-        /// </summary>
-        private void CallResetForSequence(int startIndex)
-        {
-            for (int i = startIndex; i < _Stack.Length; i++)
-            {
-                if (_Stack[i] != null)
+                if (RunningAction != null)
                 {
-                    _Stack[i].ResetBehavior();
-                    _Stack[i] = null;
-                }
-                else
-                    break;
-            }
-        }
-
+                    if (RunningAction != behavior)
+                        RunningAction.ResetBehavior();
+                }                               
+            }            
+        }                
 
         private bool IsChildOf(Behavior parent, Behavior child)
         {

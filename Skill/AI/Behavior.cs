@@ -58,10 +58,7 @@ namespace Skill.AI
             {
                 state.Exception = e;// store exception
                 Result = BehaviorResult.Failure; // set result to failure
-            }
-
-            if (Result != BehaviorResult.Running)
-                state.UnRegisterForExecution(this);
+            }            
             return Result;
         }
 

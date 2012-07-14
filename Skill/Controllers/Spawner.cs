@@ -30,7 +30,7 @@ namespace Skill.Controllers
         // If true, only spawn agents if player can't see spawn point
         //public bool OnlySpawnHidden;
         // If true, controls whether we are actively spawning agents
-        //public bool SpawnActivate = false;
+        public bool SpawnActivate = false;
 
         /// <summary> List of all alive spawned objects </summary>
         public List<GameObject> SpawnedObjects { get; private set; }
@@ -125,7 +125,7 @@ namespace Skill.Controllers
 
         public virtual void Awake()
         {
-            enabled = false;
+            enabled = SpawnActivate;
         }
 
         public virtual void Update()
