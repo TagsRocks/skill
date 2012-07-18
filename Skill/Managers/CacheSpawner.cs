@@ -37,6 +37,7 @@ namespace Skill.Managers
             for (_NextIndex = 0; _NextIndex < InitialCacheSize; _NextIndex++)
             {
                 GameObject obj = MonoBehaviour.Instantiate(Prefab) as GameObject;
+                obj.transform.parent = CacheSpawner.Parent; 
                 if (string.IsNullOrEmpty(NamePatternFormat))
                     NamePatternFormat = obj.name + "_{0}";
 
@@ -82,6 +83,7 @@ namespace Skill.Managers
             if (Growable)
             {
                 GameObject obj = MonoBehaviour.Instantiate(Prefab) as GameObject;
+                obj.transform.parent = CacheSpawner.Parent; 
                 obj.name = string.Format(NamePatternFormat, _NextIndex++);
                 SetCacheId(obj);
                 _Objects.Add(obj);
@@ -135,10 +137,13 @@ namespace Skill.Managers
     public class CacheSpawner : MonoBehaviour
     {
         public float CleanInterval = 20;
+        public Transform ParentOfCache; // all gameobjects will be child of this to avoid mess in "Hierarchy" window in editor
         public ObjectCache[] Caches;
 
         private static CacheSpawner _Instance = null;
         private Skill.TimeWatch _CleanTW;
+
+
 
         void Awake()
         {
@@ -150,6 +155,12 @@ namespace Skill.Managers
                 Caches[i].Initialize();
             }
         }
+
+        /// <summary>
+        /// all cached GameObjects will be child of this to avoid mess in "Hierarchy" window in editor
+        /// </summary>
+        public static Transform Parent { get { return _Instance.ParentOfCache; } }
+
 
         private static ObjectCache GetObjectCache(GameObject prefab)
         {
