@@ -482,6 +482,11 @@ namespace Skill.Studio
 
         public void BuildNode(EntityNodeViewModel vm)
         {
+            if (PluginManager.Plugin == null)
+            {
+                ShowError("Invalid plugin. Please select valid plugin.");
+                return;
+            }
             CheckErrors();
             if (_ErrorList.GetErrorCount(Skill.Studio.Compiler.ErrorType.Error) == 0)
             {
@@ -712,6 +717,13 @@ namespace Skill.Studio
         {
             CopyDlls(true);
         }
+
+        private void MnuSelectPlugin_Click(object sender, RoutedEventArgs e)
+        {
+            PluginWindow window = new PluginWindow();
+            window.Owner = this;
+            window.ShowDialog();
+        }
         #endregion
 
         #region Documents
@@ -869,6 +881,8 @@ namespace Skill.Studio
         }
 
         #endregion
+
+       
 
 
 

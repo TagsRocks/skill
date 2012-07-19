@@ -175,6 +175,12 @@
                 </MenuItem>
                 <Separator/>
                 <MenuItem Header="Create Dlls" Click="MnuCopySkillDll_Click"  IsEnabled="{Binding IsProjectLoaded,ElementName=This}" />
+                <Separator/>
+                <MenuItem Header="Select Plugin" Click="MnuSelectPlugin_Click" >
+                    <MenuItem.Icon>
+                        <Image Source="/SkillStudio;component/Images/Default/plugin.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
             <MenuItem Header="Help" >
                 <MenuItem Header="View Help" Command="ApplicationCommands.Help"  InputGestureText="F1" >

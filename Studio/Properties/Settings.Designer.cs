@@ -93,5 +93,17 @@ namespace Skill.Studio.Properties {
                 this["RecentProjects"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Plugin {
+            get {
+                return ((string)(this["Plugin"]));
+            }
+            set {
+                this["Plugin"] = value;
+            }
+        }
     }
 }

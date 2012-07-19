@@ -9,7 +9,6 @@ namespace Skill.Studio
 {
     public static class Builder
     {
-        private static ICodeGenerator _CodeGenerator = new Skill.CodeGeneration.CSharp.CSharpCodeGenerator();
         private static char[] OldeCodeTimeChars = new char[] { ' ', '\'', '\"', '\n', '\r', '\t' };
 
         private static void CreateDirectory(string dir)
@@ -19,28 +18,32 @@ namespace Skill.Studio
 
         public static void Build(Skill.DataModels.AI.BehaviorTree tree, string localDir, string name)
         {
-            _CodeGenerator.Generate(tree);
-            CreateFile(_CodeGenerator, localDir, name);
+            PluginManager.Plugin.Reset();
+            PluginManager.Plugin.Generate(tree);
+            CreateFile(PluginManager.Plugin, localDir, name);
 
         }
 
         public static void Build(Skill.DataModels.AI.SharedAccessKeys keys, string localDir, string name)
         {
-            _CodeGenerator.Generate(keys);
-            CreateFile(_CodeGenerator, localDir, name);
+            PluginManager.Plugin.Reset();
+            PluginManager.Plugin.Generate(keys);
+            CreateFile(PluginManager.Plugin, localDir, name);
 
         }
 
         public static void Build(Skill.DataModels.Animation.AnimationTree tree, string localDir, string name)
         {
-            _CodeGenerator.Generate(tree);
-            CreateFile(_CodeGenerator, localDir, name);
+            PluginManager.Plugin.Reset();
+            PluginManager.Plugin.Generate(tree);
+            CreateFile(PluginManager.Plugin, localDir, name);
         }
 
         public static void Build(Skill.DataModels.IO.SaveData saveGame, string localDir, string name)
         {
-            _CodeGenerator.Generate(saveGame);
-            CreateFile(_CodeGenerator, localDir, name);
+            PluginManager.Plugin.Reset();
+            PluginManager.Plugin.Generate(saveGame);
+            CreateFile(PluginManager.Plugin, localDir, name);
         }
 
         private static void CreateFile(ICodeGenerator generator, string localDir, string name)
@@ -61,7 +64,7 @@ namespace Skill.Studio
             writer.Close();
             file.Close();
 
-            if (_CodeGenerator.HasPartial)
+            if (generator.HasPartial)
             {
                 string oldCode = null;
                 // writer user file

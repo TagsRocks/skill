@@ -22,12 +22,14 @@ namespace Skill.CodeGeneration
         bool HasPartial { get; }
 
         /// <summary>
+        /// Reset generator and prepare to generate another output
+        /// </summary>
+        void Reset();
+
+        /// <summary>
         /// Generate code for BehaviorTree
         /// </summary>
-        /// <param name="bTree">BehaviorTree containing raw data</param>
-        /// <remarks>
-        /// Each instance of class will used to call one of Generate methods and not two or more of them        
-        /// </remarks>
+        /// <param name="bTree">BehaviorTree containing raw data</param>        
         void Generate(BehaviorTree bTree);
 
         /// <summary>

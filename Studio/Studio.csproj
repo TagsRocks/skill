@@ -204,6 +204,10 @@
     <Compile Include="IO\SaveClass.cs" />
     <Compile Include="IO\SaveData.cs" />
     <Compile Include="IO\SaveProperty.cs" />
+    <Compile Include="Windows\PluginWindow.xaml.cs">
+      <DependentUpon>PluginWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Root\PluginManager.cs" />
     <Compile Include="Root\SaveDataNode.cs" />
     <Compile Include="Root\SkinMeshNode.cs" />
     <Compile Include="Root\SharedAccessKeysNode.cs" />
@@ -346,6 +350,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="IO\Editor\SaveDataEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\PluginWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -610,6 +618,7 @@
     <Resource Include="Images\Animation\Random.png" />
     <Resource Include="Images\Default\AccessLimitDecorator.png" />
     <Resource Include="Images\Default\Disabled\AccessLimitDecorator.png" />
+    <Resource Include="Images\Default\plugin.png" />
     <Content Include="WPFToolkit.Extended.dll" />
     <Resource Include="Images\Default\Disabled\Remove2.png" />
     <Resource Include="Images\Default\Remove2.png" />
@@ -665,6 +674,10 @@
     <ProjectReference Include="..\DataModels\DataModels.csproj">
       <Project>{EDE188CB-1A7D-4168-988B-33DBCCBAA21A}</Project>
       <Name>DataModels</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UnityCSharpCodeGeneration\UnityCSharpCodeGeneration.csproj">
+      <Project>{C00A59BC-EC40-40BE-8A78-AB9754CBDBE3}</Project>
+      <Name>UnityCSharpCodeGeneration</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
