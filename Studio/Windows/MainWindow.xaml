@@ -202,7 +202,7 @@
                     <Setter Property="Height" Value="16"/>
                 </Style>
             </ToolBarTray.Resources>
-            <ToolBar  Background="{StaticResource ResourceKey=ToolbarBackColor}" BorderThickness="1" BorderBrush="#FFD5DCE8" >
+            <ToolBar  Background="{StaticResource ResourceKey=ToolbarBackColor}" BorderThickness="1" BorderBrush="{StaticResource ToolbarBorderColor}" >
                 <Button Command="ApplicationCommands.New" >
                     <my:ButtonImage NormalImage="{StaticResource ImgNewProject}" DisableImage="{StaticResource ImgNewProject_D}" />
                 </Button>
@@ -216,7 +216,7 @@
                     <my:ButtonImage NormalImage="{StaticResource ImgSaveAll}" DisableImage="{StaticResource ImgSaveAll_D}" />
                 </Button>
             </ToolBar>
-            <ToolBar  Background="{StaticResource ResourceKey=ToolbarBackColor}" BorderThickness="1" BorderBrush="#FFD5DCE8">
+            <ToolBar  Background="{StaticResource ResourceKey=ToolbarBackColor}" BorderThickness="1" BorderBrush="{StaticResource ToolbarBorderColor}">
                 <Button Command="{x:Static local:MainWindow.CheckForErrorsCommand}"  >
                     <my:ButtonImage NormalImage="{StaticResource ImgCheckForErrors}" DisableImage="{StaticResource ImgCheckForErrors_D}" />
                 </Button>
@@ -224,6 +224,28 @@
                     <my:ButtonImage NormalImage="{StaticResource ImgBuild}" DisableImage="{StaticResource ImgBuild_D}" />
                 </Button>
             </ToolBar>
+
+            <ToolBar  Background="{StaticResource ResourceKey=ToolbarBackColor}" BorderThickness="1" BorderBrush="{StaticResource ToolbarBorderColor}">
+                <Button Command="{x:Static local:MainWindow.AlignTopCommand}" ToolTip="Align Objects Top" >
+                    <my:ButtonImage NormalImage="{StaticResource ImgAlignTop}" DisableImage="{StaticResource ImgAlignTop_D}" />
+                </Button>
+                <Button Command="{x:Static local:MainWindow.AlignBottomCommand}" ToolTip="Align Objects Bottom" >
+                    <my:ButtonImage NormalImage="{StaticResource ImgAlignBottom}" DisableImage="{StaticResource ImgAlignBottom_D}" />
+                </Button>
+                <Button Command="{x:Static local:MainWindow.AlignLeftCommand}" ToolTip="Align Objects Left" >
+                    <my:ButtonImage NormalImage="{StaticResource ImgAlignLeft}" DisableImage="{StaticResource ImgAlignLeft_D}" />
+                </Button>
+                <Button Command="{x:Static local:MainWindow.AlignRightCommand}" ToolTip="Align Objects Right" >
+                    <my:ButtonImage NormalImage="{StaticResource ImgAlignRight}" DisableImage="{StaticResource ImgAlignRight_D}" />
+                </Button>
+                <Button Command="{x:Static local:MainWindow.AlignCenteredHorizontalCommand}" ToolTip="Align Objects Centered Horizontal" >
+                    <my:ButtonImage NormalImage="{StaticResource ImgAlignCenteredHorizontal}" DisableImage="{StaticResource ImgAlignCenteredHorizontal_D}" />
+                </Button>
+                <Button Command="{x:Static local:MainWindow.AlignCenteredVerticalCommand}" ToolTip="Align Objects Centered Vertical" >
+                    <my:ButtonImage NormalImage="{StaticResource ImgAlignCenteredVertical}" DisableImage="{StaticResource ImgAlignCenteredVertical_D}" />
+                </Button>
+            </ToolBar>
+
         </ToolBarTray>
         <StatusBar DockPanel.Dock="Bottom" Height="24" Background="#293955" >
             <TextBlock Name="_StatusText"  Text="Ready" Foreground="White" />

@@ -436,7 +436,7 @@ namespace Skill.Studio.Animation.Editor
                     foreach (var connection in qurey)
                     {
                         connectionsToDelete.Add(connection);
-                    }                    
+                    }
                 }
             }
 
@@ -534,7 +534,6 @@ namespace Skill.Studio.Animation.Editor
         }
         #endregion
 
-
         #region Duplicate
 
         void DuplicateCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -552,6 +551,241 @@ namespace Skill.Studio.Animation.Editor
         {
             CopySelectionToClipboard(true);
             PasteFromClipboard();
+        }
+
+        #endregion
+
+        #region Alignment
+
+        void AlignTopCmdCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = Selection.SelectedObjects.Count > 1;
+            e.Handled = true;
+        }
+        void AlignTopCmdExecuted(object target, ExecutedRoutedEventArgs e)
+        {
+            if (Selection.SelectedObjects.Count > 1)
+            {
+                List<AlignmentNodeData> dataList = new List<AlignmentNodeData>(); // history data
+
+                double minY = double.MaxValue;
+                foreach (AnimNodeViewModel node in Selection.SelectedObjects)
+                    minY = Math.Min(minY, node.Y);
+
+
+                foreach (AnimNodeViewModel node in Selection.SelectedObjects)
+                {
+                    AlignmentNodeData data = new AlignmentNodeData(); // create for history
+                    data.Node = node;
+                    data.PreY = node.Y;
+                    node.Y = minY;
+                    data.NewY = node.Y;
+                    dataList.Add(data);
+                }
+
+                History.Insert(new AlignmentUndoRedo(dataList));
+            }
+            e.Handled = true;
+        }
+
+        void AlignBottomCmdCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = Selection.SelectedObjects.Count > 1;
+            e.Handled = true;
+        }
+        void AlignBottomCmdExecuted(object target, ExecutedRoutedEventArgs e)
+        {
+            if (Selection.SelectedObjects.Count > 1)
+            {
+                List<AlignmentNodeData> dataList = new List<AlignmentNodeData>();
+                double maxY = 0;
+                foreach (AnimNodeViewModel node in Selection.SelectedObjects)
+                    maxY = Math.Max(maxY, node.Y + node.Height);
+
+                foreach (AnimNodeViewModel node in Selection.SelectedObjects)
+                {
+                    AlignmentNodeData data = new AlignmentNodeData();
+                    data.Node = node;
+                    data.PreY = node.Y;
+                    node.Y = maxY - node.Height;
+                    data.NewY = node.Y;
+                    dataList.Add(data);
+                }
+                History.Insert(new AlignmentUndoRedo(dataList));
+            }
+
+            e.Handled = true;
+        }
+
+        void AlignLeftCmdCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = Selection.SelectedObjects.Count > 1;
+            e.Handled = true;
+        }
+        void AlignLeftCmdExecuted(object target, ExecutedRoutedEventArgs e)
+        {
+            if (Selection.SelectedObjects.Count > 1)
+            {
+                List<AlignmentNodeData> dataList = new List<AlignmentNodeData>();
+                double minX = double.MaxValue;
+                foreach (AnimNodeViewModel node in Selection.SelectedObjects)
+                    minX = Math.Min(minX, node.X);
+
+                foreach (AnimNodeViewModel node in Selection.SelectedObjects)
+                {
+                    AlignmentNodeData data = new AlignmentNodeData();
+                    data.Node = node;
+                    data.PreX = node.X;
+                    node.X = minX;
+                    data.NewX = node.X;
+                    dataList.Add(data);
+                }
+                History.Insert(new AlignmentUndoRedo(dataList));
+            }
+
+            e.Handled = true;
+        }
+
+        void AlignRightCmdCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = Selection.SelectedObjects.Count > 1;
+            e.Handled = true;
+        }
+        void AlignRightCmdExecuted(object target, ExecutedRoutedEventArgs e)
+        {
+            if (Selection.SelectedObjects.Count > 1)
+            {
+                List<AlignmentNodeData> dataList = new List<AlignmentNodeData>();
+                double maxX = 0;
+                foreach (AnimNodeViewModel node in Selection.SelectedObjects)
+                    maxX = Math.Max(maxX, node.X + node.Width);
+
+                foreach (AnimNodeViewModel node in Selection.SelectedObjects)
+                {
+                    AlignmentNodeData data = new AlignmentNodeData();
+                    data.Node = node;
+                    data.PreX = node.X;
+                    node.X = maxX - node.Width;
+                    data.NewX = node.X;
+                    dataList.Add(data);
+                }
+                History.Insert(new AlignmentUndoRedo(dataList));
+            }
+            e.Handled = true;
+        }
+
+        void AlignCenteredHorizontalCmdCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = Selection.SelectedObjects.Count > 1;
+            e.Handled = true;
+        }
+        void AlignCenteredHorizontalCmdExecuted(object target, ExecutedRoutedEventArgs e)
+        {
+            if (Selection.SelectedObjects.Count > 1)
+            {
+                List<AlignmentNodeData> dataList = new List<AlignmentNodeData>();
+                double minX = double.MaxValue;
+                double maxX = 0;
+                foreach (AnimNodeViewModel node in Selection.SelectedObjects)
+                {
+                    maxX = Math.Max(maxX, node.X + node.Width);
+                    minX = Math.Min(minX, node.X);
+                }
+
+                double middleX = (maxX + minX) * 0.5;
+
+                foreach (AnimNodeViewModel node in Selection.SelectedObjects)
+                {
+                    AlignmentNodeData data = new AlignmentNodeData();
+                    data.Node = node;
+                    data.PreX = node.X;
+                    node.X = middleX - (node.Width * 0.5);
+                    data.NewX = node.X;
+                    dataList.Add(data);
+                }
+                History.Insert(new AlignmentUndoRedo(dataList));
+
+            }
+            e.Handled = true;
+        }
+
+        void AlignCenteredVerticalCmdCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = Selection.SelectedObjects.Count > 1;
+            e.Handled = true;
+        }
+        void AlignCenteredVerticalCmdExecuted(object target, ExecutedRoutedEventArgs e)
+        {
+            if (Selection.SelectedObjects.Count > 1)
+            {
+                List<AlignmentNodeData> dataList = new List<AlignmentNodeData>();
+                double minY = double.MaxValue;
+                double maxY = 0;
+                foreach (AnimNodeViewModel node in Selection.SelectedObjects)
+                {
+                    maxY = Math.Max(maxY, node.Y + node.Height);
+                    minY = Math.Min(minY, node.Y);
+                }
+
+                double middleY = (maxY + minY) * 0.5;
+
+                foreach (AnimNodeViewModel node in Selection.SelectedObjects)
+                {
+                    AlignmentNodeData data = new AlignmentNodeData();
+                    data.Node = node;
+                    data.PreY = node.Y;
+                    node.Y = middleY - (node.Height * 0.5);
+                    data.NewY = node.Y;
+                    dataList.Add(data);
+                }
+                History.Insert(new AlignmentUndoRedo(dataList));
+
+            }
+            e.Handled = true;
+        }
+
+        class AlignmentNodeData
+        {
+            public AnimNodeViewModel Node;
+            public double PreX, PreY;
+            public double NewX, NewY;
+
+            public AlignmentNodeData()
+            {
+                PreX = PreY = NewX = NewY = -1;
+            }
+        }
+
+        class AlignmentUndoRedo : IUnDoRedoCommand
+        {
+            private List<AlignmentNodeData> _Data;
+
+            public AlignmentUndoRedo(List<AlignmentNodeData> data)
+            {
+                _Data = data;
+            }
+
+            public void Undo()
+            {
+                foreach (var item in _Data)
+                {
+                    if (item.PreX > 0)
+                        item.Node.X = item.PreX;
+                    if (item.PreY > 0)
+                        item.Node.Y = item.PreY;
+                }
+            }
+
+            public void Redo()
+            {
+                foreach (var item in _Data)
+                {
+                    if (item.NewX > 0)
+                        item.Node.X = item.NewX;
+                    if (item.NewY > 0)
+                        item.Node.Y = item.NewY;
+                }
+            }
         }
 
         #endregion

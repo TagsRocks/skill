@@ -8,6 +8,7 @@
     <SolidColorBrush x:Key="ButtonPanelBg"  Color="#293A56" />
     <SolidColorBrush x:Key="ControlBg" Color="#FFF0F0F0" />
     <SolidColorBrush x:Key="ToolbarBackColor" Color="#BCC7D8" />
+    <SolidColorBrush x:Key="ToolbarBorderColor" Color="#FFD5DCE8" />
     <LinearGradientBrush x:Key="MenuBackgroundColor" StartPoint="0,0" EndPoint="0,1">
         <GradientStop Offset="0.0"  Color="#CAD3E2" />
         <GradientStop Offset="1.0"  Color="#AEB9CD" />
@@ -52,11 +53,11 @@
 
     <BitmapImage x:Key="ImgSharedAccessKeys" UriSource="/SkillStudio;component/Images/Default/SharedAccessKeys.png" />
     <BitmapImage x:Key="ImgAnimationBranch" UriSource="/SkillStudio;component/Images/Default/AnimationBranch.png" />
-    <BitmapImage x:Key="ImgSkinMesh" UriSource="/SkillStudio;component/Images/Default/SkinMesh.png" />    
+    <BitmapImage x:Key="ImgSkinMesh" UriSource="/SkillStudio;component/Images/Default/SkinMesh.png" />
 
     <BitmapImage x:Key="ImgBone" UriSource="/SkillStudio;component/Images/Default/Bone.png" />
     <BitmapImage x:Key="ImgBone_D" UriSource="/SkillStudio;component/Images/Default/Disabled/Bone.png" />
-    
+
     <BitmapImage x:Key="ImgOpenFile" UriSource="/SkillStudio;component/Images/Default/OpenFile.png" />
     <BitmapImage x:Key="ImgOpenFile_D" UriSource="/SkillStudio;component/Images/Default/Disabled/OpenFile.png" />
 
@@ -67,7 +68,7 @@
     <BitmapImage x:Key="ImgExistingItem_D" UriSource="/SkillStudio;component/Images/Default/Disabled/ExistingItem.png" />
 
     <BitmapImage x:Key="ImgNewProject" UriSource="/SkillStudio;component/Images/Default/NewProject.png" />
-    <BitmapImage x:Key="ImgNewProject_D" UriSource="/SkillStudio;component/Images/Default/Disabled/NewProject.png" />    
+    <BitmapImage x:Key="ImgNewProject_D" UriSource="/SkillStudio;component/Images/Default/Disabled/NewProject.png" />
 
     <BitmapImage x:Key="ImgBehaviorTree" UriSource="/SkillStudio;component/Images/Default/BehaviorTree.png" />
     <BitmapImage x:Key="ImgBehaviorTree_D" UriSource="/SkillStudio;component/Images/Default/Disabled/BehaviorTree.png" />
@@ -98,7 +99,7 @@
 
     <BitmapImage x:Key="ImgACDecorator"   UriSource="/SkillStudio;component/Images/Default/AccessLimitDecorator.png" />
     <BitmapImage x:Key="ImgACDecorator_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/AccessLimitDecorator.png" />
-    
+
     <BitmapImage x:Key="ImgDecorator"   UriSource="/SkillStudio;component/Images/Default/Decorator.png" />
     <BitmapImage x:Key="ImgDecorator_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Decorator.png" />
 
@@ -151,7 +152,7 @@
     <BitmapImage x:Key="ImgRandom_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Random.png" />
 
     <BitmapImage x:Key="ImgSave"   UriSource="/SkillStudio;component/Images/Default/Save.png" />
-    <BitmapImage x:Key="ImgSave_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Save.png" />    
+    <BitmapImage x:Key="ImgSave_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Save.png" />
 
     <BitmapImage x:Key="ImgSaveAll"   UriSource="/SkillStudio;component/Images/Default/SaveAll.png" />
     <BitmapImage x:Key="ImgSaveAll_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/SaveAll.png" />
@@ -179,19 +180,41 @@
 
     <BitmapImage x:Key="ImgBringForward"   UriSource="/SkillStudio;component/Images/Default/BringForward.png" />
     <BitmapImage x:Key="ImgBringForward_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/BringForward.png" />
-    
+
     <BitmapImage x:Key="ImgBringToFront"   UriSource="/SkillStudio;component/Images/Default/BringToFront.png" />
     <BitmapImage x:Key="ImgBringToFront_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/BringToFront.png" />
-    
+
     <BitmapImage x:Key="ImgSendBackward"   UriSource="/SkillStudio;component/Images/Default/SendBackward.png" />
     <BitmapImage x:Key="ImgSendBackward_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/SendBackward.png" />
-    
+
     <BitmapImage x:Key="ImgSendToBack"   UriSource="/SkillStudio;component/Images/Default/SendToBack.png" />
     <BitmapImage x:Key="ImgSendToBack_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/SendToBack.png" />
 
+
+    <BitmapImage x:Key="ImgAlignTop"   UriSource="/SkillStudio;component/Images/Default/AlignTop.png" />
+    <BitmapImage x:Key="ImgAlignTop_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/AlignTop.png" />
+
+    <BitmapImage x:Key="ImgAlignBottom"   UriSource="/SkillStudio;component/Images/Default/AlignBottom.png" />
+    <BitmapImage x:Key="ImgAlignBottom_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/AlignBottom.png" />
+
+    <BitmapImage x:Key="ImgAlignLeft"   UriSource="/SkillStudio;component/Images/Default/AlignLeft.png" />
+    <BitmapImage x:Key="ImgAlignLeft_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/AlignLeft.png" />
+
+    <BitmapImage x:Key="ImgAlignRight"   UriSource="/SkillStudio;component/Images/Default/AlignRight.png" />
+    <BitmapImage x:Key="ImgAlignRight_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/AlignRight.png" />
+
+    <BitmapImage x:Key="ImgAlignCenteredHorizontal"   UriSource="/SkillStudio;component/Images/Default/AlignCenteredHorizontal.png" />
+    <BitmapImage x:Key="ImgAlignCenteredHorizontal_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/AlignCenteredHorizontal.png" />
+
+    <BitmapImage x:Key="ImgAlignCenteredVertical"   UriSource="/SkillStudio;component/Images/Default/AlignCenteredVertical.png" />
+    <BitmapImage x:Key="ImgAlignCenteredVertical_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/AlignCenteredVertical.png" />
+
+
+
+
     <BitmapImage x:Key="ImgEditInfo"   UriSource="/SkillStudio;component/Images/Default/EditInfo.png" />
 
-    <BitmapImage  x:Key="ImgError" UriSource="/SkillStudio;component/Images/Default/Error.png" />    
+    <BitmapImage  x:Key="ImgError" UriSource="/SkillStudio;component/Images/Default/Error.png" />
     <BitmapImage  x:Key="ImgWarning" UriSource="/SkillStudio;component/Images/Default/Warning.png" />
     <BitmapImage  x:Key="ImgMessage" UriSource="/SkillStudio;component/Images/Default/Info.png" />
 
@@ -220,5 +243,5 @@
 
     <SolidColorBrush Color="LightGray" x:Key="BoneSelectedBrush" />
     <SolidColorBrush Color="Transparent" x:Key="BoneDefaultBrush" />
-    
+
 </ResourceDictionary>

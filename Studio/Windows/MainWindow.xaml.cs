@@ -36,6 +36,25 @@ namespace Skill.Studio
         static RoutedCommand _CheckForErrorsCommand = new RoutedCommand();
         public static RoutedCommand CheckForErrorsCommand { get { return _CheckForErrorsCommand; } }
 
+
+        static RoutedCommand _AlignTopCommand = new RoutedCommand();
+        public static RoutedCommand AlignTopCommand { get { return _AlignTopCommand; } }
+
+        static RoutedCommand _AlignBottomCommand = new RoutedCommand();
+        public static RoutedCommand AlignBottomCommand { get { return _AlignBottomCommand; } }
+
+        static RoutedCommand _AlignLeftCommand = new RoutedCommand();
+        public static RoutedCommand AlignLeftCommand { get { return _AlignLeftCommand; } }
+
+        static RoutedCommand _AlignRightCommand = new RoutedCommand();
+        public static RoutedCommand AlignRightCommand { get { return _AlignRightCommand; } }
+
+        static RoutedCommand _AlignCenteredHorizontalCommand = new RoutedCommand();
+        public static RoutedCommand AlignCenteredHorizontalCommand { get { return _AlignCenteredHorizontalCommand; } }
+
+        static RoutedCommand _AlignCenteredVerticalCommand = new RoutedCommand();
+        public static RoutedCommand AlignCenteredVerticalCommand { get { return _AlignCenteredVerticalCommand; } }
+
         #endregion
 
 
@@ -882,7 +901,7 @@ namespace Skill.Studio
 
         #endregion
 
-       
+
 
 
 

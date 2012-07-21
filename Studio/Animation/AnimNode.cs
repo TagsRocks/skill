@@ -25,7 +25,7 @@ namespace Skill.Studio.Animation
 
         /// <summary> Whether input connectors are visible or not (for Sequence node this value is false)</summary>
         [Browsable(false)]
-        public virtual Visibility InputsVisible { get { return Visibility.Visible; } }        
+        public virtual Visibility InputsVisible { get { return Visibility.Visible; } }
 
         /// <summary> Model </summary>
         [Browsable(false)]
@@ -48,6 +48,30 @@ namespace Skill.Studio.Animation
         [Browsable(false)]
         public double Y { get { return Model.Y; } set { if (Model.Y != value) { Model.Y = value; OnPropertyChanged("Y"); Tree.Editor.SetChanged(true); } } }
 
+
+        private Editor.AnimNodeBorder _Border;
+        [Browsable(false)]
+        public Editor.AnimNodeBorder Border
+        {
+            get { return _Border; }
+            set
+            {
+                if (_Border != value)
+                {
+                    _Border = value;
+                    OnPropertyChanged("Border");
+                }
+            }
+        }
+
+        /// <summary> Width gets from ui </summary>        
+        [Browsable(false)]
+        public double Width { get { return (_Border != null) ? _Border.DesiredSize.Width : 0; } }
+
+        /// <summary> Height gets from ui </summary>        
+        [Browsable(false)]
+        public double Height { get { return (_Border != null) ? _Border.DesiredSize.Height : 0; } }
+
         [Browsable(false)]
         public AnimationTreeViewModel Tree { get; private set; }
 
@@ -66,7 +90,7 @@ namespace Skill.Studio.Animation
                     else
                         BorderBrush = ContentBrush;
                     OnSelectedChanged();
-                    OnPropertyChanged("IsSelected");                    
+                    OnPropertyChanged("IsSelected");
                 }
             }
         }
@@ -165,7 +189,7 @@ namespace Skill.Studio.Animation
                         Tree.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "Name", value, Model.Name));
                     }
                     Model.Name = value;
-                    OnPropertyChanged("Name");                    
+                    OnPropertyChanged("Name");
                 }
             }
         }
@@ -355,7 +379,7 @@ namespace Skill.Studio.Animation
         internal void RefreshConnections()
         {
             OnPropertyChanged("X");
-        } 
+        }
         #endregion
     }
 

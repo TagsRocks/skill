@@ -75,6 +75,26 @@
         <CommandBinding Command="{x:Static animedit:AnimationTreeEditor.DuplicateCommand}"
                   Executed="DuplicateCommandExecuted"
                   CanExecute="DuplicateCommandCanExecute"/>
+
+        <CommandBinding Command="{x:Static sk:MainWindow.AlignTopCommand}"
+                  Executed="AlignTopCmdExecuted"
+                  CanExecute="AlignTopCmdCanExecute"/>
+        <CommandBinding Command="{x:Static sk:MainWindow.AlignBottomCommand}"
+                  Executed="AlignBottomCmdExecuted"
+                  CanExecute="AlignBottomCmdCanExecute"/>
+        <CommandBinding Command="{x:Static sk:MainWindow.AlignLeftCommand}"
+                  Executed="AlignLeftCmdExecuted"
+                  CanExecute="AlignLeftCmdCanExecute"/>
+        <CommandBinding Command="{x:Static sk:MainWindow.AlignRightCommand}"
+                  Executed="AlignRightCmdExecuted"
+                  CanExecute="AlignRightCmdCanExecute"/>
+        <CommandBinding Command="{x:Static sk:MainWindow.AlignCenteredHorizontalCommand}"
+                  Executed="AlignCenteredHorizontalCmdExecuted"
+                  CanExecute="AlignCenteredHorizontalCmdCanExecute"/>
+        <CommandBinding Command="{x:Static sk:MainWindow.AlignCenteredVerticalCommand}"
+                  Executed="AlignCenteredVerticalCmdExecuted"
+                  CanExecute="AlignCenteredVerticalCmdCanExecute"/>
+        
     </sk:TabDocument.CommandBindings>
     <Grid>
         <ScrollViewer Name="_DesignerScrollViewer" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
@@ -116,7 +136,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.Resources>
                     <DataTemplate DataType="{x:Type anim:AnimNodeViewModel}"  >
-                        <Border BorderThickness="2" BorderBrush="{Binding BorderBrush}" Background="{StaticResource AnimNodeBg}" SnapsToDevicePixels="True" MinWidth="150" MinHeight="60" >
+                        <animedit:AnimNodeBorder ViewModel="{Binding}" BorderThickness="2" BorderBrush="{Binding BorderBrush}" Background="{StaticResource AnimNodeBg}" SnapsToDevicePixels="True" MinWidth="150" MinHeight="60" >
                             <Border.ContextMenu>
                                 <ContextMenu>
                                     <ContextMenu.Resources>
@@ -186,7 +206,7 @@
                                     </Grid>
                                 </Grid>
                             </Grid>
-                        </Border>
+                        </animedit:AnimNodeBorder>
                     </DataTemplate>
 
                     <DataTemplate DataType="{x:Type anim:AnimationConnectionViewModel}">
