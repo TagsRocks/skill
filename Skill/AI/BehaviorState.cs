@@ -10,6 +10,11 @@ namespace Skill.AI
     /// </summary>
     public class BehaviorState
     {
+        /// <summary>
+        /// Maximum lenght of visited behaviors in each BehaviorTree update
+        /// if your BehaviorTrees is very large increas this value
+        /// </summary>
+        public static int MaxSequenceLength = 200;
 
         /// <summary>
         /// Used internally to send valid parameters to child behaviors
@@ -48,10 +53,12 @@ namespace Skill.AI
             this.BehaviorTree = behaviorTree;
             this.Exception = null;
             this.RunningAction = null;
+            _RunningStack = new RunningStack(MaxSequenceLength);
         }
 
-        private Behavior[] _ExecutionSequence = new Behavior[200];// 200 is maximum node trace in tree (i hope).
-        private int _CurrnetExecutionIndex = -1;        
+        private Behavior[] _ExecutionSequence = new Behavior[MaxSequenceLength];// 200 is maximum node trace in tree (i hope).
+        private int _CurrnetExecutionIndex = -1;
+        private RunningStack _RunningStack;
 
 
         /// <summary>
@@ -59,7 +66,8 @@ namespace Skill.AI
         /// </summary>
         internal void Begin()
         {
-            _CurrnetExecutionIndex = -1;            
+            _CurrnetExecutionIndex = -1;
+            _RunningStack.Swap();
         }
 
         /// <summary>
@@ -75,18 +83,29 @@ namespace Skill.AI
         /// </remarks>
         internal void RegisterForExecution(Behavior behavior)
         {
-            _CurrnetExecutionIndex++;// move to next place
-            _ExecutionSequence[_CurrnetExecutionIndex] = behavior;            
+            _CurrnetExecutionIndex++;// move to next place  
+            if (_CurrnetExecutionIndex >= _ExecutionSequence.Length)
+                throw new IndexOutOfRangeException("ExecutionSequence buffer is low. to avoid this error set higher value to 'BehaviorState.MaxSequenceLength'.");
+            _ExecutionSequence[_CurrnetExecutionIndex] = behavior;
 
             if (behavior.Type == BehaviorType.Action)
             {
-                if (RunningAction != null)
+                if (RunningAction != null && RunningAction != behavior)
                 {
-                    if (RunningAction != behavior)
-                        RunningAction.ResetBehavior();
-                }                               
-            }            
-        }                
+                    _RunningStack.ResetPreviousStack();                   
+                    RunningAction = null;
+                }
+            }
+            _RunningStack.Push(behavior);
+        }
+
+        internal void UnRegisterForExecution(Behavior behavior)
+        {
+            if (_RunningStack.Top != behavior)
+                throw new InvalidOperationException("Invalid behavior registeration");
+
+            _RunningStack.Pop();
+        }
 
         private bool IsChildOf(Behavior parent, Behavior child)
         {
