@@ -6,7 +6,7 @@ using System.ComponentModel;
 using Skill.DataModels.AI;
 
 namespace Skill.Studio.AI
-{    
+{
 
     #region CompositeViewModel
     public abstract class CompositeViewModel : BehaviorViewModel
@@ -66,6 +66,7 @@ namespace Skill.Studio.AI
                 if (value != ((ConcurrentSelector)Model).FirstConditions)
                 {
                     ((ConcurrentSelector)Model).FirstConditions = value;
+                    ((Skill.AI.ConcurrentSelector)Debug.Behavior).FirstConditions = value;
                     OnPropertyChanged(new PropertyChangedEventArgs("FirstConditions"));
                     Tree.History.Insert(new ChangePropertyUnDoRedo(this, "FirstConditions", value, !value));
                 }
@@ -84,6 +85,7 @@ namespace Skill.Studio.AI
                 if (value != ((ConcurrentSelector)Model).BreakOnConditionFailure)
                 {
                     ((ConcurrentSelector)Model).BreakOnConditionFailure = value;
+                    ((Skill.AI.ConcurrentSelector)Debug.Behavior).BreakOnConditionFailure = value;
                     OnPropertyChanged(new PropertyChangedEventArgs("BreakOnConditionFailure"));
                     Tree.History.Insert(new ChangePropertyUnDoRedo(this, "BreakOnConditionFailure", value, !value));
                 }
@@ -103,6 +105,7 @@ namespace Skill.Studio.AI
                 {
                     Tree.History.Insert(new ChangePropertyUnDoRedo(this, "FailurePolicy", value, ((ConcurrentSelector)Model).FailurePolicy));
                     ((ConcurrentSelector)Model).FailurePolicy = value;
+                    ((Skill.AI.ConcurrentSelector)Debug.Behavior).FailurePolicy = (Skill.AI.FailurePolicy)value;
                     OnPropertyChanged(new PropertyChangedEventArgs("FailurePolicy"));
                 }
             }
@@ -122,6 +125,7 @@ namespace Skill.Studio.AI
                 {
                     Tree.History.Insert(new ChangePropertyUnDoRedo(this, "SuccessPolicy", value, ((ConcurrentSelector)Model).SuccessPolicy));
                     ((ConcurrentSelector)Model).SuccessPolicy = value;
+                    ((Skill.AI.ConcurrentSelector)Debug.Behavior).SuccessPolicy = (Skill.AI.SuccessPolicy)value;
                     OnPropertyChanged(new PropertyChangedEventArgs("SuccessPolicy"));
                 }
             }
@@ -153,6 +157,7 @@ namespace Skill.Studio.AI
                 {
                     Tree.History.Insert(new ChangePropertyUnDoRedo(this, "Priority", value, ((PrioritySelector)Model).Priority));
                     ((PrioritySelector)Model).Priority = value;
+                    ((Skill.AI.PrioritySelector)Debug.Behavior).Priority = (Skill.AI.PriorityType)value;
                     OnPropertyChanged(new PropertyChangedEventArgs("Priority"));
                 }
             }
@@ -187,6 +192,7 @@ namespace Skill.Studio.AI
                 {
                     Tree.History.Insert(new ChangePropertyUnDoRedo(this, "LoopCount", value, ((LoopSelector)Model).LoopCount));
                     ((LoopSelector)Model).LoopCount = value;
+                    ((Skill.AI.LoopSelector)Debug.Behavior).LoopCount = value;
                     OnPropertyChanged(new PropertyChangedEventArgs("LoopCount"));
                 }
             }

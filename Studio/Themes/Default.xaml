@@ -24,6 +24,33 @@
         <GradientStop Color="#AAFFECB5" Offset="1"/>
     </LinearGradientBrush>
 
+    <LinearGradientBrush x:Key="OrgChartItemAreaBrush" StartPoint="0.5, 0" EndPoint="0.5, 1">
+        <GradientStop Color="#66000000" Offset="0" />
+        <GradientStop Color="#22000000" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="OrgChartSelectedItemAreaBrush" StartPoint="0.5, 0" EndPoint="0.5, 1">
+        <GradientStop Color="Orange" Offset="0" />
+        <GradientStop Color="OrangeRed" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="OrgChartItemBorderBrush" StartPoint="0.5, 0" EndPoint="0.5, 1">
+        <GradientStop Color="LightGray" Offset="0" />
+        <GradientStop Color="Gray" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="OrgChartSelectedItemBorderBrush" StartPoint="0.5, 0" EndPoint="0.5, 1">
+        <GradientStop Color="Yellow" Offset="0" />
+        <GradientStop Color="Black" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="SelectedConnectionBrush" StartPoint="1, 0.5" EndPoint="0, 0.5">
+        <GradientStop Color="Orange" Offset="0.2" />
+        <GradientStop Color="Gray" Offset="0.8" />
+    </LinearGradientBrush>    
+
+    <SolidColorBrush x:Key="ConnectionBrush" Color="Gray" />
+        
+    <DropShadowBitmapEffect x:Key="DropShadowEffect" />
+
+
     <Style TargetType="{x:Type TreeViewItem}" x:Key="TreeViewItemStyle" >
         <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
         <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
@@ -208,15 +235,34 @@
 
     <BitmapImage x:Key="ImgAlignCenteredVertical"   UriSource="/SkillStudio;component/Images/Default/AlignCenteredVertical.png" />
     <BitmapImage x:Key="ImgAlignCenteredVertical_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/AlignCenteredVertical.png" />
-
-
-
-
+    
     <BitmapImage x:Key="ImgEditInfo"   UriSource="/SkillStudio;component/Images/Default/EditInfo.png" />
-
+            
     <BitmapImage  x:Key="ImgError" UriSource="/SkillStudio;component/Images/Default/Error.png" />
     <BitmapImage  x:Key="ImgWarning" UriSource="/SkillStudio;component/Images/Default/Warning.png" />
     <BitmapImage  x:Key="ImgMessage" UriSource="/SkillStudio;component/Images/Default/Info.png" />
+
+
+
+    <BitmapImage x:Key="ImgPlayBtn"   UriSource="/SkillStudio;component/Images/Default/Player/Play.png" />
+    <BitmapImage x:Key="ImgPlayStopBtn"   UriSource="/SkillStudio;component/Images/Default/Player/PlayStop.png" />
+    <BitmapImage x:Key="ImgPauseBtn"   UriSource="/SkillStudio;component/Images/Default/Player/Pause.png" />
+    <BitmapImage x:Key="ImgStopBtn"   UriSource="/SkillStudio;component/Images/Default/Player/Stop.png" />
+    <BitmapImage x:Key="ImgStepBtn"   UriSource="/SkillStudio;component/Images/Default/Player/Step.png" />
+
+    <BitmapImage x:Key="ImgPlayPressedBtn"   UriSource="/SkillStudio;component/Images/Default/Player/Play_P.png" />
+    <BitmapImage x:Key="ImgPlayStopPressedBtn"   UriSource="/SkillStudio;component/Images/Default/Player/PlayStop_P.png" />
+    <BitmapImage x:Key="ImgPausePressedBtn"   UriSource="/SkillStudio;component/Images/Default/Player/Pause_P.png" />
+    <BitmapImage x:Key="ImgStopPressedBtn"   UriSource="/SkillStudio;component/Images/Default/Player/Stop_P.png" />
+    <BitmapImage x:Key="ImgStepPressedBtn"   UriSource="/SkillStudio;component/Images/Default/Player/Step_P.png" />
+    
+
+    <BitmapImage x:Key="ImgPlayHoverBtn"   UriSource="/SkillStudio;component/Images/Default/Player/Play_H.png" />
+    <BitmapImage x:Key="ImgPlayStopHoverBtn"   UriSource="/SkillStudio;component/Images/Default/Player/PlayStop_H.png" />
+    <BitmapImage x:Key="ImgPauseHoverBtn"   UriSource="/SkillStudio;component/Images/Default/Player/Pause_H.png" />
+    <BitmapImage x:Key="ImgStopHoverBtn"   UriSource="/SkillStudio;component/Images/Default/Player/Stop_H.png" />
+    <BitmapImage x:Key="ImgStepHoverBtn"   UriSource="/SkillStudio;component/Images/Default/Player/Step_H.png" />
+
 
     <Style x:Key="AnimationText" TargetType="TextBlock" >
         <Setter Property="Foreground" Value="White" />

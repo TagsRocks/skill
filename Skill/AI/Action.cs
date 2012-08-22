@@ -62,9 +62,9 @@ namespace Skill.AI
 
             // if action needs to run next frame store it's reference
             if (result == BehaviorResult.Running)
-                state.RunningAction = this;
+                state.RunningActions.Add(this);
             else
-                state.RunningAction = null;
+                state.RunningActions.Remove(this);
             return result;
         }
 
@@ -80,7 +80,7 @@ namespace Skill.AI
         /// Reset behavior. For internal use. when a branch with higher priority executed, let nodes in previous branch reset
         /// </summary>        
         /// <param name="resetChildren">Reset children too</param>
-        internal override void ResetBehavior(bool resetChildren = false)
+        public override void ResetBehavior(bool resetChildren = false)
         {
             OnReset();
             base.ResetBehavior();

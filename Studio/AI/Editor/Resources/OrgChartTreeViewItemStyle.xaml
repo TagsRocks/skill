@@ -4,33 +4,6 @@
     <!-- This Style redefines the ControlTemplate used by TreeViewItems and
          also provides a different itemspanel for their child items. -->
     <Style TargetType="TreeViewItem" x:Key="OrgChartTreeViewItemStyle" >
-        <Style.Resources>
-            <LinearGradientBrush x:Key="ItemAreaBrush" StartPoint="0.5, 0" EndPoint="0.5, 1">
-                <GradientStop Color="#66000000" Offset="0" />
-                <GradientStop Color="#22000000" Offset="1" />
-            </LinearGradientBrush>
-            <LinearGradientBrush x:Key="SelectedItemAreaBrush" StartPoint="0.5, 0" EndPoint="0.5, 1">
-                <GradientStop Color="Orange" Offset="0" />
-                <GradientStop Color="OrangeRed" Offset="1" />
-            </LinearGradientBrush>
-            <LinearGradientBrush x:Key="ItemBorderBrush" StartPoint="0.5, 0" EndPoint="0.5, 1">
-                <GradientStop Color="LightGray" Offset="0" />
-                <GradientStop Color="Gray" Offset="1" />
-            </LinearGradientBrush>
-            <LinearGradientBrush x:Key="SelectedItemBorderBrush" StartPoint="0.5, 0" EndPoint="0.5, 1">
-                <GradientStop Color="Yellow" Offset="0" />
-                <GradientStop Color="Black" Offset="1" />
-            </LinearGradientBrush>
-
-            <LinearGradientBrush x:Key="SelectedConnectionBrush" StartPoint="1, 0.5" EndPoint="0, 0.5">
-                <GradientStop Color="Orange" Offset="0.2" />
-                <GradientStop Color="Gray" Offset="0.8" />
-            </LinearGradientBrush>
-
-            <SolidColorBrush x:Key="ConnectionBrush" Color="Gray" />
-
-            <DropShadowBitmapEffect x:Key="DropShadowEffect" />
-        </Style.Resources>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TreeViewItem" >
@@ -42,9 +15,9 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <!-- This Border and ContentPresenter displays the content of the TreeViewItem. -->
-                        <Border Grid.Column="0"  Name="Bd" Background="{StaticResource ItemAreaBrush}" BorderBrush="{StaticResource ItemBorderBrush}"
+                        <Border Grid.Column="0"  Name="Bd" Background="{Binding OrgChartBg}" BorderBrush="{Binding OrgChartBorder}"
                                     VerticalAlignment="Center"
-                                    BorderThickness="0.6" CornerRadius="8" Padding="6" >
+                                    BorderThickness="2" CornerRadius="8" Padding="6" >
                             <ContentPresenter Name="PART_Header"                  
                                     ContentSource="Header"
                                     HorizontalAlignment="Center"
@@ -60,9 +33,7 @@
                     <ControlTemplate.Triggers>
                         <!--When the item is selected in the TreeView, use the 
                   "selected" colors and give it a drop shadow. -->
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="Bd" Property="Panel.Background" Value="{StaticResource SelectedItemAreaBrush}" />
-                            <Setter TargetName="Bd" Property="Border.BorderBrush" Value="{StaticResource SelectedItemBorderBrush}" />
+                        <Trigger Property="IsSelected" Value="True" >                            
                             <Setter TargetName="Bd" Property="TextElement.Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
                             <Setter TargetName="Bd" Property="Border.BitmapEffect" Value="{StaticResource DropShadowEffect}" />
                             <Setter TargetName="_Connection" Property="Stroke" Value="{StaticResource SelectedConnectionBrush}" />

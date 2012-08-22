@@ -28,6 +28,11 @@ namespace Skill.AI
         public float Weight { get; set; }
 
         /// <summary>
+        /// User object data
+        /// </summary>
+        public object Tag { get; set; }
+
+        /// <summary>
         /// Create an instance of Behavior
         /// </summary>
         /// <param name="name">Name of Behavior</param>
@@ -46,7 +51,7 @@ namespace Skill.AI
         /// </summary>
         /// <param name="state">State of BehaviorTree</param>
         /// <returns>Result of execution</returns>
-        internal BehaviorResult Trace(BehaviorState state)
+        public BehaviorResult Trace(BehaviorState state)
         {
             //int registerIndex = 
             state.RegisterForExecution(this); // register in execution sequence
@@ -84,10 +89,10 @@ namespace Skill.AI
 
 
         /// <summary>
-        /// Reset behavior. For internal use. when a branch with higher priority executed, let nodes in previous branch reset
+        /// Reset behavior. For internal use. when a branch with higher priority executed, let nodes in previous branch reset (internal use)
         /// </summary>        
         /// <param name="resetChildren">Reset children too</param>
-        internal virtual void ResetBehavior(bool resetChildren = false)
+        public virtual void ResetBehavior(bool resetChildren = false)
         {
             Result = BehaviorResult.Failure;
         }

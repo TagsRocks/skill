@@ -67,6 +67,11 @@ namespace Skill.Studio
                 this.ClassName.Equals(info.ClassName, StringComparison.OrdinalIgnoreCase);
         }
 
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
     }
     #endregion
 

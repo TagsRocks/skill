@@ -17,6 +17,8 @@ using System.Collections.ObjectModel;
 using Skill.DataModels.AI;
 using System.Xml.Linq;
 using Skill.DataModels;
+using System.Windows.Threading;
+using Skill.Studio.Controls;
 
 namespace Skill.Studio.AI.Editor
 {
@@ -108,7 +110,7 @@ namespace Skill.Studio.AI.Editor
         void CheckContextMnuAvailability()
         {
             BehaviorViewModel selected = GetSelectedItem();
-            if (selected != null)
+            if (selected != null && !BehaviorTree.IsDebuging)
             {
                 IsDeleteAv = IsCopyAv = selected != BehaviorTree.Root;
                 if (selected.Model.BehaviorType == BehaviorType.Composite)
@@ -143,6 +145,38 @@ namespace Skill.Studio.AI.Editor
         /// <summary> BehaviorTree ViewModel </summary>
         public BehaviorTreeViewModel BehaviorTree { get; private set; }
 
+        public ScrollViewer ScrollViewer { get { return _DesignerScrollViewer; } }
+
+        public ObservableCollection<GifImage> Animations { get; private set; }
+
+        private bool _ShowAnimations = true;
+        public bool ShowAnimations
+        {
+            get { return _ShowAnimations; }
+            set
+            {
+                if (_ShowAnimations != value)
+                {
+                    _ShowAnimations = value;
+                    RaisePropertyChanged("ShowAnimations");
+                }
+            }
+        }
+
+        private double _AnimationSize = 128;
+        public double AnimationSize
+        {
+            get { return _AnimationSize; }
+            set
+            {
+                if (_AnimationSize != value)
+                {
+                    _AnimationSize = value;
+                    RaisePropertyChanged("AnimationSize");
+                }
+            }
+        }
+
         #endregion
 
         #region Constructor
@@ -157,17 +191,23 @@ namespace Skill.Studio.AI.Editor
         public BehaviorTreeEditor(BehaviorTreeNodeViewModel viewModel)
             : base(viewModel)
         {
+            this.Animations = new ObservableCollection<GifImage>();
             InitializeComponent();
             this.DataContext = this;
             if (viewModel != null)
             {
                 Skill.DataModels.AI.BehaviorTree bt = viewModel.LoadData() as Skill.DataModels.AI.BehaviorTree;
                 if (bt != null)
+                {
                     Data = BehaviorTree = new BehaviorTreeViewModel(bt) { Editor = this };
+                    RaisePropertyChanged("BehaviorTree");
+                }
             }
 
             History.UndoChange += new UnDoRedoChangeEventHandler(History_UndoChange);
             History.RedoChange += new UnDoRedoChangeEventHandler(History_RedoChange);
+
+            InitialDebug();
         }
         #endregion
 
@@ -176,13 +216,13 @@ namespace Skill.Studio.AI.Editor
         void History_RedoChange(UnDoRedo sender, UnDoRedoChangeEventArgs e)
         {
             if (e.Command is AddBehaviorUnDoRedo || e.Command is MoveUpBehaviorUnDoRedo)
-                UpdateConnections();
+                UpdatePositions();
         }
 
         void History_UndoChange(UnDoRedo sender, UnDoRedoChangeEventArgs e)
         {
             if (e.Command is AddBehaviorUnDoRedo || e.Command is MoveUpBehaviorUnDoRedo)
-                UpdateConnections();
+                UpdatePositions();
         }
 
         // when any change occurs in history, update title
@@ -193,6 +233,19 @@ namespace Skill.Studio.AI.Editor
         #endregion
 
         #region Selected item changed
+
+        private void Behavior_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            Border border = sender as Border;
+            if (border != null)
+            {
+                BehaviorViewModel vm = border.DataContext as BehaviorViewModel;
+                if (vm != null)
+                {
+                    vm.IsSelected = true;
+                }
+            }
+        }
 
         private void TreeViewItem_PreviewMouseRightButtonDown(object sender, MouseEventArgs e)
         {
@@ -207,6 +260,29 @@ namespace Skill.Studio.AI.Editor
         {
             CheckContextMnuAvailability();
             ApplicationCommands.Properties.Execute(_BTTree.SelectedItem, null);
+
+            if (!BehaviorTree.IsDebuging)
+            {
+                BehaviorViewModel vm = GetSelectedItem();
+                if (vm != null)
+                {
+                    if (vm.Model.BehaviorType == BehaviorType.Action)
+                    {
+                        ActionViewModel ac = (ActionViewModel)vm;
+                        if (!Animations.Contains(ac.GifAnimation))
+                        {
+                            foreach (var anim in Animations) anim.Stop();
+                            Animations.Clear();
+                            Animations.Add(ac.GifAnimation);
+                            ac.GifAnimation.Play();
+                        }
+                    }
+                    else
+                    {
+                        Animations.Clear();
+                    }
+                }
+            }
         }
         private void TreeViewItem_KeyDown(object sender, KeyEventArgs e)
         {
@@ -217,10 +293,27 @@ namespace Skill.Studio.AI.Editor
         }
         #endregion
 
-        #region UpdateConnections
-        private void UpdateConnections()
+        #region UpdatePositions
+
+        protected override void OnContentLoaded()
         {
-            this.BehaviorTree.Root.UpdateConnection();
+            UpdatePositions();
+            base.OnContentLoaded();
+        }
+
+
+        public event EventHandler UpdateTreeNodes;
+
+        private void UpdatePositions()
+        {
+            this.BehaviorTree.Root.UpdatePosition();
+            OnUpdateTreeNodes();
+        }
+
+        private void OnUpdateTreeNodes()
+        {
+            if (UpdateTreeNodes != null)
+                UpdateTreeNodes(this, EventArgs.Empty);
         }
         #endregion
 
@@ -246,7 +339,7 @@ namespace Skill.Studio.AI.Editor
                                     var newVM = selected.AddBehavior(insertItem, null, true);
                                     if (newVM != null)
                                         newVM.IsSelected = true;
-                                    UpdateConnections();
+                                    UpdatePositions();
                                 }
                                 else
                                     MainWindow.Instance.ShowError(message);
@@ -301,7 +394,7 @@ namespace Skill.Studio.AI.Editor
                     {
                         newVM.IsSelected = true;
                     }
-                    UpdateConnections();
+                    UpdatePositions();
                 }
             }
         }
@@ -319,7 +412,7 @@ namespace Skill.Studio.AI.Editor
 
                         newVM.IsSelected = true;
                     }
-                    UpdateConnections();
+                    UpdatePositions();
                 }
             }
         }
@@ -336,7 +429,7 @@ namespace Skill.Studio.AI.Editor
                     {
                         newVM.IsSelected = true;
                     }
-                    UpdateConnections();
+                    UpdatePositions();
                 }
             }
         }
@@ -353,7 +446,7 @@ namespace Skill.Studio.AI.Editor
                     {
                         newVM.IsSelected = true;
                     }
-                    UpdateConnections();
+                    UpdatePositions();
                 }
             }
         }
@@ -408,7 +501,7 @@ namespace Skill.Studio.AI.Editor
                     if (selected.Parent != null)
                     {
                         ((BehaviorViewModel)selected.Parent).MoveUp(selected);
-                        UpdateConnections();
+                        UpdatePositions();
                     }
                 }
 
@@ -425,7 +518,7 @@ namespace Skill.Studio.AI.Editor
                     if (selected.Parent != null)
                     {
                         ((BehaviorViewModel)selected.Parent).MoveDown(selected);
-                        UpdateConnections();
+                        UpdatePositions();
                     }
                 }
             }
@@ -443,7 +536,7 @@ namespace Skill.Studio.AI.Editor
                     if (selected.Parent is BehaviorViewModel)
                     {
                         ((BehaviorViewModel)selected.Parent).RemoveBehavior(selected);
-                        UpdateConnections();
+                        UpdatePositions();
                     }
                 }
                 CheckContextMnuAvailability();
@@ -529,7 +622,7 @@ namespace Skill.Studio.AI.Editor
         void PasteCmdExecuted(object target, ExecutedRoutedEventArgs e)
         {
             PasteFromClipboard();
-            UpdateConnections();
+            UpdatePositions();
             e.Handled = true;
         }
 
@@ -642,6 +735,207 @@ namespace Skill.Studio.AI.Editor
         }
 
         #endregion
+
+        #region Debug
+
+        private void Mnu_ShowAnimations_Click(object sender, RoutedEventArgs e)
+        {
+            ShowAnimations = !ShowAnimations;
+        }
+
+
+        private TimeSpan _DebugTimeInterval;
+        private DispatcherTimer _DebugTimer;
+        private DebugBehaviorTree _DebugBehaviorTree;
+        private DebugRandomService _DebugRandomService;
+
+        private ObservableCollection<double> _TimeIntervals;
+        public ObservableCollection<double> TimeIntervals
+        {
+            get { return _TimeIntervals; }
+            set
+            {
+                if (_TimeIntervals != value)
+                {
+                    _TimeIntervals = value;
+                    RaisePropertyChanged("TimeIntervals");
+                }
+            }
+        }
+
+        private void InitialDebug()
+        {
+            _DebugTimer = new DispatcherTimer(DispatcherPriority.Normal, this.Dispatcher);
+            _DebugTimer.Tick += new EventHandler(DebugTimer_Tick);
+            _DebugBehaviorTree = new DebugBehaviorTree(BehaviorTree.Root.Debug.Behavior);
+            _DebugRandomService = new DebugRandomService();
+
+            ObservableCollection<double> timeIntervals = new ObservableCollection<double>();
+            timeIntervals.Add(0.25f);
+            timeIntervals.Add(0.5f);
+            timeIntervals.Add(0.75f);
+            timeIntervals.Add(1.0f);
+            timeIntervals.Add(2.0f);
+            this.TimeIntervals = timeIntervals;
+
+            _CmbTimeInterval.SelectedIndex = 3;
+        }
+
+        void DebugTimer_Tick(object sender, EventArgs e)
+        {
+            StepDebug();
+        }
+
+        private void StartDebug()
+        {
+            Skill.AI.RandomSelector.RandomService = _DebugRandomService;
+            BehaviorTree.Root.Debug.UpdateChildren();
+            BehaviorTree.IsDebuging = true;
+            BehaviorTree.DebugTimer = new TimeSpan();
+            _DebugTimer.IsEnabled = _BtnPause.IsChecked == false;
+        }
+        private void PauseDebug()
+        {
+            if (_BtnPlayStop.IsChecked == true)
+                _BtnPause.IsChecked = true;
+            _DebugTimer.IsEnabled = false;
+        }
+        private void ResumeDebug()
+        {
+            _DebugTimer.IsEnabled = true;
+        }
+        private void StopDebug()
+        {
+            if (BehaviorTree != null)
+            {
+                BehaviorTree.IsDebuging = false;
+                BehaviorTree.Root.Debug.ValidateBrush(false);
+                BehaviorTree.DebugTimer = new TimeSpan();
+            }
+            _DebugTimer.IsEnabled = false;
+        }
+        private void StepDebug()
+        {
+            if (BehaviorTree == null)
+            {
+                if (_DebugTimer != null)
+                    _DebugTimer.Stop();
+                return;
+            }
+
+            if (!BehaviorTree.IsDebuging) return;
+            BehaviorTree.DebugTimer += _DebugTimeInterval;
+            _DebugBehaviorTree.Update();
+
+            // notify debug behaviors that all ExecutionSequence is visited
+            for (int i = 0; i < _DebugBehaviorTree.State.SequenceCount; i++)
+            {
+                var item = _DebugBehaviorTree.State.ExecutionSequence[i];
+                if (item == null) break;
+                BehaviorViewModel d = item.Tag as BehaviorViewModel;
+                if (d != null)
+                    d.Debug.IsVisited = true;
+            }
+
+            BehaviorTree.Root.Debug.ValidateBrush(true);
+            UpdateDebugAnimations();
+        }
+
+        private void UpdateDebugAnimations()
+        {
+            List<GifImage> activeAnimations = new List<GifImage>();
+            foreach (var item in _DebugBehaviorTree.State.RunningActions)
+            {
+                ActionViewModel ac = item.Tag as ActionViewModel;
+                if (ac != null)
+                    activeAnimations.Add(ac.GifAnimation);
+            }
+
+            bool newAnimation = false;
+            foreach (var anim in activeAnimations)
+            {
+                if (!Animations.Contains(anim))
+                {
+                    if (!string.IsNullOrEmpty(anim.GifSource))
+                    {
+                        Animations.Add(anim);
+                        anim.Play();
+                        newAnimation = true;
+                    }
+                }
+            }
+
+            if (newAnimation)
+            {
+                int index = 0;
+                while (index < Animations.Count)
+                {
+                    if (!activeAnimations.Contains(Animations[index]))
+                    {
+                        Animations[index].Stop();
+                        Animations.RemoveAt(index);
+                        continue;
+                    }
+                    index++;
+                }
+            }
+
+        }
+
+        private void BtnPlayStop_Click(object sender, RoutedEventArgs e)
+        {
+            if (_BtnPlayStop.IsChecked == true)
+            {
+                StartDebug();
+            }
+            else
+            {
+                StopDebug();
+            }
+
+        }
+
+        private void BtnPause_Click(object sender, RoutedEventArgs e)
+        {
+            if (_BtnPlayStop.IsChecked == true)
+            {
+                if (_BtnPause.IsChecked == true)
+                    PauseDebug();
+                else
+                    ResumeDebug();
+            }
+        }
+
+        private void BtnStep_Click(object sender, RoutedEventArgs e)
+        {
+            StepDebug();
+        }
+
+        private void CmbTimeInterval_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_CmbTimeInterval.SelectedIndex >= 0)
+            {
+                _DebugTimeInterval = TimeSpan.FromMilliseconds((double)_CmbTimeInterval.SelectedItem * 1000);
+                _DebugTimer.Interval = _DebugTimeInterval;
+            }
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            PauseDebug();
+            base.OnClosing(e);
+        }
+
+        protected override void OnClosed()
+        {
+            StopDebug();
+            base.OnClosed();
+        }
+        #endregion
+
+
+
+
 
 
     }

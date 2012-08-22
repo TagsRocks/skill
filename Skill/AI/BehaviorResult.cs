@@ -9,7 +9,7 @@ namespace Skill.AI
     /// Defines result of Behavior execution
     /// </summary>
     public enum BehaviorResult
-    {
+    {        
         /// <summary>
         /// Failure
         /// </summary>

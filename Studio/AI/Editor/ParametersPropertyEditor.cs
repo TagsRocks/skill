@@ -46,6 +46,14 @@ namespace Skill.Studio.AI.Editor
                         _Behavior.Tree.Editor.SetChanged(true);
 
                     _Behavior.RaiseChangeDisplayName();
+                    foreach (BehaviorViewModel vm in _Behavior.Tree.GetSharedModel(_Behavior.Model))
+                    {
+                        if (vm != _Behavior)
+                        {
+                            vm.MatchParameters(parameters.Model);
+                            vm.RaiseChangeDisplayName();
+                        }
+                    }
                 }
             }
         }

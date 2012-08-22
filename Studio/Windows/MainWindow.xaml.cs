@@ -743,6 +743,16 @@ namespace Skill.Studio
             window.Owner = this;
             window.ShowDialog();
         }
+
+        private void MnuShowGifAnimations_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsProjectLoaded)
+            {
+                GifBrowser browser = new GifBrowser();
+                browser.Owner = this;
+                browser.ShowDialog();                
+            }
+        }
         #endregion
 
         #region Documents
@@ -900,6 +910,8 @@ namespace Skill.Studio
         }
 
         #endregion
+
+        
 
 
 

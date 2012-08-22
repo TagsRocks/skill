@@ -35,6 +35,8 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <Utf8Output>true</Utf8Output>
+    <ExpressionBlendVersion>4.0.20525.0</ExpressionBlendVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -69,9 +71,11 @@
     <Reference Include="AvalonDock.Themes">
       <HintPath>Avalon\AvalonDock.Themes.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationFramework.Aero" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Interactivity" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -93,7 +97,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AI\DebugBehavior.cs" />
     <Compile Include="AI\Editor\AccessKeyPropertyEditor.cs" />
+    <Compile Include="AI\Editor\BehaviorBrushes.cs" />
+    <Compile Include="AI\Editor\BehaviorBorder.cs" />
+    <Compile Include="AI\Editor\BehaviorTreeCanvas.cs" />
+    <Compile Include="AI\Editor\AnimationPropertyEditor.cs" />
+    <Compile Include="AI\Editor\DebugBehaviorTree.cs" />
+    <Compile Include="AI\Editor\DebugRandomService.cs" />
     <Compile Include="AI\Editor\ParametersPropertyEditor.cs" />
     <Compile Include="AI\Editor\ParametersEditorWindow.xaml.cs">
       <DependentUpon>ParametersEditorWindow.xaml</DependentUpon>
@@ -189,6 +200,14 @@
     <Compile Include="Compiler\SaveGameCompiler.cs" />
     <Compile Include="Compiler\SharedAccessKeysCompiler.cs" />
     <Compile Include="Compiler\SkinMeshCompiler.cs" />
+    <Compile Include="Controls\MediaButton.xaml.cs">
+      <DependentUpon>MediaButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\GifImage.cs" />
+    <Compile Include="Controls\ToggleMediaButton.xaml.cs">
+      <DependentUpon>ToggleMediaButton.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Controls\ProjectPropertiesControl.xaml.cs">
       <DependentUpon>ProjectPropertiesControl.xaml</DependentUpon>
     </Compile>
@@ -205,6 +224,9 @@
     <Compile Include="IO\SaveClass.cs" />
     <Compile Include="IO\SaveData.cs" />
     <Compile Include="IO\SaveProperty.cs" />
+    <Compile Include="Windows\GifBrowser.xaml.cs">
+      <DependentUpon>GifBrowser.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\PluginWindow.xaml.cs">
       <DependentUpon>PluginWindow.xaml</DependentUpon>
     </Compile>
@@ -286,6 +308,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="AI\Editor\Resources\OrgChartTreeViewItemStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="AI\Editor\SelectAccessKeyWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -342,6 +368,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\MediaButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\ToggleMediaButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\ProjectPropertiesControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -351,6 +385,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="IO\Editor\SaveDataEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\GifBrowser.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -365,10 +403,6 @@
     <Page Include="AI\Editor\SharedAccessKeysEditorWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="AI\Editor\Resources\OrgChartTreeViewItemStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="AI\Editor\BehaviorTreeEditor.xaml">
       <SubType>Designer</SubType>
@@ -632,6 +666,22 @@
     <Resource Include="Images\Default\AlignLeft.png" />
     <Resource Include="Images\Default\AlignRight.png" />
     <Resource Include="Images\Default\AlignTop.png" />
+    <Resource Include="Images\Default\Player\Pause.png" />
+    <Resource Include="Images\Default\Player\Pause_H.png" />
+    <Resource Include="Images\Default\Player\Pause_P.png" />
+    <Resource Include="Images\Default\Player\Play.png" />
+    <Resource Include="Images\Default\Player\Play_H.png" />
+    <Resource Include="Images\Default\Player\Play_P.png" />
+    <Resource Include="Images\Default\Player\Step.png" />
+    <Resource Include="Images\Default\Player\Step_H.png" />
+    <Resource Include="Images\Default\Player\Step_P.png" />
+    <Resource Include="Images\Default\Player\Stop.png" />
+    <Resource Include="Images\Default\Player\Stop_H.png" />
+    <Resource Include="Images\Default\Player\Stop_P.png" />
+    <Resource Include="Images\Default\Player\PlayStop.png" />
+    <Resource Include="Images\Default\Player\PlayStop_H.png" />
+    <Resource Include="Images\Default\Player\PlayStop_P.png" />
+    <Resource Include="Images\Animation\Soldier\SampleGif.gif" />
     <Content Include="WPFToolkit.Extended.dll" />
     <Resource Include="Images\Default\Disabled\Remove2.png" />
     <Resource Include="Images\Default\Remove2.png" />
@@ -687,6 +737,10 @@
     <ProjectReference Include="..\DataModels\DataModels.csproj">
       <Project>{EDE188CB-1A7D-4168-988B-33DBCCBAA21A}</Project>
       <Name>DataModels</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Skill\Skill.csproj">
+      <Project>{5AAE3714-704C-4150-91FE-B73B05808D14}</Project>
+      <Name>Skill</Name>
     </ProjectReference>
     <ProjectReference Include="..\UnityCSharpCodeGeneration\UnityCSharpCodeGeneration.csproj">
       <Project>{C00A59BC-EC40-40BE-8A78-AB9754CBDBE3}</Project>

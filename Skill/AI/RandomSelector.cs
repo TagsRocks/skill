@@ -5,12 +5,39 @@ using System.Text;
 
 namespace Skill.AI
 {
+    public interface IRandomService
+    {
+        float Range(float min, float max);
+    }
+
     /// <summary>    
     /// Select random child by chance for execution and continue executing that until result of chlid be Running. 
     /// if result is Failure or success, selected another random child on next exevution
     /// </summary>
     public class RandomSelector : Composite
     {
+        private class UnityRandomService : IRandomService
+        {
+            public float Range(float min, float max)
+            {
+                return UnityEngine.Random.Range(min, max);
+            }
+        }
+
+
+        private static IRandomService _RandomService;
+        public static IRandomService RandomService
+        {
+            get
+            {
+                if (_RandomService == null)
+                    _RandomService = new UnityRandomService();
+                return _RandomService;
+            }
+            set { _RandomService = value; }
+        }
+
+
         private float _TotalWeight;
 
         /// <summary>
@@ -36,7 +63,7 @@ namespace Skill.AI
         public override void Add(Behavior child, BehaviorParameterCollection parameters = null)
         {
             _TotalWeight += child.Weight;
-            base.Add(child, parameters);            
+            base.Add(child, parameters);
         }
 
         /// <summary>
@@ -74,9 +101,9 @@ namespace Skill.AI
             if (RunningChildIndex < 0)
                 RunningChildIndex = GetRandomIndex();// pick random node
             BehaviorResult result = BehaviorResult.Failure;
-            BehaviorContainer node = this[RunningChildIndex];            
+            BehaviorContainer node = this[RunningChildIndex];
             state.Parameters = node.Parameters;
-            result = node.Behavior.Trace(state);            
+            result = node.Behavior.Trace(state);
             if (result != BehaviorResult.Running)
                 RunningChildIndex = -1;
             return result;
@@ -88,7 +115,7 @@ namespace Skill.AI
         /// <returns>Index of selected child</returns>
         private int GetRandomIndex()
         {
-            float rnd = UnityEngine.Random.Range(0.0f, _TotalWeight);
+            float rnd = RandomService.Range(0.0f, _TotalWeight);
             float sum = 0;
             for (int i = 0; i < ChildCount; i++)
             {

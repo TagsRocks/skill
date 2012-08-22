@@ -19,6 +19,10 @@ namespace Skill.DataModels.AI
         public PrioritySelector Root { get; private set; }
         /// <summary> Name of tree. this name is based on filename and will set after loading from file </summary>
         public string Name { get; set; }
+
+        public double Scale { get; set; }
+        public double HorizontalOffset { get; set; }
+        public double VerticalOffset { get; set; }
         #endregion
 
         #region Constructor
@@ -31,6 +35,7 @@ namespace Skill.DataModels.AI
             this.Name = "NewBehaviorTree";
             this.Root = new PrioritySelector();
             this.Root.Name = "Root";
+            this.Scale = 1;
         }
         #endregion
 
@@ -89,6 +94,11 @@ namespace Skill.DataModels.AI
             XElement behaviorTree = new XElement("BehaviorTree");
             behaviorTree.SetAttributeValue("Name", Name);
             behaviorTree.SetAttributeValue("RootId", Root.Id);
+
+            behaviorTree.SetAttributeValue("Scale", Scale);
+            behaviorTree.SetAttributeValue("HorizontalOffset", HorizontalOffset);
+            behaviorTree.SetAttributeValue("VerticalOffset", VerticalOffset);
+
             XElement behaviorsElement = new XElement("Behaviors");
 
             // write each behavior without children hierarchy
@@ -221,6 +231,10 @@ namespace Skill.DataModels.AI
         public void Load(XElement e)
         {
             this.Name = e.GetAttributeValueAsString("Name", this.Name);
+            this.Scale = e.GetAttributeValueAsDouble("Scale", Scale);
+            this.HorizontalOffset = e.GetAttributeValueAsDouble("HorizontalOffset", HorizontalOffset);
+            this.VerticalOffset = e.GetAttributeValueAsDouble("VerticalOffset", VerticalOffset);
+
 
             List<Behavior> list = new List<Behavior>();
             XElement behaviorsElement = e.FindChildByName("Behaviors");

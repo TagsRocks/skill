@@ -119,6 +119,14 @@ namespace Skill.Studio
 
         public string DesignerName { get { return "Designer"; } }
 
+        public string GifAnimationDirectory
+        {
+            get
+            {
+                return System.IO.Path.Combine(this.Directory, "GifAnimations");
+            }
+        }
+
         /// <summary> Directory of project </summary>
         public string Directory
         {
@@ -368,6 +376,16 @@ namespace Skill.Studio
             return GetDesignerOutputPath(localPath);
         }
 
+        /// <summary>
+        /// Get full path of file in gif animation directory
+        /// </summary>
+        /// <param name="localPath">local path of gif file</param>
+        /// <returns>path</returns>
+        public string GetAnimationPath(string localPath)
+        {
+            return System.IO.Path.Combine(this.GifAnimationDirectory, localPath);
+        }
+
 
         /// <summary>
         /// Delete file in output and designer directory
@@ -399,7 +417,7 @@ namespace Skill.Studio
         }
         private void DeleteDirectory(string path)
         {
-            if (System.IO.Directory.Exists(path)) System.IO.Directory.Delete(path,true);
+            if (System.IO.Directory.Exists(path)) System.IO.Directory.Delete(path, true);
         }
 
         /// <summary>

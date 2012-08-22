@@ -135,6 +135,9 @@
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator />
+                <MenuItem Header="Gif Animations" Click="MnuShowGifAnimations_Click"  IsEnabled="{Binding IsProjectLoaded,ElementName=This}" >                    
+                </MenuItem>
+                <Separator />
                 <MenuItem Header="Project Properties" Command="{x:Static local:MainWindow.ShowSettingsCommand}" >
                     <MenuItem.Icon>
                         <my:ButtonImage NormalImage="{StaticResource ImgSettings}" DisableImage="{StaticResource ImgSettings_D}" />

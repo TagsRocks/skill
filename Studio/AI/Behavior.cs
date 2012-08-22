@@ -19,7 +19,96 @@ namespace Skill.Studio.AI
     /// </summary>
     public abstract class BehaviorViewModel : TreeViewItemViewModel
     {
+        #region Brush Properties
+
+        private Brush _BackBrush;
+        public Brush BackBrush
+        {
+            get { return _BackBrush != null ? _BackBrush : Editor.BehaviorBrushes.DefaultBackBrush; }
+            set
+            {
+                if (_BackBrush != value)
+                {
+                    _BackBrush = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("BackBrush"));
+                }
+            }
+        }
+
+        private Brush _BorderBrush;
+        [Browsable(false)]
+        public Brush BorderBrush
+        {
+            get
+            {
+                return _BorderBrush;
+            }
+            set
+            {
+                if (_BorderBrush != value)
+                {
+                    _BorderBrush = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("BorderBrush"));
+                }
+            }
+        }
+
+        private double _ConnectionStroke;
+        [Browsable(false)]
+        public double ConnectionStroke
+        {
+            get { return _ConnectionStroke; }
+            set
+            {
+                if (_ConnectionStroke != value)
+                {
+                    _ConnectionStroke = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("ConnectionStroke"));
+                }
+            }
+        }
+        #endregion
+
+        #region Debug
+
+        [Browsable(false)]
+        internal DebugBehavior Debug { get; private set; }
+
+        [Browsable(false)]
+        internal bool IsDebuging { get { return Tree.IsDebuging; } }
+
+        private bool _IsVisited;
+        [Browsable(false)]
+        public bool IsVisited
+        {
+            get { return _IsVisited; }
+            set
+            {
+                if (_IsVisited != value)
+                {
+                    _IsVisited = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("IsVisited"));
+                }
+            }
+        }
+
+        #endregion
+
         #region Properties
+
+        public override bool IsSelected
+        {
+            get { return base.IsSelected; }
+            set
+            {
+                base.IsSelected = value;
+                if (!IsDebuging)
+                {
+                    BorderBrush = value ? Editor.BehaviorBrushes.SelectedBrush : Editor.BehaviorBrushes.DefaultBorderBrush;
+                }
+            }
+        }
+
         /// <summary>
         /// Actual behavior data
         /// </summary>
@@ -37,103 +126,106 @@ namespace Skill.Studio.AI
         [Browsable(false)]
         public PathGeometry ConnectionToP
         {
-            get
+            get { return _ConnectionToP; }
+            set
             {
+                if (_ConnectionToP != value)
+                {
+                    _ConnectionToP = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("ConnectionToP"));
+                }
+            }
+        }
+
+        private PathFigure _PathFigure;
+        private BezierSegment _BezierSegment;
+        private void UpdateConnectionToP()
+        {
+
+            if (_ConnectionToP == null)
+            {
+                _PathFigure = new PathFigure();
+                _BezierSegment = new BezierSegment();
+                _BezierSegment.IsStroked = true;
+                _PathFigure.Segments.Add(_BezierSegment);
+            }
+            BehaviorViewModel parent = Parent as BehaviorViewModel;
+            if (parent != null)
+            {
+                double deltaX = parent.X - this.X;
+                double deltaY = parent.Y - this.Y;
+
+                Point targetPosition = new Point(OFFSET, Height / 2);
+                Point sourcePosition = new Point(deltaX + parent.Width - OFFSET, deltaY + Height / 2);
+
+                deltaX = System.Math.Abs(targetPosition.X - sourcePosition.X) * 0.5;
+                deltaY = System.Math.Abs(targetPosition.Y - sourcePosition.Y) * 0.5;
+
+                Point startBezierPoint = Skill.Studio.Diagram.BezierCurve.GetBezierPoint(deltaX, deltaY, Diagram.ConnectorOrientation.Right, sourcePosition);
+                Point endBezierPoint = Skill.Studio.Diagram.BezierCurve.GetBezierPoint(deltaX, deltaY, Diagram.ConnectorOrientation.Left, targetPosition);
+
+                _PathFigure.StartPoint = sourcePosition;
+                _BezierSegment.Point1 = startBezierPoint;
+                _BezierSegment.Point2 = endBezierPoint;
+                _BezierSegment.Point3 = targetPosition;
+
                 if (_ConnectionToP == null)
                 {
-                    BehaviorViewModel parent = Parent as BehaviorViewModel;
-                    if (parent != null)
-                    {
-                        int index = parent.IndexOf(this);
-                        double h = 0;
-
-                        for (int i = 0; i < parent.Count; i++)
-                        {
-                            BehaviorViewModel child = parent[i] as BehaviorViewModel;
-                            if (child != null)
-                            {
-                                if (child == this)
-                                {
-                                    h += child.Height / 2;
-                                    break;
-                                }
-                                else
-                                {
-                                    h += child.Height;
-                                }
-                            }
-                        }
-
-                        double y = (parent.Height / 2) - h - MarginBottom;
-                        double x = -MarginLeft;
-                        double offset = Height / 2;
-
-                        _ConnectionToP = Skill.Studio.Diagram.BezierCurve.GetPathGeometry(new Point(0, offset), new Point(x, y + offset), Diagram.ConnectorOrientation.Left, Diagram.ConnectorOrientation.Right);
-                    }
-                    else
-                        _ConnectionToP = new PathGeometry();
+                    PathGeometry pathGeometry = new System.Windows.Media.PathGeometry();
+                    pathGeometry.Figures.Add(_PathFigure);
+                    this.ConnectionToP = pathGeometry;
                 }
-                return _ConnectionToP;
             }
+
         }
 
-        private static double MarginLeft = 25;
-        private static double MarginBottom = 4;
-        private static double UnitH = 33;
 
-        private double _Height;
-        [Browsable(false)]
-        public double Height
+
+        private static double MINWIDTH = 80;
+        private static double MARGINLEFT = 50;
+        private static double MARGINBOTTOM = 10;
+        private static double MINHEIGHT = 30;
+        private static double OFFSET = 2;
+
+
+        public void UpdatePosition()
         {
-            get
+            UpdatePosition(MARGINLEFT, 10);
+            UpdateConnection();
+        }
+
+        private void UpdateConnection()
+        {
+            this.UpdateConnectionToP();
+            foreach (BehaviorViewModel child in this) if (child != null) child.UpdateConnection();
+        }
+
+        private double UpdatePosition(double x, double y)
+        {
+            X = x;
+
+            double delta;
+            if (Count == 0)
             {
-                if (_Height == 0)
+                delta = MINHEIGHT;
+                Y = y + delta * 0.5;
+            }
+            else
+            {
+                delta = 0;
+                int i = 0;
+                foreach (BehaviorViewModel child in this)
                 {
-                    if (Count == 0)
-                    {
-                        _Height = UnitH;
-                    }
-                    else
-                    {
-                        _Height = MarginBottom;
-                        foreach (BehaviorViewModel child in this)
-                        {
-                            if (child != null)
-                                _Height += child.Height;
-                        }
-                    }
+                    if (child != null)
+                        delta += child.UpdatePosition(x + Width + MARGINLEFT, y + delta + i * MARGINBOTTOM);
+                    i++;
                 }
-                return _Height;
-            }
-        }
 
-        public void UpdateConnection()
-        {
-            ResetHeight();
-            ResetConnection();
-        }
+                delta += (Count - 1) * MARGINBOTTOM;
 
-        private void ResetHeight()
-        {
-            _Height = 0;
-            foreach (BehaviorViewModel child in this)
-            {
-                if (child != null)
-                    child.ResetHeight();
+                Y = y + delta * 0.5;
             }
-        }
-
-        private void ResetConnection()
-        {
-            if (_ConnectionToP != null)
-                _ConnectionToP.Clear();
-            _ConnectionToP = null;
-            foreach (BehaviorViewModel child in this)
-            {
-                if (child != null)
-                    child.ResetConnection();
-            }
-            OnPropertyChanged(new PropertyChangedEventArgs("ConnectionToP"));
+            return delta;
         }
 
         [Browsable(false)]
@@ -174,6 +266,35 @@ namespace Skill.Studio.AI
                 OnPropertyChanged(new PropertyChangedEventArgs("DisplayName"));
         }
 
+        private Editor.BehaviorBorder _Border;
+        [Browsable(false)]
+        public Editor.BehaviorBorder Border
+        {
+            get { return _Border; }
+            set
+            {
+                if (_Border != value)
+                {
+                    _Border = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("Border"));
+                }
+            }
+        }
+
+        [Browsable(false)]
+        public double Width { get { return (_Border != null) ? _Border.DesiredSize.Width : MINWIDTH; } }
+        [Browsable(false)]
+        public double Height { get { return (_Border != null) ? _Border.DesiredSize.Height : MINHEIGHT; } }
+
+        private double _X;
+        /// <summary> Canvas.Left </summary>        
+        [Browsable(false)]
+        public double X { get { return _X; } set { if (_X != value) { _X = value; OnPropertyChanged(new PropertyChangedEventArgs("X")); } } }
+
+        private double _Y;
+        /// <summary> Canvas.Top </summary>        
+        [Browsable(false)]
+        public double Y { get { return _Y; } set { if (_Y != value) { _Y = value; OnPropertyChanged(new PropertyChangedEventArgs("Y")); } } }
         #endregion
 
         #region Constructors
@@ -198,10 +319,14 @@ namespace Skill.Studio.AI
         private BehaviorViewModel(BehaviorTreeViewModel tree, BehaviorViewModel parent, Behavior behavior)
             : base(parent)
         {
+            this._BorderBrush = Editor.BehaviorBrushes.DefaultBorderBrush;
+            this._ConnectionStroke = 2;
             this.Model = behavior;
             this.Tree = tree;
             this.Tree.RegisterViewModel(this);
+            this.Debug = new DebugBehavior(this);
             LoadChildren();
+
         }
 
         /// <summary>
@@ -369,7 +494,7 @@ namespace Skill.Studio.AI
                 }
             }
         }
-               
+
 
         [DefaultValue(1)]
         [DisplayName("Weight")]
@@ -384,6 +509,7 @@ namespace Skill.Studio.AI
                     if (Weight < 0) { MainWindow.Instance.ShowError("Negative weight is invalid"); return; }
                     Tree.History.Insert(new ChangePropertyUnDoRedo(this, "Weight", value, Model.Weight));
                     Model.Weight = value;
+                    Debug.Behavior.Weight = value;
                     this.OnPropertyChanged(new PropertyChangedEventArgs("Weight"));
                 }
             }
@@ -706,10 +832,37 @@ namespace Skill.Studio.AI
                         }
                     }
                 }
+                Tree.UnRegisterViewModel(child);
                 Tree.History.Insert(new AddBehaviorUnDoRedo(child, parameters, this, index, true));
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Match parameters when parameters of another viewmodel with shared Behavior model edited by user
+        /// </summary>
+        /// <param name="parameters">new parameters</param>
+        public void MatchParameters(ParameterCollection parameters)
+        {
+            ParameterCollection myParams = ((BehaviorViewModel)Parent).GetParameters(this);
+            foreach (var p in parameters)
+            {
+                if (myParams.Count(mp => mp.Name == p.Name) == 0)
+                    myParams.Add(new Parameter() { Name = p.Name, Type = p.Type, Value = p.Value });
+            }
+
+            int index = 0;
+            while (index < myParams.Count)
+            {
+                var mp = myParams[index];
+                if (parameters.Count(p => p.Name == mp.Name) == 0)
+                {
+                    myParams.Remove(mp);
+                    continue;
+                }
+                index++;
+            }
         }
 
         #endregion
@@ -720,6 +873,8 @@ namespace Skill.Studio.AI
             return Name;
         }
         #endregion
+
+
     }
     #endregion
 

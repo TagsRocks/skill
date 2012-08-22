@@ -13,6 +13,10 @@ namespace Skill.Studio.AI
     public class BehaviorTreeViewModel : INotifyPropertyChanged, IDataViewModel
     {
         #region Properties
+
+        /// <summary> list of all behaviors in tree</summary>
+        public ObservableCollection<BehaviorViewModel> Behaviors { get; private set; }
+
         /// <summary> list of all actions in tree</summary>
         public ObservableCollection<BehaviorViewModel> Actions { get; private set; }
         /// <summary> list of all conditions in tree</summary>
@@ -49,6 +53,75 @@ namespace Skill.Studio.AI
 
         /// <summary> Editor owner </summary>
         public Editor.BehaviorTreeEditor Editor { get; set; }
+
+        private bool _IsDebuging;
+        [Browsable(false)]
+        public bool IsDebuging
+        {
+            get { return _IsDebuging; }
+            set
+            {
+                if (_IsDebuging != value)
+                {
+                    _IsDebuging = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("IsDebuging"));
+                }
+            }
+        }
+
+        private TimeSpan _DebugTimer;
+        [Browsable(false)]
+        public TimeSpan DebugTimer
+        {
+            get { return _DebugTimer; }
+            set
+            {
+                _DebugTimer = value;
+                OnPropertyChanged(new PropertyChangedEventArgs("DebugTimerString"));
+            }
+        }
+
+        public string DebugTimerString { get { return string.Format("Time : {0:D2}.{1:D2}.{2:D3}", _DebugTimer.Minutes, _DebugTimer.Seconds, _DebugTimer.Milliseconds); } }
+
+
+        public double Scale
+        {
+            get { return Model.Scale; }
+            set
+            {
+                if (Model.Scale != value)
+                {
+                    Model.Scale = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("Scale"));
+                }
+            }
+        }
+
+        public double HorizontalOffset
+        {
+            get { return Model.HorizontalOffset; }
+            set
+            {
+                if (Model.HorizontalOffset != value)
+                {
+                    Model.HorizontalOffset = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("HorizontalOffset"));
+                }
+            }
+        }
+
+        public double VerticalOffset
+        {
+            get { return Model.VerticalOffset; }
+            set
+            {
+                if (Model.VerticalOffset != value)
+                {
+                    Model.VerticalOffset = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("VerticalOffset"));
+                }
+            }
+        }
         #endregion
 
         #region Constructor
@@ -59,6 +132,7 @@ namespace Skill.Studio.AI
         /// <param name="history">History of TabContent</param>
         public BehaviorTreeViewModel(BehaviorTree tree)
         {
+            this.Behaviors = new ObservableCollection<BehaviorViewModel>();
             this.Actions = new ObservableCollection<BehaviorViewModel>();
             this.Conditions = new ObservableCollection<BehaviorViewModel>();
             this.Decorators = new ObservableCollection<BehaviorViewModel>();
@@ -102,6 +176,9 @@ namespace Skill.Studio.AI
         int _AvoidRootRegister = 0;
         public void RegisterViewModel(BehaviorViewModel viewModel)
         {
+            if (!this.Behaviors.Contains(viewModel))
+                this.Behaviors.Add(viewModel);
+
             _AvoidRootRegister++;
             // root behavior model already added to behavior tree model in constructor of behavior tree
             if (_AvoidRootRegister == 1)
@@ -129,6 +206,30 @@ namespace Skill.Studio.AI
                         this.Composites.Add(viewModel);
                     break;
             }
+
+
+        }
+
+        public void UnRegisterViewModel(BehaviorViewModel viewModel)
+        {
+            if (!IsInHierarchy(viewModel))
+                Behaviors.Remove(viewModel);
+        }
+
+        private bool IsInHierarchy(BehaviorViewModel viewModel)
+        {
+            return IsInHierarchy(Root, viewModel);
+        }
+
+        private bool IsInHierarchy(BehaviorViewModel node, BehaviorViewModel viewModel)
+        {
+            if (node == viewModel) return true;
+            foreach (BehaviorViewModel child in node)
+            {
+                if (IsInHierarchy(child, viewModel))
+                    return true;
+            }
+            return false;
         }
         #endregion
 
@@ -205,7 +306,7 @@ namespace Skill.Studio.AI
 
         public void CommiteChanges()
         {
-            this.AccessKeys.CommiteChanges();            
+            this.AccessKeys.CommiteChanges();
         }
         #endregion
     }

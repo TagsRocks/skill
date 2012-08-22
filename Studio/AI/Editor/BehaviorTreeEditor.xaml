@@ -8,8 +8,9 @@
              xmlns:dmai="clr-namespace:Skill.DataModels.AI;assembly=DataModels"
              xmlns:sk="clr-namespace:Skill.Studio"
              xmlns:my="clr-namespace:Skill.Studio.Controls"             
+             xmlns:bedit="clr-namespace:Skill.Studio.AI.Editor"             
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="700" x:Name="BTEditor" Title="BehaviorTree Editor">
+             d:DesignHeight="300" d:DesignWidth="700" x:Name="BTEditor" Title="BehaviorTree Editor"  >
 
     <sk:TabDocument.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Undo"
@@ -115,7 +116,7 @@
                         <StackPanel Orientation="Horizontal" >
                             <Image Width="16" Height="16" Margin="2" Source="{Binding ImageName}"  />
                             <TextBlock Text="{Binding Name}" Tag="{Binding}" />
-                        </StackPanel>                        
+                        </StackPanel>
                     </DataTemplate>
                     <Style x:Key="MenuClickStyle" >
                         <Setter Property="MenuItem.Tag" Value="{Binding}" />
@@ -125,7 +126,7 @@
                 <MenuItem Header="Actions" ItemsSource="{Binding BehaviorTree.Actions}" ItemContainerStyle="{StaticResource MenuClickStyle}" >
                     <MenuItem.Icon>
                         <my:ButtonImage NormalImage="{StaticResource ImgAction}" DisableImage="{StaticResource ImgAction_D}" />
-                    </MenuItem.Icon>                    
+                    </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Header="Conditions" ItemsSource="{Binding BehaviorTree.Conditions}" ItemContainerStyle="{StaticResource MenuClickStyle}" >
                     <MenuItem.Icon>
@@ -149,90 +150,172 @@
             <MenuItem Header="Delete" Command="ApplicationCommands.Delete"/>
         </ContextMenu>
     </sk:TabDocument.Resources>
-    <Grid>
+    <Grid Background="White" >
         <Grid.RowDefinitions>
+            <RowDefinition Height="24" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250" />
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <Grid Grid.Row="0" Grid.Column="0" >
-            <Grid.RowDefinitions>
-                <RowDefinition Height="26" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0" Orientation="Horizontal" Background="{StaticResource ToolbarBackColor}" >
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250" MinWidth="160" />
+                <ColumnDefinition Width="*" MinWidth="300" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Background="{StaticResource ToolbarBackColor}" >
                 <Menu Height="20" Background="{StaticResource ToolbarBackColor}" VerticalAlignment="Center"  >
                     <MenuItem Header="Edit">
                         <MenuItem Header="AccessKeys" Click="Mnu_EditAccessKeys_Click" />
                     </MenuItem>
                     <MenuItem Header="Show">
                         <MenuItem Header="Parameters" Click="Mnu_ShowParameters_Click" IsChecked="{Binding BehaviorTree.ShowParameters}" />
+                        <MenuItem Header="Animations" Click="Mnu_ShowAnimations_Click" IsChecked="{Binding ShowAnimations}" />
                     </MenuItem>
                 </Menu>
             </StackPanel>
-            <TreeView ItemsSource="{Binding BehaviorTree.Nodes}" BorderThickness="0" Name="_BTTree" 
-                  SelectedItemChanged="_BTTree_SelectedItemChanged" Grid.Row="1" Grid.Column="0" ContextMenu="{StaticResource TVContextMenu}"  >
-                <TreeView.ItemContainerStyle>
-                    <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource TreeViewItemStyle}">
-                        <EventSetter Event="TreeViewItem.PreviewMouseRightButtonDown" Handler="TreeViewItem_PreviewMouseRightButtonDown"/>
-                        <EventSetter Event="TreeViewItem.KeyDown" Handler="TreeViewItem_KeyDown"/>
-                    </Style>
-                </TreeView.ItemContainerStyle>
-
-                <TreeView.Resources>
-                    <HierarchicalDataTemplate DataType="{x:Type vm:BehaviorViewModel}"
-                    ItemsSource="{Binding}">
-                        <Grid>
-                            <StackPanel Orientation="Horizontal" Height="16" >
-                                <Image Width="16" Height="16" Margin="3,0" Source="{Binding ImageName}" />
-                                <TextBlock Text="{Binding DisplayName}" />
-                            </StackPanel>
-                        </Grid>
-                    </HierarchicalDataTemplate>
-                    <LinearGradientBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" EndPoint="0,1" StartPoint="0,0">
-                        <GradientStop Color="#f2f8ff" Offset="0.05"/>
-                        <GradientStop Color="#d0e5ff" Offset="1"/>
-                    </LinearGradientBrush>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black" />
-                    <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="Black" />
-                </TreeView.Resources>
-            </TreeView>
+            <Grid Grid.Row="0" Grid.Column="2" Background="{StaticResource ToolbarBackColor}" >
+                <StackPanel  Orientation="Horizontal" HorizontalAlignment="Center"  >
+                    <StackPanel.Resources>
+                        <Style TargetType="Control" x:Key="BtnStyle" >
+                            <Setter Property="Width" Value="22" />
+                            <Setter Property="Height" Value="22" />
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                            <Setter Property="HorizontalAlignment" Value="Center" />
+                            <Setter Property="Margin" Value="2,0" />
+                        </Style>
+                    </StackPanel.Resources>
+                    <my:ToggleMediaButton x:Name="_BtnPlayStop" NormalImage="{StaticResource ImgPlayStopBtn}" PressedImage="{StaticResource ImgPlayStopPressedBtn}" HoverImage="{StaticResource ImgPlayStopHoverBtn}" Style="{StaticResource BtnStyle}" Click="BtnPlayStop_Click" />
+                    <my:ToggleMediaButton x:Name="_BtnPause" NormalImage="{StaticResource ImgPauseBtn}" PressedImage="{StaticResource ImgPausePressedBtn}" HoverImage="{StaticResource ImgPauseHoverBtn}" Style="{StaticResource BtnStyle}" Click="BtnPause_Click" />
+                    <my:MediaButton IsEnabled="{Binding IsChecked,ElementName=_BtnPause}" x:Name="_BtnStep" NormalImage="{StaticResource ImgStepBtn}" PressedImage="{StaticResource ImgStepPressedBtn}" HoverImage="{StaticResource ImgStepHoverBtn}" Style="{StaticResource BtnStyle}" Click="BtnStep_Click" />
+                    <ComboBox x:Name="_CmbTimeInterval" ItemsSource="{Binding TimeIntervals,ElementName=BTEditor }" Style="{StaticResource BtnStyle}" Width="40" SelectionChanged="CmbTimeInterval_SelectionChanged" />
+                    <TextBox Text="{Binding BehaviorTree.DebugTimerString, Mode=OneWay}" />
+                    <Slider Width="100" Value="{Binding AnimationSize}" Minimum="64" Maximum="194" ToolTip="Animation Size" Margin="4,0,0,0" />
+                </StackPanel>
+            </Grid>
         </Grid>
-        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="2" Background="Gray" Grid.Row="0" />
-        <Grid Grid.Column="2" Background="LightGray" >
-            <TreeView Name="_VisualTree" ItemsSource="{Binding BehaviorTree.Nodes}" ContextMenu="{StaticResource TVContextMenu}" >
-                <TreeView.Resources>
-                    <ResourceDictionary>
-                        <ResourceDictionary.MergedDictionaries>
-                            <ResourceDictionary 
-                                Source="Resources/OrgChartTreeViewItemStyle.xaml" />
-                        </ResourceDictionary.MergedDictionaries>
-                        <HierarchicalDataTemplate DataType="{x:Type vm:BehaviorViewModel}" ItemsSource="{Binding}">
+        <Grid Grid.Row="1" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250" MinWidth="160" />
+                <ColumnDefinition Width="Auto"  />
+                <ColumnDefinition Width="*" MinWidth="300" />
+            </Grid.ColumnDefinitions>
+            <Grid >
+                <TreeView ItemsSource="{Binding BehaviorTree.Nodes}" BorderThickness="0" Name="_BTTree"  
+                  SelectedItemChanged="_BTTree_SelectedItemChanged" Grid.Row="1" Grid.Column="0" ContextMenu="{StaticResource TVContextMenu}"  >
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource TreeViewItemStyle}">
+                            <EventSetter Event="TreeViewItem.PreviewMouseRightButtonDown" Handler="TreeViewItem_PreviewMouseRightButtonDown"/>
+                            <EventSetter Event="TreeViewItem.KeyDown" Handler="TreeViewItem_KeyDown"/>
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+
+                    <TreeView.Resources>
+                        <HierarchicalDataTemplate DataType="{x:Type vm:BehaviorViewModel}"
+                    ItemsSource="{Binding}">
                             <Grid>
                                 <StackPanel Orientation="Horizontal" Height="16" >
                                     <Image Width="16" Height="16" Margin="3,0" Source="{Binding ImageName}" />
-                                    <TextBlock Text="{Binding Name}" />
+                                    <TextBlock Text="{Binding DisplayName}" />
                                 </StackPanel>
                             </Grid>
                         </HierarchicalDataTemplate>
-                    </ResourceDictionary>
-                </TreeView.Resources>
-                <TreeView.ItemContainerStyle>
-                    <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource OrgChartTreeViewItemStyle}">
-                        <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded, Mode=TwoWay}"/>
-                        <EventSetter Event="TreeViewItem.PreviewMouseRightButtonDown" Handler="TreeViewItem_PreviewMouseRightButtonDown"/>
-                        <EventSetter Event="TreeViewItem.KeyDown" Handler="TreeViewItem_KeyDown"/>
-                    </Style>
-                </TreeView.ItemContainerStyle>
-                <TreeView.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Grid HorizontalAlignment="Center" IsItemsHost="True" />
-                    </ItemsPanelTemplate>
-                </TreeView.ItemsPanel>
-            </TreeView>
+                        <LinearGradientBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" EndPoint="0,1" StartPoint="0,0">
+                            <GradientStop Color="#f2f8ff" Offset="0.05"/>
+                            <GradientStop Color="#d0e5ff" Offset="1"/>
+                        </LinearGradientBrush>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black" />
+                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="Black" />
+                    </TreeView.Resources>
+                </TreeView>
+            </Grid>
+            <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="2" Background="Gray" />
+            <Grid Grid.Column="2" >
+                <ScrollViewer Name="_DesignerScrollViewer" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
+                    <ItemsControl ItemsSource="{Binding BehaviorTree.Behaviors}" >
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <bedit:BehaviorTreeCanvas Editor="{Binding ElementName=BTEditor}" Background="LightGray" >
+                                </bedit:BehaviorTreeCanvas>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.Resources>
+                            <DataTemplate DataType="{x:Type vm:ActionViewModel}"  >
+                                <bedit:BehaviorBorder ViewModel="{Binding}" x:Name="Bd" >
+                                    <Grid>
+                                        <Canvas VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  >
+                                            <Path  Data="{Binding ConnectionToP}" Stroke="{Binding BorderBrush}" StrokeThickness="{Binding ConnectionStroke}" />
+                                        </Canvas>
+                                        <Border Background="{Binding BackBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="{Binding ConnectionStroke}" CornerRadius="8" Padding="6" MouseLeftButtonDown="Behavior_MouseLeftButtonDown" MinWidth="80" >
+                                            <StackPanel Orientation="Horizontal" >
+                                                <Image Source="{Binding ImageName}" Width="16" Height="16" Margin="2,0" />
+                                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="2,0" />
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </bedit:BehaviorBorder>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type vm:CompositeViewModel}"  >
+                                <bedit:BehaviorBorder ViewModel="{Binding}" x:Name="Bd" >
+                                    <Grid>
+                                        <Canvas VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  >
+                                            <Path  Data="{Binding ConnectionToP}" Stroke="{Binding BorderBrush}" StrokeThickness="{Binding ConnectionStroke}" />
+                                        </Canvas>
+                                        <Border Background="{Binding BackBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="{Binding ConnectionStroke}" CornerRadius="2" Padding="6" MouseLeftButtonDown="Behavior_MouseLeftButtonDown" MinWidth="80" MinHeight="50" >
+                                            <StackPanel Orientation="Horizontal" >
+                                                <Image Source="{Binding ImageName}" Width="16" Height="16" Margin="2,0" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="2,0" />
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </bedit:BehaviorBorder>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type vm:DecoratorViewModel}"  >
+                                <bedit:BehaviorBorder ViewModel="{Binding}" x:Name="Bd" >
+                                    <Grid>
+                                        <Canvas VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  >
+                                            <Path  Data="{Binding ConnectionToP}" Stroke="{Binding BorderBrush}" StrokeThickness="{Binding ConnectionStroke}" />
+                                        </Canvas>
+                                        <Border Background="{Binding BackBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="{Binding ConnectionStroke}" CornerRadius="30" Padding="6" MouseLeftButtonDown="Behavior_MouseLeftButtonDown" MinWidth="80" MinHeight="40"  >
+                                            <StackPanel Orientation="Horizontal" >
+                                                <Image Source="{Binding ImageName}" Width="16" Height="16" Margin="2,0" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="2,0" />
+                                                <CheckBox IsChecked="{Binding IsValid}" Margin="2,0" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </bedit:BehaviorBorder>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type vm:ConditionViewModel}"  >
+                                <bedit:BehaviorBorder ViewModel="{Binding}" x:Name="Bd" >
+                                    <Grid>
+                                        <Canvas VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  >
+                                            <Path  Data="{Binding ConnectionToP}" Stroke="{Binding BorderBrush}" StrokeThickness="{Binding ConnectionStroke}" />
+                                        </Canvas>
+                                        <Border Background="{Binding BackBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="{Binding ConnectionStroke}" CornerRadius="8" Padding="6" MouseLeftButtonDown="Behavior_MouseLeftButtonDown" MinWidth="80" >
+                                            <StackPanel Orientation="Horizontal" >
+                                                <Image Source="{Binding ImageName}" Width="16" Height="16" Margin="2,0" />
+                                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="2,0" />
+                                                <CheckBox IsChecked="{Binding IsValid}" Margin="2,0" />
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </bedit:BehaviorBorder>
+                            </DataTemplate>
+                        </ItemsControl.Resources>
+                        <ItemsControl.ItemContainerStyle >
+                            <Style >
+                                <Setter Property="Canvas.Top" Value="{Binding Path=Y,Mode=TwoWay}" />
+                                <Setter Property="Canvas.Left" Value="{Binding Path=X,Mode=TwoWay}" />
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+                    </ItemsControl>
+                </ScrollViewer>
+                <ItemsControl ItemsSource="{Binding Animations}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,8,0" Height="{Binding AnimationSize}"  Visibility="{Binding ShowAnimations, Converter={StaticResource BToVisConverter}, ConverterParameter=False}" >
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="0" HorizontalAlignment="Right" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </Grid>
         </Grid>
     </Grid>
 </sk:TabDocument>

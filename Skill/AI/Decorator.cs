@@ -125,7 +125,7 @@ namespace Skill.AI
         /// Reset behavior
         /// </summary>        
         /// <param name="resetChildren">Reset children too</param>
-        internal override void ResetBehavior(bool resetChildren = false)
+        public override void ResetBehavior(bool resetChildren = false)
         {
             base.ResetBehavior();
             if (resetChildren)

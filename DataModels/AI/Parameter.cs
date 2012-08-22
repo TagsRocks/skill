@@ -75,6 +75,8 @@ namespace Skill.DataModels.AI
     {
         private List<Parameter> _Parameters;
 
+        public Parameter this[int index] { get { return _Parameters[index]; } }
+
         /// <summary>
         /// Create an instance of ParameterCollection
         /// </summary>
@@ -181,6 +183,8 @@ namespace Skill.DataModels.AI
         /// <returns>Parameters as string</returns>
         public override string ToString()
         {
+            if (Count == 0) return string.Empty;
+
             StringBuilder builder = new StringBuilder();
 
             builder.Append('(');

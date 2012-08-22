@@ -42,6 +42,7 @@ namespace Skill.Studio.AI
                 {
                     ((Decorator)Model).NeverFail = value;
                     OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs("NeverFail"));
+                    ((Skill.AI.Decorator)Debug.Behavior).NeverFail = value;
                     Tree.History.Insert(new ChangePropertyUnDoRedo(this, "NeverFail", value, !value));
                 }
             }
@@ -50,6 +51,32 @@ namespace Skill.Studio.AI
         public DecoratorViewModel(BehaviorViewModel parent, Decorator decorator)
             : base(parent, decorator)
         {
+        }
+
+        [Category("Debug")]
+        [Description("Is decorator valid in simulation runtime")]
+        public bool IsValid
+        {
+            get { return ((Skill.DataModels.AI.Decorator)Model).IsValid; }
+            set
+            {
+                if (((Skill.DataModels.AI.Decorator)Model).IsValid != value)
+                {
+                    ((Skill.DataModels.AI.Decorator)Model).IsValid = value;
+                    Debug.IsValid = value;
+                    if (IsDebuging) BackBrush = value ? Editor.BehaviorBrushes.EnableBrush : Editor.BehaviorBrushes.DisableBrush;
+                    OnPropertyChanged(new PropertyChangedEventArgs("IsValid"));
+
+                    foreach (DecoratorViewModel dvm in Tree.GetSharedModel(Model))
+                    {
+                        if (dvm != this)
+                        {
+                            dvm.OnPropertyChanged(new PropertyChangedEventArgs("IsValid"));                            
+                        }
+                    }
+                    Tree.Editor.SetChanged(true);
+                }
+            }
         }
     }
     #endregion

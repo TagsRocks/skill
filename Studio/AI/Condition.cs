@@ -6,7 +6,7 @@ using Skill.DataModels.AI;
 using System.ComponentModel;
 
 namespace Skill.Studio.AI
-{    
+{
     #region ConditionViewModel
     [DisplayName("Condition")]
     public class ConditionViewModel : BehaviorViewModel
@@ -29,6 +29,31 @@ namespace Skill.Studio.AI
         {
 
         }
-    } 
+
+        [Category("Debug")]
+        [Description("Is condition valid in simulation runtime")]
+        public bool IsValid
+        {
+            get { return ((Skill.DataModels.AI.Condition)Model).IsValid; }
+            set
+            {
+                if (((Skill.DataModels.AI.Condition)Model).IsValid != value)
+                {
+                    ((Skill.DataModels.AI.Condition)Model).IsValid = value;
+                    Debug.IsValid = value;
+                    if (IsDebuging) BackBrush = value ? Editor.BehaviorBrushes.EnableBrush : Editor.BehaviorBrushes.DisableBrush;
+                    OnPropertyChanged(new PropertyChangedEventArgs("IsValid"));
+                    foreach (ConditionViewModel cvm in Tree.GetSharedModel(Model))
+                    {
+                        if (cvm != this)
+                        {
+                            cvm.OnPropertyChanged(new PropertyChangedEventArgs("IsValid"));
+                        }
+                    }
+                    Tree.Editor.SetChanged(true);
+                }
+            }
+        }
+    }
     #endregion
 }

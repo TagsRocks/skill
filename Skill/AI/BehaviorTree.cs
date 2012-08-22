@@ -56,7 +56,7 @@ namespace Skill.AI
             if (controller == null)
                 throw new ArgumentNullException("Controller is null");
             this.Controller = controller;
-            this.State = new BehaviorState(this);
+            this.State = new BehaviorState();
             this._LastUpdateTime = 0;
             this.UpdateTimeInterval = 0.2f;
             Root = CreateTree();

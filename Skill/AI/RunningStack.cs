@@ -10,22 +10,27 @@ namespace Skill.AI
     /// </summary>
     class RunningStack
     {
+        private BehaviorState _State;
+
         // defines two stact, one holds running actions at current update , other holds running actions at previous update
         Behavior[] _Stack1;
         Behavior[] _Stack2;
 
         Behavior[] _Stack; // active stack
+        Behavior[] _PreStack; // active stack
         private int _TopIndex;// top index of stack , -1 means stack is empty
 
         /// <summary>
         /// Create an instance of RunningStack
         /// </summary>
         /// <param name="length">Maximum lenght of stack</param>
-        public RunningStack(int length)
+        public RunningStack(BehaviorState state, int length)
         {
+            _State = state;
             _Stack1 = new Behavior[length];
             _Stack2 = new Behavior[length];
             _Stack = _Stack1;
+            _PreStack = _Stack2;
             _TopIndex = -1;
         }
 
@@ -63,6 +68,8 @@ namespace Skill.AI
                 throw new InvalidOperationException("Stack is empty : Invalid pop operation");
             Behavior b = _Stack[_TopIndex];
             _Stack[_TopIndex] = null;
+            if (_PreStack[_TopIndex] == b)
+                _PreStack[_TopIndex] = null;
             _TopIndex--;
             return b;
         }
@@ -73,9 +80,15 @@ namespace Skill.AI
         public void Swap()
         {
             if (_Stack == _Stack1)
+            {
                 _Stack = _Stack2;
+                _PreStack = _Stack1;
+            }
             else
+            {
                 _Stack = _Stack1;
+                _PreStack = _Stack2;
+            }
             _TopIndex = -1;
         }
 
@@ -106,6 +119,8 @@ namespace Skill.AI
                 {
                     same = false;
                     b.ResetBehavior();
+                    if (b.Type == BehaviorType.Action)
+                        _State.RunningActions.Remove((Action)b);
                 }
                 previous[i] = null;
             }

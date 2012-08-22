@@ -153,7 +153,7 @@ namespace Skill.AI
         /// </summary>
         /// <param name="state">State of BehaviorTree</param>
         /// <param name="resetChildren">Reset children too</param>
-        internal override void ResetBehavior(bool resetChildren = false)
+        public override void ResetBehavior(bool resetChildren = false)
         {
             RunningChildIndex = -1;
             base.ResetBehavior();

@@ -27,17 +27,12 @@ namespace Skill.AI
         public Exception Exception { get; internal set; }
 
         /// <summary>
-        /// current running action.
+        /// current running actions.
         /// </summary>
         /// <remarks>
         /// action is allways leaf node. after execution of each action, if result is running hold it's reference
         /// </remarks>
-        public Action RunningAction { get; internal set; }
-
-        /// <summary>
-        /// The BehaviorTree
-        /// </summary>
-        public BehaviorTree BehaviorTree { get; private set; }
+        public ActionCollection RunningActions { get; private set; }
 
         /// <summary>
         /// The execution sequence after last update call.
@@ -47,13 +42,15 @@ namespace Skill.AI
         /// </remarks>
         public Behavior[] ExecutionSequence { get { return _ExecutionSequence; } }
 
+        /// <summary> Number of valid Behaviors in ExecutionSequence</summary>
+        public int SequenceCount { get { return _CurrnetExecutionIndex + 1; } }
 
-        public BehaviorState(BehaviorTree behaviorTree)
+
+        public BehaviorState()
         {
-            this.BehaviorTree = behaviorTree;
             this.Exception = null;
-            this.RunningAction = null;
-            _RunningStack = new RunningStack(MaxSequenceLength);
+            this.RunningActions = new ActionCollection();
+            _RunningStack = new RunningStack(this, MaxSequenceLength);
         }
 
         private Behavior[] _ExecutionSequence = new Behavior[MaxSequenceLength];// 200 is maximum node trace in tree (i hope).
@@ -62,9 +59,9 @@ namespace Skill.AI
 
 
         /// <summary>
-        /// BehaviorTree call this method at begin of each update
+        /// BehaviorTree call this method at begin of each update (internal use)
         /// </summary>
-        internal void Begin()
+        public void Begin()
         {
             _CurrnetExecutionIndex = -1;
             _RunningStack.Swap();
@@ -90,10 +87,9 @@ namespace Skill.AI
 
             if (behavior.Type == BehaviorType.Action)
             {
-                if (RunningAction != null && RunningAction != behavior)
+                if (!RunningActions.Contains((Action)behavior))
                 {
-                    _RunningStack.ResetPreviousStack();                   
-                    RunningAction = null;
+                    _RunningStack.ResetPreviousStack();
                 }
             }
             _RunningStack.Push(behavior);

@@ -36,6 +36,9 @@ namespace Skill.DataModels.AI
         /// <summary> if true : when handler function fail return success </summary>
         public bool NeverFail { get; set; }
 
+        /// <summary> use for simulation AnimationTree</summary>
+        public bool IsValid { get; set; }
+
         protected Decorator(string name, DecoratorType type)
             : base(name)
         {
@@ -51,9 +54,17 @@ namespace Skill.DataModels.AI
 
         protected override void ReadAttributes(System.Xml.Linq.XElement e)
         {
+
             NeverFail = e.GetAttributeValueAsBoolean("NeverFail", true);
             string child = e.Attribute("Child").Value;
             var childArray = Behavior.ConvertToIndices(child);
+
+            XElement debug = e.FindChildByName("Debug");
+            if (debug != null)
+            {
+                IsValid = debug.GetAttributeValueAsBoolean("IsValid", false);
+            }
+
             base.ReadAttributes(e);
         }
 
@@ -62,6 +73,11 @@ namespace Skill.DataModels.AI
             e.SetAttributeValue("DecoratorType", this.Type.ToString());
             e.SetAttributeValue("Child", GetChildrenString());
             e.SetAttributeValue("NeverFail", NeverFail);
+
+            XElement debug = new XElement("Debug");
+            debug.SetAttributeValue("IsValid", IsValid);
+            e.Add(debug);
+
             base.WriteAttributes(e);
         }
     }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Skill.DataModels.AI;
 using System.ComponentModel;
+using Skill.Studio.Controls;
 
 namespace Skill.Studio.AI
 {
@@ -46,10 +47,105 @@ namespace Skill.Studio.AI
         }
 
 
+        [Category("Debug")]
+        [Description("ExecutionTime of action in simulation runtime")]
+        public float ExecutionTime
+        {
+            get { return ((Skill.DataModels.AI.Action)Model).ExecutionTime; }
+            set
+            {
+                if (((Skill.DataModels.AI.Action)Model).ExecutionTime != value)
+                {
+                    ((Skill.DataModels.AI.Action)Model).ExecutionTime = value;
+                    Debug.ExecutionTime = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("ExecutionTime"));
+                    Tree.Editor.SetChanged(true);
+                }
+            }
+        }
+
+        [Category("Debug")]
+        [Description("FrameRate of animation")]
+        public int FrameRate
+        {
+            get { return ((Skill.DataModels.AI.Action)Model).AnimationFrameRate; }
+            set
+            {
+                if (((Skill.DataModels.AI.Action)Model).AnimationFrameRate != value)
+                {
+                    ((Skill.DataModels.AI.Action)Model).AnimationFrameRate = value;
+                    _GifAnimation.FrameRate = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("FrameRate"));
+                    Tree.Editor.SetChanged(true);
+                }
+            }
+        }
+
+        [Category("Debug")]
+        [Description("WrapMode of animation")]
+        public GifWrapMode WrapMode
+        {
+            get { return (GifWrapMode)((Skill.DataModels.AI.Action)Model).AnimationWrapMode; }
+            set
+            {
+                if (((Skill.DataModels.AI.Action)Model).AnimationWrapMode != (int)value)
+                {
+                    ((Skill.DataModels.AI.Action)Model).AnimationWrapMode = (int)value;
+                    _GifAnimation.WrapMode = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("WrapMode"));
+                    Tree.Editor.SetChanged(true);
+                }
+            }
+        }
+
+        [Category("Debug")]
+        [Description("gif Animation")]
+        [System.ComponentModel.Editor(typeof(Editor.AnimationPropertyEditor), typeof(Editor.AnimationPropertyEditor))]
+        public string Animation
+        {
+            get
+            {
+                string result = ((Skill.DataModels.AI.Action)Model).AnimationSource;
+                if (!string.IsNullOrEmpty(result))
+                    _GifAnimation.GifSource = MainWindow.Instance.Project.GetAnimationPath(result);
+                return result;
+            }
+            set
+            {
+                if (((Skill.DataModels.AI.Action)Model).AnimationSource != value)
+                {
+                    ((Skill.DataModels.AI.Action)Model).AnimationSource = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("Animation"));
+                    Tree.Editor.SetChanged(true);
+                }
+            }
+        }
+
+        private GifImage _GifAnimation;
+        [Browsable(false)]
+        public GifImage GifAnimation
+        {
+            get { return _GifAnimation; }
+            set
+            {
+                if (_GifAnimation != value)
+                {
+                    _GifAnimation = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("GifAnimation"));
+                }
+            }
+        }
+
         public ActionViewModel(BehaviorViewModel parent, Skill.DataModels.AI.Action action)
             : base(parent, action)
         {
+            GifAnimation = new GifImage();
+            GifAnimation.FrameRate = FrameRate;
+            GifAnimation.WrapMode = WrapMode;
 
+            string anim = action.AnimationSource;
+            if (!string.IsNullOrEmpty(anim))
+                _GifAnimation.GifSource = MainWindow.Instance.Project.GetAnimationPath(anim);
         }
     }
     #endregion
