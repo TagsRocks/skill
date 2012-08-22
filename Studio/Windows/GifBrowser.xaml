@@ -71,12 +71,12 @@
             </StackPanel>
         </Grid>
         <Grid Grid.Row="1" Background="{StaticResource ButtonPanelBg}" >
-            <Grid.ColumnDefinitions>
+            <Grid.ColumnDefinitions>                
+                <ColumnDefinition Width="100" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="100" />
-                <ColumnDefinition Width="100" />
             </Grid.ColumnDefinitions>
-            <Button Content="Select None" Width="90" VerticalAlignment="Center" Grid.Column="1" Click="BtnSelectNone_Click"/>
+            <Button Content="Select None" Width="90" VerticalAlignment="Center" Grid.Column="0" Click="BtnSelectNone_Click"/>
             <Button Content="Done" Width="90" VerticalAlignment="Center" Grid.Column="2" Click="BtnDone_Click"/>
         </Grid>
     </Grid>

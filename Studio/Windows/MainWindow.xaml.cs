@@ -753,6 +753,20 @@ namespace Skill.Studio
                 browser.ShowDialog();                
             }
         }
+
+        private void MnuHToM_Click(object sender, RoutedEventArgs e)
+        {
+            Skill.Studio.Tools.HeightmapToMesh hToM = new Tools.HeightmapToMesh();
+            hToM.Owner = this;
+            hToM.ShowDialog();
+        }
+
+        private void MnuMeshOpt_Click(object sender, RoutedEventArgs e)
+        {
+            Skill.Studio.Tools.MeshOptimizer meshOpt = new Tools.MeshOptimizer();
+            meshOpt.Owner = this;
+            meshOpt.ShowDialog();
+        }
         #endregion
 
         #region Documents

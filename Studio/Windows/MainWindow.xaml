@@ -177,9 +177,12 @@
                     </MenuItem>
                 </MenuItem>
                 <Separator/>
+                <MenuItem Header="Heigthmap to Mesh" Click="MnuHToM_Click"  />
+                <MenuItem Header="Mesh Optimizer" Click="MnuMeshOpt_Click"  />
+                <Separator/>
                 <MenuItem Header="Create Dlls" Click="MnuCopySkillDll_Click"  IsEnabled="{Binding IsProjectLoaded,ElementName=This}" />
                 <Separator/>
-                <MenuItem Header="Select Plugin" Click="MnuSelectPlugin_Click" >
+                <MenuItem Header="Plugins" Click="MnuSelectPlugin_Click" >
                     <MenuItem.Icon>
                         <Image Source="/SkillStudio;component/Images/Default/plugin.png" />
                     </MenuItem.Icon>
