@@ -256,7 +256,7 @@ namespace Skill.Studio.Controls
             var selected = GetSelectedEntity();
             if (selected != null)
             {
-                CanBuild = (selected.EntityType != EntityType.SkinMesh);
+                CanBuild = true;
                 CanAdd = (selected.EntityType == EntityType.Folder || selected.EntityType == EntityType.Root);
                 CanOpen = !CanAdd;
                 CanCopy = (selected.EntityType != EntityType.Root);

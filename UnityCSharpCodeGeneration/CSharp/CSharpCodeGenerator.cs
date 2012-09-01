@@ -16,6 +16,17 @@ namespace Skill.CodeGeneration.CSharp
     [DisplayName("Skill-Unity-CSharp")]
     public class CSharpCodeGenerator : ICodeGenerator
     {
+        private RequiredFile[] _RequiredFiles = new RequiredFile[]
+        {
+            new RequiredFile("Skill.dll","Designer"),
+            new RequiredFile("Skill.xml","Designer"),
+            new RequiredFile("Skill.Editor.dll","Editor\\Skill","Assets"),
+        };
+        public RequiredFile[] RequiredFiles { get { return _RequiredFiles; } }
+
+        public bool IsDebuging { get; set; }
+
+
         /// <summary>
         /// Extension of C# file ( .cs )
         /// </summary>
@@ -62,10 +73,22 @@ namespace Skill.CodeGeneration.CSharp
         /// <param name="aTree">AnimationTree</param>
         public void Generate(AnimationTree aTree)
         {
-           AnimationTreeClass atClass = new AnimationTreeClass(aTree);
+            AnimationTreeClass atClass = new AnimationTreeClass(aTree);
             _Document.Add(atClass);
             HasPartial = true;
-        }        
+        }
+
+        /// <summary>
+        /// Generate code for SkinMesh
+        /// </summary>
+        /// <param name="skinMesh">SkinMesh</param>
+        public void Generate(Skill.DataModels.Animation.SkinMesh skinMesh)
+        {
+            SkinMeshClass skClass = new SkinMeshClass(skinMesh);
+            _Document.Add(skClass);
+            HasPartial = false;
+        }
+
 
         /// <summary>
         /// Generate code for SaveData
@@ -73,7 +96,7 @@ namespace Skill.CodeGeneration.CSharp
         /// <param name="saveGame">SaveData</param>
         public void Generate(Skill.DataModels.IO.SaveData saveGame)
         {
-           
+
             SaveDataClass sgClass = new SaveDataClass(saveGame);
             _Document.Add(sgClass);
             HasPartial = false;
@@ -97,5 +120,7 @@ namespace Skill.CodeGeneration.CSharp
         {
             _Document.WritePartial(writer, oldCode);
         }
+
+
     }
 }

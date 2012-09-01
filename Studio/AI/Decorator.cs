@@ -62,21 +62,21 @@ namespace Skill.Studio.AI
             {
                 if (((Skill.DataModels.AI.Decorator)Model).IsValid != value)
                 {
-                    ((Skill.DataModels.AI.Decorator)Model).IsValid = value;
-                    Debug.IsValid = value;
-                    if (IsDebuging) BackBrush = value ? Editor.BehaviorBrushes.EnableBrush : Editor.BehaviorBrushes.DisableBrush;
-                    OnPropertyChanged(new PropertyChangedEventArgs("IsValid"));
+                    SetValid(value);
 
                     foreach (DecoratorViewModel dvm in Tree.GetSharedModel(Model))
-                    {
-                        if (dvm != this)
-                        {
-                            dvm.OnPropertyChanged(new PropertyChangedEventArgs("IsValid"));                            
-                        }
-                    }
+                        if (dvm != this) dvm.SetValid(value);
                     Tree.Editor.SetChanged(true);
                 }
             }
+        }
+
+        private void SetValid(bool value)
+        {
+            ((Skill.DataModels.AI.Decorator)Model).IsValid = value;
+            Debug.IsValid = value;
+            if (IsDebuging) BackBrush = value ? Editor.BehaviorBrushes.EnableBrush : Editor.BehaviorBrushes.DisableBrush;
+            OnPropertyChanged(new PropertyChangedEventArgs("IsValid"));
         }
     }
     #endregion

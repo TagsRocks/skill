@@ -39,20 +39,20 @@ namespace Skill.Studio.AI
             {
                 if (((Skill.DataModels.AI.Condition)Model).IsValid != value)
                 {
-                    ((Skill.DataModels.AI.Condition)Model).IsValid = value;
-                    Debug.IsValid = value;
-                    if (IsDebuging) BackBrush = value ? Editor.BehaviorBrushes.EnableBrush : Editor.BehaviorBrushes.DisableBrush;
-                    OnPropertyChanged(new PropertyChangedEventArgs("IsValid"));
+                    SetValid(value);
                     foreach (ConditionViewModel cvm in Tree.GetSharedModel(Model))
-                    {
-                        if (cvm != this)
-                        {
-                            cvm.OnPropertyChanged(new PropertyChangedEventArgs("IsValid"));
-                        }
-                    }
+                        if (cvm != this) cvm.SetValid(value);
                     Tree.Editor.SetChanged(true);
                 }
             }
+        }
+
+        private void SetValid(bool value)
+        {
+            ((Skill.DataModels.AI.Condition)Model).IsValid = value;
+            Debug.IsValid = value;
+            if (IsDebuging) BackBrush = value ? Editor.BehaviorBrushes.EnableBrush : Editor.BehaviorBrushes.DisableBrush;
+            OnPropertyChanged(new PropertyChangedEventArgs("IsValid"));
         }
     }
     #endregion

@@ -147,7 +147,11 @@ namespace Skill.Editor.UI
 
         private void CopyAnimations()
         {
-            if (_Animations == null)
+            if (_RootBone == null)
+            {
+                Debug.LogError("Set valid Root");
+            }
+            else if (_Animations == null)
             {
                 Debug.LogError("Set valid Animation");
             }
@@ -169,6 +173,16 @@ namespace Skill.Editor.UI
                             WrapMode = (DataModels.Animation.WrapMode)state.wrapMode,
                             Length = state.length
                         };
+
+
+                        var xCurve = AnimationUtility.GetEditorCurve(state.clip, _RootBone.name, typeof(Transform), "m_LocalPosition.x");
+                        var yCurve = AnimationUtility.GetEditorCurve(state.clip, _RootBone.name, typeof(Transform), "m_LocalPosition.y");
+                        var zCurve = AnimationUtility.GetEditorCurve(state.clip, _RootBone.name, typeof(Transform), "m_LocalPosition.z");
+
+                        AddKeys(xCurve, clip.RootMotion.XKeys);
+                        AddKeys(yCurve, clip.RootMotion.YKeys);
+                        AddKeys(zCurve, clip.RootMotion.ZKeys);
+
                         animationsElement.Add(clip.ToXElement());
                     }
                     if (animNames.Count > 0)
@@ -180,6 +194,18 @@ namespace Skill.Editor.UI
                     else
                         Debug.LogWarning("can not find any AnimationClip");
                 }
+            }
+        }
+
+        private void AddKeys(AnimationCurve curve, Skill.DataModels.Animation.KeyframeCollection collection)
+        {
+            if (curve == null) return;
+            if (curve.keys == null || curve.keys.Length == 0) return;
+
+            for (int i = 0; i < curve.keys.Length; i++)
+            {
+                var k = curve.keys[i];
+                collection.Add(new DataModels.Animation.Keyframe(k.time, k.value, k.inTangent, k.outTangent));
             }
         }
 

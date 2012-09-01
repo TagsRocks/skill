@@ -87,10 +87,10 @@ namespace Skill.Studio
         private static string[] IgnoredAssemblies = new string[]
         {
             "Skill.dll",
-            "CodeGeneration.dll",
-            "UnityCSharpCodeGeneration.dll",
-            "DataModels.dll",
-            "Editor.dll",
+            "Skill.CodeGeneration.dll",
+            "Skill.UnityCSharpCodeGeneration.dll",
+            "Skill.DataModels.dll",
+            "Skill.Editor.dll",
             "nunit.framework.dll",
             "UnityEditor.dll",
             "UnityEngine.dll",

@@ -64,6 +64,14 @@ namespace Skill.AI
                 throw new InvalidProgramException("You must provide valid root in subclass");
         }
 
+        /// <summary> Occurs when Behavior Tree updated </summary>
+        public EventHandler Updated;
+        /// <summary> Call Updated event </summary>
+        protected virtual void OnUpdated()
+        {
+            if (Updated != null) Updated(this,EventArgs.Empty);
+        }
+
         /// <summary>
         /// Update Tree
         /// </summary>
@@ -99,6 +107,8 @@ namespace Skill.AI
             {
                 UnityEngine.Debug.LogWarning(State.Exception.ToString());
             }
+
+            OnUpdated();
         }
 
         /// <summary>

@@ -55,7 +55,7 @@ namespace Skill.CodeGeneration.CSharp
         /// <returns>target name of variable that used in generated code</returns>
         public static string GetName(string name)
         {
-            return "_" + name; // just add an underline at begin of variables name
+            return "_" + Property.GetName(name); // just add an underline at begin of variables name
         }
     }
 }

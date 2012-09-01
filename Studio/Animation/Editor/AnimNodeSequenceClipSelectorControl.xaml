@@ -6,16 +6,16 @@
              xmlns:anim="clr-namespace:Skill.Studio.Animation"
              xmlns:animedit="clr-namespace:Skill.Studio.Animation.Editor"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" Background="{StaticResource ControlBg}" >
+             d:DesignHeight="300" d:DesignWidth="300" Background="{StaticResource ControlBg}" x:Name="ThisControl" >
     <Grid >
         <Grid.RowDefinitions>
-            <RowDefinition Height="60" />
+            <RowDefinition Height="60" />            
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <GroupBox Header="AnimationClip" Margin="5" >
             <ComboBox VerticalAlignment="Center" x:Name="_CmbAnimations" SelectionChanged="CmbAnimations_SelectionChanged" >
             </ComboBox>
-        </GroupBox>
+        </GroupBox>        
         <GroupBox Grid.Row="1" Header="MixTransforms" Margin="5" >
             <TreeView Margin="2" x:Name="_TvBones" >
                 <TreeView.Resources>

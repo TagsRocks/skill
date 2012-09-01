@@ -23,12 +23,15 @@
                     <RowDefinition Height="30" />                    
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Margin="10" VerticalAlignment="Center" ><Bold>Skill Studio</Bold> Version 1.0 preview </TextBlock>
+                <TextBlock Grid.Row="0" Margin="10" VerticalAlignment="Center" ><Bold>Skill Studio</Bold> Version 1.0</TextBlock>
                 <TextBlock Grid.Row="1" Margin="10" TextWrapping="Wrap" >                    
                     <Bold>Skill Studio</Bold> is a Visual Code Generator for Unity.                    
                     (<Hyperlink NavigateUri="http://unity3d.com/unity/" >http://unity3d.com/unity/</Hyperlink>)
                     <LineBreak/>
-                     By now it can generate BehaviorTree and AnimationTree.                        
+                     By now it can generate BehaviorTree and AnimationTree.
+                    <LineBreak/>
+                    <LineBreak/>
+                    <Hyperlink NavigateUri="https://skill.codeplex.com/" >https://skill.codeplex.com/</Hyperlink>
                 </TextBlock>                
             </Grid>            
         </Grid>

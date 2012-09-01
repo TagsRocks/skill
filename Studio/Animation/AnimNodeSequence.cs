@@ -168,5 +168,75 @@ namespace Skill.Studio.Animation
                 }
             }
         }
+
+
+        [DefaultValue(false)]
+        [Category("RootMotion")]
+        [Description("Enable or Disable RootMotion for PositionX")]
+        public  bool PositionX
+        {
+            get
+            {
+                return ((AnimNodeSequence)Model).RootMotion.PositionX;
+            }
+            set
+            {
+                if (((AnimNodeSequence)Model).RootMotion.PositionX != value)
+                {
+                    if (Tree.Editor.History != null)
+                    {
+                        Tree.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "PositionX", value, ((AnimNodeSequence)Model).RootMotion.PositionX));
+                    }
+                    ((AnimNodeSequence)Model).RootMotion.PositionX = value;
+                    OnPropertyChanged("PositionX");
+                }
+            }
+        }
+
+        [DefaultValue(false)]
+        [Category("RootMotion")]
+        [Description("Enable or Disable RootMotion for PositionY")]
+        public bool PositionY
+        {
+            get
+            {
+                return ((AnimNodeSequence)Model).RootMotion.PositionY;
+            }
+            set
+            {
+                if (((AnimNodeSequence)Model).RootMotion.PositionY != value)
+                {
+                    if (Tree.Editor.History != null)
+                    {
+                        Tree.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "PositionY", value, ((AnimNodeSequence)Model).RootMotion.PositionY));
+                    }
+                    ((AnimNodeSequence)Model).RootMotion.PositionY = value;
+                    OnPropertyChanged("PositionY");
+                }
+            }
+        }
+
+        [DefaultValue(false)]
+        [Category("RootMotion")]
+        [Description("Enable or Disable RootMotion for PositionZ")]
+        public bool PositionZ
+        {
+            get
+            {
+                return ((AnimNodeSequence)Model).RootMotion.PositionZ;
+            }
+            set
+            {
+                if (((AnimNodeSequence)Model).RootMotion.PositionZ != value)
+                {
+                    if (Tree.Editor.History != null)
+                    {
+                        Tree.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "PositionZ", value, ((AnimNodeSequence)Model).RootMotion.PositionZ));
+                    }
+                    ((AnimNodeSequence)Model).RootMotion.PositionZ = value;
+                    OnPropertyChanged("PositionZ");
+                }
+            }
+        }
     }
 }

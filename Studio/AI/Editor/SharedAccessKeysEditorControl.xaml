@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:extToolkit="clr-namespace:Xceed.Wpf.Toolkit.PropertyGrid;assembly=WPFToolkit.Extended"
-             xmlns:dmai="clr-namespace:Skill.DataModels.AI;assembly=DataModels"
+             xmlns:dmai="clr-namespace:Skill.DataModels.AI;assembly=Skill.DataModels"
              xmlns:ctrl="clr-namespace:Skill.Studio.Controls"
              xmlns:ai="clr-namespace:Skill.Studio.AI"
              mc:Ignorable="d" 

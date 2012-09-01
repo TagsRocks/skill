@@ -320,7 +320,7 @@ namespace Skill.Studio.Animation.Editor
                 }
             }
         }
-        #endregion       
+        #endregion
 
         #region Animation from Clipboard
         private void BtnAddClipsFromClipboard_Click(object sender, RoutedEventArgs e)
@@ -371,15 +371,20 @@ namespace Skill.Studio.Animation.Editor
 
         private void BtnRemoveClip_Click(object sender, RoutedEventArgs e)
         {
-            if (_LbAnimations.SelectedItem != null)
+            RemoveAnimationClips();
+        }
+
+        private void RemoveAnimationClips()
+        {
+            if (_LbAnimations.SelectedItems.Count > 0)
             {
-                AnimationClipViewModel clipVM = _LbAnimations.SelectedItem as AnimationClipViewModel;
-                if (clipVM != null)
-                {
-                    int index = SkinMesh.Animations.IndexOf(clipVM);
-                    SkinMesh.Animations.Remove(clipVM);
-                    History.Insert(new AddAnimationClipUnDoRedo(clipVM, SkinMesh, index, true));
-                }
+                AnimationClipViewModel[] anims = new AnimationClipViewModel[_LbAnimations.SelectedItems.Count];
+                _LbAnimations.SelectedItems.CopyTo(anims, 0);
+
+                foreach (var anim in anims)
+                    SkinMesh.Animations.Remove(anim);
+
+                History.Insert(new AddAnimationsUnDoRedo(anims, SkinMesh, true));
             }
         }
 
@@ -400,6 +405,11 @@ namespace Skill.Studio.Animation.Editor
 
         }
 
+        private void LbAnimations_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete)
+                RemoveAnimationClips();
+        }
         #endregion
 
         #region Remove String
@@ -412,7 +422,9 @@ namespace Skill.Studio.Animation.Editor
                     clip.Name = clip.Name.Replace(_TxtRemoveString.Text, "");
                 }
             }
-        } 
+        }
         #endregion
+
+
     }
 }

@@ -39,6 +39,13 @@ namespace Skill.Studio
             CreateFile(PluginManager.Plugin, localDir, name);
         }
 
+        public static void Build(Skill.DataModels.Animation.SkinMesh mesh, string localDir, string name)
+        {
+            PluginManager.Plugin.Reset();
+            PluginManager.Plugin.Generate(mesh);
+            CreateFile(PluginManager.Plugin, localDir, name);
+        }
+
         public static void Build(Skill.DataModels.IO.SaveData saveGame, string localDir, string name)
         {
             PluginManager.Plugin.Reset();

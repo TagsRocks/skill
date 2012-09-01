@@ -6,7 +6,7 @@
         Title="AnimationClip Selector" Height="700" Width="400" Background="{StaticResource WindowBg}" WindowStartupLocation="CenterOwner" >
     <Grid  >
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />            
             <RowDefinition Height="38" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">

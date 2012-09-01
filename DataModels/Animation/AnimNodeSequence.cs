@@ -23,9 +23,10 @@ namespace Skill.DataModels.Animation
         {
             this.Speed = 1;
             this.WrapMode = WrapMode.Default;
-            IsPublic = false;
-            UseTreeProfile = true;
-            Synchronize = false;
+            this.IsPublic = false;
+            this.UseTreeProfile = true;
+            this.Synchronize = false;
+            this.RootMotion = new RootMotionState();
 
             base.Inputs = new Connector[1];
             base.Inputs[0] = new Connector() { Index = 0, Name = "Null" };
@@ -48,6 +49,8 @@ namespace Skill.DataModels.Animation
         public float Length { get; set; }
 
         public WrapMode WrapMode { get; set; }
+
+        public RootMotionState RootMotion { get; set; }
 
         protected override void WriteAttributes(XElement e)
         {
@@ -74,6 +77,7 @@ namespace Skill.DataModels.Animation
                 data.Add(mixingTransforms);
             }
 
+            data.Add(RootMotion.ToXElement());
 
             e.Add(data);
 
@@ -103,6 +107,11 @@ namespace Skill.DataModels.Animation
                         MixingTransforms[i++] = transform.Value;
                     }
                 }
+
+                XElement rootmotion = data.FindChildByName(RootMotionState.ElementName);
+                if (rootmotion != null)
+                    this.RootMotion.Load(rootmotion);
+
             }
             base.ReadAttributes(e);
         }

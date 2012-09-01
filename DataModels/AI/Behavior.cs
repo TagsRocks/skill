@@ -39,7 +39,7 @@ namespace Skill.DataModels.AI
         public float Weight { get; set; }
 
         /// <summary> User comment for this behavior </summary>
-        public string Comment { get; set; }
+        public string Comment { get; set; }       
         #endregion
 
         #region Constructor
@@ -52,7 +52,7 @@ namespace Skill.DataModels.AI
             _Behaviors = new List<Behavior>();
             _Parameters = new List<ParameterCollection>();
             this.Name = name;
-            this.Weight = 1;
+            this.Weight = 1;            
         }
         #endregion
 
@@ -112,7 +112,8 @@ namespace Skill.DataModels.AI
                 XElement comment = new XElement("Comment");
                 comment.SetValue(Comment);
                 behavior.Add(comment);
-            }
+            }            
+
 
             WriteAttributes(behavior); // allow subclass to add additional data
             return behavior;

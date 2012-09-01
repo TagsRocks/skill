@@ -18,7 +18,7 @@ namespace Skill.Animation
     /// </remarks>
     public abstract class AnimationTree
     {
-
+        private UnityEngine.Vector3 _RootMotion;
         private AnimationTreeState _State;
         private Dictionary<string, string> _Profiles;// list of profiles
 
@@ -85,6 +85,9 @@ namespace Skill.Animation
                 }
             }
         }
+
+        /// <summary> Retrieves RootMotion at current frame </summary>
+        public UnityEngine.Vector3 RootMotion { get { return _RootMotion; } }
 
         /// <summary>
         /// Override by subclass to create hierarchy of AnimNodes and return root node
@@ -163,7 +166,7 @@ namespace Skill.Animation
         /// </summary>
         /// <param name="controller">optional controller to send throw AnimNodes</param>
         public void Update(Controllers.Controller controller = null)
-        {
+        {            
             _State.Controller = controller;
             foreach (var layer in LayerManager.Layers)
                 layer.BeginUpdate();
@@ -171,8 +174,12 @@ namespace Skill.Animation
             Root.Weight = 1;
             Root.Update(_State);
 
+            _RootMotion = UnityEngine.Vector3.zero;
             foreach (var layer in LayerManager.Layers)
+            {
                 layer.Update();
+                _RootMotion += layer.RootMotion;
+            }
         }
 
         /// <summary>

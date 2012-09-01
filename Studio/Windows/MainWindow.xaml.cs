@@ -350,7 +350,7 @@ namespace Skill.Studio
                             CloseStartPage();
                         AddToRecent(wizard.ProjectInfo.Filename);
                         IsProjectLoaded = true;
-                        CopyDlls(true);
+                        CopyRequiredFiles(true);
                     }
                     else
                         IsProjectLoaded = false;
@@ -538,6 +538,10 @@ namespace Skill.Studio
             {
                 Builder.Build((Skill.DataModels.Animation.AnimationTree)vm.SavedData, vm.GetLocalDirectory(), vm.Name);
             }
+            else if (vm.EntityType == EntityType.SkinMesh)
+            {
+                Builder.Build((Skill.DataModels.Animation.SkinMesh)vm.SavedData, vm.GetLocalDirectory(), vm.Name);
+            }
             else if (vm.EntityType == EntityType.SaveData)
             {
                 Builder.Build((Skill.DataModels.IO.SaveData)vm.SavedData, vm.GetLocalDirectory(), vm.Name);
@@ -624,15 +628,94 @@ namespace Skill.Studio
         }
         #endregion
 
-        #region Copy Dlls
+        #region Copy Required Files
 
-        private void CopyDlls(bool overWrite = false)
+        private void CopyRequiredFiles(bool overWrite = false)
         {
+
+#if DEBUG
             CopyEditorFile("Editor.dll", overWrite);
             CopyEditorFile("DataModels.dll", overWrite);
             CopyFile("Skill.dll", overWrite);
-            CopyFile("Skill.xml", overWrite);
+            CopyFile("Skill.xml", overWrite);            
+#else
+            Skill.CodeGeneration.RequiredFile[] files = PluginManager.Plugin.RequiredFiles;
+            if (files != null && files.Length > 0)
+            {
+                foreach (var rf in files)
+                {
+                    CopyFile(rf, overWrite);
+                }
+            }
+#endif
+
+
         }
+
+        private void CopyFile(Skill.CodeGeneration.RequiredFile rf, bool overWrite)
+        {
+            string destinaion = Project.GetRequiredFilePath(rf);
+
+            if (System.IO.File.Exists(destinaion) && !overWrite)
+                return;
+
+            string appDir = AppDomain.CurrentDomain.BaseDirectory;
+            string filePath = System.IO.Path.Combine(appDir, rf.SourceFile);
+
+            try
+            {
+                if (System.IO.File.Exists(filePath))
+                {
+                    Project.CreateDirectory(destinaion);
+                    System.IO.File.Copy(filePath, destinaion, true);
+                }
+                else if (System.IO.Directory.Exists(filePath))
+                {
+                    Project.CreateDirectory(destinaion);
+                    DirectoryCopy(filePath, destinaion, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message);
+            }
+        }
+
+        private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
+        {
+            System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo(sourceDirName);
+            System.IO.DirectoryInfo[] dirs = dir.GetDirectories();
+
+            if (!dir.Exists)
+            {
+                return;
+                //throw new System.IO.DirectoryNotFoundException(
+                //    "Source directory does not exist or could not be found: "
+                //    + sourceDirName);
+            }
+
+            if (!System.IO.Directory.Exists(destDirName))
+            {
+                System.IO.Directory.CreateDirectory(destDirName);
+            }
+
+            System.IO.FileInfo[] files = dir.GetFiles();
+            foreach (System.IO.FileInfo file in files)
+            {
+                string temppath = System.IO.Path.Combine(destDirName, file.Name);
+                file.CopyTo(temppath, true);
+            }
+
+            if (copySubDirs)
+            {
+                foreach (System.IO.DirectoryInfo subdir in dirs)
+                {
+                    string temppath = System.IO.Path.Combine(destDirName, subdir.Name);
+                    DirectoryCopy(subdir.FullName, temppath, copySubDirs);
+                }
+            }
+        }
+
 
         private void CopyFile(string filename, bool overWrite)
         {
@@ -664,7 +747,6 @@ namespace Skill.Studio
             }
 
         }
-
 
         private void CopyEditorFile(string filename, bool overWrite)
         {
@@ -732,9 +814,9 @@ namespace Skill.Studio
             about.ShowDialog();
         }
 
-        private void MnuCopySkillDll_Click(object sender, RoutedEventArgs e)
+        private void MnuCopyRequiredFiles_Click(object sender, RoutedEventArgs e)
         {
-            CopyDlls(true);
+            CopyRequiredFiles(true);
         }
 
         private void MnuSelectPlugin_Click(object sender, RoutedEventArgs e)
@@ -750,7 +832,7 @@ namespace Skill.Studio
             {
                 GifBrowser browser = new GifBrowser();
                 browser.Owner = this;
-                browser.ShowDialog();                
+                browser.ShowDialog();
             }
         }
 
@@ -925,12 +1007,7 @@ namespace Skill.Studio
 
         #endregion
 
+
         
-
-
-
-
-
-
     }
 }

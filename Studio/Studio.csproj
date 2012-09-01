@@ -797,6 +797,10 @@
       <Project>{EDE188CB-1A7D-4168-988B-33DBCCBAA21A}</Project>
       <Name>DataModels</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Editor\Editor.csproj">
+      <Project>{DB02ABC1-D536-4EEA-84D5-A3736F7E4C39}</Project>
+      <Name>Editor</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Fbx\Fbx.vcxproj">
       <Project>{6DB70F0E-475D-467C-828E-9A5E97A04660}</Project>
       <Name>Fbx</Name>

@@ -23,7 +23,7 @@ namespace Skill.CodeGeneration.CSharp
         /// <summary> Comment of property </summary>
         public string Comment { get; set; }
         /// <summary> whether result of property seperated in multilines or single line</summary>
-        public bool Multiline { get; private set; }
+        public bool Multiline { get; protected set; }
         /// <summary> whether this property is static? </summary>
         public bool IsStatic { get; set; }
 
@@ -59,7 +59,7 @@ namespace Skill.CodeGeneration.CSharp
             CommentWriter.Write(writer, Comment);
             if (Multiline)
             {
-                writer.WriteLine(string.Format("{0} {1} {2} {3} ", Modifiers.ToString().ToLower(), IsStatic ? "static" : string.Empty, Type, Name));
+                writer.WriteLine(string.Format("{0} {1} {2} {3} ", Modifiers.ToString().ToLower(), IsStatic ? "static" : string.Empty, Type, GetName(Name)));
                 writer.WriteLine("{");
 
                 writer.WriteLine("get");
@@ -83,15 +83,38 @@ namespace Skill.CodeGeneration.CSharp
                 {
                     writer.WriteLine(string.Format("{0} {1} {2} {3} {{ get {{ {4} }} set {{ {5} }} }}", Modifiers.ToString().ToLower(),
                         IsStatic ? "static" : string.Empty,
-                        Type, Name, _Get, _Set));
+                        Type, GetName(Name), _Get, _Set));
                 }
                 else
                 {
                     writer.WriteLine(string.Format("{0} {1} {2} {3} {{ get {{ {4} }} }}", Modifiers.ToString().ToLower(),
                         IsStatic ? "static" : string.Empty,
-                        Type, Name, _Get));
+                        Type, GetName(Name), _Get));
                 }
             }
+        }
+
+        /// <summary>
+        /// all variables use same method of naming
+        /// /// </summary>
+        /// <param name="name">Name of variable without underline</param>
+        /// <returns>target name of property that used in generated code</returns>
+        public static string GetName(string name)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            for (int i = 0; i < name.Length; i++)
+            {
+                char c = name[i];
+                if (i == 0 && char.IsDigit(c))
+                    builder.Append("Num");
+                if (!char.IsLetterOrDigit(c))
+                    builder.Append('_');
+                else
+                    builder.Append(c);
+            }
+
+            return builder.ToString();
         }
     }
 }

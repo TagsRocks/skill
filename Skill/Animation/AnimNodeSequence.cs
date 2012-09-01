@@ -128,6 +128,9 @@ namespace Skill.Animation
             }
         }
 
+        /// <summary> RootMotion data </summary>
+        public RootMotion RootMotion { get; private set; }
+
         /// <summary>
         /// Create an instance of AnimNodeSequence
         /// </summary>
@@ -143,12 +146,13 @@ namespace Skill.Animation
         public AnimNodeSequence(string animationName)
             : base(0)
         {
-            _InitializedAnimations = new List<AnimationInfo>();
-            Synchronize = false;
-            UseTreeProfile = true;
-            Speed = 1;
-            WrapMode = UnityEngine.WrapMode.Default;
-            AnimationName = animationName;
+            this.RootMotion = new Animation.RootMotion(this);
+            this._InitializedAnimations = new List<AnimationInfo>();
+            this.Synchronize = false;
+            this.UseTreeProfile = true;
+            this.Speed = 1;
+            this.WrapMode = UnityEngine.WrapMode.Default;
+            this.AnimationName = animationName;
         }
 
         /// <summary>
@@ -158,6 +162,7 @@ namespace Skill.Animation
         protected override void OnBecameRelevant(AnimationTreeState state)
         {
             RelevantTime.Begin(Length);
+            RootMotion.Begin();
             base.OnBecameRelevant(state);
         }
         /// <summary>
@@ -175,6 +180,8 @@ namespace Skill.Animation
         /// </summary>
         protected override void Blend()
         {
+            if (this.RootMotion.State.IsEnable)
+                this.RootMotion.Evaluate();
             if (!string.IsNullOrEmpty(AnimationName)) Layer.UpdateAnimation(this);
         }
         /// <summary>

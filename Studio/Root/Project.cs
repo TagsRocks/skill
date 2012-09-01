@@ -377,6 +377,25 @@ namespace Skill.Studio
         }
 
         /// <summary>
+        /// Get full path of file in RequiredFile destination directory
+        /// </summary>
+        /// <param name="rf">RequiredFile information</param>
+        /// <returns>path</returns>        
+        public string GetRequiredFilePath(Skill.CodeGeneration.RequiredFile rf)
+        {
+            string destDir = null;
+            if (!string.IsNullOrEmpty(rf.SearchPath))
+            {
+                int index = this.Settings.OutputLocaltion.IndexOf(rf.SearchPath, StringComparison.OrdinalIgnoreCase);
+                if (index >= 0)
+                    destDir = this.Settings.OutputLocaltion.Substring(0, index + rf.SearchPath.Length);
+            }
+            if (destDir == null)
+                destDir = this.Settings.OutputLocaltion;
+            return System.IO.Path.Combine(destDir, rf.DestinationDirectory, System.IO.Path.GetFileName(rf.SourceFile));
+        }
+
+        /// <summary>
         /// Get full path of file in gif animation directory
         /// </summary>
         /// <param name="localPath">local path of gif file</param>

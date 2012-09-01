@@ -8,7 +8,7 @@
              xmlns:ctr="clr-namespace:Skill.Studio.Controls"
              xmlns:anim="clr-namespace:Skill.Studio.Animation"             
              xmlns:animedit="clr-namespace:Skill.Studio.Animation.Editor"
-             xmlns:dmanim="clr-namespace:Skill.DataModels.Animation;assembly=DataModels"
+             xmlns:dmanim="clr-namespace:Skill.DataModels.Animation;assembly=Skill.DataModels"
              d:DesignHeight="473" d:DesignWidth="977" x:Name="This" >
     <sk:TabDocument.Resources>
         <!-- DragThumb Default Template -->

@@ -25,6 +25,9 @@ namespace Skill.DataModels.Animation
         public AnimationTreeProfile[] Profiles { get; set; }
 
         public string SkinMesh { get; set; }
+
+        
+        
         #endregion
 
         #region Constructor

@@ -324,44 +324,5 @@ namespace Skill.DataModels.Animation
         }
         #endregion
     }
-    #endregion
-
-    #region AnimationClip
-    /// <summary>
-    /// Represent an AnimationClip data
-    /// </summary>
-    public class AnimationClip : IXElement
-    {
-        /// <summary> Name of AnimationClip </summary>
-        public string Name { get; set; }
-        /// <summary> WrapMode of AnimationClip </summary>
-        public WrapMode WrapMode { get; set; }
-        /// <summary> Length of AnimationClip </summary>
-        public float Length { get; set; }
-
-        /// <summary>
-        /// Convert AnimationClip data to a XElement
-        /// </summary>
-        /// <returns>XElement containing data</returns>
-        public XElement ToXElement()
-        {
-            XElement clip = new XElement("AnimationClip");
-            clip.SetAttributeValue("Name", Name);
-            clip.SetAttributeValue("WrapMode", (int)WrapMode);
-            clip.SetAttributeValue("Length", Length);
-            return clip;
-        }
-
-        /// <summary>
-        /// Load AnimationClip data from XElement
-        /// </summary>
-        /// <param name="e">XElement to load</param>
-        public void Load(XElement e)
-        {
-            this.Name = e.GetAttributeValueAsString("Name", Name);
-            this.WrapMode = (WrapMode)e.GetAttributeValueAsInt("WrapMode", 0);
-            this.Length = e.GetAttributeValueAsFloat("Length", 0);
-        }
-    }
-    #endregion
+    #endregion   
 }

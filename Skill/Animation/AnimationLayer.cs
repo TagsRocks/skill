@@ -12,6 +12,7 @@ namespace Skill.Animation
     {
         private AnimNodeSequence _MaxReleavant;
         private bool _Synchronization;
+        private UnityEngine.Vector3 _RootMotion;
 
         /// <summary>
         /// include AnimNodes with weight > 0
@@ -25,6 +26,8 @@ namespace Skill.Animation
         /// AnimationBlendMode. (Blend or Additive)
         /// </summary>
         public UnityEngine.AnimationBlendMode BlendMode { get; private set; }
+
+        public UnityEngine.Vector3 RootMotion { get { return _RootMotion; } }
 
         /// <summary>
         /// Create an instance of AnimationLayer
@@ -52,11 +55,17 @@ namespace Skill.Animation
         /// </summary>
         internal void Update()
         {
-            if (_Synchronization)
+            _RootMotion = UnityEngine.Vector3.zero;
+
+            _MaxReleavant = null;
+            float maxW = 0;
+
+            foreach (var node in ActiveAnimNodes)
             {
-                _MaxReleavant = null;
-                float maxW = 0;
-                foreach (var node in ActiveAnimNodes)
+                if (node.RootMotion.State.IsEnable)
+                    _RootMotion += node.RootMotion.Motion * node.Weight;
+
+                if (_Synchronization)
                 {
                     if (node.Weight > maxW)
                     {

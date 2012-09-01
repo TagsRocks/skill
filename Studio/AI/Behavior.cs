@@ -179,12 +179,10 @@ namespace Skill.Studio.AI
 
         }
 
-
-
         private static double MINWIDTH = 80;
+        private static double MINHEIGHT = 30;
         private static double MARGINLEFT = 50;
         private static double MARGINBOTTOM = 10;
-        private static double MINHEIGHT = 30;
         private static double OFFSET = 2;
 
 
@@ -207,7 +205,7 @@ namespace Skill.Studio.AI
             double delta;
             if (Count == 0)
             {
-                delta = MINHEIGHT;
+                delta = Height;
                 Y = y + delta * 0.5;
             }
             else
@@ -282,9 +280,23 @@ namespace Skill.Studio.AI
         }
 
         [Browsable(false)]
-        public double Width { get { return (_Border != null) ? _Border.DesiredSize.Width : MINWIDTH; } }
+        public double Width
+        {
+            get
+            {
+                return _Border != null ? _Border.DesiredSize.Width : MINWIDTH;                
+            }
+        }
+
+
         [Browsable(false)]
-        public double Height { get { return (_Border != null) ? _Border.DesiredSize.Height : MINHEIGHT; } }
+        public double Height
+        {
+            get
+            {
+                return _Border != null ? _Border.DesiredSize.Height : MINHEIGHT;
+            }
+        }
 
         private double _X;
         /// <summary> Canvas.Left </summary>        

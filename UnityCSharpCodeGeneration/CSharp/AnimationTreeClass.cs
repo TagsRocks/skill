@@ -243,6 +243,16 @@ namespace Skill.CodeGeneration.CSharp
             if (node.MixingTransforms != null && node.MixingTransforms.Length > 0) // default is null            
                 SetProperty(node, "MixingTransforms", CreateStringArray(node.MixingTransforms));
 
+            if (node.RootMotion.PositionX) // default is false            
+                SetProperty(node, "RootMotion.State.PositionX", "true");
+            if (node.RootMotion.PositionY) // default is false            
+                SetProperty(node, "RootMotion.State.PositionY", "true");
+            if (node.RootMotion.PositionZ) // default is false            
+                SetProperty(node, "RootMotion.State.PositionZ", "true");
+
+            if (node.RootMotion.PositionX || node.RootMotion.PositionY || node.RootMotion.PositionZ)
+                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.RootMotion.SetKeyframes({1}.PositionKeyframes.{2} );", Variable.GetName(node.Name), System.IO.Path.GetFileNameWithoutExtension(_Tree.SkinMesh), Property.GetName(node.AnimationName)));
+
             SetSharedParameters(node);
         }
 
@@ -364,7 +374,7 @@ namespace Skill.CodeGeneration.CSharp
             foreach (var profile in node.Profiles)
             {
                 StringBuilder profileStr = new StringBuilder();
-                profileStr.Append(string.Format("this.{0}.AddProfile(new AnimNodeAimOffsetProfile(){{ Name = \"{1}\" ", Variable.GetName(node.Name), profile.Name));
+                profileStr.Append(string.Format("this.{0}.AddProfile(new Skill.Animation.AnimNodeAimOffsetProfile(){{ Name = \"{1}\" ", Variable.GetName(node.Name), profile.Name));
 
                 if (!string.IsNullOrEmpty(profile.CenterCenter.AnimationName))
                     profileStr.Append(string.Format(", CenterCenter = \"{0}\"", profile.CenterCenter.AnimationName));

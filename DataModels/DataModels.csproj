@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Skill.DataModels</RootNamespace>
-    <AssemblyName>DataModels</AssemblyName>
+    <AssemblyName>Skill.DataModels</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -48,10 +48,12 @@
     <Compile Include="AI\Decorator.cs" />
     <Compile Include="AI\Parameter.cs" />
     <Compile Include="AI\SharedAccessKeys.cs" />
+    <Compile Include="Animation\AnimationClip.cs" />
     <Compile Include="Animation\AnimationTreeProperty.cs" />
     <Compile Include="Animation\AnimationTreeRoot.cs" />
     <Compile Include="Animation\AnimNodeSubTree.cs" />
     <Compile Include="Animation\Connector.cs" />
+    <Compile Include="Animation\RootMotion.cs" />
     <Compile Include="Animation\SkinMesh.cs" />
     <Compile Include="Animation\AnimationConnection.cs" />
     <Compile Include="Animation\AnimationTree.cs" />
@@ -75,6 +77,7 @@
     <Compile Include="IO\SaveData.cs" />
     <Compile Include="IO\SaveProperty.cs" />
     <Compile Include="IXElement.cs" />
+    <Compile Include="Animation\Keyframe.cs" />
     <Compile Include="Matrix4x4.cs" />
     <Compile Include="Plane.cs" />
     <Compile Include="IPrimitive.cs" />

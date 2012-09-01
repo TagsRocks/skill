@@ -14,12 +14,20 @@ namespace Skill.CodeGeneration
     /// C# code generator is implemented.
     /// </summary>    
     public interface ICodeGenerator
-    {        
+    {
+        /// <summary> Required files to copy in output directoy at build time </summary>
+        RequiredFile[] RequiredFiles { get; }
+
+        /// <summary> Specify whether generated code result containes extra code for debuging </summary>
+        bool IsDebuging { get; set; }
+
         /// <summary> Target File Extension ( .cs for c# -- .js for javascript -- ...) </summary>
         string Extension { get; }
 
         /// <summary> Whether generate code has partial part </summary>
         bool HasPartial { get; }
+
+
 
         /// <summary>
         /// Reset generator and prepare to generate another output
@@ -39,10 +47,18 @@ namespace Skill.CodeGeneration
         void Generate(AnimationTree aTree);
 
         /// <summary>
+        /// Generate code for SkinMesh
+        /// </summary>
+        /// <param name="skinMesh">SkinMesh</param>
+        void Generate(Skill.DataModels.Animation.SkinMesh skinMesh);
+
+        /// <summary>
         /// Generate code for SaveData
         /// </summary>
         /// <param name="saveData">SaveData</param>
         void Generate(Skill.DataModels.IO.SaveData saveData);
+
+        
 
         /// <summary>
         /// Generate Code for SharedAccessKeys that used by BehaviorTree

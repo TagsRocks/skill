@@ -15,6 +15,12 @@ namespace Skill.Editor.UI
             Exporter.Instance.Show();
         }
 
+        [MenuItem("Skill/AI/BTree Debugger")]
+        public static void BTreeDebugger()
+        {
+            BehaviorTreeDebugger.Instance.ShowUtility();
+        }
+
         [MenuItem("Skill/About")]
         public static void About()
         {

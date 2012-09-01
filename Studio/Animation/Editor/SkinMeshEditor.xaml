@@ -124,7 +124,7 @@
                 <ToolBar>
                     <Button ToolTip="Paste from clipboard" VerticalAlignment="Center" Margin="2" Click="BtnAddClipsFromClipboard_Click" >
                         <Image Source="{StaticResource ImgPaste}" Width="16" Height="16" />
-                    </Button>
+                    </Button>                    
                     <Separator/>
                     <Button ToolTip="Add" VerticalAlignment="Center" Margin="2" Click="BtnAddClip_Click" >
                         <Image Source="{StaticResource ImgAdd2}" Width="16" Height="16" />
@@ -141,7 +141,7 @@
                     </Button>
                     <TextBox x:Name="_TxtRemoveString" Text="Rifle" VerticalAlignment="Center" Margin="0,2,2,2" MinWidth="80" BorderThickness="1" BorderBrush="Gray" />
                 </ToolBar>
-                <ListBox Grid.Row="2" Margin="2" ItemsSource="{Binding ElementName=This,Path=SkinMesh.Animations}" x:Name="_LbAnimations" SelectionChanged="LbAnimations_SelectionChanged" >
+                <ListBox Grid.Row="2" Margin="2" ItemsSource="{Binding ElementName=This,Path=SkinMesh.Animations}" x:Name="_LbAnimations" SelectionChanged="LbAnimations_SelectionChanged" SelectionMode="Multiple" KeyDown="LbAnimations_KeyDown" >
                     <ListBox.Resources>
                         <DataTemplate DataType="{x:Type anim:AnimationClipViewModel}" >
                             <Grid>

@@ -60,6 +60,8 @@
     <Compile Include="AI\RunningStack.cs" />
     <Compile Include="Animation\AnimationTreeState.cs" />
     <Compile Include="Animation\AnimNodeMultilayer.cs" />
+    <Compile Include="Animation\Vector3Keyframes.cs" />
+    <Compile Include="Animation\RootMotion.cs" />
     <Compile Include="Controllers\Spawner.cs" />
     <Compile Include="IO\BinaryLoadStream.cs" />
     <Compile Include="IO\BinarySaveStream.cs" />
