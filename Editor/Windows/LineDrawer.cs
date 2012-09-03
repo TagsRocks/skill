@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Collections;
 
-namespace Skill.Editor.UI
+namespace Skill.Editor
 {
 
     public class LineDrawer

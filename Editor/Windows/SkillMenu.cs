@@ -5,7 +5,7 @@ using System.Text;
 using UnityEditor;
 using UnityEngine;
 
-namespace Skill.Editor.UI
+namespace Skill.Editor
 {
     public class SkillMenu : ScriptableObject
     {

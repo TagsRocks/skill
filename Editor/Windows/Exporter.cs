@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Xml.Linq;
 
-namespace Skill.Editor.UI
+namespace Skill.Editor
 {
     public class Exporter : UnityEditor.EditorWindow
     {
@@ -93,7 +93,7 @@ namespace Skill.Editor.UI
             // ****************   Copy Animations   ****************            
 
             rowRect = EditorGUILayout.BeginHorizontal(GUILayout.Height(rowHeight));
-            _Animations = EditorGUILayout.ObjectField("Animations", _Animations, typeof(Animation), true);
+            _Animations = EditorGUILayout.ObjectField("Animations", _Animations, typeof(UnityEngine.Animation), true);
 
             buttonRect = rowRect;
             buttonRect.y += btnYOffset;
@@ -157,7 +157,7 @@ namespace Skill.Editor.UI
             }
             else
             {
-                Animation animations = _Animations as Animation;
+                UnityEngine.Animation animations = _Animations as UnityEngine.Animation;
                 if (animations != null)
                 {
                     XDocument document = new XDocument();

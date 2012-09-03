@@ -9,7 +9,7 @@
         <SolidColorBrush Color="#50FFFF00" x:Key="SelectedColor" />
     </UserControl.Resources>
     <Grid >
-        <Rectangle Fill="Transparent" MouseLeftButtonUp="Img_MouseClick" />
+        <Rectangle Fill="Transparent" MouseMove="Img_MouseMove" MouseEnter="Img_MouseEnter" />
         <Border BorderBrush="{StaticResource SelectedColor}" BorderThickness="1" />
         <Rectangle Fill="{StaticResource SelectedColor}" Visibility="{Binding BorderVisibility, ElementName=This}" IsHitTestVisible="False" />        
     </Grid>

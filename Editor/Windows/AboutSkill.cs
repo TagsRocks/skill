@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using System.Text;
 
-namespace Skill.Editor.UI
+namespace Skill.Editor
 {
     public class AboutSkill : UnityEditor.EditorWindow
     {

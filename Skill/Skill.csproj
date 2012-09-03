@@ -110,6 +110,42 @@
     <Compile Include="Controllers\Controller.cs" />
     <Compile Include="Managers\CacheSpawner.cs" />
     <Compile Include="Modules\DelayRender.cs" />
+    <Compile Include="UI\BaseControl.cs" />
+    <Compile Include="UI\Box.cs" />
+    <Compile Include="UI\Button.cs" />
+    <Compile Include="UI\Canvas.cs" />
+    <Compile Include="UI\ColumnDefinition.cs" />
+    <Compile Include="UI\Control.cs" />
+    <Compile Include="UI\DockPanel.cs" />
+    <Compile Include="UI\Frame.cs" />
+    <Compile Include="UI\Grid.cs" />
+    <Compile Include="UI\GridLength.cs" />
+    <Compile Include="UI\GridUnitType.cs" />
+    <Compile Include="UI\Group.cs" />
+    <Compile Include="UI\HorizontalAlignment.cs" />
+    <Compile Include="UI\Image.cs" />
+    <Compile Include="UI\Label.cs" />
+    <Compile Include="UI\Orientation.cs" />
+    <Compile Include="UI\Panel.cs" />
+    <Compile Include="UI\PasswordField.cs" />
+    <Compile Include="UI\RepeatButton.cs" />
+    <Compile Include="UI\RowDefinition.cs" />
+    <Compile Include="UI\ScrollView.cs" />
+    <Compile Include="UI\SelectionGrid.cs" />
+    <Compile Include="UI\SelectionGridItem.cs" />
+    <Compile Include="UI\Size.cs" />
+    <Compile Include="UI\Slider.cs" />
+    <Compile Include="UI\StackPanel.cs" />
+    <Compile Include="UI\TextArea.cs" />
+    <Compile Include="UI\TextField.cs" />
+    <Compile Include="UI\Tickness.cs" />
+    <Compile Include="UI\ToggleButton.cs" />
+    <Compile Include="UI\Toolbar.cs" />
+    <Compile Include="UI\ToolbarButton.cs" />
+    <Compile Include="UI\UniformGrid.cs" />
+    <Compile Include="UI\VerticalAlignment.cs" />
+    <Compile Include="UI\Window.cs" />
+    <Compile Include="UI\WrapImage.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

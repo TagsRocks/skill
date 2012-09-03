@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEditor;
 
-namespace Skill.Editor.UI
+namespace Skill.Editor
 {
     public class BehaviorTreeDebugger : UnityEditor.EditorWindow
     {

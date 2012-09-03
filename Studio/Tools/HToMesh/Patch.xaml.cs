@@ -23,7 +23,7 @@ namespace Skill.Studio.Tools.HToMesh
         public Patch()
         {
             InitializeComponent();
-        }        
+        }
 
         private bool _Selected;
         public bool Selected
@@ -34,7 +34,7 @@ namespace Skill.Studio.Tools.HToMesh
                 if (_Selected != value)
                 {
                     _Selected = value;
-                    BorderVisibility = value ? Visibility.Visible : System.Windows.Visibility.Hidden; 
+                    BorderVisibility = value ? Visibility.Visible : System.Windows.Visibility.Hidden;
                     OnPropertyChanged("Selected");
                 }
             }
@@ -91,11 +91,21 @@ namespace Skill.Studio.Tools.HToMesh
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(name));
         }
-
-        private void Img_MouseClick(object sender, MouseButtonEventArgs e)
-        {
-            Selected = !Selected;
-        } 
         #endregion
+
+        private void Img_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+                Selected = true;
+            else if (e.RightButton == MouseButtonState.Pressed)
+                Selected = false;
+        }
+        private void Img_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+                Selected = true;
+            else if (e.RightButton == MouseButtonState.Pressed)
+                Selected = false;
+        }
     }
 }

@@ -52,11 +52,49 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="UI\AboutSkill.cs" />
-    <Compile Include="UI\BehaviorTreeDebugger.cs" />
-    <Compile Include="UI\Exporter.cs" />
-    <Compile Include="UI\LineDrawer.cs" />
-    <Compile Include="UI\SkillMenu.cs" />
+    <Compile Include="UI\BoundsField.cs" />
+    <Compile Include="UI\ChangeCheck.cs" />
+    <Compile Include="UI\ColorField.cs" />
+    <Compile Include="UI\CurveField.cs" />
+    <Compile Include="UI\CustomPropertyField.cs" />
+    <Compile Include="UI\DisabledGroup.cs" />
+    <Compile Include="UI\DropShadowLabel.cs" />
+    <Compile Include="UI\EnumMaskField.cs" />
+    <Compile Include="UI\EnumPopup.cs" />
+    <Compile Include="UI\FloatField.cs" />
+    <Compile Include="UI\Foldout.cs" />
+    <Compile Include="UI\HelpBox.cs" />
+    <Compile Include="UI\InspectorTitlebar.cs" />
+    <Compile Include="UI\IntField.cs" />
+    <Compile Include="UI\IntSlider.cs" />
+    <Compile Include="UI\LabelField.cs" />
+    <Compile Include="UI\LayerField.cs" />
+    <Compile Include="UI\MaskField.cs" />
+    <Compile Include="UI\MinMaxSlider.cs" />
+    <Compile Include="UI\ObjectField.cs" />
+    <Compile Include="UI\PasswordField.cs" />
+    <Compile Include="UI\Popup.cs" />
+    <Compile Include="UI\PopupOption.cs" />
+    <Compile Include="UI\PrefixLabel.cs" />
+    <Compile Include="UI\ProgressBar.cs" />
+    <Compile Include="UI\PropertyField.cs" />
+    <Compile Include="UI\RectField.cs" />
+    <Compile Include="UI\SelectableLabel.cs" />
+    <Compile Include="UI\SerializedPropertySlider.cs" />
+    <Compile Include="UI\Slider.cs" />
+    <Compile Include="UI\TagField.cs" />
+    <Compile Include="UI\TextArea.cs" />
+    <Compile Include="UI\TextField.cs" />
+    <Compile Include="UI\TextureImage.cs" />
+    <Compile Include="UI\ToggleButton.cs" />
+    <Compile Include="UI\Vector2Field.cs" />
+    <Compile Include="UI\Vector3Field.cs" />
+    <Compile Include="UI\Vector4Field.cs" />
+    <Compile Include="Windows\AboutSkill.cs" />
+    <Compile Include="Windows\BehaviorTreeDebugger.cs" />
+    <Compile Include="Windows\Exporter.cs" />
+    <Compile Include="Windows\LineDrawer.cs" />
+    <Compile Include="Windows\SkillMenu.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -68,6 +106,10 @@
     <ProjectReference Include="..\DataModels\DataModels.csproj">
       <Project>{EDE188CB-1A7D-4168-988B-33DBCCBAA21A}</Project>
       <Name>DataModels</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Skill\Skill.csproj">
+      <Project>{5AAE3714-704C-4150-91FE-B73B05808D14}</Project>
+      <Name>Skill</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
