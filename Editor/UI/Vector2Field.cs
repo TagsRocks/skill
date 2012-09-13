@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make an X & Y field for entering a Vector2.
     /// </summary>
-    public class Vector2Field : Control
+    public class Vector2Field : EditorControl
     {
         private string _Label;
         /// <summary>
@@ -58,6 +58,7 @@ namespace Skill.Editor.UI
         public Vector2Field()
         {
             _Label = string.Empty;
+            this.Height = 38;
         }
 
         protected override void Paint()

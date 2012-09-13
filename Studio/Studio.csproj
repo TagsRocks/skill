@@ -238,8 +238,8 @@
     <Compile Include="Tools\HToMesh\View\OpenPageView.xaml.cs" />
     <Compile Include="Tools\HToMesh\View\SplitPageView.xaml.cs" />
     <Compile Include="Tools\HToMesh\View\TSWizardView.xaml.cs" />
-    <Compile Include="Tools\MeshOptimizer.xaml.cs">
-      <DependentUpon>MeshOptimizer.xaml</DependentUpon>
+    <Compile Include="Tools\MergeMesh.xaml.cs">
+      <DependentUpon>MergeMesh.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tools\SaveOptionControl.xaml.cs">
       <DependentUpon>SaveOptionControl.xaml</DependentUpon>
@@ -435,7 +435,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Tools\MeshOptimizer.xaml">
+    <Page Include="Tools\MergeMesh.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

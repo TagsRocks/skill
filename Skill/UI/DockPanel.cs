@@ -45,12 +45,13 @@ namespace Skill.UI
         {
             LastChildFill = true;
         }
+        
         /// <summary>
         /// Ensures that all visual child elements of this element are properly updated for layout.
         /// </summary>
         public override void UpdateLayout()
         {
-            Rect rect = PaintAreaWithPadding;            
+            Rect rect = PaintAreaWithPadding;
 
             int lastIndex = Controls.Count - 1;
             for (int i = 0; i < Controls.Count; i++)
@@ -69,7 +70,7 @@ namespace Skill.UI
                             {
                                 case Dock.Left:
                                     float xMax = rect.xMax;
-                                    paintArea.width = c.Size.Width + c.Margin.Horizontal;
+                                    paintArea.width = c.LayoutWidth + c.Margin.Horizontal;
                                     if (paintArea.xMax > xMax)
                                         paintArea.xMax = xMax;
                                     rect.xMin = paintArea.xMax;
@@ -77,14 +78,14 @@ namespace Skill.UI
                                     break;
                                 case Dock.Top:
                                     float yMax = rect.yMax;
-                                    paintArea.height = c.Size.Height + c.Margin.Vertical;
+                                    paintArea.height = c.LayoutHeight + c.Margin.Vertical;
                                     if (paintArea.yMax > yMax)
                                         paintArea.yMax = yMax;
                                     rect.yMin = paintArea.yMax;
                                     rect.yMax = yMax;
                                     break;
                                 case Dock.Right:
-                                    float w = c.Size.Width + c.Margin.Horizontal;
+                                    float w = c.LayoutWidth + c.Margin.Horizontal;
                                     paintArea.xMin = rect.xMax - w;
                                     paintArea.width = w;
                                     if (paintArea.xMin < rect.xMin)
@@ -92,7 +93,7 @@ namespace Skill.UI
                                     rect.xMax = paintArea.xMin;
                                     break;
                                 case Dock.Bottom:
-                                    float h = c.Size.Height + c.Margin.Vertical;
+                                    float h = c.LayoutHeight + c.Margin.Vertical;
                                     paintArea.yMin = rect.yMax - h;
                                     paintArea.height = h;
                                     if (paintArea.yMin < rect.yMin)

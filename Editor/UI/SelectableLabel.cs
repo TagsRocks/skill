@@ -10,12 +10,20 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make a selectable label field. (Useful for showing read-only info that can be copy-pasted.)
     /// </summary>
-    public class SelectableLabel : Control
+    public class SelectableLabel : EditorControl
     {
         /// <summary>
         /// The text to show.
         /// </summary>
-        public string Text { get; set; }        
+        public string Text { get; set; }
+
+        /// <summary>
+        /// Create a SelectableLabel
+        /// </summary>
+        public SelectableLabel()
+        {
+            this.Height = 16;
+        }
 
         protected override void Paint()
         {

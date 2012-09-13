@@ -7,30 +7,36 @@ using Skill.Managers;
 
 namespace Skill.Controllers
 {
+    /// <summary>
+    /// Use this class to spawn object in scheduled time and with triggers
+    /// </summary>
+    [AddComponentMenu("Skill/Controllers/Spawner")]
     public class Spawner : MonoBehaviour
     {
-        // GameObject to spawn
+        /// <summary> GameObject to spawn </summary>
         public GameObject SpawnObject;
-        // where to spawn objects
+        /// <summary> where to spawn objects </summary>
         public Transform[] SpawnLocations;
-        // If true, use CacheSpawner.Instance to create objects
-        public bool UseCacheSpawner = false;
-        // If true, the spawner will cycle through the spawn locations instead of spawning from a randomly chosen one
+        /// <summary> If true, the spawner will cycle through the spawn locations instead of spawning from a randomly chosen one </summary>
         public bool CycleSpawnLocations;
-        // Delta time between spawns
+        /// <summary> Delta time between spawns </summary>
         public float SpawnInterval = 1f;
-        // The maximum number of agents alive at one time. If agents are destroyed, more will spawn to meet this number.
+        /// <summary> The maximum number of agents alive at one time. If agents are destroyed, more will spawn to meet this number. </summary>
         public int AliveCount = 2;
-        // The maximum number of agents to spawn.when number of spawned object reach this value the spawner will not spawn anymore 
+        /// <summary> The maximum number of agents to spawn.when number of spawned object reach this value the spawner will not spawn anymore  </summary>
         public int MaxSpawnCount = 1;
-        // If true, agents that are totally removed (ie blown up) are respawned
+        /// <summary> If true, agents that are totally removed (ie blown up) are respawned </summary>
         public bool RespawnDeadAgents;
-        // Radius around spawn location to spawn agents.
+        /// <summary> Radius around spawn location to spawn agents. </summary>
         public float SpawnRadius = 0;
+
         // If true, only spawn agents if player can't see spawn point
         //public bool OnlySpawnHidden;
         // If true, controls whether we are actively spawning agents
-        public bool SpawnActivate = false;
+        //public bool SpawnActivate = false;
+
+        /// <summary> Spawner will disabled when (number of spawned object) reach MaxSpawnCount, in other words, when spawned all objects. </summary>
+        public bool DisableAfterAll { get; protected set; }
 
         /// <summary> List of all alive spawned objects </summary>
         public List<GameObject> SpawnedObjects { get; private set; }
@@ -45,6 +51,8 @@ namespace Skill.Controllers
 
         protected virtual bool CanSpawn { get { return true; } }
 
+
+
         public Spawner()
         {
             SpawnedObjects = new List<GameObject>();
@@ -53,6 +61,7 @@ namespace Skill.Controllers
             _LastSpawnTime = -1000;
             _SpawnCount = 0;
             _DeadCount = 0;
+            DisableAfterAll = true;
         }
 
         // let inherited class modify spawned object
@@ -75,10 +84,7 @@ namespace Skill.Controllers
 
             if (spawnedObj == null)
             {
-                if (UseCacheSpawner)
-                    spawnedObj = CacheSpawner.Spawn(SpawnObject, position, rotation);
-                else
-                    spawnedObj = (GameObject)GameObject.Instantiate(SpawnObject, position, rotation);
+                spawnedObj = CacheSpawner.Spawn(SpawnObject, position, rotation);
                 SpawnedObjects.Add(spawnedObj);
             }
             else
@@ -112,7 +118,7 @@ namespace Skill.Controllers
             else
             {
                 rotation = transform.rotation;
-                position = transform.position;                
+                position = transform.position;
             }
 
             if (SpawnRadius != 0)
@@ -125,7 +131,7 @@ namespace Skill.Controllers
 
         public virtual void Awake()
         {
-            enabled = SpawnActivate;
+            enabled = false;
         }
 
         public virtual void Update()
@@ -150,7 +156,7 @@ namespace Skill.Controllers
                     Spawn();
                 }
             }
-            if (_SpawnCount >= MaxSpawnCount)
+            if (_SpawnCount >= MaxSpawnCount && DisableAfterAll)
             {
                 enabled = false;
                 DestroyRespawnedObjects();
@@ -168,7 +174,7 @@ namespace Skill.Controllers
             foreach (var item in SpawnedObjects)
             {
                 Destroy(item);
-            }            
+            }
             _RespawnObjects.Clear();
         }
 
@@ -183,10 +189,7 @@ namespace Skill.Controllers
 
         private void Destroy(GameObject SpawnedObj)
         {
-            if (UseCacheSpawner)
-                CacheSpawner.DestroyCache(SpawnedObj);
-            else
-                GameObject.Destroy(SpawnedObj);
+            CacheSpawner.DestroyCache(SpawnedObj);
         }
 
         public void DestroySpawnedObject(GameObject spawnedObj)
@@ -199,7 +202,7 @@ namespace Skill.Controllers
                     _RespawnObjects.Add(spawnedObj);
                 }
                 else
-                {                    
+                {
                     Destroy(spawnedObj);
                 }
             }

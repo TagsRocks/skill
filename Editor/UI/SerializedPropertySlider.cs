@@ -7,7 +7,7 @@ using UnityEditor;
 namespace Skill.Editor.UI
 {
     /// <summary> A slider the user can drag to change a value between a min and a max. </summary>
-	public class SerializedPropertySlider  : Control
+    public class SerializedPropertySlider : EditorControl
     {
         /// <summary>
         /// Optional label in front of the field.
@@ -56,8 +56,9 @@ namespace Skill.Editor.UI
         {
             this.Label = new GUIContent();
             this._MinValue = 0;
-            this._MaxValue = 100;            
-            this.Property = null;
+            this._MaxValue = 100;
+            this.Property = null; 
+            this.Height = 16;
         }
 
         protected override void Paint()

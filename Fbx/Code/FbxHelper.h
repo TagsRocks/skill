@@ -34,7 +34,13 @@ namespace Skill
 
 			static bool LoadScene( FbxManager *pSdkManager, FbxScene  *pScene,  const char *pFbxFilePath );
 
-			static bool SaveScene(FbxManager* pManager, FbxScene* pScene, const char* pFilename, SaveSceneOptions options);
+			static bool SaveScene(FbxManager* pManager, FbxScene* pScene, const char* pFilename, SaveSceneOptions options);		
+
+			static void TriangulateRecursive(FbxNode* pNode);
+
+			static FbxAMatrix GetGeometry(FbxNode* pNode);
+			static FbxAMatrix GetGlobalPosition(FbxNode* pNode, const FbxTime& pTime, FbxPose* pPose = NULL, FbxAMatrix* pParentGlobalPosition = NULL);
+			static FbxAMatrix GetPoseMatrix(FbxPose* pPose, int pNodeIndex);
 
 			/// <summary>
 			/// Is two given vertices equal?

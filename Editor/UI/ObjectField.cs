@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make an object field. You can assign objects either by drag and drop objects or by selecting an object using the Object Picker.
     /// </summary>    
-    public class ObjectField<T> : Control where T : UnityEngine.Object
+    public class ObjectField<T> : EditorControl where T : UnityEngine.Object
     {
         /// <summary>
         /// Optional label in front of the field.
@@ -59,6 +59,7 @@ namespace Skill.Editor.UI
         {
             Label = new GUIContent();
             ObjectType = typeof(T);
+            this.Height = 16;
         }
 
         protected override void Paint()

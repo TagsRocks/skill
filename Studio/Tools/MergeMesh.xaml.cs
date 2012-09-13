@@ -19,7 +19,7 @@ namespace Skill.Studio.Tools
     /// <summary>
     /// Interaction logic for MeshOptimizer.xaml
     /// </summary>
-    public partial class MeshOptimizer : Window, INotifyPropertyChanged
+    public partial class MergeMeshTool : Window, INotifyPropertyChanged
     {
 
         private bool _IsFileOpened;
@@ -67,7 +67,7 @@ namespace Skill.Studio.Tools
         private OptimizeScene _Scene = null;
         private SceneNodeViewModel _Root = null;
 
-        public MeshOptimizer()
+        public MergeMeshTool()
         {            
             InitializeComponent();
             Nodes = new ObservableCollection<SceneNodeViewModel>();

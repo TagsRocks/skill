@@ -73,7 +73,7 @@ namespace Skill.Editor
             {
                 if (_Instance == null)
                 {
-                    EditorWindow.GetWindow<AboutSkill>();
+                   _Instance = EditorWindow.GetWindow<AboutSkill>();
                 }
                 return _Instance;
             }

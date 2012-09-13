@@ -7,7 +7,7 @@ using UnityEditor;
 namespace Skill.Editor.UI
 {
     /// <summary> Make a slider the user can drag to change an integer value between a min and a max. </summary>
-    public class IntSlider : Control
+    public class IntSlider : EditorControl
     {
         /// <summary>
         /// Optional label in front of the field.
@@ -82,6 +82,7 @@ namespace Skill.Editor.UI
             this._MinValue = 0;
             this._MaxValue = 100;
             this._Value = 50;
+            this.Height = 16;
         }
 
         protected override void Paint()

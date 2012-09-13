@@ -177,8 +177,8 @@
                     </MenuItem>
                 </MenuItem>
                 <Separator/>
-                <MenuItem Header="heightmap to Mesh" Click="MnuHToM_Click"  />
-                <MenuItem Header="Mesh Optimizer" Click="MnuMeshOpt_Click"  />
+                <MenuItem Header="Heightmap to Mesh" Click="MnuHToM_Click"  />
+                <MenuItem Header="Merge Mesh Tool" Click="MnuMeshOpt_Click"  />
                 <Separator/>
                 <MenuItem Header="Copy Required Files" Click="MnuCopyRequiredFiles_Click"  IsEnabled="{Binding IsProjectLoaded,ElementName=This}" />
                 <Separator/>

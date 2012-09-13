@@ -55,10 +55,12 @@
     <Compile Include="UI\BoundsField.cs" />
     <Compile Include="UI\ChangeCheck.cs" />
     <Compile Include="UI\ColorField.cs" />
+    <Compile Include="UI\IntPopup.cs" />
     <Compile Include="UI\CurveField.cs" />
     <Compile Include="UI\CustomPropertyField.cs" />
     <Compile Include="UI\DisabledGroup.cs" />
     <Compile Include="UI\DropShadowLabel.cs" />
+    <Compile Include="UI\EditorControl.cs" />
     <Compile Include="UI\EnumMaskField.cs" />
     <Compile Include="UI\EnumPopup.cs" />
     <Compile Include="UI\FloatField.cs" />
@@ -80,6 +82,7 @@
     <Compile Include="UI\PropertyField.cs" />
     <Compile Include="UI\RectField.cs" />
     <Compile Include="UI\SelectableLabel.cs" />
+    <Compile Include="UI\SelectionField.cs" />
     <Compile Include="UI\SerializedPropertySlider.cs" />
     <Compile Include="UI\Slider.cs" />
     <Compile Include="UI\TagField.cs" />
@@ -90,6 +93,7 @@
     <Compile Include="UI\Vector2Field.cs" />
     <Compile Include="UI\Vector3Field.cs" />
     <Compile Include="UI\Vector4Field.cs" />
+    <Compile Include="UI\VerticalExpander.cs" />
     <Compile Include="Windows\AboutSkill.cs" />
     <Compile Include="Windows\BehaviorTreeDebugger.cs" />
     <Compile Include="Windows\Exporter.cs" />

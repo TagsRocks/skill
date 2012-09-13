@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make a field for enum based masks.
     /// </summary>
-    public class EnumMaskField : Control
+    public class EnumMaskField : EditorControl
     {
         /// <summary>
         ///  Optional label to display above the EnumMaskField.
@@ -48,7 +48,8 @@ namespace Skill.Editor.UI
         /// </summary>
         public EnumMaskField()
         {
-            this.Label = new GUIContent();            
+            this.Label = new GUIContent();
+            this.Height = 16;
         }
 
         protected override void Paint()

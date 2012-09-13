@@ -142,7 +142,7 @@ namespace Skill
             {
                 for (int j = i + 1; j < vertexCount; j++)
                 {
-                    if (FbxHelper::IsEqual(meshData.Vertices[i].Position, meshData.Vertices[j].Position, PositionsTelorance))
+                    if (FbxHelper::IsEqual(meshData.Vertices[i].Position, meshData.Vertices[j].Position, _PositionsTelorance))
                     {
                         FbxVector4 tangent = meshData.Vertices[i].Tangent;
                         meshData.Vertices[i].Tangent += meshData.Vertices[j].Tangent;
@@ -374,5 +374,116 @@ namespace Skill
 				meshData.Vertices.SetAt(i,v);
 			}
 		}
+
+		void MeshProcessor::TransformToLocal(FbxNode* node, MeshData& meshData)
+		{
+			Matrix gTransform = Matrix::LocalNode(node);
+
+			int vertexCount = meshData.Vertices.GetCount();
+			
+			for( int i = 0; i < vertexCount; i++ )
+			{
+				Vertex v = meshData.Vertices.GetAt(i);
+
+				v.Position = Matrix::Transform(v.Position,gTransform );
+				if(meshData.HasNormal)
+					v.Normal = Matrix::TransformNormal(v.Normal,gTransform );
+
+				meshData.Vertices.SetAt(i,v);
+			}
+		}
+		
+		void MeshProcessor::TransformToBindPose(FbxMesh* mesh,MeshData& meshData)
+		{
+
+			FbxSkin* lSkin = reinterpret_cast<FbxSkin*>(mesh->GetDeformer(0, FbxDeformer::eSkin));
+			if(!lSkin) return;
+			
+			FbxCluster* lCluster = lSkin->GetCluster(0);
+			FbxCluster::ELinkMode lClusterMode = lCluster->GetLinkMode();
+
+			FbxAMatrix lReferenceGlobalInitPosition;
+			FbxAMatrix lReferenceGlobalCurrentPosition;
+			FbxAMatrix lAssociateGlobalInitPosition;
+			FbxAMatrix lAssociateGlobalCurrentPosition;
+			FbxAMatrix lClusterGlobalInitPosition;
+			FbxAMatrix lClusterGlobalCurrentPosition;
+			FbxAMatrix  vertexTransformMatrix;
+
+			FbxAMatrix lReferenceGeometry;
+			FbxAMatrix lAssociateGeometry;
+			FbxAMatrix lClusterGeometry;
+
+			FbxAMatrix lClusterRelativeInitPosition;
+			FbxAMatrix lClusterRelativeCurrentPositionInverse;
+			
+
+			lReferenceGlobalCurrentPosition.SetIdentity();
+
+			if (lClusterMode == FbxCluster::eAdditive && lCluster->GetAssociateModel())
+			{
+				lCluster->GetTransformAssociateModelMatrix(lAssociateGlobalInitPosition);
+				// Geometric transform of the model
+				lAssociateGeometry = FbxHelper::GetGeometry(lCluster->GetAssociateModel());
+				lAssociateGlobalInitPosition *= lAssociateGeometry;
+				lAssociateGlobalCurrentPosition = FbxHelper::GetGlobalPosition(lCluster->GetAssociateModel(), FBXSDK_TIME_ZERO);
+
+				lCluster->GetTransformMatrix(lReferenceGlobalInitPosition);
+				// Multiply lReferenceGlobalInitPosition by Geometric Transformation
+				lReferenceGeometry = FbxHelper::GetGeometry(mesh->GetNode());
+				lReferenceGlobalInitPosition *= lReferenceGeometry;				
+
+				// Get the link initial global position and the link current global position.
+				lCluster->GetTransformLinkMatrix(lClusterGlobalInitPosition);
+				// Multiply lClusterGlobalInitPosition by Geometric Transformation
+				lClusterGeometry = FbxHelper::GetGeometry(lCluster->GetLink());
+				lClusterGlobalInitPosition *= lClusterGeometry;
+				lClusterGlobalCurrentPosition = FbxHelper::GetGlobalPosition(lCluster->GetLink(), FBXSDK_TIME_ZERO);
+
+				// Compute the shift of the link relative to the reference.
+				//ModelM-1 * AssoM * AssoGX-1 * LinkGX * LinkM-1*ModelM
+				vertexTransformMatrix = lReferenceGlobalInitPosition.Inverse() * lAssociateGlobalInitPosition * lAssociateGlobalCurrentPosition.Inverse() *
+					lClusterGlobalCurrentPosition * lClusterGlobalInitPosition.Inverse() * lReferenceGlobalInitPosition;
+			}
+			else
+			{
+
+				lCluster->GetTransformMatrix(lReferenceGlobalInitPosition);
+								
+				// Multiply lReferenceGlobalInitPosition by Geometric Transformation
+				lReferenceGeometry = FbxHelper::GetGeometry(mesh->GetNode());
+				lReferenceGlobalInitPosition *= lReferenceGeometry;
+
+				// Get the link initial global position and the link current global position.
+				lCluster->GetTransformLinkMatrix(lClusterGlobalInitPosition);
+				lClusterGlobalCurrentPosition = FbxHelper::GetGlobalPosition(lCluster->GetLink(), FBXSDK_TIME_ZERO);
+
+				// Compute the initial position of the link relative to the reference.
+				lClusterRelativeInitPosition = lClusterGlobalInitPosition.Inverse() * lReferenceGlobalInitPosition;
+
+				// Compute the current position of the link relative to the reference.
+				lClusterRelativeCurrentPositionInverse = lReferenceGlobalCurrentPosition.Inverse() * lClusterGlobalCurrentPosition;
+
+				// Compute the shift of the link relative to the reference.
+				vertexTransformMatrix = lClusterRelativeCurrentPositionInverse * lClusterRelativeInitPosition;
+			}
+			
+			int vertexCount = meshData.Vertices.GetCount();
+			
+			for( int i = 0; i < vertexCount; i++ )
+			{
+
+				Vertex v = meshData.Vertices.GetAt(i);						
+				v.Position = vertexTransformMatrix.MultT(v.Position);												
+				
+				//v.Position = Matrix::Transform(v.Position,gTransform );
+				//if(meshData.HasNormal)
+					//v.Normal = Matrix::TransformNormal(v.Normal,gTransform );
+
+				meshData.Vertices.SetAt(i,v);
+			}
+		}
+
+		
 	}
 }

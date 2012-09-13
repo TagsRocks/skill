@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make a special slider the user can use to specify a range between a min and a max.
     /// </summary>
-    public class MinMaxSlider : Control
+    public class MinMaxSlider : EditorControl
     {
         /// <summary>
         /// Optional label in front of the slider.
@@ -111,6 +111,7 @@ namespace Skill.Editor.UI
             this._MaxValue = 75;
             this._MinLimit = 0;
             this._MaxLimit = 100;
+            this.Height = 16;
         }
 
         protected override void Paint()

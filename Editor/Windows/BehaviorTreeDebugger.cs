@@ -25,7 +25,7 @@ namespace Skill.Editor
             {
                 if (_Instance == null)
                 {
-                    EditorWindow.GetWindow<BehaviorTreeDebugger>();
+                    _Instance = EditorWindow.GetWindow<BehaviorTreeDebugger>();
                 }
                 return _Instance;
             }

@@ -10,7 +10,7 @@ namespace Skill.Editor.UI
     /// Make an enum popup selection field.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class EnumPopup : Control 
+    public class EnumPopup : EditorControl 
     {
         /// <summary>
         /// Optional label in front of the field.
@@ -49,7 +49,8 @@ namespace Skill.Editor.UI
         /// </summary>
         public EnumPopup()
         {
-            this.Label = new GUIContent();                        
+            this.Label = new GUIContent();
+            this.Height = 16;           
         }
 
         protected override void Paint()

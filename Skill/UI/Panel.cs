@@ -31,6 +31,10 @@ namespace Skill.UI
         /// </summary>
         public BaseControlCollection Controls { get; private set; }
 
+        private Size _DesiredSize;
+        /// <summary> The Size needs for all controls </summary>
+        public Size DesiredSize { get { return _DesiredSize; } }
+
         /// <summary>
         /// Gets PaintArea that shrinks by Padding.
         /// </summary>
@@ -83,23 +87,55 @@ namespace Skill.UI
             
         }
 
-        protected override void Paint()
+
+        protected override void BeginPaint()
         {
+            base.BeginPaint();
             if (_NeedUpdateLayout)
             {
-                UpdateLayout(); 
+                UpdateLayout();
+                CalcDesiredSize();
                 _NeedUpdateLayout = false;
             }
-            PaintControls();
         }
 
-        protected virtual void PaintControls()
+        private void CalcDesiredSize()
+        {            
+            Rect view = new Rect();
+            view.xMin = view.yMin = 0;
+            view.xMax = view.yMax = 0;
+
+            foreach (var c in Controls)
+            {
+                Rect cPaintArea = c.PaintArea;
+                
+                view.xMin = Mathf.Min(cPaintArea.xMin, view.xMin);
+                view.yMin = Mathf.Min(cPaintArea.yMin, view.yMin);
+
+                view.xMax = Mathf.Max(cPaintArea.xMax, view.xMax);
+                view.yMax = Mathf.Max(cPaintArea.yMax, view.yMax);
+                
+            }
+
+            float deltaX = 0.0f - view.xMin;
+            float deltaY = 0.0f - view.yMin;
+
+            view.xMin += deltaX;
+            view.xMax += deltaX;
+
+            view.yMin += deltaY;
+            view.yMax += deltaY;
+
+            _DesiredSize = new Size(view.width, view.height);
+        }
+
+        protected override void Paint()
         {
             foreach (var c in Controls)
             {
                 c.OnGUI();
             }
-        }
+        }        
 
         
 
@@ -169,6 +205,65 @@ namespace Skill.UI
             }
             return null;
         }
-    }
 
+
+        /// <summary>
+        /// calculate PaintArea of Control based on given available Rect
+        /// </summary>
+        /// <param name="c">Control to calc it's PaintArea</param>
+        /// <param name="cellRect">Available space</param>
+        protected void SetControlPaintArea(BaseControl c, Rect cellRect)
+        {
+            Rect paintArea = cellRect;
+
+            // check for VerticalAlignment
+            paintArea.height = Mathf.Min(c.LayoutHeight, cellRect.height);
+            switch (c.VerticalAlignment)
+            {
+                case VerticalAlignment.Top: // only Margin.Top is important
+                    paintArea.y = Mathf.Min(cellRect.y + c.Margin.Top, cellRect.yMax - paintArea.height);
+                    break;
+                case VerticalAlignment.Center: // none of Margin.Top and Margin.Bottom is important
+                    paintArea.y = cellRect.y + (cellRect.height - paintArea.height) / 2;
+                    break;
+                case VerticalAlignment.Bottom: // only Margin.Bottom is important
+                    paintArea.y = Mathf.Max(cellRect.y, cellRect.yMax - paintArea.height - c.Margin.Bottom);
+                    break;
+                case VerticalAlignment.Stretch: // both Margin.Top and Margin.Bottom is important
+                    paintArea.height = cellRect.height - c.Margin.Vertical;
+                    paintArea.y += c.Margin.Top;
+                    break;
+            }
+
+            if (paintArea.yMax > cellRect.yMax)
+                paintArea.y = cellRect.yMax - paintArea.height;
+
+
+
+            // check for HorizontalAlignment
+            paintArea.width = Mathf.Min(c.LayoutWidth, cellRect.width);
+            switch (c.HorizontalAlignment)
+            {
+                case HorizontalAlignment.Left: // only Margin.Left is important
+                    paintArea.x = Mathf.Min(cellRect.x + c.Margin.Left, cellRect.xMax - paintArea.width);
+                    break;
+                case HorizontalAlignment.Center: // none of Margin.Left and Margin.Right is important
+                    paintArea.x = cellRect.x + (cellRect.width - paintArea.width) / 2;
+                    break;
+                case HorizontalAlignment.Right: // only Margin.Right is important
+                    paintArea.x = Mathf.Max(cellRect.x, cellRect.xMax - paintArea.width - c.Margin.Right);
+                    break;
+                case HorizontalAlignment.Stretch: // both Margin.Left and Margin.Right is important
+                    paintArea.width = cellRect.width - c.Margin.Horizontal;
+                    paintArea.x += c.Margin.Left;
+                    break;
+            }
+
+            if (paintArea.xMax > cellRect.xMax)
+                paintArea.x = cellRect.xMax - paintArea.width;
+
+
+            c.PaintArea = paintArea;
+        }                       
+    }
 }

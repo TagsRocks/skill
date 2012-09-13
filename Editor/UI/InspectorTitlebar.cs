@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make an inspector-window-like titlebar.
     /// </summary>
-    public class InspectorTitlebar : Control
+    public class InspectorTitlebar : EditorControl
     {
         /// <summary>
         /// Occurs when state of Foldout of InspectorTitlebar changed
@@ -47,16 +47,24 @@ namespace Skill.Editor.UI
         /// </summary>
         public UnityEngine.Object[] Objects { get; set; }
 
+        /// <summary>
+        /// Create an InspectorTitlebar
+        /// </summary>
+        public InspectorTitlebar()
+        {
+            this.Height = 16;
+        }
+
         protected override void Paint()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
 
             if (Objects != null && Objects.Length > 0)
                 FoldoutState = EditorGUI.InspectorTitlebar(PaintArea, _FoldoutState, Objects);
-            else if (Objects != null)
+            else //if (Object != null)
                 FoldoutState = EditorGUI.InspectorTitlebar(PaintArea, _FoldoutState, Object);
-            else
-                Debug.LogError("Invalid object for InspectorTitlebar");
+            //else
+            //    Debug.LogError("Invalid object for InspectorTitlebar");
         }
     }
 }

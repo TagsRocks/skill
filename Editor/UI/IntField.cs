@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make a text field for entering ints.
     /// </summary>
-    public class IntField : Control
+    public class IntField : EditorControl
     {
         /// <summary>
         /// Optional label in front of the field.
@@ -48,6 +48,7 @@ namespace Skill.Editor.UI
         public IntField()
         {
             Label = new GUIContent();
+            this.Height = 16;
         }
 
         protected override void Paint()

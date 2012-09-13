@@ -39,7 +39,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -69,6 +68,9 @@
     <Compile Include="IO\XmlLoadStream.cs" />
     <Compile Include="IO\XmlSaveStream.cs" />
     <Compile Include="Managers\CacheBehavior.cs" />
+    <Compile Include="Managers\CacheGroup.cs" />
+    <Compile Include="Managers\CacheLifeTime.cs" />
+    <Compile Include="Managers\CacheObject.cs" />
     <Compile Include="Managers\EventManager.cs" />
     <Compile Include="MathHelper.cs" />
     <Compile Include="Smoothing.cs" />
@@ -144,8 +146,10 @@
     <Compile Include="UI\ToolbarButton.cs" />
     <Compile Include="UI\UniformGrid.cs" />
     <Compile Include="UI\VerticalAlignment.cs" />
+    <Compile Include="UI\Visibility.cs" />
     <Compile Include="UI\Window.cs" />
     <Compile Include="UI\WrapImage.cs" />
+    <Compile Include="UI\WrapPanel.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

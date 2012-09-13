@@ -74,7 +74,7 @@ namespace Skill
 			}
 
 
-			int i,j;			
+			int i;			
 			for (i = 0; i < vertexCount; i++)
 			{
 				Vertex vertex = meshData.Vertices.GetAt(i);
@@ -156,7 +156,7 @@ namespace Skill
 			
 			if(meshData.HasSkin)
 			{
-				int i,j;
+				int i;
 				// these two lists are correspond eachother
 				FbxArray<FbxNode*> bonesArray; // list to hold reference of all bones
 				FbxArray<FbxCluster*> clustersArray; // list to hold reference of all clusters
@@ -295,7 +295,7 @@ namespace Skill
 
 				for (i=0; i<lClusteredFbxNodes.GetCount(); i++)
 				{
-					FbxNode*  lKFbxNode   = lClusteredFbxNodes.GetAt(i);
+					FbxNode*  lKFbxNode   = lClusteredFbxNodes.GetAt(i);					
 					FbxMatrix lBindMatrix = lKFbxNode->EvaluateGlobalTransform();
 
 					lPose->Add(lKFbxNode, lBindMatrix);

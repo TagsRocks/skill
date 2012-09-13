@@ -11,7 +11,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make a generic popup selection field.
     /// </summary>
-    public class Popup : EditorControl
+    public class IntPopup : EditorControl
     {
         /// <summary>
         /// Optional label in front of the field.
@@ -22,25 +22,37 @@ namespace Skill.Editor.UI
         /// </summary>
         public PopupOptionCollection Options { get; private set; }
 
-        private int _SelectedIndex = -1;
-        /// <summary>
-        /// The index of the option the field shows.
-        /// </summary>
-        public int SelectedIndex
+        private int FindIndexByValue(int value)
         {
-            get { return _SelectedIndex; }
+            for (int i = 0; i < Options.Count; i++)
+            {
+                if (Options[i].Value == value)
+                    return i;
+            }
+            return -1;
+        }
+
+        private int _SelectedValue = -1;
+        /// <summary>
+        /// The value of the option the field shows.
+        /// </summary>
+        public int SelectedValue
+        {
+            get { return _SelectedValue; }
             set
             {
-                if (_SelectedIndex != value)
+                if (_SelectedValue != value)
                 {
-                    if (_SelectedIndex >= 0 && _SelectedIndex < Options.Count)
-                        Options[_SelectedIndex].IsSelected = false;
+                    int index = FindIndexByValue(_SelectedValue);
+                    if (index >= 0 && index < Options.Count)
+                        Options[index].IsSelected = false;
 
-                    _SelectedIndex = value;
+                    _SelectedValue = value;
                     OnOptionChanged();
 
-                    if (_SelectedIndex >= 0 && _SelectedIndex < Options.Count)
-                        Options[_SelectedIndex].IsSelected = true;
+                    index = FindIndexByValue(_SelectedValue);
+                    if (index >= 0 && index < Options.Count)
+                        Options[index].IsSelected = true;
                 }
             }
         }
@@ -52,19 +64,17 @@ namespace Skill.Editor.UI
         {
             get
             {
-                if (_SelectedIndex >= 0 && _SelectedIndex < Options.Count)
-                    return Options[_SelectedIndex];
+                int index = FindIndexByValue(_SelectedValue);
+                if (index >= 0 && index < Options.Count)
+                    return Options[index];
                 return null;
             }
             set
             {
-                if (value == null)
+                if (value != null)
                 {
-                    SelectedIndex = 0;
-                }
-                else
-                {
-                    SelectedIndex = Options.IndexOf(value);
+                    if (Options.Contains(value))
+                        SelectedValue = value.Value;
                 }
             }
         }
@@ -81,7 +91,7 @@ namespace Skill.Editor.UI
         /// <summary>
         /// Create an instace of Popup
         /// </summary>
-        public Popup()
+        public IntPopup()
         {
             this.Options = new PopupOptionCollection();
             this.Label = new GUIContent();
@@ -93,12 +103,12 @@ namespace Skill.Editor.UI
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)
             {
-                SelectedIndex = EditorGUI.Popup(PaintArea, Label, _SelectedIndex, Options.Contents, Style);
+                SelectedValue = EditorGUI.IntPopup(PaintArea, Label, _SelectedValue, Options.Contents, Options.Values, Style);
             }
             else
             {
-                SelectedIndex = EditorGUI.Popup(PaintArea, Label, _SelectedIndex, Options.Contents);
+                SelectedValue = EditorGUI.IntPopup(PaintArea, Label, _SelectedValue, Options.Contents, Options.Values);
             }
-        }        
+        }
     }
 }

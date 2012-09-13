@@ -19,7 +19,7 @@ namespace Skill.UI
         /// <summary>
         /// Gets a RowDefinitionCollection defined on this instance of Grid.
         /// </summary>    
-        public RowDefinitionCollection RowDefinitions { get; private set; }
+        public RowDefinitionCollection RowDefinitions { get; private set; }        
 
         /// <summary>
         /// Initializes a new instance of Grid.        
@@ -85,63 +85,11 @@ namespace Skill.UI
             }
         }
 
-        private void SetControlPaintArea(BaseControl c, Rect cellRect)
-        {
-            Rect paintArea = cellRect;
-
-            // check for VerticalAlignment
-            paintArea.height = Mathf.Min(c.Size.Height, cellRect.height);
-            switch (c.VerticalAlignment)
-            {
-                case VerticalAlignment.Top: // only Margin.Top is important
-                    paintArea.y = Mathf.Min(cellRect.y + c.Margin.Top, cellRect.yMax - paintArea.height);
-                    break;
-                case VerticalAlignment.Center: // none of Margin.Top and Margin.Bottom is important
-                    paintArea.y = cellRect.y + (cellRect.height - paintArea.height) / 2;
-                    break;
-                case VerticalAlignment.Bottom: // only Margin.Bottom is important
-                    paintArea.y = Mathf.Max(cellRect.y, cellRect.yMax - paintArea.height - c.Margin.Bottom);
-                    break;
-                case VerticalAlignment.Stretch: // both Margin.Top and Margin.Bottom is important
-                    paintArea.height = cellRect.height - c.Margin.Vertical;
-                    paintArea.y += c.Margin.Top;
-                    break;
-            }
-
-            if (paintArea.yMax > cellRect.yMax)
-                paintArea.y = cellRect.yMax - paintArea.height;
-
-
-
-            // check for HorizontalAlignment
-            paintArea.width = Mathf.Min(c.Size.Width, cellRect.width);
-            switch (c.HorizontalAlignment)
-            {
-                case HorizontalAlignment.Left: // only Margin.Left is important
-                    paintArea.x = Mathf.Min(cellRect.x + c.Margin.Left, cellRect.xMax - paintArea.width);
-                    break;
-                case HorizontalAlignment.Center: // none of Margin.Left and Margin.Right is important
-                    paintArea.x = cellRect.x + (cellRect.width - paintArea.width) / 2;
-                    break;
-                case HorizontalAlignment.Right: // only Margin.Right is important
-                    paintArea.x = Mathf.Max(cellRect.x, cellRect.xMax - paintArea.width - c.Margin.Right);
-                    break;
-                case HorizontalAlignment.Stretch: // both Margin.Left and Margin.Right is important
-                    paintArea.width = cellRect.width - c.Margin.Horizontal;
-                    paintArea.x += c.Margin.Left;
-                    break;
-            }
-
-            if (paintArea.xMax > cellRect.xMax)
-                paintArea.x = cellRect.xMax - paintArea.width;
-
-
-            c.PaintArea = paintArea;
-        }
+        
 
         private Rect[] CalcRowsLayout()
         {
-            Rect paintArea = PaintArea;
+            Rect paintArea = PaintAreaWithPadding;
             Rect[] rowRects = new Rect[Mathf.Max(1, RowDefinitions.Count)];
 
             if (RowDefinitions.Count > 0)
@@ -165,7 +113,7 @@ namespace Skill.UI
                         {
                             if (c.Row == i && c.RowSpan <= 1) // control is fully in row 
                             {
-                                rowRects[i].height = Mathf.Max(rowRects[i].height, c.Size.Height + c.Margin.Vertical);
+                                rowRects[i].height = Mathf.Max(rowRects[i].height, c.LayoutHeight + c.Margin.Vertical);
                             }
                             else if (c.RowSpan > 1 && c.Row + c.RowSpan - 1== i) // control is partially in row (ends with this row)
                             {
@@ -173,7 +121,7 @@ namespace Skill.UI
                                 for (int r = c.Row; r < i; r++) // calc height of previous rows that affected by this control
                                     previousRowheights += rowRects[r].height;
 
-                                rowRects[i].height = Mathf.Max(rowRects[i].height, c.Size.Height + c.Margin.Vertical - previousRowheights);
+                                rowRects[i].height = Mathf.Max(rowRects[i].height, c.LayoutHeight + c.Margin.Vertical - previousRowheights);
                             }
                         }
                     }
@@ -229,7 +177,7 @@ namespace Skill.UI
 
         private Rect[] CalcColumnsLayout()
         {
-            Rect paintArea = PaintArea;
+            Rect paintArea = PaintAreaWithPadding;
             Rect[] columnRects = new Rect[Mathf.Max(1, ColumnDefinitions.Count)];
 
             if (ColumnDefinitions.Count > 0)
@@ -253,7 +201,7 @@ namespace Skill.UI
                         {
                             if (c.Column == j && c.ColumnSpan <= 1) // control is fully in row 
                             {
-                                columnRects[j].width = Mathf.Max(columnRects[j].width, c.Size.Width + c.Margin.Horizontal);
+                                columnRects[j].width = Mathf.Max(columnRects[j].width, c.LayoutWidth + c.Margin.Horizontal);
                             }
                             else if (c.ColumnSpan > 1 && c.Column + c.ColumnSpan - 1 == j) // control is partially in column (ends with this column)
                             {
@@ -261,7 +209,7 @@ namespace Skill.UI
                                 for (int cl = c.Column; cl < j; cl++) // calc width of previous columns that affected by this control
                                     previousColumnsWidths += columnRects[cl].width;
 
-                                columnRects[j].width = Mathf.Max(columnRects[j].width, c.Size.Width + c.Margin.Horizontal - previousColumnsWidths);
+                                columnRects[j].width = Mathf.Max(columnRects[j].width, c.LayoutWidth + c.Margin.Horizontal - previousColumnsWidths);
                             }
                         }
                     }

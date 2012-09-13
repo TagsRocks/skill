@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make a field for masks.
     /// </summary>
-    public class MaskField : Control
+    public class MaskField : EditorControl
     {
         /// <summary>
         /// Optional label in front of the field.
@@ -53,7 +53,8 @@ namespace Skill.Editor.UI
         public MaskField()
         {
             this.Label = new GUIContent();
-            this.DisplayedOptions = new List<string>();            
+            this.DisplayedOptions = new List<string>();
+            this.Height = 16;
         }
 
         protected override void Paint()

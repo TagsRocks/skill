@@ -28,7 +28,7 @@ namespace Skill
 			lConversionOptions.mConvertRrsNodes = false; /* mConvertRrsNodes */
 			lConversionOptions.mConvertLimits = true; /* mConvertAllLimits */
 			lConversionOptions.mConvertClusters  = true; /* mConvertClusters */
-			lConversionOptions.mConvertLightIntensity == true; /* mConvertLightIntensity */
+			lConversionOptions.mConvertLightIntensity = true; /* mConvertLightIntensity */
 			lConversionOptions.mConvertPhotometricLProperties = true; /* mConvertPhotometricLProperties */
 			lConversionOptions.mConvertCameraClipPlanes = true; //true  /* mConvertCameraClipPlanes */  };
 
@@ -256,6 +256,112 @@ namespace Skill
 				abs(v1[1] - v2[2]) < telorance )
 				return true;
 			return false;
+		}
+
+		void FbxHelper::TriangulateRecursive(FbxNode* pNode)
+		{
+			FbxNodeAttribute* lNodeAttribute = pNode->GetNodeAttribute();
+
+			if (lNodeAttribute)
+			{
+				if (lNodeAttribute->GetAttributeType() == FbxNodeAttribute::eMesh ||
+					lNodeAttribute->GetAttributeType() == FbxNodeAttribute::eNurbs ||
+					lNodeAttribute->GetAttributeType() == FbxNodeAttribute::eNurbsSurface ||
+					lNodeAttribute->GetAttributeType() == FbxNodeAttribute::ePatch)
+				{
+					FbxGeometryConverter lConverter(pNode->GetFbxManager());
+					lConverter.TriangulateInPlace(pNode);
+				}
+			}
+
+			const int lChildCount = pNode->GetChildCount();
+			for (int lChildIndex = 0; lChildIndex < lChildCount; ++lChildIndex)
+			{
+				TriangulateRecursive(pNode->GetChild(lChildIndex));
+			}
+		}
+
+		// Get the geometry offset to a node. It is never inherited by the children.
+		FbxAMatrix FbxHelper::GetGeometry(FbxNode* pNode)
+		{
+			const FbxVector4 lT = pNode->GetGeometricTranslation(FbxNode::eSourcePivot);
+			const FbxVector4 lR = pNode->GetGeometricRotation(FbxNode::eSourcePivot);
+			const FbxVector4 lS = pNode->GetGeometricScaling(FbxNode::eSourcePivot);
+
+			return FbxAMatrix(lT, lR, lS);
+		}
+
+		// Get the global position of the node for the current pose.
+		// If the specified node is not part of the pose or no pose is specified, get its
+		// global position at the current time.
+		FbxAMatrix FbxHelper::GetGlobalPosition(FbxNode* pNode, const FbxTime& pTime, FbxPose* pPose, FbxAMatrix* pParentGlobalPosition)
+		{
+			FbxAMatrix lGlobalPosition;
+			bool        lPositionFound = false;
+
+			if (pPose)
+			{
+				int lNodeIndex = pPose->Find(pNode);
+
+				if (lNodeIndex > -1)
+				{
+					// The bind pose is always a global matrix.
+					// If we have a rest pose, we need to check if it is
+					// stored in global or local space.
+					if (pPose->IsBindPose() || !pPose->IsLocalMatrix(lNodeIndex))
+					{
+						lGlobalPosition = GetPoseMatrix(pPose, lNodeIndex);
+					}
+					else
+					{
+						// We have a local matrix, we need to convert it to
+						// a global space matrix.
+						FbxAMatrix lParentGlobalPosition;
+
+						if (pParentGlobalPosition)
+						{
+							lParentGlobalPosition = *pParentGlobalPosition;
+						}
+						else
+						{
+							if (pNode->GetParent())
+							{
+								lParentGlobalPosition = GetGlobalPosition(pNode->GetParent(), pTime, pPose);
+							}
+						}
+
+						FbxAMatrix lLocalPosition = GetPoseMatrix(pPose, lNodeIndex);
+						lGlobalPosition = lParentGlobalPosition * lLocalPosition;
+					}
+
+					lPositionFound = true;
+				}
+			}
+
+			if (!lPositionFound)
+			{
+				// There is no pose entry for that node, get the current global position instead.
+
+				// Ideally this would use parent global position and local position to compute the global position.
+				// Unfortunately the equation 
+				//    lGlobalPosition = pParentGlobalPosition * lLocalPosition
+				// does not hold when inheritance type is other than "Parent" (RSrs).
+				// To compute the parent rotation and scaling is tricky in the RrSs and Rrs cases.
+				lGlobalPosition = pNode->EvaluateGlobalTransform(pTime);
+			}
+
+			return lGlobalPosition;
+		}
+
+		// Get the matrix of the given pose
+		FbxAMatrix FbxHelper::GetPoseMatrix(FbxPose* pPose, int pNodeIndex)
+		{
+			FbxAMatrix lPoseMatrix;
+			FbxMatrix lMatrix = pPose->GetMatrix(pNodeIndex);
+
+			memcpy((double*)lPoseMatrix, (double*)lMatrix, sizeof(lMatrix.mData));
+
+			return lPoseMatrix;
 		}
 	}
 }

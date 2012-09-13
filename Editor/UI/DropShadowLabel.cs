@@ -12,7 +12,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Draws a label with a drop shadow.
     /// </summary>
-    public class DropShadowLabel : Control
+    public class DropShadowLabel : EditorControl
     {
         /// <summary>
         /// text to show
@@ -34,6 +34,7 @@ namespace Skill.Editor.UI
         public DropShadowLabel()
         {
             Content = new GUIContent();
+            this.Height = 16;
         }
 
         protected override void Paint()

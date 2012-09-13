@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make an X, Y, W & H field for entering a Rect.
     /// </summary>
-    public class RectField : Control
+    public class RectField : EditorControl
     {
         /// <summary>
         /// Optional label in front of the field.
@@ -48,6 +48,7 @@ namespace Skill.Editor.UI
         public RectField()
         {
             Label = new GUIContent();
+            this.Height = 58;
         }
 
         protected override void Paint()

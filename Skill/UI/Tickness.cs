@@ -176,6 +176,12 @@ namespace Skill.UI
                 return this._Top + this._Bottom;
             }
         }
+
+        private static Thickness _Empty= new Thickness(0);
+        /// <summary>
+        /// zero Thickness
+        /// </summary>
+        public static Thickness Empty { get { return _Empty; } }
     }
 
 }

@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make an X, Y, Z & W field for entering a Vector4.
     /// </summary>
-    public class Vector4Field : Control
+    public class Vector4Field : EditorControl
     {
         private string _Label;
         /// <summary>
@@ -58,6 +58,7 @@ namespace Skill.Editor.UI
         public Vector4Field()
         {
             _Label = string.Empty;
+            this.Height = 38;
         }
 
         protected override void Paint()

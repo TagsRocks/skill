@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using UnityEditor;
+using Skill.UI;
 
 namespace Skill.Editor.UI
 {
     /// <summary>
     /// Check if any control was changed inside a block of code.
     /// </summary>
-    public class ChangeCheck : Skill.UI.Canvas
+    public class ChangeCheck : Canvas
     {
         private bool _IsChanged;
         /// <summary>
@@ -39,11 +38,25 @@ namespace Skill.Editor.UI
             if (Changed != null) Changed(this, EventArgs.Empty);
         }
 
-        protected override void PaintControls()
+        /// <summary>
+        /// Create new instance of ChangeCheck
+        /// </summary>
+        public ChangeCheck()            
         {
+
+        }
+
+        /// <summary> Begin Paint control's content </summary>
+        protected override void BeginPaint()
+        {
+            base.BeginPaint();
             EditorGUI.BeginChangeCheck();
-            base.PaintControls();
+        }
+        /// <summary> End Paint control's content </summary>
+        protected override void EndPaint()
+        {
             IsChanged = EditorGUI.EndChangeCheck();
-        }        
+            base.EndPaint();            
+        }
     }
 }

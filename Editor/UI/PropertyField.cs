@@ -6,7 +6,7 @@ using UnityEditor;
 
 namespace Skill.Editor.UI
 {
-    public class PropertyField : Control
+    public class PropertyField : EditorControl
     {
         /// <summary>
         /// Optional label to use. If not specified the label of the property itself is used. Use GUIContent.none to not display a label at all.
@@ -30,6 +30,7 @@ namespace Skill.Editor.UI
         {
             this.Label = new GUIContent();
             this.Property = null;
+            this.Height = 16;
         }
 
         protected override void Paint()

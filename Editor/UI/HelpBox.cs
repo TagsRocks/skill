@@ -8,7 +8,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make a help box with a message to the user.
     /// </summary>
-    public class HelpBox : Control
+    public class HelpBox : EditorControl
     {
         /// <summary>
         /// The message text.
@@ -18,6 +18,14 @@ namespace Skill.Editor.UI
         /// The type of message.
         /// </summary>
         public MessageType Type { get; set; }
+
+        /// <summary>
+        /// Create a HelpBox
+        /// </summary>
+        public HelpBox()
+        {
+            this.Height = 16;
+        }
 
 
         protected override void Paint()

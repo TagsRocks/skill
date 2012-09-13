@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make a text field.
     /// </summary>
-    public class TextField : FocusableControl
+    public class TextField : EditorControl
     {
         /// <summary>
         /// Optional label to display in front of the text field.
@@ -53,7 +53,8 @@ namespace Skill.Editor.UI
         public TextField()
         {
             this.Label = new GUIContent();
-            this._Text = string.Empty;            
+            this._Text = string.Empty;
+            this.Height = 16;
         }
 
         protected override void Paint()

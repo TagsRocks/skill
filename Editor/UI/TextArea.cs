@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make a text area.
     /// </summary>
-    public class TextArea : FocusableControl
+    public class TextArea : EditorControl
     {
         private string _Text;
         /// <summary>
@@ -47,7 +47,8 @@ namespace Skill.Editor.UI
         /// </summary>
         public TextArea()
         {
-            this._Text = string.Empty;            
+            this._Text = string.Empty;
+            this.Height = 38;
         }        
 
         protected override void Paint()

@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make Center & Extents field for entering a Bounds.
     /// </summary>
-    public class BoundsField : Control
+    public class BoundsField : EditorControl
     {
         /// <summary>
         /// Optional label to display above the field.
@@ -49,6 +49,7 @@ namespace Skill.Editor.UI
         public BoundsField()
         {
             Label = new GUIContent();
+            this.Height = 32;
         }
 
         protected override void Paint()

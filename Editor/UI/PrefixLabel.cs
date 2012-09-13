@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make a text field for entering ints.
     /// </summary>
-    public class PrefixLabel : Control
+    public class PrefixLabel : EditorControl
     {
         /// <summary>
         /// Label to show in front of the control.
@@ -31,6 +31,7 @@ namespace Skill.Editor.UI
         public PrefixLabel()
         {
             Label = new GUIContent();
+            this.Height = 16;
         }
 
         protected override void Paint()

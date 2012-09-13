@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make a toggle.
     /// </summary>
-    public class ToggleButton : Control
+    public class ToggleButton : EditorControl
     {
         /// <summary>
         /// Optional label in front of the toggle.
@@ -62,6 +62,7 @@ namespace Skill.Editor.UI
         public ToggleButton()
         {
             Label = new GUIContent();
+            this.Height = 16;
         }
 
         protected override void Paint()

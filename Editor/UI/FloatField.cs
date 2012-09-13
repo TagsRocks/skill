@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make a text field for entering floats.
     /// </summary>
-    public class FloatField : Control
+    public class FloatField : EditorControl
     {
         /// <summary>
         /// Optional label in front of the field.
@@ -48,6 +48,7 @@ namespace Skill.Editor.UI
         public FloatField()
         {
             Label = new GUIContent();
+            this.Height = 16;
         }
 
         protected override void Paint()

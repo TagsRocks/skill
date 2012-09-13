@@ -22,7 +22,7 @@ namespace Skill.Editor
             {
                 if (_Instance == null)
                 {
-                    EditorWindow.GetWindow<Exporter>();
+                   _Instance=  EditorWindow.GetWindow<Exporter>();
                 }
                 return _Instance;
             }

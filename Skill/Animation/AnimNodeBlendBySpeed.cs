@@ -149,7 +149,7 @@ namespace Skill.Animation
             for (int i = 0; i < _TargetBlendWeights.Length; i++)
                 _TargetBlendWeights[i] = 0;
 
-            int index = -1;
+            int index = 0;
             if (Velocity < Constraints[0] || Velocity > Constraints[ChildCount])
             {
                 BlendTime = BlendDownTime;

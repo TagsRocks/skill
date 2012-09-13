@@ -20,7 +20,7 @@ namespace Skill.Studio
     {
         public AboutWindow()
         {
-            InitializeComponent();
+            InitializeComponent();            
         }
     }
 }

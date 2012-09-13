@@ -6,10 +6,14 @@ using UnityEngine;
 
 namespace Skill.Managers
 {
+    //namespace Skill.Managers
+    //{
     [AddComponentMenu("Skill/Managers/CacheBehavior")]
     public sealed class CacheBehavior : MonoBehaviour
     {
         public int CacheId { get; set; }
+        public bool IsCollected { get; set; }
+        public CacheGroup Group { get; set; }
 
         void Awake()
         {
@@ -21,4 +25,6 @@ namespace Skill.Managers
             enabled = false;
         }
     }
+    //}
+
 }

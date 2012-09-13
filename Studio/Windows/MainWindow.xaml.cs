@@ -634,10 +634,10 @@ namespace Skill.Studio
         {
 
 #if DEBUG
-            CopyEditorFile("Editor.dll", overWrite);
-            CopyEditorFile("DataModels.dll", overWrite);
-            CopyFile("Skill.dll", overWrite);
-            CopyFile("Skill.xml", overWrite);            
+            CopyEditorFile("Editor", "Skill.Editor.dll", overWrite);
+            CopyEditorFile("DataModels","Skill.DataModels.dll", overWrite);
+            CopyFile("Skill", "Skill.dll", overWrite);
+            CopyFile("Skill", "Skill.xml", overWrite);            
 #else
             Skill.CodeGeneration.RequiredFile[] files = PluginManager.Plugin.RequiredFiles;
             if (files != null && files.Length > 0)
@@ -717,65 +717,46 @@ namespace Skill.Studio
         }
 
 
-        private void CopyFile(string filename, bool overWrite)
+        private void CopyFile(string projectName, string filename , bool overWrite)
         {
             string destinaion = Project.GetDesignerOutputPath(filename);
 
             if (System.IO.File.Exists(destinaion) && !overWrite)
                 return;
 
-            string appDir = AppDomain.CurrentDomain.BaseDirectory;
-
-            string filePath1 = System.IO.Path.Combine(appDir, filename);
+            string appDir = AppDomain.CurrentDomain.BaseDirectory;            
 
             string name = System.IO.Path.GetFileNameWithoutExtension(filename);
-#if DEBUG
-            string filePath2 = System.IO.Path.Combine(appDir, string.Format("../../../{0}/bin/Debug", name), filename);
-#else
-            string filePath2 = System.IO.Path.Combine(appDir, string.Format("../../../{0}/bin/Release", name), filename);
-#endif
+
+            string filePath = System.IO.Path.Combine(appDir, string.Format("../../../{0}/bin/Debug", projectName), filename);
 
             Project.CreateDirectory(destinaion);
 
-            if (System.IO.File.Exists(filePath1))
+            if (System.IO.File.Exists(filePath))
             {
-                System.IO.File.Copy(filePath1, destinaion, true);
-            }
-            else if (System.IO.File.Exists(filePath2))
-            {
-                System.IO.File.Copy(filePath2, destinaion, true);
-            }
-
+                System.IO.File.Copy(filePath, destinaion, true);
+            }            
         }
 
-        private void CopyEditorFile(string filename, bool overWrite)
+        private void CopyEditorFile(string projectName, string filename, bool overWrite)
         {
             string destinaion = Project.GetEditorOutputPath(System.IO.Path.Combine("Skill", filename));
 
             if (System.IO.File.Exists(destinaion) && !overWrite)
                 return;
 
-            string appDir = AppDomain.CurrentDomain.BaseDirectory;
-
-            string filePath1 = System.IO.Path.Combine(appDir, filename);
+            string appDir = AppDomain.CurrentDomain.BaseDirectory;            
 
             string name = System.IO.Path.GetFileNameWithoutExtension(filename);
-#if DEBUG
-            string filePath2 = System.IO.Path.Combine(appDir, string.Format("../../../{0}/bin/Debug", name), filename);
-#else
-            string filePath2 = System.IO.Path.Combine(appDir, string.Format("../../../{0}/bin/Release", name), filename);
-#endif
+
+            string filePath = System.IO.Path.Combine(appDir, string.Format("../../../{0}/bin/Debug", projectName), filename);
 
             Project.CreateDirectory(destinaion);
 
-            if (System.IO.File.Exists(filePath1))
+            if (System.IO.File.Exists(filePath))
             {
-                System.IO.File.Copy(filePath1, destinaion, true);
-            }
-            else if (System.IO.File.Exists(filePath2))
-            {
-                System.IO.File.Copy(filePath2, destinaion, true);
-            }
+                System.IO.File.Copy(filePath, destinaion, true);
+            }            
 
         }
 
@@ -845,7 +826,7 @@ namespace Skill.Studio
 
         private void MnuMeshOpt_Click(object sender, RoutedEventArgs e)
         {
-            Skill.Studio.Tools.MeshOptimizer meshOpt = new Tools.MeshOptimizer();
+            Skill.Studio.Tools.MergeMeshTool meshOpt = new Tools.MergeMeshTool();
             meshOpt.Owner = this;
             meshOpt.ShowDialog();
         }

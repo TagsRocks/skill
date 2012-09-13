@@ -44,6 +44,23 @@ namespace Skill
 			if(!FbxHelper::LoadScene(_SdkManager, _Scene, filenameChars))
 				throw gcnew Exception("Can not load file");
 
+			// Convert Axis System to what is used in this example, if needed
+            FbxAxisSystem SceneAxisSystem = _Scene->GetGlobalSettings().GetAxisSystem();
+            FbxAxisSystem OurAxisSystem(FbxAxisSystem::eYAxis, FbxAxisSystem::eParityOdd, FbxAxisSystem::eRightHanded);
+            if( SceneAxisSystem != OurAxisSystem )
+            {
+                OurAxisSystem.ConvertScene(_Scene);
+            }
+
+            // Convert Unit System to what is used in this example, if needed
+            FbxSystemUnit SceneSystemUnit = _Scene->GetGlobalSettings().GetSystemUnit();
+            if( SceneSystemUnit.GetScaleFactor() != 1.0 )
+            {
+                //The unit in this example is centimeter.
+                FbxSystemUnit::cm.ConvertScene( _Scene);
+            }
+			
+			FbxHelper::TriangulateRecursive(_Scene->GetRootNode());
 			CreateHierarchy();
 		}
 
@@ -127,8 +144,15 @@ namespace Skill
 
 				MeshData* data = new MeshData();
 				loader.Fill(data);
-				
-				processor.TransformToGlobal(meshes[i]->GetFbxNode(),*data);				
+								
+				if(data->HasSkin)
+				{					
+					processor.TransformToBindPose(mesh,*data);										
+				}
+				else
+				{
+					processor.TransformToGlobal(meshes[i]->GetFbxNode(),*data);
+				}
 				meshDataArray.Add(data);
 			}
 					
@@ -164,8 +188,8 @@ namespace Skill
 						
 			MeshProcessor processor;
 
-			processor.PositionsTelorance = _PositionsTelorance;
-			processor.UvTelorance = _UvTelorance;
+			processor.SetPositionsTelorance(_PositionsTelorance);
+			processor.SetUvTelorance(_UvTelorance);
 
 			if(generateNormals || (!meshData->HasNormal && generateTangents))
 				processor.GenerateNormals(*meshData);

@@ -49,8 +49,7 @@ namespace Skill
 		private:
 			
 			bool InitializeSdkObjects();
-			void DestroySdkObjects();				
-
+			void DestroySdkObjects();							
 
 			void CreateHierarchy();
 			SceneNode^ CreateHierarchy(FbxNode* node);

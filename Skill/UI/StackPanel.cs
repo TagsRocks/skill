@@ -11,7 +11,7 @@ namespace Skill.UI
         /// <summary>
         /// Gets or sets a value that indicates the dimension by which child elements are stacked.
         /// </summary>       
-        public Orientation Orientation { get; set; }
+        public Orientation Orientation { get; set; }        
 
         /// <summary>
         /// Ensures that all visual child elements of this element are properly updated for layout.
@@ -46,10 +46,10 @@ namespace Skill.UI
                 Rect cRect = paintArea;
                 float xMax = paintArea.xMax;
                 cRect.x += c.Margin.Left;
-                cRect.width = c.Size.Width;
+                cRect.width = c.LayoutWidth;
                 paintArea.xMin = cRect.xMax + c.Margin.Right;
                 paintArea.xMax = Mathf.Max(xMax, paintArea.xMin);
-                cRect.height = c.Size.Height;
+                cRect.height = c.LayoutHeight;
                 switch (c.VerticalAlignment)
                 {
                     case VerticalAlignment.Top:
@@ -66,7 +66,7 @@ namespace Skill.UI
                         cRect.y = paintArea.yMax - cRect.height - c.Margin.Bottom;
                         break;
                     case VerticalAlignment.Stretch:
-                        cRect.height = Mathf.Max(paintArea.height - c.Margin.Vertical, c.Size.Height);
+                        cRect.height = Mathf.Max(paintArea.height - c.Margin.Vertical, c.LayoutHeight);
                         cRect.y += c.Margin.Top;
                         if (cRect.yMax > paintArea.yMax)
                             cRect.y = paintArea.yMax - cRect.height;
@@ -88,10 +88,10 @@ namespace Skill.UI
                 Rect cRect = paintArea;
                 float yMax = paintArea.yMax;
                 cRect.y += c.Margin.Top;
-                cRect.height = c.Size.Height;
+                cRect.height = c.LayoutHeight;
                 paintArea.yMin = cRect.yMax + c.Margin.Bottom;
                 paintArea.yMax = Mathf.Max(yMax, paintArea.yMin);
-                cRect.width = c.Size.Width;
+                cRect.width = c.LayoutWidth;
 
                 switch (c.HorizontalAlignment)
                 {
@@ -109,7 +109,7 @@ namespace Skill.UI
                         cRect.x = paintArea.xMax - cRect.width - c.Margin.Right;
                         break;
                     case HorizontalAlignment.Stretch:
-                        cRect.width = Mathf.Max(paintArea.width - c.Margin.Horizontal, c.Size.Width);
+                        cRect.width = Mathf.Max(paintArea.width - c.Margin.Horizontal, c.LayoutWidth);
                         cRect.x += c.Margin.Left;
                         if (cRect.xMax > paintArea.xMax)
                             cRect.x = paintArea.xMax - cRect.width;

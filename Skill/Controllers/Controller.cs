@@ -34,6 +34,14 @@ namespace Skill.Controllers
             UnhookEvents();
         }
 
+        public virtual void Destroy()
+        {
+            if (Spawner != null)
+                this.Spawner.DestroySpawnedObject(this.gameObject);
+            else
+                GameObject.Destroy(this.gameObject);
+        }
+
 
         public virtual void HookEvents() { }
         public virtual void UnhookEvents() { }

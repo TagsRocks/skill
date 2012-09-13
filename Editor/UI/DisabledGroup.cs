@@ -21,11 +21,25 @@ namespace Skill.Editor.UI
         /// </summary>
         public bool Disabled { get; set; }
         
-        protected override void PaintControls()
+        /// <summary>
+        /// Create new instance of DisabledGroup
+        /// </summary>        
+        public DisabledGroup()            
         {
+
+        }
+
+        /// <summary> Begin Paint control's content </summary>
+        protected override void BeginPaint()
+        {
+            base.BeginPaint();
             EditorGUI.BeginDisabledGroup(Disabled);
-            base.PaintControls();
+        }
+        /// <summary> End Paint control's content </summary>
+        protected override void EndPaint()
+        {
             EditorGUI.EndDisabledGroup();
+            base.EndPaint();
         }        
     }
 }

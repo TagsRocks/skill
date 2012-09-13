@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make a layer selection field.
     /// </summary>
-    public class LayerField : Control
+    public class LayerField : EditorControl
     {
         /// <summary>
         /// Optional label in front of the field.
@@ -48,6 +48,7 @@ namespace Skill.Editor.UI
         public LayerField()
         {
             Label = new GUIContent();
+            this.Height = 16;
         }
 
         protected override void Paint()

@@ -11,7 +11,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make a label field. (Useful for showing read-only info.)
     /// </summary>
-    public class LabelField : Control
+    public class LabelField : EditorControl
     {
         /// <summary>
         /// Label in front of the label field.
@@ -29,7 +29,7 @@ namespace Skill.Editor.UI
         {
             Label = new GUIContent();
             Label2 = new GUIContent();
-
+            this.Height = 16;
         }
 
         protected override void Paint()

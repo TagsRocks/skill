@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make a text field where the user can enter a password.
     /// </summary>
-    public class PasswordField : FocusableControl
+    public class PasswordField : EditorControl
     {
         /// <summary>
         /// Optional label to display in front of the password field.
@@ -54,6 +54,7 @@ namespace Skill.Editor.UI
         {
             this._Password = string.Empty;
             this.Label = new GUIContent();
+            this.Height = 16;
         }                       
 
         protected override void Paint()

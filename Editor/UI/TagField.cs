@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make a tag selection field.
     /// </summary>
-    public class TagField : Control
+    public class TagField : EditorControl
     {
         /// <summary>
         /// Optional label in front of the field.
@@ -48,6 +48,7 @@ namespace Skill.Editor.UI
         public TagField()
         {
             Label = new GUIContent();
+            this.Height = 16;
         }
 
         protected override void Paint()

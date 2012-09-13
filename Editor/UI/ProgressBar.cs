@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make a progress bar.
     /// </summary>
-    public class ProgressBar : Control
+    public class ProgressBar : EditorControl
     {
         private string _Text;
         public string Text
@@ -60,12 +60,24 @@ namespace Skill.Editor.UI
         public ProgressBar()
         {
             Text = string.Empty;
+            this.Height = 16;
         }
 
         protected override void Paint()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             EditorGUI.ProgressBar(PaintArea, _Value, _Text);
+        }
+
+        /// <summary>
+        /// Set value between minimum and maximum
+        /// </summary>
+        /// <param name="min">Minimum value</param>
+        /// <param name="max">Maximum value</param>
+        /// <param name="value">Value between min and max</param>
+        public void SetValue(float min, float max, float value)
+        {
+            this.Value = (value - min) / (max - min);
         }
     }
 }

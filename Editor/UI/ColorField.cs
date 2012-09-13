@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make a field for selecting a Color.
     /// </summary>
-    public class ColorField : Control
+    public class ColorField : EditorControl
     {
         /// <summary>
         /// Optional label to display above the field.
@@ -48,6 +48,7 @@ namespace Skill.Editor.UI
         public ColorField()
         {
             Label = new GUIContent();
+            this.Height = 16;
         }
 
         protected override void Paint()

@@ -19,7 +19,7 @@ namespace Skill.UI
         /// Panels that contains another Controls
         /// </summary>
         Panel
-    } 
+    }
     #endregion
 
     #region BaseControl
@@ -31,11 +31,11 @@ namespace Skill.UI
 
         #region Properties
 
-        private Vector2 _Position;
+        private Rect _Position;
         /// <summary>
-        /// Position of control relative to parent when it is a child of Canvas panel
+        /// Position of control relative to parent
         /// </summary>
-        public Vector2 Position
+        public Rect Position
         {
             get { return _Position; }
             set
@@ -44,32 +44,114 @@ namespace Skill.UI
                 {
                     _Position = value;
                     OnPositionChange();
-                    OnLayoutChanged();
                 }
             }
         }
 
-        private Size _Size;
         /// <summary>
-        /// Size of control
+        /// Gets or sets Position.X
         /// </summary>
-        public Size Size
+        public float X
         {
             get
             {
-                return _Size;
+                return _Position.x;
             }
             set
             {
-                if (_Size != value)
+                if (_Position.x != value)
                 {
-                    _Size = value;
-                    OnResize();
-                    OnLayoutChanged();
+                    _Position.x = value;
+                    OnPositionChange();
                 }
             }
         }
 
+        /// <summary>
+        /// Gets or sets Position.Y
+        /// </summary>
+        public float Y
+        {
+            get
+            {
+                return _Position.y;
+            }
+            set
+            {
+                if (_Position.y != value)
+                {
+                    _Position.y = value;
+                    OnPositionChange();
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Gets or sets Position.width
+        /// </summary>
+        public float Width
+        {
+            get
+            {
+                return _Position.width;
+            }
+            set
+            {
+                if (_Position.width != value)
+                {
+                    _Position.width = value;
+                    OnPositionChange();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets Position.height
+        /// </summary>
+        public float Height
+        {
+            get
+            {
+                return _Position.height;
+            }
+            set
+            {
+                if (_Position.height != value)
+                {
+                    _Position.height = value;
+                    OnPositionChange();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Retrieves Width used in layout. It is dependents on visibility and state of children
+        /// </summary>
+        public virtual float LayoutWidth
+        {
+            get
+            {
+                if (Visibility == UI.Visibility.Collapsed)
+                    return 0;
+                else
+                    return _Position.width;
+            }            
+        }
+
+        /// <summary>
+        /// Retrieves Height used in layout. It is dependents on visibility and state of children
+        /// </summary>
+        public virtual float LayoutHeight
+        {
+            get
+            {
+                if (Visibility == UI.Visibility.Collapsed)
+                    return 0;
+                else
+                    return _Position.height;
+            }           
+        }
 
         private Thickness _Margin;
         /// <summary> Gets or sets the outer margin of an element.</summary>        
@@ -80,7 +162,10 @@ namespace Skill.UI
         {
             get
             {
-                return _Margin;
+                if (Visibility == UI.Visibility.Collapsed)
+                    return Thickness.Empty;
+                else
+                    return _Margin;
             }
             set
             {
@@ -112,8 +197,8 @@ namespace Skill.UI
             }
         }
 
-        /// <summary> Parent Panel that host this control. </summary>
-        public Panel Parent { get; internal set; }
+        /// <summary> Parent Panel that host this control.(do not modify it manually) </summary>
+        public BaseControl Parent { get; set; }
 
         private VerticalAlignment _VerticalAlignment;
 
@@ -259,6 +344,23 @@ namespace Skill.UI
             }
         }
 
+        private Visibility _Visibility;
+        /// <summary>
+        /// Gets or sets the user interface (UI) visibility of this element.
+        /// </summary>
+        public Visibility Visibility
+        {
+            get { return _Visibility; }
+            set
+            {
+                if (_Visibility != value)
+                {
+                    _Visibility = value;
+                    OnLayoutChanged();
+                }
+            }
+        }
+
         #endregion
 
         #region Events
@@ -268,13 +370,9 @@ namespace Skill.UI
         {
             if (PositionChange != null)
                 PositionChange(this, EventArgs.Empty);
+            OnLayoutChanged();
         }
-        /// <summary> Occurs when size of control changed </summary>
-        public event EventHandler Resize;
-        protected virtual void OnResize()
-        {
-            if (Resize != null) Resize(this, EventArgs.Empty);
-        }
+
         /// <summary> Occurs when PaintArea of control changed </summary>
         public event EventHandler PaintAreaChanged;
         protected virtual void OnPaintAreaChanged()
@@ -302,6 +400,8 @@ namespace Skill.UI
             this._Column = 0;
             this._RowSpan = 1;
             this._ColumnSpan = 1;
+            this.Width = 100;
+            this.Height = 16;
         }
         #endregion
 
@@ -312,6 +412,10 @@ namespace Skill.UI
         public abstract ControlType ControlType { get; }
         /// <summary> Paint control's content </summary>
         protected abstract void Paint();
+        /// <summary> Begin Paint control's content </summary>
+        protected virtual void BeginPaint() { }
+        /// <summary> End Paint control's content </summary>
+        protected virtual void EndPaint() { }
 
         #endregion
 
@@ -319,25 +423,33 @@ namespace Skill.UI
         /// <summary>
         /// to paint control you have to call this method in OnGUI method of MonoBehavior.(call this for Frame class)
         /// </summary>
-        public void OnGUI() { Paint(); }
+        public void OnGUI()
+        {
+            if (Visibility == UI.Visibility.Visible)
+            {
+                BeginPaint();
+                Paint();
+                EndPaint();
+            }
+        }
 
 
         /// <summary> Attempts to bring this element to front. </summary>
         public void BringToFront()
         {
-            if (Parent != null)
-                Parent.Controls.BringToFront(this);
+            if (Parent != null && Parent.ControlType == UI.ControlType.Panel)
+                ((Panel)Parent).Controls.BringToFront(this);
         }
         /// <summary> Attempts to bring this element to back. </summary>
         public void BringToBack()
         {
-            if (Parent != null)
-                Parent.Controls.BringToBack(this);
+            if (Parent != null && Parent.ControlType == UI.ControlType.Panel)
+                ((Panel)Parent).Controls.BringToBack(this);
         }
         #endregion
-    } 
-    #endregion  
-    
+    }
+    #endregion
+
     #region BaseControlCollection
     /// <summary>
     /// Defines methods to manipulate collection of BaseControls.
@@ -526,7 +638,7 @@ namespace Skill.UI
                 _Items.Insert(0, control);
             }
         }
-    } 
+    }
     #endregion
 
 }

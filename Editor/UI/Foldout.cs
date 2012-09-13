@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make a label with a foldout arrow to the left of it.
     /// </summary>
-    public class Foldout : Control
+    public class Foldout : EditorControl
     {
         /// <summary>
         /// The label to show.
@@ -53,6 +53,7 @@ namespace Skill.Editor.UI
         public Foldout()
         {
             Content = new GUIContent();
+            this.Height = 16;
         }
 
         protected override void Paint()

@@ -8,32 +8,31 @@ namespace Skill.UI
     /// <summary>
     /// A group of controls
     /// </summary>
-    public class Group : Panel
+    public class Group : Canvas
     {
         /// <summary>
         /// Text, image and tooltip for this group. If supplied, any mouse clicks are "captured" by the group and not If left out,
         /// no background is rendered, and mouse clicks are passed
         /// </summary>
         public GUIContent Content { get; private set; }
-        
+
         /// <summary>
-        /// The style to use for the background.
+        /// The style to use. If null, the style from the current GUISkin is used.
         /// </summary>
-        public GUIStyle Style { get; set; }
+        public GUIStyle Style { get; set; }      
 
         /// <summary>
         /// Create new instance of Group
-        /// </summary>
+        /// </summary>        
         public Group()
         {
             Content = new GUIContent();
-        }
+        }        
 
-        protected override void PaintControls()
+        /// <summary> Begin paint contents </summary>
+        protected override void BeginPaint()
         {
-            
-            //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
-
+            base.BeginPaint();
             if (Style != null)
             {
                 GUI.BeginGroup(PaintArea, Content, Style);
@@ -42,28 +41,13 @@ namespace Skill.UI
             {
                 GUI.BeginGroup(PaintArea, Content);
             }
-
-
-            base.PaintControls();
-
-            GUI.EndGroup();
         }
 
-        /// <summary>
-        /// Ensures that all visual child elements of this element are properly updated for layout.
-        /// </summary>
-        public override void UpdateLayout()
+        /// <summary> End paint contents </summary>
+        protected override void EndPaint()
         {
-            foreach (var c in Controls)
-            {
-                Rect btnRect = new Rect();
-                btnRect.x = Padding.Left + c.Position.x + c.Margin.Left;
-                btnRect.y = Padding.Top + c.Position.y + c.Margin.Top;
-                btnRect.width = c.Size.Width;
-                btnRect.height = c.Size.Height;
-
-                c.PaintArea = btnRect;
-            }
+            GUI.EndGroup();
+            base.EndPaint();            
         }
     }
 

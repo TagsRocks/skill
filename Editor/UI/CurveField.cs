@@ -9,21 +9,12 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make a field for editing an AnimationCurve.
     /// </summary>
-    public class CurveField : Control
+    public class CurveField : EditorControl
     {
         /// <summary>
         /// Optional label to display in front of the field.
         /// </summary>
         public GUIContent Label { get; private set; }
-
-        /// <summary>
-        /// Occurs when Curve of CurveField changed
-        /// </summary>
-        public event EventHandler CurveChanged;
-        protected virtual void OnCurveChanged()
-        {
-            if (CurveChanged != null) CurveChanged(this, EventArgs.Empty);
-        }
 
         private AnimationCurve _Curve;
         /// <summary>
@@ -32,14 +23,6 @@ namespace Skill.Editor.UI
         public AnimationCurve Curve
         {
             get { return _Curve; }
-            set
-            {
-                if (_Curve != value)
-                {
-                    _Curve = value;
-                    OnCurveChanged();
-                }
-            }
         }
 
         /// <summary>
@@ -60,17 +43,31 @@ namespace Skill.Editor.UI
         /// Create a CurveField
         /// </summary>
         public CurveField()
+            : this(new AnimationCurve())
         {
+        }
+
+        /// <summary>
+        /// Create a CurveField
+        /// </summary>
+        /// <param name="curve">AnimationCurve to edit</param>
+        public CurveField(AnimationCurve curve)
+        {
+            _Curve = curve;
+            if (_Curve == null)
+                throw new ArgumentNullException("Invalid AnimationCurve");
             Label = new GUIContent();
+            this.Height = 32;
+
         }
 
         protected override void Paint()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (UseColor)
-                Curve = EditorGUI.CurveField(PaintArea, Label, _Curve, Color, Ranges);
+                _Curve = EditorGUI.CurveField(PaintArea, Label, _Curve, Color, Ranges);
             else
-                Curve = EditorGUI.CurveField(PaintArea, Label, _Curve);
+                _Curve = EditorGUI.CurveField(PaintArea, Label, _Curve);
         }
     }
 }

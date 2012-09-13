@@ -7,8 +7,8 @@ namespace Skill.UI
     /// <summary>
     /// Make a scrolling view inside your GUI.
     /// </summary>
-    public class ScrollView : Panel
-    {        
+    public class ScrollView : Canvas
+    {
         /// <summary>
         /// Optional GUIStyle to use for the horizontal scrollbar. If left out, the horizontalScrollbar style from the current GUISkin is used.
         /// </summary>
@@ -110,42 +110,13 @@ namespace Skill.UI
 
         }
 
-        private void UpdateViewRect()
+        /// <summary> Begin Paint control's content </summary>
+        protected override void BeginPaint()
         {
-            if (Controls.Count <= 0)
-            {
-                _ViewRect = PaintArea;
-            }
-            else
-            {
-                Rect view = new Rect();
-                view.xMin = view.yMin = 0;
-                view.xMax = view.yMax = 0;
-
-                foreach (var c in Controls)
-                {
-                    Rect cRect = c.PaintArea;
-                    view.xMin = Mathf.Min(cRect.xMin, view.xMin);
-                    view.yMin = Mathf.Min(cRect.yMin, view.yMin);
-
-                    view.xMax = Mathf.Max(cRect.xMax, view.xMax);
-                    view.yMax = Mathf.Max(cRect.yMax, view.yMax);
-                }
-                _ViewRect = view;
-            }
-            float deltaX = 0.0f - _ViewRect.xMin;
-            float deltaY = 0.0f - _ViewRect.yMin;
-
-            _ViewRect.xMin += deltaX;
-            _ViewRect.xMax += deltaX;
-
-            _ViewRect.yMin += deltaY;
-            _ViewRect.yMax += deltaY;
-        }
-
-        protected override void PaintControls()
-        {
-            UpdateViewRect();
+            base.BeginPaint();
+            Size ds = DesiredSize;
+            _ViewRect.width = Mathf.Max(PaintArea.width, ds.Width);
+            _ViewRect.height = Mathf.Max(PaintArea.height, ds.Height);
 
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (HorizontalScrollbarStyle != null && VerticalScrollbarStyle != null)
@@ -156,28 +127,13 @@ namespace Skill.UI
             {
                 ScrollPosition = GUI.BeginScrollView(PaintArea, _ScrollPosition, _ViewRect, AlwayShowHorizontal, AlwayShowVertical);
             }
-
-            base.PaintControls();
-
-            GUI.EndScrollView(HandleScrollWheel);
         }
-
-        /// <summary>
-        /// Ensures that all visual child elements of this element are properly updated for layout.
-        /// </summary>
-        public override void UpdateLayout()
+        /// <summary> End Paint control's content </summary>
+        protected override void EndPaint()
         {
-            foreach (var c in Controls)
-            {
-                Rect btnRect = new Rect();
-                btnRect.x = Padding.Left + c.Position.x + c.Margin.Left;
-                btnRect.y = Padding.Top + c.Position.y + c.Margin.Top;
-                btnRect.width = c.Size.Width;
-                btnRect.height = c.Size.Height;
-
-                c.PaintArea = btnRect;
-            }
-        }        
+            GUI.EndScrollView(HandleScrollWheel);
+            base.EndPaint();
+        }
     }
 
 }

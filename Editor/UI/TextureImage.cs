@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Drawsa texture within a rectangle.
     /// </summary>
-    public class TextureImage : Control
+    public class TextureImage : EditorControl
     {
         /// <summary>
         /// Texture to display.
