@@ -69,7 +69,7 @@ namespace Skill.UI
             this.Items = new ToolbarButtonCollection();
         }
 
-        protected override void Paint()
+        protected override void Paint(PaintParameters paintParams)
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)

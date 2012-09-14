@@ -33,7 +33,7 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
-        protected override void Paint()
+        protected override void Paint(PaintParameters paintParams)
         {
             if (Property != null)
                 EditorGUI.PropertyField(PaintArea, Property, Label, IncludeChildren);

@@ -53,7 +53,7 @@ namespace Skill.UI
             this.MaxLength = 0;
         }
 
-        protected override void Paint()
+        protected override void Paint(PaintParameters paintParams)
         {
             string result;
 

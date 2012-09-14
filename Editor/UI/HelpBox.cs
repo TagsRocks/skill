@@ -28,7 +28,7 @@ namespace Skill.Editor.UI
         }
 
 
-        protected override void Paint()
+        protected override void Paint(PaintParameters paintParams)
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             EditorGUI.HelpBox(PaintArea, Message, Type);

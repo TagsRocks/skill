@@ -55,6 +55,7 @@
     <Compile Include="UI\BoundsField.cs" />
     <Compile Include="UI\ChangeCheck.cs" />
     <Compile Include="UI\ColorField.cs" />
+    <Compile Include="UI\EditorFrame.cs" />
     <Compile Include="UI\IntPopup.cs" />
     <Compile Include="UI\CurveField.cs" />
     <Compile Include="UI\CustomPropertyField.cs" />
@@ -71,6 +72,7 @@
     <Compile Include="UI\IntSlider.cs" />
     <Compile Include="UI\LabelField.cs" />
     <Compile Include="UI\LayerField.cs" />
+    <Compile Include="UI\LayerMaskField.cs" />
     <Compile Include="UI\MaskField.cs" />
     <Compile Include="UI\MinMaxSlider.cs" />
     <Compile Include="UI\ObjectField.cs" />

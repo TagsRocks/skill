@@ -86,7 +86,7 @@ namespace Skill.UI
             this._Value = 50;
         }
 
-        protected override void Paint()
+        protected override void Paint(PaintParameters paintParams)
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null && ThumbStyle != null)

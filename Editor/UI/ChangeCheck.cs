@@ -47,16 +47,16 @@ namespace Skill.Editor.UI
         }
 
         /// <summary> Begin Paint control's content </summary>
-        protected override void BeginPaint()
+        protected override void BeginPaint(PaintParameters paintParams)
         {
-            base.BeginPaint();
+            base.BeginPaint(paintParams);
             EditorGUI.BeginChangeCheck();
         }
         /// <summary> End Paint control's content </summary>
-        protected override void EndPaint()
+        protected override void EndPaint(PaintParameters paintParams)
         {
             IsChanged = EditorGUI.EndChangeCheck();
-            base.EndPaint();            
+            base.EndPaint( paintParams);            
         }
     }
 }

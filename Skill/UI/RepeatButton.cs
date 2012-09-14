@@ -54,7 +54,7 @@ namespace Skill.UI
             Content = new GUIContent();
         }
 
-        protected override void Paint()
+        protected override void Paint(PaintParameters paintParams)
         {
             bool result;
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

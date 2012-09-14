@@ -111,9 +111,10 @@ namespace Skill.UI
         }
 
         /// <summary> Begin Paint control's content </summary>
-        protected override void BeginPaint()
+        protected override void BeginPaint(PaintParameters paintParams)
         {
-            base.BeginPaint();
+            base.BeginPaint(paintParams);
+            _ViewRect = PaintArea;
             Size ds = DesiredSize;
             _ViewRect.width = Mathf.Max(PaintArea.width, ds.Width);
             _ViewRect.height = Mathf.Max(PaintArea.height, ds.Height);
@@ -129,10 +130,10 @@ namespace Skill.UI
             }
         }
         /// <summary> End Paint control's content </summary>
-        protected override void EndPaint()
+        protected override void EndPaint(PaintParameters paintParams)
         {
             GUI.EndScrollView(HandleScrollWheel);
-            base.EndPaint();
+            base.EndPaint(paintParams);
         }
     }
 

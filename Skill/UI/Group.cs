@@ -30,9 +30,9 @@ namespace Skill.UI
         }        
 
         /// <summary> Begin paint contents </summary>
-        protected override void BeginPaint()
+        protected override void BeginPaint(PaintParameters paintParams)
         {
-            base.BeginPaint();
+            base.BeginPaint(paintParams);
             if (Style != null)
             {
                 GUI.BeginGroup(PaintArea, Content, Style);
@@ -44,10 +44,10 @@ namespace Skill.UI
         }
 
         /// <summary> End paint contents </summary>
-        protected override void EndPaint()
+        protected override void EndPaint(PaintParameters paintParams)
         {
             GUI.EndGroup();
-            base.EndPaint();            
+            base.EndPaint(paintParams);            
         }
     }
 

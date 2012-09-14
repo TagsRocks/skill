@@ -47,7 +47,7 @@ namespace Skill.Editor.UI
             this.ImageAspect = 0;
         }
 
-        protected override void Paint()
+        protected override void Paint(PaintParameters paintParams)
         {
             if (Texture != null)
             {

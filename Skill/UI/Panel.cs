@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Skill.UI
 {
-    
+
     /// <summary>
     /// Provides a base class for all Panel elements. Use Panel elements to position and arrange child objects
     /// </summary>
@@ -15,7 +15,7 @@ namespace Skill.UI
 
         /// <summary>  Type of Control : Panel </summary>
         public override ControlType ControlType { get { return ControlType.Panel; } }
-        
+
         /// <summary>
         /// Gets or sets the padding inside a control.
         /// </summary>
@@ -25,7 +25,7 @@ namespace Skill.UI
         /// The default is a thickness of 0 on all four sides.
         /// </returns>
         public Thickness Padding { get; set; }
-                
+
         /// <summary>
         /// Gets a BaseControlCollection of child elements of this Panel.
         /// </summary>
@@ -77,20 +77,20 @@ namespace Skill.UI
         {
             RequestUpdateLayout();
             base.OnPaintAreaChanged();
-        } 
+        }
         #endregion
 
         protected override void OnLayoutChanged()
         {
             _NeedUpdateLayout = true;
             base.OnLayoutChanged();
-            
+
         }
 
 
-        protected override void BeginPaint()
+        protected override void BeginPaint(PaintParameters paintParams)
         {
-            base.BeginPaint();
+            base.BeginPaint(paintParams);
             if (_NeedUpdateLayout)
             {
                 UpdateLayout();
@@ -100,44 +100,35 @@ namespace Skill.UI
         }
 
         private void CalcDesiredSize()
-        {            
-            Rect view = new Rect();
-            view.xMin = view.yMin = 0;
-            view.xMax = view.yMax = 0;
+        {
+            Rect pa = PaintArea;
+            Vector2 min = new Vector2(pa.xMin, pa.yMin);
+            Vector2 max = new Vector2(pa.xMax, pa.yMax);
 
             foreach (var c in Controls)
             {
                 Rect cPaintArea = c.PaintArea;
-                
-                view.xMin = Mathf.Min(cPaintArea.xMin, view.xMin);
-                view.yMin = Mathf.Min(cPaintArea.yMin, view.yMin);
+                Thickness cMargin = c.Margin;
 
-                view.xMax = Mathf.Max(cPaintArea.xMax, view.xMax);
-                view.yMax = Mathf.Max(cPaintArea.yMax, view.yMax);
-                
+                min.x = Mathf.Min(cPaintArea.xMin - cMargin.Left, min.x);
+                min.y = Mathf.Min(cPaintArea.yMin - cMargin.Top, min.y);
+
+                max.x = Mathf.Max(cPaintArea.xMax + cMargin.Right, max.x);
+                max.y = Mathf.Max(cPaintArea.yMax + cMargin.Bottom, max.y);
+
             }
-
-            float deltaX = 0.0f - view.xMin;
-            float deltaY = 0.0f - view.yMin;
-
-            view.xMin += deltaX;
-            view.xMax += deltaX;
-
-            view.yMin += deltaY;
-            view.yMax += deltaY;
-
-            _DesiredSize = new Size(view.width, view.height);
+            _DesiredSize = new Size(max.x - min.x, max.y - min.y);
         }
 
-        protected override void Paint()
+        protected override void Paint(PaintParameters paintParams)
         {
             foreach (var c in Controls)
             {
-                c.OnGUI();
+                c.OnGUI(paintParams);
             }
-        }        
+        }
 
-        
+
 
         /// <summary>
         /// Ensures that all visual child elements of this element are properly updated for layout.
@@ -149,7 +140,7 @@ namespace Skill.UI
         /// The layout system will perform element layout in a deferred manner, using an algorithm that balances performance and currency, and with a weighting strategy to defer changes to roots until all child elements are valid.
         /// You should only call UpdateLayout if you absolutely need updated sizes and positions, and only after you are certain that all changes to properties that you control and that may affect layout are completed.
         /// </remarks>
-        public abstract void UpdateLayout();        
+        public abstract void UpdateLayout();
 
 
         /// <summary>
@@ -264,6 +255,6 @@ namespace Skill.UI
 
 
             c.PaintArea = paintArea;
-        }                       
+        }
     }
 }

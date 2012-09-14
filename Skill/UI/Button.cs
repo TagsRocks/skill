@@ -37,7 +37,7 @@ namespace Skill.UI
         /// <summary>
         /// Paint button
         /// </summary>
-        protected override void Paint()
+        protected override void Paint(PaintParameters paintParams)
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)

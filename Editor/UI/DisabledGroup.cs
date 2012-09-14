@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEditor;
+using Skill.UI;
 
 namespace Skill.Editor.UI
 {
@@ -30,16 +31,16 @@ namespace Skill.Editor.UI
         }
 
         /// <summary> Begin Paint control's content </summary>
-        protected override void BeginPaint()
+        protected override void BeginPaint(PaintParameters paintParams)
         {
-            base.BeginPaint();
+            base.BeginPaint(paintParams);
             EditorGUI.BeginDisabledGroup(Disabled);
         }
         /// <summary> End Paint control's content </summary>
-        protected override void EndPaint()
+        protected override void EndPaint(PaintParameters paintParams)
         {
             EditorGUI.EndDisabledGroup();
-            base.EndPaint();
+            base.EndPaint(paintParams);
         }        
     }
 }

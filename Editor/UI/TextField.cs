@@ -57,7 +57,7 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
-        protected override void Paint()
+        protected override void Paint(PaintParameters paintParams)
         {
             string result;
 

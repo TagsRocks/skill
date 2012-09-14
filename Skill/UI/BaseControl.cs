@@ -411,11 +411,11 @@ namespace Skill.UI
         /// <summary> Specify type of Control  </summary>
         public abstract ControlType ControlType { get; }
         /// <summary> Paint control's content </summary>
-        protected abstract void Paint();
+        protected abstract void Paint(PaintParameters paintParams);
         /// <summary> Begin Paint control's content </summary>
-        protected virtual void BeginPaint() { }
+        protected virtual void BeginPaint(PaintParameters paintParams) { }
         /// <summary> End Paint control's content </summary>
-        protected virtual void EndPaint() { }
+        protected virtual void EndPaint(PaintParameters paintParams) { }
 
         #endregion
 
@@ -423,13 +423,13 @@ namespace Skill.UI
         /// <summary>
         /// to paint control you have to call this method in OnGUI method of MonoBehavior.(call this for Frame class)
         /// </summary>
-        public void OnGUI()
+        public void OnGUI(PaintParameters paintParams)
         {
             if (Visibility == UI.Visibility.Visible)
             {
-                BeginPaint();
-                Paint();
-                EndPaint();
+                BeginPaint(paintParams);
+                Paint(paintParams);
+                EndPaint(paintParams);
             }
         }
 
@@ -445,6 +445,29 @@ namespace Skill.UI
         {
             if (Parent != null && Parent.ControlType == UI.ControlType.Panel)
                 ((Panel)Parent).Controls.BringToBack(this);
+        }
+
+        /// <summary>
+        /// Returns true if the x and y components of mousePosition is inside PaintArea.
+        /// </summary>
+        /// <param name="mousePosition">Mouse position</param>
+        /// <param name="screenOffset">ScreenOffset (specified by PaintParams)</param>
+        /// <returns>true if the x and y components of mousePosition is inside PaintArea, otherwise false</returns>
+        public bool Containes(Vector2 mousePosition , Vector2 screenOffset)
+        {
+            mousePosition.x -= screenOffset.x;
+            mousePosition.y -= screenOffset.y;
+            return _PaintArea.Contains(mousePosition);
+        }
+
+        /// <summary>
+        /// Returns true if the x and y components of point is inside PaintArea.
+        /// </summary>
+        /// <param name="point">Mouse position</param>        
+        /// <returns>true if the x and y components of point is inside PaintArea, otherwise false</returns>
+        public bool Containes(Vector2 point)
+        {
+            return _PaintArea.Contains(point);
         }
         #endregion
     }

@@ -83,7 +83,7 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
-        protected override void Paint()
+        protected override void Paint(PaintParameters paintParams)
         {
             Value = EditorGUI.Slider(PaintArea, Label, _Value, _MinValue, _MaxValue);
         }        

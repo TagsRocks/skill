@@ -30,7 +30,7 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
-        protected override void Paint()
+        protected override void Paint(PaintParameters paintParams)
         {
             throw new NotImplementedException("CustomPropertyField not implemented");
             // should be implemented

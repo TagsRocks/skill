@@ -29,7 +29,7 @@ namespace Skill.UI
         }
 
         /// <summary> Paint Image </summary>
-        protected override void Paint()
+        protected override void Paint(PaintParameters paintParams)
         {
             if (Texture != null)
             {

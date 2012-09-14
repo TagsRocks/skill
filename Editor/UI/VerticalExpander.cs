@@ -151,12 +151,12 @@ namespace Skill.Editor.UI
         /// <summary>
         /// Paint VerticalExpander contents
         /// </summary>
-        protected override void Paint()
+        protected override void Paint(PaintParameters paintParams)
         {
-            Header.OnGUI();
-            _Foldout.OnGUI();
+            Header.OnGUI(paintParams);
+            _Foldout.OnGUI(paintParams);
             if (IsExpanded)
-                Panel.OnGUI();
+                Panel.OnGUI(paintParams);
         }
     }
 }

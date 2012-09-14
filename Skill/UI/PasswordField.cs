@@ -60,7 +60,7 @@ namespace Skill.UI
             this.MaskChar = '•';
         }
 
-        protected override void Paint()
+        protected override void Paint(PaintParameters paintParams)
         {
             string result;
             if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

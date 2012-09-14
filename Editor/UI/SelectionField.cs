@@ -131,7 +131,7 @@ namespace Skill.Editor.UI
             this._Background = new Box() { RowSpan = 2, ColumnSpan = 3 };
             this._Popup = new Popup() { Position = new Rect(0, 0, 16, 16), Column = 2, Row = 0, VerticalAlignment = Skill.UI.VerticalAlignment.Center, HorizontalAlignment = Skill.UI.HorizontalAlignment.Right, Margin = new Thickness(2) };
             this._Label = new Label() { Position = new Rect(0, 0, 100, 16), Column = 0, Row = 0, VerticalAlignment = Skill.UI.VerticalAlignment.Center, HorizontalAlignment = Skill.UI.HorizontalAlignment.Left, Margin = new Thickness(2) };
-            this._Panel = new Grid();
+            this._Panel = new Grid() { Parent = this};
 
             this._Panel.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Auto) });
             this._Panel.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
@@ -211,9 +211,9 @@ namespace Skill.Editor.UI
         /// <summary>
         /// Paint contents
         /// </summary>
-        protected override void Paint()
+        protected override void Paint(PaintParameters paintParams)
         {
-            this._Panel.OnGUI();
+            this._Panel.OnGUI(paintParams);
         }
 
 
