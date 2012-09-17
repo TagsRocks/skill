@@ -53,7 +53,7 @@ namespace Skill.UI
             this.MaxLength = 0;
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             string result;
 
@@ -62,16 +62,16 @@ namespace Skill.UI
             if (Style != null)
             {
                 if (MaxLength > 0)
-                    result = GUI.TextField(PaintArea, _Text, MaxLength, Style);
+                    result = GUI.TextField(RenderArea, _Text, MaxLength, Style);
                 else
-                    result = GUI.TextField(PaintArea, _Text, Style);
+                    result = GUI.TextField(RenderArea, _Text, Style);
             }
             else
             {
                 if (MaxLength > 0)
-                    result = GUI.TextField(PaintArea, _Text, MaxLength);
+                    result = GUI.TextField(RenderArea, _Text, MaxLength);
                 else
-                    result = GUI.TextField(PaintArea, _Text);
+                    result = GUI.TextField(RenderArea, _Text);
             }
 
             Text = result;

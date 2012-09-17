@@ -62,16 +62,16 @@ namespace Skill.UI
             Content = new GUIContent();
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)
             {
-                IsChecked = GUI.Toggle(PaintArea, _IsChecked, Content, Style);
+                IsChecked = GUI.Toggle(RenderArea, _IsChecked, Content, Style);
             }
             else
             {
-                IsChecked = GUI.Toggle(PaintArea, _IsChecked, Content);
+                IsChecked = GUI.Toggle(RenderArea, _IsChecked, Content);
             }
         }        
     }

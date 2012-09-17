@@ -56,16 +56,16 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)
             {
-                FoldoutState = EditorGUI.Foldout(PaintArea, _FoldoutState, Content, ToggleOnLabelClick, Style);
+                FoldoutState = EditorGUI.Foldout(RenderArea, _FoldoutState, Content, ToggleOnLabelClick, Style);
             }
             else
             {
-                FoldoutState = EditorGUI.Foldout(PaintArea, _FoldoutState, Content, ToggleOnLabelClick);
+                FoldoutState = EditorGUI.Foldout(RenderArea, _FoldoutState, Content, ToggleOnLabelClick);
             }
         }
     }

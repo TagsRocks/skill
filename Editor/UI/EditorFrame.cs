@@ -55,11 +55,9 @@ namespace Skill.Editor.UI
             this.Owner = owner;
         }
 
-        protected override void BeginPaint(PaintParameters paintParams)
+        protected override void BeginRender()
         {
-            Rect position = Owner.position;
-            paintParams.ScreenOffset += new Vector2(position.x, position.y);
-
+            Rect position = Owner.position;            
             switch (Location)
             {
                 case EditorFrameLocation.Fill:
@@ -74,7 +72,7 @@ namespace Skill.Editor.UI
                     break;
             }
             this.Position = position;
-            base.BeginPaint(paintParams);
+            base.BeginRender();
         }
     }
 }

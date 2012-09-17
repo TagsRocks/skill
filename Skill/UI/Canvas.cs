@@ -14,7 +14,7 @@ namespace Skill.UI
         /// </summary>
         public override void UpdateLayout()
         {            
-            Rect rect = PaintAreaWithPadding;
+            Rect rect = RenderAreaShrinksByPadding;
             if (rect.xMax < rect.xMin) rect.xMax = rect.xMin;
             if (rect.yMax < rect.yMin) rect.yMax = rect.yMin;            
 
@@ -27,7 +27,7 @@ namespace Skill.UI
                 cRect.width = c.LayoutWidth;
                 cRect.height = c.LayoutHeight;                
 
-                c.PaintArea = cRect;
+                c.RenderArea = cRect;
             }            
         }        
 

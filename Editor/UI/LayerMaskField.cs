@@ -33,7 +33,7 @@ namespace Skill.Editor.UI
                 string layerName = LayerMask.LayerToName(i);
                 if (!string.IsNullOrEmpty(layerName))
                 {
-                    LayersInfo.Add(new LayerInfo() { LayerName = layerName, BitShift = i + 1 });
+                    LayersInfo.Add(new LayerInfo() { LayerName = layerName, BitShift = i });
                 }
             }
             return LayersInfo.ToArray();
@@ -81,9 +81,9 @@ namespace Skill.Editor.UI
 
 
         /// <summary>
-        /// Paint LayerMaskField's content
+        /// Render LayerMaskField's content
         /// </summary>
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             // get information about all available layers
             LayerInfo[] layers = GetLayersInfo();
@@ -100,22 +100,22 @@ namespace Skill.Editor.UI
                 // convert to a sequential format
                 int mask = 1 << layers[i].BitShift;
                 if ((_Layers & mask) != 0)
-                    sequentialLayerMask |= 1 << (i + 1);
+                    sequentialLayerMask |= 1 << i;
             }
 
             if (Style != null)
             {
-                sequentialLayerMask = EditorGUI.MaskField(PaintArea, Label, sequentialLayerMask, layerNames, Style);
+                sequentialLayerMask = EditorGUI.MaskField(RenderArea, Label, sequentialLayerMask, layerNames, Style);
             }
             else
             {
-                sequentialLayerMask = EditorGUI.MaskField(PaintArea, Label, sequentialLayerMask, layerNames);
+                sequentialLayerMask = EditorGUI.MaskField(RenderArea, Label, sequentialLayerMask, layerNames);
             }
             // convert back from sequential format to standard format
             int result = 0;
             for (int i = 0; i < layers.Length; i++)
             {
-                int mask = 1 << (i + 1);
+                int mask = 1 << i;
                 if ((sequentialLayerMask & mask) != 0)
                     result |= 1 << layers[i].BitShift;
             }

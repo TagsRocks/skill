@@ -114,12 +114,12 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             float minV = _MinValue;
             float maxV = _MaxValue;
 
-            EditorGUI.MinMaxSlider(Label, PaintArea, ref minV, ref maxV, _MinLimit, _MaxLimit);
+            EditorGUI.MinMaxSlider(Label, RenderArea, ref minV, ref maxV, _MinLimit, _MaxLimit);
             bool change = minV != _MinValue || maxV != _MaxValue;
             _MinValue = minV;
             _MaxValue = maxV;

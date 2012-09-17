@@ -48,15 +48,15 @@ namespace Skill.UI
             this.ImageAspect = 0;
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             if (Texture != null)
             {
                 //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
                 if (UseTextureCoordinate)
-                    GUI.DrawTextureWithTexCoords(PaintArea, Texture, TextureCoordinate, AlphaBlend);
+                    GUI.DrawTextureWithTexCoords(RenderArea, Texture, TextureCoordinate, AlphaBlend);
                 else
-                    GUI.DrawTexture(PaintArea, Texture, Scale, AlphaBlend, ImageAspect);
+                    GUI.DrawTexture(RenderArea, Texture, Scale, AlphaBlend, ImageAspect);
             }
         }
 

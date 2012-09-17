@@ -31,13 +31,13 @@ namespace Skill.UI
         /// </summary>
         public override void UpdateLayout()
         {
-            Rect paintArea = PaintAreaWithPadding;
+            Rect renderArea = RenderAreaShrinksByPadding;
 
             int rows = Mathf.Max(Rows, 1);
             int columns = Mathf.Max(Columns, 1);
 
-            float cellWidth = paintArea.width / columns;
-            float cellHeight = paintArea.height / rows;
+            float cellWidth = renderArea.width / columns;
+            float cellHeight = renderArea.height / rows;
 
             Rect[,] cells = new Rect[rows, columns];
 
@@ -47,8 +47,8 @@ namespace Skill.UI
                 {
                     Rect rect = new Rect();
 
-                    rect.x = paintArea.x + j * cellWidth;
-                    rect.y = paintArea.y + i * cellHeight;
+                    rect.x = renderArea.x + j * cellWidth;
+                    rect.y = renderArea.y + i * cellHeight;
                     rect.width = cellWidth;
                     rect.height = cellHeight;
 
@@ -73,7 +73,7 @@ namespace Skill.UI
                     cellRect.xMax = cells[row, columnspan].xMax;
                 }
 
-                SetControlPaintArea(c, cellRect);
+                SetControlRenderArea(c, cellRect);
             }
         }
     }

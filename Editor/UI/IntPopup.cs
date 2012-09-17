@@ -98,16 +98,16 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)
             {
-                SelectedValue = EditorGUI.IntPopup(PaintArea, Label, _SelectedValue, Options.Contents, Options.Values, Style);
+                SelectedValue = EditorGUI.IntPopup(RenderArea, Label, _SelectedValue, Options.Contents, Options.Values, Style);
             }
             else
             {
-                SelectedValue = EditorGUI.IntPopup(PaintArea, Label, _SelectedValue, Options.Contents, Options.Values);
+                SelectedValue = EditorGUI.IntPopup(RenderArea, Label, _SelectedValue, Options.Contents, Options.Values);
             }
         }
     }

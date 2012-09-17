@@ -65,16 +65,16 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)
             {
-                IsChecked = EditorGUI.Toggle(PaintArea, Label, IsChecked, Style);
+                IsChecked = EditorGUI.Toggle(RenderArea, Label, IsChecked, Style);
             }
             else
             {
-                IsChecked = EditorGUI.Toggle(PaintArea, Label, IsChecked);
+                IsChecked = EditorGUI.Toggle(RenderArea, Label, IsChecked);
             }
         }
         

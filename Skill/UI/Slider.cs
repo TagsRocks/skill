@@ -86,22 +86,22 @@ namespace Skill.UI
             this._Value = 50;
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null && ThumbStyle != null)
             {
                 if (Orientation == Orientation.Horizontal)
-                    Value = GUI.HorizontalSlider(PaintArea, _Value, _MinValue, _MaxValue, Style, ThumbStyle);
+                    Value = GUI.HorizontalSlider(RenderArea, _Value, _MinValue, _MaxValue, Style, ThumbStyle);
                 else
-                    Value = GUI.VerticalSlider(PaintArea, _Value, _MinValue, _MaxValue, Style, ThumbStyle);
+                    Value = GUI.VerticalSlider(RenderArea, _Value, _MinValue, _MaxValue, Style, ThumbStyle);
             }
             else
             {
                 if (Orientation == Orientation.Horizontal)
-                    Value = GUI.HorizontalSlider(PaintArea, _Value, _MinValue, _MaxValue);
+                    Value = GUI.HorizontalSlider(RenderArea, _Value, _MinValue, _MaxValue);
                 else
-                    Value = GUI.VerticalSlider(PaintArea, _Value, _MinValue, _MaxValue);
+                    Value = GUI.VerticalSlider(RenderArea, _Value, _MinValue, _MaxValue);
             }
         }        
     }

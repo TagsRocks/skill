@@ -57,7 +57,7 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             string result;
 
@@ -65,11 +65,11 @@ namespace Skill.Editor.UI
 
             if (Style != null)
             {
-                result = EditorGUI.TextField(PaintArea, Label, Text, Style);
+                result = EditorGUI.TextField(RenderArea, Label, Text, Style);
             }
             else
             {
-                result = EditorGUI.TextField(PaintArea, Label, Text);
+                result = EditorGUI.TextField(RenderArea, Label, Text);
             }
 
             Text = result;

@@ -29,21 +29,18 @@ namespace Skill.UI
                 }
             }
         }
-
-        public PaintParameters PaintParams { get; private set; } 
-
+       
         /// <summary>
         /// Initializes a new instance of the Frame class.
         /// </summary>
         public Frame()
-        {
-            PaintParams = new PaintParameters();
+        {            
         }
+        
 
-
-        protected override void EndPaint(PaintParameters paintParams)
+        protected override void EndRender()
         {
-            base.EndPaint(paintParams);
+            base.EndRender();
             string focusedControlName = GUI.GetNameOfFocusedControl();
             if (!string.IsNullOrEmpty(focusedControlName))
             {
@@ -61,9 +58,9 @@ namespace Skill.UI
         /// </summary>
         public override void UpdateLayout()
         {
-            base.PaintArea = Position;
-            Rect space = PaintArea;
-            Rect rect = PaintAreaWithPadding;
+            base.RenderArea = Position;
+            Rect space = RenderArea;
+            Rect rect = RenderAreaShrinksByPadding;
 
             if (rect.xMax < rect.xMin) rect.xMax = rect.xMin;
             if (rect.yMax < rect.yMin) rect.yMax = rect.yMin;
@@ -77,16 +74,8 @@ namespace Skill.UI
                 cRect.width = c.LayoutWidth;
                 cRect.height = c.LayoutHeight;
                 
-                c.PaintArea = cRect;
+                c.RenderArea = cRect;
             }            
-        }
-
-        /// <summary>
-        /// to paint control you have to call this method in OnGUI method of MonoBehavior.(call this for Frame class)
-        /// </summary>
-        public void OnGUI()
-        {
-            base.OnGUI(PaintParams);
-        }
+        }        
     }
 }

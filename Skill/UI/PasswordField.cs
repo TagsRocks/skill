@@ -60,23 +60,23 @@ namespace Skill.UI
             this.MaskChar = '•';
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             string result;
             if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)
             {
                 if (MaxLength > 0)
-                    result = GUI.PasswordField(PaintArea, _Password, MaskChar, MaxLength, Style);
+                    result = GUI.PasswordField(RenderArea, _Password, MaskChar, MaxLength, Style);
                 else
-                    result = GUI.PasswordField(PaintArea, _Password, MaskChar, Style);
+                    result = GUI.PasswordField(RenderArea, _Password, MaskChar, Style);
             }
             else
             {
                 if (MaxLength > 0)
-                    result = GUI.PasswordField(PaintArea, _Password, MaskChar, MaxLength);
+                    result = GUI.PasswordField(RenderArea, _Password, MaskChar, MaxLength);
                 else
-                    result = GUI.PasswordField(PaintArea, _Password, MaskChar);
+                    result = GUI.PasswordField(RenderArea, _Password, MaskChar);
             }
 
             Password = result;

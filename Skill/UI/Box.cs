@@ -22,17 +22,17 @@ namespace Skill.UI
             Content = new GUIContent();
         }
 
-        /// <summary> Paint box content </summary>
-        protected override void Paint(PaintParameters paintParams)
+        /// <summary> Render box content </summary>
+        protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)
             {
-                GUI.Box(PaintArea, Content, Style);
+                GUI.Box(RenderArea, Content, Style);
             }
             else
             {
-                GUI.Box(PaintArea, Content);
+                GUI.Box(RenderArea, Content);
             }
         }        
 

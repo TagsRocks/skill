@@ -11,7 +11,7 @@ namespace Skill.UI
     public abstract class Panel : BaseControl
     {
         // Variables
-        private bool _NeedUpdateLayout; // true when panel needs update layout at next paint
+        private bool _NeedUpdateLayout; // true when panel needs update layout at next render
 
         /// <summary>  Type of Control : Panel </summary>
         public override ControlType ControlType { get { return ControlType.Panel; } }
@@ -36,13 +36,13 @@ namespace Skill.UI
         public Size DesiredSize { get { return _DesiredSize; } }
 
         /// <summary>
-        /// Gets PaintArea that shrinks by Padding.
+        /// Gets RenderArea that shrinks by Padding.
         /// </summary>
-        protected Rect PaintAreaWithPadding
+        protected Rect RenderAreaShrinksByPadding
         {
             get
             {
-                Rect rect = PaintArea;
+                Rect rect = RenderArea;
                 rect.x += Padding.Left;
                 rect.y += Padding.Top;
                 rect.width -= Padding.Horizontal;
@@ -67,30 +67,29 @@ namespace Skill.UI
             this.Controls.LayoutChange += new System.EventHandler(Controls_LayoutChange);
         }
 
-
         void Controls_LayoutChange(object sender, System.EventArgs e)
         {
-            this._NeedUpdateLayout = true;
+            OnLayoutChanged();
         }
 
-        protected override void OnPaintAreaChanged()
+        protected override void OnRenderAreaChanged()
         {
-            RequestUpdateLayout();
-            base.OnPaintAreaChanged();
+            this.RequestUpdateLayout();
+            base.OnRenderAreaChanged();
         }
         #endregion
 
         protected override void OnLayoutChanged()
         {
-            _NeedUpdateLayout = true;
+            this.RequestUpdateLayout();
             base.OnLayoutChanged();
 
         }
 
 
-        protected override void BeginPaint(PaintParameters paintParams)
+        protected override void BeginRender()
         {
-            base.BeginPaint(paintParams);
+            base.BeginRender();
             if (_NeedUpdateLayout)
             {
                 UpdateLayout();
@@ -101,30 +100,30 @@ namespace Skill.UI
 
         private void CalcDesiredSize()
         {
-            Rect pa = PaintArea;
-            Vector2 min = new Vector2(pa.xMin, pa.yMin);
-            Vector2 max = new Vector2(pa.xMax, pa.yMax);
+            Rect ra = RenderArea;
+            Vector2 min = new Vector2(ra.xMin, ra.yMin);
+            Vector2 max = new Vector2(ra.xMax, ra.yMax);
 
             foreach (var c in Controls)
             {
-                Rect cPaintArea = c.PaintArea;
+                Rect cRenderArea = c.RenderArea;
                 Thickness cMargin = c.Margin;
 
-                min.x = Mathf.Min(cPaintArea.xMin - cMargin.Left, min.x);
-                min.y = Mathf.Min(cPaintArea.yMin - cMargin.Top, min.y);
+                min.x = Mathf.Min(cRenderArea.xMin - cMargin.Left, min.x);
+                min.y = Mathf.Min(cRenderArea.yMin - cMargin.Top, min.y);
 
-                max.x = Mathf.Max(cPaintArea.xMax + cMargin.Right, max.x);
-                max.y = Mathf.Max(cPaintArea.yMax + cMargin.Bottom, max.y);
+                max.x = Mathf.Max(cRenderArea.xMax + cMargin.Right, max.x);
+                max.y = Mathf.Max(cRenderArea.yMax + cMargin.Bottom, max.y);
 
             }
-            _DesiredSize = new Size(max.x - min.x, max.y - min.y);
+            _DesiredSize = new Size(Mathf.Max(max.x - min.x, 0), Mathf.Max(max.y - min.y, 0));
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             foreach (var c in Controls)
             {
-                c.OnGUI(paintParams);
+                c.OnGUI();
             }
         }
 
@@ -199,62 +198,62 @@ namespace Skill.UI
 
 
         /// <summary>
-        /// calculate PaintArea of Control based on given available Rect
+        /// calculate RenderArea of Control based on given available Rect
         /// </summary>
-        /// <param name="c">Control to calc it's PaintArea</param>
+        /// <param name="c">Control to calc it's RenderArea</param>
         /// <param name="cellRect">Available space</param>
-        protected void SetControlPaintArea(BaseControl c, Rect cellRect)
+        protected void SetControlRenderArea(BaseControl c, Rect cellRect)
         {
-            Rect paintArea = cellRect;
+            Rect renderArea = cellRect;
 
             // check for VerticalAlignment
-            paintArea.height = Mathf.Min(c.LayoutHeight, cellRect.height);
+            renderArea.height = Mathf.Min(c.LayoutHeight, cellRect.height);
             switch (c.VerticalAlignment)
             {
                 case VerticalAlignment.Top: // only Margin.Top is important
-                    paintArea.y = Mathf.Min(cellRect.y + c.Margin.Top, cellRect.yMax - paintArea.height);
+                    renderArea.y = Mathf.Min(cellRect.y + c.Margin.Top, cellRect.yMax - renderArea.height);
                     break;
                 case VerticalAlignment.Center: // none of Margin.Top and Margin.Bottom is important
-                    paintArea.y = cellRect.y + (cellRect.height - paintArea.height) / 2;
+                    renderArea.y = cellRect.y + (cellRect.height - renderArea.height) / 2;
                     break;
                 case VerticalAlignment.Bottom: // only Margin.Bottom is important
-                    paintArea.y = Mathf.Max(cellRect.y, cellRect.yMax - paintArea.height - c.Margin.Bottom);
+                    renderArea.y = Mathf.Max(cellRect.y, cellRect.yMax - renderArea.height - c.Margin.Bottom);
                     break;
                 case VerticalAlignment.Stretch: // both Margin.Top and Margin.Bottom is important
-                    paintArea.height = cellRect.height - c.Margin.Vertical;
-                    paintArea.y += c.Margin.Top;
+                    renderArea.height = cellRect.height - c.Margin.Vertical;
+                    renderArea.y += c.Margin.Top;
                     break;
             }
 
-            if (paintArea.yMax > cellRect.yMax)
-                paintArea.y = cellRect.yMax - paintArea.height;
+            if (renderArea.yMax > cellRect.yMax)
+                renderArea.y = cellRect.yMax - renderArea.height;
 
 
 
             // check for HorizontalAlignment
-            paintArea.width = Mathf.Min(c.LayoutWidth, cellRect.width);
+            renderArea.width = Mathf.Min(c.LayoutWidth, cellRect.width);
             switch (c.HorizontalAlignment)
             {
                 case HorizontalAlignment.Left: // only Margin.Left is important
-                    paintArea.x = Mathf.Min(cellRect.x + c.Margin.Left, cellRect.xMax - paintArea.width);
+                    renderArea.x = Mathf.Min(cellRect.x + c.Margin.Left, cellRect.xMax - renderArea.width);
                     break;
                 case HorizontalAlignment.Center: // none of Margin.Left and Margin.Right is important
-                    paintArea.x = cellRect.x + (cellRect.width - paintArea.width) / 2;
+                    renderArea.x = cellRect.x + (cellRect.width - renderArea.width) / 2;
                     break;
                 case HorizontalAlignment.Right: // only Margin.Right is important
-                    paintArea.x = Mathf.Max(cellRect.x, cellRect.xMax - paintArea.width - c.Margin.Right);
+                    renderArea.x = Mathf.Max(cellRect.x, cellRect.xMax - renderArea.width - c.Margin.Right);
                     break;
                 case HorizontalAlignment.Stretch: // both Margin.Left and Margin.Right is important
-                    paintArea.width = cellRect.width - c.Margin.Horizontal;
-                    paintArea.x += c.Margin.Left;
+                    renderArea.width = cellRect.width - c.Margin.Horizontal;
+                    renderArea.x += c.Margin.Left;
                     break;
             }
 
-            if (paintArea.xMax > cellRect.xMax)
-                paintArea.x = cellRect.xMax - paintArea.width;
+            if (renderArea.xMax > cellRect.xMax)
+                renderArea.x = cellRect.xMax - renderArea.width;
 
 
-            c.PaintArea = paintArea;
+            c.RenderArea = renderArea;
         }
     }
 }

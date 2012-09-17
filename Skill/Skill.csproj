@@ -127,8 +127,8 @@
     <Compile Include="UI\HorizontalAlignment.cs" />
     <Compile Include="UI\Image.cs" />
     <Compile Include="UI\Label.cs" />
+    <Compile Include="UI\ListBox.cs" />
     <Compile Include="UI\Orientation.cs" />
-    <Compile Include="UI\PaintParameters.cs" />
     <Compile Include="UI\Panel.cs" />
     <Compile Include="UI\PasswordField.cs" />
     <Compile Include="UI\RepeatButton.cs" />

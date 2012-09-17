@@ -37,7 +37,7 @@ namespace Skill.UI
 
         private void UpdateLayoutHorizontal()
         {
-            Rect rect = PaintAreaWithPadding;
+            Rect rect = RenderAreaShrinksByPadding;
             float x = rect.x;
             float y = rect.y, yMax = rect.y;
 
@@ -55,13 +55,13 @@ namespace Skill.UI
 
                 x = cRect.xMax;
                 yMax = Mathf.Max(cRect.yMax, yMax);
-                c.PaintArea = new Rect(cRect.x + c.Margin.Left, cRect.y + c.Margin.Top, c.LayoutWidth, c.LayoutHeight);
+                c.RenderArea = new Rect(cRect.x + c.Margin.Left, cRect.y + c.Margin.Top, c.LayoutWidth, c.LayoutHeight);
             }
         }
 
         private void UpdateLayoutVertical()
         {
-            Rect rect = PaintAreaWithPadding;
+            Rect rect = RenderAreaShrinksByPadding;
             float x = rect.x, xMax = rect.x;
             float y = rect.y;
 
@@ -79,7 +79,7 @@ namespace Skill.UI
 
                 y = cRect.yMax;
                 xMax = Mathf.Max(cRect.xMax, xMax);
-                c.PaintArea = new Rect(cRect.x + c.Margin.Left, cRect.y + c.Margin.Top, c.LayoutWidth, c.LayoutHeight);
+                c.RenderArea = new Rect(cRect.x + c.Margin.Left, cRect.y + c.Margin.Top, c.LayoutWidth, c.LayoutHeight);
             }
         }
     }

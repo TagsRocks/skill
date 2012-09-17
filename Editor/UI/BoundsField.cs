@@ -52,10 +52,10 @@ namespace Skill.Editor.UI
             this.Height = 32;
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
-            Value = EditorGUI.BoundsField(PaintArea, Label, _Value);
+            Value = EditorGUI.BoundsField(RenderArea, Label, _Value);
         }
     }
 }

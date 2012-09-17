@@ -2,12 +2,12 @@ using UnityEngine;
 using System.Collections;
 using System;
 
-namespace Skill.UI
+namespace Skill.Editor.UI
 {
     /// <summary>
     /// Make a single press button. The user clicks them and something happens immediately.
     /// </summary>
-    public class Button : Control
+    public class Button : EditorControl
     {
 
         /// <summary>
@@ -52,6 +52,6 @@ namespace Skill.UI
             }
         }
 
-            }
+    }
 
 }

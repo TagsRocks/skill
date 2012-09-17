@@ -53,23 +53,23 @@ namespace Skill.UI
             this.MaxLength = 0;
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             string result;
             if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)
             {
                 if (MaxLength > 0)
-                    result = GUI.TextArea(PaintArea, _Text, MaxLength, Style);
+                    result = GUI.TextArea(RenderArea, _Text, MaxLength, Style);
                 else
-                    result = GUI.TextArea(PaintArea, _Text, Style);
+                    result = GUI.TextArea(RenderArea, _Text, Style);
             }
             else
             {
                 if (MaxLength > 0)
-                    result = GUI.TextArea(PaintArea, _Text, MaxLength);
+                    result = GUI.TextArea(RenderArea, _Text, MaxLength);
                 else
-                    result = GUI.TextArea(PaintArea, _Text);
+                    result = GUI.TextArea(RenderArea, _Text);
             }
 
             Text = result;

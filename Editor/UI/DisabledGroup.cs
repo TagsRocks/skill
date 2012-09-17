@@ -30,17 +30,17 @@ namespace Skill.Editor.UI
 
         }
 
-        /// <summary> Begin Paint control's content </summary>
-        protected override void BeginPaint(PaintParameters paintParams)
+        /// <summary> Begin Render control's content </summary>
+        protected override void BeginRender()
         {
-            base.BeginPaint(paintParams);
+            base.BeginRender();
             EditorGUI.BeginDisabledGroup(Disabled);
         }
-        /// <summary> End Paint control's content </summary>
-        protected override void EndPaint(PaintParameters paintParams)
+        /// <summary> End Render control's content </summary>
+        protected override void EndRender()
         {
             EditorGUI.EndDisabledGroup();
-            base.EndPaint(paintParams);
+            base.EndRender();
         }        
     }
 }

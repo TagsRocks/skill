@@ -47,15 +47,15 @@ namespace Skill.Editor.UI
             this.ImageAspect = 0;
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             if (Texture != null)
             {
                 //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
                 if (Alpha)
-                    EditorGUI.DrawTextureAlpha(PaintArea, Texture, Scale, ImageAspect);
+                    EditorGUI.DrawTextureAlpha(RenderArea, Texture, Scale, ImageAspect);
                 else
-                    EditorGUI.DrawPreviewTexture(PaintArea, Texture, Material, Scale, ImageAspect);
+                    EditorGUI.DrawPreviewTexture(RenderArea, Texture, Material, Scale, ImageAspect);
             }
         }
 

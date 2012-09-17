@@ -29,25 +29,25 @@ namespace Skill.UI
             Content = new GUIContent();
         }        
 
-        /// <summary> Begin paint contents </summary>
-        protected override void BeginPaint(PaintParameters paintParams)
+        /// <summary> Begin render contents </summary>
+        protected override void BeginRender()
         {
-            base.BeginPaint(paintParams);
+            base.BeginRender();
             if (Style != null)
             {
-                GUI.BeginGroup(PaintArea, Content, Style);
+                GUI.BeginGroup(RenderArea, Content, Style);
             }
             else
             {
-                GUI.BeginGroup(PaintArea, Content);
+                GUI.BeginGroup(RenderArea, Content);
             }
         }
 
-        /// <summary> End paint contents </summary>
-        protected override void EndPaint(PaintParameters paintParams)
+        /// <summary> End render contents </summary>
+        protected override void EndRender()
         {
             GUI.EndGroup();
-            base.EndPaint(paintParams);            
+            base.EndRender();            
         }
     }
 

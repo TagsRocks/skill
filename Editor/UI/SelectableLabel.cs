@@ -25,16 +25,16 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)
             {
-                EditorGUI.SelectableLabel(PaintArea, Text, Style);
+                EditorGUI.SelectableLabel(RenderArea, Text, Style);
             }
             else
             {
-                EditorGUI.SelectableLabel(PaintArea, Text);
+                EditorGUI.SelectableLabel(RenderArea, Text);
             }
         }
     }

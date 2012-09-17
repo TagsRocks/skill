@@ -39,16 +39,16 @@ namespace Skill.UI
 
         private void UpdateLayoutHorizontal()
         {
-            Rect paintArea = base.PaintAreaWithPadding;
+            Rect renderArea = base.RenderAreaShrinksByPadding;
 
             foreach (var c in Controls)
             {
-                Rect cRect = paintArea;
-                float xMax = paintArea.xMax;
+                Rect cRect = renderArea;
+                float xMax = renderArea.xMax;
                 cRect.x += c.Margin.Left;
                 cRect.width = c.LayoutWidth;
-                paintArea.xMin = cRect.xMax + c.Margin.Right;
-                paintArea.xMax = Mathf.Max(xMax, paintArea.xMin);
+                renderArea.xMin = cRect.xMax + c.Margin.Right;
+                renderArea.xMax = Mathf.Max(xMax, renderArea.xMin);
                 cRect.height = c.LayoutHeight;
                 switch (c.VerticalAlignment)
                 {
@@ -56,41 +56,41 @@ namespace Skill.UI
                         cRect.y += c.Margin.Top;
                         break;
                     case VerticalAlignment.Center:
-                        cRect.y = Mathf.Max(paintArea.y, paintArea.y + (paintArea.height - cRect.height) / 2);
-                        if (paintArea.y + c.Margin.Top > cRect.y)
-                            cRect.y = Mathf.Min(paintArea.y + c.Margin.Top, paintArea.yMax - cRect.height);
-                        else if (cRect.yMax > paintArea.yMax - c.Margin.Bottom)
-                            cRect.y = Mathf.Max(paintArea.yMax - cRect.height - c.Margin.Bottom, Mathf.Min(cRect.y, paintArea.yMin + c.Margin.Top));
+                        cRect.y = Mathf.Max(renderArea.y, renderArea.y + (renderArea.height - cRect.height) / 2);
+                        if (renderArea.y + c.Margin.Top > cRect.y)
+                            cRect.y = Mathf.Min(renderArea.y + c.Margin.Top, renderArea.yMax - cRect.height);
+                        else if (cRect.yMax > renderArea.yMax - c.Margin.Bottom)
+                            cRect.y = Mathf.Max(renderArea.yMax - cRect.height - c.Margin.Bottom, Mathf.Min(cRect.y, renderArea.yMin + c.Margin.Top));
                         break;
                     case VerticalAlignment.Bottom:
-                        cRect.y = paintArea.yMax - cRect.height - c.Margin.Bottom;
+                        cRect.y = renderArea.yMax - cRect.height - c.Margin.Bottom;
                         break;
                     case VerticalAlignment.Stretch:
-                        cRect.height = Mathf.Max(paintArea.height - c.Margin.Vertical, c.LayoutHeight);
+                        cRect.height = renderArea.height - c.Margin.Vertical;
                         cRect.y += c.Margin.Top;
-                        if (cRect.yMax > paintArea.yMax)
-                            cRect.y = paintArea.yMax - cRect.height;
+                        if (cRect.yMax > renderArea.yMax)
+                            cRect.y = renderArea.yMax - cRect.height;
                         break;
                 }
-                if (cRect.yMax > paintArea.yMax)
-                    cRect.y = paintArea.yMax - cRect.height;
-                c.PaintArea = cRect;
+                if (cRect.yMax > renderArea.yMax)
+                    cRect.y = renderArea.yMax - cRect.height;
+                c.RenderArea = cRect;
 
             }
         }
 
         private void UpdateLayoutVertical()
         {
-            Rect paintArea = base.PaintArea;
+            Rect renderArea = base.RenderAreaShrinksByPadding;
 
             foreach (var c in Controls)
             {
-                Rect cRect = paintArea;
-                float yMax = paintArea.yMax;
+                Rect cRect = renderArea;
+                float yMax = renderArea.yMax;
                 cRect.y += c.Margin.Top;
                 cRect.height = c.LayoutHeight;
-                paintArea.yMin = cRect.yMax + c.Margin.Bottom;
-                paintArea.yMax = Mathf.Max(yMax, paintArea.yMin);
+                renderArea.yMin = cRect.yMax + c.Margin.Bottom;
+                renderArea.yMax = Mathf.Max(yMax, renderArea.yMin);
                 cRect.width = c.LayoutWidth;
 
                 switch (c.HorizontalAlignment)
@@ -99,23 +99,23 @@ namespace Skill.UI
                         cRect.x += c.Margin.Left;
                         break;
                     case HorizontalAlignment.Center:
-                        cRect.x = Mathf.Max(paintArea.x, paintArea.x + (paintArea.width - cRect.width) / 2);
-                        if (paintArea.x + c.Margin.Left > cRect.x)
-                            cRect.x = Mathf.Min(paintArea.x + c.Margin.Left, paintArea.xMax - cRect.width);
-                        else if (cRect.xMax > paintArea.xMax - c.Margin.Right)
-                            cRect.x = Mathf.Max(paintArea.xMax - cRect.width - c.Margin.Right, Mathf.Min(cRect.x, paintArea.xMin + c.Margin.Left));
+                        cRect.x = Mathf.Max(renderArea.x, renderArea.x + (renderArea.width - cRect.width) / 2);
+                        if (renderArea.x + c.Margin.Left > cRect.x)
+                            cRect.x = Mathf.Min(renderArea.x + c.Margin.Left, renderArea.xMax - cRect.width);
+                        else if (cRect.xMax > renderArea.xMax - c.Margin.Right)
+                            cRect.x = Mathf.Max(renderArea.xMax - cRect.width - c.Margin.Right, Mathf.Min(cRect.x, renderArea.xMin + c.Margin.Left));
                         break;
                     case HorizontalAlignment.Right:
-                        cRect.x = paintArea.xMax - cRect.width - c.Margin.Right;
+                        cRect.x = renderArea.xMax - cRect.width - c.Margin.Right;
                         break;
                     case HorizontalAlignment.Stretch:
-                        cRect.width = Mathf.Max(paintArea.width - c.Margin.Horizontal, c.LayoutWidth);
+                        cRect.width = renderArea.width - c.Margin.Horizontal;
                         cRect.x += c.Margin.Left;
-                        if (cRect.xMax > paintArea.xMax)
-                            cRect.x = paintArea.xMax - cRect.width;
+                        if (cRect.xMax > renderArea.xMax)
+                            cRect.x = renderArea.xMax - cRect.width;
                         break;
                 }
-                c.PaintArea = cRect;
+                c.RenderArea = cRect;
             }
         }       
     }

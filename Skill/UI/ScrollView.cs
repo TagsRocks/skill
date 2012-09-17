@@ -110,30 +110,30 @@ namespace Skill.UI
 
         }
 
-        /// <summary> Begin Paint control's content </summary>
-        protected override void BeginPaint(PaintParameters paintParams)
+        /// <summary> Begin Render control's content </summary>
+        protected override void BeginRender()
         {
-            base.BeginPaint(paintParams);
-            _ViewRect = PaintArea;
+            base.BeginRender();
+            _ViewRect = RenderArea;
             Size ds = DesiredSize;
-            _ViewRect.width = Mathf.Max(PaintArea.width, ds.Width);
-            _ViewRect.height = Mathf.Max(PaintArea.height, ds.Height);
+            _ViewRect.width = Mathf.Max(RenderArea.width, ds.Width);
+            _ViewRect.height = Mathf.Max(RenderArea.height, ds.Height);
 
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (HorizontalScrollbarStyle != null && VerticalScrollbarStyle != null)
             {
-                ScrollPosition = GUI.BeginScrollView(PaintArea, _ScrollPosition, _ViewRect, AlwayShowHorizontal, AlwayShowVertical, HorizontalScrollbarStyle, VerticalScrollbarStyle);
+                ScrollPosition = GUI.BeginScrollView(RenderArea, _ScrollPosition, _ViewRect, AlwayShowHorizontal, AlwayShowVertical, HorizontalScrollbarStyle, VerticalScrollbarStyle);
             }
             else
             {
-                ScrollPosition = GUI.BeginScrollView(PaintArea, _ScrollPosition, _ViewRect, AlwayShowHorizontal, AlwayShowVertical);
+                ScrollPosition = GUI.BeginScrollView(RenderArea, _ScrollPosition, _ViewRect, AlwayShowHorizontal, AlwayShowVertical);
             }
         }
-        /// <summary> End Paint control's content </summary>
-        protected override void EndPaint(PaintParameters paintParams)
+        /// <summary> End Render control's content </summary>
+        protected override void EndRender()
         {
             GUI.EndScrollView(HandleScrollWheel);
-            base.EndPaint(paintParams);
+            base.EndRender();
         }
     }
 

@@ -63,10 +63,10 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
-            EditorGUI.ProgressBar(PaintArea, _Value, _Text);
+            EditorGUI.ProgressBar(RenderArea, _Value, _Text);
         }
 
         /// <summary>

@@ -81,7 +81,7 @@ namespace Skill.UI
                     cellRect.xMax = cells[row, columnspan].xMax;
                 }
 
-                SetControlPaintArea(c, cellRect);
+                SetControlRenderArea(c, cellRect);
             }
         }
 
@@ -89,7 +89,7 @@ namespace Skill.UI
 
         private Rect[] CalcRowsLayout()
         {
-            Rect paintArea = PaintAreaWithPadding;
+            Rect renderArea = RenderAreaShrinksByPadding;
             Rect[] rowRects = new Rect[Mathf.Max(1, RowDefinitions.Count)];
 
             if (RowDefinitions.Count > 0)
@@ -100,7 +100,7 @@ namespace Skill.UI
                 for (int i = 0; i < RowDefinitions.Count; i++)
                 {
                     if (i > 0) rowRects[i].y = rowRects[i - 1].yMax;// estimate y to be after previous row
-                    else rowRects[i].y = paintArea.y;
+                    else rowRects[i].y = renderArea.y;
 
                     RowDefinition rd = RowDefinitions[i];
                     if (rd.Height.IsAbsolute) // no calculation needs
@@ -139,15 +139,15 @@ namespace Skill.UI
                     }
 
                     // do not let row go outside of grid
-                    if (rowRects[i].yMax > paintArea.yMax)
-                        rowRects[i].height = paintArea.yMax - rowRects[i].y;
+                    if (rowRects[i].yMax > renderArea.yMax)
+                        rowRects[i].height = renderArea.yMax - rowRects[i].y;
 
                     absAndAutoH += rowRects[i].height;
                 }
 
                 if (starCount > 0)// if there is any row in star mode
                 {
-                    float availableHeight = paintArea.height - absAndAutoH;
+                    float availableHeight = renderArea.height - absAndAutoH;
                     if (availableHeight > 0)
                     {
                         for (int i = 0; i < RowDefinitions.Count; i++)
@@ -163,7 +163,7 @@ namespace Skill.UI
                 }
 
                 // calc y of rows
-                float y = paintArea.y;
+                float y = renderArea.y;
                 for (int i = 0; i < RowDefinitions.Count; i++)
                 {
                     rowRects[i].y = y;
@@ -171,13 +171,13 @@ namespace Skill.UI
                 }
             }
             else
-                rowRects[0] = paintArea;
+                rowRects[0] = renderArea;
             return rowRects;
         }
 
         private Rect[] CalcColumnsLayout()
         {
-            Rect paintArea = PaintAreaWithPadding;
+            Rect renderArea = RenderAreaShrinksByPadding;
             Rect[] columnRects = new Rect[Mathf.Max(1, ColumnDefinitions.Count)];
 
             if (ColumnDefinitions.Count > 0)
@@ -188,7 +188,7 @@ namespace Skill.UI
                 for (int j = 0; j < ColumnDefinitions.Count; j++)
                 {
                     if (j > 0) columnRects[j].x = columnRects[j - 1].xMax;// estimate x to be after previous column
-                    else columnRects[j].x = paintArea.x;
+                    else columnRects[j].x = renderArea.x;
 
                     ColumnDefinition cd = ColumnDefinitions[j];
                     if (cd.Width.IsAbsolute) // no calculation needs
@@ -227,15 +227,15 @@ namespace Skill.UI
                     }
 
                     // do not let column go outside of grid
-                    if (columnRects[j].xMax > paintArea.xMax)
-                        columnRects[j].width = paintArea.xMax - columnRects[j].x;
+                    if (columnRects[j].xMax > renderArea.xMax)
+                        columnRects[j].width = renderArea.xMax - columnRects[j].x;
 
                     absAndAutoW += columnRects[j].width;
                 }
 
                 if (starCount > 0)// if there is any column in star mode
                 {
-                    float availableWidth = paintArea.width - absAndAutoW;
+                    float availableWidth = renderArea.width - absAndAutoW;
                     if (availableWidth > 0)
                     {
                         for (int j = 0; j < ColumnDefinitions.Count; j++)
@@ -251,7 +251,7 @@ namespace Skill.UI
                 }
 
                 // calc x of rows
-                float x = paintArea.x;
+                float x = renderArea.x;
                 for (int i = 0; i < ColumnDefinitions.Count; i++)
                 {
                     columnRects[i].x = x;
@@ -259,7 +259,7 @@ namespace Skill.UI
                 }
             }
             else
-                columnRects[0] = paintArea;
+                columnRects[0] = renderArea;
             return columnRects;
         }
     }

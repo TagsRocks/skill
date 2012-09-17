@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Skill.Editor.UI
 {
     /// <summary>
-    /// Contains some EditorControl and allow user to select on of them.
+    /// Contains some BaseControl and allow user to select on of them.
     /// </summary>
     public class SelectionField : EditorControl
     {
@@ -18,7 +18,7 @@ namespace Skill.Editor.UI
         private class FieldTag
         {
             /// <summary> Field </summary>
-            public EditorControl Field { get; set; }
+            public BaseControl Field { get; set; }
             /// <summary> Label for Field </summary>
             public string Label { get; set; }
             /// <summary> Option in Popup </summary>
@@ -44,16 +44,16 @@ namespace Skill.Editor.UI
         /// </summary>
         /// <param name="index">Index of field</param>
         /// <returns>Field atspecified index</returns>
-        public EditorControl this[int index]
+        public BaseControl this[int index]
         {
             get { return _Fields[index].Field; }
         }
 
-        private EditorControl _SelectedField;
+        private BaseControl _SelectedField;
         /// <summary>
         /// Selected Field by user
         /// </summary>
-        public EditorControl SelectedField
+        public BaseControl SelectedField
         {
             get { return _SelectedField; }
             private set
@@ -68,7 +68,9 @@ namespace Skill.Editor.UI
                         _SelectedField.Row = 0;
                         _SelectedField.RowSpan = 2;
                         _SelectedField.Column = 1;
-                        SelectedField.Margin = new Thickness(0, _Label.Margin.Top, 0, _Label.Margin.Bottom);
+
+                        Thickness margin = _SelectedField.Margin;
+                        SelectedField.Margin = new Thickness(margin.Left, _Label.Margin.Top, margin.Right, _Label.Margin.Bottom);
                         SelectedField.VerticalAlignment = Skill.UI.VerticalAlignment.Top;
                         _SelectedField.Visibility = Skill.UI.Visibility.Visible;
                     }
@@ -115,12 +117,12 @@ namespace Skill.Editor.UI
         }
 
         /// <summary>
-        /// Notify that PaintArea changed
+        /// Notify that RenderArea changed
         /// </summary>
-        protected override void OnPaintAreaChanged()
+        protected override void OnRenderAreaChanged()
         {
-            base.OnPaintAreaChanged();
-            this._Panel.PaintArea = PaintArea;
+            base.OnRenderAreaChanged();
+            this._Panel.RenderArea = RenderArea;
         }
 
         /// <summary>
@@ -131,7 +133,7 @@ namespace Skill.Editor.UI
             this._Background = new Box() { RowSpan = 2, ColumnSpan = 3 };
             this._Popup = new Popup() { Position = new Rect(0, 0, 16, 16), Column = 2, Row = 0, VerticalAlignment = Skill.UI.VerticalAlignment.Center, HorizontalAlignment = Skill.UI.HorizontalAlignment.Right, Margin = new Thickness(2) };
             this._Label = new Label() { Position = new Rect(0, 0, 100, 16), Column = 0, Row = 0, VerticalAlignment = Skill.UI.VerticalAlignment.Center, HorizontalAlignment = Skill.UI.HorizontalAlignment.Left, Margin = new Thickness(2) };
-            this._Panel = new Grid() { Parent = this};
+            this._Panel = new Grid() { Parent = this };
 
             this._Panel.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Auto) });
             this._Panel.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
@@ -162,7 +164,7 @@ namespace Skill.Editor.UI
             ShowField(_Popup.SelectedIndex);
         }
 
-        private int FindField(EditorControl field)
+        private int FindField(BaseControl field)
         {
             for (int i = 0; i < _Fields.Count; i++)
             {
@@ -177,7 +179,7 @@ namespace Skill.Editor.UI
         /// Select field
         /// </summary>
         /// <param name="field">field to select</param>
-        public void SelectField(EditorControl field)
+        public void SelectField(BaseControl field)
         {
             ShowField(FindField(field));
         }
@@ -209,11 +211,11 @@ namespace Skill.Editor.UI
         }
 
         /// <summary>
-        /// Paint contents
+        /// Render contents
         /// </summary>
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
-            this._Panel.OnGUI(paintParams);
+            this._Panel.OnGUI();
         }
 
 
@@ -223,7 +225,7 @@ namespace Skill.Editor.UI
         /// </summary>
         /// <param name="field">Field to add</param>
         /// <param name="label">Label for field</param>
-        public void AddField(EditorControl field, string label)
+        public void AddField(BaseControl field, string label)
         {
             if (field == null)
                 throw new ArgumentNullException("Invalid field");
@@ -249,7 +251,7 @@ namespace Skill.Editor.UI
         /// </summary>
         /// <param name="field">field to remove</param>
         /// <returns>true if success, otherwise false</returns>
-        public bool RemoveField(EditorControl field)
+        public bool RemoveField(BaseControl field)
         {
             return RemoveField(FindField(field));
         }

@@ -57,17 +57,17 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             string result;
             if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)
             {
-                result = EditorGUI.PasswordField(PaintArea, Label, Password, Style);
+                result = EditorGUI.PasswordField(RenderArea, Label, Password, Style);
             }
             else
             {
-                result = EditorGUI.PasswordField(PaintArea, Label, Password);
+                result = EditorGUI.PasswordField(RenderArea, Label, Password);
             }
 
             Password = result;

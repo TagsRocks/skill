@@ -62,10 +62,10 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
-            UnityEngine.Object obj = EditorGUI.ObjectField(PaintArea, Label, _Object, ObjectType, AllowSceneObjects);
+            UnityEngine.Object obj = EditorGUI.ObjectField(RenderArea, Label, _Object, ObjectType, AllowSceneObjects);
             if (obj != null)
                 Object = (T)obj;
             else

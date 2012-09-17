@@ -94,21 +94,21 @@ namespace Skill.Editor.UI
         public P Panel { get; private set; }
 
         /// <summary>
-        /// Handle PaintArea is changed
+        /// Handle RenderArea is changed
         /// </summary>
-        protected override void OnPaintAreaChanged()
+        protected override void OnRenderAreaChanged()
         {
-            base.OnPaintAreaChanged();
-            Rect hpa = PaintArea;
+            base.OnRenderAreaChanged();
+            Rect hpa = RenderArea;
             hpa.height = Header.LayoutHeight;
-            Header.PaintArea = hpa;
+            Header.RenderArea = hpa;
 
-            _Foldout.PaintArea = new Rect(hpa.x + _Foldout.X, hpa.y + (Header.LayoutHeight - _Foldout.LayoutHeight) / 2, _Foldout.LayoutWidth, _Foldout.LayoutHeight);
+            _Foldout.RenderArea = new Rect(hpa.x + _Foldout.X, hpa.y + (Header.LayoutHeight - _Foldout.LayoutHeight) / 2, _Foldout.LayoutWidth, _Foldout.LayoutHeight);
             _Foldout.StateChanged += new EventHandler(_Foldout_StateChanged);
 
             hpa.y += hpa.height;
-            hpa.height = PaintArea.height - Header.LayoutHeight;
-            Panel.PaintArea = hpa;
+            hpa.height = RenderArea.height - Header.LayoutHeight;
+            Panel.RenderArea = hpa;
         }
 
         void _Foldout_StateChanged(object sender, EventArgs e)
@@ -149,14 +149,14 @@ namespace Skill.Editor.UI
         }
 
         /// <summary>
-        /// Paint VerticalExpander contents
+        /// Render VerticalExpander contents
         /// </summary>
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
-            Header.OnGUI(paintParams);
-            _Foldout.OnGUI(paintParams);
+            Header.OnGUI();
+            _Foldout.OnGUI();
             if (IsExpanded)
-                Panel.OnGUI(paintParams);
+                Panel.OnGUI();
         }
     }
 }

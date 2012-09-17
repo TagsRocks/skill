@@ -31,16 +31,16 @@ namespace Skill.UI
             Content = new GUIContent();
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)
             {
-                GUI.Label(PaintArea, Content, Style);
+                GUI.Label(RenderArea, Content, Style);
             }
             else
             {
-                GUI.Label(PaintArea, Content);
+                GUI.Label(RenderArea, Content);
             }
         }        
     }

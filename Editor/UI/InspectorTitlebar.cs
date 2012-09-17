@@ -55,14 +55,14 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
 
             if (Objects != null && Objects.Length > 0)
-                FoldoutState = EditorGUI.InspectorTitlebar(PaintArea, _FoldoutState, Objects);
+                FoldoutState = EditorGUI.InspectorTitlebar(RenderArea, _FoldoutState, Objects);
             else //if (Object != null)
-                FoldoutState = EditorGUI.InspectorTitlebar(PaintArea, _FoldoutState, Object);
+                FoldoutState = EditorGUI.InspectorTitlebar(RenderArea, _FoldoutState, Object);
             //else
             //    Debug.LogError("Invalid object for InspectorTitlebar");
         }

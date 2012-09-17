@@ -52,16 +52,16 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)
             {
-                Mask = EditorGUI.EnumMaskField(PaintArea, Label, _Mask, Style);
+                Mask = EditorGUI.EnumMaskField(RenderArea, Label, _Mask, Style);
             }
             else
             {
-                Mask = EditorGUI.EnumMaskField(PaintArea, Label, _Mask);
+                Mask = EditorGUI.EnumMaskField(RenderArea, Label, _Mask);
             }
         }
     }

@@ -28,42 +28,42 @@ namespace Skill.UI
             this.WrapV = true;
         }
 
-        /// <summary> Paint Image </summary>
-        protected override void Paint(PaintParameters paintParams)
+        /// <summary> Render Image </summary>
+        protected override void Render()
         {
             if (Texture != null)
             {
-                Rect paintArea = PaintArea; // copy PaintArea to access faster
+                Rect renderArea = RenderArea; // copy RenderArea to access faster
 
-                float width = WrapU ? Texture.width : paintArea.width;      // if WrapU is disable, scale with to entire PaintArea.width
-                float height = WrapV ? Texture.height : paintArea.height;   // if WrapV is disable, scale height to entire PaintArea.height
+                float width = WrapU ? Texture.width : renderArea.width;      // if WrapU is disable, scale with to entire RenderArea.width
+                float height = WrapV ? Texture.height : renderArea.height;   // if WrapV is disable, scale height to entire RenderArea.height
 
-                Rect drawRect = paintArea;  // this rect traverse through PaintArea until entire PaintArea drawn
+                Rect drawRect = renderArea;  // this rect traverse through RenderArea until entire RenderArea drawn
                 drawRect.width = width;     // begin by top left corner
                 drawRect.height = height;   // begin by top left corner
 
                 Rect texRect = new Rect();  // texture coordinate 
-                while (drawRect.x < paintArea.xMax) // continue drawing until x exit PaintArea
+                while (drawRect.x < renderArea.xMax) // continue drawing until x exit RenderArea
                 {
                     // set to entire texture
                     texRect.width = 1.0f;
                     drawRect.width = width;
-                    if (drawRect.xMax > paintArea.xMax) // if right of drawRect exit PaintArea
+                    if (drawRect.xMax > renderArea.xMax) // if right of drawRect exit RenderArea
                     {
                         // corp texture to fit inside drawRect
-                        drawRect.width = width - (drawRect.xMax - paintArea.xMax);
+                        drawRect.width = width - (drawRect.xMax - renderArea.xMax);
                         texRect.width = drawRect.width / width;
 
                     }
-                    while (drawRect.y < paintArea.yMax) // continue drawing until y exit PaintArea
+                    while (drawRect.y < renderArea.yMax) // continue drawing until y exit RenderArea
                     {
                         // set to entire texture
                         texRect.height = 1.0f;
                         drawRect.height = height;
-                        if (drawRect.yMax > paintArea.yMax) // if bottom of drawRect exit PaintArea
+                        if (drawRect.yMax > renderArea.yMax) // if bottom of drawRect exit RenderArea
                         {
                             // corp texture to fit inside drawRect
-                            drawRect.height = height - (drawRect.yMax - paintArea.yMax);
+                            drawRect.height = height - (drawRect.yMax - renderArea.yMax);
                             texRect.height = drawRect.height / height;
 
                         }
@@ -71,7 +71,7 @@ namespace Skill.UI
                         GUI.DrawTextureWithTexCoords(drawRect, Texture, texRect, AlphaBlend); // draw texture
                         drawRect.y += height; // advance height
                     }
-                    drawRect.y = paintArea.y; // set to top of paintArea
+                    drawRect.y = renderArea.y; // set to top of renderArea
                     drawRect.x += width; // advance width
                 }
             }

@@ -51,7 +51,7 @@ namespace Skill.UI
         /// </summary>
         public override void UpdateLayout()
         {
-            Rect rect = PaintAreaWithPadding;
+            Rect rect = RenderAreaShrinksByPadding;
 
             int lastIndex = Controls.Count - 1;
             for (int i = 0; i < Controls.Count; i++)
@@ -60,55 +60,55 @@ namespace Skill.UI
                 if (c != null)
                 {
                     if (rect.width == 0 || rect.height == 0)
-                        c.PaintArea = rect;
+                        c.RenderArea = rect;
                     else
                     {
-                        Rect paintArea = rect;
+                        Rect renderArea = rect;
                         if (!(LastChildFill && i == lastIndex))
                         {
                             switch (c.Dock)
                             {
                                 case Dock.Left:
                                     float xMax = rect.xMax;
-                                    paintArea.width = c.LayoutWidth + c.Margin.Horizontal;
-                                    if (paintArea.xMax > xMax)
-                                        paintArea.xMax = xMax;
-                                    rect.xMin = paintArea.xMax;
+                                    renderArea.width = c.LayoutWidth + c.Margin.Horizontal;
+                                    if (renderArea.xMax > xMax)
+                                        renderArea.xMax = xMax;
+                                    rect.xMin = renderArea.xMax;
                                     rect.xMax = xMax;
                                     break;
                                 case Dock.Top:
                                     float yMax = rect.yMax;
-                                    paintArea.height = c.LayoutHeight + c.Margin.Vertical;
-                                    if (paintArea.yMax > yMax)
-                                        paintArea.yMax = yMax;
-                                    rect.yMin = paintArea.yMax;
+                                    renderArea.height = c.LayoutHeight + c.Margin.Vertical;
+                                    if (renderArea.yMax > yMax)
+                                        renderArea.yMax = yMax;
+                                    rect.yMin = renderArea.yMax;
                                     rect.yMax = yMax;
                                     break;
                                 case Dock.Right:
                                     float w = c.LayoutWidth + c.Margin.Horizontal;
-                                    paintArea.xMin = rect.xMax - w;
-                                    paintArea.width = w;
-                                    if (paintArea.xMin < rect.xMin)
-                                        paintArea.xMin = rect.xMin;
-                                    rect.xMax = paintArea.xMin;
+                                    renderArea.xMin = rect.xMax - w;
+                                    renderArea.width = w;
+                                    if (renderArea.xMin < rect.xMin)
+                                        renderArea.xMin = rect.xMin;
+                                    rect.xMax = renderArea.xMin;
                                     break;
                                 case Dock.Bottom:
                                     float h = c.LayoutHeight + c.Margin.Vertical;
-                                    paintArea.yMin = rect.yMax - h;
-                                    paintArea.height = h;
-                                    if (paintArea.yMin < rect.yMin)
-                                        paintArea.yMin = rect.yMin;
-                                    rect.yMax = paintArea.yMin;
+                                    renderArea.yMin = rect.yMax - h;
+                                    renderArea.height = h;
+                                    if (renderArea.yMin < rect.yMin)
+                                        renderArea.yMin = rect.yMin;
+                                    rect.yMax = renderArea.yMin;
                                     break;
                             }
                         }
 
-                        paintArea.x += c.Margin.Left;
-                        paintArea.y += c.Margin.Top;
-                        paintArea.width -= c.Margin.Horizontal;
-                        paintArea.height -= c.Margin.Vertical;
+                        renderArea.x += c.Margin.Left;
+                        renderArea.y += c.Margin.Top;
+                        renderArea.width -= c.Margin.Horizontal;
+                        renderArea.height -= c.Margin.Vertical;
 
-                        c.PaintArea = paintArea;
+                        c.RenderArea = renderArea;
                     }
                 }
             }

@@ -61,13 +61,13 @@ namespace Skill.Editor.UI
 
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (UseColor)
-                _Curve = EditorGUI.CurveField(PaintArea, Label, _Curve, Color, Ranges);
+                _Curve = EditorGUI.CurveField(RenderArea, Label, _Curve, Color, Ranges);
             else
-                _Curve = EditorGUI.CurveField(PaintArea, Label, _Curve);
+                _Curve = EditorGUI.CurveField(RenderArea, Label, _Curve);
         }
     }
 }

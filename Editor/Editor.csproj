@@ -53,6 +53,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="UI\BoundsField.cs" />
+    <Compile Include="UI\Button.cs" />
     <Compile Include="UI\ChangeCheck.cs" />
     <Compile Include="UI\ColorField.cs" />
     <Compile Include="UI\EditorFrame.cs" />
@@ -96,9 +97,12 @@
     <Compile Include="UI\Vector3Field.cs" />
     <Compile Include="UI\Vector4Field.cs" />
     <Compile Include="UI\VerticalExpander.cs" />
+    <Compile Include="UI\XYZComponent.cs" />
     <Compile Include="Windows\AboutSkill.cs" />
     <Compile Include="Windows\BehaviorTreeDebugger.cs" />
     <Compile Include="Windows\Exporter.cs" />
+    <Compile Include="Windows\Implant.cs" />
+    <Compile Include="Windows\ImplantObjectField.cs" />
     <Compile Include="Windows\LineDrawer.cs" />
     <Compile Include="Windows\SkillMenu.cs" />
   </ItemGroup>

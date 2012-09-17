@@ -57,16 +57,16 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)
             {
-                Mask = EditorGUI.MaskField(PaintArea, Label, _Mask, DisplayedOptions.ToArray(), Style);
+                Mask = EditorGUI.MaskField(RenderArea, Label, _Mask, DisplayedOptions.ToArray(), Style);
             }
             else
             {
-                Mask = EditorGUI.MaskField(PaintArea, Label, _Mask, DisplayedOptions.ToArray());
+                Mask = EditorGUI.MaskField(RenderArea, Label, _Mask, DisplayedOptions.ToArray());
             }
         }
     }

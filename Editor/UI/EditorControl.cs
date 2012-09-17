@@ -24,16 +24,16 @@ namespace Skill.Editor.UI
             this.Position = new UnityEngine.Rect(0, 0, 300, 16);
         }
 
-        protected override void BeginPaint(PaintParameters paintParams)
+        protected override void BeginRender()
         {
-            base.BeginPaint(paintParams);
+            base.BeginRender();
             if (!IsEnabled)
                 EditorGUI.BeginDisabledGroup(true);
         }
 
-        protected override void EndPaint(PaintParameters paintParams)
+        protected override void EndRender()
         {
-            base.EndPaint(paintParams);
+            base.EndRender();
             if (!IsEnabled)
                 EditorGUI.EndDisabledGroup();
         }

@@ -86,16 +86,16 @@ namespace Skill.UI
             this.XCount = 2;
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)
             {
-                SelectedIndex = GUI.SelectionGrid(PaintArea, _SelectedIndex, Items.Contents, XCount, Style);
+                SelectedIndex = GUI.SelectionGrid(RenderArea, _SelectedIndex, Items.Contents, XCount, Style);
             }
             else
             {
-                SelectedIndex = GUI.SelectionGrid(PaintArea, _SelectedIndex, Items.Contents, XCount);
+                SelectedIndex = GUI.SelectionGrid(RenderArea, _SelectedIndex, Items.Contents, XCount);
             }
         }        
     }

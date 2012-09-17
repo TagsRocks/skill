@@ -88,7 +88,7 @@ namespace Skill.UI
 
 
         /// <summary>
-        /// Gets or sets Position.width
+        /// Gets or sets the suggested width of the element
         /// </summary>
         public float Width
         {
@@ -107,7 +107,7 @@ namespace Skill.UI
         }
 
         /// <summary>
-        /// Gets or sets Position.height
+        /// Gets or sets the suggested height of the element.
         /// </summary>
         public float Height
         {
@@ -125,6 +125,10 @@ namespace Skill.UI
             }
         }
 
+        /// <summary> Gets the final render size of this element. </summary>
+        public Size RenderSize { get { return new Size(_RenderArea.width, _RenderArea.height); } }
+
+
         /// <summary>
         /// Retrieves Width used in layout. It is dependents on visibility and state of children
         /// </summary>
@@ -136,7 +140,7 @@ namespace Skill.UI
                     return 0;
                 else
                     return _Position.width;
-            }            
+            }
         }
 
         /// <summary>
@@ -150,8 +154,14 @@ namespace Skill.UI
                     return 0;
                 else
                     return _Position.height;
-            }           
+            }
         }
+
+        /// <summary> Gets the rendered width of this element. </summary>
+        public float ActualWidth { get { return _RenderArea.width; } }
+
+        /// <summary> Gets the rendered height of this element. </summary>
+        public float ActualHeight { get { return _RenderArea.height; } }
 
         private Thickness _Margin;
         /// <summary> Gets or sets the outer margin of an element.</summary>        
@@ -177,22 +187,22 @@ namespace Skill.UI
             }
         }
 
-        private Rect _PaintArea;
+        private Rect _RenderArea;
         /// <summary>
-        /// The area that used to paint control.
+        /// The area that used to render control.
         /// </summary>
         /// <remarks>
-        /// if it is child of Scrollview or Group PaintArea is relative, otherwise it is absolute
+        /// if it is child of Scrollview or Group RenderArea is relative, otherwise it is absolute
         /// </remarks>
-        public Rect PaintArea
+        public Rect RenderArea
         {
-            get { return _PaintArea; }
+            get { return _RenderArea; }
             set
             {
-                if (_PaintArea != value)
+                if (_RenderArea != value)
                 {
-                    _PaintArea = value;
-                    OnPaintAreaChanged();
+                    _RenderArea = value;
+                    OnRenderAreaChanged();
                 }
             }
         }
@@ -373,11 +383,11 @@ namespace Skill.UI
             OnLayoutChanged();
         }
 
-        /// <summary> Occurs when PaintArea of control changed </summary>
-        public event EventHandler PaintAreaChanged;
-        protected virtual void OnPaintAreaChanged()
+        /// <summary> Occurs when RenderArea of control changed </summary>
+        public event EventHandler RenderAreaChanged;
+        protected virtual void OnRenderAreaChanged()
         {
-            if (PaintAreaChanged != null) PaintAreaChanged(this, EventArgs.Empty);
+            if (RenderAreaChanged != null) RenderAreaChanged(this, EventArgs.Empty);
         }
         /// <summary> Occurs when layout of control changed and parent panel needs to update layout of it's children</summary>
         public event EventHandler LayoutChanged;
@@ -410,26 +420,26 @@ namespace Skill.UI
 
         /// <summary> Specify type of Control  </summary>
         public abstract ControlType ControlType { get; }
-        /// <summary> Paint control's content </summary>
-        protected abstract void Paint(PaintParameters paintParams);
-        /// <summary> Begin Paint control's content </summary>
-        protected virtual void BeginPaint(PaintParameters paintParams) { }
-        /// <summary> End Paint control's content </summary>
-        protected virtual void EndPaint(PaintParameters paintParams) { }
+        /// <summary> Render control's content </summary>
+        protected abstract void Render();
+        /// <summary> Begin Render control's content </summary>
+        protected virtual void BeginRender() { }
+        /// <summary> End Render control's content </summary>
+        protected virtual void EndRender() { }
 
         #endregion
 
         #region Public methods
         /// <summary>
-        /// to paint control you have to call this method in OnGUI method of MonoBehavior.(call this for Frame class)
+        /// to render control you have to call this method in OnGUI method of MonoBehavior.(call this for Frame class)
         /// </summary>
-        public void OnGUI(PaintParameters paintParams)
+        public void OnGUI()
         {
             if (Visibility == UI.Visibility.Visible)
             {
-                BeginPaint(paintParams);
-                Paint(paintParams);
-                EndPaint(paintParams);
+                BeginRender();
+                Render();
+                EndRender();
             }
         }
 
@@ -448,26 +458,26 @@ namespace Skill.UI
         }
 
         /// <summary>
-        /// Returns true if the x and y components of mousePosition is inside PaintArea.
+        /// Returns true if the x and y components of mousePosition is inside RenderArea.
         /// </summary>
         /// <param name="mousePosition">Mouse position</param>
-        /// <param name="screenOffset">ScreenOffset (specified by PaintParams)</param>
-        /// <returns>true if the x and y components of mousePosition is inside PaintArea, otherwise false</returns>
-        public bool Containes(Vector2 mousePosition , Vector2 screenOffset)
+        /// <param name="screenOffset">ScreenOffset (specified by RenderParams)</param>
+        /// <returns>true if the x and y components of mousePosition is inside RenderArea, otherwise false</returns>
+        public bool Containes(Vector2 mousePosition, Vector2 screenOffset)
         {
             mousePosition.x -= screenOffset.x;
             mousePosition.y -= screenOffset.y;
-            return _PaintArea.Contains(mousePosition);
+            return _RenderArea.Contains(mousePosition);
         }
 
         /// <summary>
-        /// Returns true if the x and y components of point is inside PaintArea.
+        /// Returns true if the x and y components of point is inside RenderArea.
         /// </summary>
         /// <param name="point">Mouse position</param>        
-        /// <returns>true if the x and y components of point is inside PaintArea, otherwise false</returns>
+        /// <returns>true if the x and y components of point is inside RenderArea, otherwise false</returns>
         public bool Containes(Vector2 point)
         {
-            return _PaintArea.Contains(point);
+            return _RenderArea.Contains(point);
         }
         #endregion
     }
@@ -535,6 +545,7 @@ namespace Skill.UI
         {
             if (control == null)
                 throw new ArgumentNullException("BaseControl is null");
+            if (_Items.Contains(control)) return;
             _Items.Add(control);
             control.Parent = Panel;
             control.LayoutChanged += _LayoutChangeHandler;
@@ -661,6 +672,19 @@ namespace Skill.UI
                 _Items.Insert(0, control);
             }
         }
+
+        
+        /// <summary>
+        /// Searches for the specified BaseControl and returns the zero-based index of the first occurrence within the entire Controls.
+        /// </summary>
+        /// <param name="control">The BaseControl to locate in the Controls.</param>
+        /// <returns>
+        /// The zero-based index of the first occurrence of item within the entire Controls, if found; otherwise, –1.
+        /// </returns>
+        public int IndexOf(BaseControl control)
+        {
+            return _Items.IndexOf(control);
+        }            
     }
     #endregion
 

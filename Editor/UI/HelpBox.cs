@@ -28,10 +28,10 @@ namespace Skill.Editor.UI
         }
 
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
-            EditorGUI.HelpBox(PaintArea, Message, Type);
+            EditorGUI.HelpBox(RenderArea, Message, Type);
         }
     }
 }

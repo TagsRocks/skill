@@ -30,13 +30,13 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             throw new NotImplementedException("CustomPropertyField not implemented");
             // should be implemented
 
             //if (Property != null)
-            //    EditorGUI.BeginProperty(PaintArea, Property, Label, IncludeChildren);
+            //    EditorGUI.BeginProperty(RenderArea, Property, Label, IncludeChildren);
         }
     }
 }

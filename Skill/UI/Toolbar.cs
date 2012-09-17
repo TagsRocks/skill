@@ -69,16 +69,16 @@ namespace Skill.UI
             this.Items = new ToolbarButtonCollection();
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)
             {
-                SelectedIndex = GUI.Toolbar(PaintArea, _SelectedIndex, Items.Contents, Style);
+                SelectedIndex = GUI.Toolbar(RenderArea, _SelectedIndex, Items.Contents, Style);
             }
             else
             {
-                SelectedIndex = GUI.Toolbar(PaintArea, _SelectedIndex, Items.Contents);
+                SelectedIndex = GUI.Toolbar(RenderArea, _SelectedIndex, Items.Contents);
             }
         }
     }

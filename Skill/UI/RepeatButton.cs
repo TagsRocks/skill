@@ -54,17 +54,17 @@ namespace Skill.UI
             Content = new GUIContent();
         }
 
-        protected override void Paint(PaintParameters paintParams)
+        protected override void Render()
         {
             bool result;
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)
             {
-                result = GUI.RepeatButton(PaintArea, Content, Style);
+                result = GUI.RepeatButton(RenderArea, Content, Style);
             }
             else
             {
-                result = GUI.RepeatButton(PaintArea, Content);
+                result = GUI.RepeatButton(RenderArea, Content);
             }
 
             if (result)
