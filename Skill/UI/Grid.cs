@@ -130,10 +130,10 @@ namespace Skill.UI
                         starCount += Mathf.Max(rd.Height.Value, 1.0f);
                     }
 
-                    if (!rd.Height.IsStar)
+                    if (rd.Height.IsAuto)
                     {
                         if (rowRects[i].height < rd.MinHeight)
-                            rowRects[i].height = rd.Height.Value;
+                            rowRects[i].height = rd.MinHeight;
                         else if (rd.MaxHeight > rd.MinHeight && rowRects[i].height > rd.MaxHeight)
                             rowRects[i].height = rd.MaxHeight;
                     }
@@ -157,6 +157,10 @@ namespace Skill.UI
                             {
                                 // calc percent of row's height depend of available height
                                 rowRects[i].height = availableHeight / starCount * rd.Height.Value;
+                                if (rowRects[i].height < rd.MinHeight)
+                                    rowRects[i].height = rd.MinHeight;
+                                else if (rd.MaxHeight > rd.MinHeight && rowRects[i].height > rd.MaxHeight)
+                                    rowRects[i].height = rd.MaxHeight;
                             }
                         }
                     }
@@ -218,10 +222,10 @@ namespace Skill.UI
                         starCount += Mathf.Max(cd.Width.Value, 1.0f);
                     }
 
-                    if (!cd.Width.IsStar)
+                    if (cd.Width.IsAuto)
                     {
                         if (columnRects[j].width < cd.MinWidth)
-                            columnRects[j].width = cd.Width.Value;
+                            columnRects[j].width = cd.MinWidth;
                         else if (cd.MaxWidth > cd.MinWidth && columnRects[j].width > cd.MaxWidth)
                             columnRects[j].width = cd.MaxWidth;
                     }
@@ -245,6 +249,10 @@ namespace Skill.UI
                             {
                                 // calc percent of row's height depend of available height
                                 columnRects[j].width = availableWidth / starCount * cd.Width.Value;
+                                if (columnRects[j].width < cd.MinWidth)
+                                    columnRects[j].width = cd.MinWidth;
+                                else if (cd.MaxWidth > cd.MinWidth && columnRects[j].width > cd.MaxWidth)
+                                    columnRects[j].width = cd.MaxWidth;
                             }
                         }
                     }

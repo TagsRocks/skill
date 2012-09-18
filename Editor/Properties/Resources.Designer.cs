@@ -61,8 +61,7 @@ namespace Skill.Editor.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Skill Studio is a Visual Code Generator for Unity.
-        ///By now it can generate BehaviorTree and AnimationTree..
+        ///   Looks up a localized string similar to Skill Studio is a Visual Code Generator for Unity..
         /// </summary>
         internal static string AppDescription {
             get {

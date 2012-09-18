@@ -22,8 +22,8 @@ namespace Skill.UI
             {
                 Rect cRect = new Rect();
 
-                cRect.x = rect.x + c.Position.x + c.Margin.Left;
-                cRect.y = rect.y + c.Position.y + c.Margin.Top;
+                cRect.x = rect.x + c.X + c.Margin.Left;
+                cRect.y = rect.y + c.Y + c.Margin.Top;
                 cRect.width = c.LayoutWidth;
                 cRect.height = c.LayoutHeight;                
 

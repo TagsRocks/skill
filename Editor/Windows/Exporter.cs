@@ -11,7 +11,7 @@ namespace Skill.Editor
     public class Exporter : UnityEditor.EditorWindow
     {
         #region Variables
-        private static Vector2 Size = new Vector2(250, 200);
+        private static Vector2 Size = new Vector2(320, 100);
         private static Exporter _Instance;
         #endregion
 
@@ -22,7 +22,7 @@ namespace Skill.Editor
             {
                 if (_Instance == null)
                 {
-                   _Instance=  EditorWindow.GetWindow<Exporter>();
+                    _Instance = EditorWindow.GetWindow<Exporter>();
                 }
                 return _Instance;
             }
@@ -45,7 +45,12 @@ namespace Skill.Editor
 
             title = "Export to Skill Studio";
             position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);
+            base.minSize = new Vector2(Size.x, Size.y);
+
+            CreateUI();
         }
+
+
         #endregion
 
         #region Destroy
@@ -56,63 +61,88 @@ namespace Skill.Editor
         #endregion
 
 
-        private UnityEngine.Object _RootBone;
-        private UnityEngine.Object _Animations;
+        private Skill.Editor.UI.EditorFrame _Frame;
+        private Skill.UI.Grid _Grid;
+
+        private Skill.Editor.UI.ObjectField<Transform> _RootBone;
+        private Skill.Editor.UI.ObjectField<UnityEngine.Animation> _Animations;
+
+        private Skill.Editor.UI.Button _BtnCopySkeleton;
+        private Skill.Editor.UI.Button _BtnCopyAimations;
+
+        private void CreateUI()
+        {
+            _RootBone = new UI.ObjectField<Transform>() { Margin = new Skill.UI.Thickness(4, 2, 4, 2), VerticalAlignment = Skill.UI.VerticalAlignment.Center, Row = 0, Column = 0 };
+            _RootBone.Label.text = "Root Bone";
+            _RootBone.ObjectChanged += new EventHandler(_RootBone_ObjectChanged);
+
+            _Animations = new UI.ObjectField<UnityEngine.Animation>() { Margin = new Skill.UI.Thickness(4, 2, 4, 2), VerticalAlignment = Skill.UI.VerticalAlignment.Center, Row = 3, Column = 0 };
+            _Animations.Label.text = "Animations";
+            _Animations.ObjectChanged += new EventHandler(_Animations_ObjectChanged);
+
+            _BtnCopySkeleton = new UI.Button() { Margin = new Skill.UI.Thickness(4, 2, 4, 2), VerticalAlignment = Skill.UI.VerticalAlignment.Center, IsEnabled = false, Row = 1, Column = 0 };
+            _BtnCopySkeleton.Content.text = "Copy Skeleton to Clipboard";
+            _BtnCopySkeleton.Click += new EventHandler(_BtnCopySkeleton_Click);
+
+            _BtnCopyAimations = new UI.Button() { Margin = new Skill.UI.Thickness(4, 2, 4, 2), VerticalAlignment = Skill.UI.VerticalAlignment.Center, IsEnabled = false, Row = 4, Column = 0 };
+            _BtnCopyAimations.Content.text = "Copy Animations to Clipboard";
+            _BtnCopyAimations.Click += new EventHandler(_BtnCopyAimations_Click);
+
+            _Grid = new Skill.UI.Grid();
+            _Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(20, Skill.UI.GridUnitType.Pixel) });
+            _Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(20, Skill.UI.GridUnitType.Pixel) });
+            _Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(5, Skill.UI.GridUnitType.Pixel) });
+            _Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(20, Skill.UI.GridUnitType.Pixel) });
+            _Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(20, Skill.UI.GridUnitType.Pixel) });
+            _Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(1, Skill.UI.GridUnitType.Star) });
+
+            _Grid.ColumnDefinitions.Add(new Skill.UI.ColumnDefinition() { Width = new Skill.UI.GridLength(312, Skill.UI.GridUnitType.Pixel)});
+            _Grid.ColumnDefinitions.Add(new Skill.UI.ColumnDefinition() { Width = new Skill.UI.GridLength(1, Skill.UI.GridUnitType.Star) });
+
+            _Grid.Controls.Add(_RootBone);
+            _Grid.Controls.Add(_BtnCopySkeleton);
+            _Grid.Controls.Add(_Animations);
+            _Grid.Controls.Add(_BtnCopyAimations);
+
+            _Frame = new UI.EditorFrame(this);
+            _Frame.Controls.Add(_Grid);
+        }
+
+        void _BtnCopyAimations_Click(object sender, EventArgs e)
+        {
+            CopyAnimations();
+        }
+
+        void _BtnCopySkeleton_Click(object sender, EventArgs e)
+        {
+            CopySkeleton();
+        }
+
+        void _Animations_ObjectChanged(object sender, EventArgs e)
+        {
+            _BtnCopyAimations.IsEnabled = _RootBone.Object != null && _Animations.Object != null;
+        }
+
+        void _RootBone_ObjectChanged(object sender, EventArgs e)
+        {
+            _BtnCopySkeleton.IsEnabled = _RootBone.Object != null;
+            _BtnCopyAimations.IsEnabled = _RootBone.Object != null && _Animations.Object != null;
+        }
 
         public void OnGUI()
         {
-            float btnYOffset = 22;
-            float btnX = 150;
-            float btnMarginRight = 18;
-            float btnHeight = 22;
-            float rowHeight = 45;
-
-            EditorGUILayout.BeginVertical();
-
-            // ****************   Copy Skeleton   ****************
-
-            Rect rowRect = EditorGUILayout.BeginHorizontal(GUILayout.Height(rowHeight));
-            _RootBone = EditorGUILayout.ObjectField("Root", _RootBone, typeof(Transform), true);
-
-            Rect buttonRect = rowRect;
-            buttonRect.y += btnYOffset;
-            buttonRect.x = Mathf.Min(btnX, rowRect.width * 0.46f);
-            buttonRect.width = rowRect.width - buttonRect.x - btnMarginRight;
-            buttonRect.height = btnHeight;
-
-            if (GUI.Button(buttonRect, "Copy Skeleton to Clipboard"))
-            {
-                CopySkeleton();
-            }
-
-            EditorGUILayout.EndHorizontal();
-
-
-            EditorGUILayout.Space();
-
-            // ****************   Copy Animations   ****************            
-
-            rowRect = EditorGUILayout.BeginHorizontal(GUILayout.Height(rowHeight));
-            _Animations = EditorGUILayout.ObjectField("Animations", _Animations, typeof(UnityEngine.Animation), true);
-
-            buttonRect = rowRect;
-            buttonRect.y += btnYOffset;
-            buttonRect.x = Mathf.Min(btnX, rowRect.width * 0.46f);
-            buttonRect.width = rowRect.width - buttonRect.x - btnMarginRight;
-            buttonRect.height = btnHeight;
-
-            if (GUI.Button(buttonRect, "Copy Animations to Clipboard"))
-            {
-                CopyAnimations();
-            }
-            EditorGUILayout.EndHorizontal();
-            EditorGUILayout.EndVertical();
+            Rect pos = position;
+            pos.x = 0;
+            pos.y = 10;
+            pos.height -= 10;
+            _Grid.Position = pos;
+            _Frame.OnGUI();
         }
 
 
         private void CopySkeleton()
         {
-            if (_RootBone == null)
+            if (_RootBone.Object == null)
             {
                 Debug.LogError("Set valid Root");
             }
@@ -120,7 +150,7 @@ namespace Skill.Editor
             {
                 try
                 {
-                    Skill.DataModels.Animation.Bone root = CreateBone(_RootBone as Transform);
+                    Skill.DataModels.Animation.Bone root = CreateBone(_RootBone.Object);
                     XDocument document = new XDocument();
                     document.Add(root.ToXElement());
                     CopyToClipboard(document);
@@ -147,23 +177,22 @@ namespace Skill.Editor
 
         private void CopyAnimations()
         {
-            if (_RootBone == null)
+            if (_RootBone.Object == null)
             {
                 Debug.LogError("Set valid Root");
             }
-            else if (_Animations == null)
+            else if (_Animations.Object == null)
             {
                 Debug.LogError("Set valid Animation");
             }
             else
             {
-                UnityEngine.Animation animations = _Animations as UnityEngine.Animation;
-                if (animations != null)
+                if (_Animations.Object != null)
                 {
                     XDocument document = new XDocument();
                     XElement animationsElement = new XElement("Animations");
                     List<string> animNames = new List<string>();
-                    foreach (AnimationState state in animations)
+                    foreach (AnimationState state in _Animations.Object)
                     {
                         if (animNames.Contains(state.name)) continue;
                         animNames.Add(state.name);
@@ -175,9 +204,9 @@ namespace Skill.Editor
                         };
 
 
-                        var xCurve = AnimationUtility.GetEditorCurve(state.clip, _RootBone.name, typeof(Transform), "m_LocalPosition.x");
-                        var yCurve = AnimationUtility.GetEditorCurve(state.clip, _RootBone.name, typeof(Transform), "m_LocalPosition.y");
-                        var zCurve = AnimationUtility.GetEditorCurve(state.clip, _RootBone.name, typeof(Transform), "m_LocalPosition.z");
+                        var xCurve = AnimationUtility.GetEditorCurve(state.clip, _RootBone.Object.name, typeof(Transform), "m_LocalPosition.x");
+                        var yCurve = AnimationUtility.GetEditorCurve(state.clip, _RootBone.Object.name, typeof(Transform), "m_LocalPosition.y");
+                        var zCurve = AnimationUtility.GetEditorCurve(state.clip, _RootBone.Object.name, typeof(Transform), "m_LocalPosition.z");
 
                         AddKeys(xCurve, clip.RootMotion.XKeys);
                         AddKeys(yCurve, clip.RootMotion.YKeys);

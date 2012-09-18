@@ -15,22 +15,28 @@ namespace Skill.Editor
             Implant.Instance.Show();
         }
 
-        [MenuItem("Skill/AI/BTree Debugger", false, 10)]
-        public static void ShowBTreeDebugger()
+        [MenuItem("Skill/Animation/Animation Assigner", false, 50)]
+        public static void ShowAnimationAssigner()
         {
-            BehaviorTreeDebugger.Instance.ShowUtility();
+            AnimationAssigner.Instance.Show();
         }
 
-        [MenuItem("Skill/Export to Skill Studio", false, 101)]
+        [MenuItem("Skill/AI/BTree Debugger", false, 100)]
+        public static void ShowBTreeDebugger()
+        {
+            BehaviorTreeDebugger.Instance.Show();
+        }
+
+        [MenuItem("Skill/Export to Skill Studio", false, 1001)]
         public static void ShowExporter()
         {
             Exporter.Instance.Show();
         }
 
-        [MenuItem("Skill/About", false, 102)]
+        [MenuItem("Skill/About", false, 1002)]
         public static void ShowAbout()
         {
-            AboutSkill.Instance.ShowUtility();
+            AboutSkill.Instance.Show();
         }
 
 

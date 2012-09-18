@@ -42,7 +42,7 @@ namespace Skill.Editor
             this._PrefabField = new ObjectField<GameObject>() { AllowSceneObjects = true, Margin = new Thickness(2, 2, 2, 0) };
             this._PrefabField.Label.text = "Prefab";
 
-            this._MinScaleField = new FloatField() { Margin = new Thickness(2, 2, 2, 0), Value = 1.0f };
+            this._MinScaleField = new FloatField() { Margin = new Thickness(2, 2, 2, 0), Value = 0.8f };
             this._MinScaleField.Label.text = "Min Scale Percent";
 
             this._MaxScaleField = new FloatField() { Margin = new Thickness(2, 2, 2, 0), Value = 1.0f };

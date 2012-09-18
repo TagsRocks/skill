@@ -94,7 +94,7 @@ namespace Skill.Editor
             _PrefabsLB.Background.Visibility = Visibility.Visible;
             _PrefabsLB.SelectionChanged += new System.EventHandler(_PrefabsLB_SelectionChanged);
 
-            _Layers = new Skill.Editor.UI.LayerMaskField() { Layers = 0xFFFFFF, Row = 0, Column = 1, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(2) };
+            _Layers = new Skill.Editor.UI.LayerMaskField() { Layers = 1, Row = 0, Column = 1, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(2) };
             _Layers.Label.text = "Raycast layers";
 
             _RotationSF = new Skill.Editor.UI.SelectionField() { Row = 1, Column = 1 };
@@ -185,7 +185,7 @@ namespace Skill.Editor
 
         public void OnEnable()
         {
-            SceneView.onSceneGUIDelegate += UpdateScene;             
+            SceneView.onSceneGUIDelegate += UpdateScene;
         }
 
         public void OnDisable()
@@ -242,9 +242,8 @@ namespace Skill.Editor
                             if (obj != null)
                             {
 
-                                // scale
-                                float scale = UnityEngine.Random.Range(randomField.MinScale, randomField.MaxScale);
-                                obj.transform.localScale = new Vector3(scale, scale, scale);
+                                // scale                                
+                                obj.transform.localScale *= UnityEngine.Random.Range(randomField.MinScale, randomField.MaxScale);
 
                                 // position
                                 obj.transform.position = hit.point;

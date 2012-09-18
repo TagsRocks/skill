@@ -82,6 +82,7 @@ namespace Skill.Managers
 
         public static void DestroyCache(GameObject objectToDestroy)
         {
+            if (objectToDestroy == null) return; // maybe engine destroy it before
             CacheObject cache = GetCacheObject(objectToDestroy);
             if (cache != null)
             {

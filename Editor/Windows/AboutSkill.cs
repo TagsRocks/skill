@@ -8,40 +8,22 @@ namespace Skill.Editor
 {
     public class AboutSkill : UnityEditor.EditorWindow
     {
-        private static Vector2 Size = new Vector2(500,400);        
-
+        private static Vector2 Size = new Vector2(300, 100);
         private static AboutSkill _Instance;
 
-        private GUIStyle _TextLableStyle;
-        private GUIStyle _CloseButonStyle;
+
+        private Skill.Editor.UI.EditorFrame _Frame;
+        private Skill.UI.Grid _Grid;
+        private Skill.Editor.UI.LabelField _LblAbout;
+        private Skill.Editor.UI.Button _BtnClose;
 
         public void OnGUI()
         {
-            if (_TextLableStyle == null)
-                CreateStyles();
-
-            Rect r = EditorGUILayout.BeginVertical();
-            EditorGUILayout.LabelField(Skill.Editor.Properties.Resources.AppDescription, _TextLableStyle, GUILayout.ExpandWidth(true));
-            EditorGUILayout.EndVertical();
-
-            
-            if (GUILayout.Button("Close", _CloseButonStyle, GUILayout.ExpandWidth(false)))
-                this.Close();
-        }
-
-        private void CreateStyles()
-        {
-            _TextLableStyle = new GUIStyle()
-            {                
-                margin= new RectOffset(5,5,5,5),
-                 stretchHeight = true,
-                  wordWrap = true
-            };
-
-            _CloseButonStyle = new GUIStyle(GUI.skin.button)
-            {
-                margin = new RectOffset(5, 5, 100, 5)
-            };
+            Rect pos = base.position;
+            pos.x = 0;
+            pos.y = 0;
+            _Grid.Position = pos;
+            _Frame.OnGUI();
         }
 
         public AboutSkill()
@@ -54,11 +36,38 @@ namespace Skill.Editor
                 Destroy(this);
                 return;
             }
-
             _Instance = this;
 
             title = "About Skill";
-            position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);            
+            base.position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);
+            base.minSize = new Vector2(Size.x, Size.y);
+
+            CreateUI();
+        }
+
+        private void CreateUI()
+        {
+            _Frame = new UI.EditorFrame(this);
+
+            _Grid = new Skill.UI.Grid();
+            _Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(1, Skill.UI.GridUnitType.Star) });
+            _Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(20, Skill.UI.GridUnitType.Pixel) });            
+
+            _LblAbout = new UI.LabelField() { Row = 0, Column = 0 };
+            _LblAbout.Label2.text = Skill.Editor.Properties.Resources.AppDescription;
+
+            _BtnClose = new UI.Button() { Row = 1, Column = 0 };
+            _BtnClose.Content.text = "Close";
+            _BtnClose.Click += new EventHandler(_BtnClose_Click);
+
+            _Grid.Controls.Add(_LblAbout);
+            _Grid.Controls.Add(_BtnClose);
+            _Frame.Controls.Add(_Grid);
+        }
+
+        void _BtnClose_Click(object sender, EventArgs e)
+        {
+            base.Close();
         }
 
         public void OnDestroy()
@@ -73,7 +82,7 @@ namespace Skill.Editor
             {
                 if (_Instance == null)
                 {
-                   _Instance = EditorWindow.GetWindow<AboutSkill>();
+                    _Instance = EditorWindow.GetWindow<AboutSkill>();
                 }
                 return _Instance;
             }

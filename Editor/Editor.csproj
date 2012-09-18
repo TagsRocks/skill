@@ -99,6 +99,7 @@
     <Compile Include="UI\VerticalExpander.cs" />
     <Compile Include="UI\XYZComponent.cs" />
     <Compile Include="Windows\AboutSkill.cs" />
+    <Compile Include="Windows\AnimationAssigner.cs" />
     <Compile Include="Windows\BehaviorTreeDebugger.cs" />
     <Compile Include="Windows\Exporter.cs" />
     <Compile Include="Windows\Implant.cs" />

@@ -103,30 +103,37 @@ namespace Skill.UI
         public bool HandleScrollWheel { get; set; }
 
         /// <summary>
+        /// Gets or sets thikness of vertical scrollbar to consider when calculating scrollview area (default is 16)
+        /// </summary>
+        public float ScrollbarThickness { get; set; }
+
+        /// <summary>
         /// Create an instance of ScrollView
         /// </summary>
         public ScrollView()
         {
-
+            this.Padding = new Thickness(0, 0, 16, 0);
+            this.ScrollbarThickness = 16;
         }
 
         /// <summary> Begin Render control's content </summary>
         protected override void BeginRender()
         {
             base.BeginRender();
-            _ViewRect = RenderArea;
+            Rect ra = RenderArea;
+            _ViewRect = ra;
             Size ds = DesiredSize;
-            _ViewRect.width = Mathf.Max(RenderArea.width, ds.Width);
-            _ViewRect.height = Mathf.Max(RenderArea.height, ds.Height);
+            _ViewRect.width = Mathf.Max(ra.width, ds.Width) - ScrollbarThickness;
+            _ViewRect.height = Mathf.Max(ra.height, ds.Height);            
 
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (HorizontalScrollbarStyle != null && VerticalScrollbarStyle != null)
             {
-                ScrollPosition = GUI.BeginScrollView(RenderArea, _ScrollPosition, _ViewRect, AlwayShowHorizontal, AlwayShowVertical, HorizontalScrollbarStyle, VerticalScrollbarStyle);
+                ScrollPosition = GUI.BeginScrollView(ra, _ScrollPosition, _ViewRect, AlwayShowHorizontal, AlwayShowVertical, HorizontalScrollbarStyle, VerticalScrollbarStyle);
             }
             else
             {
-                ScrollPosition = GUI.BeginScrollView(RenderArea, _ScrollPosition, _ViewRect, AlwayShowHorizontal, AlwayShowVertical);
+                ScrollPosition = GUI.BeginScrollView(ra, _ScrollPosition, _ViewRect, AlwayShowHorizontal, AlwayShowVertical);
             }
         }
         /// <summary> End Render control's content </summary>

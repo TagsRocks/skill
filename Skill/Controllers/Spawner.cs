@@ -30,6 +30,8 @@ namespace Skill.Controllers
         /// <summary> Radius around spawn location to spawn agents. </summary>
         public float SpawnRadius = 0;
 
+        public bool SpawnOnAwake = false;
+
         // If true, only spawn agents if player can't see spawn point
         //public bool OnlySpawnHidden;
         // If true, controls whether we are actively spawning agents
@@ -131,7 +133,7 @@ namespace Skill.Controllers
 
         public virtual void Awake()
         {
-            enabled = false;
+            enabled = SpawnOnAwake;
         }
 
         public virtual void Update()
@@ -189,7 +191,8 @@ namespace Skill.Controllers
 
         private void Destroy(GameObject SpawnedObj)
         {
-            CacheSpawner.DestroyCache(SpawnedObj);
+            if (SpawnedObj != null) // maybe engine destroy it before
+                CacheSpawner.DestroyCache(SpawnedObj);
         }
 
         public void DestroySpawnedObject(GameObject spawnedObj)
