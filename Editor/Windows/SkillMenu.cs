@@ -9,10 +9,16 @@ namespace Skill.Editor
 {
     public class SkillMenu : ScriptableObject
     {
-        [MenuItem("Skill/General/Implant", false, 0)]
+        [MenuItem("Skill/Tools/Implant", false, 0)]
         public static void ShowImplant()
         {
-            Implant.Instance.Show();
+            Tools.Implant.Instance.Show();
+        }
+
+        [MenuItem("Skill/Tools/Distance", false, 1)]
+        public static void ShowDistance()
+        {
+            Tools.Distance.Instance.Show();
         }
 
         [MenuItem("Skill/Animation/Animation Assigner", false, 50)]
@@ -40,5 +46,24 @@ namespace Skill.Editor
         }
 
 
+
+        // Create Menu
+
+        [MenuItem("Assets/Create/Skill/ImplantAsset")]
+        public static void CreateImplantAsset()
+        {
+            Skill.Editor.Tools.ImplantAsset asset;
+            string name = "NewImplantAsset";
+            int nameIdx = 0;
+
+            while (System.IO.File.Exists(Application.dataPath + "/" + name + nameIdx + ".asset"))
+                nameIdx++;
+
+
+            asset = CreateInstance<Skill.Editor.Tools.ImplantAsset>();
+            AssetDatabase.CreateAsset(asset, "Assets/" + name + nameIdx + ".asset");
+            Selection.activeObject = asset;
+            EditorUtility.FocusProjectWindow();            
+        }        
     }
 }

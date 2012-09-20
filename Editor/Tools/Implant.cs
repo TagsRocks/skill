@@ -4,12 +4,12 @@ using UnityEngine;
 using UnityEditor;
 using Skill.UI;
 
-namespace Skill.Editor
+namespace Skill.Editor.Tools
 {
     public class Implant : UnityEditor.EditorWindow
     {
         #region Variables
-        private static Vector2 Size = new Vector2(605, 200);
+        private static Vector2 Size = new Vector2(320, 140);
         private static Implant _Instance;
         #endregion
 
@@ -61,12 +61,8 @@ namespace Skill.Editor
 
         private Skill.Editor.UI.EditorFrame _Frame;
         private Skill.UI.Grid _MainGrid;
-        private Skill.UI.ListBox _PrefabsLB;
+        private Skill.Editor.UI.ObjectField<ImplantAsset> _AssetField;
         private Skill.Editor.UI.SelectionField _RotationSF;
-        private Skill.UI.StackPanel _ButtonsPanel;
-        private Skill.Editor.UI.Button _BtnAdd;
-        private Skill.Editor.UI.Button _BtnRemove;
-        private Skill.Editor.UI.Button _BtnClear;
         private Skill.Editor.UI.LayerMaskField _Layers;
         private Skill.Editor.UI.XYZComponent _RandomRotation;
         private Skill.Editor.UI.Vector3Field _CustomRotation;
@@ -82,22 +78,22 @@ namespace Skill.Editor
 
             _MainGrid = new Skill.UI.Grid();
             _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) });
-            _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Auto) });
-            _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
             _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) });
+            _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Auto) });
             _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30, GridUnitType.Pixel) });
-            _MainGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(304, GridUnitType.Pixel) });
-            _MainGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(300, GridUnitType.Pixel) });
+            _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) });
+            _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
+            _MainGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(316, GridUnitType.Pixel) });
             _MainGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
 
-            _PrefabsLB = new ListBox() { Row = 0, Column = 0, RowSpan = 5, Margin = new Thickness(2), SelectionMode = Skill.UI.SelectionMode.Single };
-            _PrefabsLB.Background.Visibility = Visibility.Visible;
-            _PrefabsLB.SelectionChanged += new System.EventHandler(_PrefabsLB_SelectionChanged);
 
-            _Layers = new Skill.Editor.UI.LayerMaskField() { Layers = 1, Row = 0, Column = 1, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(2) };
+            _AssetField = new UI.ObjectField<ImplantAsset>() { Row = 0, Column = 0, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(2) };
+            _AssetField.Label.text = "ImplantAsset";
+
+            _Layers = new Skill.Editor.UI.LayerMaskField() { Layers = 1, Row = 1, Column = 0, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(2) };
             _Layers.Label.text = "Raycast layers";
 
-            _RotationSF = new Skill.Editor.UI.SelectionField() { Row = 1, Column = 1 };
+            _RotationSF = new Skill.Editor.UI.SelectionField() { Row = 2, Column = 0, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(2) };
             _RotationSF.Label.Width = 110;
 
             _RandomRotation = new Skill.Editor.UI.XYZComponent();
@@ -109,46 +105,19 @@ namespace Skill.Editor
             _RotationSF.AddField(_CustomRotation, "Custom :");
             _RotationSF.AddField(_RaycastNormalRotation, "Raycast normal :");
 
-
-            _ButtonsPanel = new StackPanel() { Row = 2, Column = 1, HorizontalAlignment = HorizontalAlignment.Left, Width = 100 };
-
-            _BtnAdd = new Skill.Editor.UI.Button() { Margin = new Thickness(2, 2, 2, 0) };
-            _BtnAdd.Content.text = "Add";
-            _BtnAdd.Click += new System.EventHandler(_BtnAdd_Click);
-
-            _BtnRemove = new Skill.Editor.UI.Button() { Margin = new Thickness(2, 2, 2, 0), IsEnabled = false };
-            _BtnRemove.Content.text = "Remove";
-            _BtnRemove.Click += new System.EventHandler(_BtnRemove_Click);
-
-            _BtnClear = new Skill.Editor.UI.Button() { Margin = new Thickness(2, 2, 2, 0) };
-            _BtnClear.Content.text = "Clear";
-            _BtnClear.Click += new System.EventHandler(_BtnClear_Click);
-
-            _ButtonsPanel.Controls.Add(_BtnAdd);
-            _ButtonsPanel.Controls.Add(_BtnRemove);
-            _ButtonsPanel.Controls.Add(_BtnClear);
-
-
-            _BtnEnabled = new Skill.Editor.UI.Button() { Margin = new Thickness(2), Row = 4, Column = 1 };
+            _BtnEnabled = new Skill.Editor.UI.Button() { Margin = new Thickness(2), Row = 3, Column = 0 };
             _BtnEnabled.Content.text = "Enable";
             _BtnEnabled.Click += new System.EventHandler(_BtnEnabled_Click);
 
-            _InfoLabel = new Skill.UI.Label() { Row = 3, Column = 1 };
+            _InfoLabel = new Skill.UI.Label() { Row = 4, Column = 0 };
 
-            _MainGrid.Controls.Add(_PrefabsLB);
+            _MainGrid.Controls.Add(_AssetField);
             _MainGrid.Controls.Add(_Layers);
             _MainGrid.Controls.Add(_RotationSF);
-            _MainGrid.Controls.Add(_ButtonsPanel);
             _MainGrid.Controls.Add(_BtnEnabled);
             _MainGrid.Controls.Add(_InfoLabel);
             _Frame.Controls.Add(_MainGrid);
 
-        }
-
-        void _BtnRemove_Click(object sender, System.EventArgs e)
-        {
-            if (_PrefabsLB.SelectedItem != null)
-                _PrefabsLB.Controls.Remove(_PrefabsLB.SelectedItem);
         }
 
         void _BtnEnabled_Click(object sender, System.EventArgs e)
@@ -165,22 +134,6 @@ namespace Skill.Editor
                 _InfoLabel.Content.text = "";
             }
         }
-
-        void _PrefabsLB_SelectionChanged(object sender, System.EventArgs e)
-        {
-            _BtnRemove.IsEnabled = _PrefabsLB.SelectedItem != null;
-        }
-
-        void _BtnClear_Click(object sender, System.EventArgs e)
-        {
-            _PrefabsLB.Controls.Clear();
-        }
-
-        void _BtnAdd_Click(object sender, System.EventArgs e)
-        {
-            _PrefabsLB.Controls.Add(new ImplantObjectField());
-        }
-
         #endregion
 
         public void OnEnable()
@@ -203,17 +156,18 @@ namespace Skill.Editor
         }
 
 
-        private ImplantObjectField GetRandomField()
+        private ImplantObject GetRandomImplantObject()
         {
-            if (_PrefabsLB.Controls.Count == 0) return null;
+            if (_AssetField.Object == null) return null;
+            if (_AssetField.Object.Objects == null || _AssetField.Object.Objects.Length == 0) return null;
 
             float totalWeight = 0;
-            foreach (ImplantObjectField item in _PrefabsLB.Controls)
+            foreach (ImplantObject item in _AssetField.Object.Objects)
                 totalWeight += item.Chance;
 
             float rnd = UnityEngine.Random.Range(0.0f, totalWeight);
             float sum = 0;
-            foreach (ImplantObjectField item in _PrefabsLB.Controls)
+            foreach (ImplantObject item in _AssetField.Object.Objects)
             {
                 sum += item.Chance;
                 if (sum >= rnd) return item;
@@ -230,20 +184,20 @@ namespace Skill.Editor
 
                 if (e.isMouse && e.type == EventType.MouseDown && e.button == 1 && e.modifiers == EventModifiers.Control)
                 {
-                    ImplantObjectField randomField = GetRandomField();
+                    ImplantObject randomObj = GetRandomImplantObject();
 
-                    if (randomField != null && randomField.Prefab != null)
+                    if (randomObj != null && randomObj.Prefab != null)
                     {
                         Ray r = Camera.current.ScreenPointToRay(new Vector3(e.mousePosition.x, -e.mousePosition.y + Camera.current.pixelHeight));
                         RaycastHit hit;
                         if (Physics.Raycast(r, out hit, 1000, _Layers.Layers))
                         {
-                            GameObject obj = PrefabUtility.InstantiatePrefab(randomField.Prefab) as GameObject;
+                            GameObject obj = PrefabUtility.InstantiatePrefab(randomObj.Prefab) as GameObject;
                             if (obj != null)
                             {
 
                                 // scale                                
-                                obj.transform.localScale *= UnityEngine.Random.Range(randomField.MinScale, randomField.MaxScale);
+                                obj.transform.localScale *= UnityEngine.Random.Range(randomObj.MinScalePercent, randomObj.MaxScalePercent);
 
                                 // position
                                 obj.transform.position = hit.point;

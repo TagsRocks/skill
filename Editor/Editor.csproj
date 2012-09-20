@@ -52,6 +52,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Tools\Distance.cs" />
+    <Compile Include="Tools\ImplantAsset.cs" />
+    <Compile Include="Tools\ImplantAssetEditor.cs" />
+    <Compile Include="Tools\ImplantObject.cs" />
     <Compile Include="UI\BoundsField.cs" />
     <Compile Include="UI\Button.cs" />
     <Compile Include="UI\ChangeCheck.cs" />
@@ -102,8 +106,8 @@
     <Compile Include="Windows\AnimationAssigner.cs" />
     <Compile Include="Windows\BehaviorTreeDebugger.cs" />
     <Compile Include="Windows\Exporter.cs" />
-    <Compile Include="Windows\Implant.cs" />
-    <Compile Include="Windows\ImplantObjectField.cs" />
+    <Compile Include="Tools\Implant.cs" />
+    <Compile Include="Tools\ImplantObjectField.cs" />
     <Compile Include="Windows\LineDrawer.cs" />
     <Compile Include="Windows\SkillMenu.cs" />
   </ItemGroup>
@@ -123,6 +127,7 @@
       <Name>Skill</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
