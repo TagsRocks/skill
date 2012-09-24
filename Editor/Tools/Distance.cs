@@ -175,8 +175,7 @@ namespace Skill.Editor.Tools
                         if (_IsStartPointPicked)
                         {
                             _EndPoint = hit.point;
-                            _LblEndPoint.Label2.text = _EndPoint.ToString();
-                            _LblDistance.Label2.text = Vector3.Distance(_StartPoint, _EndPoint).ToString("F4");
+                            _LblEndPoint.Label2.text = _EndPoint.ToString();                            
                             _IsStartPointPicked = false;
                             _IsEndPointPicked = true;
                         }
@@ -187,10 +186,12 @@ namespace Skill.Editor.Tools
                             _LblDistance.Label2.text = "0";
                             _IsStartPointPicked = true;
                             _IsEndPointPicked = false;
+                            Repaint();
                         }
                     }
                     if (_IsEndPointPicked)
                     {
+                        _LblDistance.Label2.text = Vector3.Distance(_StartPoint, _EndPoint).ToString("F4");
                         Debug.DrawLine(_StartPoint, _EndPoint, Color.red, 0.1f);
                         Repaint();
                         _IsEndPointPicked = false;

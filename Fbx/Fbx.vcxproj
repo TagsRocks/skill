@@ -82,6 +82,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -90,7 +92,7 @@
     <ClInclude Include="Code\FbxAxis.h" />
     <ClInclude Include="Code\FbxFileFormat.h" />
     <ClInclude Include="Code\FbxHelper.h" />
-    <ClInclude Include="Code\FbxMeshLoader.h" />
+    <ClInclude Include="Code\MeshLoader.h" />
     <ClInclude Include="Code\FbxSystemUnits.h" />
     <ClInclude Include="Code\FbxVersion.h" />
     <ClInclude Include="Code\Matrix.h" />
@@ -109,7 +111,7 @@
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="Code\FbxHelper.cpp" />
-    <ClCompile Include="Code\FbxMeshLoader.cpp" />
+    <ClCompile Include="Code\MeshLoader.cpp" />
     <ClCompile Include="Code\Matrix.cpp" />
     <ClCompile Include="Code\MeshCreator.cpp" />
     <ClCompile Include="Code\MeshProcessor.cpp" />

@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "FbxMeshLoader.h"
+#include "MeshLoader.h"
 #include "Primitives.h"
 
 
@@ -9,7 +9,7 @@ namespace Skill
 	namespace Fbx
 	{
 
-		FbxMeshLoader::FbxMeshLoader(FbxMesh* mesh)		 
+		MeshLoader::MeshLoader(FbxMesh* mesh)		 
 		{
 			_ControlsPointsCount = 0;			
 			_NormalCount = 0;
@@ -30,12 +30,27 @@ namespace Skill
 			_Colors = NULL;
 			_BoneSkins = NULL;			
 			_FaceMaterial = NULL;	
-			_MaterialNames = NULL;
+			_Materials = NULL;
 
-			this->_Mesh = mesh;			
+			this->_Mesh = mesh;
+			Destroy();
+
+			LoadControlsPoints();
+			LoadPolygonIndices();
+			LoadNormals();
+			LoadUvsA();
+			LoadUvsB();
+			LoadColors();
+			LoadSkins();
+			LoadFaceMaterials();
+			LoadMaterials();
+
+			bool hasSkin = _BoneSkinCount > 0;			
+			if (hasSkin)
+				GenerateBlendWeightIndices();
 		}
 
-		void FbxMeshLoader::Destroy()
+		void MeshLoader::Destroy()
 		{								
 			if(_ControlsPoints) delete[] _ControlsPoints;
 			if(_WeightPerVertex) delete[] _WeightPerVertex;
@@ -46,7 +61,7 @@ namespace Skill
 			if(_UvsB) delete[] _UvsB;			
 			if(_Colors) delete[] _Colors;			
 			if(_FaceMaterial) delete[] _FaceMaterial;			
-			if(_MaterialNames) delete[] _MaterialNames;						
+			if(_Materials) delete[] _Materials;						
 
 
 			_VertexWeightCount = 0;
@@ -68,10 +83,10 @@ namespace Skill
 			_Colors = NULL;
 			_BoneSkins = NULL;			
 			_FaceMaterial = NULL;	
-			_MaterialNames = NULL;
+			_Materials = NULL;
 		}
 
-		FbxMeshLoader::~FbxMeshLoader(void)
+		MeshLoader::~MeshLoader(void)
 		{
 			_Mesh = NULL;
 			Destroy();
@@ -79,7 +94,7 @@ namespace Skill
 		}
 
 
-		void FbxMeshLoader::LoadControlsPoints()
+		void MeshLoader::LoadControlsPoints()
 		{
 			_ControlsPointsCount = _Mesh->GetControlPointsCount();
 
@@ -89,7 +104,7 @@ namespace Skill
 
 		}
 
-		void FbxMeshLoader::LoadNormals()
+		void MeshLoader::LoadNormals()
 		{
 			if(_Mesh->GetElementNormalCount() > 0)
 			{
@@ -111,17 +126,23 @@ namespace Skill
 				{
 					_NormalCount = _PolyCount * 3;
 					_Normals = new FbxVector4[_NormalCount];
-
-					for(int i=0; i < _NormalCount; i++)
+					FbxVector4 lCurrentNormal;
+					int lVertexCount = 0;
+					for (int lPolygonIndex = 0; lPolygonIndex < _PolyCount; ++lPolygonIndex)
 					{
-						_Normals[i]= leNormals->GetDirectArray().GetAt(i);
-					}
+						for (int lVerticeIndex = 0; lVerticeIndex < 3; ++lVerticeIndex)
+						{
+							_Mesh->GetPolygonVertexNormal(lPolygonIndex, lVerticeIndex, lCurrentNormal);
+							_Normals[lVertexCount] = lCurrentNormal;	
+							lVertexCount++;
+						}
+					}					
 				}
 			}
 
 		}
 
-		void FbxMeshLoader::LoadPolygonIndices()
+		void MeshLoader::LoadPolygonIndices()
 		{
 			_PolyCount = _Mesh->GetPolygonCount();
 
@@ -139,7 +160,7 @@ namespace Skill
 			}
 		}
 
-		void FbxMeshLoader::LoadUvsA()
+		void MeshLoader::LoadUvsA()
 		{
 			int uvCount = _Mesh->GetElementUVCount();
 			if(uvCount < 1) return;
@@ -148,7 +169,7 @@ namespace Skill
 			_UvsA = LoadUvs(leUV, _UvsCountA);
 		}
 
-		void FbxMeshLoader::LoadUvsB()
+		void MeshLoader::LoadUvsB()
 		{
 			int uvCount = _Mesh->GetElementUVCount();
 			if(uvCount < 2) return;
@@ -157,7 +178,7 @@ namespace Skill
 			_UvsB = LoadUvs(leUV, _UvsCountB);
 		}
 
-		FbxVector2* FbxMeshLoader::LoadUvs(FbxGeometryElementUV* leUV, int& uvsCount)
+		FbxVector2* MeshLoader::LoadUvs(FbxGeometryElementUV* leUV, int& uvsCount)
 		{	
 			FbxVector2* result = NULL;
 
@@ -222,7 +243,7 @@ namespace Skill
 			return result;
 		}
 
-		void FbxMeshLoader::LoadColors()
+		void MeshLoader::LoadColors()
 		{	
 			if( _Mesh->GetElementVertexColorCount() < 1) return;
 
@@ -286,7 +307,7 @@ namespace Skill
 			}
 		}
 
-		void FbxMeshLoader::LoadSkins()
+		void MeshLoader::LoadSkins()
 		{
 			FbxCluster* cluster;
 			
@@ -316,7 +337,7 @@ namespace Skill
 			}
 		}
 
-		void FbxMeshLoader::LoadFaceMaterials()
+		void MeshLoader::LoadFaceMaterials()
 		{
 			if(_Mesh->GetElementMaterialCount() < 1) return;			
 			FbxGeometryElementMaterial* leMat = _Mesh->GetElementMaterial(0);
@@ -360,21 +381,99 @@ namespace Skill
 
 		}
 
-		void FbxMeshLoader::LoadMaterialNames()
+		void MeshLoader::LoadMaterials()
 		{
 			FbxNode*  lNode = _Mesh->GetNode();
 			if(lNode) _MaterialCount = lNode->GetMaterialCount();  
 
-			_MaterialNames = new  FbxString[_MaterialCount ];
-
+			_Materials = new Material[_MaterialCount];
+			
 			for(int i=0;i<_MaterialCount;i++)
 			{
-				FbxSurfaceMaterial *Material = lNode->GetMaterial(i);
-				_MaterialNames[i] = FbxString(Material->GetName());
+				FbxSurfaceMaterial *lMaterial = lNode->GetMaterial(i);
+				_Materials[i].Name = lMaterial->GetName();
+				_Materials[i].Index = i;
+
+				if (lMaterial->GetClassId().Is(FbxSurfacePhong::ClassId))
+				{
+					// We found a Phong material.
+					_Materials[i].IsPhong = true;
+					
+					_Materials[i].Ambient = ((FbxSurfacePhong*) lMaterial)->Ambient.Get();
+					_Materials[i].Diffuse = ((FbxSurfacePhong*) lMaterial)->Diffuse.Get();
+					_Materials[i].Specular = ((FbxSurfacePhong*) lMaterial)->Specular.Get();					
+					_Materials[i].Emissive = ((FbxSurfacePhong*) lMaterial)->Emissive.Get();
+
+					_Materials[i].TransparencyFactor = ((FbxSurfacePhong *)lMaterial)->TransparencyFactor.Get();
+					_Materials[i].Shininess = ((FbxSurfacePhong*) lMaterial)->Shininess.Get();
+					_Materials[i].ReflectionFactor = ((FbxSurfacePhong*) lMaterial)->ReflectionFactor.Get();
+					
+					_Materials[i].AmbientTexture = GetFileTexture(((FbxSurfacePhong*) lMaterial)->Ambient);
+					_Materials[i].DiffuseTexture = GetFileTexture(((FbxSurfacePhong*) lMaterial)->Diffuse);
+					_Materials[i].SpecularTexture = GetFileTexture(((FbxSurfacePhong*) lMaterial)->Specular);
+					_Materials[i].EmissiveTexture = GetFileTexture(((FbxSurfacePhong*) lMaterial)->Emissive);
+
+				}
+				else if(lMaterial->GetClassId().Is(FbxSurfaceLambert::ClassId) )
+				{
+					// We found a Lambert material.
+					_Materials[i].IsPhong = false;
+
+					_Materials[i].Ambient = ((FbxSurfaceLambert*) lMaterial)->Ambient.Get();
+					_Materials[i].Diffuse = ((FbxSurfaceLambert*) lMaterial)->Diffuse.Get();
+					_Materials[i].Emissive = ((FbxSurfaceLambert*) lMaterial)->Emissive.Get();
+
+					_Materials[i].TransparencyFactor = ((FbxSurfaceLambert*)lMaterial)->TransparencyFactor.Get();
+
+					_Materials[i].AmbientTexture = GetFileTexture(((FbxSurfaceLambert*) lMaterial)->Ambient);
+					_Materials[i].DiffuseTexture = GetFileTexture(((FbxSurfaceLambert*) lMaterial)->Diffuse);					 
+					_Materials[i].EmissiveTexture = GetFileTexture(((FbxSurfaceLambert*) lMaterial)->Emissive);
+				}
+				else // unknown material set default value
+				{
+					_Materials[i].IsPhong = false;
+
+					_Materials[i].Ambient = FbxDouble3(0,0,0);
+					_Materials[i].Diffuse = FbxDouble3(0,0,0);
+					_Materials[i].Specular = FbxDouble3(0,0,0);
+					_Materials[i].Emissive = FbxDouble3(0,0,0);
+					_Materials[i].TransparencyFactor = 1.0f;
+					_Materials[i].Shininess = 0;
+					_Materials[i].ReflectionFactor = 0;
+				}
 			}
 		}
 
-		void FbxMeshLoader::GenerateBlendWeightIndices()
+		TextureInfo* MeshLoader::GetFileTexture(FbxPropertyT<FbxDouble3>& lProperty)
+		{			
+			if (lProperty.IsValid())
+			{
+				const int lTextureCount = lProperty.GetSrcObjectCount<FbxFileTexture>();
+				if (lTextureCount)
+				{
+					const FbxFileTexture* lTexture = lProperty.GetSrcObject<FbxFileTexture>();
+					if (lTexture )
+					{	
+						TextureInfo* info = new TextureInfo();	
+						info->Name = lTexture->GetName();
+						info->FileName = lTexture->GetFileName();
+						info->TextureUse = lTexture->GetTextureUse();
+						info->MaterialUse = lTexture->GetMaterialUse();
+						info->MappingType = lTexture->GetMappingType();
+						info->SwapUV = lTexture->GetSwapUV();
+						info->Translation =  FbxDouble2( lTexture->GetTranslationU(),lTexture->GetTranslationV());
+						info->Scale = FbxDouble2( lTexture->GetScaleU(),lTexture->GetScaleV());
+						info->Rotation = FbxDouble2( lTexture->GetRotationU(),lTexture->GetRotationV());
+						info->DefaultAlpha = lTexture->GetDefaultAlpha();
+						info->BlendMode = lTexture->GetBlendMode();
+						return info;
+					}
+				}
+			}
+			return NULL; 
+		}
+
+		void MeshLoader::GenerateBlendWeightIndices()
 		{
 			_WeightPerVertex = new VertexWeightArray[_ControlsPointsCount];
 			for (int i = 0; i < _ControlsPointsCount; i++) _WeightPerVertex[i] =  VertexWeightArray();
@@ -388,29 +487,16 @@ namespace Skill
 
 		}		
 
-		void FbxMeshLoader::Fill(MeshData* meshdata)
+		void MeshLoader::Fill(MeshData* meshdata)
 		{
-			Destroy();
-
-			LoadControlsPoints();
-			LoadPolygonIndices();
-			LoadNormals();
-			LoadUvsA();
-			LoadUvsB();
-			LoadColors();
-			LoadSkins();
-			LoadFaceMaterials();
-			LoadMaterialNames();
+			
 
 			int index = 0;// helper index
 			bool hasColor = _ColorCount > 0;
 			bool hasSkin = _BoneSkinCount > 0;
 			bool hasUv1 = _UvsCountA > 0;
 			bool hasUv2 = _UvsCountB > 0;
-			bool hasNormal =_NormalCount > 0;
-
-			if (hasSkin)
-				GenerateBlendWeightIndices();
+			bool hasNormal =_NormalCount > 0;			
 
 #pragma region Create faces
 
@@ -508,7 +594,7 @@ namespace Skill
 
 			if (hasNormal)
 			{
-				if (_NormalCount ==_UvsCountA && _NormalCount ==_UvsCountB)
+				if (_NormalCount ==_UvsCountA && ( _UvsCountB == 0 || _NormalCount == _UvsCountB ))
 					for (int i = 0; i < vertexCount; i++)
 						vertices[i].Normal = _Normals[i];
 				else
@@ -536,12 +622,10 @@ namespace Skill
 			{
 				meshdata->Faces.Add(faces[i]);
 			}
-			Material mat;
+			
 			for( i=0; i < _MaterialCount; i++)
-			{
-				mat.Index=i;
-				mat.Name = _MaterialNames[i];
-				meshdata->Materials.Add(mat);
+			{				
+				meshdata->Materials.Add(_Materials[i]);
 			}
 
 

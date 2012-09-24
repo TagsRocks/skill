@@ -52,6 +52,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Tools\Commands.cs" />
     <Compile Include="Tools\Distance.cs" />
     <Compile Include="Tools\ImplantAsset.cs" />
     <Compile Include="Tools\ImplantAssetEditor.cs" />

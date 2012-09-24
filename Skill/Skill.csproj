@@ -152,7 +152,9 @@
     <Compile Include="UI\WrapImage.cs" />
     <Compile Include="UI\WrapPanel.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="Unity\UnityEditor.dll" />
     <Content Include="Unity\UnityEngine.dll" />

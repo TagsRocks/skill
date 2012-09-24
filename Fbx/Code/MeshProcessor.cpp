@@ -260,7 +260,7 @@ namespace Skill
 
 		MeshData* MeshProcessor::Merge(FbxArray<MeshData*>& meshes)
 		{
-			int i,j,k;
+			int i,j;
 			int totalVertex = 0;
 			int totalFace = 0;
 			
@@ -276,39 +276,21 @@ namespace Skill
 			result->Vertices.Reserve(totalVertex); // reserve space for all vertex
 			result->Faces.Reserve(totalFace); // reserve space for all face
 
+			int materialIdBase = 0;
 			// merge materials of all mesh to single list and remove duplicates
 			for(i = 0; i < meshes.GetCount(); i++)
 			{
 				MeshData* mesh = meshes.GetAt(i);
 				for(j = 0;j < mesh->Materials.GetCount(); j++) // go through materials of mesh
 				{
-					FbxString newMatName = mesh->Materials.GetAt(j).Name;
-					bool exist = false;
-					for(k = 0; k < result->Materials.GetCount(); k++) // go through new materials
-					{
-						FbxString matName = result->Materials.GetAt(k).Name;
-						if(newMatName == matName)// check wether we add this material to list before ( two materials can not have same names in fbx file )
-						{
-							exist = true;
-							break;
-						}
-					}
-					if(!exist) // if we did not add this material to list
-					{
-						Material newMat = Material();
-						newMat.Name = newMatName;
-						result->Materials.Add(newMat); // add material to list of result materials
-					}
+					Material newMat = mesh->Materials.GetAt(j);					
+					result->Materials.Add(newMat); // add material to list of result materials
 				}
 			}
 
-			const int MaxMaterial = 50; // suppose that maximum number of materials for each mesh does not exited from 50
 			int vIndex = 0; // index of current modifing vertex
-			int fIndex = 0; // index of current modifing face
-			int materialMapping[MaxMaterial]; // new material mapping - materialMapping[i] = index of new material in result mesh for materialId i
-
+			int fIndex = 0; // index of current modifing face			
 			int vertexFaceOffset = 0;
-
 			for(i = 0; i < meshes.GetCount(); i++)
 			{
 				MeshData* mesh = meshes.GetAt(i);	
@@ -322,23 +304,7 @@ namespace Skill
 					Vertex v = mesh->Vertices.GetAt(j);
 					result->Vertices.SetAt(vIndex,v);
 					vIndex++;
-				}
-
-				for(j = 0; j < MaxMaterial; j++) materialMapping[j] = -1; // reset material mappings
-
-				for(j = 0;j < mesh->Materials.GetCount(); j++) // for each material in mesh
-				{
-					FbxString meshMatName = mesh->Materials.GetAt(j).Name;					
-					for(k = 0; k < result->Materials.GetCount(); k++) // for each material in result mesh
-					{
-						FbxString resultMatName = result->Materials.GetAt(k).Name;
-						if(meshMatName == resultMatName) // find material in result material
-						{
-							materialMapping[j] = k; // specify that all face with MaterialId : j, will map to MaterialId : k
-							break;
-						}
-					}					
-				}
+				}				
 
 				for(j = 0;j < mesh->Faces.GetCount(); j++) // copy all face at end of result face
 				{
@@ -346,51 +312,28 @@ namespace Skill
 					f.A += vertexFaceOffset;
 					f.B += vertexFaceOffset;					
 					f.C += vertexFaceOffset;
-					f.MaterialId = materialMapping[f.MaterialId]; // remap MaterialId to new MaterialId
+					f.MaterialId += materialIdBase; // remap MaterialId to new MaterialId
 					result->Faces.SetAt(fIndex,f);
 					fIndex++;
 				}
 
 				vertexFaceOffset += mesh->Vertices.GetCount();
+				materialIdBase += mesh->Materials.GetCount();
 			}
 
 			return result;
 		}
 
 		void MeshProcessor::TransformToGlobal(FbxNode* node, MeshData& meshData)
-		{
-			Matrix gTransform = Matrix::GlobalNode(node);
-
-			int vertexCount = meshData.Vertices.GetCount();
-			
-			for( int i = 0; i < vertexCount; i++ )
-			{
-				Vertex v = meshData.Vertices.GetAt(i);
-
-				v.Position = Matrix::Transform(v.Position,gTransform );
-				if(meshData.HasNormal)
-					v.Normal = Matrix::TransformNormal(v.Normal,gTransform );
-
-				meshData.Vertices.SetAt(i,v);
-			}
+		{			
+			FbxAMatrix vertexTransformMatrix = node->EvaluateGlobalTransform();
+			TransformVertices(meshData,vertexTransformMatrix);
 		}
 
 		void MeshProcessor::TransformToLocal(FbxNode* node, MeshData& meshData)
 		{
-			Matrix gTransform = Matrix::LocalNode(node);
-
-			int vertexCount = meshData.Vertices.GetCount();
-			
-			for( int i = 0; i < vertexCount; i++ )
-			{
-				Vertex v = meshData.Vertices.GetAt(i);
-
-				v.Position = Matrix::Transform(v.Position,gTransform );
-				if(meshData.HasNormal)
-					v.Normal = Matrix::TransformNormal(v.Normal,gTransform );
-
-				meshData.Vertices.SetAt(i,v);
-			}
+			FbxAMatrix vertexTransformMatrix = node->EvaluateLocalTransform();
+			TransformVertices(meshData,vertexTransformMatrix);
 		}
 		
 		void MeshProcessor::TransformToBindPose(FbxMesh* mesh,MeshData& meshData)
@@ -468,22 +411,41 @@ namespace Skill
 				vertexTransformMatrix = lClusterRelativeCurrentPositionInverse * lClusterRelativeInitPosition;
 			}
 			
-			int vertexCount = meshData.Vertices.GetCount();
-			
+			int vertexCount = meshData.Vertices.GetCount();			
+			TransformVertices(meshData,vertexTransformMatrix);
+		}
+
+		void MeshProcessor::TransformVertices(MeshData& meshData , FbxAMatrix& matrix)
+		{
+
+			int vertexCount = meshData.Vertices.GetCount();			
 			for( int i = 0; i < vertexCount; i++ )
 			{
+				Vertex v = meshData.Vertices.GetAt(i);
 
-				Vertex v = meshData.Vertices.GetAt(i);						
-				v.Position = vertexTransformMatrix.MultT(v.Position);												
-				
-				//v.Position = Matrix::Transform(v.Position,gTransform );
-				//if(meshData.HasNormal)
-					//v.Normal = Matrix::TransformNormal(v.Normal,gTransform );
+				v.Position = matrix.MultT(v.Position);
+				if(meshData.HasNormal)
+					v.Normal = matrix.MultR(v.Normal);
 
 				meshData.Vertices.SetAt(i,v);
 			}
-		}
 
+
+			/*Matrix m = Matrix::CreateFromAMatrix(matrix);
+
+			int vertexCount = meshData.Vertices.GetCount();			
+			for( int i = 0; i < vertexCount; i++ )
+			{
+				Vertex v = meshData.Vertices.GetAt(i);
+
+				v.Position = Matrix::Transform(v.Position,m);
+				if(meshData.HasNormal)
+					v.Normal = Matrix::TransformNormal(v.Normal,m);
+
+				meshData.Vertices.SetAt(i,v);
+			}
+			*/
+		}
 		
 	}
 }

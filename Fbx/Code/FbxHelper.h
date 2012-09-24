@@ -52,6 +52,9 @@ namespace Skill
 			static bool IsEqual(FbxVector4& v1, FbxVector4& v2, double telorance);
 			static bool IsEqual(FbxVector2& v1, FbxVector2& v2, double telorance);
 
+
+			static FbxDouble3 GetMaterialProperty(const FbxSurfaceMaterial * pMaterial, const char * pPropertyName, const char * pFactorPropertyName, unsigned int& pTextureName);
+
 		};
 	}
 }

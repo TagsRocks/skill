@@ -5,6 +5,8 @@ namespace Skill
 	namespace Fbx
 	{
 		class MeshData;		
+		class Material;
+		class TextureInfo;
 
 		typedef FbxNode* P_FbxNode;
 
@@ -81,11 +83,11 @@ namespace Skill
 			}
 		};
 
-		class FbxMeshLoader
+		class MeshLoader
 		{
 		public:
-			FbxMeshLoader(FbxMesh* mesh);
-			~FbxMeshLoader(void);
+			MeshLoader(FbxMesh* mesh);
+			~MeshLoader(void);
 
 			void Fill(MeshData* meshdata);
 
@@ -99,7 +101,8 @@ namespace Skill
 			void LoadColors();
 			void LoadSkins();
 			void LoadFaceMaterials();
-			void LoadMaterialNames();
+			void LoadMaterials();
+			TextureInfo* GetFileTexture(FbxPropertyT<FbxDouble3>& lProperty);
 			void GenerateBlendWeightIndices();			
 			void Destroy();
 
@@ -130,9 +133,10 @@ namespace Skill
 			int _BoneSkinCount;
 
 			int* _FaceMaterial;
-			FbxString* _MaterialNames;
+			Material* _Materials;			
 			int _MaterialCount;
 			
 		};
 
-	}}
+	}
+}

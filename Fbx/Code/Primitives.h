@@ -64,11 +64,64 @@ namespace Skill
 
 		};		
 
+		class TextureInfo
+		{
+		public:			
+
+			const char* Name;
+			const char* FileName;
+			FbxTexture::ETextureUse TextureUse;
+			FbxFileTexture::EMaterialUse MaterialUse;
+			FbxTexture::EMappingType MappingType;
+			bool SwapUV;
+			FbxDouble2 Translation;
+			FbxDouble2 Scale;
+			FbxDouble2 Rotation;
+			double DefaultAlpha;
+			FbxTexture::EBlendMode BlendMode;	
+
+			TextureInfo()
+			{				
+				FileName = NULL;
+				Name = NULL;
+			}
+		};
+		
 		class Material
 		{
 		public:
-			FbxString Name;
+			const char* Name;
+			bool IsPhong;
+
+			FbxDouble3 Ambient;
+			FbxDouble3 Diffuse;
+			FbxDouble3 Specular;
+			FbxDouble3 Emissive;
+			FbxDouble TransparencyFactor;			
+			FbxDouble Shininess;
+			FbxDouble ReflectionFactor;
+
+			TextureInfo* AmbientTexture;
+			TextureInfo* DiffuseTexture;
+			TextureInfo* SpecularTexture;
+			TextureInfo* EmissiveTexture;
+
 			int Index;
+
+			Material()
+			{
+				AmbientTexture = NULL;
+				DiffuseTexture = NULL;
+				SpecularTexture = NULL;
+				EmissiveTexture = NULL;
+			}
+			~Material()
+			{
+				AmbientTexture = NULL;
+				DiffuseTexture = NULL;
+				SpecularTexture = NULL;
+				EmissiveTexture = NULL;
+			}
 		};
 
 

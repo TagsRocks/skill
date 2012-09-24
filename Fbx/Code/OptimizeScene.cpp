@@ -4,7 +4,7 @@
 #include "FbxHelper.h"
 #include "SceneNode.h"
 #include "Primitives.h"
-#include "FbxMeshLoader.h"
+#include "MeshLoader.h"
 #include "MeshCreator.h"
 #include "MeshProcessor.h"
 
@@ -26,8 +26,8 @@ namespace Skill
 		OptimizeScene::OptimizeScene(String^ filename)
 		{	
 			_SkeletonRoot = nullptr;
-			_PositionsTelorance = 0.02f;
-			_UvTelorance = 0.01f;
+			_PositionsTelorance = 0.02;
+			_UvTelorance = 0.01;
 
 			_Filename = filename;
 
@@ -140,7 +140,7 @@ namespace Skill
 			for(int i=0; i < meshes->Length; i++)
 			{
 				FbxMesh* mesh = meshes[i]->GetFbxNode()->GetMesh();
-				FbxMeshLoader loader = FbxMeshLoader(mesh);
+				MeshLoader loader = MeshLoader(mesh);
 
 				MeshData* data = new MeshData();
 				loader.Fill(data);
@@ -164,7 +164,7 @@ namespace Skill
 
 			MeshCreator creator;
 			creator.SetCreateSkin(true);
-			FbxNode* resultMesh = creator.Create(_Scene,newNameChars , *mergedMesh);
+			FbxNode* resultMesh = creator.Create(_Scene,newNameChars , *mergedMesh);			
 
 			SceneNode^ result = gcnew SceneNode(resultMesh);
 			delete mergedMesh;
@@ -182,7 +182,7 @@ namespace Skill
 
 		void OptimizeScene::Optimize(SceneNode^ mesh , bool generateNormals, bool generateTangents)
 		{			
-			FbxMeshLoader loader = FbxMeshLoader(mesh->GetFbxNode()->GetMesh());
+			MeshLoader loader = MeshLoader(mesh->GetFbxNode()->GetMesh());
 			MeshData* meshData = new MeshData();
 			loader.Fill(meshData);			
 						

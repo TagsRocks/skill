@@ -94,8 +94,9 @@ namespace Skill
 				
 			}																												
 
-			int faceCount = meshData.Faces.GetCount();
+			CreateMaterialMapping(lMesh , meshData);
 
+			int faceCount = meshData.Faces.GetCount();
 			//Create polygons. Assign texture and texture UV indices.
 			for (i = 0; i < faceCount; i++)
 			{
@@ -126,7 +127,10 @@ namespace Skill
 			// set the shading mode to view texture
 			lNode->SetShadingMode(FbxNode::eTextureShading);
 
-			CreateMaterialMapping(lMesh , meshData);
+			
+			CreateMaterials(scene, lMesh , meshData);
+			
+
 			if(_CreateSkin)
 			{
 				LinkMeshToSkeleton(scene , lNode , meshData );
@@ -137,18 +141,114 @@ namespace Skill
 		}
 
 		void MeshCreator::CreateMaterialMapping(FbxMesh* pMesh , MeshData& meshData)
-		{			
-			// Set material mapping.
+		{														
 			FbxGeometryElementMaterial* lMaterialElement = pMesh->CreateElementMaterial();
 			lMaterialElement->SetMappingMode(FbxGeometryElement::eByPolygon);
-			lMaterialElement->SetReferenceMode(FbxGeometryElement::eIndexToDirect);						
-			
-			lMaterialElement->GetIndexArray().SetCount(meshData.Faces.GetCount());
+			lMaterialElement->SetReferenceMode(FbxGeometryElement::eIndexToDirect);
+			lMaterialElement->GetIndexArray().SetCount(meshData.Faces.GetCount());	
 
+			// Set material mapping.					
 			int faceCount = meshData.Faces.GetCount();
-			// Set the Index 0 to polyCount to the material in position 0 of the direct array.
 			for(int i=0; i< faceCount; ++i)
-				lMaterialElement->GetIndexArray().SetAt(i,meshData.Faces[i].MaterialId);
+			{				
+				lMaterialElement->GetIndexArray().SetAt(i,meshData.Faces[i].MaterialId);				
+			}			
+		}
+
+		void MeshCreator::CreateMaterials(FbxScene* scene , FbxMesh* pMesh , MeshData& meshData)
+		{								
+			FbxNode* node = pMesh->GetNode();
+			for(int i=0; i < meshData.Materials.GetCount() ; ++i)
+			{				
+				
+				Material mat = meshData.Materials.GetAt(i);
+				FbxSurfaceMaterial* lMaterial;
+
+				if(mat.IsPhong)
+				{
+					lMaterial = FbxSurfacePhong::Create(scene,mat.Name);
+					FbxString lShadingName = "Phong";
+					lMaterial->ShadingModel.Set(lShadingName);
+
+					((FbxSurfacePhong*)lMaterial)->Ambient.Set(mat.Ambient);
+					((FbxSurfacePhong*)lMaterial)->Diffuse.Set(mat.Diffuse);
+					((FbxSurfacePhong*)lMaterial)->Specular.Set(mat.Specular);					
+					((FbxSurfacePhong*)lMaterial)->Emissive.Set(mat.Emissive);
+
+					((FbxSurfacePhong*)lMaterial)->TransparencyFactor.Set(mat.TransparencyFactor);
+					((FbxSurfacePhong*)lMaterial)->Shininess.Set(mat.Shininess);
+					((FbxSurfacePhong*)lMaterial)->ReflectionFactor.Set(mat.ReflectionFactor);
+
+
+					if(mat.AmbientTexture != NULL )
+					{
+						FbxFileTexture* aTexture = CreateFileTexture(scene,mat.AmbientTexture);						
+						((FbxSurfacePhong*)lMaterial)->Ambient.ConnectSrcObject(aTexture);
+					}
+					if(mat.DiffuseTexture != NULL )
+					{
+						FbxFileTexture* dTexture = CreateFileTexture(scene,mat.DiffuseTexture);						
+						((FbxSurfacePhong*)lMaterial)->Diffuse.ConnectSrcObject(dTexture);
+					}
+					if(mat.SpecularTexture != NULL )
+					{
+						FbxFileTexture* sTexture = CreateFileTexture(scene,mat.SpecularTexture);						
+						((FbxSurfacePhong*)lMaterial)->Specular.ConnectSrcObject(sTexture);
+					}
+					if(mat.EmissiveTexture != NULL )
+					{
+						FbxFileTexture* eTexture = CreateFileTexture(scene,mat.EmissiveTexture);						
+						((FbxSurfacePhong*)lMaterial)->Emissive.ConnectSrcObject(eTexture);
+					}
+				}
+				else
+				{												
+					lMaterial = FbxSurfaceLambert::Create(scene,mat.Name);
+					FbxString lShadingName = "Lambert";
+					lMaterial->ShadingModel.Set(lShadingName);
+
+					((FbxSurfaceLambert*)lMaterial)->Ambient.Set(mat.Ambient);
+					((FbxSurfaceLambert*)lMaterial)->Diffuse.Set(mat.Diffuse);										
+					((FbxSurfaceLambert*)lMaterial)->Emissive.Set(mat.Emissive);
+					((FbxSurfaceLambert*)lMaterial)->TransparencyFactor.Set(mat.TransparencyFactor);
+
+					if(mat.AmbientTexture != NULL )
+					{
+						FbxFileTexture* aTexture = CreateFileTexture(scene,mat.AmbientTexture);						
+						((FbxSurfaceLambert*)lMaterial)->Ambient.ConnectSrcObject(aTexture);
+					}
+					if(mat.DiffuseTexture != NULL )
+					{
+						FbxFileTexture* dTexture = CreateFileTexture(scene,mat.DiffuseTexture);						
+						((FbxSurfaceLambert*)lMaterial)->Diffuse.ConnectSrcObject(dTexture);
+					}					
+					if(mat.EmissiveTexture != NULL )
+					{
+						FbxFileTexture* eTexture = CreateFileTexture(scene,mat.EmissiveTexture);						
+						((FbxSurfaceLambert*)lMaterial)->Emissive.ConnectSrcObject(eTexture);
+					}
+					
+				}
+				node->AddMaterial(lMaterial);				
+			}						
+		}
+
+		FbxFileTexture* MeshCreator::CreateFileTexture(FbxScene* scene , TextureInfo* info)
+		{
+			FbxFileTexture* ft = FbxFileTexture::Create(scene,info->Name);
+
+			ft->SetFileName(info->FileName);
+			ft->SetTextureUse(info->TextureUse);
+			ft->SetMaterialUse(info->MaterialUse);
+			ft->SetMappingType(info->MappingType);
+			ft->SetSwapUV(info->SwapUV);
+			ft->SetTranslation(info->Translation[0],info->Translation[1]);
+			ft->SetScale(info->Scale[0],info->Scale[1]);
+			ft->SetRotation(info->Rotation[0],info->Rotation[1]);
+			ft->SetDefaultAlpha(info->DefaultAlpha);
+			ft->SetBlendMode(info->BlendMode);
+
+			return ft;
 		}
 
 		void MeshCreator::LinkMeshToSkeleton(FbxScene* scene , FbxNode* lNode , MeshData& meshData )

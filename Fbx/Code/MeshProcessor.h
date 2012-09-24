@@ -54,7 +54,7 @@ namespace Skill
 			// returns number of vertex
 			
 			void CreateTangent(Vertex& v0, Vertex& v1, Vertex& v2, FbxVector4* tangentArray);			
-			
+			void TransformVertices(MeshData& meshData , FbxAMatrix& matrix);
 
 		};
 	}

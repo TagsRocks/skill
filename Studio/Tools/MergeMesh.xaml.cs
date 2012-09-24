@@ -50,16 +50,30 @@ namespace Skill.Studio.Tools
             }
         }
 
-        public double Threshold
+        private double _PositionsTelorance = 0.02;
+        public double PositionsTelorance
         {
-            get { return _Scene.PositionsTelorance; }
+            get { return _PositionsTelorance; }
             set
-            {                
-                if ( _Scene.PositionsTelorance != value)
+            {
+                if (_PositionsTelorance != value)
                 {
-                    _Scene.PositionsTelorance = value;
-                    _Scene.UvTelorance = value / 2;
-                    OnPropertyChanged("Threshold");
+                    _PositionsTelorance = value;
+                    OnPropertyChanged("PositionsTelorance");
+                }
+            }
+        }
+
+        private double _UvTelorance = 0.01;
+        public double UvTelorance
+        {
+            get { return _UvTelorance; }
+            set
+            {
+                if (_UvTelorance != value)
+                {
+                    _UvTelorance = value;
+                    OnPropertyChanged("UvTelorance");
                 }
             }
         }
@@ -199,6 +213,8 @@ namespace Skill.Studio.Tools
             List<SceneNodeViewModel> checkedList = GetCheckedList();
             foreach (SceneNodeViewModel item in checkedList)
             {
+                _Scene.PositionsTelorance = _PositionsTelorance;
+                _Scene.UvTelorance = _UvTelorance;
                 _Scene.Optimize(item.Model, _GenerateNormals.IsChecked.Value, _GenerateTangents.IsChecked.Value);
             }
         }

@@ -107,6 +107,7 @@ namespace Skill
 			this->HasTangent = false;
 			this->HasColor = false;
 			this->HasSkin = false;
+
 		}
 
 		MeshData::~MeshData()

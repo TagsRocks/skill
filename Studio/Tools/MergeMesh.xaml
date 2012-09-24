@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:tools="clr-namespace:Skill.Studio.Tools"
         xmlns:crl="clr-namespace:Skill.Studio.Controls"
-        Title="Mesh Optimizer" x:Name="This" Height="480" Width="640" WindowStartupLocation="CenterOwner" Background="{StaticResource WindowBg}"  >
+        Title="Merge Mesh" x:Name="This" Height="480" Width="640" WindowStartupLocation="CenterOwner" Background="{StaticResource WindowBg}"  >
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="48" />
@@ -39,20 +39,35 @@
                 <Button Content="Merge Selected"  Click="BtnMerge_Click" />
                 <GroupBox Header="Optimize" Margin="2" >
                     <StackPanel Margin="2,6,2,0" >
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="130" />
-                            </Grid.ColumnDefinitions>
+                        <Grid>                            
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*" />
                                 <RowDefinition Height="*" />
-                                <RowDefinition Height="*" />                                
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
-                            <CheckBox Content="Generate Normals" x:Name="_GenerateNormals" Grid.Row="0" Grid.Column="1" Margin="0,2,0,0" />
-                            <CheckBox Content="Generate Tangents" x:Name="_GenerateTangents" Grid.Row="1" Grid.Column="1" Margin="0,2,0,0" />
-                            <TextBlock Text="Threshold" Grid.Row="2" HorizontalAlignment="Right" Margin="0,0,6,0"  VerticalAlignment="Center" />
-                            <Slider Grid.Column="1" Grid.Row="2" Margin="2" Minimum="0" Maximum="2" Value="{Binding Threshold}" />
+                            <CheckBox Content="Generate Normals" x:Name="_GenerateNormals" Grid.Row="0" Grid.Column="1" Margin="0,2,8,0" HorizontalAlignment="Right"  />
+                            <CheckBox Content="Generate Tangents" x:Name="_GenerateTangents" Grid.Row="1" Grid.Column="1" Margin="0,2,4,0" HorizontalAlignment="Right" />                            
+                            <Grid Grid.Row="2" >
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="140" />
+                                    <ColumnDefinition Width="30" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Position Threshold" Margin="2,0"  VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Column="0"  />
+                                <Slider Margin="2" Minimum="0" Maximum="1" Value="{Binding PositionsTelorance,ElementName=This}" Grid.Column="1" />
+                                <TextBlock Text="{Binding PositionsTelorance,ElementName=This}" Grid.Column="2" />
+                            </Grid>
+                            <Grid Grid.Row="3" >
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="140" />
+                                    <ColumnDefinition Width="30" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="UV Threshold" Margin="2,0"  VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Column="0"  />
+                                <Slider Margin="2" Minimum="0" Maximum="0.5" Value="{Binding UvTelorance,ElementName=This}" Grid.Column="1" />
+                                <TextBlock Text="{Binding UvTelorance,ElementName=This}" Grid.Column="2" />
+                            </Grid>
                         </Grid>
                         <Button Content="Optimize Selected" Click="BtnOptimize_Click"  />
                     </StackPanel>

@@ -69,10 +69,10 @@
     <ClInclude Include="Code\MeshCreator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Code\FbxMeshLoader.h">
+    <ClInclude Include="Code\Matrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Code\Matrix.h">
+    <ClInclude Include="Code\MeshLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -104,10 +104,10 @@
     <ClCompile Include="Code\MeshCreator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Code\FbxMeshLoader.cpp">
+    <ClCompile Include="Code\Matrix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Code\Matrix.cpp">
+    <ClCompile Include="Code\MeshLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

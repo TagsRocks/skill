@@ -363,5 +363,41 @@ namespace Skill
 
 			return lPoseMatrix;
 		}
+
+
+	// Get specific property value and connected texture if any.
+    // Value = Property value * Factor property value (if no factor property, multiply by 1).
+		FbxDouble3 FbxHelper::GetMaterialProperty(const FbxSurfaceMaterial * pMaterial, const char * pPropertyName, const char * pFactorPropertyName, unsigned int& pTextureName)
+		{
+			FbxDouble3 lResult(0, 0, 0);
+			const FbxProperty lProperty = pMaterial->FindProperty(pPropertyName);
+			const FbxProperty lFactorProperty = pMaterial->FindProperty(pFactorPropertyName);
+			if (lProperty.IsValid() && lFactorProperty.IsValid())
+			{
+				lResult = lProperty.Get<FbxDouble3>();
+				double lFactor = lFactorProperty.Get<FbxDouble>();
+				if (lFactor != 1)
+				{
+					lResult[0] *= lFactor;
+					lResult[1] *= lFactor;
+					lResult[2] *= lFactor;
+				}
+			}
+
+			if (lProperty.IsValid())
+			{
+				const int lTextureCount = lProperty.GetSrcObjectCount<FbxFileTexture>();
+				if (lTextureCount)
+				{
+					const FbxFileTexture* lTexture = lProperty.GetSrcObject<FbxFileTexture>();
+					if (lTexture && lTexture->GetUserDataPtr())
+					{
+						pTextureName = *(static_cast<unsigned int*>(lTexture->GetUserDataPtr()));
+					}
+				}
+			}
+
+			return lResult;
+		}
 	}
 }

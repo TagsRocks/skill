@@ -63,7 +63,21 @@ namespace Skill.Editor
             asset = CreateInstance<Skill.Editor.Tools.ImplantAsset>();
             AssetDatabase.CreateAsset(asset, "Assets/" + name + nameIdx + ".asset");
             Selection.activeObject = asset;
-            EditorUtility.FocusProjectWindow();            
-        }        
+            EditorUtility.FocusProjectWindow();
+        }
+
+
+        // commands
+        [MenuItem("Skill/Commands/Copy Transform")]
+        static void CopyTransform()
+        {
+            Skill.Editor.Tools.Commands.CopyTransform();
+        }
+
+        [MenuItem("Skill/Commands/Paste Transform")]
+        static void PasteTransform()
+        {
+            Skill.Editor.Tools.Commands.PasteTransform();
+        }
     }
 }
