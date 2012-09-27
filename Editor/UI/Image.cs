@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Drawsa texture within a rectangle.
     /// </summary>
-    public class TextureImage : EditorControl
+    public class Image : EditorControl
     {
         /// <summary>
         /// Texture to display.
@@ -40,13 +40,16 @@ namespace Skill.Editor.UI
         /// <summary>
         /// Create an instance of TextureImage
         /// </summary>
-        public TextureImage()
+        public Image()
         {
             this.Alpha = false;
             this.Scale = ScaleMode.ScaleToFit;
             this.ImageAspect = 0;
         }
 
+        /// <summary>
+        /// Render Image
+        /// </summary>
         protected override void Render()
         {
             if (Texture != null)

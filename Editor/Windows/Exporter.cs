@@ -8,7 +8,7 @@ using System.Xml.Linq;
 
 namespace Skill.Editor
 {
-    public class Exporter : UnityEditor.EditorWindow
+    class Exporter : UnityEditor.EditorWindow
     {
         #region Variables
         private static Vector2 Size = new Vector2(320, 100);
@@ -62,7 +62,6 @@ namespace Skill.Editor
 
 
         private Skill.Editor.UI.EditorFrame _Frame;
-        private Skill.UI.Grid _Grid;
 
         private Skill.Editor.UI.ObjectField<Transform> _RootBone;
         private Skill.Editor.UI.ObjectField<UnityEngine.Animation> _Animations;
@@ -88,24 +87,23 @@ namespace Skill.Editor
             _BtnCopyAimations.Content.text = "Copy Animations to Clipboard";
             _BtnCopyAimations.Click += new EventHandler(_BtnCopyAimations_Click);
 
-            _Grid = new Skill.UI.Grid();
-            _Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(20, Skill.UI.GridUnitType.Pixel) });
-            _Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(20, Skill.UI.GridUnitType.Pixel) });
-            _Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(5, Skill.UI.GridUnitType.Pixel) });
-            _Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(20, Skill.UI.GridUnitType.Pixel) });
-            _Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(20, Skill.UI.GridUnitType.Pixel) });
-            _Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(1, Skill.UI.GridUnitType.Star) });
-
-            _Grid.ColumnDefinitions.Add(new Skill.UI.ColumnDefinition() { Width = new Skill.UI.GridLength(312, Skill.UI.GridUnitType.Pixel)});
-            _Grid.ColumnDefinitions.Add(new Skill.UI.ColumnDefinition() { Width = new Skill.UI.GridLength(1, Skill.UI.GridUnitType.Star) });
-
-            _Grid.Controls.Add(_RootBone);
-            _Grid.Controls.Add(_BtnCopySkeleton);
-            _Grid.Controls.Add(_Animations);
-            _Grid.Controls.Add(_BtnCopyAimations);
-
             _Frame = new UI.EditorFrame(this);
-            _Frame.Controls.Add(_Grid);
+
+            _Frame.Grid.Margin = new Skill.UI.Thickness(0, 10, 0, 0);
+            _Frame.Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(20, Skill.UI.GridUnitType.Pixel) });
+            _Frame.Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(20, Skill.UI.GridUnitType.Pixel) });
+            _Frame.Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(5, Skill.UI.GridUnitType.Pixel) });
+            _Frame.Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(20, Skill.UI.GridUnitType.Pixel) });
+            _Frame.Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(20, Skill.UI.GridUnitType.Pixel) });
+            _Frame.Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(1, Skill.UI.GridUnitType.Star) });
+
+            _Frame.Grid.ColumnDefinitions.Add(new Skill.UI.ColumnDefinition() { Width = new Skill.UI.GridLength(312, Skill.UI.GridUnitType.Pixel) });
+            _Frame.Grid.ColumnDefinitions.Add(new Skill.UI.ColumnDefinition() { Width = new Skill.UI.GridLength(1, Skill.UI.GridUnitType.Star) });
+
+            _Frame.Grid.Controls.Add(_RootBone);
+            _Frame.Grid.Controls.Add(_BtnCopySkeleton);
+            _Frame.Grid.Controls.Add(_Animations);
+            _Frame.Grid.Controls.Add(_BtnCopyAimations);
         }
 
         void _BtnCopyAimations_Click(object sender, EventArgs e)
@@ -129,13 +127,8 @@ namespace Skill.Editor
             _BtnCopyAimations.IsEnabled = _RootBone.Object != null && _Animations.Object != null;
         }
 
-        public void OnGUI()
+        void OnGUI()
         {
-            Rect pos = position;
-            pos.x = 0;
-            pos.y = 10;
-            pos.height -= 10;
-            _Grid.Position = pos;
             _Frame.OnGUI();
         }
 

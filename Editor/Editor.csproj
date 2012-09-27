@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Skill.Editor.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,6 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Skill.Editor.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -64,7 +66,6 @@
     <Compile Include="UI\EditorFrame.cs" />
     <Compile Include="UI\IntPopup.cs" />
     <Compile Include="UI\CurveField.cs" />
-    <Compile Include="UI\CustomPropertyField.cs" />
     <Compile Include="UI\DisabledGroup.cs" />
     <Compile Include="UI\DropShadowLabel.cs" />
     <Compile Include="UI\EditorControl.cs" />
@@ -96,7 +97,7 @@
     <Compile Include="UI\TagField.cs" />
     <Compile Include="UI\TextArea.cs" />
     <Compile Include="UI\TextField.cs" />
-    <Compile Include="UI\TextureImage.cs" />
+    <Compile Include="UI\Image.cs" />
     <Compile Include="UI\ToggleButton.cs" />
     <Compile Include="UI\Vector2Field.cs" />
     <Compile Include="UI\Vector3Field.cs" />

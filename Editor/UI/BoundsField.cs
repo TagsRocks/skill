@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Skill.Editor.UI
 {
     /// <summary>
-    /// Make Center & Extents field for entering a Bounds.
+    /// Make Center and Extents field for entering a Bounds.
     /// </summary>
     public class BoundsField : EditorControl
     {
@@ -20,6 +20,9 @@ namespace Skill.Editor.UI
         /// Occurs when value of BoundsField changed
         /// </summary>
         public event EventHandler ValueChanged;
+        /// <summary>
+        /// when value of BoundsField changed
+        /// </summary>
         protected virtual void OnValueChanged()
         {
             if (ValueChanged != null) ValueChanged(this, EventArgs.Empty);
@@ -52,6 +55,9 @@ namespace Skill.Editor.UI
             this.Height = 32;
         }
 
+        /// <summary>
+        /// Render BoundsField
+        /// </summary>
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

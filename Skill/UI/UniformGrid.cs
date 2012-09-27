@@ -12,7 +12,7 @@ namespace Skill.UI
         /// <summary> Gets or sets the number of columns that are in the grid. </summary>
         public int Columns { get; set; }
 
-        /// <summary> Gets or sets the number of leading blank cells in the first row of the grid. </summary>
+        //// <summary> Gets or sets the number of leading blank cells in the first row of the grid. </summary>
         //public int FirstColumn { get; set; }
 
         /// <summary> Gets or sets the number of rows that are in the grid. </summary>

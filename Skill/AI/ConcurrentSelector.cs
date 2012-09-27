@@ -51,9 +51,9 @@ namespace Skill.AI
         //private bool[] _ChildrenResults;// state of children that finish their jobs and result is not BehaviorResult.Running
 
 
-        /// <summary>
-        /// At first time execution, make sure the  _ChildrenResults array is valid
-        /// </summary>
+        //// <summary>
+        //// At first time execution, make sure the  _ChildrenResults array is valid
+        //// </summary>
         //private void CreateChildrenResults()
         //{
         //    if (_ChildrenResults == null || _ChildrenResults.Length != ChildCount)
@@ -175,7 +175,7 @@ namespace Skill.AI
         }
 
         /// <summary>
-        /// itrate throw children and evaluate conditions
+        /// iterate throw children and evaluate conditions
         /// </summary>
         /// <param name="state">State of BehaviorTree</param>
         /// <returns></returns>

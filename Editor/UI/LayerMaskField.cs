@@ -48,6 +48,9 @@ namespace Skill.Editor.UI
         /// Occurs when Layer of LayerMaskField changed
         /// </summary>
         public event EventHandler LayersChanged;
+        /// <summary>
+        /// when Layer of LayerMaskField changed
+        /// </summary>
         protected virtual void OnLayersChanged()
         {
             if (LayersChanged != null) LayersChanged(this, EventArgs.Empty);

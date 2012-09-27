@@ -150,8 +150,7 @@ namespace Skill.AI
 
         /// <summary>
         /// Reset behavior
-        /// </summary>
-        /// <param name="state">State of BehaviorTree</param>
+        /// </summary>        
         /// <param name="resetChildren">Reset children too</param>
         public override void ResetBehavior(bool resetChildren = false)
         {
@@ -167,6 +166,12 @@ namespace Skill.AI
             }
         }
 
+        /// <summary>
+        /// Checks whether behavior2 is one of next siblings of behavior1
+        /// </summary>
+        /// <param name="behavior1">firsy behavior</param>
+        /// <param name="behavior2">next behavior</param>
+        /// <returns>True if behavior2 is one of next siblings of behavior1, otherwise false</returns>
         public bool IsInSequenceChild(Behavior behavior1, Behavior behavior2)
         {
             bool found1 = false;

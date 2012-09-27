@@ -38,6 +38,9 @@ namespace Skill.UI
         /// Occurs when a ToggleButton is checked.
         /// </summary>
         public event EventHandler Checked;
+        /// <summary>
+        /// Occurs when a ToggleButton is checked.
+        /// </summary>
         protected virtual void OnChecked()
         {
             if (Checked != null)
@@ -47,6 +50,9 @@ namespace Skill.UI
         /// Occurs when a ToggleButton is unchecked.
         /// </summary>
         public event EventHandler Unchecked;
+        /// <summary>
+        /// Occurs when a ToggleButton is unchecked.
+        /// </summary>
         protected virtual void OnUnchecked()
         {
             if (Unchecked != null)
@@ -62,6 +68,9 @@ namespace Skill.UI
             Content = new GUIContent();
         }
 
+        /// <summary>
+        /// Render ToggleButton
+        /// </summary>
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

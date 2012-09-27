@@ -69,6 +69,9 @@ namespace Skill.UI
             this.Items = new ToolbarButtonCollection();
         }
 
+        /// <summary>
+        /// Render Toolbar
+        /// </summary>
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

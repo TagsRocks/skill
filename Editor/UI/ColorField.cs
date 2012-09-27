@@ -20,6 +20,9 @@ namespace Skill.Editor.UI
         /// Occurs when Color of ColorField changed
         /// </summary>
         public event EventHandler ColorChanged;
+        /// <summary>
+        /// when Color of ColorField changed
+        /// </summary>
         protected virtual void OnColorChanged()
         {
             if (ColorChanged != null) ColorChanged(this, EventArgs.Empty);
@@ -51,6 +54,9 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
+        /// <summary>
+        /// Render ColorField
+        /// </summary>
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

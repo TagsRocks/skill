@@ -27,6 +27,9 @@ namespace Skill.Animation
         /// </summary>
         public UnityEngine.AnimationBlendMode BlendMode { get; private set; }
 
+        /// <summary>
+        /// RootMotion result of Sequences in this layer
+        /// </summary>
         public UnityEngine.Vector3 RootMotion { get { return _RootMotion; } }
 
         /// <summary>

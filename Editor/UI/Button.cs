@@ -20,6 +20,9 @@ namespace Skill.Editor.UI
         /// Occurs when users clicks the button
         /// </summary>
         public event EventHandler Click;
+        /// <summary>
+        /// when users clicks the button
+        /// </summary>
         protected virtual void OnClick()
         {
             if (Click != null)
@@ -35,7 +38,7 @@ namespace Skill.Editor.UI
         }
 
         /// <summary>
-        /// Render button
+        /// Render Button
         /// </summary>
         protected override void Render()
         {

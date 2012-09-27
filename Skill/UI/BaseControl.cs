@@ -43,7 +43,7 @@ namespace Skill.UI
                 if (_Position != value)
                 {
                     _Position = value;
-                    OnPositionChange();
+                    OnPositionChanged();
                 }
             }
         }
@@ -62,7 +62,7 @@ namespace Skill.UI
                 if (_Position.x != value)
                 {
                     _Position.x = value;
-                    OnPositionChange();
+                    OnPositionChanged();
                 }
             }
         }
@@ -81,7 +81,7 @@ namespace Skill.UI
                 if (_Position.y != value)
                 {
                     _Position.y = value;
-                    OnPositionChange();
+                    OnPositionChanged();
                 }
             }
         }
@@ -101,7 +101,7 @@ namespace Skill.UI
                 if (_Position.width != value)
                 {
                     _Position.width = value;
-                    OnPositionChange();
+                    OnPositionChanged();
                 }
             }
         }
@@ -120,7 +120,7 @@ namespace Skill.UI
                 if (_Position.height != value)
                 {
                     _Position.height = value;
-                    OnPositionChange();
+                    OnPositionChanged();
                 }
             }
         }
@@ -366,7 +366,7 @@ namespace Skill.UI
                 if (_Visibility != value)
                 {
                     _Visibility = value;
-                    OnLayoutChanged();
+                    OnVisibilityChanged();                    
                 }
             }
         }
@@ -375,25 +375,46 @@ namespace Skill.UI
 
         #region Events
         /// <summary> Occurs when position of control changed </summary>
-        public event EventHandler PositionChange;
-        protected virtual void OnPositionChange()
+        public event EventHandler PositionChanged;
+        /// <summary>
+        /// when position of control changed 
+        /// </summary>
+        protected virtual void OnPositionChanged()
         {
-            if (PositionChange != null)
-                PositionChange(this, EventArgs.Empty);
+            if (PositionChanged != null)
+                PositionChanged(this, EventArgs.Empty);
             OnLayoutChanged();
         }
 
         /// <summary> Occurs when RenderArea of control changed </summary>
         public event EventHandler RenderAreaChanged;
+        /// <summary>
+        /// when RenderArea of control changed
+        /// </summary>
         protected virtual void OnRenderAreaChanged()
         {
             if (RenderAreaChanged != null) RenderAreaChanged(this, EventArgs.Empty);
         }
-        /// <summary> Occurs when layout of control changed and parent panel needs to update layout of it's children</summary>
+        /// <summary> Occurs when layout of control changed and parent control needs to update layout of it's children</summary>
         public event EventHandler LayoutChanged;
+        /// <summary>
+        /// when layout of control changed and parent control needs to update layout of it's children
+        /// </summary>
         protected virtual void OnLayoutChanged()
         {
             if (LayoutChanged != null) LayoutChanged(this, EventArgs.Empty);
+        }
+
+        /// <summary> Occurs when Visibility of control changed </summary>
+        public event EventHandler VisibilityChanged;
+        /// <summary>
+        /// when Visibility of control changed
+        /// </summary>
+        protected virtual void OnVisibilityChanged()
+        {
+            if (VisibilityChanged != null)
+                VisibilityChanged(this, EventArgs.Empty);
+            OnLayoutChanged();
         }
         #endregion
 
@@ -499,6 +520,9 @@ namespace Skill.UI
         ///  Occurs when any Control insid collection needs to update it's layout
         /// </summary>
         public event EventHandler LayoutChange;
+        /// <summary>
+        /// when any Control insid collection needs to update it's layout
+        /// </summary>
         protected virtual void OnLayoutChange()
         {
             if (LayoutChange != null) LayoutChange(this, EventArgs.Empty);
@@ -580,7 +604,7 @@ namespace Skill.UI
         /// Copies the elements of the collection to an System.Array, starting at a particular System.Array index.
         /// </summary>
         /// <param name="array">The one-dimensional System.Array that is the destination of the elements
-        //     copied from collection. The System.Array must have zero-based indexing.</param>
+        /// copied from collection. The System.Array must have zero-based indexing.</param>
         /// <param name="arrayIndex">The zero-based index in array at which copying begins.</param>
         /// <exception cref="System.ArgumentNullException">array is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">arrayIndex is less than 0.</exception>

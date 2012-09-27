@@ -35,6 +35,9 @@ namespace Skill.UI
         /// Occurs when password changed
         /// </summary>
         public event EventHandler PasswordChanged;
+        /// <summary>
+        /// when password changed
+        /// </summary>
         protected virtual void OnPasswordChanged()
         {
             if (PasswordChanged != null) PasswordChanged(this, EventArgs.Empty);
@@ -60,6 +63,9 @@ namespace Skill.UI
             this.MaskChar = '•';
         }
 
+        /// <summary>
+        /// Render PasswordField
+        /// </summary>
         protected override void Render()
         {
             string result;

@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Skill.Editor.UI
 {
     /// <summary>
-    /// Make an X & Y field for entering a Vector2.
+    /// Make an X , Y field for entering a Vector2.
     /// </summary>
     public class Vector2Field : EditorControl
     {
@@ -30,6 +30,9 @@ namespace Skill.Editor.UI
         /// Occurs when value of Vector2Field changed
         /// </summary>
         public event EventHandler ValueChanged;
+        /// <summary>
+        /// when value of Vector2Field changed
+        /// </summary>
         protected virtual void OnValueChanged()
         {
             if (ValueChanged != null) ValueChanged(this, EventArgs.Empty);
@@ -61,6 +64,9 @@ namespace Skill.Editor.UI
             this.Height = 38;
         }
 
+        /// <summary>
+        /// Render Vector2Field
+        /// </summary>
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

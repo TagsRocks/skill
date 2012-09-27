@@ -5,8 +5,17 @@ using System.Text;
 
 namespace Skill.AI
 {
+    /// <summary>
+    /// Defines an interface for objects that can generate random values 
+    /// </summary>
     public interface IRandomService
     {
+        /// <summary>
+        /// Returns a random float number between and min [inclusive] and max [inclusive].
+        /// </summary>
+        /// <param name="min">min value</param>
+        /// <param name="max">max value</param>
+        /// <returns>a random float number between and min [inclusive] and max [inclusive].</returns>
         float Range(float min, float max);
     }
 
@@ -24,8 +33,17 @@ namespace Skill.AI
             }
         }
 
-
         private static IRandomService _RandomService;
+
+        /// <summary>        
+        /// Gets or sets random value generation service
+        /// </summary>
+        /// <remarks>
+        /// The main reason to write this property is :
+        /// as for simulation BehaviorTree in Skill Studio i use Skill Dll, to avoid writing duplicate code for BehaviorTree (one in Skill Dll and one in Skill Studio)
+        /// i could't use UnityEngine.Random class in Skill Studio application. so i create IRandomService interface to change random generation
+        /// algorithm in Skill Studio application. Although you can change random generation algorith (:D).
+        /// </remarks>
         public static IRandomService RandomService
         {
             get
@@ -38,7 +56,7 @@ namespace Skill.AI
         }
 
 
-        private float _TotalWeight;
+        private float _TotalWeight;// sum of weights of child behaviors
 
         /// <summary>
         /// CompositeType

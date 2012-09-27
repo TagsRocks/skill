@@ -55,9 +55,12 @@ namespace Skill.Editor.UI
             this.Owner = owner;
         }
 
-        protected override void BeginRender()
+        /// <summary>
+        /// to render control you have to call this method in OnGUI method of MonoBehavior.(call this for Frame class)
+        /// </summary>
+        public override void OnGUI()
         {
-            Rect position = Owner.position;            
+            Rect position = Owner.position;
             switch (Location)
             {
                 case EditorFrameLocation.Fill:
@@ -72,7 +75,7 @@ namespace Skill.Editor.UI
                     break;
             }
             this.Position = position;
-            base.BeginRender();
+            base.OnGUI();
         }
     }
 }

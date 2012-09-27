@@ -29,7 +29,7 @@ namespace Skill.Controllers
         public bool RespawnDeadAgents;
         /// <summary> Radius around spawn location to spawn agents. </summary>
         public float SpawnRadius = 0;
-
+        /// <summary> Spawn On Awake </summary>
         public bool SpawnOnAwake = false;
 
         // If true, only spawn agents if player can't see spawn point
@@ -44,29 +44,21 @@ namespace Skill.Controllers
         public List<GameObject> SpawnedObjects { get; private set; }
 
         private List<GameObject> _RespawnObjects;
-
         // Holds the last SpawnLocation index used
         private int _LastSpawnLocationIndex;
         private float _LastSpawnTime;
         private int _SpawnCount;
         private int _DeadCount;
 
-        protected virtual bool CanSpawn { get { return true; } }
+        /// <summary>
+        /// Subclasses can avoid spawning for some reason at specific times
+        /// </summary>
+        protected virtual bool CanSpawn { get { return true; } }        
 
-
-
-        public Spawner()
-        {
-            SpawnedObjects = new List<GameObject>();
-            _RespawnObjects = new List<GameObject>();
-            _LastSpawnLocationIndex = -1;
-            _LastSpawnTime = -1000;
-            _SpawnCount = 0;
-            _DeadCount = 0;
-            DisableAfterAll = true;
-        }
-
-        // let inherited class modify spawned object
+        /// <summary>
+        /// let inherited class modify spawned object right after spawn time
+        /// </summary>
+        /// <param name="spawnedObj">Spawned Object</param>
         protected virtual void InitializeSpawnedObject(GameObject spawnedObj) { }
 
         /// <summary>
@@ -131,12 +123,25 @@ namespace Skill.Controllers
             }
         }
 
-        public virtual void Awake()
+        /// <summary>
+        /// Awake
+        /// </summary>
+        protected virtual void Awake()
         {
+            SpawnedObjects = new List<GameObject>();
+            _RespawnObjects = new List<GameObject>();
+            _LastSpawnLocationIndex = -1;
+            _LastSpawnTime = -1000;
+            _SpawnCount = 0;
+            _DeadCount = 0;
+            DisableAfterAll = true;
             enabled = SpawnOnAwake;
         }
 
-        public virtual void Update()
+        /// <summary>
+        /// Update
+        /// </summary>
+        protected virtual void Update()
         {
             if ((_SpawnCount < MaxSpawnCount) &&
                 (Time.time > SpawnInterval + _LastSpawnTime))
@@ -165,7 +170,10 @@ namespace Skill.Controllers
             }
         }
 
-        public virtual void OnDestroy()
+        /// <summary>
+        /// when spawner destroyed (all spawned objects will destroyed too)
+        /// </summary>
+        protected virtual void OnDestroy()
         {
             DestroySpawnedObjects();
             DestroyRespawnedObjects();
@@ -195,6 +203,10 @@ namespace Skill.Controllers
                 CacheSpawner.DestroyCache(SpawnedObj);
         }
 
+        /// <summary>
+        /// Destroy Spawned Object by this spawner
+        /// </summary>
+        /// <param name="spawnedObj">GameObject or destroy</param>
         public void DestroySpawnedObject(GameObject spawnedObj)
         {
             if (SpawnedObjects.Contains(spawnedObj))
@@ -213,12 +225,12 @@ namespace Skill.Controllers
                 GameObject.Destroy(spawnedObj);
         }
 
-        public void OnDieSpawnedObject(GameObject spawnedObj)
-        {
-            if (SpawnedObjects.Contains(spawnedObj))
-            {
-                _DeadCount++;
-            }
-        }
+        //public void OnDieSpawnedObject(GameObject spawnedObj)
+        //{
+        //    if (SpawnedObjects.Contains(spawnedObj))
+        //    {
+        //        _DeadCount++;
+        //    }
+        //}
     }
 }

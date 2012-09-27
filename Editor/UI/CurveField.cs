@@ -61,6 +61,9 @@ namespace Skill.Editor.UI
 
         }
 
+        /// <summary>
+        /// Render CurveField
+        /// </summary>
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

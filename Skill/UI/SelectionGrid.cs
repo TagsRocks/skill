@@ -71,6 +71,9 @@ namespace Skill.UI
         /// Occurs when selected item changed
         /// </summary>
         public event EventHandler SelectedChanged;
+        /// <summary>
+        /// when selected item changed
+        /// </summary>
         protected virtual void OnSelectedChanged()
         {
             if (SelectedChanged != null)
@@ -86,6 +89,9 @@ namespace Skill.UI
             this.XCount = 2;
         }
 
+        /// <summary>
+        /// Render SelectionGrid
+        /// </summary>
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

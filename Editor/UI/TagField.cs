@@ -20,6 +20,9 @@ namespace Skill.Editor.UI
         /// Occurs when tag of TagField changed 
         /// </summary>
         public event EventHandler TagChanged;
+        /// <summary>
+        /// when tag of TagField changed 
+        /// </summary>
         protected virtual void OnTagChanged()
         {
             if (TagChanged != null) TagChanged(this, EventArgs.Empty);
@@ -51,6 +54,9 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
+        /// <summary>
+        /// Render TagField
+        /// </summary>
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

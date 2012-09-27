@@ -68,6 +68,9 @@ namespace Skill.UI
         /// Occurs when this element gets logical focus.
         /// </summary>
         public event EventHandler GotFocus;
+        /// <summary>
+        /// when this element gets logical focus.
+        /// </summary>
         protected virtual void OnGotFocus()
         {
             if (GotFocus != null) GotFocus(this, EventArgs.Empty);
@@ -77,6 +80,9 @@ namespace Skill.UI
         /// Occurs when this element loses logical focus.
         /// </summary>
         public event EventHandler LostFocus;
+        /// <summary>
+        /// when this element loses logical focus.
+        /// </summary>
         protected virtual void OnLostFocus()
         {
             if (LostFocus != null) LostFocus(this, EventArgs.Empty);

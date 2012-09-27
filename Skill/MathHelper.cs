@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace Skill
 {
+    /// <summary>
+    /// Some helper methods for math
+    /// </summary>
     public static class MathHelper
     {
         /// <summary>
@@ -67,7 +70,13 @@ namespace Skill
         }
 
 
-        // The angle between dirA and dirB around axis
+        /// <summary>
+        /// The angle between dirA and dirB around axis
+        /// </summary>
+        /// <param name="dirA">Direction A</param>
+        /// <param name="dirB">Direction B</param>
+        /// <param name="axis">Axis</param>
+        /// <returns>The angle between dirA and dirB around axis</returns>
         public static float AngleAroundAxis(Vector3 dirA, Vector3 dirB, Vector3 axis)
         {
             // Project A and B onto the plane orthogonal target axis

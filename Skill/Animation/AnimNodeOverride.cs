@@ -22,7 +22,13 @@ namespace Skill.Animation
         private TimeWatch _OverrideTimer;
         private int _OverrideIndex;
 
+        /// <summary>
+        /// Normal node
+        /// </summary>
         public AnimNode NormalNode { get { return this[0]; } set { this[0] = value; } }
+        /// <summary>
+        /// Override Node (higher layer)
+        /// </summary>
         public AnimNode OverrideNode { get { return this[_OverrideIndex]; } }
 
         /// <summary>
@@ -119,6 +125,10 @@ namespace Skill.Animation
         }
 
 
+        /// <summary>
+        /// Update
+        /// </summary>
+        /// <param name="state">State of AnimationTree</param>
         internal override void Update(AnimationTreeState state)
         {                    
             if (_OverrideTimer.Enabled)

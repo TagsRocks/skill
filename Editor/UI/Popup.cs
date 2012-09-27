@@ -73,6 +73,9 @@ namespace Skill.Editor.UI
         /// Ocuurs when Option of Popup changed
         /// </summary>
         public event EventHandler OptionChanged;
+        /// <summary>
+        /// when Option of Popup changed
+        /// </summary>
         protected virtual void OnOptionChanged()
         {
             if (OptionChanged != null)
@@ -88,6 +91,9 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
+        /// <summary>
+        /// Render Popup
+        /// </summary>
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

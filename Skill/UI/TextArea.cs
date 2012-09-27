@@ -34,6 +34,9 @@ namespace Skill.UI
         /// Occurs when text of TextArea changed
         /// </summary>
         public event EventHandler TextChanged;
+        /// <summary>
+        /// Occurs when text of TextArea changed
+        /// </summary>
         protected virtual void OnTextChanged()
         {
             if (TextChanged != null) TextChanged(this, EventArgs.Empty);
@@ -53,6 +56,9 @@ namespace Skill.UI
             this.MaxLength = 0;
         }
 
+        /// <summary>
+        /// Render TextArea
+        /// </summary>
         protected override void Render()
         {
             string result;

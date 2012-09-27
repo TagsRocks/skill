@@ -5,16 +5,24 @@ using System.Collections.Generic;
 
 namespace Skill.Managers
 {
-
+    /// <summary>
+    /// Manage spawning cache objects
+    /// </summary>
+    /// <remarks>
+    /// Only one instance of this object should be in scene
+    /// </remarks>
     [AddComponentMenu("Skill/Managers/CacheSpawner")]
     public class CacheSpawner : MonoBehaviour
     {
+        /// <summary> Groups to manage </summary>
         public CacheGroup[] Groups;
 
         private static CacheSpawner _Instance = null;
 
-
-        void Awake()
+        /// <summary>
+        /// Awake
+        /// </summary>
+        protected void Awake()
         {
             if (_Instance != null)
                 Debug.LogError("More that one CacheSpawner found in scene");
@@ -48,6 +56,17 @@ namespace Skill.Managers
             return null;
         }
 
+        /// <summary>
+        /// Spawn a cache object
+        /// </summary>
+        /// <param name="prefab">GameObject with CacheBehavior component</param>
+        /// <param name="position">Position</param>
+        /// <param name="rotation">Rotation</param>
+        /// <param name="enabled">Enable at spawn time or let caller enable it itself</param>
+        /// <returns>Spawned GameObject</returns>
+        /// <remarks>
+        /// If GameObject has not a CacheBehavior component, spawner instantiate it normally ( by GameObject.Instantiate method )
+        /// </remarks>
         public static GameObject Spawn(GameObject prefab, Vector3 position, Quaternion rotation, bool enabled = true)
         {
             CacheObject cache = GetCacheObject(prefab);
@@ -80,6 +99,13 @@ namespace Skill.Managers
             return obj;
         }
 
+        /// <summary>
+        /// Destroy cache GameObject and add to free list
+        /// </summary>
+        /// <param name="objectToDestroy">GameObject with CacheBehavior component</param>
+        ///  /// <remarks>
+        /// If GameObject has not a CacheBehavior component, spawner destroy it normally ( by GameObject.Destroy method )
+        /// </remarks>
         public static void DestroyCache(GameObject objectToDestroy)
         {
             if (objectToDestroy == null) return; // maybe engine destroy it before
@@ -97,15 +123,6 @@ namespace Skill.Managers
             {
                 GameObject.Destroy(objectToDestroy);
             }
-        }
-
-        void Start()
-        {
-            enabled = false;
-        }
-        void Update()
-        {
-            enabled = false;
-        }
+        }        
     }
 }

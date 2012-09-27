@@ -41,6 +41,9 @@ namespace Skill.UI
         /// Occurs when value of slider changed
         /// </summary>
         public event EventHandler ValueChanged;
+        /// <summary>
+        /// Occurs when value of slider changed
+        /// </summary>
         protected virtual void OnValueChanged()
         {
             if (ValueChanged != null) ValueChanged(this, EventArgs.Empty);
@@ -86,6 +89,9 @@ namespace Skill.UI
             this._Value = 50;
         }
 
+        /// <summary>
+        /// Render Slider
+        /// </summary>
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

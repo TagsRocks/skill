@@ -3,15 +3,23 @@ using System.Collections;
 
 namespace Skill.Managers
 {
+    /// <summary>
+    /// Group of CacheObjects for better management
+    /// </summary>
     [AddComponentMenu("Skill/Managers/CacheGroup")]
     public class CacheGroup : MonoBehaviour
     {
+        /// <summary> CacheObjects </summary>
         public CacheObject[] Caches;
+        /// <summary> Clean Interval of this group</summary>
         public float CleanInterval = 20;
 
         private Skill.TimeWatch _CleanTW;
 
-        void Awake()
+        /// <summary>
+        /// Awake
+        /// </summary>
+        protected void Awake()
         {
             // Loop through the caches
             for (var i = 0; i < Caches.Length; i++)
@@ -21,18 +29,25 @@ namespace Skill.Managers
             }
         }
 
-        void OnDestroy()
+        /// <summary>
+        /// On Destroy
+        /// </summary>
+        protected void OnDestroy()
         {
             if (Caches != null)
             {
                 foreach (var item in Caches)
                 {
-                    item.Destroy();
+                    if (item != null)
+                        item.Destroy();
                 }
             }
         }
 
-        void Update()
+        /// <summary>
+        /// Update
+        /// </summary>
+        protected void Update()
         {
             if (CleanInterval > 0)
             {
@@ -42,7 +57,8 @@ namespace Skill.Managers
                     {
                         foreach (var item in Caches)
                         {
-                            item.Clean();
+                            if (item != null)
+                                item.Clean();
                         }
                         _CleanTW.End();
                     }

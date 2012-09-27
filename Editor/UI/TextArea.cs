@@ -37,6 +37,9 @@ namespace Skill.Editor.UI
         /// Occurs when text of TextArea changed
         /// </summary>
         public event EventHandler TextChanged;
+        /// <summary>
+        /// when text of TextArea changed
+        /// </summary>
         protected virtual void OnTextChanged()
         {
             if (TextChanged != null) TextChanged(this, EventArgs.Empty);
@@ -51,6 +54,9 @@ namespace Skill.Editor.UI
             this.Height = 38;
         }
 
+        /// <summary>
+        /// Render TextArea
+        /// </summary>
         protected override void Render()
         {
             string result;

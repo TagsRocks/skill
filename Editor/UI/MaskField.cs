@@ -20,6 +20,9 @@ namespace Skill.Editor.UI
         /// Occurs when mask of MaskField changed
         /// </summary>
         public event EventHandler MaskChanged;
+        /// <summary>
+        /// when mask of MaskField changed
+        /// </summary>
         protected virtual void OnMaskChanged()
         {
             if (MaskChanged != null) MaskChanged(this, EventArgs.Empty);
@@ -57,6 +60,9 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
+        /// <summary>
+        /// Render MaskField
+        /// </summary>
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

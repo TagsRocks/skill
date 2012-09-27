@@ -6,6 +6,9 @@ using UnityEditor;
 
 namespace Skill.Editor.UI
 {
+    /// <summary>
+    /// Make a field for SerializedProperty.
+    /// </summary>
     public class PropertyField : EditorControl
     {
         /// <summary>
@@ -23,6 +26,39 @@ namespace Skill.Editor.UI
         /// </summary>
         public bool IncludeChildren { get; set; }
 
+
+
+        private bool _Result;
+
+        /// <summary>
+        /// True if the property has children and is expanded and includeChildren was set to false; otherwise false.
+        /// </summary>
+        public bool Result
+        {
+            get { return _Result; }
+            set
+            {
+                if (_Result != value)
+                {
+                    _Result = value;
+                    OnResultChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Occurs when Result of PropertyField changed
+        /// </summary>
+        public event EventHandler ResultChanged;
+        /// <summary>
+        /// when Result of PropertyField changed
+        /// </summary>
+        protected virtual void OnResultChanged()
+        {
+            if (ResultChanged != null) ResultChanged(this, EventArgs.Empty);
+        }
+
+
         /// <summary>
         /// Create a PropertyField
         /// </summary>
@@ -33,10 +69,13 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
+        /// <summary>
+        /// Render PropertyField
+        /// </summary>
         protected override void Render()
         {
             if (Property != null)
-                EditorGUI.PropertyField(RenderArea, Property, Label, IncludeChildren);
+                Result = EditorGUI.PropertyField(RenderArea, Property, Label, IncludeChildren);
         }
     }
 }

@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace Skill.Editor
 {
-    public class AnimationAssigner : UnityEditor.EditorWindow
+    class AnimationAssigner : UnityEditor.EditorWindow
     {
         #region Variables
         private static Vector2 Size = new Vector2(440, 100);
@@ -61,7 +61,6 @@ namespace Skill.Editor
 
         private static float FieldWidth = 300;
         private Skill.Editor.UI.EditorFrame _Frame;
-        private Skill.UI.Grid _Grid;
 
         private Skill.UI.ScrollView _DestinationsView;
         private Skill.Editor.UI.ObjectField<UnityEngine.Animation> _SourceAnimation;
@@ -86,22 +85,21 @@ namespace Skill.Editor
 
             _DestinationsView = new Skill.UI.ScrollView() { Margin = new Skill.UI.Thickness(0, 6, 0, 4), Row = 1, Column = 0, RowSpan = 2, Padding = new Skill.UI.Thickness(0, 0, 16, 0) };
 
-            _Grid = new Skill.UI.Grid();
-            _Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(20, Skill.UI.GridUnitType.Pixel) });
-            _Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(26, Skill.UI.GridUnitType.Pixel) });
-            _Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(1, Skill.UI.GridUnitType.Star) });
-
-            _Grid.ColumnDefinitions.Add(new Skill.UI.ColumnDefinition() { Width = new Skill.UI.GridLength(320, Skill.UI.GridUnitType.Pixel) });
-            _Grid.ColumnDefinitions.Add(new Skill.UI.ColumnDefinition() { Width = new Skill.UI.GridLength(120, Skill.UI.GridUnitType.Pixel) });
-            _Grid.ColumnDefinitions.Add(new Skill.UI.ColumnDefinition() { Width = new Skill.UI.GridLength(1, Skill.UI.GridUnitType.Star) });
-
-            _Grid.Controls.Add(_SourceAnimation);
-            _Grid.Controls.Add(_DestinationsView);
-            _Grid.Controls.Add(_BtnAssign);
-            _Grid.Controls.Add(_BtnAdd);
-
             _Frame = new UI.EditorFrame(this);
-            _Frame.Controls.Add(_Grid);
+
+            _Frame.Grid.Margin = new Skill.UI.Thickness(0, 10, 0, 0);
+            _Frame.Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(20, Skill.UI.GridUnitType.Pixel) });
+            _Frame.Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(26, Skill.UI.GridUnitType.Pixel) });
+            _Frame.Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(1, Skill.UI.GridUnitType.Star) });
+
+            _Frame.Grid.ColumnDefinitions.Add(new Skill.UI.ColumnDefinition() { Width = new Skill.UI.GridLength(320, Skill.UI.GridUnitType.Pixel) });
+            _Frame.Grid.ColumnDefinitions.Add(new Skill.UI.ColumnDefinition() { Width = new Skill.UI.GridLength(120, Skill.UI.GridUnitType.Pixel) });
+            _Frame.Grid.ColumnDefinitions.Add(new Skill.UI.ColumnDefinition() { Width = new Skill.UI.GridLength(1, Skill.UI.GridUnitType.Star) });
+
+            _Frame.Grid.Controls.Add(_SourceAnimation);
+            _Frame.Grid.Controls.Add(_DestinationsView);
+            _Frame.Grid.Controls.Add(_BtnAssign);
+            _Frame.Grid.Controls.Add(_BtnAdd);
 
             AddDestination();
         }
@@ -138,13 +136,8 @@ namespace Skill.Editor
             AddDestination();
         }
 
-        public void OnGUI()
+        void OnGUI()
         {
-            Rect pos = position;
-            pos.x = 0;
-            pos.y = 10;
-            pos.height -= 10;
-            _Grid.Position = pos;
             _Frame.OnGUI();
         }
 

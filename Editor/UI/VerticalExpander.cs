@@ -49,6 +49,9 @@ namespace Skill.Editor.UI
         /// Occurs when the content window of an VerticalExpander control opens to display both its header and content.
         /// </summary>    
         public event EventHandler Expanded;
+        /// <summary>
+        /// when the content window of an VerticalExpander control opens to display both its header and content.
+        /// </summary>
         protected virtual void OnExpanded()
         {
             Panel.Visibility = Skill.UI.Visibility.Visible;
@@ -61,6 +64,9 @@ namespace Skill.Editor.UI
         /// Occurs when the content window of an VerticalExpander control closes and only the Header is visible.
         /// </summary>
         public event EventHandler Collapsed;
+        /// <summary>
+        /// when the content window of an VerticalExpander control closes and only the Header is visible.
+        /// </summary>
         protected virtual void OnCollapsed()
         {
             Panel.Visibility = Skill.UI.Visibility.Collapsed;
@@ -85,7 +91,7 @@ namespace Skill.Editor.UI
                 }
                 else
                     return 0;
-            }            
+            }
         }
 
         /// <summary>
@@ -111,7 +117,7 @@ namespace Skill.Editor.UI
             Panel.RenderArea = hpa;
         }
 
-        void _Foldout_StateChanged(object sender, EventArgs e)
+        private void _Foldout_StateChanged(object sender, EventArgs e)
         {
             if (_IsExpanded != _Foldout.FoldoutState)
             {
@@ -142,6 +148,9 @@ namespace Skill.Editor.UI
             this.IsExpanded = true;
         }
 
+        /// <summary>
+        /// Set default header position
+        /// </summary>
         public void DefaultHeader()
         {
             Header.Position = new Rect(0, 0, 300, 20);

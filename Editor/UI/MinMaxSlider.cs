@@ -20,6 +20,9 @@ namespace Skill.Editor.UI
         /// Occurs when MinValue or MaxValue of MinMaxSlider changed
         /// </summary>
         public event EventHandler ValueChanged;
+        /// <summary>
+        /// when MinValue or MaxValue of MinMaxSlider changed
+        /// </summary>
         protected virtual void OnValueChanged()
         {
             if (ValueChanged != null) ValueChanged(this, EventArgs.Empty);
@@ -114,6 +117,9 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
+        /// <summary>
+        /// Render MinMaxSlider
+        /// </summary>
         protected override void Render()
         {
             float minV = _MinValue;

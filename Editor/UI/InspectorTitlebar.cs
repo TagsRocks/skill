@@ -15,6 +15,9 @@ namespace Skill.Editor.UI
         /// Occurs when state of Foldout of InspectorTitlebar changed
         /// </summary>
         public event EventHandler FoldoutStateChanged;
+        /// <summary>
+        /// when state of Foldout of InspectorTitlebar changed
+        /// </summary>
         protected virtual void OnFoldoutStateChanged()
         {
             if (FoldoutStateChanged != null) FoldoutStateChanged(this, EventArgs.Empty);
@@ -55,6 +58,9 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
+        /// <summary>
+        /// Render InspectorTitlebar
+        /// </summary>
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

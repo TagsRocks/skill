@@ -6,7 +6,7 @@ using Skill.UI;
 
 namespace Skill.Editor.Tools
 {
-    public class Distance : UnityEditor.EditorWindow
+    class Distance : UnityEditor.EditorWindow
     {
         #region Variables
         private static Vector2 Size = new Vector2(320, 180);
@@ -60,7 +60,6 @@ namespace Skill.Editor.Tools
         #region UI
 
         private Skill.Editor.UI.EditorFrame _Frame;
-        private Skill.UI.Grid _MainGrid;
         private Skill.UI.Box _Title;
         private Skill.Editor.UI.LayerMaskField _Layers;
         private Skill.Editor.UI.LabelField _LblStartPoint;
@@ -80,17 +79,16 @@ namespace Skill.Editor.Tools
         {
             _Frame = new Skill.Editor.UI.EditorFrame(this);
 
-            _MainGrid = new Skill.UI.Grid();
-            _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30, GridUnitType.Pixel) });
-            _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30, GridUnitType.Pixel) });
-            _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) });
-            _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) });
-            _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) });
-            _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30, GridUnitType.Pixel) });
-            _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) });
-            _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
-            _MainGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(316, GridUnitType.Pixel) });
-            _MainGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
+            _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30, GridUnitType.Pixel) });
+            _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30, GridUnitType.Pixel) });
+            _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) });
+            _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) });
+            _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) });
+            _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30, GridUnitType.Pixel) });
+            _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) });
+            _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
+            _Frame.Grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(316, GridUnitType.Pixel) });
+            _Frame.Grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
 
             _Title = new Box() { Row = 0, Column = 0, Margin = new Thickness(2) };
             _Title.Content.text = "Measure distance of two points";
@@ -113,14 +111,13 @@ namespace Skill.Editor.Tools
 
             _InfoLabel = new Skill.UI.Label() { Row = 6, Column = 0 };
 
-            _MainGrid.Controls.Add(_Title);
-            _MainGrid.Controls.Add(_Layers);
-            _MainGrid.Controls.Add(_LblStartPoint);
-            _MainGrid.Controls.Add(_LblEndPoint);
-            _MainGrid.Controls.Add(_LblDistance);
-            _MainGrid.Controls.Add(_BtnEnabled);
-            _MainGrid.Controls.Add(_InfoLabel);
-            _Frame.Controls.Add(_MainGrid);
+            _Frame.Grid.Controls.Add(_Title);
+            _Frame.Grid.Controls.Add(_Layers);
+            _Frame.Grid.Controls.Add(_LblStartPoint);
+            _Frame.Grid.Controls.Add(_LblEndPoint);
+            _Frame.Grid.Controls.Add(_LblDistance);
+            _Frame.Grid.Controls.Add(_BtnEnabled);
+            _Frame.Grid.Controls.Add(_InfoLabel);
 
         }
 
@@ -141,22 +138,18 @@ namespace Skill.Editor.Tools
         }
         #endregion
 
-        public void OnEnable()
+        void OnEnable()
         {
             SceneView.onSceneGUIDelegate += UpdateScene;
         }
 
-        public void OnDisable()
+        void OnDisable()
         {
             SceneView.onSceneGUIDelegate -= UpdateScene;
         }
 
-        public void OnGUI()
+        void OnGUI()
         {
-            Rect rect = position;
-            rect.x = 0;
-            rect.y = 0;
-            _MainGrid.Position = rect;
             _Frame.OnGUI();
         }
 
@@ -175,7 +168,7 @@ namespace Skill.Editor.Tools
                         if (_IsStartPointPicked)
                         {
                             _EndPoint = hit.point;
-                            _LblEndPoint.Label2.text = _EndPoint.ToString();                            
+                            _LblEndPoint.Label2.text = _EndPoint.ToString();
                             _IsStartPointPicked = false;
                             _IsEndPointPicked = true;
                         }

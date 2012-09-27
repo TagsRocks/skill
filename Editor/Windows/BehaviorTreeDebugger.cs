@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace Skill.Editor
 {
-    public class BehaviorTreeDebugger : UnityEditor.EditorWindow
+    class BehaviorTreeDebugger : UnityEditor.EditorWindow
     {
         private static Vector2 Size = new Vector2(500, 400);
 
@@ -49,9 +49,9 @@ namespace Skill.Editor
             _RedLine = new LineDrawer(Color.red);
         }
 
-        public void OnGUI()
+        void OnGUI()
         {
-            _RedLine.DrawLine(new Vector2(10, 10), new Vector2(200, 200), 5);            
+            _RedLine.DrawLine(new Vector2(10, 10), new Vector2(200, 200), 5);
         }
     }
 }

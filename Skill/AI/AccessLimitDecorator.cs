@@ -226,8 +226,7 @@ namespace Skill.AI
 
         /// <summary>
         /// Reset behavior. when a branch with more periority be valid let this nod to unlock key
-        /// </summary>
-       /// <param name="state">State of BehaviorTree</param>
+        /// </summary>       
         /// <param name="resetChildren">Reset children too</param>
         public override void ResetBehavior(bool resetChildren = false)
         {

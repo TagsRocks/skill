@@ -50,6 +50,9 @@ namespace Skill.Editor.UI
         /// Occurs When option first got selected
         /// </summary>
         public event EventHandler Selected;
+        /// <summary>
+        /// When option first got selected
+        /// </summary>
         protected virtual void OnSelected()
         {
             if (Selected != null)
@@ -60,6 +63,9 @@ namespace Skill.Editor.UI
         /// Occurs When item first time option lost selected
         /// </summary>
         public event EventHandler Unselected;
+        /// <summary>
+        /// When item first time option lost selected
+        /// </summary>
         protected virtual void OnUnselected()
         {
             if (Unselected != null)

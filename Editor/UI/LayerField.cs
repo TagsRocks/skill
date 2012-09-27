@@ -20,6 +20,9 @@ namespace Skill.Editor.UI
         /// Occurs when Layer of LayerField changed
         /// </summary>
         public event EventHandler LayerChanged;
+        /// <summary>
+        /// when Layer of LayerField changed
+        /// </summary>
         protected virtual void OnLayerChanged()
         {
             if (LayerChanged != null) LayerChanged(this, EventArgs.Empty);
@@ -51,6 +54,9 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
+        /// <summary>
+        /// Render LayerField
+        /// </summary>
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

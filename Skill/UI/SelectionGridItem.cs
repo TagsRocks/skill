@@ -45,6 +45,9 @@ namespace Skill.UI
         /// Occurs When item first got selected
         /// </summary>
         public event EventHandler Selected;
+        /// <summary>
+        /// When item first got selected
+        /// </summary>
         protected virtual void OnSelected()
         {
             if (Selected != null)
@@ -55,6 +58,9 @@ namespace Skill.UI
         /// Occurs When item first time item lost selected
         /// </summary>
         public event EventHandler Unselected;
+        /// <summary>
+        /// When item first time item lost selected
+        /// </summary>
         protected virtual void OnUnselected()
         {
             if (Unselected != null)

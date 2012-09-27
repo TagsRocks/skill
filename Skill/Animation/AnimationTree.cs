@@ -97,8 +97,7 @@ namespace Skill.Animation
 
         /// <summary>
         /// Create an instance of AnimationTree
-        /// </summary>
-        /// <param name="controller">The Controller using this AnimationTree.</param>
+        /// </summary>        
         public AnimationTree()
         {
             this._State = new AnimationTreeState(this);

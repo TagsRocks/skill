@@ -25,6 +25,9 @@ namespace Skill.Editor.UI
         /// Occurs when state of Foldout changed
         /// </summary>
         public event EventHandler StateChanged;
+        /// <summary>
+        /// when state of Foldout changed
+        /// </summary>
         protected virtual void OnStateChanged()
         {
             if (StateChanged != null) StateChanged(this, EventArgs.Empty);
@@ -56,6 +59,9 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
+        /// <summary>
+        /// Render Foldout
+        /// </summary>
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

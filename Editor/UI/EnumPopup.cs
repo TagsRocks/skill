@@ -8,8 +8,7 @@ namespace Skill.Editor.UI
 {
     /// <summary>
     /// Make an enum popup selection field.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// </summary>    
     public class EnumPopup : EditorControl 
     {
         /// <summary>
@@ -38,6 +37,9 @@ namespace Skill.Editor.UI
         /// Occurs when Value of EnumPopup changed
         /// </summary>
         public event EventHandler ValueChanged;
+        /// <summary>
+        /// when Value of EnumPopup changed
+        /// </summary>
         protected virtual void OnValueChanged()
         {
             if (ValueChanged != null)
@@ -53,6 +55,9 @@ namespace Skill.Editor.UI
             this.Height = 16;           
         }
 
+        /// <summary>
+        /// Render EnumPopup
+        /// </summary>
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

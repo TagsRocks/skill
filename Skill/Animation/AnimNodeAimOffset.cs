@@ -202,6 +202,10 @@ namespace Skill.Animation
             base.Initialize(animationComponent);
         }
 
+        /// <summary>
+        /// Set format of all profiles
+        /// </summary>
+        /// <param name="format"></param>
         internal override void SetFormat(string format)
         {
             foreach (var p in _Profiles)

@@ -20,6 +20,9 @@ namespace Skill.Editor.UI
         /// Occurs when Mask of EnumMaskField changed
         /// </summary>
         public event EventHandler MaskChanged;
+        /// <summary>
+        /// when Mask of EnumMaskField changed
+        /// </summary>
         protected virtual void OnMaskChanged()
         {
             if (MaskChanged != null) MaskChanged(this, EventArgs.Empty);
@@ -52,6 +55,9 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
+        /// <summary>
+        /// Render EnumMaskField
+        /// </summary>
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

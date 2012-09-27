@@ -40,18 +40,20 @@ namespace Skill.UI
     //    public IList RemovedItems { get; private set; }
     //}
 
-    /// <summary>
-    /// Represents the method that will handle the SelectionChanged event.
-    /// </summary>
-    /// <param name="sender">The object where the event handler is attached.</param>
-    /// <param name="e">The event data.</param>
+    //// <summary>
+    //// Represents the method that will handle the SelectionChanged event.
+    //// </summary>
+    //// <param name="sender">The object where the event handler is attached.</param>
+    //// <param name="e">The event data.</param>
     //public delegate void SelectionChangedEventHandler(object sender, SelectionChangedEventArgs e);
 
+    /// <summary>
+    /// Contains a list of selectable items.
+    /// </summary>
     public class ListBox : StackPanel
     {
 
         // variables
-
         private List<BaseControl> _SelectedItems;
         private int _SelectedIndex = -1;
 
@@ -144,6 +146,9 @@ namespace Skill.UI
         /// Occurs when the selection of ListBox changes.
         /// </summary>
         public event System.EventHandler SelectionChanged;
+        /// <summary>
+        /// when the selection of ListBox changes.
+        /// </summary>
         protected virtual void OnSelectionChanged()
         {
             if (SelectionChanged != null) SelectionChanged(this, System.EventArgs.Empty);
@@ -315,6 +320,9 @@ namespace Skill.UI
             return selectionChanged;
         }
 
+        /// <summary>
+        /// Render ListBox
+        /// </summary>
         protected override void Render()
         {
 

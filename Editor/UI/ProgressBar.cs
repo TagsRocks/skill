@@ -12,6 +12,9 @@ namespace Skill.Editor.UI
     public class ProgressBar : EditorControl
     {
         private string _Text;
+        /// <summary>
+        /// Text of ProgressBar
+        /// </summary>
         public string Text
         {
             get
@@ -30,6 +33,9 @@ namespace Skill.Editor.UI
         /// Occurs when value of ProgressBar changed
         /// </summary>
         public event EventHandler ValueChanged;
+        /// <summary>
+        /// when value of ProgressBar changed
+        /// </summary>
         protected virtual void OnValueChanged()
         {
             if (ValueChanged != null) ValueChanged(this, EventArgs.Empty);
@@ -63,6 +69,9 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
+        /// <summary>
+        /// Render ProgressBar
+        /// </summary>
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

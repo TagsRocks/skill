@@ -42,6 +42,9 @@ namespace Skill.Editor.UI
         /// Occurs when Password of PasswordField changed
         /// </summary>
         public event EventHandler PasswordChanged;
+        /// <summary>
+        /// when Password of PasswordField changed
+        /// </summary>
         protected virtual void OnPasswordChanged()
         {
             if (PasswordChanged != null) PasswordChanged(this, EventArgs.Empty);
@@ -57,6 +60,9 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
+        /// <summary>
+        /// Render Render
+        /// </summary>
         protected override void Render()
         {
             string result;

@@ -121,7 +121,7 @@ namespace Skill.Studio
             {
                 return new PluginInfo()
                 {
-                    AssemblyPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "UnityCSharpCodeGeneration.dll"),
+                    AssemblyPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Skill.UnityCSharpCodeGeneration.dll"),
                     ClassName = "Skill.CodeGeneration.CSharp.CSharpCodeGenerator",
                     DisplayName = "Skill-Unity-CSharp"
                 };

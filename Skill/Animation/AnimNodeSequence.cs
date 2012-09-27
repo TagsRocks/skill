@@ -194,13 +194,16 @@ namespace Skill.Animation
             this.Layer = parentSuggestLayer;
         }
 
+        /// <summary>
+        /// Set format of aimation name
+        /// </summary>
+        /// <param name="format"></param>
         internal override void SetFormat(string format)
         {
             this.Format = format;
         }
 
         private List<AnimationInfo> _InitializedAnimations;
-
         private AnimationInfo FindInfo(string name)
         {
             foreach (var item in _InitializedAnimations)

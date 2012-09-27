@@ -31,6 +31,9 @@ namespace Skill.UI
             Content = new GUIContent();
         }
 
+        /// <summary>
+        /// Render Label
+        /// </summary>
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

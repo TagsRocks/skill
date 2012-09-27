@@ -22,7 +22,8 @@ namespace Skill.AI
 
         /// <summary>
         /// Create an instance of RunningStack
-        /// </summary>
+        /// </summary>        
+        /// <param name="state"> State of Behavior</param>
         /// <param name="length">Maximum lenght of stack</param>
         public RunningStack(BehaviorState state, int length)
         {

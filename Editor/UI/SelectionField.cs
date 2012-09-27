@@ -110,6 +110,9 @@ namespace Skill.Editor.UI
         /// Occurs when SelectedField of SelectionFoild changed
         /// </summary>
         public event EventHandler SelectedFieldChanged;
+        /// <summary>
+        ///  when SelectedField of SelectionFoild changed
+        /// </summary>
         protected virtual void OnSelectedFieldChanged()
         {
             if (SelectedFieldChanged != null) SelectedFieldChanged(this, EventArgs.Empty);
@@ -211,7 +214,7 @@ namespace Skill.Editor.UI
         }
 
         /// <summary>
-        /// Render contents
+        /// Render SelectionGrid
         /// </summary>
         protected override void Render()
         {

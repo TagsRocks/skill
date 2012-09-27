@@ -72,6 +72,9 @@ namespace Skill.UI
             OnLayoutChanged();
         }
 
+        /// <summary>
+        /// When RenderArea hanged
+        /// </summary>
         protected override void OnRenderAreaChanged()
         {
             this.RequestUpdateLayout();
@@ -79,6 +82,9 @@ namespace Skill.UI
         }
         #endregion
 
+        /// <summary>
+        /// When Layout changed
+        /// </summary>
         protected override void OnLayoutChanged()
         {
             this.RequestUpdateLayout();
@@ -86,7 +92,9 @@ namespace Skill.UI
 
         }
 
-
+        /// <summary>
+        /// Prepare for render
+        /// </summary>
         protected override void BeginRender()
         {
             base.BeginRender();
@@ -119,6 +127,9 @@ namespace Skill.UI
             _DesiredSize = new Size(Mathf.Max(max.x - min.x, 0), Mathf.Max(max.y - min.y, 0));
         }
 
+        /// <summary>
+        /// Render child controls
+        /// </summary>
         protected override void Render()
         {
             foreach (var c in Controls)

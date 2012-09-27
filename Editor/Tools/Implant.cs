@@ -6,10 +6,10 @@ using Skill.UI;
 
 namespace Skill.Editor.Tools
 {
-    public class Implant : UnityEditor.EditorWindow
+    class Implant : UnityEditor.EditorWindow
     {
         #region Variables
-        private static Vector2 Size = new Vector2(320, 140);
+        private static Vector2 Size = new Vector2(320, 110);
         private static Implant _Instance;
         #endregion
 
@@ -60,13 +60,8 @@ namespace Skill.Editor.Tools
         #region UI
 
         private Skill.Editor.UI.EditorFrame _Frame;
-        private Skill.UI.Grid _MainGrid;
         private Skill.Editor.UI.ObjectField<ImplantAsset> _AssetField;
-        private Skill.Editor.UI.SelectionField _RotationSF;
         private Skill.Editor.UI.LayerMaskField _Layers;
-        private Skill.Editor.UI.XYZComponent _RandomRotation;
-        private Skill.Editor.UI.Vector3Field _CustomRotation;
-        private Skill.UI.ToggleButton _RaycastNormalRotation;
         private Skill.UI.Label _InfoLabel;
 
         private bool _IsImplantEnable;
@@ -75,16 +70,13 @@ namespace Skill.Editor.Tools
         private void CreateUI()
         {
             _Frame = new Skill.Editor.UI.EditorFrame(this);
-
-            _MainGrid = new Skill.UI.Grid();
-            _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) });
-            _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) });
-            _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Auto) });
-            _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30, GridUnitType.Pixel) });
-            _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) });
-            _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
-            _MainGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(316, GridUnitType.Pixel) });
-            _MainGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
+            _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) });
+            _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) });            
+            _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30, GridUnitType.Pixel) });
+            _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) });
+            _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
+            _Frame.Grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(316, GridUnitType.Pixel) });
+            _Frame.Grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
 
 
             _AssetField = new UI.ObjectField<ImplantAsset>() { Row = 0, Column = 0, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(2) };
@@ -93,30 +85,16 @@ namespace Skill.Editor.Tools
             _Layers = new Skill.Editor.UI.LayerMaskField() { Layers = 1, Row = 1, Column = 0, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(2) };
             _Layers.Label.text = "Raycast layers";
 
-            _RotationSF = new Skill.Editor.UI.SelectionField() { Row = 2, Column = 0, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(2) };
-            _RotationSF.Label.Width = 110;
-
-            _RandomRotation = new Skill.Editor.UI.XYZComponent();
-            _CustomRotation = new Skill.Editor.UI.Vector3Field();
-            _RaycastNormalRotation = new Skill.UI.ToggleButton() { HorizontalAlignment = Skill.UI.HorizontalAlignment.Left, Margin = new Thickness(20, 0, 0, 0) };
-            _RaycastNormalRotation.Content.text = "Random Y";
-
-            _RotationSF.AddField(_RandomRotation, "Random :");
-            _RotationSF.AddField(_CustomRotation, "Custom :");
-            _RotationSF.AddField(_RaycastNormalRotation, "Raycast normal :");
-
-            _BtnEnabled = new Skill.Editor.UI.Button() { Margin = new Thickness(2), Row = 3, Column = 0 };
+            _BtnEnabled = new Skill.Editor.UI.Button() { Margin = new Thickness(2), Row = 2, Column = 0 };
             _BtnEnabled.Content.text = "Enable";
             _BtnEnabled.Click += new System.EventHandler(_BtnEnabled_Click);
 
-            _InfoLabel = new Skill.UI.Label() { Row = 4, Column = 0 };
+            _InfoLabel = new Skill.UI.Label() { Row = 3, Column = 0 };
 
-            _MainGrid.Controls.Add(_AssetField);
-            _MainGrid.Controls.Add(_Layers);
-            _MainGrid.Controls.Add(_RotationSF);
-            _MainGrid.Controls.Add(_BtnEnabled);
-            _MainGrid.Controls.Add(_InfoLabel);
-            _Frame.Controls.Add(_MainGrid);
+            _Frame.Grid.Controls.Add(_AssetField);
+            _Frame.Grid.Controls.Add(_Layers);
+            _Frame.Grid.Controls.Add(_BtnEnabled);
+            _Frame.Grid.Controls.Add(_InfoLabel);
 
         }
 
@@ -136,22 +114,18 @@ namespace Skill.Editor.Tools
         }
         #endregion
 
-        public void OnEnable()
+        void OnEnable()
         {
             SceneView.onSceneGUIDelegate += UpdateScene;
         }
 
-        public void OnDisable()
+        void OnDisable()
         {
             SceneView.onSceneGUIDelegate -= UpdateScene;
         }
 
-        public void OnGUI()
+        void OnGUI()
         {
-            Rect rect = position;
-            rect.x = 0;
-            rect.y = 0;
-            _MainGrid.Position = rect;
             _Frame.OnGUI();
         }
 
@@ -204,23 +178,23 @@ namespace Skill.Editor.Tools
 
                                 // rotation
                                 Quaternion rotation = obj.transform.rotation;
-                                if (_RotationSF.SelectedField == _RandomRotation)
+                                if (randomObj.Rotation == ImplantObjectRotation.Random)
                                 {
                                     Vector3 euler = obj.transform.eulerAngles;
-                                    if (_RandomRotation.IsXChecked) euler.x = UnityEngine.Random.Range(0.0f, 360.0f);
-                                    if (_RandomRotation.IsYChecked) euler.y = UnityEngine.Random.Range(0.0f, 360.0f);
-                                    if (_RandomRotation.IszChecked) euler.z = UnityEngine.Random.Range(0.0f, 360.0f);
+                                    if (randomObj.RandomX) euler.x = UnityEngine.Random.Range(0.0f, 360.0f);
+                                    if (randomObj.RandomY) euler.y = UnityEngine.Random.Range(0.0f, 360.0f);
+                                    if (randomObj.RandomZ) euler.z = UnityEngine.Random.Range(0.0f, 360.0f);
                                     rotation = Quaternion.Euler(euler);
                                 }
-                                else if (_RotationSF.SelectedField == _CustomRotation)
+                                else if (randomObj.Rotation == ImplantObjectRotation.Custom)
                                 {
-                                    rotation = Quaternion.Euler(_CustomRotation.Value);
+                                    rotation = Quaternion.Euler(randomObj.CustomRotation);
                                 }
                                 else
                                 {
                                     rotation *= Quaternion.FromToRotation(obj.transform.up, hit.normal);
 
-                                    if (_RaycastNormalRotation.IsChecked)
+                                    if (randomObj.RandomYaw)
                                     {
                                         rotation *= Quaternion.Euler(0, UnityEngine.Random.Range(0.0f, 360.0f), 0);
                                     }

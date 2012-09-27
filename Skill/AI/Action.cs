@@ -33,6 +33,7 @@ namespace Skill.AI
     {
         private ActionHandler _Handler = null;// handler        
 
+        /// <summary>
         /// Occurs when behavior is reset
         /// </summary>
         public event ActionResetEventHandler Reset;

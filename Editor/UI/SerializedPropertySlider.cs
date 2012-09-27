@@ -61,6 +61,9 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
+        /// <summary>
+        /// Render SerializedPropertySlider
+        /// </summary>
         protected override void Render()
         {
             if (Property != null)

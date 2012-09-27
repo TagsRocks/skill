@@ -20,6 +20,9 @@ namespace Skill.Editor.UI
         /// Occurs when object of ObjectField changes
         /// </summary>
         public event EventHandler ObjectChanged;
+        /// <summary>
+        /// when object of ObjectField changes
+        /// </summary>
         protected virtual void OnObjectChanged()
         {
             if (ObjectChanged != null) ObjectChanged(this, EventArgs.Empty);
@@ -62,6 +65,9 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
+        /// <summary>
+        /// Render ObjectField
+        /// </summary>
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

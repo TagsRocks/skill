@@ -6,23 +6,18 @@ using System.Text;
 
 namespace Skill.Editor
 {
-    public class AboutSkill : UnityEditor.EditorWindow
+    class AboutSkill : UnityEditor.EditorWindow
     {
         private static Vector2 Size = new Vector2(300, 100);
         private static AboutSkill _Instance;
 
 
         private Skill.Editor.UI.EditorFrame _Frame;
-        private Skill.UI.Grid _Grid;
         private Skill.Editor.UI.LabelField _LblAbout;
         private Skill.Editor.UI.Button _BtnClose;
 
         public void OnGUI()
         {
-            Rect pos = base.position;
-            pos.x = 0;
-            pos.y = 0;
-            _Grid.Position = pos;
             _Frame.OnGUI();
         }
 
@@ -49,9 +44,8 @@ namespace Skill.Editor
         {
             _Frame = new UI.EditorFrame(this);
 
-            _Grid = new Skill.UI.Grid();
-            _Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(1, Skill.UI.GridUnitType.Star) });
-            _Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(20, Skill.UI.GridUnitType.Pixel) });            
+            _Frame.Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(1, Skill.UI.GridUnitType.Star) });
+            _Frame.Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(20, Skill.UI.GridUnitType.Pixel) });
 
             _LblAbout = new UI.LabelField() { Row = 0, Column = 0 };
             _LblAbout.Label2.text = Skill.Editor.Properties.Resources.AppDescription;
@@ -60,9 +54,8 @@ namespace Skill.Editor
             _BtnClose.Content.text = "Close";
             _BtnClose.Click += new EventHandler(_BtnClose_Click);
 
-            _Grid.Controls.Add(_LblAbout);
-            _Grid.Controls.Add(_BtnClose);
-            _Frame.Controls.Add(_Grid);
+            _Frame.Grid.Controls.Add(_LblAbout);
+            _Frame.Grid.Controls.Add(_BtnClose);
         }
 
         void _BtnClose_Click(object sender, EventArgs e)
@@ -70,7 +63,7 @@ namespace Skill.Editor
             base.Close();
         }
 
-        public void OnDestroy()
+        void OnDestroy()
         {
             _Instance = null;
         }

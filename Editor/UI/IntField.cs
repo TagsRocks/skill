@@ -20,6 +20,9 @@ namespace Skill.Editor.UI
         /// Occurs when Value of IntField changed
         /// </summary>
         public event EventHandler ValueChanged;
+        /// <summary>
+        /// when Value of IntField changed
+        /// </summary>
         protected virtual void OnValueChanged()
         {
             if (ValueChanged != null) ValueChanged(this, EventArgs.Empty);
@@ -51,6 +54,9 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
+        /// <summary>
+        /// Render IntField
+        /// </summary>
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

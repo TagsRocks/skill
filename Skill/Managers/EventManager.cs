@@ -14,7 +14,7 @@ namespace Skill.Managers
     /// so i use this way to call methods on MonoBehaviors. this needs more work to do
     /// each game must defines it's own EventManager
     /// </remarks>
-    /// <example> for example
+    /// <example> for example    
     /// <code>
     /// public class ThisGameEventManager : EventManager
     /// {
@@ -45,7 +45,7 @@ namespace Skill.Managers
     ///     {
     ///         _OnHitHandler = OnHit;
     /// 
-    ///         ThisGameEventManager eventManager = ThisGameEventManager.Get<ThisGameEventManager>(this.gameObject);
+    ///         ThisGameEventManager eventManager = ThisGameEventManager.Get;ltThisGameEventManager;gt(this.gameObject);
     ///         if (eventManager != null)
     ///         {                
     ///             eventManager.Hit += _OnHitHandler;
@@ -54,7 +54,7 @@ namespace Skill.Managers
     /// 
     ///     public void UnhookEvents()
     ///     {
-    ///         ThisGameEventManager eventManager = ThisGameEventManager.Get;gt<ThisGameEventManager>(this.gameObject);
+    ///         ThisGameEventManager eventManager = ThisGameEventManager.Get;ltThisGameEventManager;gt(this.gameObject);
     ///         if (eventManager != null)
     ///         {
     ///             eventManager.Hit -= _OnHitHandler;
@@ -66,8 +66,7 @@ namespace Skill.Managers
     ///     {
     ///         // do something
     ///     }
-    /// }
-    ///     
+    /// }    
     /// </code>
     /// 
     /// other behaviors could call OnHit method to notify interested behaviors
@@ -156,10 +155,6 @@ namespace Skill.Managers
         /// <summary>
         /// Call this method in Awake and hook desired events of EventManager
         /// </summary>
-        void HookEvents();
-        /// <summary>
-        /// Call this method in OnDestroy and unhook hooked events from EventManager
-        /// </summary>
-        void UnhookEvents();
+        void HookEvents();        
     }
 }

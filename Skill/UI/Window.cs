@@ -1,23 +1,75 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using UnityEngine;
 
 namespace Skill.UI
 {
-	public class Window
-	{
+    /// <summary>
+    /// Make a popup window.
+    /// </summary>
+    public class Window : Frame
+    {
+        private static int _IdGenerator = 0;
+        private GUI.WindowFunction _DrawWindowFunction;
 
+        /// <summary>
+        /// A unique ID to use for each window. This is the ID you'll use to interface to.
+        /// </summary>
+        public int Id { get; private set; }
+        /// <summary>
+        /// Whether the window Is draggable or not?
+        /// </summary>
+        public bool IsDraggable { get; set; }
+        /// <summary>
+        /// True if you want to have the entire window background to act as a drag area, otherwise false to use DraggableArea
+        /// </summary>
+        public bool FullDraggable { get; set; }
+        /// <summary>
+        /// the part of the window that can be dragged. This is clipped to the actual window.
+        /// </summary>
+        public Rect DraggableArea { get; set; }
+        /// <summary>
+        /// Title of window
+        /// </summary>
+        public GUIContent Title { get; private set; }
+
+        /// <summary>
+        /// The style to use. If null, the style from the current GUISkin is used.
+        /// </summary>
+        public GUIStyle Style { get; set; }
+
+        /// <summary>
+        /// Create a window
+        /// </summary>
         public Window()
         {
-            throw new NotImplementedException("Window not implemented");
+            _DrawWindowFunction = DrawWindow;
+            Id = _IdGenerator++;
+            Title = new GUIContent() { text = "Window " + Id };
+            DraggableArea = new Rect(0, 0, 1000, 20);
         }
-        public bool IsDraggable { get; set; }
 
+        private void DrawWindow(int id)
+        {
+            Grid.OnGUI();
+            if (IsDraggable)
+            {
+                if (FullDraggable)
+                    GUI.DragWindow();
+                else
+                    GUI.DragWindow(DraggableArea);
+            }
+        }
 
-        //BringWindowToFront	 Bring a specific window to front of the floating windows. 
-        //BringWindowToBack	 Bring a specific window to back of the floating windows. 
-        //FocusWindow	 Make a window become the active window. 
-        //UnfocusWindow
-	}
+        /// <summary>
+        /// Draw controls inside window
+        /// </summary>
+        protected override void DrawControls()
+        {
+            if (Style != null)
+                Position = GUI.Window(Id, Position, _DrawWindowFunction, Title, Style);
+            else
+                Position = GUI.Window(Id, Position, _DrawWindowFunction, Title);
+        }
+    }
 }

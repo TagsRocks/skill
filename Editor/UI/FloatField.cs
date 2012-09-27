@@ -20,6 +20,9 @@ namespace Skill.Editor.UI
         /// Occurs when value of FloatField changed
         /// </summary>
         public event EventHandler ValueChanged;
+        /// <summary>
+        /// when value of FloatField changed
+        /// </summary>
         protected virtual void OnValueChanged()
         {
             if (ValueChanged != null) ValueChanged(this, EventArgs.Empty);
@@ -51,6 +54,9 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
+        /// <summary>
+        /// Render FloatField
+        /// </summary>
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

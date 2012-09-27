@@ -4,14 +4,18 @@ using System.Collections;
 
 namespace Skill.Editor
 {
-
+    /// <summary>
+    /// Helper class to draw line in EditorWindow
+    /// </summary>
     public class LineDrawer
     {
 
         // The texture used by DrawLine
         private Texture2D _LineTexture;
 
-        // The color used by DrawLine(Color)
+        /// <summary>
+        /// The color used by DrawLine(Color)
+        /// </summary>
         public Color LineColor { get; private set; }
 
         /// <summary>
@@ -36,8 +40,8 @@ namespace Skill.Editor
 
         /// <summary>
         /// Draw a line between two points the specified thickness
-        /// Inspired by code posted by Sylvan
-        /// http://forum.unity3d.com/threads/17066-How-to-draw-a-GUI-2D-quot-line-quot?p=407005&viewfull=1#post407005
+        /// Inspired by code posted by Sylvan 
+        /// <!-- http://forum.unity3d.com/threads/17066-How-to-draw-a-GUI-2D-quot-line-quot?p=407005&viewfull=1#post407005 --> 
         /// </summary>
         /// <param name="lineStart">The start of the line</param>
         /// <param name="lineEnd">The end of the line</param>        
@@ -58,7 +62,7 @@ namespace Skill.Editor
         /// Draw a line between two points with the specified texture and thickness.
         /// The texture will be stretched to fill the drawing rectangle.
         /// Inspired by code posted by Sylvan
-        /// http://forum.unity3d.com/threads/17066-How-to-draw-a-GUI-2D-quot-line-quot?p=407005&viewfull=1#post407005
+        /// <!-- http://forum.unity3d.com/threads/17066-How-to-draw-a-GUI-2D-quot-line-quot?p=407005&viewfull=1#post407005 -->
         /// </summary>
         /// <param name="lineStart">The start of the line</param>
         /// <param name="lineEnd">The end of the line</param>
@@ -104,8 +108,8 @@ namespace Skill.Editor
         /// Draw a line between two points with the specified texture and thickness.
         /// The texture will be repeated to fill the drawing rectangle.
         /// Inspired by code posted by Sylvan and ArenMook
-        /// http://forum.unity3d.com/threads/17066-How-to-draw-a-GUI-2D-quot-line-quot?p=407005&viewfull=1#post407005
-        /// http://forum.unity3d.com/threads/28247-Tile-texture-on-a-GUI?p=416986&viewfull=1#post416986
+        /// <!-- http://forum.unity3d.com/threads/17066-How-to-draw-a-GUI-2D-quot-line-quot?p=407005&viewfull=1#post407005 -->
+        /// <!-- http://forum.unity3d.com/threads/28247-Tile-texture-on-a-GUI?p=416986&viewfull=1#post416986 -->
         /// </summary>
         /// <param name="lineStart">The start of the line</param>
         /// <param name="lineEnd">The end of the line</param>

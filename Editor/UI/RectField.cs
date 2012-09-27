@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Skill.Editor.UI
 {
     /// <summary>
-    /// Make an X, Y, W & H field for entering a Rect.
+    /// Make an X, Y, W and H field for entering a Rect.
     /// </summary>
     public class RectField : EditorControl
     {
@@ -20,6 +20,9 @@ namespace Skill.Editor.UI
         /// Occurs when Value of RectField changed
         /// </summary>
         public event EventHandler ValueChanged;
+        /// <summary>
+        /// when Value of RectField changed
+        /// </summary>
         protected virtual void OnValueChanged()
         {
             if (ValueChanged != null) ValueChanged(this, EventArgs.Empty);
@@ -51,6 +54,9 @@ namespace Skill.Editor.UI
             this.Height = 58;
         }
 
+        /// <summary>
+        /// Render RectField
+        /// </summary>
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

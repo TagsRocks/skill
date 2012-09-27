@@ -45,7 +45,9 @@ namespace Skill.AI
         /// <summary> Number of valid Behaviors in ExecutionSequence</summary>
         public int SequenceCount { get { return _CurrnetExecutionIndex + 1; } }
 
-
+        /// <summary>
+        /// Create a BehaviorState
+        /// </summary>
         public BehaviorState()
         {
             this.Exception = null;
@@ -95,6 +97,10 @@ namespace Skill.AI
             _RunningStack.Push(behavior);
         }
 
+        /// <summary>
+        /// Unregister behavior from execution sequence.
+        /// </summary>
+        /// <param name="behavior">Behavior to unregister</param>
         internal void UnRegisterForExecution(Behavior behavior)
         {
             if (_RunningStack.Top != behavior)

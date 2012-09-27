@@ -50,12 +50,18 @@ namespace Skill.Editor.UI
             this._Panel.Controls.Add(this._TbZ);
         }
 
+        /// <summary>
+        /// when RenderArea of control changed
+        /// </summary>
         protected override void OnRenderAreaChanged()
         {
             _Panel.RenderArea = RenderArea;
             base.OnRenderAreaChanged();
         }
 
+        /// <summary>
+        /// Render XYZComponent
+        /// </summary>
         protected override void Render()
         {
             this._Panel.OnGUI();

@@ -42,6 +42,9 @@ namespace Skill.Editor.UI
         /// Occurs when Text of TextField changed
         /// </summary>
         public event EventHandler TextChanged;
+        /// <summary>
+        /// when Text of TextField changed
+        /// </summary>
         protected virtual void OnTextChanged()
         {
             if (TextChanged != null) TextChanged(this, EventArgs.Empty);
@@ -57,6 +60,9 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
+        /// <summary>
+        /// Render TextField
+        /// </summary>
         protected override void Render()
         {
             string result;

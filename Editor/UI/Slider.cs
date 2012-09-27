@@ -38,6 +38,9 @@ namespace Skill.Editor.UI
         /// Occurs when value of Slider changed
         /// </summary>
         public event EventHandler ValueChanged;
+        /// <summary>
+        /// when value of Slider changed
+        /// </summary>
         protected virtual void OnValueChanged()
         {
             if (ValueChanged != null) ValueChanged(this, EventArgs.Empty);
@@ -83,6 +86,9 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
+        /// <summary>
+        /// Render Slider
+        /// </summary>
         protected override void Render()
         {
             Value = EditorGUI.Slider(RenderArea, Label, _Value, _MinValue, _MaxValue);

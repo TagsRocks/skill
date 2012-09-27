@@ -48,6 +48,9 @@ namespace Skill.UI
             this.ImageAspect = 0;
         }
 
+        /// <summary>
+        /// Render Image
+        /// </summary>
         protected override void Render()
         {
             if (Texture != null)

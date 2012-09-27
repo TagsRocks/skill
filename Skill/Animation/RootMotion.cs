@@ -67,6 +67,9 @@ namespace Skill.Animation
     }
 
 
+    /// <summary>
+    /// RootMotion of AnimationSequence
+    /// </summary>
     public class RootMotion
     {
         private AnimNodeSequence _Sequence;
@@ -125,24 +128,37 @@ namespace Skill.Animation
         }
 
 
+        /// <summary>
+        /// Create a RootMotion
+        /// </summary>
+        /// <param name="sequence">Owner Sequence</param>
         internal RootMotion(AnimNodeSequence sequence)
         {
             this._Sequence = sequence;
             this.State = new RootMotionState();
         }
 
+        /// <summary>
+        /// Begin calculatin RootMotion (when Sequence became relevant)
+        /// </summary>
         internal void Begin()
         {
             _Time = _PreTime = 0;
             _PrePosition = _Position = _FirstPosition;
         }
 
+        /// <summary>
+        /// End calculatin RootMotion (when Sequence Cease relevant)
+        /// </summary>
         internal void End()
         {
             _Time = _PreTime = _Sequence.Length;
             _PrePosition = _Position = _LastPosition;
         }
 
+        /// <summary>
+        /// Evaluate curves and calculate motion between two updates
+        /// </summary>
         internal void Evaluate()
         {
             _Motion = Vector3.zero;

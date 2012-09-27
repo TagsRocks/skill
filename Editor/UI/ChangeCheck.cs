@@ -33,6 +33,9 @@ namespace Skill.Editor.UI
         /// occurs when any control was changed inside a block of code.
         /// </summary>
         public event EventHandler Changed;
+        /// <summary>
+        /// when any control was changed inside a block of code.
+        /// </summary>
         protected virtual void OnChanged()
         {
             if (Changed != null) Changed(this, EventArgs.Empty);

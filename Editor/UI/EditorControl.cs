@@ -18,12 +18,18 @@ namespace Skill.Editor.UI
         /// <returns>  true if the element is enabled; otherwise, false. The default value is true. </returns>
         public bool IsEnabled { get; set; }
 
+        /// <summary>
+        /// Create an EditorControl
+        /// </summary>
         public EditorControl()
         {
             this.IsEnabled = true;
             this.Position = new UnityEngine.Rect(0, 0, 300, 16);
         }
 
+        /// <summary>
+        /// Begin Render
+        /// </summary>
         protected override void BeginRender()
         {
             base.BeginRender();
@@ -31,6 +37,9 @@ namespace Skill.Editor.UI
                 EditorGUI.BeginDisabledGroup(true);
         }
 
+        /// <summary>
+        /// End Render
+        /// </summary>
         protected override void EndRender()
         {
             base.EndRender();

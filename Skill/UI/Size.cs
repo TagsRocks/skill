@@ -112,7 +112,7 @@ namespace Skill.UI
         }
 
         /// <summary>
-        /// 
+        /// Empty size
         /// </summary>
         public static Size Empty
         {

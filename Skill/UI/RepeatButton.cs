@@ -20,6 +20,9 @@ namespace Skill.UI
         /// Occurs when first time button is down
         /// </summary>
         public event EventHandler Down;
+        /// <summary>
+        /// when first time button is down
+        /// </summary>
         protected virtual void OnDown()
         {
             if (Down != null)
@@ -30,6 +33,9 @@ namespace Skill.UI
         /// Occurs when first time button is up
         /// </summary>
         public event EventHandler Up;
+        /// <summary>
+        /// when first time button is up
+        /// </summary>
         protected virtual void OnUp()
         {
             if (Up != null)
@@ -40,6 +46,9 @@ namespace Skill.UI
         /// Occurs each frame until it gets up
         /// </summary>
         public event EventHandler Repeat;
+        /// <summary>
+        /// each frame until it gets up
+        /// </summary>
         protected virtual void OnRepeat()
         {
             if (Repeat != null)
@@ -54,6 +63,9 @@ namespace Skill.UI
             Content = new GUIContent();
         }
 
+        /// <summary>
+        /// Render RepeatButton
+        /// </summary>
         protected override void Render()
         {
             bool result;

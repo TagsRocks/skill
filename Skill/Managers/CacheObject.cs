@@ -4,28 +4,42 @@ using System.Collections.Generic;
 
 namespace Skill.Managers
 {
+    /// <summary>
+    /// Information about an GameObject by CacheBehavior component
+    /// </summary>
     [Serializable]
     public class CacheObject
     {
+        /// <summary> Cacheable GameObject</summary>
         public GameObject Prefab;
+        /// <summary> Number of instances to create at initialize time</summary>
         public int InitialCacheSize = 10;
+        /// <summary> If this object is Growable, grow until what size? </summary>
         public int MaxSize = 10;
+        /// <summary> C# string format use for names of CacheBehavior objects </summary>
         public string NamePatternFormat;
+        /// <summary> Is Growable?</summary>
         public bool Growable = true;
 
-        public float CleanInterval = 0;// after this time try to destroy some inactive objects to reach InitialCacheSize. (0 means never)
+        /// <summary> After this time try to destroy some inactive objects to reach InitialCacheSize. (0 means never) </summary>
+        public float CleanInterval = 0;
 
+        /// <summary> Group </summary>
         public CacheGroup Group { get; private set; }
+        /// <summary> Unique id (same as CacheBehavior.CacheId ) </summary>
         public int CacheId { get; private set; }
-        private static int _CacheIdGenerator = 1;
 
+        private static int _CacheIdGenerator = 1;
         private Queue<GameObject> _DeactiveObjects;
         private List<GameObject> _Objects;
         private int _NextIndex;
         private int _FreeIndex;
         private Skill.TimeWatch _CleanTW;
 
-
+        /// <summary>
+        /// Initialize and instantiate objects
+        /// </summary>
+        /// <param name="group"></param>
         public void Initialize(CacheGroup group)
         {
             this.Group = group;
@@ -61,7 +75,7 @@ namespace Skill.Managers
                 cacheable.Group = Group;
             }
             else
-                throw new Exception("The prefab you set for cache does not have CacheBehavior component : " +  obj.name);
+                throw new Exception("The prefab you set for cache does not have CacheBehavior component : " + obj.name);
         }
 
         private GameObject GetFirstInactive()
@@ -81,6 +95,10 @@ namespace Skill.Managers
             return obj;
         }
 
+        /// <summary>
+        /// Get next available and deactive object to reuse
+        /// </summary>
+        /// <returns></returns>
         public GameObject Next()
         {
             if (_DeactiveObjects.Count > 0)
@@ -102,12 +120,19 @@ namespace Skill.Managers
             }
         }
 
+        /// <summary>
+        /// Add unused GameObject to free list
+        /// </summary>
+        /// <param name="objToFree"> unused GameObject </param>
         public void Free(GameObject objToFree)
         {
             objToFree.SetActiveRecursively(false);
             _DeactiveObjects.Enqueue(objToFree);
         }
 
+        /// <summary>
+        /// Destroy all instances
+        /// </summary>
         public void Destroy()
         {
             foreach (var objectToDestroy in _Objects)
@@ -116,6 +141,9 @@ namespace Skill.Managers
             }
         }
 
+        /// <summary>
+        /// Clean
+        /// </summary>
         public void Clean()
         {
             if (CleanInterval > 0)
@@ -128,8 +156,11 @@ namespace Skill.Managers
                         {
                             if (_DeactiveObjects.Count <= InitialCacheSize || (MaxSize > InitialCacheSize && _DeactiveObjects.Count <= MaxSize)) break;
                             GameObject objectToDestroy = _DeactiveObjects.Dequeue();
-                            _Objects.Remove(objectToDestroy);
-                            GameObject.Destroy(objectToDestroy);
+                            if (objectToDestroy != null)
+                            {
+                                _Objects.Remove(objectToDestroy);
+                                GameObject.Destroy(objectToDestroy);
+                            }
                         }
                         _CleanTW.End();
                     }

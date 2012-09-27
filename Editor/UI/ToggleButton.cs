@@ -40,6 +40,9 @@ namespace Skill.Editor.UI
         /// Occurs when a ToggleButton is checked.
         /// </summary>
         public event EventHandler Checked;
+        /// <summary>
+        /// when a ToggleButton is checked.
+        /// </summary>
         protected virtual void OnChecked()
         {
             if (Checked != null)
@@ -50,6 +53,9 @@ namespace Skill.Editor.UI
         /// Occurs when a ToggleButton is unchecked.
         /// </summary>
         public event EventHandler Unchecked;
+        /// <summary>
+        /// when a ToggleButton is unchecked.
+        /// </summary>
         protected virtual void OnUnchecked()
         {
             if (Unchecked != null)
@@ -65,6 +71,9 @@ namespace Skill.Editor.UI
             this.Height = 16;
         }
 
+        /// <summary>
+        /// Render ToggleButton
+        /// </summary>
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);

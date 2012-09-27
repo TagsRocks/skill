@@ -6,9 +6,11 @@ using System.Text;
 
 namespace Skill.Editor.Tools
 {
-    public static class Commands
+    static class Commands
     {
-
+        /// <summary>
+        /// Copy localPosition, localRotation and localScale of selected objetc to clipboard as formated string
+        /// </summary>
         public static void CopyTransform()
         {
             Transform t = Selection.activeTransform;
@@ -26,10 +28,13 @@ namespace Skill.Editor.Tools
             }
             else
             {
-                Debug.LogWarning("No selected transform to copy.");
+                Debug.LogError("No selected transform to copy.");
             }
         }
 
+        /// <summary>
+        /// Paste localPosition, localRotation and localScale from clipboard as formated string to selected objetc
+        /// </summary>
         public static void PasteTransform()
         {
             Transform t = Selection.activeTransform;
@@ -38,13 +43,13 @@ namespace Skill.Editor.Tools
                 string tData = System.Windows.Forms.Clipboard.GetText();
                 if (string.IsNullOrEmpty(tData))
                 {
-                    Debug.LogWarning("Clipboard is empty.");
+                    Debug.LogError("Clipboard is empty.");
                     return;
                 }
                 string[] values = tData.Split(new char[] { ',' });
                 if (values == null || values.Length != 10)
                 {
-                    Debug.LogWarning("Invalid transform data.");
+                    Debug.LogError("Invalid transform data.");
                     return;
                 }
 
@@ -73,7 +78,7 @@ namespace Skill.Editor.Tools
             }
             else
             {
-                Debug.LogWarning("No selected transform to paste.");
+                Debug.LogError("No selected transform to paste.");
             }
         }
     }
