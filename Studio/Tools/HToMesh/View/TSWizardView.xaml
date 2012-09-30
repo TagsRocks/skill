@@ -59,7 +59,7 @@
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Grid.IsSharedSizeScope="True" HorizontalAlignment="Right">
                     <Button Grid.Column="0" Grid.Row="0" Command="{Binding Path=MovePreviousCommand}" Content="Back" />
                     <Button Grid.Column="1" Grid.Row="0" Command="{Binding Path=MoveNextCommand}" Style="{StaticResource MoveNextButtonStyle}" />
-                    <Button Grid.Column="2" Grid.Row="0" Command="{Binding Path=CancelCommand}" Content="Cancel" />
+                    <Button Grid.Column="2" Grid.Row="0" Command="{Binding Path=CancelCommand}" Style="{StaticResource CancelButtonStyle}"/>
                 </StackPanel>
             </Grid>
         </Border>

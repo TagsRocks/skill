@@ -107,5 +107,15 @@ namespace Skill.Studio.Tools.HToMesh
             else if (e.RightButton == MouseButtonState.Pressed)
                 Selected = false;
         }
+
+        private void Img_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            Selected = true;
+        }
+
+        private void Img_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            Selected = false;
+        }
     }
 }

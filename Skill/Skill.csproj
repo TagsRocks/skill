@@ -126,11 +126,17 @@
     <Compile Include="UI\Group.cs" />
     <Compile Include="UI\HorizontalAlignment.cs" />
     <Compile Include="UI\Image.cs" />
+    <Compile Include="Text\ITextConverter.cs" />
     <Compile Include="UI\Label.cs" />
     <Compile Include="UI\ListBox.cs" />
     <Compile Include="UI\Orientation.cs" />
     <Compile Include="UI\Panel.cs" />
     <Compile Include="UI\PasswordField.cs" />
+    <Compile Include="Text\IPersianCharacterMap.cs" />
+    <Compile Include="Text\PersianCharacterMap.cs" />
+    <Compile Include="Text\PersianCharacter.cs" />
+    <Compile Include="Text\PersianTextConverter.cs" />
+    <Compile Include="Text\PersianCharacterFrom.cs" />
     <Compile Include="UI\RepeatButton.cs" />
     <Compile Include="UI\RowDefinition.cs" />
     <Compile Include="UI\ScrollView.cs" />
@@ -159,6 +165,7 @@
     <Content Include="Unity\UnityEditor.dll" />
     <Content Include="Unity\UnityEngine.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

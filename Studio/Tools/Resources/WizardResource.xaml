@@ -16,6 +16,15 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
+    
+    <Style BasedOn="{StaticResource {x:Type Button}}" TargetType="{x:Type Button}" x:Key="CancelButtonStyle">
+        <Setter Property="Content" Value="Cancel" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Path=IsOnLastPage}" Value="True">
+                <Setter Property="Content" Value="Finish" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
 
     <!-- HEADERED CONTENT CONTROL STYLE -->
     <Style TargetType="{x:Type HeaderedContentControl}">

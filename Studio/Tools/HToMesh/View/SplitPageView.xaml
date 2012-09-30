@@ -64,12 +64,12 @@
             <Button Content="None" Grid.Column="2" Command="{Binding SelectNoneCommand}" />
         </Grid>
         <Grid Grid.Row="3" Margin="8" >
-            <Image Margin="1" Source="{Binding Data.Image}" Stretch="Fill"/>
+            <Image Margin="1" Source="{Binding Data.Image}" Stretch="Fill" />
             <Border BorderThickness="1" BorderBrush="Gray" >
                 <ItemsControl ItemsSource="{Binding Data.Patches}" >
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <UniformGrid Rows="{Binding RowCount}" Columns="{Binding ColumnCount}"  />
+                            <UniformGrid Rows="{Binding RowCount}" Columns="{Binding ColumnCount}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                 </ItemsControl>

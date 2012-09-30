@@ -79,7 +79,7 @@ namespace Skill.UI
             }
 
             Text = result;
-        }        
+        }
     }
 
 }
