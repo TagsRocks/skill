@@ -9,10 +9,10 @@ namespace Skill.Text
     /// Convert a text contains of none persian characters to equivalent persian characters.
     /// </summary>
     /// <remarks>
-    /// this version of converter does not care about changes of text and use light calculation to convert text.
-    /// use this class when you want convert static texts, or when your TextField is RightToLeft (currently unity does not support RTL TextFields)
+    /// this version of converter use more calculation to convert text and should use for left to right TextField.
+    /// so use this class when your text is dynamic and 
     /// </remarks>
-    public class PersianTextConverter : ITextConverter
+    public class PersianTextFieldConverter : ITextConverter
     {        
         /// <summary>
         /// IPersianCharacterMap provided for this converter
@@ -39,13 +39,14 @@ namespace Skill.Text
         public bool RightToLeft { get; private set; }
 
         private CharInfo[] _SourceChars;
+        private CharInfo[] _RepositionedChars;
 
         /// <summary>
         /// Create a PersianTextConverter
         /// </summary>
         /// <param name="characterMap">Character mapping information for persian language</param>
         /// <param name="maxLength">Maximum length of text ( for better performance)</param>
-        public PersianTextConverter(IPersianCharacterMap characterMap, int maxLength = 100)
+        public PersianTextFieldConverter(IPersianCharacterMap characterMap, int maxLength = 100)
         {
             this.CharacterMap = characterMap;
             if (this.CharacterMap == null)
@@ -62,6 +63,7 @@ namespace Skill.Text
             {
                 this.MaxLength = textLength;
                 this._SourceChars = new CharInfo[this.MaxLength];
+                this._RepositionedChars = new CharInfo[this.MaxLength];
                 for (int i = 0; i < this.MaxLength; i++)
                     this._SourceChars[i] = new CharInfo() { Character = null, Form = PersianCharacterForm.Isolated };
             }
@@ -79,10 +81,28 @@ namespace Skill.Text
             {
                 LastConvertedText = string.Empty;
             }
+            else if (LastConvertedText != null && LastConvertedText.Equals(text, StringComparison.Ordinal))
+            {
+                return LastConvertedText;
+            }
             else
             {
                 // make sure that we alocated enough space for text
                 EnsureCharSize(text.Length);
+
+                if (LastConvertedText == null) LastConvertedText = string.Empty;
+                int oldIndex = 0;
+
+                if (LastConvertedText.Length > text.Length) // characters removed
+                {
+                    int index = LastConvertedText.IndexOf(text);
+                    if (index >= 0)
+                    {
+                        if (index == 0) // we have to remove from first because text is reversed
+                            oldIndex = LastConvertedText.Length - text.Length;
+                        text = LastConvertedText.Substring(oldIndex, text.Length);
+                    }
+                }
 
                 // find maps (if exist)
                 for (int i = 0; i < text.Length; i++)
@@ -92,7 +112,54 @@ namespace Skill.Text
                     if (!CharacterMap.Map.TryGetValue(cf.SourceChar, out cf.Character))
                         cf.Character = null;
                     cf.Form = PersianCharacterForm.Isolated;
+                    _RepositionedChars[i] = null;
+
+                    // check for new characters in text
+                    if (!RightToLeft && oldIndex < LastConvertedText.Length)
+                    {
+                        char oldChar = LastConvertedText[oldIndex];
+                        if (cf.SourceChar == oldChar || (cf.Character != null && cf.Character.Contains(oldChar)) || cf.SourceChar != ' ')
+                        {
+                            cf.IsReversed = true;
+                            oldIndex++;
+                        }
+                        else
+                            cf.IsReversed = false;
+                    }
+                    else
+                        cf.IsReversed = false;
                 }
+
+
+                // find none persian characters and place them in correct position
+                for (int i = 0; i < text.Length; i++)
+                {
+                    CharInfo cf = _SourceChars[i];
+                    if (!cf.IsReversed)
+                    {
+                        _RepositionedChars[text.Length - i - 1] = cf;
+                    }
+                }
+
+                // place persian characters ( that we found them in previous text change) in correct position
+                int j = 0;
+                for (int i = 0; i < text.Length; i++)
+                {
+                    if (_RepositionedChars[i] == null)
+                    {
+                        for (; j < text.Length; j++)
+                        {
+                            if (_SourceChars[j].IsReversed)
+                            {
+                                _RepositionedChars[i] = _SourceChars[j];
+                                j++;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+
 
                 // calc forms of each character
                 for (int i = 0; i < text.Length; i++)
@@ -101,8 +168,8 @@ namespace Skill.Text
                     PersianCharacter nextPc = null;
                     PersianCharacterForm form = PersianCharacterForm.Isolated;
 
-                    if (i > 0) prePc = _SourceChars[i - 1].Character;
-                    if (i < text.Length - 1) nextPc = _SourceChars[i + 1].Character;
+                    if (i > 0) nextPc = _RepositionedChars[i - 1].Character;
+                    if (i < text.Length - 1) prePc = _RepositionedChars[i + 1].Character;
 
                     if (prePc == null)
                     {
@@ -124,33 +191,19 @@ namespace Skill.Text
                             form = PersianCharacterForm.Initial;
                     }
 
-                    _SourceChars[i].Form = form;
+                    _RepositionedChars[i].Form = form;
                 }
 
                 // build text from end to start
                 StringBuilder result = new StringBuilder();
 
-                if (RightToLeft)
+                for (int i = 0; i < text.Length; i++)
                 {
-                    for (int i = 0; i < text.Length; i++)
-                    {
-                        CharInfo cf = _SourceChars[i];
-                        if (cf != null && cf.Character != null)
-                            result.Append(cf.Character[cf.Form]);
-                        else
-                            result.Append(cf.SourceChar);
-                    }
-                }
-                else // reverse text
-                {
-                    for (int i = text.Length - 1; i >= 0; i--)
-                    {
-                        CharInfo cf = _SourceChars[i];
-                        if (cf != null && cf.Character != null)
-                            result.Append(cf.Character[cf.Form]);
-                        else
-                            result.Append(cf.SourceChar);
-                    }
+                    CharInfo cf = _RepositionedChars[i];
+                    if (cf.Character != null)
+                        result.Append(cf.Character[cf.Form]);
+                    else
+                        result.Append(cf.SourceChar);
                 }
 
                 LastConvertedText = result.ToString();

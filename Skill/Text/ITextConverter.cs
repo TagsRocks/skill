@@ -15,6 +15,6 @@ namespace Skill.Text
         /// </summary>
         /// <param name="source">Source text to convert</param>
         /// <returns>Converted text</returns>
-        string Converter(string source);
+        string Convert(string source);
     }
 }

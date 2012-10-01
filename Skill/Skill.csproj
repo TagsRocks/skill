@@ -74,6 +74,8 @@
     <Compile Include="Managers\EventManager.cs" />
     <Compile Include="MathHelper.cs" />
     <Compile Include="Smoothing.cs" />
+    <Compile Include="Text\CharInfo.cs" />
+    <Compile Include="Text\PersianTextConverter.cs" />
     <Compile Include="TimeWatch.cs" />
     <Compile Include="AI\AccessLimitDecorator.cs" />
     <Compile Include="AI\Action.cs" />
@@ -135,7 +137,7 @@
     <Compile Include="Text\IPersianCharacterMap.cs" />
     <Compile Include="Text\PersianCharacterMap.cs" />
     <Compile Include="Text\PersianCharacter.cs" />
-    <Compile Include="Text\PersianTextConverter.cs" />
+    <Compile Include="Text\PersianTextFieldConverter.cs" />
     <Compile Include="Text\PersianCharacterFrom.cs" />
     <Compile Include="UI\RepeatButton.cs" />
     <Compile Include="UI\RowDefinition.cs" />

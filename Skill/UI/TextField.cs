@@ -48,6 +48,11 @@ namespace Skill.UI
         public int MaxLength { get; set; }
 
         /// <summary>
+        /// Text conveter for other languages (like persian)
+        /// </summary>
+        public Text.ITextConverter Converter { get; set; }
+
+        /// <summary>
         /// Create an instance of TextField
         /// </summary>
         public TextField()
@@ -80,7 +85,10 @@ namespace Skill.UI
                     result = GUI.TextField(RenderArea, _Text);
             }
 
-            Text = result;
+            if (Converter != null)
+                Text = Converter.Convert(result);
+            else
+                Text = result;
         }
     }
 }

@@ -53,13 +53,25 @@ namespace Skill.Controllers
         /// <summary>
         /// Subclasses can avoid spawning for some reason at specific times
         /// </summary>
-        protected virtual bool CanSpawn { get { return true; } }        
+        protected virtual bool CanSpawn { get { return true; } }
 
         /// <summary>
         /// let inherited class modify spawned object right after spawn time
         /// </summary>
         /// <param name="spawnedObj">Spawned Object</param>
         protected virtual void InitializeSpawnedObject(GameObject spawnedObj) { }
+
+        /// <summary>
+        /// Occurs when spawner spawned all objects
+        /// </summary>
+        public event EventHandler Complete;
+        /// <summary>
+        /// when spawner spawned all objects
+        /// </summary>
+        protected virtual void OnComplete()
+        {
+            if (Complete != null) Complete(this, EventArgs.Empty);
+        }        
 
         /// <summary>
         /// Spawn new game objects
@@ -163,9 +175,11 @@ namespace Skill.Controllers
                     Spawn();
                 }
             }
-            if (_SpawnCount >= MaxSpawnCount && DisableAfterAll)
+            if (_SpawnCount >= MaxSpawnCount)
             {
-                enabled = false;
+                if (DisableAfterAll)
+                    enabled = false;
+                OnComplete();
                 DestroyRespawnedObjects();
             }
         }
@@ -225,12 +239,16 @@ namespace Skill.Controllers
                 GameObject.Destroy(spawnedObj);
         }
 
-        //public void OnDieSpawnedObject(GameObject spawnedObj)
-        //{
-        //    if (SpawnedObjects.Contains(spawnedObj))
-        //    {
-        //        _DeadCount++;
-        //    }
-        //}
+        /// <summary>
+        /// Notify spawner that given object is dead but not destroyed yet ( the dead body is still visible )
+        /// </summary>
+        /// <param name="deadSpawnedObj">dead spawned object</param>
+        public void OnDieSpawnedObject(GameObject deadSpawnedObj)
+        {
+            if (SpawnedObjects.Contains(deadSpawnedObj))
+            {
+                _DeadCount++;
+            }
+        }
     }
 }

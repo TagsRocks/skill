@@ -51,7 +51,7 @@ namespace Skill.Editor.UI
         public Type ObjectType { get; private set; }
 
         /// <summary>
-        /// Allow assigning scene objects. See Description for more info.
+        /// Allow assigning scene objects. See Description for more info. (default true)
         /// </summary>
         public bool AllowSceneObjects { get; set; }
 
@@ -63,6 +63,7 @@ namespace Skill.Editor.UI
             Label = new GUIContent();
             ObjectType = typeof(T);
             this.Height = 16;
+            this.AllowSceneObjects = true;
         }
 
         /// <summary>
