@@ -13,7 +13,7 @@ namespace Skill.Text
     /// use this class when you want convert static texts, or when your TextField is RightToLeft (currently unity does not support RTL TextFields)
     /// </remarks>
     public class PersianTextConverter : ITextConverter
-    {        
+    {
         /// <summary>
         /// IPersianCharacterMap provided for this converter
         /// </summary>
@@ -97,33 +97,41 @@ namespace Skill.Text
                 // calc forms of each character
                 for (int i = 0; i < text.Length; i++)
                 {
+                    PersianCharacter currentPc = _SourceChars[i].Character;
                     PersianCharacter prePc = null;
                     PersianCharacter nextPc = null;
                     PersianCharacterForm form = PersianCharacterForm.Isolated;
 
-                    if (i > 0) prePc = _SourceChars[i - 1].Character;
-                    if (i < text.Length - 1) nextPc = _SourceChars[i + 1].Character;
+                    if (currentPc != null)
+                    {
+                        if (i > 0) prePc = _SourceChars[i - 1].Character;
+                        if (i < text.Length - 1) nextPc = _SourceChars[i + 1].Character;
 
-                    if (prePc == null)
-                    {
-                        if (nextPc != null && nextPc.CanStickToPrevious)
-                            form = PersianCharacterForm.Initial;
+                        if (prePc == null)
+                        {
+                            if (nextPc != null && nextPc.CanStickToPrevious && currentPc.CanStickToNext)
+                                form = PersianCharacterForm.Initial;
+                        }
+                        else if (nextPc == null)
+                        {
+                            if (prePc != null && prePc.CanStickToNext)
+                                form = PersianCharacterForm.Final;
+                        }
+                        else
+                        {
+                            if (nextPc.CanStickToPrevious && prePc.CanStickToNext)
+                            {
+                                if (currentPc.CanStickToNext)
+                                    form = PersianCharacterForm.Medial;
+                                else
+                                    form = PersianCharacterForm.Final;
+                            }
+                            else if (prePc.CanStickToNext)
+                                form = PersianCharacterForm.Final;
+                            else if (nextPc.CanStickToPrevious)
+                                form = PersianCharacterForm.Initial;
+                        }
                     }
-                    else if (nextPc == null)
-                    {
-                        if (prePc != null && prePc.CanStickToNext)
-                            form = PersianCharacterForm.Final;
-                    }
-                    else
-                    {
-                        if (nextPc.CanStickToPrevious && prePc.CanStickToNext)
-                            form = PersianCharacterForm.Medial;
-                        else if (prePc.CanStickToNext)
-                            form = PersianCharacterForm.Final;
-                        else if (nextPc.CanStickToPrevious)
-                            form = PersianCharacterForm.Initial;
-                    }
-
                     _SourceChars[i].Form = form;
                 }
 
@@ -153,7 +161,14 @@ namespace Skill.Text
                     }
                 }
 
-                LastConvertedText = result.ToString();
+
+                string temp = result.ToString();
+
+                temp = temp.Replace("\uFE8E\uFEDF", "\uFEFB");
+                temp = temp.Replace("\uFE8E\uFEE0", "\uFEFC");
+                temp = temp.Replace("\uFEEA\uFEE0\uFEDF\uFE8D", "\uFDF2");
+
+                LastConvertedText = temp;
             }
             return LastConvertedText;
         }

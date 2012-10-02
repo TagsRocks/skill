@@ -13,7 +13,7 @@ namespace Skill.Text
     /// so use this class when your text is dynamic and 
     /// </remarks>
     public class PersianTextFieldConverter : ITextConverter
-    {        
+    {
         /// <summary>
         /// IPersianCharacterMap provided for this converter
         /// </summary>
@@ -91,20 +91,23 @@ namespace Skill.Text
                 EnsureCharSize(text.Length);
 
                 if (LastConvertedText == null) LastConvertedText = string.Empty;
-                int oldIndex = 0;
+                int startoldIndex = 0;
+                int lastoldIndex = LastConvertedText.Length - 1;
 
-                if (LastConvertedText.Length > text.Length) // characters removed
+                if (LastConvertedText.Length == text.Length + 1) // characters removed
                 {
                     int index = LastConvertedText.IndexOf(text);
                     if (index >= 0)
                     {
                         if (index == 0) // we have to remove from first because text is reversed
-                            oldIndex = LastConvertedText.Length - text.Length;
-                        text = LastConvertedText.Substring(oldIndex, text.Length);
+                            startoldIndex = LastConvertedText.Length - text.Length;
+                        else
+                            lastoldIndex = text.Length - 1;
+                        text = LastConvertedText.Substring(startoldIndex, text.Length);
                     }
                 }
 
-                // find maps (if exist)
+                bool findDiff = false;
                 for (int i = 0; i < text.Length; i++)
                 {
                     CharInfo cf = _SourceChars[i];
@@ -113,21 +116,38 @@ namespace Skill.Text
                         cf.Character = null;
                     cf.Form = PersianCharacterForm.Isolated;
                     _RepositionedChars[i] = null;
+                    cf.IsReversed = false;
 
-                    // check for new characters in text
-                    if (!RightToLeft && oldIndex < LastConvertedText.Length)
+                    // start from begin and search for missmatch
+                    if (!findDiff && startoldIndex < LastConvertedText.Length)
                     {
-                        char oldChar = LastConvertedText[oldIndex];
-                        if (cf.SourceChar == oldChar || (cf.Character != null && cf.Character.Contains(oldChar)) || cf.SourceChar != ' ')
+                        if (cf.SourceChar == LastConvertedText[startoldIndex])
                         {
+                            startoldIndex++;
                             cf.IsReversed = true;
-                            oldIndex++;
                         }
                         else
-                            cf.IsReversed = false;
+                            findDiff = true;
                     }
-                    else
-                        cf.IsReversed = false;
+
+                }
+
+                if (findDiff) // if we found missmatch start from last index to find last missmatch
+                {
+                    for (int i = text.Length - 1; i >= 0; i--)
+                    {
+                        CharInfo cf = _SourceChars[i];
+                        if (lastoldIndex >= startoldIndex)
+                        {
+                            if (cf.SourceChar == LastConvertedText[lastoldIndex])
+                            {
+                                lastoldIndex--;
+                                cf.IsReversed = true;
+                            }
+                            else
+                                break;
+                        }
+                    }
                 }
 
 
@@ -164,33 +184,41 @@ namespace Skill.Text
                 // calc forms of each character
                 for (int i = 0; i < text.Length; i++)
                 {
+                    PersianCharacter currentPc = _RepositionedChars[i].Character;
                     PersianCharacter prePc = null;
                     PersianCharacter nextPc = null;
                     PersianCharacterForm form = PersianCharacterForm.Isolated;
 
-                    if (i > 0) nextPc = _RepositionedChars[i - 1].Character;
-                    if (i < text.Length - 1) prePc = _RepositionedChars[i + 1].Character;
+                    if (currentPc != null)
+                    {
+                        if (i > 0) nextPc = _RepositionedChars[i - 1].Character;
+                        if (i < text.Length - 1) prePc = _RepositionedChars[i + 1].Character;
 
-                    if (prePc == null)
-                    {
-                        if (nextPc != null && nextPc.CanStickToPrevious)
-                            form = PersianCharacterForm.Initial;
+                        if (prePc == null)
+                        {
+                            if (nextPc != null && nextPc.CanStickToPrevious && currentPc.CanStickToNext)
+                                form = PersianCharacterForm.Initial;
+                        }
+                        else if (nextPc == null)
+                        {
+                            if (prePc != null && prePc.CanStickToNext)
+                                form = PersianCharacterForm.Final;
+                        }
+                        else
+                        {
+                            if (nextPc.CanStickToPrevious && prePc.CanStickToNext)
+                            {
+                                if (currentPc.CanStickToNext)
+                                    form = PersianCharacterForm.Medial;
+                                else
+                                    form = PersianCharacterForm.Final;
+                            }
+                            else if (prePc.CanStickToNext)
+                                form = PersianCharacterForm.Final;
+                            else if (nextPc.CanStickToPrevious)
+                                form = PersianCharacterForm.Initial;
+                        }
                     }
-                    else if (nextPc == null)
-                    {
-                        if (prePc != null && prePc.CanStickToNext)
-                            form = PersianCharacterForm.Final;
-                    }
-                    else
-                    {
-                        if (nextPc.CanStickToPrevious && prePc.CanStickToNext)
-                            form = PersianCharacterForm.Medial;
-                        else if (prePc.CanStickToNext)
-                            form = PersianCharacterForm.Final;
-                        else if (nextPc.CanStickToPrevious)
-                            form = PersianCharacterForm.Initial;
-                    }
-
                     _RepositionedChars[i].Form = form;
                 }
 

@@ -127,7 +127,7 @@ namespace Skill.Text
         /// <summary> ، </summary>
         public PersianCharacter Comma { get; private set; }
         /// <summary> ؛ </summary>
-        public PersianCharacter Semicolon { get; private set; }        
+        public PersianCharacter Semicolon { get; private set; }
         /// <summary> آ </summary>
         public PersianCharacter AlefMadda { get; private set; }
         /// <summary> ؤ </summary>
@@ -140,6 +140,14 @@ namespace Skill.Text
         public PersianCharacter Hamza { get; private set; }
         /// <summary> ؟ </summary>
         public PersianCharacter QuestionMark { get; private set; }
+        /// <summary> ـ </summary>
+        public PersianCharacter Tatweel { get; private set; }
+        /// <summary> ( </summary>
+        public PersianCharacter LeftParenthesis { get; private set; }
+        /// <summary> ) </summary>
+        public PersianCharacter RightParenthesis { get; private set; }
+        /// <summary> ئ </summary>
+        public PersianCharacter YehWithHamzaAbove { get; private set; }
 
         private void CreatePersianCharacters()
         {
@@ -200,13 +208,17 @@ namespace Skill.Text
             this.Shadda = new PersianCharacter('\u0651');
             this.RialSign = new PersianCharacter('\uFDFC');
             this.Comma = new PersianCharacter('\u060C');
-            this.Semicolon = new PersianCharacter('\u061B');            
+            this.Semicolon = new PersianCharacter('\u061B');
             this.AlefMadda = new PersianCharacter('\uFE82', '\uFE81');
             this.WawWithHamzaAbove = new PersianCharacter('\uFE86', '\uFE85');
             this.AlefWithHamzaAbove = new PersianCharacter('\uFE84', '\uFE83');
             this.AlefWithHamzaBelow = new PersianCharacter('\uFE88', '\uFE87');
             this.Hamza = new PersianCharacter('\uFE80');
             this.QuestionMark = new PersianCharacter('\u061F');
+            this.Tatweel = new PersianCharacter('\u0640', '\u0640', '\u0640', '\u0640');
+            this.LeftParenthesis = new PersianCharacter('\uFD3E');
+            this.RightParenthesis = new PersianCharacter('\uFD3F');
+            this.YehWithHamzaAbove = new PersianCharacter('\uFE8B', '\uFE8C', '\uFE8A', '\uFE89');
 
         }
 
@@ -288,14 +300,14 @@ namespace Skill.Text
             CreateMap(Ghain, '\uFECF', '\uFED0', '\uFECE', '\uFECD', 'y', 'غ');
             CreateMap(Feh, '\uFED3', '\uFED4', '\uFED2', '\uFED1', 't', 'ف');
             CreateMap(Qaf, '\uFED7', '\uFED8', '\uFED6', '\uFED5', 'r', 'ق');
-            CreateMap(Kaf, '\uFEDB', '\uFEDC', '\uFEDA', '\uFED9', ';', 'ک');
+            CreateMap(Kaf, '\uFEDB', '\uFEDC', '\uFEDA', '\uFED9', ';', 'ک', '\u0643');
             CreateMap(Gaf, '\uFB94', '\uFB95', '\uFB93', '\uFB92', '\'', 'گ');
             CreateMap(Lam, '\uFEDF', '\uFEE0', '\uFEDE', '\uFEDD', 'g', 'ل');
             CreateMap(Meem, '\uFEE3', '\uFEE4', '\uFEE2', '\uFEE1', 'l', 'م');
             CreateMap(Noon, '\uFEE7', '\uFEE8', '\uFEE6', '\uFEE5', 'k', 'ن');
             CreateMap(Waw, '\uFEEE', '\uFEED', ',', 'و', 'U');
             CreateMap(Heh, '\uFEEB', '\uFEEC', '\uFEEA', '\uFEE9', 'i', 'ه');
-            CreateMap(Yeh, '\uFBFE', '\uFBFF', '\uFBFD', '\uFBFC', 'd', 'ی');
+            CreateMap(Yeh, '\uFBFE', '\uFBFF', '\uFBFD', '\uFBFC', 'd', '\u0649', '\u064A');
 
             // create maps for numeric characters
             CreateMap(Zero, '0', '\u0660', '\u06F0');
@@ -319,13 +331,17 @@ namespace Skill.Text
             CreateMap(Shadda, '\u0651', 'F');
             CreateMap(RialSign, '\uFDFC', 'R');
             CreateMap(Comma, '\u060C', 'T');
-            CreateMap(Semicolon, '\u061B', 'Y');            
-            CreateMap(AlefMadda, '\uFE82', '\uFE81', 'H');
-            CreateMap(WawWithHamzaAbove, '\uFE86', '\uFE85', 'V');
-            CreateMap(AlefWithHamzaAbove, '\uFE84', '\uFE83', 'N');
-            CreateMap(AlefWithHamzaBelow, '\uFE88', '\uFE87', 'B');
+            CreateMap(Semicolon, '\u061B', 'Y');
+            CreateMap(AlefMadda, '\uFE82', '\uFE81', 'H', '\u0622');
+            CreateMap(WawWithHamzaAbove, '\uFE86', '\uFE85', 'V', '\u0624');
+            CreateMap(AlefWithHamzaAbove, '\uFE84', '\uFE83', 'N', '\u0623');
+            CreateMap(AlefWithHamzaBelow, '\uFE88', '\uFE87', 'B', '\u0625');
             CreateMap(Hamza, '\uFE80', 'M');
             CreateMap(QuestionMark, '\u061F', '?');
+            CreateMap(Tatweel, '\u0640');
+            CreateMap(LeftParenthesis, '\uFD3E', ')');
+            CreateMap(RightParenthesis, '\uFD3F', '(');
+            CreateMap(YehWithHamzaAbove , '\uFE8B', '\uFE8C', '\uFE8A', '\uFE89' , 'm' , 'ئ');
         }
 
         /// <summary>
