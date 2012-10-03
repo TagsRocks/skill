@@ -38,6 +38,40 @@ namespace Skill.Text
         /// </remarks>
         public bool RightToLeft { get; private set; }
 
+
+        /// <summary>
+        /// if converter is LTR This is reversed text to save.
+        /// </summary>
+        /// <remarks>
+        /// When we set text of TextField for first time the converter does not know that this text reversed before
+        /// so (if converter is LTR) it will reverse it and the result in TextFiled gets wrong.
+        /// </remarks>
+        public string TextToSave
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(LastConvertedText))
+                {
+                    if (RightToLeft) // the text is correct and we do not need to reverse it
+                    {
+                        return LastConvertedText;
+                    }
+                    else
+                    {
+                        StringBuilder builder = new StringBuilder();
+                        // reverse text for save
+                        for (int i = LastConvertedText.Length - 1; i >= 0; i--)
+                        {
+                            builder.Append(LastConvertedText[i]);
+                        }
+                        return builder.ToString();
+                    }
+                }
+                else
+                    return string.Empty;
+            }
+        }
+
         private CharInfo[] _SourceChars;
 
         /// <summary>
@@ -128,7 +162,7 @@ namespace Skill.Text
                             }
                             else if (prePc.CanStickToNext)
                                 form = PersianCharacterForm.Final;
-                            else if (nextPc.CanStickToPrevious)
+                            else if (nextPc.CanStickToPrevious && currentPc.CanStickToNext)
                                 form = PersianCharacterForm.Initial;
                         }
                     }

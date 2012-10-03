@@ -29,17 +29,35 @@ namespace Skill.Text
         /// </summary>
         public string LastConvertedText { get; private set; }
 
-        /// <summary>
-        /// if your TextField is right to left set this parameter to true
-        /// </summary>
-        /// <remarks>
-        /// Unity currently does not support right to left TextField, so to convert text in LTR format to RTL persian format
-        /// we have to reverse text.
-        /// </remarks>
-        public bool RightToLeft { get; private set; }
-
         private CharInfo[] _SourceChars;
         private CharInfo[] _RepositionedChars;
+
+        /// <summary>
+        /// This is reversed text to save.
+        /// </summary>
+        /// <remarks>
+        /// When we set text of TextField for first time the converter does not know that this text reversed before
+        /// so it will reverse it and the result in TextFiled gets wrong.
+        /// </remarks>
+        public string TextToSave
+        {
+            get
+            {                
+                if (!string.IsNullOrEmpty(LastConvertedText))
+                {
+                    StringBuilder builder = new StringBuilder();
+                    // reverse text for save
+                    for (int i = LastConvertedText.Length - 1; i >= 0; i--)
+                    {
+                        builder.Append(LastConvertedText[i]);
+                    }
+
+                    return builder.ToString();
+                }
+                else
+                    return string.Empty;
+            }
+        }
 
         /// <summary>
         /// Create a PersianTextConverter
@@ -52,7 +70,6 @@ namespace Skill.Text
             if (this.CharacterMap == null)
                 throw new ArgumentNullException("Invalid IPersianCharacterMap for PersianTextConverter");
 
-            this.RightToLeft = false;
             this.MaxLength = 0;
             EnsureCharSize(Math.Max(10, maxLength));
         }
@@ -215,7 +232,7 @@ namespace Skill.Text
                             }
                             else if (prePc.CanStickToNext)
                                 form = PersianCharacterForm.Final;
-                            else if (nextPc.CanStickToPrevious)
+                            else if (nextPc.CanStickToPrevious && currentPc.CanStickToNext)
                                 form = PersianCharacterForm.Initial;
                         }
                     }
