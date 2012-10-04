@@ -65,7 +65,7 @@ namespace Skill.Text
         /// <param name="canStickToPrevious">can stick to previous character</param>
         /// <param name="canStickToNext">can stick to next character</param>
         public PersianCharacter(char final, char isolated, bool canStickToPrevious = true, bool canStickToNext = false)
-            : this(final, final, final, isolated, canStickToPrevious, canStickToNext)
+            : this(isolated, isolated, final, isolated, canStickToPrevious, canStickToNext)
         {
 
         }

@@ -38,6 +38,10 @@ namespace Skill.Text
         /// </remarks>
         public bool RightToLeft { get; private set; }
 
+        /// <summary>
+        /// Whether convert لا and الله to one equivalent character. (default true)
+        /// </summary>
+        public bool ConvertLigature { get; set; }
 
         /// <summary>
         /// if converter is LTR This is reversed text to save.
@@ -85,6 +89,7 @@ namespace Skill.Text
             if (this.CharacterMap == null)
                 throw new ArgumentNullException("Invalid IPersianCharacterMap for PersianTextConverter");
 
+            this.ConvertLigature = true;
             this.RightToLeft = false;
             this.MaxLength = 0;
             EnsureCharSize(Math.Max(10, maxLength));
@@ -197,11 +202,12 @@ namespace Skill.Text
 
 
                 string temp = result.ToString();
-
-                temp = temp.Replace("\uFE8E\uFEDF", "\uFEFB");
-                temp = temp.Replace("\uFE8E\uFEE0", "\uFEFC");
-                temp = temp.Replace("\uFEEA\uFEE0\uFEDF\uFE8D", "\uFDF2");
-
+                if (ConvertLigature)
+                {
+                    temp = temp.Replace("\uFE8E\uFEDF", "\uFEFB");
+                    temp = temp.Replace("\uFE8E\uFEE0", "\uFEFC");
+                    temp = temp.Replace("\uFEEA\uFEE0\uFEDF\uFE8D", "\uFDF2");
+                }
                 LastConvertedText = temp;
             }
             return LastConvertedText;

@@ -149,6 +149,12 @@ namespace Skill.Text
         /// <summary> ئ </summary>
         public PersianCharacter YehWithHamzaAbove { get; private set; }
 
+        // Ligature
+        /// <summary> لا </summary>
+        public PersianCharacter LigatureLam { get; private set; }
+        /// <summary> الله </summary>
+        public PersianCharacter LigatureAllah { get; private set; }
+
         private void CreatePersianCharacters()
         {
             // alefba
@@ -219,6 +225,10 @@ namespace Skill.Text
             this.LeftParenthesis = new PersianCharacter('\uFD3E');
             this.RightParenthesis = new PersianCharacter('\uFD3F');
             this.YehWithHamzaAbove = new PersianCharacter('\uFE8B', '\uFE8C', '\uFE8A', '\uFE89');
+
+            // Ligature
+            this.LigatureLam = new PersianCharacter('\uFEFC', '\uFEFB');
+            this.LigatureAllah = new PersianCharacter('\uFDF2');
 
         }
 
@@ -341,7 +351,11 @@ namespace Skill.Text
             CreateMap(Tatweel, '\u0640');
             CreateMap(LeftParenthesis, '\uFD3E', ')');
             CreateMap(RightParenthesis, '\uFD3F', '(');
-            CreateMap(YehWithHamzaAbove , '\uFE8B', '\uFE8C', '\uFE8A', '\uFE89' , 'm' , 'ئ');
+            CreateMap(YehWithHamzaAbove, '\uFE8B', '\uFE8C', '\uFE8A', '\uFE89', 'm', 'ئ');
+
+            // Ligature
+            CreateMap(LigatureLam, '\uFEFC', '\uFEFB');
+            CreateMap(LigatureAllah, '\uFDF2');
         }
 
         /// <summary>
