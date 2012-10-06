@@ -47,6 +47,7 @@ namespace Skill.CodeGeneration.CSharp
         {
             Reset();
             BehaviorTreeClass btClass = new BehaviorTreeClass(bTree);
+            _Document.AddUsingSkillAI();
             _Document.Add(btClass);
             HasPartial = true;
         }
@@ -54,8 +55,7 @@ namespace Skill.CodeGeneration.CSharp
         public void Reset()
         {
             _Document = new Document();
-            _Document.AddDefaultUsings();
-            _Document.AddUsingSkillAI();
+            _Document.AddDefaultUsings();            
         }
 
         /// <summary>
@@ -65,6 +65,7 @@ namespace Skill.CodeGeneration.CSharp
         public void Generate(Skill.DataModels.AI.SharedAccessKeys sharedAccessKeys)
         {
             SharedAccessKeysClass saClass = new SharedAccessKeysClass(sharedAccessKeys);
+            _Document.AddUsingSkillAI();
             _Document.Add(saClass);
             HasPartial = false;
         }
@@ -76,6 +77,7 @@ namespace Skill.CodeGeneration.CSharp
         public void Generate(AnimationTree aTree)
         {
             AnimationTreeClass atClass = new AnimationTreeClass(aTree);
+            _Document.AddUsingSkillAnimation();
             _Document.Add(atClass);
             HasPartial = true;
         }
@@ -87,6 +89,7 @@ namespace Skill.CodeGeneration.CSharp
         public void Generate(Skill.DataModels.Animation.SkinMesh skinMesh)
         {
             SkinMeshClass skClass = new SkinMeshClass(skinMesh);
+            _Document.AddUsingSkillAnimation();
             _Document.Add(skClass);
             HasPartial = false;
         }
@@ -100,6 +103,7 @@ namespace Skill.CodeGeneration.CSharp
         {
 
             SaveDataClass sgClass = new SaveDataClass(saveGame);
+            _Document.AddUsingSkillIO();
             _Document.Add(sgClass);
             HasPartial = false;
         }

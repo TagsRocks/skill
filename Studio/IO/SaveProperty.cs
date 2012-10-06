@@ -145,7 +145,7 @@ namespace Skill.Studio.IO
             }
         }
 
-        private static string GetPrimitiveTypeString(Skill.DataModels.PrimitiveType pt )
+        private static string GetPrimitiveTypeString(Skill.DataModels.PrimitiveType pt)
         {
             switch (pt)
             {
@@ -174,6 +174,7 @@ namespace Skill.Studio.IO
     [DisplayName("Class Property")]
     public class ClassPropertyViewModel : SavePropertyViewModel
     {
+        public const string InvalidClass = "Not_Set";
 
         public ClassPropertyViewModel(SaveClassViewModel ownerClass, ClassProperty model)
             : base(ownerClass, model)
@@ -210,10 +211,12 @@ namespace Skill.Studio.IO
         {
             get
             {
+                string cName = string.IsNullOrEmpty(ClassName) ? InvalidClass : ClassName;
+
                 if (IsArray)
-                    return string.Format("public class {0}[] {1}", ClassName, Name);
+                    return string.Format("public {0}[] {1}", cName, Name);
                 else
-                    return string.Format("public class {0} {1}", ClassName, Name);
+                    return string.Format("public {0} {1}", cName, Name);
 
             }
         }

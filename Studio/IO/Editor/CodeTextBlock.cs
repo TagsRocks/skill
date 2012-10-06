@@ -39,29 +39,48 @@ namespace Skill.Studio.IO.Editor
             if (code == null)
                 code = "";
 
-            string[] parts = code.Split(new char[] { ' ', '<', '>' ,'[',']' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] parts = code.Split(new char[] { ' ', '<', '>' }, StringSplitOptions.RemoveEmptyEntries);
 
             List<Inline> lines = new List<Inline>();
 
-            bool afterClass = false;
+            bool afterClassOrPublic = false;
             foreach (var str in parts)
             {
-                if (str == "class")
+                Brush foreground = Brushes.Black;
+
+                if (str == "class" || str == "public")
                 {
-                    lines.Add(new Run(str) { Foreground = Brushes.Blue });
-                    afterClass = true;
+                    foreground = Brushes.Blue;
+                    afterClassOrPublic = true;
                 }
-                else if (afterClass)
+                else if (afterClassOrPublic)
                 {
-                    lines.Add(new Run(str) { Foreground = Brushes.DarkGreen });
-                    afterClass = false;
+                    if (str == ClassPropertyViewModel.InvalidClass )
+                    {
+                        foreground = Brushes.Red;
+                    }
+                    else if (str == "int" || str == "float" || str == "bool" || str == "string" ||
+                             str == "int[]" || str == "float[]" || str == "bool[]" || str == "string[]")
+                    {
+                        foreground = Brushes.Blue;
+                    }
+                    else
+                    {
+                        foreground = Brushes.DarkGreen;
+                    }
+                    afterClassOrPublic = false;
                 }
-                else if (str == "public" || str == "int" || str == "float" || str == "bool" || str == "string")
-                    lines.Add(new Run(str) { Foreground = Brushes.Blue });
-                else if (str == "Bounds" || str == "Color" || str == "Matrix4x4" || str == "Plane" || str == "Quaternion" || str == "Ray" || str == "Rect" || str == "Vector2" || str == "Vector3" || str == "Vector4")
-                    lines.Add(new Run(str) { Foreground = Brushes.DarkGreen });
+
+                int bIndex = str.IndexOf('[');
+                if (bIndex > 0)
+                {
+                    lines.Add(new Run(str.Substring(0, bIndex)) { Foreground = foreground });
+                    lines.Add(new Run(str.Substring(bIndex)) { Foreground = Brushes.Black });
+                }
                 else
-                    lines.Add(new Run(str));                
+                {
+                    lines.Add(new Run(str) { Foreground = foreground });
+                }
 
                 lines.Add(new Run(" "));
             }

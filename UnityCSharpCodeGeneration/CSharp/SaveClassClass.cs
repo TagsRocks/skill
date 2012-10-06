@@ -274,9 +274,9 @@ namespace Skill.CodeGeneration.CSharp
                             GetSavableMethodName(cp.ClassName, cp.IsArray), cp.ClassName, GetStaticCreatorMethodName(cp.ClassName)));
                         break;
                 }                
-            }            
+            }
 
-            Method loadBinaryMethod = new Method("void", "Load", loadMethodBody.ToString(), "BinaryLoadStream stream");
+            Method loadBinaryMethod = new Method("void", "Load", loadMethodBody.ToString(), "Skill.IO.BinaryLoadStream stream");
             loadBinaryMethod.Modifiers = Modifiers.Public;
             Add(loadBinaryMethod);
         }

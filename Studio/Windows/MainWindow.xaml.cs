@@ -134,6 +134,18 @@ namespace Skill.Studio
             }
             _DockManager.DeserializationCallback = CustomDeserializationCallbackHandler;
             _DockManager.Loaded += new RoutedEventHandler(_DockManager_Loaded);
+            _DockManager.DocumentClosed += new EventHandler(_DockManager_DocumentClosed);
+            DocumentPane_DocsCenter.SelectionChanged += new SelectionChangedEventHandler(DocumentPane_DocsCenter_SelectionChanged); 
+        }
+
+        void DocumentPane_DocsCenter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            //_PropertyGrid.SetViewModel(null);
+        }
+
+        void _DockManager_DocumentClosed(object sender, EventArgs e)
+        {
+            _PropertyGrid.SetViewModel(null);
         }
 
         void _DockManager_Loaded(object sender, RoutedEventArgs e)
@@ -411,10 +423,15 @@ namespace Skill.Studio
         {
             if (IsProjectLoaded)
             {
-                _ProjectProperties = new Controls.ProjectPropertiesControl(Project);
-                _ProjectProperties.Closing += new EventHandler<CancelEventArgs>(ProjectProperties_Closing);
-                DocumentPane_DocsCenter.Items.Add(_ProjectProperties);
+                if (_ProjectProperties == null)
+                {
+                    _ProjectProperties = new Controls.ProjectPropertiesControl(Project);
+                    _ProjectProperties.Closing += new EventHandler<CancelEventArgs>(ProjectProperties_Closing);
+                }
             }
+            if (!DocumentPane_DocsCenter.Items.Contains(_ProjectProperties))
+                DocumentPane_DocsCenter.Items.Add(_ProjectProperties);
+            DocumentPane_DocsCenter.SelectedItem = _ProjectProperties;
             e.Handled = true;
         }
 
@@ -635,9 +652,9 @@ namespace Skill.Studio
 
 #if DEBUG
             CopyEditorFile("Editor", "Skill.Editor.dll", overWrite);
-            CopyEditorFile("DataModels","Skill.DataModels.dll", overWrite);
+            CopyEditorFile("DataModels", "Skill.DataModels.dll", overWrite);
             CopyFile("Skill", "Skill.dll", overWrite);
-            CopyFile("Skill", "Skill.xml", overWrite);            
+            CopyFile("Skill", "Skill.xml", overWrite);
 #else
             Skill.CodeGeneration.RequiredFile[] files = PluginManager.Plugin.RequiredFiles;
             if (files != null && files.Length > 0)
@@ -717,14 +734,14 @@ namespace Skill.Studio
         }
 
 
-        private void CopyFile(string projectName, string filename , bool overWrite)
+        private void CopyFile(string projectName, string filename, bool overWrite)
         {
             string destinaion = Project.GetDesignerOutputPath(filename);
 
             if (System.IO.File.Exists(destinaion) && !overWrite)
                 return;
 
-            string appDir = AppDomain.CurrentDomain.BaseDirectory;            
+            string appDir = AppDomain.CurrentDomain.BaseDirectory;
 
             string name = System.IO.Path.GetFileNameWithoutExtension(filename);
 
@@ -735,7 +752,7 @@ namespace Skill.Studio
             if (System.IO.File.Exists(filePath))
             {
                 System.IO.File.Copy(filePath, destinaion, true);
-            }            
+            }
         }
 
         private void CopyEditorFile(string projectName, string filename, bool overWrite)
@@ -745,7 +762,7 @@ namespace Skill.Studio
             if (System.IO.File.Exists(destinaion) && !overWrite)
                 return;
 
-            string appDir = AppDomain.CurrentDomain.BaseDirectory;            
+            string appDir = AppDomain.CurrentDomain.BaseDirectory;
 
             string name = System.IO.Path.GetFileNameWithoutExtension(filename);
 
@@ -756,7 +773,7 @@ namespace Skill.Studio
             if (System.IO.File.Exists(filePath))
             {
                 System.IO.File.Copy(filePath, destinaion, true);
-            }            
+            }
 
         }
 
@@ -989,6 +1006,6 @@ namespace Skill.Studio
         #endregion
 
 
-        
+
     }
 }

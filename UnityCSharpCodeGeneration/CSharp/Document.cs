@@ -9,7 +9,7 @@ namespace Skill.CodeGeneration.CSharp
     /// a document is a c# file
     /// </summary>
     class Document : IPartialCode
-    {        
+    {
         List<string> _Usings; // list of using to write at top of document
         List<Namespace> _Namespaces; // list of namespaces
         List<Class> _Classes;// list of classes that does not inside of a namespace
@@ -30,7 +30,8 @@ namespace Skill.CodeGeneration.CSharp
         /// <param name="us">name of namespace (like System or System.Collections)</param>
         public void AddUsing(string us)
         {
-            _Usings.Add(us);
+            if (!_Usings.Contains(us))
+                _Usings.Add(us);
         }
         /// <summary>
         /// Remove using
@@ -152,19 +153,19 @@ namespace Skill.CodeGeneration.CSharp
                 foreach (var us in _Usings)
                     writer.WriteLine(Using(us));
                 writer.WriteLine();
-            }            
+            }
 
             foreach (var cls in _Classes)
             {
                 cls.WritePartial(writer, oldCode);
                 writer.WriteLine();
             }
-            
+
             foreach (var ns in _Namespaces)
             {
                 ns.WritePartial(writer, oldCode);
             }
         }
-        
+
     }
 }
