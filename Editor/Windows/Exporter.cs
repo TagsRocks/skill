@@ -233,8 +233,9 @@ namespace Skill.Editor
 
         private void CopyToClipboard(XDocument document)
         {
-            System.Windows.Forms.Clipboard.Clear();
-            System.Windows.Forms.Clipboard.SetText(document.ToString());
+            //System.Windows.Forms.Clipboard.Clear();
+            //System.Windows.Forms.Clipboard.SetText(document.ToString());
+            EditorGUIUtility.systemCopyBuffer = document.ToString();
         }
 
     }

@@ -22,6 +22,7 @@ namespace Skill.CodeGeneration.CSharp
             new RequiredFile("Skill.xml","Designer"),
             new RequiredFile("Skill.Editor.dll","Editor\\Skill","Assets"),
             new RequiredFile("Skill.Editor.xml","Editor\\Skill","Assets"),
+            new RequiredFile("Resources","Editor\\Skill","Assets"),
             new RequiredFile("Skill.DataModels.dll","Editor\\Skill","Assets"),
         };
         public RequiredFile[] RequiredFiles { get { return _RequiredFiles; } }

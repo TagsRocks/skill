@@ -9,7 +9,7 @@ using Skill.Editor;
 
 namespace Skill.Editor.Tools
 {
-    
+
     [UnityEditor.CustomEditor(typeof(ImplantAsset))]
     class ImplantAssetEditor : UnityEditor.Editor
     {
@@ -20,7 +20,7 @@ namespace Skill.Editor.Tools
         private Skill.Editor.UI.Button _BtnAdd;
         private Skill.Editor.UI.Button _BtnRemove;
         private Skill.Editor.UI.Button _BtnClear;
-        private Skill.Editor.UI.ChangeCheck _ChangeCheck;        
+        private Skill.Editor.UI.ChangeCheck _ChangeCheck;
 
         private void CreateUI()
         {
@@ -31,6 +31,12 @@ namespace Skill.Editor.Tools
             _PrefabsLB = new ListBox() { Row = 1, Column = 0, Margin = new Thickness(2), SelectionMode = Skill.UI.SelectionMode.Single };
             _PrefabsLB.Background.Visibility = Visibility.Visible;
             _PrefabsLB.SelectionChanged += new System.EventHandler(_PrefabsLB_SelectionChanged);
+
+            GUIStyleState selectedItemState = new GUIStyleState() { background = Resources.SelectedItemBackground};
+            _PrefabsLB.SelectedStyle = new GUIStyle()
+            {
+                normal = selectedItemState,
+            };
 
             _ButtonsPanel = new StackPanel() { Row = 0, Column = 0, HorizontalAlignment = HorizontalAlignment.Left, Orientation = Orientation.Horizontal };
 
@@ -113,7 +119,7 @@ namespace Skill.Editor.Tools
         #endregion
 
         void OnEnable()
-        {            
+        {
             CreateUI();
             ImplantAsset asset = target as ImplantAsset;
             if (asset != null)
@@ -135,7 +141,7 @@ namespace Skill.Editor.Tools
             {
                 _PrefabsLB.Controls.Clear();
             }
-        }        
+        }
 
         public override void OnInspectorGUI()
         {

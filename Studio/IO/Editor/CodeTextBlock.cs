@@ -55,7 +55,7 @@ namespace Skill.Studio.IO.Editor
                 }
                 else if (afterClassOrPublic)
                 {
-                    if (str == ClassPropertyViewModel.InvalidClass )
+                    if (str == ClassPropertyViewModel.InvalidClass || str == ClassPropertyViewModel.InvalidClassArray)
                     {
                         foreground = Brushes.Red;
                     }

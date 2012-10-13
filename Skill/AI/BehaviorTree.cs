@@ -44,6 +44,7 @@ namespace Skill.AI
         /// <returns>Root node</returns>
         protected abstract Behavior CreateTree();
 
+             
         /// <summary>
         /// Create an instance of BehaviorTree
         /// </summary>
@@ -65,7 +66,7 @@ namespace Skill.AI
         }
 
         /// <summary> Occurs when Behavior Tree updated </summary>
-        public EventHandler Updated;
+        public event EventHandler Updated;
         /// <summary> Call Updated event </summary>
         protected virtual void OnUpdated()
         {
@@ -90,16 +91,7 @@ namespace Skill.AI
         /// </summary>
         public void ForceUpdate()
         {
-            this._LastUpdateTime = UnityEngine.Time.time;
-            // let last running action finish it's job
-            //if (State.RunningAction != null)
-            //{
-            //    BehaviorResult result = State.RunningAction.Continue(State);
-            //    if (result == BehaviorResult.Running)
-            //    {
-            //        return;
-            //    }
-            //}
+            this._LastUpdateTime = UnityEngine.Time.time;            
             State.Begin();
             Root.Trace(State);
 

@@ -112,6 +112,8 @@ namespace Skill.UI
             Vector2 min = new Vector2(ra.xMin, ra.yMin);
             Vector2 max = new Vector2(ra.xMax, ra.yMax);
 
+            Size maxDesiredSize = new Size(0, 0);
+
             foreach (var c in Controls)
             {
                 Rect cRenderArea = c.RenderArea;
@@ -123,8 +125,15 @@ namespace Skill.UI
                 max.x = Mathf.Max(cRenderArea.xMax + cMargin.Right, max.x);
                 max.y = Mathf.Max(cRenderArea.yMax + cMargin.Bottom, max.y);
 
+                if (c.ControlType == UI.ControlType.Panel)
+                {
+                    Size ds = ((Panel)c).DesiredSize;
+                    maxDesiredSize.Width = Mathf.Max(maxDesiredSize.Width, ds.Width);
+                    maxDesiredSize.Height = Mathf.Max(maxDesiredSize.Height, ds.Height);
+                }
+
             }
-            _DesiredSize = new Size(Mathf.Max(max.x - min.x, 0), Mathf.Max(max.y - min.y, 0));
+            _DesiredSize = new Size(Mathf.Max(max.x - min.x, maxDesiredSize.Width), Mathf.Max(max.y - min.y, maxDesiredSize.Height));
         }
 
         /// <summary>

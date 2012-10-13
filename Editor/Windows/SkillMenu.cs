@@ -21,22 +21,28 @@ namespace Skill.Editor
             Tools.Distance.Instance.Show();
         }
 
-        [MenuItem("Skill/Animation/Animation Assigner", false, 50)]
+        [MenuItem("Skill/Tools/Animation Assigner", false, 2)]
         static void ShowAnimationAssigner()
         {
             AnimationAssigner.Instance.Show();
         }
 
-        [MenuItem("Skill/AI/BTree Debugger", false, 100)]
-        static void ShowBTreeDebugger()
+        [MenuItem("Skill/Debug/BehaviorTree State", false, 50)]
+        static void ShowBTreeStateDebugger()
         {
-            BehaviorTreeDebugger.Instance.Show();
+            BehaviorTreeStateDebugger.Instance.Show();
         }
 
         [MenuItem("Skill/Export to Skill Studio", false, 1001)]
         static void ShowExporter()
         {
             Exporter.Instance.Show();
+        }
+
+        [MenuItem("Skill/Apply Import Settings", false, 1002)]
+        static void ApplyImportSettings()
+        {
+            Resources.ApplyImportSettings();
         }
 
         [MenuItem("Skill/About", false, 1002)]
@@ -48,7 +54,6 @@ namespace Skill.Editor
 
 
         // Create Menu
-
         [MenuItem("Assets/Create/Skill/ImplantAsset")]
         static void CreateImplantAsset()
         {

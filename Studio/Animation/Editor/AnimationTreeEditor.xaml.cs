@@ -248,6 +248,7 @@ namespace Skill.Studio.Animation.Editor
             XElement nodes = new XElement("Nodes");
             foreach (var node in animNodesToCopy)
             {
+                node.Source.CommiteChangesToModel();
                 XElement e = node.Source.Model.ToXElement();
                 e.SetAttributeValue("Id", node.Id);
 

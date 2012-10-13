@@ -175,6 +175,7 @@ namespace Skill.Studio.IO
     public class ClassPropertyViewModel : SavePropertyViewModel
     {
         public const string InvalidClass = "Not_Set";
+        public const string InvalidClassArray = "Not_Set[]";
 
         public ClassPropertyViewModel(SaveClassViewModel ownerClass, ClassProperty model)
             : base(ownerClass, model)

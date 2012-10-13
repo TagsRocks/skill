@@ -10,6 +10,10 @@ namespace Skill.Animation
     /// </summary>
     public class AnimNodeSequence : AnimNode
     {
+        /// <summary>
+        /// by default skill generates warnings for miss animations. set it true to disable warnings.
+        /// </summary>
+        public static bool IgnoreMissAnimationWarning { get; set; }
 
         private class AnimationInfo
         {
@@ -252,7 +256,7 @@ namespace Skill.Animation
                 }
 
             }
-            else
+            else if (!IgnoreMissAnimationWarning)
                 UnityEngine.Debug.LogWarning("Can not find AnimationClip : " + CurrentAnimation);
         }
     }

@@ -30,6 +30,7 @@ namespace Skill.UI
                         OnChecked();
                     else
                         OnUnchecked();
+                    OnChanged();
                 }
             }
         }
@@ -59,6 +60,18 @@ namespace Skill.UI
                 Unchecked(this, EventArgs.Empty);
         }
 
+        /// <summary>
+        /// Occurs when a ToggleButton is Changed.
+        /// </summary>
+        public event EventHandler Changed;
+        /// <summary>
+        /// when a ToggleButton is Changed.
+        /// </summary>
+        protected virtual void OnChanged()
+        {
+            if (Changed != null)
+                Changed(this, EventArgs.Empty);
+        }
 
         /// <summary>
         /// Create an instance of ToggleButton

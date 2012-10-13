@@ -54,6 +54,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Resources.cs" />
     <Compile Include="Tools\Commands.cs" />
     <Compile Include="Tools\Distance.cs" />
     <Compile Include="Tools\ImplantAsset.cs" />
@@ -106,7 +107,7 @@
     <Compile Include="UI\XYZComponent.cs" />
     <Compile Include="Windows\AboutSkill.cs" />
     <Compile Include="Windows\AnimationAssigner.cs" />
-    <Compile Include="Windows\BehaviorTreeDebugger.cs" />
+    <Compile Include="Windows\BehaviorTreeStateDebugger.cs" />
     <Compile Include="Windows\Exporter.cs" />
     <Compile Include="Tools\Implant.cs" />
     <Compile Include="Tools\ImplantObjectField.cs" />

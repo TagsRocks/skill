@@ -32,6 +32,7 @@ namespace Skill.Editor.UI
                         OnChecked();
                     else
                         OnUnchecked();
+                    OnChanged();
                 }
             }
         }
@@ -43,10 +44,10 @@ namespace Skill.Editor.UI
         /// <summary>
         /// when a ToggleButton is checked.
         /// </summary>
-        protected virtual void OnChecked()
+        private void OnChecked()
         {
             if (Checked != null)
-                Checked(this, EventArgs.Empty);
+                Checked(this, EventArgs.Empty);           
         }
 
         /// <summary>
@@ -56,10 +57,23 @@ namespace Skill.Editor.UI
         /// <summary>
         /// when a ToggleButton is unchecked.
         /// </summary>
-        protected virtual void OnUnchecked()
+        private void OnUnchecked()
         {
             if (Unchecked != null)
-                Unchecked(this, EventArgs.Empty);
+                Unchecked(this, EventArgs.Empty);            
+        }
+
+        /// <summary>
+        /// Occurs when a ToggleButton is Changed.
+        /// </summary>
+        public event EventHandler Changed;
+        /// <summary>
+        /// when a ToggleButton is Changed.
+        /// </summary>
+        protected virtual void OnChanged()
+        {
+            if (Changed != null)
+                Changed(this, EventArgs.Empty);
         }
 
         /// <summary>

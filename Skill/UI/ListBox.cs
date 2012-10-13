@@ -446,14 +446,15 @@ namespace Skill.UI
                     SelectedStyle = GUI.skin.box;
 
                 Rect boxRA = RenderAreaShrinksByPadding;
-
+                boxRA.x += 1;
+                boxRA.width -= 1;
                 foreach (var c in _SelectedItems)
                 {
                     Rect cRA = c.RenderArea;
                     Thickness cMargin = c.Margin;
 
-                    boxRA.y = cRA.y - cMargin.Top;
-                    boxRA.height = cRA.height + cMargin.Vertical;
+                    boxRA.y = cRA.y - cMargin.Top + 1;
+                    boxRA.height = cRA.height + cMargin.Vertical - 1;
 
                     GUI.Box(boxRA, string.Empty, SelectedStyle);
                 }

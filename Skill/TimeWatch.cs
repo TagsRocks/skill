@@ -39,18 +39,32 @@ namespace Skill
         {
             get
             {
-                return UnityEngine.Time.time >= OverTime;
+                if (UseRealTime)
+                    return UnityEngine.Time.realtimeSinceStartup >= OverTime;
+                else
+                    return UnityEngine.Time.time >= OverTime;
             }
         }
+
+        /// <summary>
+        /// if true TimeWatch use Time.realtimeSinceStartup instead of Time.time
+        /// </summary>
+        public bool UseRealTime { get; private set; }
 
         /// <summary>
         /// Begin timer 
         /// </summary>
         /// <param name="length">Lenght of timer</param>
-        public void Begin(float length)
+        /// <param name="useRealTime">if true TimeWatch use Time.realtimeSinceStartup instead of Time.time</param>
+        public void Begin(float length, bool useRealTime = false)
         {
+            this.UseRealTime = useRealTime;
             this.Length = length;
-            StartTime = UnityEngine.Time.time;
+
+            if (this.UseRealTime)
+                StartTime = UnityEngine.Time.realtimeSinceStartup;
+            else
+                StartTime = UnityEngine.Time.time;
             OverTime = StartTime + Length;
             Enabled = true;
         }
