@@ -24,6 +24,7 @@ namespace Skill
 		{	
 		private:
 
+			bool _InverseY;
 			Dimension _PatchSize;
 			Dimension _TerrainSize;
 			int _PatchCountX;
@@ -59,6 +60,7 @@ namespace Skill
 			List<CreatePatchParams>^ _Patches;
 		public:
 
+			property bool InverseY { bool get(){ return _InverseY; } void set(bool value) { _InverseY = value; } }
 			property double MinHeight { double get(){ return _MinHeight; } void set(double value) { _MinHeight = value; } }
 			property double MaxHeight { double get(){ return _MaxHeight; } void set(double value) { _MaxHeight = value; } }			
 			property Vector2 Position { Vector2 get(){ return _Position; } void set(Vector2 value) { _Position = value; } }
@@ -94,6 +96,7 @@ namespace Skill
 			void CalcVertices();
 			void CalcUVs();
 			void CalcNormals();						
+			int GetInverseYIndex(int index);
 		};
 	}
 }

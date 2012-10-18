@@ -24,7 +24,7 @@ namespace Skill.UI
         /// and its Margin or Border.
         /// The default is a thickness of 0 on all four sides.
         /// </returns>
-        public Thickness Padding { get; set; }
+        public virtual Thickness Padding { get; set; }
 
         /// <summary>
         /// Gets a BaseControlCollection of child elements of this Panel.

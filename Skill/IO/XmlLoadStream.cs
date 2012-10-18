@@ -6,11 +6,31 @@ using UnityEngine;
 
 namespace Skill.IO
 {
+    /// <summary>
+    /// defines a method to instantiate ISavable T
+    /// </summary>
+    /// <typeparam name="T">ISavable to instantiate</typeparam>
+    /// <returns>A valid instance of ISavable T</returns>
     public delegate T CreateISavable<T>() where T : ISavable;
 
-    public class XmlLoadStream
+    /// <summary>
+    /// This class provides all required methods to load an ISavable class from Xml format. 
+    /// you do not need to use read methods of this class, Skill Studio takes care of it.
+    /// </summary>
+    /// <remarks>
+    /// Because content of Xml format can be modfied by final users and slower than binary, Xml format is useful for debuging.
+    /// Skill IO Xml saving algorithm designed to allow modify savable classes and still read from previous data (new data will be in default value).
+    /// so in Xml mode (debug time) you can add or remove new variables in Savable class designed in Skill Studio, and load savable class from previous data ( from HDD or PlayerPrefs and ...).
+    /// when your game is created and ready to release switch to binary format.
+    /// </remarks>
+    public sealed class XmlLoadStream 
     {
 
+        /// <summary>
+        /// Read data of given XmlElement as int
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>int</returns>
         public int ReadInt(XmlElement e)
         {
             string v = e.GetAttribute("Value");
@@ -23,6 +43,11 @@ namespace Skill.IO
             return 0;
         }
 
+        /// <summary>
+        /// Read data of given XmlElement as float
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>float</returns>
         public float ReadFloat(XmlElement e)
         {
             string v = e.GetAttribute("Value");
@@ -35,6 +60,11 @@ namespace Skill.IO
             return 0.0f;
         }
 
+        /// <summary>
+        /// Read data of given XmlElement as boolean
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>bool</returns>
         public bool ReadBoolean(XmlElement e)
         {
             string v = e.GetAttribute("Value");
@@ -47,6 +77,11 @@ namespace Skill.IO
             return false;
         }
 
+        /// <summary>
+        /// Read data of given XmlElement as string
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>string</returns>
         public string ReadString(XmlElement e)
         {
             string v = e.GetAttribute("Value");
@@ -55,6 +90,11 @@ namespace Skill.IO
             return v;
         }
 
+        /// <summary>
+        /// Read data of given XmlElement as Bounds
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>Bounds</returns>
         public Bounds ReadBounds(XmlElement e)
         {
             Vector3 center = new Vector3();
@@ -77,6 +117,12 @@ namespace Skill.IO
 
             return new Bounds(center, size);
         }
+
+        /// <summary>
+        /// Read data of given XmlElement as Color
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>Color</returns>
         public Color ReadColor(XmlElement e)
         {
             float a = 0, g = 0, b = 0, r = 0;
@@ -105,6 +151,12 @@ namespace Skill.IO
 
             return new Color(r, g, b, a);
         }
+
+        /// <summary>
+        /// Read data of given XmlElement as Matrix4x4
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>Matrix4x4</returns>
         public Matrix4x4 ReadMatrix4x4(XmlElement e)
         {
             Matrix4x4 matrix = new Matrix4x4();
@@ -169,6 +221,11 @@ namespace Skill.IO
             return matrix;
         }
 
+        /// <summary>
+        /// Read data of given XmlElement as Plane
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>Plane</returns>
         public Plane ReadPlane(XmlElement e)
         {
 
@@ -193,6 +250,11 @@ namespace Skill.IO
             return new Plane(normal, distance);
         }
 
+        /// <summary>
+        /// Read data of given XmlElement as Quaternion
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>Quaternion</returns>
         public Quaternion ReadQuaternion(XmlElement e)
         {
             Quaternion quaternion = new Quaternion();
@@ -219,6 +281,12 @@ namespace Skill.IO
             }
             return quaternion;
         }
+
+        /// <summary>
+        /// Read data of given XmlElement as Ray
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>Ray</returns>
         public Ray ReadRay(XmlElement e)
         {
             Vector3 origin = new Vector3();
@@ -241,6 +309,11 @@ namespace Skill.IO
             return new Ray(origin, direction);
         }
 
+        /// <summary>
+        /// Read data of given XmlElement as Rect
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>Rect</returns>
         public Rect ReadRect(XmlElement e)
         {
             Rect rect = new Rect();
@@ -267,6 +340,12 @@ namespace Skill.IO
             }
             return rect;
         }
+
+        /// <summary>
+        /// Read data of given XmlElement as Vector2
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>Vector2</returns>
         public Vector2 ReadVector2(XmlElement e)
         {
             Vector2 vector = new Vector2();
@@ -286,6 +365,12 @@ namespace Skill.IO
             }
             return vector;
         }
+
+        /// <summary>
+        /// Read data of given XmlElement as Vector3
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>Vector3</returns>
         public Vector3 ReadVector3(XmlElement e)
         {
             Vector3 vector = new Vector3();
@@ -308,6 +393,12 @@ namespace Skill.IO
             }
             return vector;
         }
+
+        /// <summary>
+        /// Read data of given XmlElement as Vector4
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>Vector4</returns>
         public Vector4 ReadVector4(XmlElement e)
         {
             Vector4 vector = new Vector4();
@@ -334,6 +425,13 @@ namespace Skill.IO
             return vector;
         }
 
+        /// <summary>
+        /// Read data of given XmlElement as specified ISavable
+        /// </summary>                
+        /// <typeparam name="T">type of ISavable to read</typeparam>
+        /// <param name="e">XmlElement contains data</param>
+        /// <param name="creator">Helper method for instantiation of T</param>
+        /// <returns>Instance of T</returns>
         public T ReadSavable<T>(XmlElement e, CreateISavable<T> creator) where T : ISavable
         {
             T newItem = creator();
@@ -341,6 +439,13 @@ namespace Skill.IO
             return newItem;
         }
 
+        /// <summary>
+        /// Read data of given XmlElement as array of specified ISavable
+        /// </summary>                
+        /// <typeparam name="T">type of ISavable to read</typeparam>
+        /// <param name="e">XmlElement contains data</param>
+        /// <param name="creator">Helper method for instantiation of T</param>
+        /// <returns>array of instance of T</returns>
         public T[] ReadSavableArray<T>(XmlElement e, CreateISavable<T> creator) where T : ISavable
         {
             string lenghtStr = e.GetAttribute("Lenght");
@@ -365,7 +470,11 @@ namespace Skill.IO
             return array;
         }
 
-
+        /// <summary>
+        /// Read data of given XmlElement as array of int
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>array of int</returns>
         public int[] ReadIntArray(XmlElement e)
         {
             string lenghtStr = e.GetAttribute("Lenght");
@@ -383,6 +492,12 @@ namespace Skill.IO
             }
             return array;
         }
+
+        /// <summary>
+        /// Read data of given XmlElement as array of float
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>array of float</returns>
         public float[] ReadFloatArray(XmlElement e)
         {
             string lenghtStr = e.GetAttribute("Lenght");
@@ -400,6 +515,12 @@ namespace Skill.IO
             }
             return array;
         }
+
+        /// <summary>
+        /// Read data of given XmlElement as array of boolean
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>array of bool</returns>
         public bool[] ReadBooleanArray(XmlElement e)
         {
             string lenghtStr = e.GetAttribute("Lenght");
@@ -417,6 +538,12 @@ namespace Skill.IO
             }
             return array;
         }
+
+        /// <summary>
+        /// Read data of given XmlElement as array of string
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>array of string</returns>
         public string[] ReadStringArray(XmlElement e)
         {
             string lenghtStr = e.GetAttribute("Lenght");
@@ -434,6 +561,12 @@ namespace Skill.IO
             }
             return array;
         }
+
+        /// <summary>
+        /// Read data of given XmlElement as array of Bounds
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>array of Bounds</returns>
         public Bounds[] ReadBoundsArray(XmlElement e)
         {
             string lenghtStr = e.GetAttribute("Lenght");
@@ -451,6 +584,12 @@ namespace Skill.IO
             }
             return array;
         }
+
+        /// <summary>
+        /// Read data of given XmlElement as array of Color
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>array of Color</returns>
         public Color[] ReadColorArray(XmlElement e)
         {
             string lenghtStr = e.GetAttribute("Lenght");
@@ -468,6 +607,12 @@ namespace Skill.IO
             }
             return array;
         }
+
+        /// <summary>
+        /// Read data of given XmlElement as array of Matrix4x4
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>array of Matrix4x4</returns>
         public Matrix4x4[] ReadMatrix4x4Array(XmlElement e)
         {
             string lenghtStr = e.GetAttribute("Lenght");
@@ -485,6 +630,12 @@ namespace Skill.IO
             }
             return array;
         }
+
+        /// <summary>
+        /// Read data of given XmlElement as array of Plane
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>array of Plane</returns>
         public Plane[] ReadPlaneArray(XmlElement e)
         {
             string lenghtStr = e.GetAttribute("Lenght");
@@ -502,6 +653,12 @@ namespace Skill.IO
             }
             return array;
         }
+
+        /// <summary>
+        /// Read data of given XmlElement as array of Quaternion
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>array of Quaternion</returns>
         public Quaternion[] ReadQuaternionArray(XmlElement e)
         {
             string lenghtStr = e.GetAttribute("Lenght");
@@ -519,6 +676,12 @@ namespace Skill.IO
             }
             return array;
         }
+
+        /// <summary>
+        /// Read data of given XmlElement as array of Ray
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>array of Ray</returns>
         public Ray[] ReadRayArray(XmlElement e)
         {
             string lenghtStr = e.GetAttribute("Lenght");
@@ -536,6 +699,12 @@ namespace Skill.IO
             }
             return array;
         }
+
+        /// <summary>
+        /// Read data of given XmlElement as array of Rect
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>array of Rect</returns>
         public Rect[] ReadRectArray(XmlElement e)
         {
             string lenghtStr = e.GetAttribute("Lenght");
@@ -553,6 +722,12 @@ namespace Skill.IO
             }
             return array;
         }
+
+        /// <summary>
+        /// Read data of given XmlElement as array of Vector2
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>array of Vector2</returns>
         public Vector2[] ReadVector2Array(XmlElement e)
         {
             string lenghtStr = e.GetAttribute("Lenght");
@@ -570,6 +745,12 @@ namespace Skill.IO
             }
             return array;
         }
+
+        /// <summary>
+        /// Read data of given XmlElement as array of Vector3
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>array of Vector3</returns>
         public Vector3[] ReadVector3Array(XmlElement e)
         {
             string lenghtStr = e.GetAttribute("Lenght");
@@ -587,6 +768,12 @@ namespace Skill.IO
             }
             return array;
         }
+
+        /// <summary>
+        /// Read data of given XmlElement as array of Vector4
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>array of Vector4</returns>
         public Vector4[] ReadVector4Array(XmlElement e)
         {
             string lenghtStr = e.GetAttribute("Lenght");

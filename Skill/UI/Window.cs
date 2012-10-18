@@ -39,6 +39,11 @@ namespace Skill.UI
         public GUIStyle Style { get; set; }
 
         /// <summary>
+        /// Grid rendered in local space
+        /// </summary>
+        protected override bool LocalGrid { get { return true; } }
+
+        /// <summary>
         /// Create a window
         /// </summary>
         public Window()
@@ -47,6 +52,7 @@ namespace Skill.UI
             Id = _IdGenerator++;
             Title = new GUIContent() { text = "Window " + Id };
             DraggableArea = new Rect(0, 0, 1000, 20);
+            Grid.Margin = new Thickness(0, 20, 0, 0);
         }
 
         private void DrawWindow(int id)

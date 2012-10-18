@@ -323,6 +323,9 @@ namespace Skill.Studio.Animation.Editor
         #endregion
 
         #region Animation from Clipboard
+
+
+
         private void BtnAddClipsFromClipboard_Click(object sender, RoutedEventArgs e)
         {
             if (System.Windows.Clipboard.ContainsData(DataFormats.Text))
@@ -341,8 +344,23 @@ namespace Skill.Studio.Animation.Editor
                             {
                                 AnimationClip clip = new AnimationClip();
                                 clip.Load(element);
-                                if (SkinMesh.Animations.Count(a => a.Name == clip.Name) == 0)
+
+                                AnimationClip oldClip = FindAnimation(SkinMesh.Animations, clip.Name);
+                                if (oldClip == null) // add new animation clip
+                                {
                                     animations.Add(new AnimationClipViewModel(SkinMesh, clip));
+                                }
+                                else // update previouse AnimationClip data
+                                {
+                                    oldClip.Length = clip.Length;
+                                    oldClip.WrapMode = clip.WrapMode;
+                                    oldClip.RootMotion.XKeys.Clear();
+                                    oldClip.RootMotion.YKeys.Clear();
+                                    oldClip.RootMotion.ZKeys.Clear();
+                                    foreach (var key in clip.RootMotion.XKeys) oldClip.RootMotion.XKeys.Add(key);
+                                    foreach (var key in clip.RootMotion.YKeys) oldClip.RootMotion.YKeys.Add(key);
+                                    foreach (var key in clip.RootMotion.ZKeys) oldClip.RootMotion.ZKeys.Add(key);
+                                }
                             }
                             if (animations.Count > 0)
                             {
@@ -358,6 +376,16 @@ namespace Skill.Studio.Animation.Editor
                     }
                 }
             }
+        }
+
+        private AnimationClip FindAnimation(IEnumerable<AnimationClipViewModel> collection, string name)
+        {
+            foreach (var item in collection)
+            {
+                if (item.Name == name)
+                    return item.Model;
+            }
+            return null;
         }
         #endregion
 

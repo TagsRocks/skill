@@ -5,6 +5,12 @@ using System.Text;
 
 namespace Skill.IO
 {
+    /// <summary>
+    /// Defines behaviors for an object to be savable by our algorithm
+    /// </summary>
+    /// <remarks>
+    /// actually you do not need to use this interface and implent it. Skill Studio will generate this class for you.
+    /// </remarks>
     public interface ISavable
     {
         /// <summary>

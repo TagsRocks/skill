@@ -19,6 +19,7 @@ namespace Skill.Studio.Tools.HToMesh.ViewModel
             MinHeight = 0;
             MaxHeight = 255;
             ScaleX = ScaleY = ScaleZ = 1;
+            _InverseY = false;
         }
 
 
@@ -45,8 +46,9 @@ namespace Skill.Studio.Tools.HToMesh.ViewModel
             {
                 TerrainScene scene = new Skill.Fbx.TerrainScene("Terrain", Data.HeightsDouble, Data.Size, Data.SplitSize);
                 scene.Scale = new Vector3() { X = ScaleX, Y = ScaleY, Z = ScaleZ };
-                scene.MinHeight = MinHeight;
-                scene.MaxHeight = MaxHeight;
+                scene.MinHeight = this.MinHeight;
+                scene.MaxHeight = this.MaxHeight;
+                scene.InverseY = this.InverseY;
 
                 CreatePatchParams parameters = new CreatePatchParams();
 
@@ -84,6 +86,19 @@ namespace Skill.Studio.Tools.HToMesh.ViewModel
             }
         }
 
+        private bool _InverseY;
+        public bool InverseY
+        {
+            get { return _InverseY; }
+            set
+            {
+                if (_InverseY != value)
+                {
+                    _InverseY = value;
+                    OnPropertyChanged("InverseY");
+                }
+            }
+        }
 
         private float _MinHeight;
         public float MinHeight
@@ -98,6 +113,7 @@ namespace Skill.Studio.Tools.HToMesh.ViewModel
                 }
             }
         }
+
         private float _MaxHeight;
         public float MaxHeight
         {

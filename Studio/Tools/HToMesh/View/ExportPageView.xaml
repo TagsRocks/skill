@@ -32,12 +32,15 @@
                     <ColumnDefinition Width="10" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="1" Text="Min : "  />
                 <TextBox Grid.Column="2" Text="{Binding MinHeight}" />
                 <TextBlock Grid.Column="4" Text="Max : "  />
                 <TextBox Grid.Column="5" Text="{Binding MaxHeight}"  />
+                <CheckBox Grid.Column="7" IsChecked="{Binding InverseY}" Content="Inverse Y" VerticalAlignment="Center" Margin="2,0"  />
             </Grid>
         </GroupBox>
         <GroupBox Grid.Row="1" Header="Scale"  >

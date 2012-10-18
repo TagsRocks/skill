@@ -100,9 +100,8 @@ namespace Skill.Animation
         /// </summary>        
         public AnimationTree()
         {
-            this._State = new AnimationTreeState(this);
+            this._State = new AnimationTreeState(this) { ForceUpdate = true };
             this._Profiles = new Dictionary<string, string>();
-
             Root = CreateTree();
             LayerManager = new AnimationLayerManager();
             Root.SelectLayer(LayerManager, LayerManager.Create(UnityEngine.AnimationBlendMode.Blend));
@@ -165,7 +164,7 @@ namespace Skill.Animation
         /// </summary>
         /// <param name="controller">optional controller to send throw AnimNodes</param>
         public void Update(Controllers.Controller controller = null)
-        {            
+        {
             _State.Controller = controller;
             foreach (var layer in LayerManager.Layers)
                 layer.BeginUpdate();
@@ -179,6 +178,7 @@ namespace Skill.Animation
                 layer.Update();
                 _RootMotion += layer.RootMotion;
             }
+            _State.ForceUpdate = false;
         }
 
         /// <summary>

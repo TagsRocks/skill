@@ -111,23 +111,6 @@ namespace Skill.UI
         /// </summary>
         public string Name { get; set; }
 
-        private Visibility _Visibility;
-        /// <summary>
-        /// Gets or sets the user interface (UI) visibility of this element.
-        /// </summary>
-        public Visibility Visibility
-        {
-            get { return _Visibility; }
-            set
-            {
-                if (_Visibility != value)
-                {
-                    _Visibility = value;
-                    OnVisibilityChanged();
-                }
-            }
-        }
-
         /// <summary>
         /// Grid of Frame.
         /// </summary>
@@ -165,55 +148,53 @@ namespace Skill.UI
             if (PositionChange != null)
                 PositionChange(this, EventArgs.Empty);
         }
-        /// <summary> Occurs when Visibility of control changed </summary>
-        public event EventHandler VisibilityChanged;
-        /// <summary>
-        /// when Visibility of control changed
-        /// </summary>
-        protected virtual void OnVisibilityChanged()
-        {
-            if (VisibilityChanged != null)
-                VisibilityChanged(this, EventArgs.Empty);
-        }
         #endregion
 
         #region OnGUI
+
+        /// <summary>
+        /// Is grid rendered in local space of Frame.
+        /// </summary>
+        protected virtual bool LocalGrid { get { return false; } }
 
         /// <summary>
         /// to render control you have to call this method in OnGUI method of MonoBehavior.(call this for Frame class)
         /// </summary>
         public virtual void OnGUI()
         {
-            if (Visibility == UI.Visibility.Visible)
+            Rect rect = Position;
+
+            float x = 0;
+            float y = 0;
+
+            if (!LocalGrid)
             {
-                Rect rect = Position;
+                x = rect.x;
+                y = rect.y;
+            }
 
-                float x = rect.x;
-                float y = rect.y;
+            Thickness margin = Grid.Margin;
 
-                Thickness margin = Grid.Margin;
+            rect.x = margin.Left;
+            rect.y = margin.Top;
+            rect.width -= margin.Horizontal;
+            rect.height -= margin.Vertical;
+            Grid.Position = rect;
 
-                rect.x = margin.Left;
-                rect.y = margin.Top;
-                rect.width -= margin.Horizontal;
-                rect.height -= margin.Vertical;
-                Grid.Position = rect;
+            rect.x += x;
+            rect.y += y;
+            Grid.RenderArea = rect;
 
-                rect.x += x;
-                rect.y += y;
-                Grid.RenderArea = rect;
+            DrawControls();
 
-                DrawControls();
-
-                string focusedControlName = GUI.GetNameOfFocusedControl();
-                if (!string.IsNullOrEmpty(focusedControlName))
-                {
-                    Control c = Grid.FindControlByName(focusedControlName);
-                    if (c != null && c.Focusable)
-                        FocusedControl = (FocusableControl)c;
-                    else
-                        FocusedControl = null;
-                }
+            string focusedControlName = GUI.GetNameOfFocusedControl();
+            if (!string.IsNullOrEmpty(focusedControlName))
+            {
+                Control c = Grid.FindControlByName(focusedControlName);
+                if (c != null && c.Focusable)
+                    FocusedControl = (FocusableControl)c;
+                else
+                    FocusedControl = null;
             }
         }
 

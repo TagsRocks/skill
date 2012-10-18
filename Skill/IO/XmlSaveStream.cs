@@ -6,17 +6,41 @@ using UnityEngine;
 
 namespace Skill.IO
 {
-    public class XmlSaveStream
+
+    /// <summary>
+    /// This class provides all required methods to save an ISavable class in Xml format. 
+    /// you do not need to use read methods of this class, Skill Studio takes care of it.
+    /// </summary>
+    /// <remarks>
+    /// Because content of Xml format can be modfied by final users and slower than binary, Xml format is useful for debuging.
+    /// Skill IO Xml saving algorithm designed to allow modify savable classes and still read from previous data (new data will be in default value).
+    /// so in Xml mode (debug time) you can add or remove new variables in Savable class designed in Skill Studio, and load savable class from previous data ( from HDD or PlayerPrefs and ...).
+    /// when your game is created and ready to release switch to binary format.
+    /// </remarks>
+    public sealed class XmlSaveStream
     {
+        /// <summary>
+        /// when an instance of ISavable class is null the content of Xml element will be NoData
+        /// </summary>
         public const string NoData = "___NoData___";
 
+        /// <summary>
+        /// The document contains all saved data. save content of Document to file or everywhere as needed
+        /// </summary>
         public XmlDocument Document { get; private set; }
 
+        /// <summary>
+        /// Create an instance of XmlSaveStream
+        /// </summary>
         public XmlSaveStream()
         {
             Document = new XmlDocument();
         }
 
+        /// <summary>
+        /// Create an instance of XmlSaveStream and save given ISavable
+        /// </summary>
+        /// <param name="savable">ISavable to save</param>
         public XmlSaveStream(ISavable savable)
         {
             Document = new XmlDocument();
@@ -27,6 +51,12 @@ namespace Skill.IO
             Document.AppendChild(rootNode);
         }
 
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="i">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, int i)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -34,6 +64,12 @@ namespace Skill.IO
             return e;
         }
 
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="f">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, float f)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -41,12 +77,25 @@ namespace Skill.IO
             return e;
         }
 
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="b">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, bool b)
         {
             XmlElement e = Document.CreateElement(propertyName);
             e.SetAttribute("Value", b.ToString());
             return e;
         }
+
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="s">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, string s)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -55,6 +104,12 @@ namespace Skill.IO
             return e;
         }
 
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="bound">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, Bounds bound)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -64,6 +119,13 @@ namespace Skill.IO
             e.AppendChild(size);
             return e;
         }
+
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="color">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, Color color)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -80,6 +142,13 @@ namespace Skill.IO
 
             return e;
         }
+
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="matrix">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, Matrix4x4 matrix)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -127,6 +196,12 @@ namespace Skill.IO
             return e;
         }
 
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="plane">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, Plane plane)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -139,7 +214,12 @@ namespace Skill.IO
 
             return e;
         }
-
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="quaternion">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, Quaternion quaternion)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -156,6 +236,13 @@ namespace Skill.IO
 
             return e;
         }
+
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="ray">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, Ray ray)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -168,7 +255,12 @@ namespace Skill.IO
 
             return e;
         }
-
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="rect">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, Rect rect)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -185,6 +277,13 @@ namespace Skill.IO
 
             return e;
         }
+
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="vector">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, Vector2 vector)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -197,6 +296,13 @@ namespace Skill.IO
 
             return e;
         }
+
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="vector">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, Vector3 vector)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -211,6 +317,13 @@ namespace Skill.IO
 
             return e;
         }
+
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="vector">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, Vector4 vector)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -228,13 +341,28 @@ namespace Skill.IO
             return e;
         }
 
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <typeparam name="T">Type of ISavable</typeparam>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="savable">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create<T>(string propertyName, T savable) where T : ISavable
         {
             XmlElement e = Document.CreateElement(propertyName);
-            savable.Save(e, this);
+            if (savable != null)
+                savable.Save(e, this);
             return e;
         }
 
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <typeparam name="T">Type of ISavable</typeparam>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="savables">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create<T>(string propertyName, T[] savables) where T : ISavable
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -253,6 +381,12 @@ namespace Skill.IO
             return e;
         }
 
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="primitives">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, int[] primitives)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -268,6 +402,13 @@ namespace Skill.IO
 
             return e;
         }
+
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="primitives">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, float[] primitives)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -283,6 +424,13 @@ namespace Skill.IO
 
             return e;
         }
+
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="primitives">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, bool[] primitives)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -298,6 +446,13 @@ namespace Skill.IO
 
             return e;
         }
+
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="primitives">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, string[] primitives)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -313,6 +468,13 @@ namespace Skill.IO
 
             return e;
         }
+
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="primitives">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, Bounds[] primitives)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -328,6 +490,13 @@ namespace Skill.IO
 
             return e;
         }
+
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="primitives">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, Color[] primitives)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -343,6 +512,13 @@ namespace Skill.IO
 
             return e;
         }
+
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="primitives">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, Matrix4x4[] primitives)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -358,6 +534,13 @@ namespace Skill.IO
 
             return e;
         }
+
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="primitives">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, Plane[] primitives)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -373,6 +556,13 @@ namespace Skill.IO
 
             return e;
         }
+
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="primitives">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, Quaternion[] primitives)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -388,6 +578,13 @@ namespace Skill.IO
 
             return e;
         }
+
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="primitives">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, Ray[] primitives)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -403,6 +600,13 @@ namespace Skill.IO
 
             return e;
         }
+
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="primitives">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, Rect[] primitives)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -418,6 +622,13 @@ namespace Skill.IO
 
             return e;
         }
+
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="primitives">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, Vector2[] primitives)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -433,6 +644,13 @@ namespace Skill.IO
 
             return e;
         }
+
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="primitives">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, Vector3[] primitives)
         {
             XmlElement e = Document.CreateElement(propertyName);
@@ -448,6 +666,13 @@ namespace Skill.IO
 
             return e;
         }
+
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="primitives">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, Vector4[] primitives)
         {
             XmlElement e = Document.CreateElement(propertyName);

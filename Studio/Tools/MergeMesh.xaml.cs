@@ -21,6 +21,7 @@ namespace Skill.Studio.Tools
     /// </summary>
     public partial class MergeMeshTool : Window, INotifyPropertyChanged
     {
+        private string _OpenedFilename;
 
         private bool _IsFileOpened;
         public bool IsFileOpened
@@ -82,7 +83,7 @@ namespace Skill.Studio.Tools
         private SceneNodeViewModel _Root = null;
 
         public MergeMeshTool()
-        {            
+        {
             InitializeComponent();
             Nodes = new ObservableCollection<SceneNodeViewModel>();
         }
@@ -127,12 +128,12 @@ namespace Skill.Studio.Tools
                 try
                 {
                     DestroyScene();
-
                     _Scene = new OptimizeScene(open.FileName);
                     _Root = new SceneNodeViewModel(null, _Scene.Root);
                     _Root.IsExpanded = true;
                     _Nodes.Add(_Root);
                     IsFileOpened = true;
+                    _OpenedFilename = System.IO.Path.GetFileName(open.FileName);
 
                 }
                 catch (Exception ex)
@@ -200,6 +201,7 @@ namespace Skill.Studio.Tools
         {
             Microsoft.Win32.SaveFileDialog save = new Microsoft.Win32.SaveFileDialog();
             save.Filter = "fbx|*.fbx";
+            save.FileName = _OpenedFilename;
             if (save.ShowDialog() == true)
             {
                 if (System.IO.File.Exists(save.FileName))
@@ -224,6 +226,52 @@ namespace Skill.Studio.Tools
             Close();
         }
 
+        private void BtnBatchConvert_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.FolderBrowserDialog sourceDialog = new System.Windows.Forms.FolderBrowserDialog();            
+            if (sourceDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                System.Windows.Forms.FolderBrowserDialog destDialog = new System.Windows.Forms.FolderBrowserDialog();
+                destDialog.SelectedPath = sourceDialog.SelectedPath;
+
+                if (destDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    string[] files = System.IO.Directory.GetFiles(sourceDialog.SelectedPath, "*.Fbx");
+                    ConvertBatch(files, destDialog.SelectedPath);
+                }
+            }
+        }
+
+        private void ConvertBatch(string[] files, string destDir)
+        {
+            if (files == null || string.IsNullOrEmpty(destDir) || !System.IO.Directory.Exists(destDir))
+            {
+                System.Windows.MessageBox.Show("Invalid files", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            try
+            {
+                foreach (var f in files)
+                {
+                    OptimizeScene scene = new OptimizeScene(f);
+
+                    string name = System.IO.Path.GetFileName(f);
+                    string saveFilename = System.IO.Path.Combine(destDir, name);
+                    if (System.IO.File.Exists(saveFilename))
+                        System.IO.File.Delete(saveFilename);
+
+                    scene.Save(saveFilename, _SaveOptions.SaveOptions);
+                    scene.Destroy();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+
+        }
 
     }
 }

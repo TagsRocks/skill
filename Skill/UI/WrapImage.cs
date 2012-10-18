@@ -67,7 +67,8 @@ namespace Skill.UI
                             texRect.height = drawRect.height / height;
 
                         }
-
+                        texRect.x = 0;
+                        texRect.y = 1.0f - texRect.height; // in unity origin of texture is left bottom corner of texture ... !!! ???
                         GUI.DrawTextureWithTexCoords(drawRect, Texture, texRect, AlphaBlend); // draw texture
                         drawRect.y += height; // advance height
                     }
@@ -75,7 +76,7 @@ namespace Skill.UI
                     drawRect.x += width; // advance width
                 }
             }
-        }        
+        }
     }
 
 }

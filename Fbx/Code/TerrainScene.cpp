@@ -49,6 +49,7 @@ namespace Skill
 			this->_GlobalUVs = NULL;
 			this->_Normals = NULL;
 
+			this->_InverseY = false;
 			this->_MinHeight = 0;
 			this->_MaxHeight = 255;
 			this->_Position.X = this->_Position.Y = 0;
@@ -453,8 +454,9 @@ namespace Skill
 			{
 				for (j = 0; j < _TerrainSize.Height; j++)
 				{					
+					int ix = this->_InverseY? GetInverseYIndex(index) : index;					
 					_Vertices[index] = FbxVector4(startX + (j * _Scale.X),
-						_MinHeight + (_Heights[index] * (deltaH / UShortMax) * _Scale.Y),
+						_MinHeight + (_Heights[ix] * (deltaH / UShortMax) * _Scale.Y),
 						startZ) ;					
 					index++;
 					_Progress += _ProgressChange;
@@ -462,6 +464,14 @@ namespace Skill
 				startZ += _Scale.Z;
 			}
 
+		}
+
+		int TerrainScene::GetInverseYIndex(int index)
+		{
+			int y = index / _TerrainSize.Width;
+			int x = index % _TerrainSize.Width;
+
+			return (_TerrainSize.Height - y - 1) * _TerrainSize.Width + x;
 		}
 
 		void TerrainScene::CalcUVs()

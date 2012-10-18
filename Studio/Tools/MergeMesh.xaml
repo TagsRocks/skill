@@ -11,7 +11,10 @@
             <RowDefinition Height="36" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
-            <Button Content="Open File" Margin="10" Click="BtnOpen_Click" HorizontalAlignment="Left" MinWidth="100"  />
+            <StackPanel Orientation="Horizontal" >
+                <Button Content="Open File" Click="BtnOpen_Click" MinWidth="100" MinHeight="30" VerticalAlignment="Center" Margin="4,0,2,0"  />
+                <Button Content="Batch Convert" Click="BtnBatchConvert_Click" MinWidth="100" MinHeight="30"  VerticalAlignment="Center" Margin="2,0"  />
+            </StackPanel>            
         </Grid>
         <Grid Grid.Row="1" >
             <Grid.ColumnDefinitions>

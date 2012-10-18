@@ -255,10 +255,46 @@ namespace Skill.UI
         /// </summary>
         public Rect ScrollViewRect { get { return _ScrollViewRect; } }
 
+
+        private float _ScrollbarThickness = 0;
         /// <summary>
         /// Gets or sets thikness of vertical scrollbar to consider when calculating scrollview area (default is 16)
         /// </summary>
-        public float ScrollbarThickness { get; set; }
+        public float ScrollbarThickness
+        {
+            get { return _ScrollbarThickness; }
+            set
+            {
+                Thickness padding = base.Padding;
+                _ScrollbarThickness = value;
+                base.Padding = padding;
+            }
+        }
+
+
+
+        /// <summary>
+        /// Gets or sets the padding inside a control.
+        /// </summary>
+        /// <returns>
+        /// The amount of space between the content of a Panel
+        /// and its Margin or Border.
+        /// The default is a thickness of 0 on all four sides.
+        /// </returns>
+        public override Thickness Padding
+        {
+            get
+            {
+                Thickness padding = base.Padding;
+                padding.Right -= ScrollbarThickness;
+                return padding;
+            }
+            set
+            {
+                value.Right += ScrollbarThickness;
+                base.Padding = value;
+            }
+        }
 
         /// <summary>
         /// Create an instance of ScrollView
@@ -267,7 +303,6 @@ namespace Skill.UI
         {
             this.ScrollbarThickness = 16;
             this.HandleScrollWheel = true;
-            this.Padding = new Thickness(0, 0, 16, 0);
             this._SelectedItems = new List<BaseControl>();
             this.Background = new Box() { Parent = this, Visibility = Skill.UI.Visibility.Hidden };
         }

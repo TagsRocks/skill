@@ -174,7 +174,7 @@ namespace Skill.Animation
         /// <param name="state">State of AnimationTree</param>
         internal virtual void Update(AnimationTreeState state)
         {
-            if (BeginUpdate(state))
+            if (BeginUpdate(state) || state.ForceUpdate)
             {
                 Blend();
                 if (ChildCount > 0)

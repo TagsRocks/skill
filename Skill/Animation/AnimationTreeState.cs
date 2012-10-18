@@ -20,6 +20,9 @@ namespace Skill.Animation
         /// </summary>
         public Controllers.Controller Controller { get; internal set; }
 
+        /// <summary> Force update AnimationTree first time </summary>
+        internal bool ForceUpdate { get; set; }
+
         /// <summary>
         /// Create an instance of AnimationTreeState
         /// </summary>
@@ -27,6 +30,7 @@ namespace Skill.Animation
         public AnimationTreeState(AnimationTree tree)
         {
             this.Tree = tree;
+            this.ForceUpdate = true;
         }
     }
 }
