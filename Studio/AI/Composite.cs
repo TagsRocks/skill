@@ -29,6 +29,7 @@ namespace Skill.Studio.AI
     [DisplayName("SequenceSelector")]
     public class SequenceSelectorViewModel : CompositeViewModel
     {
+        [Browsable(false)]
         public override string ImageName { get { return Images.Sequence; } }
 
         public SequenceSelectorViewModel(BehaviorViewModel parent, SequenceSelector selector)
@@ -42,7 +43,9 @@ namespace Skill.Studio.AI
     [DisplayName("RandomSelector")]
     public class RandomSelectorViewModel : CompositeViewModel
     {
+        [Browsable(false)]
         public override string ImageName { get { return Images.Random; } }
+
         public RandomSelectorViewModel(BehaviorViewModel parent, RandomSelector selector)
             : base(parent, selector)
         {
@@ -131,8 +134,9 @@ namespace Skill.Studio.AI
             }
         }
 
-
+        [Browsable(false)]
         public override string ImageName { get { return Images.Concurrent; } }
+
         public ConcurrentSelectorViewModel(BehaviorViewModel parent, ConcurrentSelector selector)
             : base(parent, selector)
         {
@@ -163,7 +167,9 @@ namespace Skill.Studio.AI
             }
         }
 
+        [Browsable(false)]
         public override string ImageName { get { return Images.Priority; } }
+
         public PrioritySelectorViewModel(BehaviorViewModel parent, PrioritySelector selector)
             : base(parent, selector)
         {
@@ -198,7 +204,9 @@ namespace Skill.Studio.AI
             }
         }
 
+        [Browsable(false)]
         public override string ImageName { get { return Images.Loop; } }
+
         public LoopSelectorViewModel(BehaviorViewModel parent, LoopSelector selector)
             : base(parent, selector)
         {

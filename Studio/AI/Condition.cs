@@ -11,6 +11,7 @@ namespace Skill.Studio.AI
     [DisplayName("Condition")]
     public class ConditionViewModel : BehaviorViewModel
     {
+        [Browsable(false)]
         public override string ImageName { get { return Images.Condition; } }
 
         [System.ComponentModel.Editor(typeof(Editor.ParametersPropertyEditor), typeof(Editor.ParametersPropertyEditor))]

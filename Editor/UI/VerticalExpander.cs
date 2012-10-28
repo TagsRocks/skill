@@ -12,19 +12,26 @@ namespace Skill.Editor.UI
     public class VerticalExpander<P> : Control where P : Panel
     {
 
-        private Skill.Editor.UI.Foldout _Foldout;
-
+        /// <summary>
+        /// Foldout
+        /// </summary>
+        public Skill.Editor.UI.Foldout Foldout { get; private set; }
 
         /// <summary>
-        /// Gets the data used for the header of control.
+        /// Gets and sets header of control.
         /// </summary>
-        public Box Header { get; private set; }
+        public string Header { get { return Foldout.Content.text; } set { Foldout.Content.text = value; } }
 
 
         private bool _IsExpanded;
         /// <summary>
-        /// Gets or sets whether the Expander content window is visible.
+        /// Gets or sets whether the Expander content window is visible. (see remarks)
         /// </summary>
+        /// <remarks>
+        /// Since the DesiredSize of panel will be calculated after first Render call, default value of IsExpanded property is false to allow panel calculate it's DesiredSize
+        /// then by expanding Expander by user we know correct size of inner panel.
+        /// So if you want to set this property to true before first Render call, you have to set Height of innder panel manually for first time.
+        /// </remarks>
         public bool IsExpanded
         {
             get
@@ -36,7 +43,7 @@ namespace Skill.Editor.UI
                 if (_IsExpanded != value)
                 {
                     _IsExpanded = value;
-                    _Foldout.FoldoutState = _IsExpanded;
+                    Foldout.FoldoutState = _IsExpanded;
                     if (_IsExpanded)
                         OnExpanded();
                     else
@@ -84,10 +91,13 @@ namespace Skill.Editor.UI
             {
                 if (Visibility != Skill.UI.Visibility.Collapsed)
                 {
+                    Size ds = Panel.DesiredSize;
+                    if (ds.Height > 0)
+                        Panel.Height = ds.Height;
                     if (IsExpanded)
-                        return Header.LayoutHeight + Panel.LayoutHeight;
+                        return Foldout.LayoutHeight + Panel.LayoutHeight;
                     else
-                        return Header.LayoutHeight;
+                        return Foldout.LayoutHeight;
                 }
                 else
                     return 0;
@@ -105,23 +115,23 @@ namespace Skill.Editor.UI
         protected override void OnRenderAreaChanged()
         {
             base.OnRenderAreaChanged();
-            Rect hpa = RenderArea;
-            hpa.height = Header.LayoutHeight;
-            Header.RenderArea = hpa;
+            Rect ra = RenderArea;
 
-            _Foldout.RenderArea = new Rect(hpa.x + _Foldout.X, hpa.y + (Header.LayoutHeight - _Foldout.LayoutHeight) / 2, _Foldout.LayoutWidth, _Foldout.LayoutHeight);
-            _Foldout.StateChanged += new EventHandler(_Foldout_StateChanged);
+            Thickness foldoutMargin = Foldout.Margin;
+            Foldout.RenderArea = new Rect(ra.x + foldoutMargin.Left, ra.y + foldoutMargin.Top, ra.width - foldoutMargin.Horizontal, Foldout.Height);
 
-            hpa.y += hpa.height;
-            hpa.height = RenderArea.height - Header.LayoutHeight;
-            Panel.RenderArea = hpa;
+            float headerHeight = foldoutMargin.Vertical + Foldout.Height;
+
+            Thickness panelMargin = Panel.Margin;
+            Panel.RenderArea = new Rect(ra.x + panelMargin.Left, ra.y + headerHeight + panelMargin.Top,
+                                        ra.width - panelMargin.Horizontal, ra.height - headerHeight - panelMargin.Vertical);
         }
 
         private void _Foldout_StateChanged(object sender, EventArgs e)
         {
-            if (_IsExpanded != _Foldout.FoldoutState)
+            if (_IsExpanded != Foldout.FoldoutState)
             {
-                _IsExpanded = _Foldout.FoldoutState;
+                _IsExpanded = Foldout.FoldoutState;
                 if (_IsExpanded)
                     OnExpanded();
                 else
@@ -141,11 +151,10 @@ namespace Skill.Editor.UI
             if (this.Panel == null) throw new ArgumentNullException("Invalid Panel for VerticalExpander");
             this.Panel.Parent = this;
 
-            this.Header = new Box();
-            this._Foldout = new Skill.Editor.UI.Foldout();
-            this._Foldout.Position = new Rect(5, 5, 16, 16);
+            this.Foldout = new Skill.Editor.UI.Foldout() { ToggleOnLabelClick = true };
+            this.Foldout.StateChanged += new EventHandler(_Foldout_StateChanged);
             this.DefaultHeader();
-            this.IsExpanded = true;
+            this.IsExpanded = false;
         }
 
         /// <summary>
@@ -153,8 +162,9 @@ namespace Skill.Editor.UI
         /// </summary>
         public void DefaultHeader()
         {
-            Header.Position = new Rect(0, 0, 300, 20);
-            Header.Margin = Thickness.Empty;
+            Foldout.Style = null;
+            Foldout.Position = new Rect(0, 0, 300, 16);
+            Foldout.Margin = new Thickness(5);
         }
 
         /// <summary>
@@ -162,8 +172,7 @@ namespace Skill.Editor.UI
         /// </summary>
         protected override void Render()
         {
-            Header.OnGUI();
-            _Foldout.OnGUI();
+            Foldout.OnGUI();
             if (IsExpanded)
                 Panel.OnGUI();
         }

@@ -194,20 +194,36 @@ namespace Skill.Editor
             }
         }
 
+        private bool IsInExecutionSequence(Skill.AI.Behavior behavior)
+        {
+            if (_BehaviorTree == null) return false;
+            for (int i = 0; i < _BehaviorTree.State.SequenceCount; i++)
+            {
+                if (_BehaviorTree.State.ExecutionSequence[i] == behavior)
+                    return true;
+            }
+            return false;
+        }
+
         private void ValidateStyle(BehaviorTag bt)
         {
-            switch (bt.Behavior.Result)
+            if (IsInExecutionSequence(bt.Behavior))
             {
-                case Skill.AI.BehaviorResult.Success:
-                    bt.Label.Style = _SuccessStyle;
-                    break;
-                case Skill.AI.BehaviorResult.Running:
-                    bt.Label.Style = _RunningStyle;
-                    break;
-                default:
-                    bt.Label.Style = _FailurStyle;
-                    break;
+                switch (bt.Behavior.Result)
+                {
+                    case Skill.AI.BehaviorResult.Success:
+                        bt.Label.Style = _SuccessStyle;
+                        break;
+                    case Skill.AI.BehaviorResult.Running:
+                        bt.Label.Style = _RunningStyle;
+                        break;
+                    default:
+                        bt.Label.Style = _FailurStyle;
+                        break;
+                }
             }
+            else
+                bt.Label.Style = null;
         }
 
         void _BehaviorTree_Updated(object sender, EventArgs e)

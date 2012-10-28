@@ -11,8 +11,10 @@ namespace Skill.Text
     public interface IPersianCharacterMap
     {
         /// <summary>
-        /// A dictionary that maps each word to equivalent persian character
+        /// maps each none persian chracter to equivalent persian character
         /// </summary>
-        Dictionary<char, PersianCharacter> Map { get; }
+        /// <param name="c">The character to remap to persian character</param>
+        /// <returns>if there is a map for given character returns a PersianCharacter, otherwise null.</returns>
+        PersianCharacter GetMappedCharacter(char c);
     }
 }

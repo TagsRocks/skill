@@ -14,6 +14,7 @@ namespace Skill.Text
     /// </remarks>
     public class PersianTextConverter : ITextConverter
     {
+
         /// <summary>
         /// IPersianCharacterMap provided for this converter
         /// </summary>
@@ -23,11 +24,6 @@ namespace Skill.Text
         /// Maximum length of text ( for better performance)
         /// </summary>
         public int MaxLength { get; private set; }
-
-        /// <summary>
-        /// Retrieves last converted text by this converter
-        /// </summary>
-        public string LastConvertedText { get; private set; }
 
         /// <summary>
         /// if your TextField is right to left set this parameter to true
@@ -42,40 +38,7 @@ namespace Skill.Text
         /// Whether convert لا and الله to one equivalent character. (default true)
         /// </summary>
         public bool ConvertLigature { get; set; }
-
-        /// <summary>
-        /// if converter is LTR This is reversed text to save.
-        /// </summary>
-        /// <remarks>
-        /// When we set text of TextField for first time the converter does not know that this text reversed before
-        /// so (if converter is LTR) it will reverse it and the result in TextFiled gets wrong.
-        /// </remarks>
-        public string TextToSave
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(LastConvertedText))
-                {
-                    if (RightToLeft) // the text is correct and we do not need to reverse it
-                    {
-                        return LastConvertedText;
-                    }
-                    else
-                    {
-                        StringBuilder builder = new StringBuilder();
-                        // reverse text for save
-                        for (int i = LastConvertedText.Length - 1; i >= 0; i--)
-                        {
-                            builder.Append(LastConvertedText[i]);
-                        }
-                        return builder.ToString();
-                    }
-                }
-                else
-                    return string.Empty;
-            }
-        }
-
+        
         private CharInfo[] _SourceChars;
 
         /// <summary>
@@ -116,7 +79,7 @@ namespace Skill.Text
         {
             if (string.IsNullOrEmpty(text))
             {
-                LastConvertedText = string.Empty;
+                return string.Empty;
             }
             else
             {
@@ -128,8 +91,7 @@ namespace Skill.Text
                 {
                     CharInfo cf = _SourceChars[i];
                     cf.SourceChar = text[i];
-                    if (!CharacterMap.Map.TryGetValue(cf.SourceChar, out cf.Character))
-                        cf.Character = null;
+                    cf.Character = CharacterMap.GetMappedCharacter(cf.SourceChar);
                     cf.Form = PersianCharacterForm.Isolated;
                 }
 
@@ -175,42 +137,80 @@ namespace Skill.Text
                 }
 
                 // build text from end to start
-                StringBuilder result = new StringBuilder();
-
-                if (RightToLeft)
+                if (!RightToLeft)
                 {
+                    Reverse(_SourceChars, 0, text.Length - 1);
+
+                    int invalidIndex = -1000;
+                    int firstLTRIndex = invalidIndex;
+
                     for (int i = 0; i < text.Length; i++)
                     {
                         CharInfo cf = _SourceChars[i];
-                        if (cf != null && cf.Character != null)
-                            result.Append(cf.Character[cf.Form]);
+                        if (cf.Character == null || cf.Character.LeftToRight || cf.SourceChar == ' ')
+                        {
+                            if (firstLTRIndex == invalidIndex && cf.SourceChar != ' ')
+                                firstLTRIndex = i;
+                        }
                         else
-                            result.Append(cf.SourceChar);
+                        {
+                            if (firstLTRIndex != invalidIndex)
+                            {
+                                int spaceCount = 0;
+                                for (int k = i - 1; k >= 0; k--)
+                                {
+                                    if (_SourceChars[k].SourceChar == ' ')
+                                        spaceCount++;
+                                    else
+                                        break;
+                                }
+
+                                Reverse(_SourceChars, firstLTRIndex, i - 1 - spaceCount);
+                                firstLTRIndex = invalidIndex;
+                            }
+                        }
                     }
-                }
-                else // reverse text
-                {
-                    for (int i = text.Length - 1; i >= 0; i--)
+
+                    if (firstLTRIndex != invalidIndex)
                     {
-                        CharInfo cf = _SourceChars[i];
-                        if (cf != null && cf.Character != null)
-                            result.Append(cf.Character[cf.Form]);
-                        else
-                            result.Append(cf.SourceChar);
+                        Reverse(_SourceChars, firstLTRIndex, text.Length - 1);
+                        firstLTRIndex = invalidIndex;
                     }
                 }
 
+                StringBuilder result = new StringBuilder();
+                for (int i = 0; i < text.Length; i++)
+                {
+                    CharInfo cf = _SourceChars[i];
+                    if (cf != null && cf.Character != null)
+                        result.Append(cf.Character[cf.Form]);
+                    else
+                        result.Append(cf.SourceChar);
+                }
 
-                string temp = result.ToString();
                 if (ConvertLigature)
                 {
-                    temp = temp.Replace("\uFE8E\uFEDF", "\uFEFB");
-                    temp = temp.Replace("\uFE8E\uFEE0", "\uFEFC");
-                    temp = temp.Replace("\uFEEA\uFEE0\uFEDF\uFE8D", "\uFDF2");
+                    result.Replace("\uFE8E\uFEDF", "\uFEFB");
+                    result.Replace("\uFE8E\uFEE0", "\uFEFC");
+                    result.Replace("\uFEEA\uFEE0\uFEDF\uFE8D", "\uFDF2");
                 }
-                LastConvertedText = temp;
+
+                return result.ToString();
             }
-            return LastConvertedText;
         }
+
+        private void Reverse(CharInfo[] chars, int startIndex, int endIndex)
+        {
+            while (startIndex < endIndex)
+            {
+                var temp = chars[startIndex];
+                chars[startIndex] = chars[endIndex];
+                chars[endIndex] = temp;
+
+                startIndex++;
+                endIndex--;
+            }
+        }
+
     }
 }

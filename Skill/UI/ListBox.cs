@@ -305,6 +305,7 @@ namespace Skill.UI
             this.HandleScrollWheel = true;
             this._SelectedItems = new List<BaseControl>();
             this.Background = new Box() { Parent = this, Visibility = Skill.UI.Visibility.Hidden };
+            this.Padding = new Thickness(0);
         }
 
         /// <summary> Begin render control's content </summary>

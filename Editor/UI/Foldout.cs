@@ -17,7 +17,7 @@ namespace Skill.Editor.UI
         public GUIContent Content { get; private set; }
 
         /// <summary>
-        /// The label to show.
+        /// Toggle on label click
         /// </summary>
         public bool ToggleOnLabelClick { get; set; }
 
@@ -57,6 +57,7 @@ namespace Skill.Editor.UI
         {
             Content = new GUIContent();
             this.Height = 16;
+            this.ToggleOnLabelClick = true;
         }
 
         /// <summary>

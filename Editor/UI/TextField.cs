@@ -71,11 +71,11 @@ namespace Skill.Editor.UI
 
             if (Style != null)
             {
-                result = EditorGUI.TextField(RenderArea, Label, Text, Style);
+                result = EditorGUI.TextField(RenderArea, Label, _Text, Style);
             }
             else
             {
-                result = EditorGUI.TextField(RenderArea, Label, Text);
+                result = EditorGUI.TextField(RenderArea, Label, _Text);
             }
 
             Text = result;

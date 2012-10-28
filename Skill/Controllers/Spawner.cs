@@ -14,7 +14,7 @@ namespace Skill.Controllers
     public class Spawner : MonoBehaviour
     {
         /// <summary> GameObject to spawn </summary>
-        public GameObject SpawnObject;
+        public SpawnAsset SpawnObjects;
         /// <summary> where to spawn objects </summary>
         public Transform[] SpawnLocations;
         /// <summary> If true, the spawner will cycle through the spawn locations instead of spawning from a randomly chosen one </summary>
@@ -49,6 +49,21 @@ namespace Skill.Controllers
         private float _LastSpawnTime;
         private int _SpawnCount;
         private int _DeadCount;
+        private float _TotalWeight = 0;
+
+        /// <summary>
+        /// Call this method if you change SpawnObjects after the Spawner started.
+        /// </summary>
+        public void RecalculateWeights()
+        {
+            _TotalWeight = 0;
+            foreach (SpawnObject item in SpawnObjects.Objects)
+            {
+                if (item.Chance < 0.05f) item.Chance = 0.05f;
+                else if (item.Chance > 1.0f) item.Chance = 1.0f;
+                _TotalWeight += item.Chance;
+            }
+        }
 
         /// <summary>
         /// Subclasses can avoid spawning for some reason at specific times
@@ -71,7 +86,7 @@ namespace Skill.Controllers
         protected virtual void OnComplete()
         {
             if (Complete != null) Complete(this, EventArgs.Empty);
-        }        
+        }
 
         /// <summary>
         /// Spawn new game objects
@@ -80,6 +95,20 @@ namespace Skill.Controllers
         {
             Spawn(null);
         }
+
+        private GameObject GetRandomSpawnObject()
+        {
+            if (_TotalWeight <= 0) RecalculateWeights();
+            float rnd = UnityEngine.Random.Range(0.0f, _TotalWeight);
+            float sum = 0;
+            foreach (SpawnObject item in SpawnObjects.Objects)
+            {
+                sum += item.Chance;
+                if (sum >= rnd) return item.Prefab;
+            }
+            return null;
+        }
+
 
         private void Spawn(GameObject spawnedObj)
         {
@@ -90,7 +119,13 @@ namespace Skill.Controllers
 
             if (spawnedObj == null)
             {
-                spawnedObj = CacheSpawner.Spawn(SpawnObject, position, rotation);
+                var sp = GetRandomSpawnObject();
+                if (sp == null)
+                {
+                    Debug.LogError("invalid object to spawn(No SpawnObject exist).");
+                    return;
+                }
+                spawnedObj = CacheSpawner.Spawn(sp, position, rotation);
                 SpawnedObjects.Add(spawnedObj);
             }
             else

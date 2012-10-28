@@ -87,6 +87,7 @@ namespace Skill.Studio.AI
     [DisplayName("AccessLimitDecorator")]
     public class AccessLimitDecoratorViewModel : DecoratorViewModel
     {
+        [Browsable(false)]
         public override string ImageName { get { return Images.AccessLimitDecorator; } }
 
         [Browsable(false)]

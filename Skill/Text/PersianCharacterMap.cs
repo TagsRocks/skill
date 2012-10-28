@@ -10,10 +10,9 @@ namespace Skill.Text
     /// </summary>
     public class PersianCharacterMap : IPersianCharacterMap
     {
-        /// <summary>
-        /// A dictionary that maps each word to equivalent persian character
-        /// </summary>
-        public Dictionary<char, PersianCharacter> Map { get; private set; }
+
+        // A dictionary that maps each word to equivalent persian character        
+        private Dictionary<char, PersianCharacter> _Map;
 
         // persian characters
 
@@ -155,8 +154,15 @@ namespace Skill.Text
         /// <summary> الله </summary>
         public PersianCharacter LigatureAllah { get; private set; }
 
+
+        /// <summary>
+        /// Whether convert english characters to equivalent persian characters (as on keyboard)?
+        /// </summary>
+        public bool ConvertEnglishCharacters { get; private set; }
+
         private void CreatePersianCharacters()
         {
+
             // alefba
             this.Alef = new PersianCharacter('\uFE8E', '\uFE8D');
             this.Beh = new PersianCharacter('\uFE91', '\uFE92', '\uFE90', '\uFE8F');
@@ -192,19 +198,18 @@ namespace Skill.Text
             this.Yeh = new PersianCharacter('\uFBFE', '\uFBFF', '\uFBFD', '\uFBFC');
 
             // numeric
-            this.Zero = new PersianCharacter('\u0660');
-            this.One = new PersianCharacter('\u0661');
-            this.Two = new PersianCharacter('\u0662');
-            this.Three = new PersianCharacter('\u0663');
-            this.Four = new PersianCharacter('\u0664');
-            this.Five = new PersianCharacter('\u0665');
-            this.Six = new PersianCharacter('\u0666');
-            this.Seven = new PersianCharacter('\u0667');
-            this.Eight = new PersianCharacter('\u0668');
-            this.Nine = new PersianCharacter('\u0669');
+            this.Zero = new PersianCharacter('\u0660') { LeftToRight = true };
+            this.One = new PersianCharacter('\u0661') { LeftToRight = true };
+            this.Two = new PersianCharacter('\u0662') { LeftToRight = true };
+            this.Three = new PersianCharacter('\u0663') { LeftToRight = true };
+            this.Four = new PersianCharacter('\u0664') { LeftToRight = true };
+            this.Five = new PersianCharacter('\u0665') { LeftToRight = true };
+            this.Six = new PersianCharacter('\u0666') { LeftToRight = true };
+            this.Seven = new PersianCharacter('\u0667') { LeftToRight = true };
+            this.Eight = new PersianCharacter('\u0668') { LeftToRight = true };
+            this.Nine = new PersianCharacter('\u0669') { LeftToRight = true };
 
             // other
-
             this.Fathatan = new PersianCharacter('\u064B');
             this.Dammatan = new PersianCharacter('\u064C');
             this.Kasratan = new PersianCharacter('\u064D');
@@ -229,6 +234,7 @@ namespace Skill.Text
             // Ligature
             this.LigatureLam = new PersianCharacter('\uFEFC', '\uFEFB');
             this.LigatureAllah = new PersianCharacter('\uFDF2');
+
 
         }
 
@@ -274,50 +280,50 @@ namespace Skill.Text
                 foreach (var k in keys)
                 {
                     c = k;
-                    Map.Add(k, pc);
+                    _Map.Add(k, pc);
                 }
             }
-            catch (ArgumentException)
+            catch (ArgumentException ex)
             {
-                throw new ArgumentException("Key exist " + c);
+                throw new ArgumentException("Key exist " + c, "keys", ex);
             }
         }
 
         private void CreateMaps()
         {
             // create maps for alefba characters
-            CreateMap(Alef, '\uFE8E', '\uFE8D', 'h', 'ا');
-            CreateMap(Beh, '\uFE91', '\uFE92', '\uFE90', '\uFE8F', 'f', 'ب');
-            CreateMap(Peh, '\uFB58', '\uFB59', '\uFB57', '\uFB56', '\\', 'پ');
-            CreateMap(Teh, '\uFE97', '\uFE98', '\uFE96', '\uFE95', 'j', 'ت');
-            CreateMap(Theh, '\uFE9B', '\uFE9C', '\uFE9A', '\uFE99', 'e', 'ث');
-            CreateMap(Jeem, '\uFE9F', '\uFEA0', '\uFE9E', '\uFE9D', '[', 'ج');
-            CreateMap(Cheh, '\uFB7C', '\uFB7D', '\uFB7B', '\uFB7A', ']', 'چ');
-            CreateMap(Hah, '\uFEA3', '\uFEA4', '\uFEA2', '\uFEA1', 'p', 'ح');
-            CreateMap(Khah, '\uFEA7', '\uFEA8', '\uFEA6', '\uFEA5', 'o', 'خ');
-            CreateMap(Dal, '\uFEAA', '\uFEA9', 'n', 'د');
-            CreateMap(Thal, '\uFEAC', '\uFEAB', 'b', 'ذ');
-            CreateMap(Reh, '\uFEAE', '\uFEAD', 'v', 'ر');
-            CreateMap(Zain, '\uFEB0', '\uFEAF', 'c', 'ز');
-            CreateMap(Jeh, '\uFB8B', '\uFB8A', 'C', 'ژ');
-            CreateMap(Seen, '\uFEB3', '\uFEB4', '\uFEB2', '\uFEB1', 's', 'س');
-            CreateMap(Sheen, '\uFEB7', '\uFEB8', '\uFEB6', '\uFEB5', 'a', 'ش');
-            CreateMap(Sad, '\uFEBB', '\uFEBC', '\uFEBA', '\uFEB9', 'w', 'ص');
-            CreateMap(Dad, '\uFEBF', '\uFEC0', '\uFEBE', '\uFEBD', 'q', 'ض');
-            CreateMap(Tah, '\uFEC3', '\uFEC4', '\uFEC2', '\uFEC1', 'x', 'ط');
-            CreateMap(Zah, '\uFEC7', '\uFEC8', '\uFEC6', '\uFEC5', 'z', 'ظ');
-            CreateMap(Ain, '\uFECB', '\uFECC', '\uFECA', '\uFEC9', 'u', 'ع');
-            CreateMap(Ghain, '\uFECF', '\uFED0', '\uFECE', '\uFECD', 'y', 'غ');
-            CreateMap(Feh, '\uFED3', '\uFED4', '\uFED2', '\uFED1', 't', 'ف');
-            CreateMap(Qaf, '\uFED7', '\uFED8', '\uFED6', '\uFED5', 'r', 'ق');
-            CreateMap(Kaf, '\uFEDB', '\uFEDC', '\uFEDA', '\uFED9', ';', 'ک', '\u0643');
-            CreateMap(Gaf, '\uFB94', '\uFB95', '\uFB93', '\uFB92', '\'', 'گ');
-            CreateMap(Lam, '\uFEDF', '\uFEE0', '\uFEDE', '\uFEDD', 'g', 'ل');
-            CreateMap(Meem, '\uFEE3', '\uFEE4', '\uFEE2', '\uFEE1', 'l', 'م');
-            CreateMap(Noon, '\uFEE7', '\uFEE8', '\uFEE6', '\uFEE5', 'k', 'ن');
-            CreateMap(Waw, '\uFEEE', '\uFEED', ',', 'و', 'U');
-            CreateMap(Heh, '\uFEEB', '\uFEEC', '\uFEEA', '\uFEE9', 'i', 'ه');
-            CreateMap(Yeh, '\uFBFE', '\uFBFF', '\uFBFD', '\uFBFC', 'd', '\u0649', '\u064A');
+            CreateMap(Alef, '\uFE8E', '\uFE8D', 'ا');
+            CreateMap(Beh, '\uFE91', '\uFE92', '\uFE90', '\uFE8F', 'ب');
+            CreateMap(Peh, '\uFB58', '\uFB59', '\uFB57', '\uFB56', 'پ');
+            CreateMap(Teh, '\uFE97', '\uFE98', '\uFE96', '\uFE95', 'ت');
+            CreateMap(Theh, '\uFE9B', '\uFE9C', '\uFE9A', '\uFE99', 'ث');
+            CreateMap(Jeem, '\uFE9F', '\uFEA0', '\uFE9E', '\uFE9D', 'ج');
+            CreateMap(Cheh, '\uFB7C', '\uFB7D', '\uFB7B', '\uFB7A', 'چ');
+            CreateMap(Hah, '\uFEA3', '\uFEA4', '\uFEA2', '\uFEA1', 'ح');
+            CreateMap(Khah, '\uFEA7', '\uFEA8', '\uFEA6', '\uFEA5', 'خ');
+            CreateMap(Dal, '\uFEAA', '\uFEA9', 'د');
+            CreateMap(Thal, '\uFEAC', '\uFEAB', 'ذ');
+            CreateMap(Reh, '\uFEAE', '\uFEAD', 'ر');
+            CreateMap(Zain, '\uFEB0', '\uFEAF', 'ز');
+            CreateMap(Jeh, '\uFB8B', '\uFB8A', 'ژ');
+            CreateMap(Seen, '\uFEB3', '\uFEB4', '\uFEB2', '\uFEB1', 'س');
+            CreateMap(Sheen, '\uFEB7', '\uFEB8', '\uFEB6', '\uFEB5', 'ش');
+            CreateMap(Sad, '\uFEBB', '\uFEBC', '\uFEBA', '\uFEB9', 'ص');
+            CreateMap(Dad, '\uFEBF', '\uFEC0', '\uFEBE', '\uFEBD', 'ض');
+            CreateMap(Tah, '\uFEC3', '\uFEC4', '\uFEC2', '\uFEC1', 'ط');
+            CreateMap(Zah, '\uFEC7', '\uFEC8', '\uFEC6', '\uFEC5', 'ظ');
+            CreateMap(Ain, '\uFECB', '\uFECC', '\uFECA', '\uFEC9', 'ع');
+            CreateMap(Ghain, '\uFECF', '\uFED0', '\uFECE', '\uFECD', 'غ');
+            CreateMap(Feh, '\uFED3', '\uFED4', '\uFED2', '\uFED1', 'ف');
+            CreateMap(Qaf, '\uFED7', '\uFED8', '\uFED6', '\uFED5', 'ق');
+            CreateMap(Kaf, '\uFEDB', '\uFEDC', '\uFEDA', '\uFED9', 'ک', '\u0643');
+            CreateMap(Gaf, '\uFB94', '\uFB95', '\uFB93', '\uFB92', 'گ');
+            CreateMap(Lam, '\uFEDF', '\uFEE0', '\uFEDE', '\uFEDD', 'ل');
+            CreateMap(Meem, '\uFEE3', '\uFEE4', '\uFEE2', '\uFEE1', 'م');
+            CreateMap(Noon, '\uFEE7', '\uFEE8', '\uFEE6', '\uFEE5', 'ن');
+            CreateMap(Waw, '\uFEEE', '\uFEED', 'و');
+            CreateMap(Heh, '\uFEEB', '\uFEEC', '\uFEEA', '\uFEE9', 'ه');
+            CreateMap(Yeh, '\uFBFE', '\uFBFF', '\uFBFD', '\uFBFC', '\u0649', '\u064A', '\u06CC');
 
             // create maps for numeric characters
             CreateMap(Zero, '0', '\u0660', '\u06F0');
@@ -332,40 +338,110 @@ namespace Skill.Text
             CreateMap(Nine, '9', '\u0669', '\u06F9');
 
             // create maps for other characters
-            CreateMap(Fathatan, '\u064B', 'Q');
-            CreateMap(Dammatan, '\u064C', 'W');
-            CreateMap(Kasratan, '\u064D', 'E');
-            CreateMap(Fatha, '\u064E', 'A');
-            CreateMap(Damma, '\u064F', 'S');
-            CreateMap(Kasra, '\u0650', 'D');
-            CreateMap(Shadda, '\u0651', 'F');
-            CreateMap(RialSign, '\uFDFC', 'R');
-            CreateMap(Comma, '\u060C', 'T');
-            CreateMap(Semicolon, '\u061B', 'Y');
-            CreateMap(AlefMadda, '\uFE82', '\uFE81', 'H', '\u0622');
-            CreateMap(WawWithHamzaAbove, '\uFE86', '\uFE85', 'V', '\u0624');
-            CreateMap(AlefWithHamzaAbove, '\uFE84', '\uFE83', 'N', '\u0623');
-            CreateMap(AlefWithHamzaBelow, '\uFE88', '\uFE87', 'B', '\u0625');
-            CreateMap(Hamza, '\uFE80', 'M');
+            CreateMap(Fathatan, '\u064B');
+            CreateMap(Dammatan, '\u064C');
+            CreateMap(Kasratan, '\u064D');
+            CreateMap(Fatha, '\u064E');
+            CreateMap(Damma, '\u064F');
+            CreateMap(Kasra, '\u0650');
+            CreateMap(Shadda, '\u0651');
+            CreateMap(RialSign, '\uFDFC');
+            CreateMap(Comma, '\u060C');
+            CreateMap(Semicolon, '\u061B');
+            CreateMap(AlefMadda, '\uFE82', '\uFE81', '\u0622');
+            CreateMap(WawWithHamzaAbove, '\uFE86', '\uFE85', '\u0624');
+            CreateMap(AlefWithHamzaAbove, '\uFE84', '\uFE83', '\u0623');
+            CreateMap(AlefWithHamzaBelow, '\uFE88', '\uFE87', '\u0625');
+            CreateMap(Hamza, '\uFE80');
             CreateMap(QuestionMark, '\u061F', '?');
             CreateMap(Tatweel, '\u0640');
             CreateMap(LeftParenthesis, '\uFD3E', ')');
             CreateMap(RightParenthesis, '\uFD3F', '(');
-            CreateMap(YehWithHamzaAbove, '\uFE8B', '\uFE8C', '\uFE8A', '\uFE89', 'm', 'ئ');
+            CreateMap(YehWithHamzaAbove, '\uFE8B', '\uFE8C', '\uFE8A', '\uFE89', 'ئ');
 
             // Ligature
             CreateMap(LigatureLam, '\uFEFC', '\uFEFB');
             CreateMap(LigatureAllah, '\uFDF2');
+
+            if (ConvertEnglishCharacters)
+            {
+                CreateMap(Alef, 'h');
+                CreateMap(Beh, 'f');
+                CreateMap(Peh, '\\');
+                CreateMap(Teh, 'j');
+                CreateMap(Theh, 'e');
+                CreateMap(Jeem, '[');
+                CreateMap(Cheh, ']');
+                CreateMap(Hah, 'p');
+                CreateMap(Khah, 'o');
+                CreateMap(Dal, 'n');
+                CreateMap(Thal, 'b');
+                CreateMap(Reh, 'v');
+                CreateMap(Zain, 'c');
+                CreateMap(Jeh, 'C');
+                CreateMap(Seen, 's');
+                CreateMap(Sheen, 'a');
+                CreateMap(Sad, 'w');
+                CreateMap(Dad, 'q');
+                CreateMap(Tah, 'x');
+                CreateMap(Zah, 'z');
+                CreateMap(Ain, 'u');
+                CreateMap(Ghain, 'y');
+                CreateMap(Feh, 't');
+                CreateMap(Qaf, 'r');
+                CreateMap(Kaf, ';');
+                CreateMap(Gaf, '\'');
+                CreateMap(Lam, 'g');
+                CreateMap(Meem, 'l');
+                CreateMap(Noon, 'k');
+                CreateMap(Waw, 'U', ',');
+                CreateMap(Heh, 'i');
+                CreateMap(Yeh, 'd');
+
+
+                // create maps for other characters
+                CreateMap(Fathatan, 'Q');
+                CreateMap(Dammatan, 'W');
+                CreateMap(Kasratan, 'E');
+                CreateMap(Fatha, 'A');
+                CreateMap(Damma, 'S');
+                CreateMap(Kasra, 'D');
+                CreateMap(Shadda, 'F');
+                CreateMap(RialSign, 'R');
+                CreateMap(Comma, 'T');
+                CreateMap(Semicolon, 'Y');
+                CreateMap(AlefMadda, 'H');
+                CreateMap(WawWithHamzaAbove, 'V');
+                CreateMap(AlefWithHamzaAbove, 'N');
+                CreateMap(AlefWithHamzaBelow, 'B');
+                CreateMap(Hamza, 'M');
+                CreateMap(YehWithHamzaAbove, 'm');
+            }
         }
 
         /// <summary>
         /// Create a PersianCharacterMap
         /// </summary>
-        public PersianCharacterMap()
+        /// <param name="convertEnglishCharacters">Whether convert english characters to equivalent persian characters (as on keyboard)?</param>
+        public PersianCharacterMap(bool convertEnglishCharacters = true)
         {
-            Map = new Dictionary<char, PersianCharacter>();
+            this.ConvertEnglishCharacters = convertEnglishCharacters;
+            this._Map = new Dictionary<char, PersianCharacter>();
             CreatePersianCharacters();
             CreateMaps();
+        }
+
+        /// <summary>
+        /// maps each none persian chracter to equivalent persian character
+        /// </summary>
+        /// <param name="c">The character to remap to persian character</param>
+        /// <returns>if there is a map for given character returns a PersianCharacter, otherwise null.</returns>
+        public PersianCharacter GetMappedCharacter(char c)
+        {
+            PersianCharacter result = null;
+            if (!_Map.TryGetValue(c, out result))
+                result = null;
+            return result;
         }
     }
 }

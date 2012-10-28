@@ -5,15 +5,16 @@ using Skill.UI;
 using Skill.Editor.UI;
 using UnityEngine;
 using Skill.Editor;
+using Skill.Controllers;
 
 
 namespace Skill.Editor.Tools
 {
 
-    [UnityEditor.CustomEditor(typeof(ImplantAsset))]
-    class ImplantAssetEditor : UnityEditor.Editor
+    [UnityEditor.CustomEditor(typeof(SpawnAsset))]
+    class SpawnAssetEditor : UnityEditor.Editor
     {
-        #region CreateUI        
+        #region CreateUI
         private Skill.UI.ListBox _PrefabsLB;
         private Skill.UI.StackPanel _ButtonsPanel;
         private Skill.Editor.UI.Button _BtnAdd;
@@ -27,7 +28,7 @@ namespace Skill.Editor.Tools
             _PrefabsLB = new ListBox() { Margin = new Thickness(2), SelectionMode = Skill.UI.SelectionMode.Single, Position = new Rect(0, 22, 320, 560) };            
             _PrefabsLB.SelectionChanged += new System.EventHandler(_PrefabsLB_SelectionChanged);
 
-            GUIStyleState selectedItemState = new GUIStyleState() { background = Resources.SelectedItemBackground};
+            GUIStyleState selectedItemState = new GUIStyleState() { background = Resources.SelectedItemBackground };
             _PrefabsLB.SelectedStyle = new GUIStyle()
             {
                 normal = selectedItemState,
@@ -49,8 +50,8 @@ namespace Skill.Editor.Tools
 
             _ButtonsPanel.Controls.Add(_BtnAdd);
             _ButtonsPanel.Controls.Add(_BtnRemove);
-            _ButtonsPanel.Controls.Add(_BtnClear);
-            
+            _ButtonsPanel.Controls.Add(_BtnClear);            
+
             _ChangeCheck = new ChangeCheck();
             _ChangeCheck.Controls.Add(_ButtonsPanel);
             _ChangeCheck.Controls.Add(_PrefabsLB);
@@ -62,10 +63,10 @@ namespace Skill.Editor.Tools
 
         void _ChangeCheck_Changed(object sender, EventArgs e)
         {
-            ImplantAsset asset = target as ImplantAsset;
-            if (asset != null)
+            SpawnAsset data = target as SpawnAsset;
+            if (data != null)
             {
-                EditorUtility.SetDirty(asset);
+                EditorUtility.SetDirty(data);
             }
         }
 
@@ -95,21 +96,21 @@ namespace Skill.Editor.Tools
 
         void _BtnAdd_Click(object sender, System.EventArgs e)
         {
-            _PrefabsLB.Controls.Add(new ImplantObjectField());
+            _PrefabsLB.Controls.Add(new SpawnObjectField());
             SetChanges();
         }
 
         private void SetChanges()
         {
-            ImplantAsset asset = target as ImplantAsset;
-            if (asset != null)
+            SpawnAsset data = target as SpawnAsset;
+            if (data != null)
             {
-                asset.Objects = new ImplantObject[_PrefabsLB.Controls.Count];
+                data.Objects = new SpawnObject[_PrefabsLB.Controls.Count];
                 for (int i = 0; i < _PrefabsLB.Controls.Count; i++)
                 {
-                    asset.Objects[i] = ((ImplantObjectField)_PrefabsLB.Controls[i]).Object;
+                    data.Objects[i] = ((SpawnObjectField)_PrefabsLB.Controls[i]).Object;
                 }
-                EditorUtility.SetDirty(asset);
+                EditorUtility.SetDirty(data);
             }
         }
         #endregion
@@ -117,17 +118,17 @@ namespace Skill.Editor.Tools
         void OnEnable()
         {
             CreateUI();
-            ImplantAsset asset = target as ImplantAsset;
-            if (asset != null)
+            SpawnAsset data = target as SpawnAsset;
+            if (data != null)
             {
-                asset.hideFlags = HideFlags.HideInInspector;
-                if (asset.Objects != null)
+                data.hideFlags = HideFlags.HideInInspector;
+                if (data.Objects != null)
                 {
-                    foreach (var item in asset.Objects)
+                    foreach (var item in data.Objects)
                     {
                         if (item != null)
                         {
-                            ImplantObjectField field = new ImplantObjectField(item);
+                            SpawnObjectField field = new SpawnObjectField(item);
                             _PrefabsLB.Controls.Add(field);
                         }
                     }
@@ -151,7 +152,7 @@ namespace Skill.Editor.Tools
             rect.x = rect.y = 0;
             _ChangeCheck.Position = rect;
 
-            _Frame.OnGUI();
+            _Frame.OnGUI();            
         }
     }
 }

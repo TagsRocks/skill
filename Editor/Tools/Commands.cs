@@ -23,7 +23,7 @@ namespace Skill.Editor.Tools
                 string tData = string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}", rotation.x, rotation.y, rotation.z, rotation.w,
                                                                                        position.x, position.y, position.z,
                                                                                        scale.x, scale.y, scale.z);
-                System.Windows.Forms.Clipboard.SetText(tData);
+                EditorGUIUtility.systemCopyBuffer = tData;
                 Debug.Log("Transform copied to clipboard.");
             }
             else
@@ -40,7 +40,7 @@ namespace Skill.Editor.Tools
             Transform t = Selection.activeTransform;
             if (t != null)
             {
-                string tData = System.Windows.Forms.Clipboard.GetText();
+                string tData = EditorGUIUtility.systemCopyBuffer;
                 if (string.IsNullOrEmpty(tData))
                 {
                     Debug.LogError("Clipboard is empty.");

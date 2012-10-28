@@ -35,7 +35,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
@@ -60,6 +59,8 @@
     <Compile Include="Tools\ImplantAsset.cs" />
     <Compile Include="Tools\ImplantAssetEditor.cs" />
     <Compile Include="Tools\ImplantObject.cs" />
+    <Compile Include="Tools\SpawnAssetEditor.cs" />
+    <Compile Include="Tools\SpawnObjectField.cs" />
     <Compile Include="UI\BoundsField.cs" />
     <Compile Include="UI\Button.cs" />
     <Compile Include="UI\ChangeCheck.cs" />

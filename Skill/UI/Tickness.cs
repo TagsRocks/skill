@@ -39,6 +39,17 @@ namespace Skill.UI
             this._Right = right;
             this._Bottom = bottom;
         }
+
+        /// <summary>
+        /// Initializes a new instance of the Thickness structure that has specific lengths (supplied as a System.Double) applied to each side of the rectangle.
+        /// </summary>
+        /// <param name="leftAndRight"> The thickness for the left side and the right side of the rectangle.</param>
+        /// <param name="topAndBottom"> The thickness for the upper side and the lower side of the rectangle.</param>        
+        public Thickness(float leftAndRight, float topAndBottom)
+            : this(leftAndRight, topAndBottom, leftAndRight, topAndBottom)
+        {
+        }
+
         /// <summary>
         /// Compares this Thickness structure to another System.Object for equality.
         /// </summary>
@@ -164,7 +175,7 @@ namespace Skill.UI
             get
             {
                 return this._Left + this._Right;
-            }            
+            }
         }
         /// <summary>
         /// Top + Bottom
@@ -177,7 +188,7 @@ namespace Skill.UI
             }
         }
 
-        private static Thickness _Empty= new Thickness(0);
+        private static Thickness _Empty = new Thickness(0);
         /// <summary>
         /// zero Thickness
         /// </summary>

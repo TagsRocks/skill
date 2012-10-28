@@ -10,7 +10,10 @@ namespace Skill.Text
     /// </summary>
     /// <remarks>
     /// this version of converter use more calculation to convert text and should use for left to right TextField.
-    /// so use this class when your text is dynamic and 
+    /// so use this class when your text is dynamic.
+    /// As unity does not support right to left TextField(yet), this algorithm is not perfect and have some bugs. if you search, you can find more persian algorithms
+    /// each has it's own cons and pros. it is on you to use this method.
+    /// in this algorithm you can write text from begin to end without problem, but if you want to edit text and add some character in middle it goes wrong.
     /// </remarks>
     public class PersianTextFieldConverter : ITextConverter
     {
@@ -25,9 +28,10 @@ namespace Skill.Text
         public int MaxLength { get; private set; }
 
         /// <summary>
-        /// Retrieves last converted text by this converter
+        /// Gets last converted text by this converter and set it when you want to continue editing text.
+        /// for example when load profile name and you want edit it again.
         /// </summary>
-        public string LastConvertedText { get; private set; }
+        public string LastConvertedText { get; set; }
 
         private CharInfo[] _SourceChars;
         private CharInfo[] _RepositionedChars;
@@ -122,8 +126,17 @@ namespace Skill.Text
                     int index = LastConvertedText.IndexOf(text);
                     if (index >= 0)
                     {
-                        if (index == 0) // we have to remove from first because text is reversed
-                            startoldIndex = LastConvertedText.Length - text.Length;
+                        if (index == 0)
+                        {
+                            PersianCharacter pc = CharacterMap.GetMappedCharacter(LastConvertedText[LastConvertedText.Length - 1]);
+                            if (pc != null && !pc.LeftToRight)
+                            {
+                                // we have to remove from first because text is reversed
+                                startoldIndex = LastConvertedText.Length - text.Length;
+                            }
+                            else
+                                lastoldIndex = text.Length - 1;
+                        }
                         else
                             lastoldIndex = text.Length - 1;
                         text = LastConvertedText.Substring(startoldIndex, text.Length);
@@ -135,8 +148,7 @@ namespace Skill.Text
                 {
                     CharInfo cf = _SourceChars[i];
                     cf.SourceChar = text[i];
-                    if (!CharacterMap.Map.TryGetValue(cf.SourceChar, out cf.Character))
-                        cf.Character = null;
+                    cf.Character = CharacterMap.GetMappedCharacter(cf.SourceChar);                    
                     cf.Form = PersianCharacterForm.Isolated;
                     _RepositionedChars[i] = null;
                     cf.IsReversed = false;
@@ -202,7 +214,52 @@ namespace Skill.Text
                     }
                 }
 
+                // place Left To Right characters to correct place
 
+                // find one left to right character
+                for (int i = 0; i < text.Length; i++)
+                {
+                    CharInfo cf = _RepositionedChars[i];
+                    if (!cf.IsReversed && (cf.Character == null || cf.Character.LeftToRight))
+                    {
+                        // find surrounding ltf chars
+                        int startIndex = i;
+                        int endIndex = i;
+
+                        //find most previous valid ltf index
+                        for (int k = i - 1; k >= 0; k--)
+                        {
+                            CharInfo cf2 = _RepositionedChars[k];
+                            if (cf2.IsReversed && (cf2.Character == null || cf2.Character.LeftToRight))
+                            {
+                                startIndex = k;
+                            }
+                            else
+                                break;
+                        }
+
+                        //find most next valid ltf index
+                        for (int k = i + 1; k < text.Length; k++)
+                        {
+                            CharInfo cf2 = _RepositionedChars[k];
+                            if (cf2.IsReversed && (cf2.Character == null || cf2.Character.LeftToRight))
+                            {
+                                endIndex = k;
+                            }
+                            else
+                                break;
+                        }
+
+                        int index = endIndex - (i - startIndex);
+                        int sign = Math.Sign(index - i);
+
+                        for (int k = i; k != index; k += sign)
+                            _RepositionedChars[k] = _RepositionedChars[k + sign];
+
+                        _RepositionedChars[index] = cf;
+                        cf.IsReversed = true;
+                    }
+                }
 
                 // calc forms of each character
                 for (int i = 0; i < text.Length; i++)
@@ -257,14 +314,13 @@ namespace Skill.Text
                         result.Append(cf.SourceChar);
                 }
 
-                string temp = result.ToString();
                 if (ConvertLigature)
                 {
-                    temp = temp.Replace("\uFE8E\uFEDF", "\uFEFB");
-                    temp = temp.Replace("\uFE8E\uFEE0", "\uFEFC");
-                    temp = temp.Replace("\uFEEA\uFEE0\uFEDF\uFE8D", "\uFDF2");
+                    result.Replace("\uFE8E\uFEDF", "\uFEFB");
+                    result.Replace("\uFE8E\uFEE0", "\uFEFC");
+                    result.Replace("\uFEEA\uFEE0\uFEDF\uFE8D", "\uFDF2");
                 }
-                LastConvertedText = temp;
+                LastConvertedText = result.ToString();
             }
             return LastConvertedText;
         }

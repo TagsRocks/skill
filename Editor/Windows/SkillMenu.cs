@@ -54,11 +54,11 @@ namespace Skill.Editor
 
 
         // Create Menu
-        [MenuItem("Assets/Create/Skill/ImplantAsset")]
+        [MenuItem("Assets/Create/Skill/Implant Asset")]
         static void CreateImplantAsset()
         {
             Skill.Editor.Tools.ImplantAsset asset;
-            string name = "NewImplantAsset";
+            string name = "ImplantAsset";
             int nameIdx = 0;
 
             while (System.IO.File.Exists(Application.dataPath + "/" + name + nameIdx + ".asset"))
@@ -68,6 +68,23 @@ namespace Skill.Editor
             asset = CreateInstance<Skill.Editor.Tools.ImplantAsset>();
             AssetDatabase.CreateAsset(asset, "Assets/" + name + nameIdx + ".asset");
             Selection.activeObject = asset;
+            EditorUtility.FocusProjectWindow();
+        }
+
+        [MenuItem("Assets/Create/Skill/Spawn Asset")]
+        static void CreateSpawnData()
+        {
+            Skill.Controllers.SpawnAsset data;
+            string name = "SpawnAsset";
+            int nameIdx = 0;
+
+            while (System.IO.File.Exists(Application.dataPath + "/" + name + nameIdx + ".asset"))
+                nameIdx++;
+
+
+            data = CreateInstance<Skill.Controllers.SpawnAsset>();
+            AssetDatabase.CreateAsset(data, "Assets/" + name + nameIdx + ".asset");
+            Selection.activeObject = data;
             EditorUtility.FocusProjectWindow();
         }
 

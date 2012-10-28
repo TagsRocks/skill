@@ -22,6 +22,7 @@ namespace Skill.Studio.AI
         #region Brush Properties
 
         private Brush _BackBrush;
+        [Browsable(false)]
         public Brush BackBrush
         {
             get { return _BackBrush != null ? _BackBrush : Editor.BehaviorBrushes.DefaultBackBrush; }
@@ -96,6 +97,7 @@ namespace Skill.Studio.AI
 
         #region Properties
 
+        [Browsable(false)]
         public override bool IsSelected
         {
             get { return base.IsSelected; }

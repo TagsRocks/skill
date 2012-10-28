@@ -33,6 +33,11 @@ namespace Skill.Text
         /// </remarks>
         public bool CanStickToNext { get; set; }
 
+        /// <summary>
+        /// Is this character left to right ( like numerics )
+        /// </summary>
+        public bool LeftToRight { get; set; }
+
         /// <summary> Gets or sets Character in specified form </summary>
         /// <param name="form">Form of persian character</param>
         /// <returns>Character in specified form.</returns>
@@ -53,6 +58,7 @@ namespace Skill.Text
         /// <param name="canStickToNext">can stick to next character</param>
         public PersianCharacter(char initial, char medial, char final, char isolated, bool canStickToPrevious = true, bool canStickToNext = true)
         {
+            this.LeftToRight = false;
             this._Characters = new char[4];
             SetData(initial, medial, final, isolated, canStickToPrevious, canStickToNext);
         }

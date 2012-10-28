@@ -63,11 +63,11 @@ namespace Skill.Editor.UI
             if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)
             {
-                result = EditorGUI.TextArea(RenderArea, Text, Style);
+                result = EditorGUI.TextArea(RenderArea, _Text, Style);
             }
             else
             {
-                result = EditorGUI.TextArea(RenderArea, Text);
+                result = EditorGUI.TextArea(RenderArea, _Text);
             }
 
             Text = result;

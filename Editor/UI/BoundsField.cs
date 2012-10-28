@@ -52,7 +52,7 @@ namespace Skill.Editor.UI
         public BoundsField()
         {
             Label = new GUIContent();
-            this.Height = 32;
+            this.Height = 52;
         }
 
         /// <summary>

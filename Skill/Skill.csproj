@@ -62,10 +62,15 @@
     <Compile Include="Animation\AnimNodeMultilayer.cs" />
     <Compile Include="Animation\Vector3Keyframes.cs" />
     <Compile Include="Animation\RootMotion.cs" />
+    <Compile Include="Controllers\SpawnAsset.cs" />
     <Compile Include="Controllers\Spawner.cs" />
+    <Compile Include="Controllers\SpawnObject.cs" />
     <Compile Include="IO\BinaryLoadStream.cs" />
     <Compile Include="IO\BinarySaveStream.cs" />
     <Compile Include="IO\ISavable.cs" />
+    <Compile Include="IO\PCBinaryLoadStream.cs" />
+    <Compile Include="IO\PCBinarySaveStream.cs" />
+    <Compile Include="IO\PCSaveGame.cs" />
     <Compile Include="IO\XmlLoadStream.cs" />
     <Compile Include="IO\XmlSaveStream.cs" />
     <Compile Include="Managers\CacheBehavior.cs" />
@@ -121,6 +126,7 @@
     <Compile Include="UI\Canvas.cs" />
     <Compile Include="UI\ColumnDefinition.cs" />
     <Compile Include="UI\Control.cs" />
+    <Compile Include="UI\ImageWithTexCoords.cs" />
     <Compile Include="UI\DockPanel.cs" />
     <Compile Include="UI\Frame.cs" />
     <Compile Include="UI\Grid.cs" />
