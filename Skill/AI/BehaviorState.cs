@@ -32,7 +32,7 @@ namespace Skill.AI
         /// <remarks>
         /// action is allways leaf node. after execution of each action, if result is running hold it's reference
         /// </remarks>
-        public ActionCollection RunningActions { get; private set; }
+        public RunningActionCollection RunningActions { get; private set; }
 
         /// <summary>
         /// The execution sequence after last update call.
@@ -51,7 +51,7 @@ namespace Skill.AI
         public BehaviorState()
         {
             this.Exception = null;
-            this.RunningActions = new ActionCollection();
+            this.RunningActions = new RunningActionCollection();
             _RunningStack = new RunningStack(this, MaxSequenceLength);
         }
 
@@ -64,7 +64,7 @@ namespace Skill.AI
         /// BehaviorTree call this method at begin of each update (internal use)
         /// </summary>
         public void Begin()
-        {
+        {            
             _CurrnetExecutionIndex = -1;
             _RunningStack.Swap();
         }

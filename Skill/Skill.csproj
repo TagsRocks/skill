@@ -56,10 +56,11 @@
     <Compile Include="AI\BehaviorParameter.cs" />
     <Compile Include="AI\BehaviorType.cs" />
     <Compile Include="AI\CompositeType.cs" />
-    <Compile Include="AI\ActionCollection.cs" />
+    <Compile Include="AI\RunningActionCollection.cs" />
     <Compile Include="AI\RunningStack.cs" />
     <Compile Include="Animation\AnimationTreeState.cs" />
     <Compile Include="Animation\AnimNodeMultilayer.cs" />
+    <Compile Include="Animation\BlendWeight.cs" />
     <Compile Include="Animation\Vector3Keyframes.cs" />
     <Compile Include="Animation\RootMotion.cs" />
     <Compile Include="Controllers\SpawnAsset.cs" />

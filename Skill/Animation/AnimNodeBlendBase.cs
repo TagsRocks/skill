@@ -5,12 +5,14 @@ using System.Text;
 
 namespace Skill.Animation
 {
+    
+
     /// <summary>
     /// Defiens bass class that have children and manage weights of them
     /// </summary>
     public abstract class AnimNodeBlendBase : AnimNode
     {
-        private float[] _BlendWeights;
+        private BlendWeight[] _BlendWeights;
 
         /// <summary>
         /// Retrieves lenght of active sub branch
@@ -26,9 +28,9 @@ namespace Skill.Animation
                     AnimNode child = this[i];
                     if (child != null)
                     {
-                        if (_BlendWeights[i] >= maxW)
+                        if (_BlendWeights[i].Weight >= maxW)
                         {
-                            maxW = _BlendWeights[i];
+                            maxW = _BlendWeights[i].Weight;
                             maxChild = child;
                         }
                     }
@@ -37,7 +39,7 @@ namespace Skill.Animation
                     return maxChild.Length;
                 return 0;
             }
-        }        
+        }
 
 
         /// <summary>
@@ -57,8 +59,12 @@ namespace Skill.Animation
         public AnimNodeBlendBase(int childCount)
             : base(childCount)
         {
-            _BlendWeights = new float[childCount];
-            BlendTime = 0.3f;
+            this._BlendWeights = new BlendWeight[childCount];
+            for (int i = 0; i < childCount; i++)
+            {
+                this._BlendWeights[i] = new BlendWeight();
+            }
+            this.BlendTime = 0.3f;
         }
 
         /// <summary>
@@ -72,7 +78,8 @@ namespace Skill.Animation
                 var child = this[i];
                 if (child != null)
                 {
-                    child.Weight = _BlendWeights[i] * Weight;
+                    child.BlendWeight.Weight = _BlendWeights[i].Weight * BlendWeight.Weight;
+                    child.BlendWeight.RootMotion = _BlendWeights[i].RootMotion * BlendWeight.RootMotion;
                 }
             }
         }
@@ -82,7 +89,7 @@ namespace Skill.Animation
         /// <summary>
         /// subclasses should implement this and provide valid weight (0.0 - 0.1) for each child 
         /// </summary>
-        /// <param name="blendWeights"></param>
-        protected abstract void CalcBlendWeights(ref float[] blendWeights);
+        /// <param name="blendWeights">previous weight of children</param>        
+        protected abstract void CalcBlendWeights(ref BlendWeight[] blendWeights);
     }
 }

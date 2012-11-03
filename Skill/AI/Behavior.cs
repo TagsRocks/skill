@@ -21,7 +21,7 @@ namespace Skill.AI
         /// <summary>
         /// Last ecexution result of behavior
         /// </summary>
-        public BehaviorResult Result { get; private set; }
+        public BehaviorResult Result { get; protected set; }
         /// <summary>
         /// Wheight or chance of behavior when is behavior is child of a RandomSelector
         /// </summary>

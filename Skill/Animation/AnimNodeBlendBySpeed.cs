@@ -69,13 +69,13 @@ namespace Skill.Animation
             BlendDownDelay = 0;
             _PreActiveIndex = 0;
         }
-                
-        private void MoveTowardsTarget(ref float[] blendWeights)
+
+        private void MoveTowardsTarget(ref BlendWeight[] blendWeights)
         {
             float blendRate = BlendRate;
             for (int i = 0; i < blendWeights.Length; i++)
             {
-                float f = blendWeights[i];
+                float f = blendWeights[i].Weight;
                 float t = _TargetBlendWeights[i];
 
                 if (f < t)
@@ -90,8 +90,8 @@ namespace Skill.Animation
                     if (f < t)
                         f = t;
                 }
-                blendWeights[i] = f;
-            }            
+                blendWeights[i].SetBoth(f);
+            }
         }
 
         private void CalcTargetBlendWeights(int index)
@@ -143,8 +143,8 @@ namespace Skill.Animation
         /// <summary>
         /// Calculate weight of children between 0.0f - 1.0f
         /// </summary>
-        /// <param name="blendWeights">previous weight of children</param>
-        protected override void CalcBlendWeights(ref float[] blendWeights)
+        /// <param name="blendWeights">previous weight of children</param>        
+        protected override void CalcBlendWeights(ref BlendWeight[] blendWeights)
         {
             for (int i = 0; i < _TargetBlendWeights.Length; i++)
                 _TargetBlendWeights[i] = 0;

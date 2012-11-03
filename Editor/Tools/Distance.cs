@@ -59,6 +59,8 @@ namespace Skill.Editor.Tools
 
         #region UI
 
+        private static readonly Vector3 LabelOffset = new Vector3(0, 0.5f, 0);
+
         private Skill.Editor.UI.EditorFrame _Frame;
         private Skill.UI.Box _Title;
         private Skill.Editor.UI.LayerMaskField _Layers;
@@ -74,9 +76,16 @@ namespace Skill.Editor.Tools
         private bool _IsStartPointPicked;
         private bool _IsEndPointPicked;
 
+        private GUIStyle _LableStyle;
 
         private void CreateUI()
         {
+            _LableStyle = new GUIStyle()
+            {
+                normal = new GUIStyleState() { textColor = Color.black, background = Resources.WhiteTexture },
+                padding = new RectOffset(2, 2, 2, 2)
+            };
+
             _Frame = new Skill.Editor.UI.EditorFrame(this);
 
             _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30, GridUnitType.Pixel) });
@@ -159,36 +168,76 @@ namespace Skill.Editor.Tools
             {
                 Event e = Event.current;
 
+                bool colide = false;
                 Ray r = Camera.current.ScreenPointToRay(new Vector3(e.mousePosition.x, -e.mousePosition.y + Camera.current.pixelHeight));
                 RaycastHit hit;
                 if (Physics.Raycast(r, out hit, 1000, _Layers.Layers))
                 {
-                    if (e.isMouse && e.type == EventType.MouseDown && e.button == 1 && e.modifiers == EventModifiers.Control)
+                    colide = true;
+                    Handles.color = Color.red;
+                    Handles.ArrowCap(0, hit.point, Quaternion.LookRotation(hit.normal), 0.5f);
+                    Handles.SphereCap(0, hit.point, Quaternion.LookRotation(hit.normal), 0.1f);
+                    SceneView.currentDrawingSceneView.Repaint();
+                }
+
+                if (colide && e.isMouse && e.type == EventType.MouseDown && e.button == 1 && e.modifiers == EventModifiers.Control)
+                {
+                    if (_IsStartPointPicked)
                     {
-                        if (_IsStartPointPicked)
+                        if (_IsEndPointPicked)
                         {
-                            _EndPoint = hit.point;
-                            _LblEndPoint.Label2.text = _EndPoint.ToString();
-                            _IsStartPointPicked = false;
-                            _IsEndPointPicked = true;
+                            _StartPoint = hit.point;
+                            _IsEndPointPicked = false;
+                            _IsStartPointPicked = true;
                         }
                         else
                         {
-                            _EndPoint = _StartPoint = hit.point;
-                            _LblStartPoint.Label2.text = _StartPoint.ToString();
-                            _LblDistance.Label2.text = "0";
-                            _IsStartPointPicked = true;
-                            _IsEndPointPicked = false;
-                            Repaint();
+                            _EndPoint = hit.point;
+                            _IsEndPointPicked = true;
                         }
                     }
-                    if (_IsEndPointPicked)
+                    else
                     {
-                        _LblDistance.Label2.text = Vector3.Distance(_StartPoint, _EndPoint).ToString("F4");
-                        Debug.DrawLine(_StartPoint, _EndPoint, Color.red, 0.1f);
-                        Repaint();
+                        _StartPoint = hit.point;
                         _IsEndPointPicked = false;
+                        _IsStartPointPicked = true;
                     }
+
+                    if (_IsStartPointPicked)
+                        _LblStartPoint.Label2.text = _StartPoint.ToString();
+                    else
+                        _LblStartPoint.Label2.text = "";
+
+                    if (_IsEndPointPicked)
+                        _LblEndPoint.Label2.text = _EndPoint.ToString();
+                    else
+                        _LblEndPoint.Label2.text = "";
+
+                    if (_IsEndPointPicked && _IsStartPointPicked)
+                        _LblDistance.Label2.text = Vector3.Distance(_StartPoint, _EndPoint).ToString("F4");
+                    else
+                        _LblDistance.Label2.text = "---";
+                    Repaint();
+                }
+
+                if (_IsStartPointPicked)
+                {
+                    Handles.color = Color.grey;
+                    Handles.SphereCap(0, _StartPoint, Quaternion.identity, 0.1f);
+                }
+                if (_IsEndPointPicked)
+                {
+                    Handles.color = Color.grey;
+                    Handles.SphereCap(0, _EndPoint, Quaternion.identity, 0.1f);
+                }
+
+                if (_IsEndPointPicked && _IsStartPointPicked)
+                {
+                    Handles.color = Color.red;
+                    Handles.DrawLine(_StartPoint, _EndPoint);
+                    Handles.color = Color.red;
+                    Handles.Label((_StartPoint + _EndPoint) / 2 + LabelOffset,
+                     string.Format("Distance = {0}", Vector3.Distance(_StartPoint, _EndPoint).ToString("F4")), _LableStyle);
                 }
             }
         }

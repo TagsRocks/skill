@@ -43,21 +43,12 @@ namespace Skill.Animation
     {
 
         private AnimNode[] _Children;// childrens
-        private float _PreWeight; // previous amount of weight
-        private float _Weight; // last setted amount of weight        
+        private float _PreWeight; // previous amount of weight        
 
         /// <summary>
-        /// Get or set weight of node (0.0f - 1.0f)
+        /// Weight of node (0.0f - 1.0f)
         /// </summary>
-        public virtual float Weight
-        {
-            get { return _Weight; }
-            internal set
-            {
-                _Weight = value;
-                if (_Weight < 0) _Weight = 0; else if (_Weight > 1) _Weight = 1;
-            }
-        }
+        public BlendWeight BlendWeight { get; private set; }
 
         /// <summary>
         /// Retrieves weight state of node depend on previous frame
@@ -80,7 +71,7 @@ namespace Skill.Animation
         /// <summary>
         /// This node is considered 'relevant' - that is, has >0 weight in the final blend.
         /// </summary> 
-        public bool IsRelevant { get { return Weight > 0; } }
+        public bool IsRelevant { get { return BlendWeight.Weight > 0; } }
 
         /// <summary>
         /// set to true when this node became relevant this round of updates. Will be set to false on the next tick.
@@ -161,11 +152,13 @@ namespace Skill.Animation
         /// <param name="childCount">Number of childrent</param>
         protected AnimNode(int childCount)
         {
-            Parent = null;
-            Index = -1;
-            _Children = new AnimNode[childCount];
-            IsJustBecameRelevant = false;
-            IsJustCeaseRelevant = false;
+            this.BlendWeight = new Animation.BlendWeight();
+            this.Parent = null;
+            this.Index = -1;
+            this._Children = new AnimNode[childCount];
+
+            this.IsJustBecameRelevant = false;
+            this.IsJustCeaseRelevant = false;
         }
 
         /// <summary>
@@ -198,18 +191,18 @@ namespace Skill.Animation
             IsJustBecameRelevant = false;
             IsJustCeaseRelevant = false;
 
-            if (_Weight > _PreWeight)
+            if (BlendWeight.Weight > _PreWeight)
                 WeightChange = WeightChangeMode.Increased;
-            else if (_Weight < _PreWeight)
+            else if (BlendWeight.Weight < _PreWeight)
                 WeightChange = WeightChangeMode.Decreased;
             else
                 WeightChange = WeightChangeMode.NoChange;
 
-            if (_PreWeight == 0 && _Weight > 0) OnBecameRelevant(state);
-            else if (_PreWeight > 0 && _Weight == 0) OnCeaseRelevant(state);
-            _PreWeight = _Weight;
+            if (_PreWeight == 0 && BlendWeight.Weight > 0) OnBecameRelevant(state);
+            else if (_PreWeight > 0 && BlendWeight.Weight == 0) OnCeaseRelevant(state);
+            _PreWeight = BlendWeight.Weight;
 
-            if (Weight == 0 && !IsJustCeaseRelevant)
+            if (BlendWeight.Weight == 0 && !IsJustCeaseRelevant)
                 return false;
             return true;
         }
@@ -222,7 +215,7 @@ namespace Skill.Animation
         /// <summary>
         /// Retrieves lenght of active sub branch
         /// </summary>
-        public abstract float Length { get; }        
+        public abstract float Length { get; }
 
 
         /// <summary>

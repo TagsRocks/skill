@@ -32,7 +32,7 @@ namespace Skill.Animation
         /// Whether actor is idle?
         /// </summary>
         public bool IsIdle { get; set; }
-        
+
 
         /// <summary>
         /// Retrieves lenght of active sub branch
@@ -55,14 +55,15 @@ namespace Skill.Animation
         /// <summary>
         /// Calculate weight of children between 0.0f - 1.0f
         /// </summary>
-        /// <param name="blendWeights">previous weight of children</param>
-        protected override void CalcBlendWeights(ref float[] blendWeights)
+        /// <param name="blendWeights">previous weight of children</param>        
+        protected override void CalcBlendWeights(ref BlendWeight[] blendWeights)
         {
             if (IsIdle) IdleWeight += BlendRate;
             else IdleWeight -= BlendRate;
 
-            blendWeights[1] = _IdleWeight;
-            blendWeights[0] = 1.0f;
+            blendWeights[1].SetBoth(_IdleWeight);
+            blendWeights[0].Weight = 1.0f;
+            blendWeights[0].RootMotion = 1.0f - _IdleWeight;
         }
 
         /// <summary>

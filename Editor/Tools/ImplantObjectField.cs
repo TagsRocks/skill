@@ -113,15 +113,15 @@ namespace Skill.Editor.Tools
             this._RandomRotation.ZComponent.Unchecked += new EventHandler(RandomXYZComponent_Checked);
 
             this._CustomRotation.ValueChanged += new EventHandler(_CustomRotation_ValueChanged);
-            this._RandomYaw.Checked += new EventHandler(_RandomYaw_Checked);
-            this._RandomYaw.Unchecked += new EventHandler(_RandomYaw_Checked);
+            this._RandomYaw.Changed += new EventHandler(_RandomYaw_Changed);
+            
 
             this._Panel.LayoutChanged += Panel_LayoutChanged;
         }
 
-        void _RandomYaw_Checked(object sender, EventArgs e)
+        void _RandomYaw_Changed(object sender, EventArgs e)
         {
-            Object.RandomY = _RandomYaw.IsChecked;
+            Object.RandomYaw = _RandomYaw.IsChecked;
         }
 
         void _CustomRotation_ValueChanged(object sender, EventArgs e)

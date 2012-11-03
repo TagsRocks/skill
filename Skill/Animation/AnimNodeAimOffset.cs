@@ -222,15 +222,15 @@ namespace Skill.Animation
         /// <summary>
         /// Calculate weight of children between 0.0f - 1.0f
         /// </summary>
-        /// <param name="blendWeights">previous weight of children</param>
-        protected override void CalcBlendWeights(ref float[] blendWeights)
+        /// <param name="blendWeights">previous weight of children</param>        
+        protected override void CalcBlendWeights(ref BlendWeight[] blendWeights)
         {
             if (IsAimEnable)
                 AimWeight += BlendRate;
             else
                 AimWeight -= BlendRate;
 
-            blendWeights[0] = 1;// normal node is 1
+            blendWeights[0].SetBoth(1);// normal node is 1
             if (_SelectedProfile != null && IsAimEnable)
             {
 
@@ -242,23 +242,23 @@ namespace Skill.Animation
                     DisableRight(ref blendWeights);
                     if (y < 0) // left down side is enable
                     {
-                        blendWeights[LeftUpIndex] = 0;
-                        blendWeights[CenterUpIndex] = 0;
+                        blendWeights[LeftUpIndex].SetBoth(0);
+                        blendWeights[CenterUpIndex].SetBoth(0);
 
-                        blendWeights[LeftCenterIndex] = ((-x) * (1.0f + y)) * _AimWeight;
-                        blendWeights[LeftDownIndex] = ((-x) * (-y)) * _AimWeight;
-                        blendWeights[CenterCenterIndex] = ((1.0f + x) * (1.0f + y)) * _AimWeight;
-                        blendWeights[CenterDownIndex] = ((1.0f + x) * (-y)) * _AimWeight;
+                        blendWeights[LeftCenterIndex].SetBoth(((-x) * (1.0f + y)) * _AimWeight);
+                        blendWeights[LeftDownIndex].SetBoth(((-x) * (-y)) * _AimWeight);
+                        blendWeights[CenterCenterIndex].SetBoth(((1.0f + x) * (1.0f + y)) * _AimWeight);
+                        blendWeights[CenterDownIndex].SetBoth(((1.0f + x) * (-y)) * _AimWeight);
                     }
                     else // left up side is enable
                     {
-                        blendWeights[LeftDownIndex] = 0;
-                        blendWeights[CenterDownIndex] = 0;
+                        blendWeights[LeftDownIndex].SetBoth(0);
+                        blendWeights[CenterDownIndex].SetBoth(0);
 
-                        blendWeights[LeftCenterIndex] = ((-x) * (1.0f - y)) * _AimWeight;
-                        blendWeights[LeftUpIndex] = ((-x) * (y)) * _AimWeight;
-                        blendWeights[CenterCenterIndex] = ((1.0f + x) * (1.0f - y)) * _AimWeight;
-                        blendWeights[CenterUpIndex] = ((1.0f + x) * (y)) * _AimWeight;
+                        blendWeights[LeftCenterIndex].SetBoth(((-x) * (1.0f - y)) * _AimWeight);
+                        blendWeights[LeftUpIndex].SetBoth(((-x) * (y)) * _AimWeight);
+                        blendWeights[CenterCenterIndex].SetBoth(((1.0f + x) * (1.0f - y)) * _AimWeight);
+                        blendWeights[CenterUpIndex].SetBoth(((1.0f + x) * (y)) * _AimWeight);
                     }
                 }
                 else// right side is enable
@@ -266,23 +266,23 @@ namespace Skill.Animation
                     DisableLeft(ref blendWeights);
                     if (y < 0) // right down side is enable
                     {
-                        blendWeights[RightUpIndex] = 0;
-                        blendWeights[CenterUpIndex] = 0;
+                        blendWeights[RightUpIndex].SetBoth(0);
+                        blendWeights[CenterUpIndex].SetBoth(0);
 
-                        blendWeights[RightCenterIndex] = ((x) * (1.0f + y)) * _AimWeight;
-                        blendWeights[RightDownIndex] = ((x) * (-y)) * _AimWeight;
-                        blendWeights[CenterCenterIndex] = ((1.0f - x) * (1.0f + y)) * _AimWeight;
-                        blendWeights[CenterDownIndex] = ((1.0f - x) * (-y)) * _AimWeight;
+                        blendWeights[RightCenterIndex].SetBoth(((x) * (1.0f + y)) * _AimWeight);
+                        blendWeights[RightDownIndex].SetBoth(((x) * (-y)) * _AimWeight);
+                        blendWeights[CenterCenterIndex].SetBoth(((1.0f - x) * (1.0f + y)) * _AimWeight);
+                        blendWeights[CenterDownIndex].SetBoth(((1.0f - x) * (-y)) * _AimWeight);
                     }
                     else // right up side is enable
                     {
-                        blendWeights[RightDownIndex] = 0;
-                        blendWeights[CenterDownIndex] = 0;
+                        blendWeights[RightDownIndex].SetBoth(0);
+                        blendWeights[CenterDownIndex].SetBoth(0);
 
-                        blendWeights[RightCenterIndex] = ((x) * (1.0f - y)) * _AimWeight;
-                        blendWeights[RightUpIndex] = ((x) * (y)) * _AimWeight;
-                        blendWeights[CenterCenterIndex] = ((1.0f - x) * (1.0f - y)) * _AimWeight;
-                        blendWeights[CenterUpIndex] = ((1.0f - x) * (y)) * _AimWeight;
+                        blendWeights[RightCenterIndex].SetBoth(((x) * (1.0f - y)) * _AimWeight);
+                        blendWeights[RightUpIndex].SetBoth(((x) * (y)) * _AimWeight);
+                        blendWeights[CenterCenterIndex].SetBoth(((1.0f - x) * (1.0f - y)) * _AimWeight);
+                        blendWeights[CenterUpIndex].SetBoth(((1.0f - x) * (y)) * _AimWeight);
                     }
                 }
             }
@@ -290,23 +290,23 @@ namespace Skill.Animation
             {
                 for (int i = 1; i < this.ChildCount; i++)
                 {
-                    blendWeights[i] *= _AimWeight;
+                    blendWeights[i].SetBoth(blendWeights[i].Weight * _AimWeight);
                 }
             }
         }
 
-        private void DisableLeft(ref float[] blendWeights)
+        private void DisableLeft(ref BlendWeight[] blendWeights)
         {
-            blendWeights[LeftUpIndex] = 0;
-            blendWeights[LeftDownIndex] = 0;
-            blendWeights[LeftCenterIndex] = 0;
+            blendWeights[LeftUpIndex].SetBoth(0);
+            blendWeights[LeftDownIndex].SetBoth(0);
+            blendWeights[LeftCenterIndex].SetBoth(0);
         }
 
-        private void DisableRight(ref float[] blendWeights)
+        private void DisableRight(ref BlendWeight[] blendWeights)
         {
-            blendWeights[RightUpIndex] = 0;
-            blendWeights[RightDownIndex] = 0;
-            blendWeights[RightCenterIndex] = 0;
+            blendWeights[RightUpIndex].SetBoth(0);
+            blendWeights[RightDownIndex].SetBoth(0);
+            blendWeights[RightCenterIndex].SetBoth(0);
         }
 
         /// <summary>

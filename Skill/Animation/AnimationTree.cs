@@ -169,7 +169,7 @@ namespace Skill.Animation
             foreach (var layer in LayerManager.Layers)
                 layer.BeginUpdate();
 
-            Root.Weight = 1;
+            Root.BlendWeight.SetBoth(1.0f);            
             Root.Update(_State);
 
             _RootMotion = UnityEngine.Vector3.zero;

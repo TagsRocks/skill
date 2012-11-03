@@ -71,7 +71,7 @@ namespace Skill.Editor.Tools
         {
             _Frame = new Skill.Editor.UI.EditorFrame(this);
             _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) });
-            _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) });            
+            _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) });
             _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30, GridUnitType.Pixel) });
             _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) });
             _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
@@ -151,64 +151,72 @@ namespace Skill.Editor.Tools
         }
 
         void UpdateScene(SceneView sceneview)
-        {
+        {            
             if (_IsImplantEnable)
             {
                 Event e = Event.current;
+                bool colide = false;
+                Ray r = Camera.current.ScreenPointToRay(new Vector3(e.mousePosition.x, -e.mousePosition.y + Camera.current.pixelHeight));
+                RaycastHit hit;
+                if (Physics.Raycast(r, out hit, 1000, _Layers.Layers))
+                {
+                    colide = true;
+                    Handles.color = Color.red;
+                    Handles.ArrowCap(0, hit.point, Quaternion.LookRotation(hit.normal), 0.5f);
+                    Handles.SphereCap(0, hit.point, Quaternion.LookRotation(hit.normal), 0.1f);
+                    SceneView.currentDrawingSceneView.Repaint();
+                }
 
-                if (e.isMouse && e.type == EventType.MouseDown && e.button == 1 && e.modifiers == EventModifiers.Control)
+                if (colide && e.isMouse && e.type == EventType.MouseDown && e.button == 1 && e.modifiers == EventModifiers.Control)
                 {
                     ImplantObject randomObj = GetRandomImplantObject();
 
                     if (randomObj != null && randomObj.Prefab != null)
                     {
-                        Ray r = Camera.current.ScreenPointToRay(new Vector3(e.mousePosition.x, -e.mousePosition.y + Camera.current.pixelHeight));
-                        RaycastHit hit;
-                        if (Physics.Raycast(r, out hit, 1000, _Layers.Layers))
+                        GameObject obj = PrefabUtility.InstantiatePrefab(randomObj.Prefab) as GameObject;
+                        if (obj != null)
                         {
-                            GameObject obj = PrefabUtility.InstantiatePrefab(randomObj.Prefab) as GameObject;
-                            if (obj != null)
+                            // scale                                
+                            obj.transform.localScale *= UnityEngine.Random.Range(randomObj.MinScalePercent, randomObj.MaxScalePercent);
+
+                            // position
+                            obj.transform.position = hit.point;
+
+                            // rotation
+                            Quaternion rotation = obj.transform.rotation;
+                            if (randomObj.Rotation == ImplantObjectRotation.Random)
                             {
-
-                                // scale                                
-                                obj.transform.localScale *= UnityEngine.Random.Range(randomObj.MinScalePercent, randomObj.MaxScalePercent);
-
-                                // position
-                                obj.transform.position = hit.point;
-
-                                // rotation
-                                Quaternion rotation = obj.transform.rotation;
-                                if (randomObj.Rotation == ImplantObjectRotation.Random)
-                                {
-                                    Vector3 euler = obj.transform.eulerAngles;
-                                    if (randomObj.RandomX) euler.x = UnityEngine.Random.Range(0.0f, 360.0f);
-                                    if (randomObj.RandomY) euler.y = UnityEngine.Random.Range(0.0f, 360.0f);
-                                    if (randomObj.RandomZ) euler.z = UnityEngine.Random.Range(0.0f, 360.0f);
-                                    rotation = Quaternion.Euler(euler);
-                                }
-                                else if (randomObj.Rotation == ImplantObjectRotation.Custom)
-                                {
-                                    rotation = Quaternion.Euler(randomObj.CustomRotation);
-                                }
-                                else
-                                {
-                                    rotation *= Quaternion.FromToRotation(obj.transform.up, hit.normal);
-
-                                    if (randomObj.RandomYaw)
-                                    {
-                                        rotation *= Quaternion.Euler(0, UnityEngine.Random.Range(0.0f, 360.0f), 0);
-                                    }
-
-                                }
-                                obj.transform.rotation = rotation;
-                                Undo.RegisterCreatedObjectUndo(obj, "Create " + obj.name);
+                                Vector3 euler = obj.transform.eulerAngles;
+                                if (randomObj.RandomX) euler.x = UnityEngine.Random.Range(0.0f, 360.0f);
+                                if (randomObj.RandomY) euler.y = UnityEngine.Random.Range(0.0f, 360.0f);
+                                if (randomObj.RandomZ) euler.z = UnityEngine.Random.Range(0.0f, 360.0f);
+                                rotation = Quaternion.Euler(euler);
                             }
+                            else if (randomObj.Rotation == ImplantObjectRotation.Custom)
+                            {
+                                rotation = Quaternion.Euler(randomObj.CustomRotation);
+                            }
+                            else
+                            {
+                                rotation *= Quaternion.FromToRotation(obj.transform.up, hit.normal);
+
+                                if (randomObj.RandomYaw)
+                                {
+                                    rotation *= Quaternion.Euler(0, UnityEngine.Random.Range(0.0f, 360.0f), 0);
+                                }
+
+                            }
+                            obj.transform.rotation = rotation;
+                            Undo.RegisterCreatedObjectUndo(obj, "Create " + obj.name);
                         }
+
                     }
                     else
                     {
                         Debug.LogWarning("Please set valid prefab to implant");
                     }
+
+                    e.Use();
                 }
             }
         }

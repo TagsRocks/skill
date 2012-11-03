@@ -72,6 +72,10 @@
       <HintPath>Avalon\AvalonDock.Themes.dll</HintPath>
     </Reference>
     <Reference Include="PresentationFramework.Aero" />
+    <Reference Include="Skill.Fbx, Version=1.0.4674.40977, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Release\Skill.Fbx.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
@@ -705,8 +709,8 @@
     <Resource Include="Images\StartLogo.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Avalon\AvalonDock.dll" />
-    <Content Include="Avalon\AvalonDock.Themes.dll" />
+    <None Include="Avalon\AvalonDock.dll" />
+    <None Include="Avalon\AvalonDock.Themes.dll" />
     <Resource Include="Compiler\ErrorTemplates.txt" />
     <Resource Include="Images\Animation\ByIndex.png" />
     <Resource Include="Images\Animation\Random.png" />
@@ -800,10 +804,6 @@
     <ProjectReference Include="..\Editor\Editor.csproj">
       <Project>{DB02ABC1-D536-4EEA-84D5-A3736F7E4C39}</Project>
       <Name>Editor</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Fbx\Fbx.vcxproj">
-      <Project>{6DB70F0E-475D-467C-828E-9A5E97A04660}</Project>
-      <Name>Fbx</Name>
     </ProjectReference>
     <ProjectReference Include="..\Skill\Skill.csproj">
       <Project>{5AAE3714-704C-4150-91FE-B73B05808D14}</Project>

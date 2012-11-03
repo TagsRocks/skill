@@ -49,6 +49,34 @@ namespace Skill.AI
             this._Handler = handler;
         }
 
+
+        // Let action know that we update it manually
+        internal bool AlreadyUpdated { get; set; }
+
+        // update action manually when action is running
+        internal void UpdateImmediately(BehaviorState state)
+        {            
+            try
+            {
+                // execute handler and get result back
+                if (this._Handler != null)
+                    this.Result = this._Handler(state.Parameters);
+                else
+                    this.Result = BehaviorResult.Failure;// by default failure
+
+                this.AlreadyUpdated = true;
+
+                // we do not remove action from RunningActions here because this method called inside a foreach of RunningActions 
+                // and we can not modify list inside foreach
+            }
+            catch (Exception ex)
+            {
+                state.Exception = ex;
+                this.Result = BehaviorResult.Failure;
+                return;
+            }                        
+        }
+
         /// <summary>
         /// Behave
         /// </summary>
@@ -56,6 +84,12 @@ namespace Skill.AI
         /// <returns>Result of action</returns>
         protected override BehaviorResult Behave(BehaviorState state)
         {
+            if (AlreadyUpdated)
+            {
+                AlreadyUpdated = false;
+                return Result;
+            }
+
             BehaviorResult result = BehaviorResult.Failure;// by default failure
 
             // execute handler and get result back            
@@ -63,7 +97,7 @@ namespace Skill.AI
 
             // if action needs to run next frame store it's reference
             if (result == BehaviorResult.Running)
-                state.RunningActions.Add(this);
+                state.RunningActions.Add(this, state.Parameters);
             else
                 state.RunningActions.Remove(this);
             return result;
@@ -74,6 +108,7 @@ namespace Skill.AI
         /// </summary>        
         protected virtual void OnReset()
         {
+            AlreadyUpdated = false;
             if (Reset != null) Reset(this);
         }
 

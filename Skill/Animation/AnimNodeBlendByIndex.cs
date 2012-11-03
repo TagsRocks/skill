@@ -91,13 +91,13 @@ namespace Skill.Animation
         /// <summary>
         /// Calculate weight of children between 0.0f - 1.0f
         /// </summary>
-        /// <param name="blendWeights">previous weight of children</param>
-        protected override void CalcBlendWeights(ref float[] blendWeights)
+        /// <param name="blendWeights">previous weight of children</param>        
+        protected override void CalcBlendWeights(ref BlendWeight[] blendWeights)
         {
             float blendRate = BlendRate;
             for (int i = 0; i < blendWeights.Length; i++)
             {
-                float f = blendWeights[i];
+                float f = blendWeights[i].Weight;
                 if (i == _SelectedChildIndex)
                 {
                     f += blendRate;
@@ -111,7 +111,7 @@ namespace Skill.Animation
                         f = 0;
                 }
 
-                blendWeights[i] = f;
+                blendWeights[i].SetBoth(f);
             }
         }
     }

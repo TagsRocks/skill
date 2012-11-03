@@ -91,6 +91,7 @@ namespace Skill.Studio
             "Skill.UnityCSharpCodeGeneration.dll",
             "Skill.DataModels.dll",
             "Skill.Editor.dll",
+            "Skill.Fbx.dll",
             "nunit.framework.dll",
             "UnityEditor.dll",
             "UnityEngine.dll",

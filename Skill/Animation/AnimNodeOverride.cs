@@ -67,7 +67,7 @@ namespace Skill.Animation
         /// remember to disable IsOverriding when actor is not idle
         /// </remarks>
         public float OverridePeriod { get; set; }
-        
+
 
         /// <summary>
         /// Lenght of active branch
@@ -130,7 +130,7 @@ namespace Skill.Animation
         /// </summary>
         /// <param name="state">State of AnimationTree</param>
         internal override void Update(AnimationTreeState state)
-        {                    
+        {
             if (_OverrideTimer.Enabled)
             {
                 if (_OverrideTimer.IsOver)
@@ -179,14 +179,14 @@ namespace Skill.Animation
         /// <summary>
         /// Calculate weight of children between 0.0f - 1.0f
         /// </summary>
-        /// <param name="blendWeights">previous weight of children</param>
-        protected override void CalcBlendWeights(ref float[] blendWeights)
+        /// <param name="blendWeights">previous weight of children</param>        
+        protected override void CalcBlendWeights(ref BlendWeight[] blendWeights)
         {
-            blendWeights[0] = 1;
+            blendWeights[0].SetBoth(1);
             float blendRate = BlendRate;
             for (int i = 1; i < blendWeights.Length; i++)
             {
-                float f = blendWeights[i];
+                float f = blendWeights[i].Weight;
                 if (IsOverriding && i == _OverrideIndex)
                 {
                     f += blendRate;
@@ -200,7 +200,7 @@ namespace Skill.Animation
                         f = 0;
                 }
 
-                blendWeights[i] = f;
+                blendWeights[i].SetBoth(f);
             }
         }
 

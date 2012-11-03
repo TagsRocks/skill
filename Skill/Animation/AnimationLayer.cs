@@ -66,14 +66,14 @@ namespace Skill.Animation
             foreach (var node in ActiveAnimNodes)
             {
                 if (node.RootMotion.State.IsEnable)
-                    _RootMotion += node.RootMotion.Motion * node.Weight;
+                    _RootMotion += node.RootMotion.Motion * node.BlendWeight.RootMotion;
 
                 if (_Synchronization)
                 {
-                    if (node.Weight > maxW)
+                    if (node.BlendWeight.Weight > maxW)
                     {
                         _MaxReleavant = node;
-                        maxW = node.Weight;
+                        maxW = node.BlendWeight.Weight;
                     }
                 }
             }
@@ -111,7 +111,7 @@ namespace Skill.Animation
             int i = 0;
             while (i < ActiveAnimNodes.Count)
             {
-                if (ActiveAnimNodes[i].Weight == 0.0f)
+                if (ActiveAnimNodes[i].BlendWeight.Weight == 0.0f)
                 {
                     ActiveAnimNodes.RemoveAt(i);
                     continue;
@@ -212,10 +212,10 @@ namespace Skill.Animation
                         state.blendMode = BlendMode;
                         state.wrapMode = anim.WrapMode;
                         state.layer = LayerIndex;
-                        state.weight = anim.Weight;
+                        state.weight = anim.BlendWeight.Weight;
 
                         // disable or enable animation
-                        if (anim.Weight == 0)
+                        if (anim.BlendWeight.Weight == 0)
                             state.enabled = false;
                         else
                             state.enabled = true;

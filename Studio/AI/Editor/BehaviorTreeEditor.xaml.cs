@@ -846,7 +846,7 @@ namespace Skill.Studio.AI.Editor
             List<GifImage> activeAnimations = new List<GifImage>();
             foreach (var item in _DebugBehaviorTree.State.RunningActions)
             {
-                ActionViewModel ac = item.Tag as ActionViewModel;
+                ActionViewModel ac = item.Action.Tag as ActionViewModel;
                 if (ac != null)
                     activeAnimations.Add(ac.GifAnimation);
             }

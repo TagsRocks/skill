@@ -31,6 +31,7 @@ namespace Skill.Editor
             SetTextureImportType(GetUIResourcePath("Failure.png"), TextureImporterType.GUI);
             SetTextureImportType(GetUIResourcePath("Success.png"), TextureImporterType.GUI);
             SetTextureImportType(GetUIResourcePath("Running.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("White.png"), TextureImporterType.GUI);
         }
 
         private static Texture2D LoadTexture2D(string path)
@@ -115,6 +116,18 @@ namespace Skill.Editor
                 if (_Running == null)
                     _Running = LoadTexture2D(GetUIResourcePath("Running.png"));
                 return _Running;
+            }
+        }
+
+
+        private static Texture2D _WhiteTexture;
+        public static Texture2D WhiteTexture
+        {
+            get
+            {
+                if (_WhiteTexture == null)
+                    _WhiteTexture = LoadTexture2D(GetUIResourcePath("White.png"));
+                return _WhiteTexture;
             }
         }
     }
