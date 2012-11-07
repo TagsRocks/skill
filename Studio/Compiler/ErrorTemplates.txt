@@ -17,6 +17,7 @@ AI:
 
 		Warnings :			
 			1- Composite With no children.
+			2- A Decorator with NeverFail property setted to true is child of PrioritySelector.
 			
 	SharedAccessKeys:
 		Errors :

@@ -72,7 +72,7 @@
       <HintPath>Avalon\AvalonDock.Themes.dll</HintPath>
     </Reference>
     <Reference Include="PresentationFramework.Aero" />
-    <Reference Include="Skill.Fbx, Version=1.0.4674.40977, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="Skill.Fbx, Version=1.0.4674.41233, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Release\Skill.Fbx.dll</HintPath>
     </Reference>

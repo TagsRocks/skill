@@ -78,7 +78,7 @@
                             </GridViewColumn.Header>
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Path=Description}" Foreground="Black" />
+                                    <TextBlock Text="{Binding Path=Description}" Foreground="Black" ToolTip="{Binding Path=Description}" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>

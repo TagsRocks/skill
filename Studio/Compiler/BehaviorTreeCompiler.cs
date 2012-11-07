@@ -157,6 +157,19 @@ namespace Skill.Studio.Compiler
                     {
                         AddWarning(string.Format("Behaviors node {0} has not any children.", b.Name));
                     }
+                    if (((Composite)b).CompositeType == CompositeType.Priority) // check if a Decorator with NeverFaile property is child of PrioritySelector
+                    {
+                        foreach (var child in b)
+                        {
+                            if (child != null && child.BehaviorType == BehaviorType.Decorator)
+                            {
+                                if (((Decorator)child).NeverFail)
+                                {
+                                    AddWarning(string.Format("Decorator '{0}' with 'NeverFail' property setted to 'true' is child of PrioritySelector '{1}'. This cause next children unreachable.", child.Name, b.Name));
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

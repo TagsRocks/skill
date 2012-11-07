@@ -16,6 +16,8 @@ namespace Skill.Studio.Compiler
 
         protected override void Compile()
         {
+            if (!System.IO.Directory.Exists(Node.Project.Settings.OutputLocaltion))
+                AddError(string.Format("Project Output Localtion : '{0}' doesn not exists", Node.Project.Settings.OutputLocaltion));
             CreateNodeList();
             SearchForDuplicateNames(Node as ProjectRootNodeViewModel);
         }

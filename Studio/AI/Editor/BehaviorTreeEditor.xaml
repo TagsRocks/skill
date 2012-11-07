@@ -185,7 +185,7 @@
                     <my:ToggleMediaButton x:Name="_BtnPlayStop" NormalImage="{StaticResource ImgPlayStopBtn}" PressedImage="{StaticResource ImgPlayStopPressedBtn}" HoverImage="{StaticResource ImgPlayStopHoverBtn}" Style="{StaticResource BtnStyle}" Click="BtnPlayStop_Click" />
                     <my:ToggleMediaButton x:Name="_BtnPause" NormalImage="{StaticResource ImgPauseBtn}" PressedImage="{StaticResource ImgPausePressedBtn}" HoverImage="{StaticResource ImgPauseHoverBtn}" Style="{StaticResource BtnStyle}" Click="BtnPause_Click" />
                     <my:MediaButton IsEnabled="{Binding IsChecked,ElementName=_BtnPause}" x:Name="_BtnStep" NormalImage="{StaticResource ImgStepBtn}" PressedImage="{StaticResource ImgStepPressedBtn}" HoverImage="{StaticResource ImgStepHoverBtn}" Style="{StaticResource BtnStyle}" Click="BtnStep_Click" />
-                    <ComboBox x:Name="_CmbTimeInterval" ItemsSource="{Binding TimeIntervals,ElementName=BTEditor }" Style="{StaticResource BtnStyle}" Width="40" SelectionChanged="CmbTimeInterval_SelectionChanged" />
+                    <ComboBox x:Name="_CmbTimeInterval" ItemsSource="{Binding TimeIntervals,ElementName=BTEditor }" Style="{StaticResource BtnStyle}" Width="60" SelectionChanged="CmbTimeInterval_SelectionChanged" />
                     <TextBox Text="{Binding BehaviorTree.DebugTimerString, Mode=OneWay}" />
                     <Slider Width="100" Value="{Binding AnimationSize}" Minimum="64" Maximum="194" ToolTip="Animation Size" Margin="4,0,0,0" />
                 </StackPanel>

@@ -148,6 +148,45 @@ namespace Skill.Text
         /// <summary> ئ </summary>
         public PersianCharacter YehWithHamzaAbove { get; private set; }
 
+
+        // special characters
+
+        /// <summary> ! </summary>
+        public PersianCharacter ExclamationMark { get; private set; }
+        /// <summary> . </summary>
+        public PersianCharacter Dot { get; private set; }
+        /// <summary> $ </summary>
+        public PersianCharacter DollarSign { get; private set; }
+        /// <summary> % </summary>
+        public PersianCharacter PercentSign { get; private set; }
+        /// <summary> & </summary>
+        public PersianCharacter Ampersand { get; private set; }
+        /// <summary> * </summary>
+        public PersianCharacter Asterisk { get; private set; }
+        /// <summary> + </summary>
+        public PersianCharacter PlusSign { get; private set; }
+        /// <summary> - </summary>
+        public PersianCharacter HyphenMinus { get; private set; }
+        /// <summary> . </summary>
+        public PersianCharacter FullStop { get; private set; }
+        /// <summary> = </summary>
+        public PersianCharacter EqualSign { get; private set; }
+        /// <summary> lth; </summary>
+        public PersianCharacter LessThanSign { get; private set; }
+        /// <summary> gth; </summary>
+        public PersianCharacter GreaterThanSign { get; private set; }
+        /// <summary> @ </summary>
+        public PersianCharacter CommercialAt { get; private set; }
+        /// <summary> ^ </summary>
+        public PersianCharacter CircumflexAccent { get; private set; }
+        /// <summary> _ </summary>
+        public PersianCharacter LowLine { get; private set; }
+
+        /// <summary> \n </summary>
+        public PersianCharacter NewLine { get; private set; }
+        /// <summary> \t </summary>
+        public PersianCharacter Tab { get; private set; }
+
         // Ligature
         /// <summary> لا </summary>
         public PersianCharacter LigatureLam { get; private set; }
@@ -235,6 +274,25 @@ namespace Skill.Text
             this.LigatureLam = new PersianCharacter('\uFEFC', '\uFEFB');
             this.LigatureAllah = new PersianCharacter('\uFDF2');
 
+            // special characters                        
+            this.ExclamationMark = new PersianCharacter('!');
+            this.Dot = new PersianCharacter('·');
+            this.DollarSign = new PersianCharacter('$');
+            this.PercentSign = new PersianCharacter('%');
+            this.Ampersand = new PersianCharacter('&');
+            this.Asterisk = new PersianCharacter('*');
+            this.PlusSign = new PersianCharacter('+');
+            this.HyphenMinus = new PersianCharacter('-');
+            this.FullStop = new PersianCharacter('.');
+            this.EqualSign = new PersianCharacter('=');
+            this.LessThanSign = new PersianCharacter('<');
+            this.GreaterThanSign = new PersianCharacter('>');
+            this.CommercialAt = new PersianCharacter('@');
+            this.CircumflexAccent = new PersianCharacter('^');
+            this.LowLine = new PersianCharacter('_');
+
+            this.NewLine = new PersianCharacter('\n');
+            this.Tab = new PersianCharacter('\t');
 
         }
 
@@ -362,6 +420,25 @@ namespace Skill.Text
             // Ligature
             CreateMap(LigatureLam, '\uFEFC', '\uFEFB');
             CreateMap(LigatureAllah, '\uFDF2');
+
+            // special character                                
+            CreateMap(ExclamationMark, '!');
+            CreateMap(Dot, '·');
+            CreateMap(DollarSign, '$');
+            CreateMap(PercentSign, '%');
+            CreateMap(Ampersand, '&');
+            CreateMap(Asterisk, '*');
+            CreateMap(PlusSign, '+');
+            CreateMap(HyphenMinus, '-');
+            CreateMap(FullStop, '.');
+            CreateMap(EqualSign, '=');
+            CreateMap(LessThanSign, '<');
+            CreateMap(GreaterThanSign, '>');
+            CreateMap(CommercialAt, '@');
+            CreateMap(CircumflexAccent, '^');
+            CreateMap(LowLine, '_');
+            CreateMap(NewLine, '\n');
+            CreateMap(Tab, '\t');
 
             if (ConvertEnglishCharacters)
             {
