@@ -745,6 +745,7 @@
     <Resource Include="Images\Default\Player\PlayStop_H.png" />
     <Resource Include="Images\Default\Player\PlayStop_P.png" />
     <Resource Include="Images\Animation\Soldier\SampleGif.gif" />
+    <Resource Include="Images\Default\Refresh.png" />
     <Content Include="WPFToolkit.Extended.dll" />
     <Resource Include="Images\Default\Disabled\Remove2.png" />
     <Resource Include="Images\Default\Remove2.png" />

@@ -612,8 +612,7 @@ namespace Skill.Studio
 
         #region Edit
         void CutCmdCanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-
+        {            
             e.CanExecute = false;
         }
         void CutCmdExecuted(object target, ExecutedRoutedEventArgs e)
@@ -652,8 +651,10 @@ namespace Skill.Studio
 
 #if DEBUG
             CopyEditorFile("Editor", "Skill.Editor.dll", overWrite);
+            CopyEditorFile("Editor", "Skill.Editor.pdb", overWrite);
             CopyEditorFile("DataModels", "Skill.DataModels.dll", overWrite);
             CopyFile("Skill", "Skill.dll", overWrite);
+            CopyFile("Skill", "Skill.pdb", overWrite);
             CopyFile("Skill", "Skill.xml", overWrite);
 #else
             Skill.CodeGeneration.RequiredFile[] files = PluginManager.Plugin.RequiredFiles;

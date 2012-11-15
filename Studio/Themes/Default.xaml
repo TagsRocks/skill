@@ -242,7 +242,7 @@
     <BitmapImage  x:Key="ImgWarning" UriSource="/SkillStudio;component/Images/Default/Warning.png" />
     <BitmapImage  x:Key="ImgMessage" UriSource="/SkillStudio;component/Images/Default/Info.png" />
 
-
+    <BitmapImage  x:Key="ImgRefresh" UriSource="/SkillStudio;component/Images/Default/Refresh.png" />
 
     <BitmapImage x:Key="ImgPlayBtn"   UriSource="/SkillStudio;component/Images/Default/Player/Play.png" />
     <BitmapImage x:Key="ImgPlayStopBtn"   UriSource="/SkillStudio;component/Images/Default/Player/PlayStop.png" />

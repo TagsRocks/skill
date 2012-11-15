@@ -64,7 +64,7 @@ namespace Skill.AI
         /// BehaviorTree call this method at begin of each update (internal use)
         /// </summary>
         public void Begin()
-        {            
+        {
             _CurrnetExecutionIndex = -1;
             _RunningStack.Swap();
         }
@@ -103,10 +103,25 @@ namespace Skill.AI
         /// <param name="behavior">Behavior to unregister</param>
         internal void UnRegisterForExecution(Behavior behavior)
         {
-            if (_RunningStack.Top != behavior)
-                throw new InvalidOperationException("Invalid behavior registeration");
-
-            _RunningStack.Pop();
+            while (_RunningStack.Count > 0)
+            {
+                Behavior top = _RunningStack.Pop();
+                if (top == behavior)
+                    break;
+                else
+                {
+                    if (top.Type == BehaviorType.Action && top.Result == BehaviorResult.Running)
+                    {
+                        if (!_RunningStack.IsInPreviousStack(top))
+                        {
+                            // this action is executed in only current update and is not registerd in running stack
+                            // the action is executed and still running but we miss to reset it next update
+                            // so we reset it here
+                            top.ResetBehavior();
+                        }
+                    }
+                }
+            }
         }
 
         private bool IsChildOf(Behavior parent, Behavior child)

@@ -17,8 +17,9 @@ AI:
 
 		Warnings :			
 			1- Composite With no children.
-			2- A Decorator with NeverFail property setted to true is child of PrioritySelector.
-			
+			2- A Decorator with 'NeverFail' property setted to true is child of PrioritySelector. This cause next children unreachable.
+			3- A Decorator with 'NeverFail' property setted to true is child of ConcurrentSelector with 'SuccessPolicy' property setted to 'SucceedOnOne'. This cause ConcurrentSelector never fail.
+
 	SharedAccessKeys:
 		Errors :
 			1- Two or more Accesskeys with same name. (this must avoided in editor)

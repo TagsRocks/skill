@@ -243,6 +243,7 @@ namespace Skill.Studio.AI.Editor
                 if (vm != null)
                 {
                     vm.IsSelected = true;
+                    this.Focus();
                 }
             }
         }
@@ -933,10 +934,19 @@ namespace Skill.Studio.AI.Editor
         }
         #endregion
 
+        #region Refresh
+        private void BtnRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            UpdatePositions();
+        }
+        #endregion
 
-
-
-
+        #region Focus on click
+        private void Back_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            this.Focus();
+        } 
+        #endregion
 
     }
 }

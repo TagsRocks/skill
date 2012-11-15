@@ -36,6 +36,14 @@ namespace Skill.AI
         }
 
         /// <summary>
+        /// Retrieves number of items in stack
+        /// </summary>
+        public int Count
+        {
+            get { return _TopIndex + 1; }
+        }
+
+        /// <summary>
         /// Retrieves top of the stack
         /// </summary>
         public Behavior Top
@@ -116,7 +124,7 @@ namespace Skill.AI
             {
                 Behavior b = previous[i];
                 if (b == null) break;
-                if (b != current[i] || !same) // when current and previous become unsame we should reset behavior
+                if (!same || b != current[i]) // when current and previous become unsame we should reset behavior
                 {
                     same = false;
                     b.ResetBehavior();
@@ -125,6 +133,38 @@ namespace Skill.AI
                 }
                 previous[i] = null;
             }
+        }
+
+        /// <summary>
+        /// Check whehter given behavior registered in previous update?
+        /// </summary>
+        /// <param name="behavior">Behavior to check</param>
+        /// <returns>True if exist, otherwise false</returns>
+        internal bool IsInPreviousStack(Behavior behavior)
+        {
+            for (int i = 0; i < _PreStack.Length; i++)
+            {
+                Behavior b = _PreStack[i];
+                if (b == null) return false; // end of stack
+                if (b == behavior) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Check whehter given behavior registered in current update?
+        /// </summary>
+        /// <param name="behavior">Behavior to check</param>
+        /// <returns>True if exist, otherwise false</returns>
+        internal bool IsInCurrentStack(Behavior behavior)
+        {
+            for (int i = 0; i < _Stack.Length; i++)
+            {
+                Behavior b = _Stack[i];
+                if (b == null) return false; // end of stack
+                if (b == behavior) return true;
+            }
+            return false;
         }
     }
 }

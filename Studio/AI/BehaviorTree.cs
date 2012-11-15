@@ -176,8 +176,7 @@ namespace Skill.Studio.AI
         int _AvoidRootRegister = 0;
         public void RegisterViewModel(BehaviorViewModel viewModel)
         {
-            if (!this.Behaviors.Contains(viewModel))
-                this.Behaviors.Add(viewModel);
+            RegisterRecursive(viewModel);
 
             _AvoidRootRegister++;
             // root behavior model already added to behavior tree model in constructor of behavior tree
@@ -212,8 +211,7 @@ namespace Skill.Studio.AI
 
         public void UnRegisterViewModel(BehaviorViewModel viewModel)
         {
-            if (!IsInHierarchy(viewModel))
-                Behaviors.Remove(viewModel);
+            UnRegisterRecursive(viewModel);
         }
 
         private bool IsInHierarchy(BehaviorViewModel viewModel)
@@ -230,6 +228,32 @@ namespace Skill.Studio.AI
                     return true;
             }
             return false;
+        }
+
+        private void RegisterRecursive(BehaviorViewModel viewModel)
+        {
+            if (!this.Behaviors.Contains(viewModel))
+            {
+                this.Behaviors.Add(viewModel);
+                foreach (BehaviorViewModel child in viewModel)
+                {
+                    if (child != null)
+                        RegisterRecursive(child);
+                }
+            }
+        }
+
+        private void UnRegisterRecursive(BehaviorViewModel viewModel)
+        {
+            if (!IsInHierarchy(viewModel))
+            {
+                Behaviors.Remove(viewModel);
+                foreach (BehaviorViewModel child in viewModel)
+                {
+                    if (child != null)
+                        UnRegisterRecursive(child);
+                }
+            }
         }
         #endregion
 

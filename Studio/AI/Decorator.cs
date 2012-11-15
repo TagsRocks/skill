@@ -89,17 +89,7 @@ namespace Skill.Studio.AI
     {
         [Browsable(false)]
         public override string ImageName { get { return Images.AccessLimitDecorator; } }
-
-        [Browsable(false)]
-        public override ParameterCollectionViewModel Parameters
-        {
-            get
-            {
-                return base.Parameters;
-            }
-        }
-
-
+        
         [DisplayName("AccessKey")]
         [Description("The Accesskey for decorator.")]
         [Editor(typeof(Editor.AccessKeyPropertyEditor), typeof(Editor.AccessKeyPropertyEditor))]

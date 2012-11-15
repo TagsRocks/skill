@@ -184,9 +184,10 @@ namespace Skill.AI
         /// Create an instance of AccessLimitDecorator
         /// </summary>
         /// <param name="name">Name of behavior node</param>
+        /// <param name="handler">user provided function to handle execution of Decorator</param>
         /// <param name="accessKey">Shared AccessKey</param>
-        public AccessLimitDecorator(string name, AccessKey accessKey)
-            : base(name, null)
+        public AccessLimitDecorator(string name, DecoratorHandler handler, AccessKey accessKey)
+            : base(name, handler)
         {
             if (accessKey == null)
                 throw new ArgumentNullException("Accesskey is null.");
@@ -198,29 +199,49 @@ namespace Skill.AI
         /// </summary>
         /// <param name="state">State of BehaviorTree</param>
         /// <returns>Result</returns>
-        protected override BehaviorResult Behave(BehaviorState state)
+        //protected override BehaviorResult Behave(BehaviorState state)
+        //{
+        //    BehaviorResult result = BehaviorResult.Failure;
+        //    if (Child != null)
+        //    {
+        //        if (AccessKey != null)
+        //        {
+        //            if (!_Lock)// if do not access to key
+        //                _Lock = AccessKey.Lock();// try to lock key
+        //            if (_Lock)// if success, execute child
+        //            {
+        //                state.Parameters = Child.Parameters;
+        //                result = Child.Behavior.Trace(state);
+        //            }
+        //            if (_Lock && result != BehaviorResult.Running)// if finish job, unlock key
+        //            {
+        //                AccessKey.Unlock();
+        //                _Lock = false;
+        //            }
+        //        }
+        //    }
+        //    if (NeverFail && result == BehaviorResult.Failure)
+        //        result = BehaviorResult.Success;
+        //    return result;
+        //}
+
+        protected override BehaviorResult TraceChild(BehaviorState state)
         {
             BehaviorResult result = BehaviorResult.Failure;
-            if (Child != null)
+            if (AccessKey != null)
             {
-                if (AccessKey != null)
+                if (!_Lock)// if do not access to key
+                    _Lock = AccessKey.Lock();// try to lock key
+                if (_Lock)// if success, execute child
                 {
-                    if (!_Lock)// if do not access to key
-                        _Lock = AccessKey.Lock();// try to lock key
-                    if (_Lock)// if success, execute child
-                    {
-                        state.Parameters = Child.Parameters;
-                        result = Child.Behavior.Trace(state);
-                    }
-                    if (_Lock && result != BehaviorResult.Running)// if finish job, unlock key
-                    {
-                        AccessKey.Unlock();
-                        _Lock = false;
-                    }
+                    result = base.TraceChild(state);
+                }
+                if (_Lock && result != BehaviorResult.Running)// if finish job, unlock key
+                {
+                    AccessKey.Unlock();
+                    _Lock = false;
                 }
             }
-            if (NeverFail && result == BehaviorResult.Failure)
-                result = BehaviorResult.Success;
             return result;
         }
 

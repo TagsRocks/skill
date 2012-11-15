@@ -91,24 +91,23 @@ namespace Skill.AI
         {
             BehaviorResult result = BehaviorResult.Failure;
             if (Child != null)
-            {
+            {                
                 if (_Handler != null)
                 {
                     if (_IsChildRunning)// continue execution of child
                     {
-                        state.Parameters = Child.Parameters;
-                        result = Child.Behavior.Trace(state);
+                        result = TraceChild(state);
                     }
                     else if (_Handler(state.Parameters))
                     {
-                        state.Parameters = Child.Parameters;
-                        result = Child.Behavior.Trace(state);
+                        result = TraceChild(state);
                     }
+                    else
+                        ResetBehavior(false);// running child actions will be reseted by BehaviorState at next update
                 }
                 else
                 {
-                    state.Parameters = Child.Parameters;
-                    result = Child.Behavior.Trace(state);
+                    result = TraceChild(state);
                 }
             }
             if (result == BehaviorResult.Running)
@@ -121,6 +120,20 @@ namespace Skill.AI
             return result;
         }
 
+        /// <summary>
+        /// Trace Child - subclasses should implement this method
+        /// </summary>
+        /// <param name="state">State od BehaviorTree</param>
+        /// <returns></returns>
+        protected virtual BehaviorResult TraceChild(BehaviorState state)
+        {
+            if (Child != null)
+            {
+                state.Parameters = Child.Parameters;
+                return Child.Behavior.Trace(state);
+            }
+            return BehaviorResult.Failure;
+        }
         /// <summary>
         /// Reset behavior
         /// </summary>        

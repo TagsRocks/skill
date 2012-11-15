@@ -159,7 +159,7 @@ namespace Skill.Text
         public PersianCharacter DollarSign { get; private set; }
         /// <summary> % </summary>
         public PersianCharacter PercentSign { get; private set; }
-        /// <summary> & </summary>
+        /// <summary> and </summary>
         public PersianCharacter Ampersand { get; private set; }
         /// <summary> * </summary>
         public PersianCharacter Asterisk { get; private set; }

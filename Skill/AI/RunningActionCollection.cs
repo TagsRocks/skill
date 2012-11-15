@@ -108,7 +108,7 @@ namespace Skill.AI
         /// Returns an enumerator that iterates through the collection.
         /// </summary>
         /// <returns>
-        /// A System.Collections.Generic.IEnumerator lt;Action gt; that can be used to iterate through the collection.
+        /// A System.Collections.Generic.IEnumerator &lt; Action &gt; that can be used to iterate through the collection.
         /// </returns>
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {

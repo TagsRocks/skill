@@ -16,7 +16,7 @@ namespace Skill.CodeGeneration.CSharp
         private static string[] ConditionHandlerParams = new string[] { "Skill.AI.BehaviorParameterCollection parameters" };
         private static string[] DecoratorHandlerParams = ConditionHandlerParams;
         private static string[] ActionHandlerParams = ConditionHandlerParams;
-        
+
         List<Behavior> _Behaviors;// list of behaviors in hierarchy
         BehaviorTree _Tree;// behavior tree model 
         StringBuilder _CreateTreeMethodBody;
@@ -242,7 +242,7 @@ namespace Skill.CodeGeneration.CSharp
             {
                 _CreateTreeMethodBody.AppendLine(SetProperty(behavior.Name, "Weight", behavior.Weight.ToString() + "f"));
             }
-        }        
+        }
 
         private void CreateAction(Skill.DataModels.AI.Action action)
         {
@@ -277,7 +277,7 @@ namespace Skill.CodeGeneration.CSharp
             // create condition handler method
             Method m = new Method("bool", GetConditionHandlerName(condition.Name), "return false;", ConditionHandlerParams);
             m.IsPartial = true;
-            Add(m);            
+            Add(m);
         }
 
         private void CreateDecorator(Decorator decorator)
@@ -307,7 +307,7 @@ namespace Skill.CodeGeneration.CSharp
             // create decorator handler method
             Method m = new Method("bool", GetDecoratorHandlerName(decorator.Name), "return false;", DecoratorHandlerParams);
             m.IsPartial = true;
-            Add(m);            
+            Add(m);
         }
 
         private void CreateAccessLimitDecorator(AccessLimitDecorator decorator)
@@ -319,18 +319,22 @@ namespace Skill.CodeGeneration.CSharp
 
             if (string.IsNullOrEmpty(decorator.Address) || decorator.Address.Equals("Internal", StringComparison.OrdinalIgnoreCase))
             {
-                _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.AccessLimitDecorator(\"{1}\",{2}.{3});", Variable.GetName(decorator.Name), decorator.Name, _Tree.AccessKeys.Name, decorator.AccessKey));
+                _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.AccessLimitDecorator(\"{1}\",{2},{3}.{4});", Variable.GetName(decorator.Name), decorator.Name, GetDecoratorHandlerName(decorator.Name), _Tree.AccessKeys.Name, decorator.AccessKey));
             }
             else
             {
                 string className = System.IO.Path.GetFileNameWithoutExtension(decorator.Address);
-                _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.AccessLimitDecorator(\"{1}\",{2}.{3});", Variable.GetName(decorator.Name), decorator.Name, className, decorator.AccessKey));
+                _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.AccessLimitDecorator(\"{1}\",{2},{3}.{4});", Variable.GetName(decorator.Name), decorator.Name, GetDecoratorHandlerName(decorator.Name), className, decorator.AccessKey));
             }
             // set property SuccessOnFailHandler
             if (decorator.NeverFail != true) // default value is true, so it is not necessary to set it
                 _CreateTreeMethodBody.AppendLine(SetProperty(decorator.Name, "NeverFail", decorator.NeverFail.ToString().ToLower()));
             // set weight
-            SetWeight(decorator);            
+            SetWeight(decorator);
+            // create decorator handler method
+            Method m = new Method("bool", GetDecoratorHandlerName(decorator.Name), "return true;", DecoratorHandlerParams);
+            m.IsPartial = true;
+            Add(m);
         }
 
         private void CreateComposite(Composite composite)
@@ -356,7 +360,7 @@ namespace Skill.CodeGeneration.CSharp
                     throw new InvalidOperationException("Invalid CompositeType");
             }
             // set weight
-            SetWeight(composite);            
+            SetWeight(composite);
         }
 
         private void CreateSequenceSelector(SequenceSelector sequenceSelector)

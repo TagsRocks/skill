@@ -153,11 +153,12 @@ namespace Skill.Studio.Compiler
             {
                 if (b.BehaviorType == BehaviorType.Composite)
                 {
-                    if (b.Count == 0)
+                    Composite composite = (Composite)b;
+                    if (composite.Count == 0)
                     {
-                        AddWarning(string.Format("Behaviors node {0} has not any children.", b.Name));
+                        AddWarning(string.Format("Behaviors node {0} has not any children.", composite.Name));
                     }
-                    if (((Composite)b).CompositeType == CompositeType.Priority) // check if a Decorator with NeverFaile property is child of PrioritySelector
+                    if (composite.CompositeType == CompositeType.Priority || composite.CompositeType == CompositeType.Concurrent) // check if a Decorator with NeverFaile property is child of PrioritySelector or ConcurrentSelector
                     {
                         foreach (var child in b)
                         {
@@ -165,7 +166,13 @@ namespace Skill.Studio.Compiler
                             {
                                 if (((Decorator)child).NeverFail)
                                 {
-                                    AddWarning(string.Format("Decorator '{0}' with 'NeverFail' property setted to 'true' is child of PrioritySelector '{1}'. This cause next children unreachable.", child.Name, b.Name));
+                                    if (composite.CompositeType == CompositeType.Priority)
+                                        AddWarning(string.Format("Decorator '{0}' with 'NeverFail' property setted to 'true' is child of PrioritySelector '{1}'. This cause next children unreachable.", child.Name, b.Name));
+                                    else if (composite.CompositeType == CompositeType.Concurrent)
+                                    {
+                                        if (((ConcurrentSelector)composite).SuccessPolicy == SuccessPolicy.SucceedOnOne)
+                                            AddWarning(string.Format("Decorator '{0}' with 'NeverFail' property setted to 'true' is child of ConcurrentSelector '{1}' width 'SuccessPolicy' property setted to 'SucceedOnOne' . This cause ConcurrentSelector never fail.", child.Name, b.Name));
+                                    }
                                 }
                             }
                         }
