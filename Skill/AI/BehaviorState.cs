@@ -112,12 +112,13 @@ namespace Skill.AI
                 {
                     if (top.Type == BehaviorType.Action && top.Result == BehaviorResult.Running)
                     {
-                        if (!_RunningStack.IsInPreviousStack(top))
+                        if (!_RunningStack.IsInPreviousStack(top) && !_RunningStack.IsInCurrentStack(top))
                         {
                             // this action is executed in only current update and is not registerd in running stack
                             // the action is executed and still running but we miss to reset it next update
                             // so we reset it here
                             top.ResetBehavior();
+                            RunningActions.Remove((Action)top);// this is no longer a running action
                         }
                     }
                 }
