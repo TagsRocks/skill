@@ -9,7 +9,7 @@ namespace Skill.Managers
     /// </summary>
     [RequireComponent(typeof(CacheBehavior))]
     [AddComponentMenu("Skill/Managers/CacheLifeTime")]
-    public class CacheLifeTime : MonoBehaviour
+    public class CacheLifeTime : DynamicBehaviour
     {
         /// <summary>
         /// Life Time
@@ -26,15 +26,16 @@ namespace Skill.Managers
         /// <summary>
         /// Awake
         /// </summary>
-        protected void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             enabled = EnableOnAwake;
         }
 
         /// <summary>
         /// On Enable
         /// </summary>
-        protected void OnEnable()
+        protected virtual void OnEnable()
         {
             _LifeTimeTW.Begin(LifeTime);
         }
@@ -42,12 +43,13 @@ namespace Skill.Managers
         /// <summary>
         /// Update is called once per frame
         /// </summary>
-        protected void Update()
+        protected override void Update()
         {
             if (_LifeTimeTW.EnabledAndOver)
             {
                 CacheSpawner.DestroyCache(this.gameObject);
             }
+            base.Update();
         }
     }
 

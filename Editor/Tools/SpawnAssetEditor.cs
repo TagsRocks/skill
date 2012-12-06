@@ -5,7 +5,6 @@ using Skill.UI;
 using Skill.Editor.UI;
 using UnityEngine;
 using Skill.Editor;
-using Skill.Controllers;
 
 
 namespace Skill.Editor.Tools

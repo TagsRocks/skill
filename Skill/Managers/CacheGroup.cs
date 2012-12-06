@@ -7,8 +7,8 @@ namespace Skill.Managers
     /// Group of CacheObjects for better management
     /// </summary>
     [AddComponentMenu("Skill/Managers/CacheGroup")]
-    public class CacheGroup : MonoBehaviour
-    {
+    public class CacheGroup : DynamicBehaviour
+    {        
         /// <summary> CacheObjects </summary>
         public CacheObject[] Caches;
         /// <summary> Clean Interval of this group</summary>
@@ -19,20 +19,23 @@ namespace Skill.Managers
         /// <summary>
         /// Awake
         /// </summary>
-        protected void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             // Loop through the caches
             for (var i = 0; i < Caches.Length; i++)
             {
                 // Initialize each cache
                 Caches[i].Initialize(this);
             }
+
+            enabled = CleanInterval > 0;
         }
 
         /// <summary>
         /// On Destroy
         /// </summary>
-        protected void OnDestroy()
+        protected override void OnDestroy()
         {
             if (Caches != null)
             {
@@ -42,12 +45,13 @@ namespace Skill.Managers
                         item.Destroy();
                 }
             }
+            base.OnDestroy();
         }
 
         /// <summary>
         /// Update
         /// </summary>
-        protected void Update()
+        protected override void Update()
         {
             if (CleanInterval > 0)
             {
@@ -65,7 +69,8 @@ namespace Skill.Managers
                 }
                 else
                     _CleanTW.Begin(CleanInterval);
-            }
+            }            
+            base.Update();
         }
     }
 

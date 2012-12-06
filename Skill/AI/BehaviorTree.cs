@@ -28,7 +28,7 @@ namespace Skill.AI
         /// <summary>
         /// The controller that using this BbehaviorTree
         /// </summary>
-        public Skill.Controllers.Controller Controller { get; private set; }
+        public Controller Controller { get; private set; }
         /// <summary>
         /// User data
         /// </summary>
@@ -53,7 +53,7 @@ namespace Skill.AI
         /// <remarks>
         /// controller reserved for future version
         /// </remarks>
-        public BehaviorTree(Skill.Controllers.Controller controller)
+        public BehaviorTree(Controller controller)
         {
             if (controller == null)
                 throw new ArgumentNullException("Controller is null");

@@ -54,19 +54,33 @@ namespace Skill
         /// <returns>Smooth result</returns>
         public float Update(SmoothingParameters sp)
         {
-            switch (sp.SmoothType)
+            if (_Current != Target)
             {
-                case SmoothType.Damp:
-                    _Current = Mathf.SmoothDamp(_Current, Target, ref _CurrentVelocity, sp.SmoothTime);
-                    break;
-                case SmoothType.DampSpeed:
-                    _Current = Mathf.SmoothDamp(_Current, Target, ref _CurrentVelocity, sp.SmoothTime, sp.MaxSpeed);
-                    break;
-                case SmoothType.DampSpeedAndTime:
-                    _Current = Mathf.SmoothDamp(_Current, Target, ref _CurrentVelocity, sp.SmoothTime, sp.MaxSpeed, Time.deltaTime * sp.DeltaTimeFactor);
-                    break;
+                switch (sp.SmoothType)
+                {
+                    case SmoothType.Damp:
+                        _Current = Mathf.SmoothDamp(_Current, Target, ref _CurrentVelocity, sp.SmoothTime);
+                        break;
+                    case SmoothType.DampSpeed:
+                        _Current = Mathf.SmoothDamp(_Current, Target, ref _CurrentVelocity, sp.SmoothTime, sp.MaxSpeed);
+                        break;
+                    case SmoothType.DampSpeedAndTime:
+                        _Current = Mathf.SmoothDamp(_Current, Target, ref _CurrentVelocity, sp.SmoothTime, sp.MaxSpeed, Time.deltaTime * sp.DeltaTimeFactor);
+                        break;
+                }
             }
             return _Current;
+        }
+
+        /// <summary>
+        /// Reset current and target
+        /// </summary>
+        /// <param name="value">Value</param>
+        public void Reset(float value)
+        {
+            Target = value;
+            _Current = value;
+            _CurrentVelocity = 0;
         }
     }
 
@@ -92,19 +106,33 @@ namespace Skill
         /// <returns>Smooth result</returns>
         public float Update(SmoothingParameters sp)
         {
-            switch (sp.SmoothType)
+            if (_CurrentAngle != TargetAngle)
             {
-                case SmoothType.Damp:
-                    _CurrentAngle = Mathf.SmoothDampAngle(_CurrentAngle, TargetAngle, ref _CurrentAngleVelocity, sp.SmoothTime);
-                    break;
-                case SmoothType.DampSpeed:
-                    _CurrentAngle = Mathf.SmoothDampAngle(_CurrentAngle, TargetAngle, ref _CurrentAngleVelocity, sp.SmoothTime, sp.MaxSpeed);
-                    break;
-                case SmoothType.DampSpeedAndTime:
-                    _CurrentAngle = Mathf.SmoothDampAngle(_CurrentAngle, TargetAngle, ref _CurrentAngleVelocity, sp.SmoothTime, sp.MaxSpeed, Time.deltaTime * sp.DeltaTimeFactor);
-                    break;
+                switch (sp.SmoothType)
+                {
+                    case SmoothType.Damp:
+                        _CurrentAngle = Mathf.SmoothDampAngle(_CurrentAngle, TargetAngle, ref _CurrentAngleVelocity, sp.SmoothTime);
+                        break;
+                    case SmoothType.DampSpeed:
+                        _CurrentAngle = Mathf.SmoothDampAngle(_CurrentAngle, TargetAngle, ref _CurrentAngleVelocity, sp.SmoothTime, sp.MaxSpeed);
+                        break;
+                    case SmoothType.DampSpeedAndTime:
+                        _CurrentAngle = Mathf.SmoothDampAngle(_CurrentAngle, TargetAngle, ref _CurrentAngleVelocity, sp.SmoothTime, sp.MaxSpeed, Time.deltaTime * sp.DeltaTimeFactor);
+                        break;
+                }
             }
             return _CurrentAngle;
+        }
+
+        /// <summary>
+        /// Reset current and target
+        /// </summary>
+        /// <param name="value">Value</param>
+        public void Reset(float value)
+        {
+            TargetAngle = value;
+            _CurrentAngle = value;
+            _CurrentAngleVelocity = 0;
         }
     }
 
@@ -130,22 +158,36 @@ namespace Skill
         /// <returns>Smooth result</returns>
         public Vector2 Update(SmoothingParameters sp)
         {
-            switch (sp.SmoothType)
+            if (_Current != Target)
             {
-                case SmoothType.Damp:
-                    _Current.x = Mathf.SmoothDamp(_Current.x, Target.x, ref _CurrentVelocity.x, sp.SmoothTime);
-                    _Current.y = Mathf.SmoothDamp(_Current.y, Target.y, ref _CurrentVelocity.y, sp.SmoothTime);
-                    break;
-                case SmoothType.DampSpeed:
-                    _Current.x = Mathf.SmoothDamp(_Current.x, Target.x, ref _CurrentVelocity.x, sp.SmoothTime, sp.MaxSpeed);
-                    _Current.y = Mathf.SmoothDamp(_Current.y, Target.y, ref _CurrentVelocity.y, sp.SmoothTime, sp.MaxSpeed);
-                    break;
-                case SmoothType.DampSpeedAndTime:
-                    _Current.x = Mathf.SmoothDamp(_Current.x, Target.x, ref _CurrentVelocity.x, sp.SmoothTime, sp.MaxSpeed, Time.deltaTime * sp.DeltaTimeFactor);
-                    _Current.y = Mathf.SmoothDamp(_Current.y, Target.y, ref _CurrentVelocity.y, sp.SmoothTime, sp.MaxSpeed, Time.deltaTime * sp.DeltaTimeFactor);
-                    break;
+                switch (sp.SmoothType)
+                {
+                    case SmoothType.Damp:
+                        _Current.x = Mathf.SmoothDamp(_Current.x, Target.x, ref _CurrentVelocity.x, sp.SmoothTime);
+                        _Current.y = Mathf.SmoothDamp(_Current.y, Target.y, ref _CurrentVelocity.y, sp.SmoothTime);
+                        break;
+                    case SmoothType.DampSpeed:
+                        _Current.x = Mathf.SmoothDamp(_Current.x, Target.x, ref _CurrentVelocity.x, sp.SmoothTime, sp.MaxSpeed);
+                        _Current.y = Mathf.SmoothDamp(_Current.y, Target.y, ref _CurrentVelocity.y, sp.SmoothTime, sp.MaxSpeed);
+                        break;
+                    case SmoothType.DampSpeedAndTime:
+                        _Current.x = Mathf.SmoothDamp(_Current.x, Target.x, ref _CurrentVelocity.x, sp.SmoothTime, sp.MaxSpeed, Time.deltaTime * sp.DeltaTimeFactor);
+                        _Current.y = Mathf.SmoothDamp(_Current.y, Target.y, ref _CurrentVelocity.y, sp.SmoothTime, sp.MaxSpeed, Time.deltaTime * sp.DeltaTimeFactor);
+                        break;
+                }
             }
             return _Current;
+        }
+
+        /// <summary>
+        /// Reset current and target
+        /// </summary>
+        /// <param name="value">Value</param>
+        public void Reset(Vector2 value)
+        {
+            Target = value;
+            _Current = value;
+            _CurrentVelocity = Vector2.zero;
         }
     }
 
@@ -170,19 +212,33 @@ namespace Skill
         /// <returns>Smooth result</returns>
         public Vector3 Update(SmoothingParameters sp)
         {
-            switch (sp.SmoothType)
+            if (_Current != Target)
             {
-                case SmoothType.Damp:
-                    _Current = Vector3.SmoothDamp(_Current, Target, ref _CurrentVelocity, sp.SmoothTime);
-                    break;
-                case SmoothType.DampSpeed:
-                    _Current = Vector3.SmoothDamp(_Current, Target, ref _CurrentVelocity, sp.SmoothTime, sp.MaxSpeed);
-                    break;
-                case SmoothType.DampSpeedAndTime:
-                    _Current = Vector3.SmoothDamp(_Current, Target, ref _CurrentVelocity, sp.SmoothTime, sp.MaxSpeed, Time.deltaTime * sp.DeltaTimeFactor);
-                    break;
+                switch (sp.SmoothType)
+                {
+                    case SmoothType.Damp:
+                        _Current = Vector3.SmoothDamp(_Current, Target, ref _CurrentVelocity, sp.SmoothTime);
+                        break;
+                    case SmoothType.DampSpeed:
+                        _Current = Vector3.SmoothDamp(_Current, Target, ref _CurrentVelocity, sp.SmoothTime, sp.MaxSpeed);
+                        break;
+                    case SmoothType.DampSpeedAndTime:
+                        _Current = Vector3.SmoothDamp(_Current, Target, ref _CurrentVelocity, sp.SmoothTime, sp.MaxSpeed, Time.deltaTime * sp.DeltaTimeFactor);
+                        break;
+                }
             }
             return _Current;
+        }
+
+        /// <summary>
+        /// Reset current and target
+        /// </summary>
+        /// <param name="value">Value</param>
+        public void Reset(Vector3 value)
+        {
+            Target = value;
+            _Current = value;
+            _CurrentVelocity = Vector3.zero;
         }
     }
 

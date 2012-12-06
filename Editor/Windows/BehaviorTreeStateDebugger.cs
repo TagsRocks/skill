@@ -50,7 +50,7 @@ namespace Skill.Editor
         }
 
         private EditorFrame _Frame;
-        private ObjectField<Skill.Controllers.Controller> _ControllerField;
+        private ObjectField<Controller> _ControllerField;
         private Box _ConditionCaption, _DecoratorCaption, _ActionCaption;
         private ScrollView _ConditionScrollView, _DecoratorScrollView, _ActionScrollView;
         private WrapPanel _ConditionPanel, _DecoratorPanel, _ActionPanel;
@@ -76,7 +76,7 @@ namespace Skill.Editor
             _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) }); // for panels and scrollviews
             _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) }); // for infos
 
-            _ControllerField = new ObjectField<Controllers.Controller>() { Row = 0, Column = 0, ColumnSpan = 3, VerticalAlignment = VerticalAlignment.Center, Height = 18 };
+            _ControllerField = new ObjectField<Controller>() { Row = 0, Column = 0, ColumnSpan = 3, VerticalAlignment = VerticalAlignment.Center, Height = 18 };
             _ControllerField.ObjectChanged += new EventHandler(_ControllerField_ObjectChanged);
 
             _ConditionCaption = new Box() { Row = 1, Column = 0 };

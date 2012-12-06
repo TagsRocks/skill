@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Skill.Controllers
+namespace Skill
 {
     /// <summary>
     /// Defines serializable data asset required for Spawner

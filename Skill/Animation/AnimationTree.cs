@@ -163,7 +163,7 @@ namespace Skill.Animation
         /// Update AnimationTree in new state each frame
         /// </summary>
         /// <param name="controller">optional controller to send throw AnimNodes</param>
-        public void Update(Controllers.Controller controller = null)
+        public void Update(Controller controller = null)
         {
             _State.Controller = controller;
             foreach (var layer in LayerManager.Layers)

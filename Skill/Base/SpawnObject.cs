@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace Skill.Controllers
+namespace Skill
 {
     /// <summary>
     /// Contains data needed to spawn an object

@@ -18,7 +18,7 @@ namespace Skill.Animation
         /// <summary>
         /// The updating controller
         /// </summary>
-        public Controllers.Controller Controller { get; internal set; }
+        public Controller Controller { get; internal set; }
 
         /// <summary> Force update AnimationTree first time </summary>
         internal bool ForceUpdate { get; set; }

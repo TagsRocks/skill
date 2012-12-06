@@ -6,7 +6,8 @@ namespace Skill.Modules
     /// <summary>
     /// Object vill be visible at specific time after instantiate
     /// </summary>
-    public class DelayRender : MonoBehaviour
+    [AddComponentMenu("Skill/Modules/DelayRender")]
+    public class DelayRender : DynamicBehaviour
     {
         /// <summary> Delay time </summary>
         public float Delay = 0.05f;
@@ -26,7 +27,7 @@ namespace Skill.Modules
         /// <summary>
         /// Update
         /// </summary>
-        protected void Update()
+        protected override void Update()
         {
             if (_StartTW.EnabledAndOver)
             {
@@ -35,7 +36,8 @@ namespace Skill.Modules
                 enabled = false;
                 _StartTW.End();
             }
-        }
+            base.Update();
+        } 
     }
 
 }

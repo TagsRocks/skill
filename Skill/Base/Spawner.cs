@@ -5,13 +5,13 @@ using System.Text;
 using UnityEngine;
 using Skill.Managers;
 
-namespace Skill.Controllers
+namespace Skill
 {
     /// <summary>
     /// Use this class to spawn object in scheduled time and with triggers
     /// </summary>
-    [AddComponentMenu("Skill/Controllers/Spawner")]
-    public class Spawner : MonoBehaviour
+    [AddComponentMenu("Skill/Spawner")]
+    public class Spawner : DynamicBehaviour
     {
         /// <summary> GameObject to spawn </summary>
         public SpawnAsset SpawnObjects;
@@ -139,7 +139,7 @@ namespace Skill.Controllers
 
             _LastSpawnTime = Time.time;
             InitializeSpawnedObject(spawnedObj);
-            spawnedObj.SetActiveRecursively(true);
+            spawnedObj.SetActive(true);
             _SpawnCount++;
         }
 
@@ -173,8 +173,9 @@ namespace Skill.Controllers
         /// <summary>
         /// Awake
         /// </summary>
-        protected virtual void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             SpawnedObjects = new List<GameObject>();
             _RespawnObjects = new List<GameObject>();
             _LastSpawnLocationIndex = -1;
@@ -188,8 +189,8 @@ namespace Skill.Controllers
         /// <summary>
         /// Update
         /// </summary>
-        protected virtual void Update()
-        {
+        protected override void Update()
+        {            
             if ((_SpawnCount < MaxSpawnCount) &&
                 (Time.time > SpawnInterval + _LastSpawnTime))
             {
@@ -217,15 +218,18 @@ namespace Skill.Controllers
                 OnComplete();
                 DestroyRespawnedObjects();
             }
+
+            base.Update();
         }
 
         /// <summary>
         /// when spawner destroyed (all spawned objects will destroyed too)
         /// </summary>
-        protected virtual void OnDestroy()
+        protected override void OnDestroy()
         {
             DestroySpawnedObjects();
             DestroyRespawnedObjects();
+            base.OnDestroy();
         }
 
         private void DestroySpawnedObjects()
@@ -278,7 +282,7 @@ namespace Skill.Controllers
         /// Notify spawner that given object is dead but not destroyed yet ( the dead body is still visible )
         /// </summary>
         /// <param name="deadSpawnedObj">dead spawned object</param>
-        public void OnDieSpawnedObject(GameObject deadSpawnedObj)
+        public void NotifySpawnedObjectIsDead(GameObject deadSpawnedObj)
         {
             if (SpawnedObjects.Contains(deadSpawnedObj))
             {

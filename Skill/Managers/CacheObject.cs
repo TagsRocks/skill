@@ -10,6 +10,8 @@ namespace Skill.Managers
     [Serializable]
     public class CacheObject
     {
+        /// <summary> Name of CacheObject </summary>
+        public string Name;
         /// <summary> Cacheable GameObject</summary>
         public GameObject Prefab;
         /// <summary> Number of instances to create at initialize time</summary>
@@ -21,9 +23,6 @@ namespace Skill.Managers
         /// <summary> Is Growable?</summary>
         public bool Growable = true;
 
-        /// <summary> After this time try to destroy some inactive objects to reach InitialCacheSize. (0 means never) </summary>
-        public float CleanInterval = 0;
-
         /// <summary> Group </summary>
         public CacheGroup Group { get; private set; }
         /// <summary> Unique id (same as CacheBehavior.CacheId ) </summary>
@@ -34,13 +33,12 @@ namespace Skill.Managers
         private List<GameObject> _Objects;
         private int _NextIndex;
         private int _FreeIndex;
-        private Skill.TimeWatch _CleanTW;
 
         /// <summary>
         /// Initialize and instantiate objects
         /// </summary>
-        /// <param name="group"></param>
-        public void Initialize(CacheGroup group)
+        /// <param name="group">Group</param>
+        internal void Initialize(CacheGroup group)
         {
             this.Group = group;
             this.CacheId = _CacheIdGenerator++;
@@ -59,7 +57,7 @@ namespace Skill.Managers
                     NamePatternFormat = obj.name + "_{0}";
 
                 SetCacheIdAndGroup(obj);
-                obj.SetActiveRecursively(false);
+                obj.SetActive(false);
                 obj.name = string.Format(NamePatternFormat, _NextIndex);
                 _DeactiveObjects.Enqueue(obj);
                 _Objects.Add(obj);
@@ -83,7 +81,7 @@ namespace Skill.Managers
             for (int i = 0; i < _Objects.Count; i++)
             {
                 GameObject item = _Objects[i];
-                if (!item.active)
+                if (!item.activeSelf)
                     return item;
             }
 
@@ -91,7 +89,7 @@ namespace Skill.Managers
             _FreeIndex = (_FreeIndex + 1) % _Objects.Count;
 
             GameObject obj = _Objects[index];
-            obj.SetActiveRecursively(false);
+            obj.SetActive(false);
             return obj;
         }
 
@@ -126,7 +124,7 @@ namespace Skill.Managers
         /// <param name="objToFree"> unused GameObject </param>
         public void Free(GameObject objToFree)
         {
-            objToFree.SetActiveRecursively(false);
+            objToFree.SetActive(false);
             _DeactiveObjects.Enqueue(objToFree);
         }
 
@@ -137,7 +135,8 @@ namespace Skill.Managers
         {
             foreach (var objectToDestroy in _Objects)
             {
-                GameObject.Destroy(objectToDestroy);
+                if (objectToDestroy != null) // not destroyed by engine
+                    GameObject.Destroy(objectToDestroy);
             }
         }
 
@@ -146,27 +145,15 @@ namespace Skill.Managers
         /// </summary>
         public void Clean()
         {
-            if (CleanInterval > 0)
+            while (_DeactiveObjects.Count > 0)
             {
-                if (_CleanTW.Enabled)
+                if (_DeactiveObjects.Count <= InitialCacheSize || (MaxSize > InitialCacheSize && _DeactiveObjects.Count <= MaxSize)) break;
+                GameObject objectToDestroy = _DeactiveObjects.Dequeue();
+                if (objectToDestroy != null)
                 {
-                    if (_CleanTW.IsOver)
-                    {
-                        while (_DeactiveObjects.Count > 0)
-                        {
-                            if (_DeactiveObjects.Count <= InitialCacheSize || (MaxSize > InitialCacheSize && _DeactiveObjects.Count <= MaxSize)) break;
-                            GameObject objectToDestroy = _DeactiveObjects.Dequeue();
-                            if (objectToDestroy != null)
-                            {
-                                _Objects.Remove(objectToDestroy);
-                                GameObject.Destroy(objectToDestroy);
-                            }
-                        }
-                        _CleanTW.End();
-                    }
+                    _Objects.Remove(objectToDestroy);
+                    GameObject.Destroy(objectToDestroy);
                 }
-                else
-                    _CleanTW.Begin(CleanInterval);
             }
         }
     }

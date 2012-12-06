@@ -42,7 +42,7 @@ namespace Skill.CodeGeneration.CSharp
                 this.Add(new SharedAccessKeysClass(this._Tree.AccessKeys));
             }
 
-            Method constructor = new Method("", Name, "", "Skill.Controllers.Controller controller");
+            Method constructor = new Method("", Name, "", "Skill.Controller controller");
             constructor.Modifiers = Modifiers.Public;
             constructor.BaseMethod = ":base(controller)";
             Add(constructor);

@@ -8,27 +8,8 @@ namespace Skill.Managers
     /// <summary>
     /// Manage spawning cache objects
     /// </summary>
-    /// <remarks>
-    /// Only one instance of this object should be in scene
-    /// </remarks>
-    [AddComponentMenu("Skill/Managers/CacheSpawner")]
-    public class CacheSpawner : MonoBehaviour
-    {
-        /// <summary> Groups to manage </summary>
-        public CacheGroup[] Groups;
-
-        private static CacheSpawner _Instance = null;
-
-        /// <summary>
-        /// Awake
-        /// </summary>
-        protected void Awake()
-        {
-            if (_Instance != null)
-                Debug.LogError("More that one CacheSpawner found in scene");
-            _Instance = this;
-        }
-
+    public static class CacheSpawner
+    {                
         private static CacheObject GetCacheObject(GameObject prefab)
         {
             try
@@ -50,7 +31,7 @@ namespace Skill.Managers
             }
             catch (MissingReferenceException)
             {
-                Debug.LogWarning(prefab.name);
+                Debug.LogWarning("MissingReference of " + prefab.name);
                 throw;
             }
             return null;
@@ -69,6 +50,12 @@ namespace Skill.Managers
         /// </remarks>
         public static GameObject Spawn(GameObject prefab, Vector3 position, Quaternion rotation, bool enabled = true)
         {
+            if (prefab == null)
+            {
+                Debug.LogError("Invalid GameObject to spawn"); 
+                return null;
+            }
+
             CacheObject cache = GetCacheObject(prefab);
             // If there's no cache for this prefab type, just instantiate normally
             if (cache == null)
@@ -88,14 +75,14 @@ namespace Skill.Managers
             }
             catch (MissingReferenceException)
             {
-                Debug.Log("prefab.name : " + prefab.name + " catchId : " + cache.CacheId);
+                Debug.LogWarning( string.Format("MissingReferenceException when spawn prefab.name : {0}, catchId : {1}.", prefab.name , cache.CacheId));
                 throw;
             }
 
             obj.transform.rotation = rotation;
 
             // Set the object to be active
-            obj.SetActiveRecursively(enabled);
+            obj.SetActive(enabled);
             return obj;
         }
 
@@ -103,7 +90,7 @@ namespace Skill.Managers
         /// Destroy cache GameObject and add to free list
         /// </summary>
         /// <param name="objectToDestroy">GameObject with CacheBehavior component</param>
-        ///  /// <remarks>
+        /// <remarks>
         /// If GameObject has not a CacheBehavior component, spawner destroy it normally ( by GameObject.Destroy method )
         /// </remarks>
         public static void DestroyCache(GameObject objectToDestroy)
@@ -123,6 +110,6 @@ namespace Skill.Managers
             {
                 GameObject.Destroy(objectToDestroy);
             }
-        }        
+        }
     }
 }
