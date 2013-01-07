@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Skill.UI;
+using Skill.Framework.UI;
 using UnityEngine;
 using UnityEditor;
 

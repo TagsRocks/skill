@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEditor;
-using Skill.UI;
+using Skill.Framework.UI;
 using Skill.Editor.UI;
 using UnityEngine;
 using Skill.Editor;
@@ -13,21 +13,21 @@ namespace Skill.Editor.Tools
     [UnityEditor.CustomEditor(typeof(ImplantAsset))]
     class ImplantAssetEditor : UnityEditor.Editor
     {
-        #region CreateUI        
-        private Skill.UI.ListBox _PrefabsLB;
-        private Skill.UI.StackPanel _ButtonsPanel;
+        #region CreateUI
+        private Skill.Framework.UI.ListBox _PrefabsLB;
+        private Skill.Framework.UI.StackPanel _ButtonsPanel;
         private Skill.Editor.UI.Button _BtnAdd;
         private Skill.Editor.UI.Button _BtnRemove;
         private Skill.Editor.UI.Button _BtnClear;
         private Skill.Editor.UI.ChangeCheck _ChangeCheck;
-        private Skill.UI.Frame _Frame;
+        private Skill.Framework.UI.Frame _Frame;
 
         private void CreateUI()
         {
-            _PrefabsLB = new ListBox() { Margin = new Thickness(2), SelectionMode = Skill.UI.SelectionMode.Single, Position = new Rect(0, 22, 320, 560) };            
+            _PrefabsLB = new ListBox() { Margin = new Thickness(2), SelectionMode = Skill.Framework.UI.SelectionMode.Single, Position = new Rect(0, 22, 320, 560)};
             _PrefabsLB.SelectionChanged += new System.EventHandler(_PrefabsLB_SelectionChanged);
 
-            GUIStyleState selectedItemState = new GUIStyleState() { background = Resources.SelectedItemBackground};
+            GUIStyleState selectedItemState = new GUIStyleState() { background = Resources.SelectedItemBackground };
             _PrefabsLB.SelectedStyle = new GUIStyle()
             {
                 normal = selectedItemState,
@@ -50,7 +50,7 @@ namespace Skill.Editor.Tools
             _ButtonsPanel.Controls.Add(_BtnAdd);
             _ButtonsPanel.Controls.Add(_BtnRemove);
             _ButtonsPanel.Controls.Add(_BtnClear);
-            
+
             _ChangeCheck = new ChangeCheck();
             _ChangeCheck.Controls.Add(_ButtonsPanel);
             _ChangeCheck.Controls.Add(_PrefabsLB);

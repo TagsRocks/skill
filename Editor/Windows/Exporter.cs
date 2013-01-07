@@ -71,34 +71,34 @@ namespace Skill.Editor
 
         private void CreateUI()
         {
-            _RootBone = new UI.ObjectField<Transform>() { Margin = new Skill.UI.Thickness(4, 2, 4, 2), VerticalAlignment = Skill.UI.VerticalAlignment.Center, Row = 0, Column = 0 };
+            _RootBone = new UI.ObjectField<Transform>() { Margin = new Skill.Framework.UI.Thickness(4, 2, 4, 2), VerticalAlignment = Skill.Framework.UI.VerticalAlignment.Center, Row = 0, Column = 0 };
             _RootBone.Label.text = "Root Bone";
             _RootBone.ObjectChanged += new EventHandler(_RootBone_ObjectChanged);
 
-            _Animations = new UI.ObjectField<UnityEngine.Animation>() { Margin = new Skill.UI.Thickness(4, 2, 4, 2), VerticalAlignment = Skill.UI.VerticalAlignment.Center, Row = 3, Column = 0 };
+            _Animations = new UI.ObjectField<UnityEngine.Animation>() { Margin = new Skill.Framework.UI.Thickness(4, 2, 4, 2), VerticalAlignment = Skill.Framework.UI.VerticalAlignment.Center, Row = 3, Column = 0 };
             _Animations.Label.text = "Animations";
             _Animations.ObjectChanged += new EventHandler(_Animations_ObjectChanged);
 
-            _BtnCopySkeleton = new UI.Button() { Margin = new Skill.UI.Thickness(4, 2, 4, 2), VerticalAlignment = Skill.UI.VerticalAlignment.Center, IsEnabled = false, Row = 1, Column = 0 };
+            _BtnCopySkeleton = new UI.Button() { Margin = new Skill.Framework.UI.Thickness(4, 2, 4, 2), VerticalAlignment = Skill.Framework.UI.VerticalAlignment.Center, IsEnabled = false, Row = 1, Column = 0 };
             _BtnCopySkeleton.Content.text = "Copy Skeleton to Clipboard";
             _BtnCopySkeleton.Click += new EventHandler(_BtnCopySkeleton_Click);
 
-            _BtnCopyAimations = new UI.Button() { Margin = new Skill.UI.Thickness(4, 2, 4, 2), VerticalAlignment = Skill.UI.VerticalAlignment.Center, IsEnabled = false, Row = 4, Column = 0 };
+            _BtnCopyAimations = new UI.Button() { Margin = new Skill.Framework.UI.Thickness(4, 2, 4, 2), VerticalAlignment = Skill.Framework.UI.VerticalAlignment.Center, IsEnabled = false, Row = 4, Column = 0 };
             _BtnCopyAimations.Content.text = "Copy Animations to Clipboard";
             _BtnCopyAimations.Click += new EventHandler(_BtnCopyAimations_Click);
 
             _Frame = new UI.EditorFrame(this);
 
-            _Frame.Grid.Margin = new Skill.UI.Thickness(0, 10, 0, 0);
-            _Frame.Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(20, Skill.UI.GridUnitType.Pixel) });
-            _Frame.Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(20, Skill.UI.GridUnitType.Pixel) });
-            _Frame.Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(5, Skill.UI.GridUnitType.Pixel) });
-            _Frame.Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(20, Skill.UI.GridUnitType.Pixel) });
-            _Frame.Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(20, Skill.UI.GridUnitType.Pixel) });
-            _Frame.Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(1, Skill.UI.GridUnitType.Star) });
+            _Frame.Grid.Margin = new Skill.Framework.UI.Thickness(0, 10, 0, 0);
+            _Frame.Grid.RowDefinitions.Add(new Skill.Framework.UI.RowDefinition() { Height = new Skill.Framework.UI.GridLength(20, Skill.Framework.UI.GridUnitType.Pixel) });
+            _Frame.Grid.RowDefinitions.Add(new Skill.Framework.UI.RowDefinition() { Height = new Skill.Framework.UI.GridLength(20, Skill.Framework.UI.GridUnitType.Pixel) });
+            _Frame.Grid.RowDefinitions.Add(new Skill.Framework.UI.RowDefinition() { Height = new Skill.Framework.UI.GridLength(5, Skill.Framework.UI.GridUnitType.Pixel) });
+            _Frame.Grid.RowDefinitions.Add(new Skill.Framework.UI.RowDefinition() { Height = new Skill.Framework.UI.GridLength(20, Skill.Framework.UI.GridUnitType.Pixel) });
+            _Frame.Grid.RowDefinitions.Add(new Skill.Framework.UI.RowDefinition() { Height = new Skill.Framework.UI.GridLength(20, Skill.Framework.UI.GridUnitType.Pixel) });
+            _Frame.Grid.RowDefinitions.Add(new Skill.Framework.UI.RowDefinition() { Height = new Skill.Framework.UI.GridLength(1, Skill.Framework.UI.GridUnitType.Star) });
 
-            _Frame.Grid.ColumnDefinitions.Add(new Skill.UI.ColumnDefinition() { Width = new Skill.UI.GridLength(312, Skill.UI.GridUnitType.Pixel) });
-            _Frame.Grid.ColumnDefinitions.Add(new Skill.UI.ColumnDefinition() { Width = new Skill.UI.GridLength(1, Skill.UI.GridUnitType.Star) });
+            _Frame.Grid.ColumnDefinitions.Add(new Skill.Framework.UI.ColumnDefinition() { Width = new Skill.Framework.UI.GridLength(312, Skill.Framework.UI.GridUnitType.Pixel) });
+            _Frame.Grid.ColumnDefinitions.Add(new Skill.Framework.UI.ColumnDefinition() { Width = new Skill.Framework.UI.GridLength(1, Skill.Framework.UI.GridUnitType.Star) });
 
             _Frame.Grid.Controls.Add(_RootBone);
             _Frame.Grid.Controls.Add(_BtnCopySkeleton);

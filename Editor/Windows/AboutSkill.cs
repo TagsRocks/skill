@@ -44,8 +44,8 @@ namespace Skill.Editor
         {
             _Frame = new UI.EditorFrame(this);
 
-            _Frame.Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(1, Skill.UI.GridUnitType.Star) });
-            _Frame.Grid.RowDefinitions.Add(new Skill.UI.RowDefinition() { Height = new Skill.UI.GridLength(20, Skill.UI.GridUnitType.Pixel) });
+            _Frame.Grid.RowDefinitions.Add(new Skill.Framework.UI.RowDefinition() { Height = new Skill.Framework.UI.GridLength(1, Skill.Framework.UI.GridUnitType.Star) });
+            _Frame.Grid.RowDefinitions.Add(new Skill.Framework.UI.RowDefinition() { Height = new Skill.Framework.UI.GridLength(20, Skill.Framework.UI.GridUnitType.Pixel) });
 
             _LblAbout = new UI.LabelField() { Row = 0, Column = 0 };
             _LblAbout.Label2.text = Skill.Editor.Properties.Resources.AppDescription;

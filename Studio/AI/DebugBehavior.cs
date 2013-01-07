@@ -10,7 +10,7 @@ namespace Skill.Studio.AI
         private float _ExecutionTime;
         private TimeSpan _ExecutionTimeSpan;
 
-        public Skill.AI.Behavior Behavior { get; private set; }
+        public Skill.Framework.AI.Behavior Behavior { get; private set; }
 
         public Skill.Studio.AI.BehaviorViewModel ViewModel { get; private set; }
 
@@ -41,7 +41,7 @@ namespace Skill.Studio.AI
 
         private bool _Started;
         private TimeSpan _EndTime;
-        private Skill.AI.BehaviorResult ActionHandler(Skill.AI.BehaviorParameterCollection parameters)
+        private Skill.Framework.AI.BehaviorResult ActionHandler(Skill.Framework.AI.BehaviorParameterCollection parameters)
         {
             IsVisited = true;
 
@@ -50,19 +50,19 @@ namespace Skill.Studio.AI
                 if (ViewModel.Tree.DebugTimer >= _EndTime)
                 {
                     _Started = false;
-                    return Skill.AI.BehaviorResult.Success;
+                    return Skill.Framework.AI.BehaviorResult.Success;
                 }
                 else
-                    return Skill.AI.BehaviorResult.Running;
+                    return Skill.Framework.AI.BehaviorResult.Running;
             }
             else
             {
                 _Started = true;
                 _EndTime = ViewModel.Tree.DebugTimer + _ExecutionTimeSpan;
-                return Skill.AI.BehaviorResult.Running;
+                return Skill.Framework.AI.BehaviorResult.Running;
             }
         }
-        private bool ConditionHandler(Skill.AI.BehaviorParameterCollection parameters)
+        private bool ConditionHandler(Skill.Framework.AI.BehaviorParameterCollection parameters)
         {
             IsVisited = true;
             return IsValid;
@@ -73,16 +73,16 @@ namespace Skill.Studio.AI
             switch (ViewModel.Model.BehaviorType)
             {
                 case Skill.DataModels.AI.BehaviorType.Action:
-                    Behavior = new Skill.AI.Action(ViewModel.Name, this.ActionHandler);
+                    Behavior = new Skill.Framework.AI.Action(ViewModel.Name, this.ActionHandler);
                     ExecutionTime = ((Skill.DataModels.AI.Action)ViewModel.Model).ExecutionTime;
                     break;
                 case Skill.DataModels.AI.BehaviorType.Condition:
-                    Behavior = new Skill.AI.Condition(ViewModel.Name, this.ConditionHandler);
+                    Behavior = new Skill.Framework.AI.Condition(ViewModel.Name, this.ConditionHandler);
                     IsValid = ((Skill.DataModels.AI.Condition)ViewModel.Model).IsValid;
                     break;
                 case Skill.DataModels.AI.BehaviorType.Decorator:
-                    Behavior = new Skill.AI.Decorator(ViewModel.Name, this.ConditionHandler);
-                    ((Skill.AI.Decorator)Behavior).NeverFail = ((Skill.Studio.AI.DecoratorViewModel)ViewModel).NeverFail;
+                    Behavior = new Skill.Framework.AI.Decorator(ViewModel.Name, this.ConditionHandler);
+                    ((Skill.Framework.AI.Decorator)Behavior).NeverFail = ((Skill.Studio.AI.DecoratorViewModel)ViewModel).NeverFail;
                     IsValid = ((Skill.DataModels.AI.Decorator)ViewModel.Model).IsValid;
                     break;
                 case Skill.DataModels.AI.BehaviorType.Composite:
@@ -90,25 +90,25 @@ namespace Skill.Studio.AI
                     switch (((Skill.DataModels.AI.Composite)ViewModel.Model).CompositeType)
                     {
                         case Skill.DataModels.AI.CompositeType.Sequence:
-                            Behavior = new Skill.AI.SequenceSelector(ViewModel.Name);
+                            Behavior = new Skill.Framework.AI.SequenceSelector(ViewModel.Name);
                             break;
                         case Skill.DataModels.AI.CompositeType.Concurrent:
-                            Behavior = new Skill.AI.ConcurrentSelector(ViewModel.Name);
-                            ((Skill.AI.ConcurrentSelector)Behavior).BreakOnConditionFailure = ((Skill.Studio.AI.ConcurrentSelectorViewModel)ViewModel).BreakOnConditionFailure;
-                            ((Skill.AI.ConcurrentSelector)Behavior).FailurePolicy = (Skill.AI.FailurePolicy)((Skill.Studio.AI.ConcurrentSelectorViewModel)ViewModel).FailurePolicy;
-                            ((Skill.AI.ConcurrentSelector)Behavior).SuccessPolicy = (Skill.AI.SuccessPolicy)((Skill.Studio.AI.ConcurrentSelectorViewModel)ViewModel).SuccessPolicy;
-                            ((Skill.AI.ConcurrentSelector)Behavior).FirstConditions = ((Skill.Studio.AI.ConcurrentSelectorViewModel)ViewModel).FirstConditions;
+                            Behavior = new Skill.Framework.AI.ConcurrentSelector(ViewModel.Name);
+                            ((Skill.Framework.AI.ConcurrentSelector)Behavior).BreakOnConditionFailure = ((Skill.Studio.AI.ConcurrentSelectorViewModel)ViewModel).BreakOnConditionFailure;
+                            ((Skill.Framework.AI.ConcurrentSelector)Behavior).FailurePolicy = (Skill.Framework.AI.FailurePolicy)((Skill.Studio.AI.ConcurrentSelectorViewModel)ViewModel).FailurePolicy;
+                            ((Skill.Framework.AI.ConcurrentSelector)Behavior).SuccessPolicy = (Skill.Framework.AI.SuccessPolicy)((Skill.Studio.AI.ConcurrentSelectorViewModel)ViewModel).SuccessPolicy;
+                            ((Skill.Framework.AI.ConcurrentSelector)Behavior).FirstConditions = ((Skill.Studio.AI.ConcurrentSelectorViewModel)ViewModel).FirstConditions;
                             break;
                         case Skill.DataModels.AI.CompositeType.Random:
-                            Behavior = new Skill.AI.RandomSelector(ViewModel.Name);
+                            Behavior = new Skill.Framework.AI.RandomSelector(ViewModel.Name);
                             break;
                         case Skill.DataModels.AI.CompositeType.Priority:
-                            Behavior = new Skill.AI.PrioritySelector(ViewModel.Name);
-                            ((Skill.AI.PrioritySelector)Behavior).Priority = (Skill.AI.PriorityType)((Skill.Studio.AI.PrioritySelectorViewModel)ViewModel).Priority;
+                            Behavior = new Skill.Framework.AI.PrioritySelector(ViewModel.Name);
+                            ((Skill.Framework.AI.PrioritySelector)Behavior).Priority = (Skill.Framework.AI.PriorityType)((Skill.Studio.AI.PrioritySelectorViewModel)ViewModel).Priority;
                             break;
                         case Skill.DataModels.AI.CompositeType.Loop:
-                            Behavior = new Skill.AI.LoopSelector(ViewModel.Name);
-                            ((Skill.AI.LoopSelector)Behavior).LoopCount = ((Skill.Studio.AI.LoopSelectorViewModel)ViewModel).LoopCount;
+                            Behavior = new Skill.Framework.AI.LoopSelector(ViewModel.Name);
+                            ((Skill.Framework.AI.LoopSelector)Behavior).LoopCount = ((Skill.Studio.AI.LoopSelectorViewModel)ViewModel).LoopCount;
                             break;
                     }
                     break;
@@ -129,7 +129,7 @@ namespace Skill.Studio.AI
                     IsValid = ((Skill.DataModels.AI.Condition)ViewModel.Model).IsValid;
                     break;
                 case Skill.DataModels.AI.BehaviorType.Decorator:
-                    ((Skill.AI.Decorator)Behavior).NeverFail = ((Skill.Studio.AI.DecoratorViewModel)ViewModel).NeverFail;
+                    ((Skill.Framework.AI.Decorator)Behavior).NeverFail = ((Skill.Studio.AI.DecoratorViewModel)ViewModel).NeverFail;
                     IsValid = ((Skill.DataModels.AI.Decorator)ViewModel.Model).IsValid;
                     break;
                 case Skill.DataModels.AI.BehaviorType.Composite:
@@ -137,16 +137,16 @@ namespace Skill.Studio.AI
                     switch (((Skill.DataModels.AI.Composite)ViewModel.Model).CompositeType)
                     {
                         case Skill.DataModels.AI.CompositeType.Concurrent:
-                            ((Skill.AI.ConcurrentSelector)Behavior).BreakOnConditionFailure = ((Skill.Studio.AI.ConcurrentSelectorViewModel)ViewModel).BreakOnConditionFailure;
-                            ((Skill.AI.ConcurrentSelector)Behavior).FailurePolicy = (Skill.AI.FailurePolicy)((Skill.Studio.AI.ConcurrentSelectorViewModel)ViewModel).FailurePolicy;
-                            ((Skill.AI.ConcurrentSelector)Behavior).SuccessPolicy = (Skill.AI.SuccessPolicy)((Skill.Studio.AI.ConcurrentSelectorViewModel)ViewModel).SuccessPolicy;
-                            ((Skill.AI.ConcurrentSelector)Behavior).FirstConditions = ((Skill.Studio.AI.ConcurrentSelectorViewModel)ViewModel).FirstConditions;
+                            ((Skill.Framework.AI.ConcurrentSelector)Behavior).BreakOnConditionFailure = ((Skill.Studio.AI.ConcurrentSelectorViewModel)ViewModel).BreakOnConditionFailure;
+                            ((Skill.Framework.AI.ConcurrentSelector)Behavior).FailurePolicy = (Skill.Framework.AI.FailurePolicy)((Skill.Studio.AI.ConcurrentSelectorViewModel)ViewModel).FailurePolicy;
+                            ((Skill.Framework.AI.ConcurrentSelector)Behavior).SuccessPolicy = (Skill.Framework.AI.SuccessPolicy)((Skill.Studio.AI.ConcurrentSelectorViewModel)ViewModel).SuccessPolicy;
+                            ((Skill.Framework.AI.ConcurrentSelector)Behavior).FirstConditions = ((Skill.Studio.AI.ConcurrentSelectorViewModel)ViewModel).FirstConditions;
                             break;
                         case Skill.DataModels.AI.CompositeType.Priority:
-                            ((Skill.AI.PrioritySelector)Behavior).Priority = (Skill.AI.PriorityType)((Skill.Studio.AI.PrioritySelectorViewModel)ViewModel).Priority;
+                            ((Skill.Framework.AI.PrioritySelector)Behavior).Priority = (Skill.Framework.AI.PriorityType)((Skill.Studio.AI.PrioritySelectorViewModel)ViewModel).Priority;
                             break;
                         case Skill.DataModels.AI.CompositeType.Loop:
-                            ((Skill.AI.LoopSelector)Behavior).LoopCount = ((Skill.Studio.AI.LoopSelectorViewModel)ViewModel).LoopCount;
+                            ((Skill.Framework.AI.LoopSelector)Behavior).LoopCount = ((Skill.Studio.AI.LoopSelectorViewModel)ViewModel).LoopCount;
                             break;
                         default:
                             break;
@@ -159,21 +159,21 @@ namespace Skill.Studio.AI
         public void UpdateChildren()
         {
             _Started = false;
-            if (Behavior.Type == Skill.AI.BehaviorType.Composite)
+            if (Behavior.Type == Skill.Framework.AI.BehaviorType.Composite)
             {
-                ((Skill.AI.Composite)Behavior).RemoveAll();
+                ((Skill.Framework.AI.Composite)Behavior).RemoveAll();
                 foreach (BehaviorViewModel vm in ViewModel)
                 {
-                    ((Skill.AI.Composite)Behavior).Add(vm.Debug.Behavior);
+                    ((Skill.Framework.AI.Composite)Behavior).Add(vm.Debug.Behavior);
                     vm.Debug.UpdateChildren();
                 }
 
             }
-            else if (Behavior.Type == Skill.AI.BehaviorType.Decorator)
+            else if (Behavior.Type == Skill.Framework.AI.BehaviorType.Decorator)
             {
                 if (ViewModel.Count > 0 && ViewModel[0] != null)
                 {
-                    ((Skill.AI.Decorator)Behavior).SetChild(((BehaviorViewModel)ViewModel[0]).Debug.Behavior);
+                    ((Skill.Framework.AI.Decorator)Behavior).SetChild(((BehaviorViewModel)ViewModel[0]).Debug.Behavior);
                     ((BehaviorViewModel)ViewModel[0]).Debug.UpdateChildren();
                 }
             }
@@ -193,15 +193,15 @@ namespace Skill.Studio.AI
                 {
                     switch (Behavior.Result)
                     {
-                        case Skill.AI.BehaviorResult.Failure:
+                        case Skill.Framework.AI.BehaviorResult.Failure:
                             ViewModel.BorderBrush = Editor.BehaviorBrushes.FailedBrush;
                             ViewModel.ConnectionStroke = 3;
                             break;
-                        case Skill.AI.BehaviorResult.Success:
+                        case Skill.Framework.AI.BehaviorResult.Success:
                             ViewModel.BorderBrush = Editor.BehaviorBrushes.SuccessBrush;
                             ViewModel.ConnectionStroke = 3;
                             break;
-                        case Skill.AI.BehaviorResult.Running:
+                        case Skill.Framework.AI.BehaviorResult.Running:
                             ViewModel.BorderBrush = Editor.BehaviorBrushes.RunningBrush;
                             ViewModel.ConnectionStroke = 5;
                             break;

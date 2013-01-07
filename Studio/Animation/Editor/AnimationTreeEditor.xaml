@@ -9,6 +9,7 @@
              xmlns:anim="clr-namespace:Skill.Studio.Animation"             
              xmlns:animedit="clr-namespace:Skill.Studio.Animation.Editor"
              xmlns:dmanim="clr-namespace:Skill.DataModels.Animation;assembly=Skill.DataModels"
+             xmlns:extToolkit="clr-namespace:Xceed.Wpf.Toolkit.Zoombox;assembly=WPFToolkit.Extended"
              d:DesignHeight="473" d:DesignWidth="977" x:Name="This" >
     <sk:TabDocument.Resources>
         <!-- DragThumb Default Template -->
@@ -94,14 +95,14 @@
         <CommandBinding Command="{x:Static sk:MainWindow.AlignCenteredVerticalCommand}"
                   Executed="AlignCenteredVerticalCmdExecuted"
                   CanExecute="AlignCenteredVerticalCmdCanExecute"/>
-        
+
     </sk:TabDocument.CommandBindings>
-    <Grid>
-        <ScrollViewer Name="_DesignerScrollViewer" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
+    <Grid Background="LightGray" >
+        <extToolkit:Zoombox x:Name="_Zoombox" >
             <ItemsControl ItemsSource="{Binding Elements}" >
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <animedit:AnimationTreeCanvas Editor="{Binding ElementName=This}" Background="LightGray" PreviewMouseRightButtonDown="Canvas_PreviewMouseRightButtonDown">
+                        <animedit:AnimationTreeCanvas Editor="{Binding ElementName=This}" PreviewMouseRightButtonDown="Canvas_PreviewMouseRightButtonDown">
                             <animedit:AnimationTreeCanvas.ContextMenu >
                                 <ContextMenu >
                                     <ContextMenu.Resources>
@@ -121,10 +122,10 @@
                                     </MenuItem>
                                     <MenuItem Header="Directional" >
                                         <MenuItem Header="4Directional" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.Blend4Directional}" Icon="{StaticResource ImgAnimNode4Directional}" />
-                                    </MenuItem>                                    
+                                    </MenuItem>
                                     <MenuItem Header="Other" >
                                         <MenuItem Header="Override" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.Override}" Icon="{StaticResource ImgAnimNodeOverride}" />
-                                        <MenuItem Header="AimOffset" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.AimOffset}" Icon="{StaticResource ImgAnimNodeAimOffset}" />                                        
+                                        <MenuItem Header="AimOffset" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.AimOffset}" Icon="{StaticResource ImgAnimNodeAimOffset}" />
                                     </MenuItem>
                                     <MenuItem Header="SubTree" Click="Mnu_Create_Click" Tag="{x:Static dmanim:AnimNodeType.SubTree}" Icon="{StaticResource ImgSubTree}" />
                                     <Separator/>
@@ -266,6 +267,6 @@
                     </Style>
                 </ItemsControl.ItemContainerStyle>
             </ItemsControl>
-        </ScrollViewer>
+        </extToolkit:Zoombox>
     </Grid>
 </sk:TabDocument>

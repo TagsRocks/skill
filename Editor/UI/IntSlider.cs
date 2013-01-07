@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System;
-using Skill.UI;
+using Skill.Framework.UI;
 using UnityEditor;
 
 namespace Skill.Editor.UI

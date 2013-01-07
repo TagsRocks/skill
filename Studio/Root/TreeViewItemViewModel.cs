@@ -13,6 +13,10 @@ namespace Skill.Studio
     /// </summary>
     public abstract class TreeViewItemViewModel : ObservableCollection<TreeViewItemViewModel>
     {
+        // just for disable show Count property in PropertyGrid
+        [Browsable(false)]        
+        public new int Count { get { return base.Count; } }
+
         /// <summary>
         /// Parent node (can be null if it is root)
         /// </summary>

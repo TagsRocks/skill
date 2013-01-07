@@ -363,7 +363,6 @@ namespace Skill.Studio.Animation
         }
         #endregion
 
-
         #region INotifyPropertyChanged Members
 
         // we could use DependencyProperties as well to inform others of property changes
@@ -426,7 +425,6 @@ namespace Skill.Studio.Animation
             return name;
         }
         #endregion
-
 
         #region UnDoRedo helper classes
         class AddAnimNodeUnDoRedo : IUnDoRedoCommand

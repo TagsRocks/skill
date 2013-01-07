@@ -1,30 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEditor;
-using Skill.UI;
+using Skill.Framework.UI;
 using Skill.Editor.UI;
 using UnityEngine;
 using Skill.Editor;
+using Skill.Framework;
 
 
 namespace Skill.Editor.Tools
 {
 
-    [UnityEditor.CustomEditor(typeof(SpawnAsset))]
+    [UnityEditor.CustomEditor(typeof(Skill.Framework.SpawnAsset))]
     class SpawnAssetEditor : UnityEditor.Editor
     {
         #region CreateUI
-        private Skill.UI.ListBox _PrefabsLB;
-        private Skill.UI.StackPanel _ButtonsPanel;
+        private Skill.Framework.UI.ListBox _PrefabsLB;
+        private Skill.Framework.UI.StackPanel _ButtonsPanel;
         private Skill.Editor.UI.Button _BtnAdd;
         private Skill.Editor.UI.Button _BtnRemove;
         private Skill.Editor.UI.Button _BtnClear;
         private Skill.Editor.UI.ChangeCheck _ChangeCheck;
-        private Skill.UI.Frame _Frame;
+        private Skill.Framework.UI.Frame _Frame;
 
         private void CreateUI()
         {
-            _PrefabsLB = new ListBox() { Margin = new Thickness(2), SelectionMode = Skill.UI.SelectionMode.Single, Position = new Rect(0, 22, 320, 560) };            
+            _PrefabsLB = new ListBox() { Margin = new Thickness(2), SelectionMode = Skill.Framework.UI.SelectionMode.Single, Position = new Rect(0, 22, 320, 560) };            
             _PrefabsLB.SelectionChanged += new System.EventHandler(_PrefabsLB_SelectionChanged);
 
             GUIStyleState selectedItemState = new GUIStyleState() { background = Resources.SelectedItemBackground };
@@ -62,7 +63,7 @@ namespace Skill.Editor.Tools
 
         void _ChangeCheck_Changed(object sender, EventArgs e)
         {
-            SpawnAsset data = target as SpawnAsset;
+            SpawnAsset data = target as Skill.Framework.SpawnAsset;
             if (data != null)
             {
                 EditorUtility.SetDirty(data);
@@ -117,7 +118,7 @@ namespace Skill.Editor.Tools
         void OnEnable()
         {
             CreateUI();
-            SpawnAsset data = target as SpawnAsset;
+            Skill.Framework.SpawnAsset data = target as Skill.Framework.SpawnAsset;
             if (data != null)
             {
                 data.hideFlags = HideFlags.HideInInspector;

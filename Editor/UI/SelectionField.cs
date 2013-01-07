@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Skill.UI;
+using Skill.Framework.UI;
 using UnityEngine;
 
 namespace Skill.Editor.UI
@@ -61,7 +61,7 @@ namespace Skill.Editor.UI
                 if (_SelectedField != value)
                 {
                     if (_SelectedField != null)
-                        _SelectedField.Visibility = Skill.UI.Visibility.Hidden;
+                        _SelectedField.Visibility = Skill.Framework.UI.Visibility.Hidden;
                     _SelectedField = value;
                     if (_SelectedField != null)
                     {
@@ -71,8 +71,8 @@ namespace Skill.Editor.UI
 
                         Thickness margin = _SelectedField.Margin;
                         SelectedField.Margin = new Thickness(margin.Left, _Label.Margin.Top, margin.Right, _Label.Margin.Bottom);
-                        SelectedField.VerticalAlignment = Skill.UI.VerticalAlignment.Top;
-                        _SelectedField.Visibility = Skill.UI.Visibility.Visible;
+                        SelectedField.VerticalAlignment = Skill.Framework.UI.VerticalAlignment.Top;
+                        _SelectedField.Visibility = Skill.Framework.UI.Visibility.Visible;
                     }
                     OnSelectedFieldChanged();
                 }
@@ -94,7 +94,7 @@ namespace Skill.Editor.UI
         {
             get
             {
-                if (Visibility != Skill.UI.Visibility.Collapsed)
+                if (Visibility != Skill.Framework.UI.Visibility.Collapsed)
                 {
                     float h = Mathf.Max(_Label.Height + _Label.Margin.Vertical, _Popup.Height + _Popup.Margin.Vertical);
                     if (SelectedField != null)
@@ -134,8 +134,8 @@ namespace Skill.Editor.UI
         public SelectionField()
         {
             this._Background = new Box() { RowSpan = 2, ColumnSpan = 3 };
-            this._Popup = new Popup() { Position = new Rect(0, 0, 16, 16), Column = 2, Row = 0, VerticalAlignment = Skill.UI.VerticalAlignment.Center, HorizontalAlignment = Skill.UI.HorizontalAlignment.Right, Margin = new Thickness(2) };
-            this._Label = new Label() { Position = new Rect(0, 0, 100, 16), Column = 0, Row = 0, VerticalAlignment = Skill.UI.VerticalAlignment.Center, HorizontalAlignment = Skill.UI.HorizontalAlignment.Left, Margin = new Thickness(2) };
+            this._Popup = new Popup() { Position = new Rect(0, 0, 16, 16), Column = 2, Row = 0, VerticalAlignment = Skill.Framework.UI.VerticalAlignment.Center, HorizontalAlignment = Skill.Framework.UI.HorizontalAlignment.Right, Margin = new Thickness(2) };
+            this._Label = new Label() { Position = new Rect(0, 0, 100, 16), Column = 0, Row = 0, VerticalAlignment = Skill.Framework.UI.VerticalAlignment.Center, HorizontalAlignment = Skill.Framework.UI.HorizontalAlignment.Left, Margin = new Thickness(2) };
             this._Panel = new Grid() { Parent = this };
 
             this._Panel.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Auto) });
@@ -246,7 +246,7 @@ namespace Skill.Editor.UI
             if (SelectedField == null)
                 SelectField(field);
             else
-                field.Visibility = Skill.UI.Visibility.Hidden;
+                field.Visibility = Skill.Framework.UI.Visibility.Hidden;
         }
 
         /// <summary>
@@ -275,7 +275,7 @@ namespace Skill.Editor.UI
                 if (SelectedField == ft.Field)
                     ShowField(fieldIndex > 0 ? fieldIndex - 1 : fieldIndex);
 
-                ft.Field.Visibility = Skill.UI.Visibility.Visible;
+                ft.Field.Visibility = Skill.Framework.UI.Visibility.Visible;
                 return true;
             }
             return false;

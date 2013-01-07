@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Skill.UI;
+using Skill.Framework.UI;
 using UnityEditor;
 using UnityEngine;
 

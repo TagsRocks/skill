@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEditor;
 using Skill.Editor.UI;
-using Skill.UI;
+using Skill.Framework.UI;
 
 namespace Skill.Editor
 {
@@ -50,7 +50,7 @@ namespace Skill.Editor
         }
 
         private EditorFrame _Frame;
-        private ObjectField<Controller> _ControllerField;
+        private ObjectField<Skill.Framework.Controller> _ControllerField;
         private Box _ConditionCaption, _DecoratorCaption, _ActionCaption;
         private ScrollView _ConditionScrollView, _DecoratorScrollView, _ActionScrollView;
         private WrapPanel _ConditionPanel, _DecoratorPanel, _ActionPanel;
@@ -76,7 +76,7 @@ namespace Skill.Editor
             _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) }); // for panels and scrollviews
             _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) }); // for infos
 
-            _ControllerField = new ObjectField<Controller>() { Row = 0, Column = 0, ColumnSpan = 3, VerticalAlignment = VerticalAlignment.Center, Height = 18 };
+            _ControllerField = new ObjectField<Skill.Framework.Controller>() { Row = 0, Column = 0, ColumnSpan = 3, VerticalAlignment = VerticalAlignment.Center, Height = 18 };
             _ControllerField.ObjectChanged += new EventHandler(_ControllerField_ObjectChanged);
 
             _ConditionCaption = new Box() { Row = 1, Column = 0 };
@@ -164,10 +164,10 @@ namespace Skill.Editor
 
         class BehaviorTag
         {
-            public AI.Behavior Behavior { get; private set; }
+            public Skill.Framework.AI.Behavior Behavior { get; private set; }
             public Label Label { get; private set; }
 
-            public BehaviorTag(AI.Behavior behavior, Label label)
+            public BehaviorTag(Skill.Framework.AI.Behavior behavior, Label label)
             {
                 this.Behavior = behavior;
                 this.Label = label;
@@ -178,8 +178,8 @@ namespace Skill.Editor
         private List<BehaviorTag> _Conditions = new List<BehaviorTag>();
         private List<BehaviorTag> _Decorators = new List<BehaviorTag>();
 
-        private Skill.AI.BehaviorTree _BehaviorTree;
-        public Skill.AI.BehaviorTree BehaviorTree
+        private Skill.Framework.AI.BehaviorTree _BehaviorTree;
+        public Skill.Framework.AI.BehaviorTree BehaviorTree
         {
             get { return _BehaviorTree; }
             set
@@ -194,7 +194,7 @@ namespace Skill.Editor
             }
         }
 
-        private bool IsInExecutionSequence(Skill.AI.Behavior behavior)
+        private bool IsInExecutionSequence(Skill.Framework.AI.Behavior behavior)
         {
             if (_BehaviorTree == null) return false;
             for (int i = 0; i < _BehaviorTree.State.SequenceCount; i++)
@@ -211,10 +211,10 @@ namespace Skill.Editor
             {
                 switch (bt.Behavior.Result)
                 {
-                    case Skill.AI.BehaviorResult.Success:
+                    case Skill.Framework.AI.BehaviorResult.Success:
                         bt.Label.Style = _SuccessStyle;
                         break;
-                    case Skill.AI.BehaviorResult.Running:
+                    case Skill.Framework.AI.BehaviorResult.Running:
                         bt.Label.Style = _RunningStyle;
                         break;
                     default:
@@ -262,7 +262,7 @@ namespace Skill.Editor
                 Debug.LogWarning("No BehaviorTree selected");
         }
 
-        private void AddToList(List<BehaviorTag> list, AI.Behavior behavior)
+        private void AddToList(List<BehaviorTag> list, Skill.Framework.AI.Behavior behavior)
         {
             bool exist = false;
             foreach (var bt in list)
@@ -282,26 +282,26 @@ namespace Skill.Editor
             }
         }
 
-        private void RebuildTree(AI.Behavior behavior)
+        private void RebuildTree(Skill.Framework.AI.Behavior behavior)
         {
             if (behavior == null) return;
             switch (behavior.Type)
             {
-                case Skill.AI.BehaviorType.Composite:
-                    Skill.AI.Composite composite = (Skill.AI.Composite)behavior;
+                case Skill.Framework.AI.BehaviorType.Composite:
+                    Skill.Framework.AI.Composite composite = (Skill.Framework.AI.Composite)behavior;
                     foreach (var b in composite)
                         RebuildTree(b.Behavior);
                     break;
-                case Skill.AI.BehaviorType.Condition:
+                case Skill.Framework.AI.BehaviorType.Condition:
                     AddToList(_Conditions, behavior);
                     break;
-                case Skill.AI.BehaviorType.Decorator:
+                case Skill.Framework.AI.BehaviorType.Decorator:
                     AddToList(_Decorators, behavior);
-                    Skill.AI.Decorator decorator = (Skill.AI.Decorator)behavior;
+                    Skill.Framework.AI.Decorator decorator = (Skill.Framework.AI.Decorator)behavior;
                     if (decorator.Child != null)
                         RebuildTree(decorator.Child.Behavior);
                     break;
-                case Skill.AI.BehaviorType.Action:
+                case Skill.Framework.AI.BehaviorType.Action:
                     AddToList(_Actions, behavior);
                     break;
                 default:

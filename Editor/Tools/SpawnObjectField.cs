@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Skill.Editor.UI;
-using Skill.UI;
+using Skill.Framework.UI;
 using UnityEngine;
 
 namespace Skill.Editor.Tools
@@ -14,13 +14,13 @@ namespace Skill.Editor.Tools
         private ObjectField<GameObject> _PrefabField;
         private Skill.Editor.UI.Slider _ChanceField;
 
-        public SpawnObject Object { get; private set; }
+        public Skill.Framework.SpawnObject Object { get; private set; }
 
         public override float LayoutHeight
         {
             get
             {
-                if (Visibility != Skill.UI.Visibility.Collapsed)
+                if (Visibility != Skill.Framework.UI.Visibility.Collapsed)
                     return _PrefabField.LayoutHeight + _PrefabField.Margin.Vertical +
                            _ChanceField.LayoutHeight + _ChanceField.Margin.Vertical;
                 return base.LayoutHeight;
@@ -28,10 +28,10 @@ namespace Skill.Editor.Tools
         }
 
         public SpawnObjectField()
-            : this(new SpawnObject() { Chance = 1.0f, Prefab = null })
+            : this(new Skill.Framework.SpawnObject() { Chance = 1.0f, Prefab = null })
         {
         }
-        public SpawnObjectField(SpawnObject obj)
+        public SpawnObjectField(Skill.Framework.SpawnObject obj)
         {
             this.Object = obj;
             if (this.Object == null)

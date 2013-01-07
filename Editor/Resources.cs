@@ -9,11 +9,11 @@ namespace Skill.Editor
     {
         private static string GetResourcePath(string resourceFileName)
         {
-            return "Assets/Editor/Skill/Resources/" + resourceFileName;
+            return "Assets/Skill/Editor/Resources/" + resourceFileName;
         }
         private static string GetUIResourcePath(string resourceFileName)
         {
-            return "Assets/Editor/Skill/Resources/UI/" + resourceFileName;
+            return "Assets/Skill/Editor/Resources/UI/" + resourceFileName;
         }
         private static void SetTextureImportType(string path, TextureImporterType type)
         {

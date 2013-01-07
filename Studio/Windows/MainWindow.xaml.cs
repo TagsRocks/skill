@@ -135,7 +135,7 @@ namespace Skill.Studio
             _DockManager.DeserializationCallback = CustomDeserializationCallbackHandler;
             _DockManager.Loaded += new RoutedEventHandler(_DockManager_Loaded);
             _DockManager.DocumentClosed += new EventHandler(_DockManager_DocumentClosed);
-            DocumentPane_DocsCenter.SelectionChanged += new SelectionChangedEventHandler(DocumentPane_DocsCenter_SelectionChanged); 
+            DocumentPane_DocsCenter.SelectionChanged += new SelectionChangedEventHandler(DocumentPane_DocsCenter_SelectionChanged);
         }
 
         void DocumentPane_DocsCenter_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -612,7 +612,7 @@ namespace Skill.Studio
 
         #region Edit
         void CutCmdCanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {            
+        {
             e.CanExecute = false;
         }
         void CutCmdExecuted(object target, ExecutedRoutedEventArgs e)
@@ -649,14 +649,14 @@ namespace Skill.Studio
         private void CopyRequiredFiles(bool overWrite = false)
         {
 
-#if DEBUG
-            CopyEditorFile("Editor", "Skill.Editor.dll", overWrite);
-            CopyEditorFile("Editor", "Skill.Editor.pdb", overWrite);
-            CopyEditorFile("DataModels", "Skill.DataModels.dll", overWrite);
-            CopyFile("Skill", "Skill.dll", overWrite);
-            CopyFile("Skill", "Skill.pdb", overWrite);
-            CopyFile("Skill", "Skill.xml", overWrite);
-#else
+//#if DEBUG
+//            CopyEditorFile("Editor", "Skill.Editor.dll", overWrite);
+//            CopyEditorFile("Editor", "Skill.Editor.pdb", overWrite);
+//            CopyEditorFile("DataModels", "Skill.DataModels.dll", overWrite);
+//            CopyFile("Skill", "Skill.Framework.dll", overWrite);
+//            CopyFile("Skill", "Skill.Framework.pdb", overWrite);
+//            CopyFile("Skill", "Skill.Framework.xml", overWrite);
+//#else
             Skill.CodeGeneration.RequiredFile[] files = PluginManager.Plugin.RequiredFiles;
             if (files != null && files.Length > 0)
             {
@@ -665,7 +665,7 @@ namespace Skill.Studio
                     CopyFile(rf, overWrite);
                 }
             }
-#endif
+//#endif
 
 
         }
@@ -685,12 +685,12 @@ namespace Skill.Studio
                 if (System.IO.File.Exists(filePath))
                 {
                     Project.CreateDirectory(destinaion);
-                    System.IO.File.Copy(filePath, destinaion, true);
+                    System.IO.File.Copy(filePath, destinaion, overWrite);
                 }
                 else if (System.IO.Directory.Exists(filePath))
                 {
                     Project.CreateDirectory(destinaion);
-                    DirectoryCopy(filePath, destinaion, true);
+                    DirectoryCopy(filePath, destinaion, overWrite);
                 }
             }
             catch (Exception ex)
@@ -699,7 +699,7 @@ namespace Skill.Studio
             }
         }
 
-        private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
+        private static void DirectoryCopy(string sourceDirName, string destDirName, bool overWrite)
         {
             System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo(sourceDirName);
             System.IO.DirectoryInfo[] dirs = dir.GetDirectories();
@@ -721,62 +721,59 @@ namespace Skill.Studio
             foreach (System.IO.FileInfo file in files)
             {
                 string temppath = System.IO.Path.Combine(destDirName, file.Name);
-                file.CopyTo(temppath, true);
+                file.CopyTo(temppath, overWrite);
             }
 
-            if (copySubDirs)
+            foreach (System.IO.DirectoryInfo subdir in dirs)
             {
-                foreach (System.IO.DirectoryInfo subdir in dirs)
-                {
-                    string temppath = System.IO.Path.Combine(destDirName, subdir.Name);
-                    DirectoryCopy(subdir.FullName, temppath, copySubDirs);
-                }
+                string temppath = System.IO.Path.Combine(destDirName, subdir.Name);
+                DirectoryCopy(subdir.FullName, temppath, overWrite);
             }
         }
 
 
-        private void CopyFile(string projectName, string filename, bool overWrite)
-        {
-            string destinaion = Project.GetDesignerOutputPath(filename);
+        //private void CopyFile(string projectName, string filename, bool overWrite)
+        //{
+        //    string destinaion = Project.GetDesignerOutputPath(filename);
 
-            if (System.IO.File.Exists(destinaion) && !overWrite)
-                return;
+        //    if (System.IO.File.Exists(destinaion) && !overWrite)
+        //        return;
 
-            string appDir = AppDomain.CurrentDomain.BaseDirectory;
+        //    string appDir = AppDomain.CurrentDomain.BaseDirectory;
 
-            string name = System.IO.Path.GetFileNameWithoutExtension(filename);
+        //    string name = System.IO.Path.GetFileNameWithoutExtension(filename);
 
-            string filePath = System.IO.Path.Combine(appDir, string.Format("../../../{0}/bin/Debug", projectName), filename);
+        //    string filePath = System.IO.Path.Combine(appDir, string.Format("../../../{0}/bin/Debug", projectName), filename);
 
-            Project.CreateDirectory(destinaion);
+        //    Project.CreateDirectory(destinaion);
 
-            if (System.IO.File.Exists(filePath))
-            {
-                System.IO.File.Copy(filePath, destinaion, true);
-            }
-        }
+        //    if (System.IO.File.Exists(filePath))
+        //    {
+        //        System.IO.File.Copy(filePath, destinaion, overWrite);
+        //    }
+        //}
 
-        private void CopyEditorFile(string projectName, string filename, bool overWrite)
-        {
-            string destinaion = Project.GetEditorOutputPath(System.IO.Path.Combine("Skill", filename));
+        //private void CopyEditorFile(string projectName, string filename, bool overWrite)
+        //{
+        //    string destinaion = Project.GetEditorOutputPath(System.IO.Path.Combine("Skill", filename));
 
-            if (System.IO.File.Exists(destinaion) && !overWrite)
-                return;
+        //    if (System.IO.File.Exists(destinaion) && !overWrite)
+        //        return;
 
-            string appDir = AppDomain.CurrentDomain.BaseDirectory;
+        //    string appDir = AppDomain.CurrentDomain.BaseDirectory;
 
-            string name = System.IO.Path.GetFileNameWithoutExtension(filename);
+        //    string name = System.IO.Path.GetFileNameWithoutExtension(filename);
 
-            string filePath = System.IO.Path.Combine(appDir, string.Format("../../../{0}/bin/Debug", projectName), filename);
+        //    string filePath = System.IO.Path.Combine(appDir, string.Format("../../../{0}/bin/Debug", projectName), filename);
 
-            Project.CreateDirectory(destinaion);
+        //    Project.CreateDirectory(destinaion);
 
-            if (System.IO.File.Exists(filePath))
-            {
-                System.IO.File.Copy(filePath, destinaion, true);
-            }
+        //    if (System.IO.File.Exists(filePath))
+        //    {
+        //        System.IO.File.Copy(filePath, destinaion, true);
+        //    }
 
-        }
+        //}
 
         #endregion
 

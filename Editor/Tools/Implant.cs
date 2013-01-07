@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using Skill.UI;
+using Skill.Framework.UI;
 
 namespace Skill.Editor.Tools
 {
@@ -62,7 +62,7 @@ namespace Skill.Editor.Tools
         private Skill.Editor.UI.EditorFrame _Frame;
         private Skill.Editor.UI.ObjectField<ImplantAsset> _AssetField;
         private Skill.Editor.UI.LayerMaskField _Layers;
-        private Skill.UI.Label _InfoLabel;
+        private Skill.Framework.UI.Label _InfoLabel;
 
         private bool _IsImplantEnable;
         private Skill.Editor.UI.Button _BtnEnabled;
@@ -89,7 +89,7 @@ namespace Skill.Editor.Tools
             _BtnEnabled.Content.text = "Enable";
             _BtnEnabled.Click += new System.EventHandler(_BtnEnabled_Click);
 
-            _InfoLabel = new Skill.UI.Label() { Row = 3, Column = 0 };
+            _InfoLabel = new Skill.Framework.UI.Label() { Row = 3, Column = 0 };
 
             _Frame.Grid.Controls.Add(_AssetField);
             _Frame.Grid.Controls.Add(_Layers);

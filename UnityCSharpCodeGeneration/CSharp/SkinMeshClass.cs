@@ -28,7 +28,7 @@ namespace Skill.CodeGeneration.CSharp
 
             foreach (var item in animationClips)
             {
-                Add(new Variable("Skill.Animation.Vector3Keyframes", item.Name) { IsStatic = true });
+                Add(new Variable("Skill.Framework.Animation.Vector3Keyframes", item.Name) { IsStatic = true });
                 Add(new Vector3KeyframesProperty(item.Name, item.RootMotion));
             }
         }
@@ -37,7 +37,7 @@ namespace Skill.CodeGeneration.CSharp
     class Vector3KeyframesProperty : Property
     {
         public Vector3KeyframesProperty(string propertyName, RootMotion rootMotion)
-            : base("Skill.Animation.Vector3Keyframes", propertyName, "", false)
+            : base("Skill.Framework.Animation.Vector3Keyframes", propertyName, "", false)
         {
             base.IsStatic = true;
             base.Modifiers = CSharp.Modifiers.Public;
@@ -60,7 +60,7 @@ namespace Skill.CodeGeneration.CSharp
             if (rootMotion.ZKeys.Count > 0)
                 CreateKeyframesVariable(builder, rootMotion.ZKeys, "zKeys ");
 
-            builder.AppendLine(string.Format("{0} = new Skill.Animation.Vector3Keyframes(xKeys, yKeys, zKeys);", varName));
+            builder.AppendLine(string.Format("{0} = new Skill.Framework.Animation.Vector3Keyframes(xKeys, yKeys, zKeys);", varName));
 
             builder.AppendLine("}");
             builder.AppendLine(string.Format("return {0};", varName));

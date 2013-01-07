@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Skill.UI;
+using Skill.Framework.UI;
 using UnityEngine;
 
 namespace Skill.Editor.UI
@@ -61,7 +61,7 @@ namespace Skill.Editor.UI
         /// </summary>
         protected virtual void OnExpanded()
         {
-            Panel.Visibility = Skill.UI.Visibility.Visible;
+            Panel.Visibility = Skill.Framework.UI.Visibility.Visible;
             if (Expanded != null)
                 Expanded(this, EventArgs.Empty);
             OnLayoutChanged();
@@ -76,7 +76,7 @@ namespace Skill.Editor.UI
         /// </summary>
         protected virtual void OnCollapsed()
         {
-            Panel.Visibility = Skill.UI.Visibility.Collapsed;
+            Panel.Visibility = Skill.Framework.UI.Visibility.Collapsed;
             if (Collapsed != null)
                 Collapsed(this, EventArgs.Empty);
             OnLayoutChanged();
@@ -89,7 +89,7 @@ namespace Skill.Editor.UI
         {
             get
             {
-                if (Visibility != Skill.UI.Visibility.Collapsed)
+                if (Visibility != Skill.Framework.UI.Visibility.Collapsed)
                 {
                     Size ds = Panel.DesiredSize;
                     if (ds.Height > 0)

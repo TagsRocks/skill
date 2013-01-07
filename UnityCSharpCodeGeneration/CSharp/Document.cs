@@ -58,20 +58,20 @@ namespace Skill.CodeGeneration.CSharp
         {
             AddUsing("Skill");
         }
-        /// <summary> Add using Skill.AI </summary>
+        /// <summary> Add using Skill.Framework.AI </summary>
         public void AddUsingSkillAI()
         {
-            AddUsing("Skill.AI");
+            AddUsing("Skill.Framework.AI");
         }
-        /// <summary> Add using Skill.Animation </summary>
+        /// <summary> Add using Skill.Framework.Animation </summary>
         public void AddUsingSkillAnimation()
         {
-            AddUsing("Skill.Animation");
+            AddUsing("Skill.Framework.Animation");
         }
-        /// <summary> Add using Skill.IO </summary>
+        /// <summary> Add using Skill.Framework.IO </summary>
         public void AddUsingSkillIO()
         {
-            AddUsing("Skill.IO");
+            AddUsing("Skill.Framework.IO");
         }
         /// <summary> Add default usings </summary>
         public void AddDefaultUsings()

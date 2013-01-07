@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEditor;
-using Skill.UI;
+using Skill.Framework.UI;
 
 namespace Skill.Editor.Tools
 {
@@ -62,13 +62,13 @@ namespace Skill.Editor.Tools
         private static readonly Vector3 LabelOffset = new Vector3(0, 0.5f, 0);
 
         private Skill.Editor.UI.EditorFrame _Frame;
-        private Skill.UI.Box _Title;
+        private Skill.Framework.UI.Box _Title;
         private Skill.Editor.UI.LayerMaskField _Layers;
         private Skill.Editor.UI.LabelField _LblStartPoint;
         private Skill.Editor.UI.LabelField _LblEndPoint;
         private Skill.Editor.UI.LabelField _LblDistance;
         private Skill.Editor.UI.Button _BtnEnabled;
-        private Skill.UI.Label _InfoLabel;
+        private Skill.Framework.UI.Label _InfoLabel;
         private bool _IsDistanceEnable;
 
         private Vector3 _StartPoint;
@@ -118,7 +118,7 @@ namespace Skill.Editor.Tools
             _BtnEnabled.Content.text = "Enable";
             _BtnEnabled.Click += new System.EventHandler(_BtnEnabled_Click);
 
-            _InfoLabel = new Skill.UI.Label() { Row = 6, Column = 0 };
+            _InfoLabel = new Skill.Framework.UI.Label() { Row = 6, Column = 0 };
 
             _Frame.Grid.Controls.Add(_Title);
             _Frame.Grid.Controls.Add(_Layers);

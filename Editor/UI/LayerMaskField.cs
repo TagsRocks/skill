@@ -4,7 +4,7 @@ using Skill.Editor.UI;
 using System;
 using UnityEditor;
 using System.Collections.Generic;
-using Skill.UI;
+using Skill.Framework.UI;
 
 namespace Skill.Editor.UI
 {

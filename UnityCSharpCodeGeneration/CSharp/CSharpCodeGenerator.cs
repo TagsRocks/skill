@@ -18,14 +18,14 @@ namespace Skill.CodeGeneration.CSharp
     {
         private RequiredFile[] _RequiredFiles = new RequiredFile[]
         {
-            new RequiredFile("Skill.dll","Designer"),
-            new RequiredFile("Skill.xml","Designer"),            
-            new RequiredFile("Skill.pdb","Designer"),            
-            new RequiredFile("Skill.Editor.dll","Editor\\Skill","Assets"),
-            new RequiredFile("Skill.Editor.xml","Editor\\Skill","Assets"),
-            new RequiredFile("Skill.Editor.pdb","Editor\\Skill","Assets"),
-            new RequiredFile("Resources","Editor\\Skill","Assets"),
-            new RequiredFile("Skill.DataModels.dll","Editor\\Skill","Assets"),
+            new RequiredFile("Skill.Framework.dll","Skill","Assets"),
+            new RequiredFile("Skill.Framework.xml","Skill","Assets"),            
+            new RequiredFile("Skill.Framework.pdb","Skill","Assets"),            
+            new RequiredFile("Skill.Editor.dll","Skill\\Editor","Assets"),
+            new RequiredFile("Skill.Editor.xml","Skill\\Editor","Assets"),
+            new RequiredFile("Skill.Editor.pdb","Skill\\Editor","Assets"),
+            new RequiredFile("Resources","Skill\\Editor","Assets"),
+            new RequiredFile("Skill.DataModels.dll","Skill\\Editor","Assets"),
         };
         public RequiredFile[] RequiredFiles { get { return _RequiredFiles; } }
 
@@ -58,7 +58,7 @@ namespace Skill.CodeGeneration.CSharp
         public void Reset()
         {
             _Document = new Document();
-            _Document.AddDefaultUsings();            
+            _Document.AddDefaultUsings();
         }
 
         /// <summary>

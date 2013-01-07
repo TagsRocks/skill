@@ -37,19 +37,7 @@ namespace Skill.Studio.Animation.Editor
                 if (ViewModel != null && ViewModel.IsSelected)
                 {
                     AnimationTreeCanvas canvas = ParentCanvas;
-
-                    //if ((Keyboard.Modifiers & ModifierKeys.Shift) != ModifierKeys.None)
-                    //{
-                    //    if (!canvas.Editor.IsDuplicating)
-                    //        canvas.Editor.DuplicateSelection();
-                    //}
-
-                    //if (canvas.Editor.IsDuplicating)
-                    //{
-                    //    canvas.Editor.MoveDuplicated(e.HorizontalChange, e.VerticalChange);
-                    //}
-
-
+                    
                     double minLeft = double.MaxValue;
                     double minTop = double.MaxValue;
 

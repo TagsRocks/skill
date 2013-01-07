@@ -145,8 +145,6 @@ namespace Skill.Studio.AI.Editor
         /// <summary> BehaviorTree ViewModel </summary>
         public BehaviorTreeViewModel BehaviorTree { get; private set; }
 
-        public ScrollViewer ScrollViewer { get { return _DesignerScrollViewer; } }
-
         public ObservableCollection<GifImage> Animations { get; private set; }
 
         private bool _ShowAnimations = true;
@@ -207,7 +205,14 @@ namespace Skill.Studio.AI.Editor
             History.UndoChange += new UnDoRedoChangeEventHandler(History_UndoChange);
             History.RedoChange += new UnDoRedoChangeEventHandler(History_RedoChange);
 
+            this.Loaded += BehaviorTreeEditor_Loaded;
+
             InitialDebug();
+        }
+
+        void BehaviorTreeEditor_Loaded(object sender, RoutedEventArgs e)
+        {
+            _Zoombox.FillToBounds();
         }
         #endregion
 
@@ -292,7 +297,7 @@ namespace Skill.Studio.AI.Editor
                 e.Handled = true;
             }
         }
-        #endregion
+        #endregion        
 
         #region UpdatePositions
 
@@ -339,7 +344,29 @@ namespace Skill.Studio.AI.Editor
                                 {
                                     var newVM = selected.AddBehavior(insertItem, null, true);
                                     if (newVM != null)
+                                    {
                                         newVM.IsSelected = true;
+                                        foreach (BehaviorViewModel vm in BehaviorTree.GetSharedModel(newVM.Model))
+                                        {
+                                            if (vm != newVM)
+                                            {
+                                                ParameterCollectionViewModel parameters = null;
+                                                if (vm.Model.BehaviorType == DataModels.AI.BehaviorType.Action)
+                                                    parameters = ((ActionViewModel)vm).Parameters;
+                                                else if (vm.Model.BehaviorType == DataModels.AI.BehaviorType.Decorator)
+                                                    parameters = ((DecoratorViewModel)vm).Parameters;
+                                                else if (vm.Model.BehaviorType == DataModels.AI.BehaviorType.Condition)
+                                                    parameters = ((ConditionViewModel)vm).Parameters;
+
+                                                if (parameters != null)
+                                                {
+                                                    newVM.MatchParameters(parameters.Model);
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                    }
                                     UpdatePositions();
                                 }
                                 else
@@ -789,7 +816,7 @@ namespace Skill.Studio.AI.Editor
 
         private void StartDebug()
         {
-            Skill.AI.RandomSelector.RandomService = _DebugRandomService;
+            Skill.Framework.AI.RandomSelector.RandomService = _DebugRandomService;
             BehaviorTree.Root.Debug.UpdateChildren();
             BehaviorTree.IsDebuging = true;
             BehaviorTree.DebugTimer = new TimeSpan();
@@ -945,7 +972,7 @@ namespace Skill.Studio.AI.Editor
         private void Back_MouseDown(object sender, MouseButtonEventArgs e)
         {
             this.Focus();
-        } 
+        }
         #endregion
 
     }

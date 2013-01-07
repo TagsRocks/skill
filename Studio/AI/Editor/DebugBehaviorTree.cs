@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Skill.AI;
+using Skill.Framework.AI;
 
 namespace Skill.Studio.AI.Editor
 {
@@ -21,7 +21,7 @@ namespace Skill.Studio.AI.Editor
         /// <summary>
         /// State of BehaviorTree
         /// </summary>
-        public BehaviorState State { get; private set; }
+        public BehaviorTreeState State { get; private set; }
 
         /// <summary>
         /// Create an instance of BehaviorTree
@@ -33,7 +33,7 @@ namespace Skill.Studio.AI.Editor
         public DebugBehaviorTree(Behavior root)
         {
             this.Root = root;
-            this.State = new BehaviorState();
+            this.State = new BehaviorTreeState(root);
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace Skill.Studio.AI.Editor
         /// </summary>
         public void Reset()
         {
-            Root.ResetBehavior(true);
+            Root.ResetBehavior(State);
         }
     }
 }

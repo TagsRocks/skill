@@ -74,7 +74,7 @@ namespace Skill.Editor
         [MenuItem("Assets/Create/Skill/Spawn Asset")]
         static void CreateSpawnData()
         {
-            Skill.SpawnAsset data;
+            Skill.Framework.SpawnAsset data;
             string name = "SpawnAsset";
             int nameIdx = 0;
 
@@ -82,7 +82,7 @@ namespace Skill.Editor
                 nameIdx++;
 
 
-            data = CreateInstance<SpawnAsset>();
+            data = CreateInstance<Skill.Framework.SpawnAsset>();
             AssetDatabase.CreateAsset(data, "Assets/" + name + nameIdx + ".asset");
             Selection.activeObject = data;
             EditorUtility.FocusProjectWindow();

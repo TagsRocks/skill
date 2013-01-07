@@ -42,7 +42,7 @@ namespace Skill.Studio.AI
                 {
                     ((Decorator)Model).NeverFail = value;
                     OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs("NeverFail"));
-                    ((Skill.AI.Decorator)Debug.Behavior).NeverFail = value;
+                    ((Skill.Framework.AI.Decorator)Debug.Behavior).NeverFail = value;
                     Tree.History.Insert(new ChangePropertyUnDoRedo(this, "NeverFail", value, !value));
                 }
             }

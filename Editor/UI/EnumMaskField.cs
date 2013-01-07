@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Skill.UI;
+using Skill.Framework.UI;
 using UnityEditor;
 using UnityEngine;
 
@@ -40,7 +40,7 @@ namespace Skill.Editor.UI
                 if (_Mask != value)
                 {
                     _Mask = value;
-                    OnMaskChanged();
+                    OnMaskChanged();                    
                 }
             }
         }

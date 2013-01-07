@@ -38,14 +38,14 @@ namespace Skill.CodeGeneration.CSharp
                     switch (ak.Type)
                     {
                         case AccessKeyType.CounterLimit:
-                            this.Add(new Variable("Skill.AI.CounterLimitAccessKey", ak.Key) { IsStatic = true });
-                            this.Add(new Property("Skill.AI.CounterLimitAccessKey", ak.Key, Variable.GetName(ak.Key), false) { IsStatic = true });
-                            staticConstructorBody.AppendLine(string.Format("{0} = new Skill.AI.CounterLimitAccessKey(\"{1}\",{2});", Variable.GetName(ak.Key), ak.Key, ((CounterLimitAccessKey)ak).MaxAccessCount));
+                            this.Add(new Variable("Skill.Framework.AI.CounterLimitAccessKey", ak.Key) { IsStatic = true });
+                            this.Add(new Property("Skill.Framework.AI.CounterLimitAccessKey", ak.Key, Variable.GetName(ak.Key), false) { IsStatic = true });
+                            staticConstructorBody.AppendLine(string.Format("{0} = new Skill.Framework.AI.CounterLimitAccessKey(\"{1}\",{2});", Variable.GetName(ak.Key), ak.Key, ((CounterLimitAccessKey)ak).MaxAccessCount));
                             break;
                         case AccessKeyType.TimeLimit:
-                            this.Add(new Variable("Skill.AI.TimeLimitAccessKey", ak.Key) { IsStatic = true });
-                            this.Add(new Property("Skill.AI.TimeLimitAccessKey", ak.Key, Variable.GetName(ak.Key), false) { IsStatic = true });
-                            staticConstructorBody.AppendLine(string.Format("{0} = new Skill.AI.TimeLimitAccessKey(\"{1}\",{2}f);", Variable.GetName(ak.Key), ak.Key, ((TimeLimitAccessKey)ak).TimeInterval.ToString("F")));
+                            this.Add(new Variable("Skill.Framework.AI.TimeLimitAccessKey", ak.Key) { IsStatic = true });
+                            this.Add(new Property("Skill.Framework.AI.TimeLimitAccessKey", ak.Key, Variable.GetName(ak.Key), false) { IsStatic = true });
+                            staticConstructorBody.AppendLine(string.Format("{0} = new Skill.Framework.AI.TimeLimitAccessKey(\"{1}\",{2}f);", Variable.GetName(ak.Key), ak.Key, ((TimeLimitAccessKey)ak).TimeInterval.ToString("F")));
                             break;
                     }
                 }

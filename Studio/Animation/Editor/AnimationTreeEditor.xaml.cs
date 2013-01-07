@@ -44,8 +44,6 @@ namespace Skill.Studio.Animation.Editor
 
         public Selection Selection { get; private set; }
 
-        public ScrollViewer ScrollViewer { get { return _DesignerScrollViewer; } }
-
         #endregion
 
         #region Constructor
@@ -107,26 +105,7 @@ namespace Skill.Studio.Animation.Editor
                     item.RefreshConnections();
                 }
             }
-        }
-
-        public override void OnApplyTemplate()
-        {
-            base.OnApplyTemplate();
-            if (AnimationTree != null)
-            {
-                _DesignerScrollViewer.ScrollToHorizontalOffset(AnimationTree.HorizontalOffset);
-                _DesignerScrollViewer.ScrollToVerticalOffset(AnimationTree.VerticalOffset);
-            }
-        }
-        #endregion
-
-        #region Save
-
-        public override void Save()
-        {
-            AnimationTree.HorizontalOffset = _DesignerScrollViewer.HorizontalOffset;
-            AnimationTree.VerticalOffset = _DesignerScrollViewer.VerticalOffset;
-            base.Save();
+            _Zoombox.FillToBounds();
         }
         #endregion
 

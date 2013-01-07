@@ -11,15 +11,15 @@ namespace Skill.Editor.UI
     public class XYZComponent : Skill.Editor.UI.EditorControl
     {
 
-        private Skill.UI.StackPanel _Panel;
-        private Skill.UI.ToggleButton _TbX, _TbY, _TbZ;
+        private Skill.Framework.UI.StackPanel _Panel;
+        private Skill.Framework.UI.ToggleButton _TbX, _TbY, _TbZ;
 
         /// <summary> Retrieves ToggleButton used for X component </summary>
-        public Skill.UI.ToggleButton XComponent { get { return _TbX; } }
+        public Skill.Framework.UI.ToggleButton XComponent { get { return _TbX; } }
         /// <summary> Retrieves ToggleButton used for Y component </summary>
-        public Skill.UI.ToggleButton YComponent { get { return _TbY; } }
+        public Skill.Framework.UI.ToggleButton YComponent { get { return _TbY; } }
         /// <summary> Retrieves ToggleButton used for Z component </summary>
-        public Skill.UI.ToggleButton ZComponent { get { return _TbZ; } }
+        public Skill.Framework.UI.ToggleButton ZComponent { get { return _TbZ; } }
 
         /// <summary> Is X component checked </summary>
         public bool IsXChecked { get { return _TbX.IsChecked; } }
@@ -34,15 +34,15 @@ namespace Skill.Editor.UI
         public XYZComponent()
         {
             this.Height = 16;
-            this._Panel = new Skill.UI.StackPanel() { Orientation = Skill.UI.Orientation.Horizontal, Parent = this };
+            this._Panel = new Skill.Framework.UI.StackPanel() { Orientation = Skill.Framework.UI.Orientation.Horizontal, Parent = this };
 
-            this._TbX = new Skill.UI.ToggleButton() { Margin = new Skill.UI.Thickness(2, 0, 0, 0), Width = 30 };
+            this._TbX = new Skill.Framework.UI.ToggleButton() { Margin = new Skill.Framework.UI.Thickness(2, 0, 0, 0), Width = 30 };
             this._TbX.Content.text = "X";
 
-            this._TbY = new Skill.UI.ToggleButton() { Margin = new Skill.UI.Thickness(2, 0, 0, 0), Width = 30 };
+            this._TbY = new Skill.Framework.UI.ToggleButton() { Margin = new Skill.Framework.UI.Thickness(2, 0, 0, 0), Width = 30 };
             this._TbY.Content.text = "Y";
 
-            this._TbZ = new Skill.UI.ToggleButton() { Margin = new Skill.UI.Thickness(2, 0, 0, 0), Width = 30 };
+            this._TbZ = new Skill.Framework.UI.ToggleButton() { Margin = new Skill.Framework.UI.Thickness(2, 0, 0, 0), Width = 30 };
             this._TbZ.Content.text = "Z";
 
             this._Panel.Controls.Add(this._TbX);

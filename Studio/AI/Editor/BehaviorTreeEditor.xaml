@@ -6,6 +6,7 @@
              xmlns:ad="clr-namespace:AvalonDock;assembly=AvalonDock"
              xmlns:vm="clr-namespace:Skill.Studio.AI"
              xmlns:dmai="clr-namespace:Skill.DataModels.AI;assembly=Skill.DataModels"
+             xmlns:extToolkit="clr-namespace:Xceed.Wpf.Toolkit.Zoombox;assembly=WPFToolkit.Extended"
              xmlns:sk="clr-namespace:Skill.Studio"
              xmlns:my="clr-namespace:Skill.Studio.Controls"             
              xmlns:bedit="clr-namespace:Skill.Studio.AI.Editor"             
@@ -231,86 +232,86 @@
             </Grid>
             <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="2" Background="Gray" />
             <Grid Grid.Column="2" >
-                <ScrollViewer Name="_DesignerScrollViewer" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
-                    <ItemsControl ItemsSource="{Binding BehaviorTree.Behaviors}" >
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <bedit:BehaviorTreeCanvas Editor="{Binding ElementName=BTEditor}"  >
-                                </bedit:BehaviorTreeCanvas>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.Resources>
-                            <DataTemplate DataType="{x:Type vm:ActionViewModel}"  >
-                                <bedit:BehaviorBorder ViewModel="{Binding}" x:Name="Bd" >
-                                    <Grid>
-                                        <Canvas VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  >
-                                            <Path  Data="{Binding ConnectionToP}" Stroke="{Binding BorderBrush}" StrokeThickness="{Binding ConnectionStroke}" />
-                                        </Canvas>
-                                        <Border Background="{Binding BackBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="{Binding ConnectionStroke}" CornerRadius="8" Padding="6" MouseLeftButtonDown="Behavior_MouseLeftButtonDown" MinWidth="80" >
-                                            <StackPanel Orientation="Horizontal" >
-                                                <Image Source="{Binding ImageName}" Width="16" Height="16" Margin="2,0" />
-                                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="2,0" />
-                                            </StackPanel>
-                                        </Border>
-                                    </Grid>
-                                </bedit:BehaviorBorder>
-                            </DataTemplate>
-                            <DataTemplate DataType="{x:Type vm:CompositeViewModel}"  >
-                                <bedit:BehaviorBorder ViewModel="{Binding}" x:Name="Bd" >
-                                    <Grid>
-                                        <Canvas VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  >
-                                            <Path  Data="{Binding ConnectionToP}" Stroke="{Binding BorderBrush}" StrokeThickness="{Binding ConnectionStroke}" />
-                                        </Canvas>
-                                        <Border Background="{Binding BackBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="{Binding ConnectionStroke}" CornerRadius="2" Padding="6" MouseLeftButtonDown="Behavior_MouseLeftButtonDown" MinWidth="80" MinHeight="50" >
-                                            <StackPanel Orientation="Horizontal" >
-                                                <Image Source="{Binding ImageName}" Width="16" Height="16" Margin="2,0" VerticalAlignment="Center" />
-                                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="2,0" />
-                                            </StackPanel>
-                                        </Border>
-                                    </Grid>
-                                </bedit:BehaviorBorder>
-                            </DataTemplate>
-                            <DataTemplate DataType="{x:Type vm:DecoratorViewModel}"  >
-                                <bedit:BehaviorBorder ViewModel="{Binding}" x:Name="Bd" >
-                                    <Grid>
-                                        <Canvas VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  >
-                                            <Path  Data="{Binding ConnectionToP}" Stroke="{Binding BorderBrush}" StrokeThickness="{Binding ConnectionStroke}" />
-                                        </Canvas>
-                                        <Border Background="{Binding BackBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="{Binding ConnectionStroke}" CornerRadius="30" Padding="6" MouseLeftButtonDown="Behavior_MouseLeftButtonDown" MinWidth="80" MinHeight="40"  >
-                                            <StackPanel Orientation="Horizontal" >
-                                                <Image Source="{Binding ImageName}" Width="16" Height="16" Margin="2,0" VerticalAlignment="Center" />
-                                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="2,0" />
-                                                <CheckBox IsChecked="{Binding IsValid}" Margin="2,0" VerticalAlignment="Center" />
-                                            </StackPanel>
-                                        </Border>
-                                    </Grid>
-                                </bedit:BehaviorBorder>
-                            </DataTemplate>
-                            <DataTemplate DataType="{x:Type vm:ConditionViewModel}"  >
-                                <bedit:BehaviorBorder ViewModel="{Binding}" x:Name="Bd" >
-                                    <Grid>
-                                        <Canvas VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  >
-                                            <Path  Data="{Binding ConnectionToP}" Stroke="{Binding BorderBrush}" StrokeThickness="{Binding ConnectionStroke}" />
-                                        </Canvas>
-                                        <Border Background="{Binding BackBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="{Binding ConnectionStroke}" CornerRadius="8" Padding="6" MouseLeftButtonDown="Behavior_MouseLeftButtonDown" MinWidth="80" >
-                                            <StackPanel Orientation="Horizontal" >
-                                                <Image Source="{Binding ImageName}" Width="16" Height="16" Margin="2,0" />
-                                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="2,0" />
-                                                <CheckBox IsChecked="{Binding IsValid}" Margin="2,0" />
-                                            </StackPanel>
-                                        </Border>
-                                    </Grid>
-                                </bedit:BehaviorBorder>
-                            </DataTemplate>
-                        </ItemsControl.Resources>
-                        <ItemsControl.ItemContainerStyle >
-                            <Style >
-                                <Setter Property="Canvas.Top" Value="{Binding Path=Y,Mode=TwoWay}" />
-                                <Setter Property="Canvas.Left" Value="{Binding Path=X,Mode=TwoWay}" />
-                            </Style>
-                        </ItemsControl.ItemContainerStyle>
-                    </ItemsControl>
-                </ScrollViewer>
+                <extToolkit:Zoombox x:Name="_Zoombox" >                    
+                        <ItemsControl ItemsSource="{Binding BehaviorTree.Behaviors}" >
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <bedit:BehaviorTreeCanvas Editor="{Binding ElementName=BTEditor}"  >
+                                    </bedit:BehaviorTreeCanvas>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.Resources>
+                                <DataTemplate DataType="{x:Type vm:ActionViewModel}"  >
+                                    <bedit:BehaviorBorder ViewModel="{Binding}" x:Name="Bd" >
+                                        <Grid>
+                                            <Canvas VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  >
+                                                <Path  Data="{Binding ConnectionToP}" Stroke="{Binding BorderBrush}" StrokeThickness="{Binding ConnectionStroke}" />
+                                            </Canvas>
+                                            <Border Background="{Binding BackBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="{Binding ConnectionStroke}" CornerRadius="8" Padding="6" MouseLeftButtonDown="Behavior_MouseLeftButtonDown" MinWidth="80" >
+                                                <StackPanel Orientation="Horizontal" >
+                                                    <Image Source="{Binding ImageName}" Width="16" Height="16" Margin="2,0" />
+                                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="2,0" />
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+                                    </bedit:BehaviorBorder>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type vm:CompositeViewModel}"  >
+                                    <bedit:BehaviorBorder ViewModel="{Binding}" x:Name="Bd" >
+                                        <Grid>
+                                            <Canvas VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  >
+                                                <Path  Data="{Binding ConnectionToP}" Stroke="{Binding BorderBrush}" StrokeThickness="{Binding ConnectionStroke}" />
+                                            </Canvas>
+                                            <Border Background="{Binding BackBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="{Binding ConnectionStroke}" CornerRadius="2" Padding="6" MouseLeftButtonDown="Behavior_MouseLeftButtonDown" MinWidth="80" MinHeight="50" >
+                                                <StackPanel Orientation="Horizontal" >
+                                                    <Image Source="{Binding ImageName}" Width="16" Height="16" Margin="2,0" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="2,0" />
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+                                    </bedit:BehaviorBorder>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type vm:DecoratorViewModel}"  >
+                                    <bedit:BehaviorBorder ViewModel="{Binding}" x:Name="Bd" >
+                                        <Grid>
+                                            <Canvas VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  >
+                                                <Path  Data="{Binding ConnectionToP}" Stroke="{Binding BorderBrush}" StrokeThickness="{Binding ConnectionStroke}" />
+                                            </Canvas>
+                                            <Border Background="{Binding BackBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="{Binding ConnectionStroke}" CornerRadius="30" Padding="6" MouseLeftButtonDown="Behavior_MouseLeftButtonDown" MinWidth="80" MinHeight="40"  >
+                                                <StackPanel Orientation="Horizontal" >
+                                                    <Image Source="{Binding ImageName}" Width="16" Height="16" Margin="2,0" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="2,0" />
+                                                    <CheckBox IsChecked="{Binding IsValid}" Margin="2,0" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+                                    </bedit:BehaviorBorder>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type vm:ConditionViewModel}"  >
+                                    <bedit:BehaviorBorder ViewModel="{Binding}" x:Name="Bd" >
+                                        <Grid>
+                                            <Canvas VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  >
+                                                <Path  Data="{Binding ConnectionToP}" Stroke="{Binding BorderBrush}" StrokeThickness="{Binding ConnectionStroke}" />
+                                            </Canvas>
+                                            <Border Background="{Binding BackBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="{Binding ConnectionStroke}" CornerRadius="8" Padding="6" MouseLeftButtonDown="Behavior_MouseLeftButtonDown" MinWidth="80" >
+                                                <StackPanel Orientation="Horizontal" >
+                                                    <Image Source="{Binding ImageName}" Width="16" Height="16" Margin="2,0" />
+                                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="2,0" />
+                                                    <CheckBox IsChecked="{Binding IsValid}" Margin="2,0" />
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+                                    </bedit:BehaviorBorder>
+                                </DataTemplate>
+                            </ItemsControl.Resources>
+                            <ItemsControl.ItemContainerStyle >
+                                <Style >
+                                    <Setter Property="Canvas.Top" Value="{Binding Path=Y,Mode=TwoWay}" />
+                                    <Setter Property="Canvas.Left" Value="{Binding Path=X,Mode=TwoWay}" />
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                        </ItemsControl>                    
+                </extToolkit:Zoombox>
                 <ItemsControl ItemsSource="{Binding Animations}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,8,0" Height="{Binding AnimationSize}"  Visibility="{Binding ShowAnimations, Converter={StaticResource BToVisConverter}, ConverterParameter=False}" >
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>

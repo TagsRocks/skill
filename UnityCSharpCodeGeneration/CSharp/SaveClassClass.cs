@@ -24,7 +24,7 @@ namespace Skill.CodeGeneration.CSharp
             this._SaveClass = saveClass;
             this.IsPartial = false;
 
-            AddInherit("Skill.IO.ISavable");
+            AddInherit("Skill.Framework.IO.ISavable");
 
             Method constructor = new Method("", Name, "");
             constructor.Modifiers = Modifiers.Public;
@@ -130,7 +130,7 @@ namespace Skill.CodeGeneration.CSharp
                 toXmlElementBody.AppendLine(string.Format("e.AppendChild({0});", variable));
             }
 
-            Method toXmlElement = new Method("void", "Save", toXmlElementBody.ToString(), "System.Xml.XmlElement e", "Skill.IO.XmlSaveStream stream");
+            Method toXmlElement = new Method("void", "Save", toXmlElementBody.ToString(), "System.Xml.XmlElement e", "Skill.Framework.IO.XmlSaveStream stream");
             toXmlElement.Modifiers = Modifiers.Public;
             Add(toXmlElement);
         }
@@ -147,7 +147,7 @@ namespace Skill.CodeGeneration.CSharp
                     saveBinaryBody.AppendLine(string.Format("stream.Write<{0}>({1});", ((ClassProperty)p).ClassName, Variable.GetName(p.Name)));
             }
 
-            Method saveMethod = new Method("void", "Save", saveBinaryBody.ToString(), "Skill.IO.BinarySaveStream stream");
+            Method saveMethod = new Method("void", "Save", saveBinaryBody.ToString(), "Skill.Framework.IO.BinarySaveStream stream");
             saveMethod.Modifiers = Modifiers.Public;
             Add(saveMethod);
         }
@@ -251,7 +251,7 @@ namespace Skill.CodeGeneration.CSharp
             loadXmlBody.AppendLine("element = element.NextSibling as System.Xml.XmlElement;");
             loadXmlBody.AppendLine("}");
 
-            Method loadMethod = new Method("void", "Load", loadXmlBody.ToString(), "System.Xml.XmlElement e", "Skill.IO.XmlLoadStream stream");
+            Method loadMethod = new Method("void", "Load", loadXmlBody.ToString(), "System.Xml.XmlElement e", "Skill.Framework.IO.XmlLoadStream stream");
             loadMethod.Modifiers = Modifiers.Public;
             Add(loadMethod);
         }
@@ -276,7 +276,7 @@ namespace Skill.CodeGeneration.CSharp
                 }                
             }
 
-            Method loadBinaryMethod = new Method("void", "Load", loadMethodBody.ToString(), "Skill.IO.BinaryLoadStream stream");
+            Method loadBinaryMethod = new Method("void", "Load", loadMethodBody.ToString(), "Skill.Framework.IO.BinaryLoadStream stream");
             loadBinaryMethod.Modifiers = Modifiers.Public;
             Add(loadBinaryMethod);
         }

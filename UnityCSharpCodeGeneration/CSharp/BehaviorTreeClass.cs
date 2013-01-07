@@ -12,8 +12,8 @@ namespace Skill.CodeGeneration.CSharp
     class BehaviorTreeClass : Class
     {
         #region Variables
-        private static string[] ActionResetEventHandlerParams = new string[] { "Skill.AI.Action action" };
-        private static string[] ConditionHandlerParams = new string[] { "Skill.AI.BehaviorParameterCollection parameters" };
+        private static string[] ActionResetEventHandlerParams = new string[] { "Skill.Framework.AI.Action action" };
+        private static string[] ConditionHandlerParams = new string[] { "Skill.Framework.AI.BehaviorParameterCollection parameters" };
         private static string[] DecoratorHandlerParams = ConditionHandlerParams;
         private static string[] ActionHandlerParams = ConditionHandlerParams;
 
@@ -35,19 +35,18 @@ namespace Skill.CodeGeneration.CSharp
             this._CreateTreeMethodBody = new StringBuilder();
             CreateBehaviorList();
             ProcessNodes();
-            AddInherit("Skill.AI.BehaviorTree");
+            AddInherit("Skill.Framework.AI.BehaviorTree");
 
             if (tree.AccessKeys != null)
             {
                 this.Add(new SharedAccessKeysClass(this._Tree.AccessKeys));
             }
 
-            Method constructor = new Method("", Name, "", "Skill.Controller controller");
-            constructor.Modifiers = Modifiers.Public;
-            constructor.BaseMethod = ":base(controller)";
+            Method constructor = new Method("", Name, "", "");
+            constructor.Modifiers = Modifiers.Public;            
             Add(constructor);
 
-            Method createTree = new Method("Skill.AI.Behavior", "CreateTree", this._CreateTreeMethodBody.ToString());
+            Method createTree = new Method("Skill.Framework.AI.Behavior", "CreateTree", this._CreateTreeMethodBody.ToString());
             createTree.IsPartial = false;
             createTree.SubMethod = SubMethod.Override;
             createTree.Modifiers = Modifiers.Protected;
@@ -132,7 +131,7 @@ namespace Skill.CodeGeneration.CSharp
         {
             StringBuilder result = new StringBuilder();
 
-            result.Append("new Skill.AI.BehaviorParameterCollection( new BehaviorParameter[] { ");
+            result.Append("new Skill.Framework.AI.BehaviorParameterCollection( new BehaviorParameter[] { ");
 
             foreach (var p in parameters)
             {
@@ -247,13 +246,13 @@ namespace Skill.CodeGeneration.CSharp
         private void CreateAction(Skill.DataModels.AI.Action action)
         {
             // create action variable
-            Add(new Variable("Skill.AI.Action", action.Name, "null"));
+            Add(new Variable("Skill.Framework.AI.Action", action.Name, "null"));
             // new action inside CreateTree method
-            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.Action(\"{1}\",{2});", Variable.GetName(action.Name), action.Name, GetActionHandlerName(action.Name)));
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Framework.AI.Action(\"{1}\",{2});", Variable.GetName(action.Name), action.Name, GetActionHandlerName(action.Name)));
             // set weight
             SetWeight(action);
             // create action handler method
-            Method m = new Method("Skill.AI.BehaviorResult", GetActionHandlerName(action.Name), "return Skill.AI.BehaviorResult.Failure;", ActionHandlerParams);
+            Method m = new Method("Skill.Framework.AI.BehaviorResult", GetActionHandlerName(action.Name), "return Skill.Framework.AI.BehaviorResult.Failure;", ActionHandlerParams);
             m.IsPartial = true;
             Add(m);
 
@@ -269,9 +268,9 @@ namespace Skill.CodeGeneration.CSharp
         private void CreateCondition(Condition condition)
         {
             // create condition variable
-            Add(new Variable("Skill.AI.Condition", condition.Name, "null"));
+            Add(new Variable("Skill.Framework.AI.Condition", condition.Name, "null"));
             // new condition variable inside CreateTree method
-            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.Condition(\"{1}\",{2});", Variable.GetName(condition.Name), condition.Name, GetConditionHandlerName(condition.Name)));
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Framework.AI.Condition(\"{1}\",{2});", Variable.GetName(condition.Name), condition.Name, GetConditionHandlerName(condition.Name)));
             // set weight
             SetWeight(condition);
             // create condition handler method
@@ -296,9 +295,9 @@ namespace Skill.CodeGeneration.CSharp
         private void CreateDefaultDecorator(Decorator decorator)
         {
             // create decorator variable
-            Add(new Variable("Skill.AI.Decorator", decorator.Name, "null"));
+            Add(new Variable("Skill.Framework.AI.Decorator", decorator.Name, "null"));
             // new decorator variable inside CreateTree method
-            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.Decorator(\"{1}\",{2});", Variable.GetName(decorator.Name), decorator.Name, GetDecoratorHandlerName(decorator.Name)));
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Framework.AI.Decorator(\"{1}\",{2});", Variable.GetName(decorator.Name), decorator.Name, GetDecoratorHandlerName(decorator.Name)));
             // set property SuccessOnFailHandler
             if (decorator.NeverFail != true) // default value is true, so it is not necessary to set it
                 _CreateTreeMethodBody.AppendLine(SetProperty(decorator.Name, "NeverFail", decorator.NeverFail.ToString().ToLower()));
@@ -313,18 +312,18 @@ namespace Skill.CodeGeneration.CSharp
         private void CreateAccessLimitDecorator(AccessLimitDecorator decorator)
         {
             // create decorator variable
-            Add(new Variable("Skill.AI.AccessLimitDecorator", decorator.Name, "null"));
+            Add(new Variable("Skill.Framework.AI.AccessLimitDecorator", decorator.Name, "null"));
 
             // new decorator variable inside CreateTree method
 
             if (string.IsNullOrEmpty(decorator.Address) || decorator.Address.Equals("Internal", StringComparison.OrdinalIgnoreCase))
             {
-                _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.AccessLimitDecorator(\"{1}\",{2},{3}.{4});", Variable.GetName(decorator.Name), decorator.Name, GetDecoratorHandlerName(decorator.Name), _Tree.AccessKeys.Name, decorator.AccessKey));
+                _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Framework.AI.AccessLimitDecorator(\"{1}\",{2},{3}.{4});", Variable.GetName(decorator.Name), decorator.Name, GetDecoratorHandlerName(decorator.Name), _Tree.AccessKeys.Name, decorator.AccessKey));
             }
             else
             {
                 string className = System.IO.Path.GetFileNameWithoutExtension(decorator.Address);
-                _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.AccessLimitDecorator(\"{1}\",{2},{3}.{4});", Variable.GetName(decorator.Name), decorator.Name, GetDecoratorHandlerName(decorator.Name), className, decorator.AccessKey));
+                _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Framework.AI.AccessLimitDecorator(\"{1}\",{2},{3}.{4});", Variable.GetName(decorator.Name), decorator.Name, GetDecoratorHandlerName(decorator.Name), className, decorator.AccessKey));
             }
             // set property SuccessOnFailHandler
             if (decorator.NeverFail != true) // default value is true, so it is not necessary to set it
@@ -366,17 +365,17 @@ namespace Skill.CodeGeneration.CSharp
         private void CreateSequenceSelector(SequenceSelector sequenceSelector)
         {
             // create SequenceSelector variable
-            Add(new Variable("Skill.AI.SequenceSelector", sequenceSelector.Name, "null"));
+            Add(new Variable("Skill.Framework.AI.SequenceSelector", sequenceSelector.Name, "null"));
             // new SequenceSelector variable inside CreateTree method
-            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.SequenceSelector(\"{1}\");", Variable.GetName(sequenceSelector.Name), sequenceSelector.Name));
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Framework.AI.SequenceSelector(\"{1}\");", Variable.GetName(sequenceSelector.Name), sequenceSelector.Name));
         }
 
         private void CreateConcurrentSelector(ConcurrentSelector concurrentSelector)
         {
             // create ConcurrentSelector variable
-            Add(new Variable("Skill.AI.ConcurrentSelector", concurrentSelector.Name, "null"));
+            Add(new Variable("Skill.Framework.AI.ConcurrentSelector", concurrentSelector.Name, "null"));
             // new ConcurrentSelector variable inside CreateTree method
-            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.ConcurrentSelector(\"{1}\");", Variable.GetName(concurrentSelector.Name), concurrentSelector.Name));
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Framework.AI.ConcurrentSelector(\"{1}\");", Variable.GetName(concurrentSelector.Name), concurrentSelector.Name));
 
             // set FirstConditions Property
             if (concurrentSelector.FirstConditions != true) // default is true            
@@ -388,39 +387,39 @@ namespace Skill.CodeGeneration.CSharp
 
             // set SuccessPolicy Property
             if (concurrentSelector.SuccessPolicy != SuccessPolicy.SucceedOnAll) // default is SucceedOnAll                
-                _CreateTreeMethodBody.AppendLine(SetProperty(concurrentSelector.Name, "SuccessPolicy", string.Format("Skill.AI.SuccessPolicy.{0}", concurrentSelector.SuccessPolicy)));
+                _CreateTreeMethodBody.AppendLine(SetProperty(concurrentSelector.Name, "SuccessPolicy", string.Format("Skill.Framework.AI.SuccessPolicy.{0}", concurrentSelector.SuccessPolicy)));
 
             // set FailurePolicy Property
             if (concurrentSelector.FailurePolicy != FailurePolicy.FailOnAll) // default is FailOnAll                
-                _CreateTreeMethodBody.AppendLine(SetProperty(concurrentSelector.Name, "FailurePolicy", string.Format("Skill.AI.FailurePolicy.{0}", concurrentSelector.FailurePolicy)));
+                _CreateTreeMethodBody.AppendLine(SetProperty(concurrentSelector.Name, "FailurePolicy", string.Format("Skill.Framework.AI.FailurePolicy.{0}", concurrentSelector.FailurePolicy)));
         }
 
         private void CreateRandomSelector(RandomSelector randomSelector)
         {
             // create RandomSelector variable
-            Add(new Variable("Skill.AI.RandomSelector", randomSelector.Name, "null"));
+            Add(new Variable("Skill.Framework.AI.RandomSelector", randomSelector.Name, "null"));
             // new RandomSelector variable inside CreateTree method
-            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.RandomSelector(\"{1}\");", Variable.GetName(randomSelector.Name), randomSelector.Name));
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Framework.AI.RandomSelector(\"{1}\");", Variable.GetName(randomSelector.Name), randomSelector.Name));
         }
 
         private void CreatePrioritySelector(PrioritySelector prioritySelector)
         {
             // create PrioritySelector variable
-            Add(new Variable("Skill.AI.PrioritySelector", prioritySelector.Name, "null"));
+            Add(new Variable("Skill.Framework.AI.PrioritySelector", prioritySelector.Name, "null"));
             // new PrioritySelector variable inside CreateTree method
-            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.PrioritySelector(\"{1}\");", Variable.GetName(prioritySelector.Name), prioritySelector.Name));
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Framework.AI.PrioritySelector(\"{1}\");", Variable.GetName(prioritySelector.Name), prioritySelector.Name));
 
             // set Priority property
             if (prioritySelector.Priority != PriorityType.HighestPriority) // default is HighestPriority                
-                _CreateTreeMethodBody.AppendLine(SetProperty(prioritySelector.Name, "Priority", string.Format("Skill.AI.PriorityType.{0}", prioritySelector.Priority)));
+                _CreateTreeMethodBody.AppendLine(SetProperty(prioritySelector.Name, "Priority", string.Format("Skill.Framework.AI.PriorityType.{0}", prioritySelector.Priority)));
         }
 
         private void CreateLoopSelector(LoopSelector loopSelector)
         {
             // create LoopSelector variable
-            Add(new Variable("Skill.AI.LoopSelector", loopSelector.Name, "null"));
+            Add(new Variable("Skill.Framework.AI.LoopSelector", loopSelector.Name, "null"));
             // new LoopSelector variable inside CreateTree method
-            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.AI.LoopSelector(\"{1}\");", Variable.GetName(loopSelector.Name), loopSelector.Name));
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Framework.AI.LoopSelector(\"{1}\");", Variable.GetName(loopSelector.Name), loopSelector.Name));
 
             // set LoopCount property
             if (loopSelector.LoopCount != -1) // default is -1 (infinity)                

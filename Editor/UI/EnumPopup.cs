@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using Skill.UI;
+using Skill.Framework.UI;
 
 namespace Skill.Editor.UI
 {

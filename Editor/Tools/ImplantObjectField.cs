@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Skill.Editor.UI;
-using Skill.UI;
+using Skill.Framework.UI;
 using UnityEngine;
 
 namespace Skill.Editor.Tools
@@ -21,7 +21,7 @@ namespace Skill.Editor.Tools
         private Skill.Editor.UI.SelectionField _RotationSF;
         private Skill.Editor.UI.XYZComponent _RandomRotation;
         private Skill.Editor.UI.Vector3Field _CustomRotation;
-        private Skill.UI.ToggleButton _RandomYaw;
+        private Skill.Framework.UI.ToggleButton _RandomYaw;
 
         public ImplantObject Object { get; private set; }
 
@@ -29,7 +29,7 @@ namespace Skill.Editor.Tools
         {
             get
             {
-                if (Visibility != Skill.UI.Visibility.Collapsed)
+                if (Visibility != Skill.Framework.UI.Visibility.Collapsed)
                     return _PrefabField.LayoutHeight + _PrefabField.Margin.Vertical +
                            _MinScaleField.LayoutHeight + _MinScaleField.Margin.Vertical +
                            _MaxScaleField.LayoutHeight + _MaxScaleField.Margin.Vertical +
@@ -71,12 +71,12 @@ namespace Skill.Editor.Tools
 
             _CustomRotation = new Skill.Editor.UI.Vector3Field() { Value = Object.CustomRotation };
 
-            _RandomYaw = new Skill.UI.ToggleButton() { IsChecked = Object.RandomYaw, HorizontalAlignment = Skill.UI.HorizontalAlignment.Left, Margin = new Thickness(20, 0, 0, 0) };
+            _RandomYaw = new Skill.Framework.UI.ToggleButton() { IsChecked = Object.RandomYaw, HorizontalAlignment = Skill.Framework.UI.HorizontalAlignment.Left, Margin = new Thickness(20, 0, 0, 0) };
             _RandomYaw.Content.text = "Random Yaw";
 
             _RotationSF = new Skill.Editor.UI.SelectionField() { Margin = new Thickness(2) };
             _RotationSF.Label.Width = 110;
-            _RotationSF.Background.Visibility = Skill.UI.Visibility.Hidden;
+            _RotationSF.Background.Visibility = Skill.Framework.UI.Visibility.Hidden;
 
             _RotationSF.AddField(_RandomYaw, "Surface Normal ");
             _RotationSF.AddField(_CustomRotation, "Custom ");
