@@ -85,7 +85,7 @@ namespace Skill.Editor
 
             _DestinationsView = new Skill.Framework.UI.ScrollView() { Margin = new Skill.Framework.UI.Thickness(0, 6, 0, 4), Row = 1, Column = 0, RowSpan = 2, Padding = new Skill.Framework.UI.Thickness(0, 0, 16, 0) };
 
-            _Frame = new UI.EditorFrame(this);
+            _Frame = new UI.EditorFrame("Frame", this);
 
             _Frame.Grid.Margin = new Skill.Framework.UI.Thickness(0, 10, 0, 0);
             _Frame.Grid.RowDefinitions.Add(new Skill.Framework.UI.RowDefinition() { Height = new Skill.Framework.UI.GridLength(20, Skill.Framework.UI.GridUnitType.Pixel) });

@@ -9,8 +9,6 @@ namespace Skill.Framework.UI
     /// </summary>
     public class Grid : Panel
     {
-        // Variables
-        private EventHandler _RowColumnDefinitionsChangeHandler;
 
         /// <summary>
         /// Gets a ColumnDefinitionCollection defined on this instance of Grid.
@@ -19,19 +17,18 @@ namespace Skill.Framework.UI
         /// <summary>
         /// Gets a RowDefinitionCollection defined on this instance of Grid.
         /// </summary>    
-        public RowDefinitionCollection RowDefinitions { get; private set; }        
+        public RowDefinitionCollection RowDefinitions { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of Grid.        
         /// </summary>
         public Grid()
         {
-            this._RowColumnDefinitionsChangeHandler = RowColumnDefinitions_Change;
             this.ColumnDefinitions = new ColumnDefinitionCollection();
             this.RowDefinitions = new RowDefinitionCollection();
 
-            this.ColumnDefinitions.Change += _RowColumnDefinitionsChangeHandler;
-            this.RowDefinitions.Change += _RowColumnDefinitionsChangeHandler;
+            this.ColumnDefinitions.Change += RowColumnDefinitions_Change;
+            this.RowDefinitions.Change += RowColumnDefinitions_Change;
         }
 
         private void RowColumnDefinitions_Change(object sender, System.EventArgs e)
@@ -72,20 +69,19 @@ namespace Skill.Framework.UI
                 Rect cellRect = cells[row, column];
                 if (c.RowSpan > 1)
                 {
-                    int rowspan = Mathf.Min(row + c.RowSpan - 1, RowDefinitions.Count - 1);
+                    int rowspan = Mathf.Max(0, Mathf.Min(row + c.RowSpan - 1, RowDefinitions.Count - 1));
                     cellRect.yMax = cells[rowspan, column].yMax;
                 }
                 if (c.ColumnSpan > 1)
                 {
-                    int columnspan = Mathf.Min(column + c.ColumnSpan - 1, ColumnDefinitions.Count - 1);
+                    int columnspan = Mathf.Max(0, Mathf.Min(column + c.ColumnSpan - 1, ColumnDefinitions.Count - 1));
                     cellRect.xMax = cells[row, columnspan].xMax;
                 }
-
                 SetControlRenderArea(c, cellRect);
             }
         }
 
-        
+
 
         private Rect[] CalcRowsLayout()
         {
@@ -115,7 +111,7 @@ namespace Skill.Framework.UI
                             {
                                 rowRects[i].height = Mathf.Max(rowRects[i].height, c.LayoutHeight + c.Margin.Vertical);
                             }
-                            else if (c.RowSpan > 1 && c.Row + c.RowSpan - 1== i) // control is partially in row (ends with this row)
+                            else if (c.RowSpan > 1 && c.Row + c.RowSpan - 1 == i) // control is partially in row (ends with this row)
                             {
                                 float previousRowheights = 0;
                                 for (int r = c.Row; r < i; r++) // calc height of previous rows that affected by this control

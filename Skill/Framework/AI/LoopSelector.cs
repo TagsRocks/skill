@@ -81,13 +81,8 @@ namespace Skill.Framework.AI
         /// <param name="state">State of BehaviorTree</param>                
         public override void ResetBehavior(BehaviorTreeState state)
         {
-            if (Result == BehaviorResult.Running)
+            if (Result == BehaviorResult.Running && state.UpdateId != LastUpdateId)
             {
-                foreach (var child in this)
-                {
-                    if (child != null)
-                        child.Behavior.ResetBehavior(state);
-                }
                 _LoopCounter = 0;
             }
             base.ResetBehavior(state);

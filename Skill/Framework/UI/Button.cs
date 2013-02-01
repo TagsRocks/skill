@@ -7,7 +7,7 @@ namespace Skill.Framework.UI
     /// <summary>
     /// Make a single press button. The user clicks them and something happens immediately.
     /// </summary>
-    public class Button : Control
+    public class Button : FocusableControl
     {
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Skill.Framework.UI
         /// </summary>
         protected override void Render()
         {
-            //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
+            if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)
             {
                 if (GUI.Button(RenderArea, Content, Style))
@@ -53,6 +53,21 @@ namespace Skill.Framework.UI
                 if (GUI.Button(RenderArea, Content))
                     OnClick();
             }
+        }
+
+        /// <summary>
+        /// Handle specified command. button respond to Enter command
+        /// </summary>
+        /// <param name="command">Command to handle</param>
+        /// <returns>True if command is handled, otherwise false</returns>   
+        public override bool HandleCommand(UICommand command)
+        {
+            if (command.Key ==  KeyCommand.Enter)
+            {
+                OnClick();
+                return true;
+            }
+            return base.HandleCommand(command);
         }
 
     }

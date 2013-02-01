@@ -91,9 +91,11 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="WPFToolkit.Extended, Version=1.6.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\WPFToolkit.Extended.dll</HintPath>
+    <Reference Include="Xceed.Wpf.DataGrid">
+      <HintPath>Extended WPF Toolkit\Xceed.Wpf.DataGrid.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.Toolkit">
+      <HintPath>Extended WPF Toolkit\Xceed.Wpf.Toolkit.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -225,6 +227,7 @@
     <Compile Include="IO\Editor\SaveDataEditor.xaml.cs">
       <DependentUpon>SaveDataEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Root\ObjectPropertyChangedEventArgs.cs" />
     <Compile Include="IO\SaveClass.cs" />
     <Compile Include="IO\SaveData.cs" />
     <Compile Include="IO\SaveProperty.cs" />
@@ -746,7 +749,6 @@
     <Resource Include="Images\Default\Player\PlayStop_P.png" />
     <Resource Include="Images\Animation\Soldier\SampleGif.gif" />
     <Resource Include="Images\Default\Refresh.png" />
-    <Content Include="WPFToolkit.Extended.dll" />
     <Resource Include="Images\Default\Disabled\Remove2.png" />
     <Resource Include="Images\Default\Remove2.png" />
     <Resource Include="Images\Default\Disabled\Add2.png" />
@@ -814,6 +816,10 @@
       <Project>{C00A59BC-EC40-40BE-8A78-AB9754CBDBE3}</Project>
       <Name>UnityCSharpCodeGeneration</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Extended WPF Toolkit\Xceed.Wpf.DataGrid.dll" />
+    <None Include="Extended WPF Toolkit\Xceed.Wpf.Toolkit.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

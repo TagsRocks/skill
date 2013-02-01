@@ -15,6 +15,9 @@ namespace Skill.Framework
         /// </summary>
         public static Global Instance { get; private set; }
 
+        /// <summary> Settings </summary>
+        public static Settings Settings { get; private set; }
+
         /// <summary>
         /// Awake
         /// </summary>
@@ -24,6 +27,7 @@ namespace Skill.Framework
             if (Instance != null)
                 Debug.LogWarning("More thn on instance of Skill.Global object found");
             Instance = this;
+            Settings = CreateSettings();
         }
 
 
@@ -49,6 +53,11 @@ namespace Skill.Framework
         /// <param name="explosive"> Dynamics.Explosive to initialize </param>
         public virtual void Initialize(Skill.Framework.Dynamics.Explosive explosive) { }
 
+        /// <summary>
+        /// Allow subclass to instantiate another custom Settings
+        /// </summary>
+        /// <returns></returns>
+        protected virtual Settings CreateSettings() { return new Settings(); }
 
         // ************* Sounds **************
 
@@ -58,25 +67,10 @@ namespace Skill.Framework
         /// <param name="source">Source of sound</param>
         /// <param name="clip">Sound to play</param>
         /// <param name="category">Category of sound</param>
-        public virtual void PlayOneShot(AudioSource source, AudioClip clip, Skill.Framework.Sounds.SoundCategory category)
+        public virtual void PlaySound(AudioSource source, AudioClip clip, Skill.Framework.Sounds.SoundCategory category)
         {
-            float volume = 1.0f;
-
-            switch (category)
-            {
-                case Skill.Framework.Sounds.SoundCategory.FX:
-                    volume = GameSettings.Audio.FxVolume;
-                    break;
-                case Skill.Framework.Sounds.SoundCategory.Music:
-                    volume = GameSettings.Audio.MusicVolume;
-                    break;
-                case Skill.Framework.Sounds.SoundCategory.Dialog:
-                    volume = GameSettings.Audio.DialogVolume;
-                    break;
-                default:
-                    break;
-            }
-            source.PlayOneShot(clip, volume * GameSettings.Audio.MasterVolume);
+            float volume = Settings.Audio.GetVolume(category);            
+            source.PlayOneShot(clip, volume);
         }
 
         // ********** static events **********

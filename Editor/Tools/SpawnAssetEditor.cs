@@ -57,7 +57,7 @@ namespace Skill.Editor.Tools
             _ChangeCheck.Controls.Add(_PrefabsLB);
             _ChangeCheck.Changed += new EventHandler(_ChangeCheck_Changed);
 
-            _Frame = new Frame();
+            _Frame = new Frame("MainFrame");
             _Frame.Grid.Controls.Add(_ChangeCheck);
         }
 

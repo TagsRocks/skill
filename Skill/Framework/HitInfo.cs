@@ -50,6 +50,11 @@ namespace Skill.Framework
         public Vector3 Normal;
         /// <summary> Amount of damage imposed by this hit </summary>
         public float Damage;
+        /// <summary> Whether this hit cause particle on colliding object?</summary>
+        /// <remarks>
+        /// Maybe you don't want an explosion cause to particles spawns.
+        /// </remarks>
+        public bool CauseParticle = true;
 
         /// <summary>
         /// Create a HitInfo
@@ -61,7 +66,7 @@ namespace Skill.Framework
         {
             this.Type = type;
             this.Owner = owner;
-            this.Other = other;
+            this.Other = other;            
         }
     }
 

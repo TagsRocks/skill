@@ -3,9 +3,9 @@ using System.Collections;
 using System;
 
 namespace Skill.Framework.UI
-{   
+{
     /// <summary> A slider the user can drag to change a value between a min and a max. </summary>
-    public class Slider : Control
+    public class Slider : FocusableControl
     {
         /// <summary>
         /// The GUIStyle to use for displaying draggable thumb. If left out, the horizontalSliderThumb style from the current GUISkin is used.
@@ -16,6 +16,11 @@ namespace Skill.Framework.UI
         /// Orientation of slider
         /// </summary>
         public Orientation Orientation { get; set; }
+
+        /// <summary>
+        /// Amount of change when user press direction button (only used in HandleCommand method)
+        /// </summary>
+        public float KeyStep { get; set; }
 
         private float _Value;
         /// <summary>
@@ -84,6 +89,7 @@ namespace Skill.Framework.UI
         /// </summary>
         public Slider()
         {
+            this.KeyStep = 1.0f;
             this._MinValue = 0;
             this._MaxValue = 100;
             this._Value = 50;
@@ -94,7 +100,7 @@ namespace Skill.Framework.UI
         /// </summary>
         protected override void Render()
         {
-            //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
+            if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null && ThumbStyle != null)
             {
                 if (Orientation == Orientation.Horizontal)
@@ -109,6 +115,55 @@ namespace Skill.Framework.UI
                 else
                     Value = GUI.VerticalSlider(RenderArea, _Value, _MinValue, _MaxValue);
             }
-        }        
+        }
+
+        
+
+        /// <summary>
+        /// Handle specified command. slider respond to direction commands
+        /// </summary>
+        /// <param name="command">Command to handle</param>
+        /// <returns>True if command is handled, otherwise false</returns>   
+        public override bool HandleCommand(UICommand command)
+        {
+            if (Orientation == UI.Orientation.Horizontal)
+            {
+                if (command.Key == KeyCommand.Left)
+                {
+                    Value -= KeyStep;
+                    return true;
+                }
+                else if (command.Key == KeyCommand.Right)
+                {
+                    Value += KeyStep;
+                    return true;
+                }
+            }
+            else
+            {
+                if (command.Key == KeyCommand.Up)
+                {
+                    Value -= KeyStep;
+                    return true;
+                }
+                else if (command.Key == KeyCommand.Down)
+                {
+                    Value += KeyStep;
+                    return true;
+                }
+            }
+
+            if (command.Key == KeyCommand.Home)
+            {
+                Value = _MinValue;
+                return true;
+            }
+            else if (command.Key == KeyCommand.End)
+            {
+                Value = _MaxValue;
+                return true;
+            }
+            return base.HandleCommand(command);
+        }
     }
 }

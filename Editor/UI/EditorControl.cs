@@ -12,39 +12,28 @@ namespace Skill.Editor.UI
     /// </summary>
     public abstract class EditorControl : Control
     {
-        /// <summary>
-        /// Gets or sets a value indicating whether this element is enabled in the user interface (UI).
-        /// </summary>
-        /// <returns>  true if the element is enabled; otherwise, false. The default value is true. </returns>
-        public bool IsEnabled { get; set; }
 
         /// <summary>
         /// Create an EditorControl
         /// </summary>
         public EditorControl()
         {
-            this.IsEnabled = true;
             this.Position = new UnityEngine.Rect(0, 0, 300, 16);
         }
 
-        /// <summary>
-        /// Begin Render
-        /// </summary>
-        protected override void BeginRender()
+        /// <summary> Make control enabled or disabled</summary>
+        /// <param name="enable">Enabled value</param>        
+        protected override void ApplyGUIEnable(bool enable)
         {
-            base.BeginRender();
-            if (!IsEnabled)
-                EditorGUI.BeginDisabledGroup(true);
+            EditorGUI.BeginDisabledGroup(enable);
         }
 
         /// <summary>
-        /// End Render
-        /// </summary>
-        protected override void EndRender()
+        /// Restore previous value of GUI enable
+        /// </summary>        
+        protected override void RestoreGUIEnable()
         {
-            base.EndRender();
-            if (!IsEnabled)
-                EditorGUI.EndDisabledGroup();
+            EditorGUI.EndDisabledGroup();
         }
     }
 }

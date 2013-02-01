@@ -13,6 +13,7 @@ namespace Skill.Framework.AI
     {
         private float _LastUpdateTime;// last update time
         private List<Action> _FinishedActions;
+        private bool _Reset;
 
         /// <summary>
         /// Root of Tree
@@ -53,8 +54,8 @@ namespace Skill.Framework.AI
         /// controller reserved for future version
         /// </remarks>
         public BehaviorTree()
-        {                        
-            
+        {
+            this._Reset = false;
             this._LastUpdateTime = 0;
             this.UpdateTimeInterval = 0.5f;
             this._FinishedActions = new List<Action>();
@@ -120,7 +121,7 @@ namespace Skill.Framework.AI
                 this._FinishedActions.Clear();
             }
         }
-        
+
         /// <summary>
         /// Force update tree even not reach UpdateTimeInterval
         /// </summary>
@@ -130,6 +131,7 @@ namespace Skill.Framework.AI
         /// </remarks>
         public void ForceUpdate(Controller controller)
         {
+            this._Reset = false;
             this.Controller = controller;
             if (Controller == null)
                 throw new ArgumentNullException("Controller is null");
@@ -142,6 +144,8 @@ namespace Skill.Framework.AI
                 UnityEngine.Debug.LogWarning(State.Exception.ToString());
             }
 
+            Root.ResetBehavior(this.State);
+
             OnUpdated();
         }
 
@@ -152,7 +156,10 @@ namespace Skill.Framework.AI
         /// </summary>
         public void Reset()
         {
+            if (_Reset) return;
+            State.Begin();
             Root.ResetBehavior(this.State);
+            this._Reset = true;
         }
     }
     #endregion

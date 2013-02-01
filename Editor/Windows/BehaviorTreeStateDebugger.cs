@@ -65,7 +65,7 @@ namespace Skill.Editor
             _FailurStyle = new GUIStyle() { normal = new GUIStyleState() { background = Resources.Failure } };
             _RunningStyle = new GUIStyle() { normal = new GUIStyleState() { background = Resources.Running } };
 
-            _Frame = new EditorFrame(this);
+            _Frame = new EditorFrame("Frame", this);
 
             _Frame.Grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
             _Frame.Grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });

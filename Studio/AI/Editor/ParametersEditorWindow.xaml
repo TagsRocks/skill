@@ -1,7 +1,7 @@
 ﻿<Window x:Class="Skill.Studio.AI.Editor.ParametersEditorWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:extToolkit="clr-namespace:Xceed.Wpf.Toolkit.PropertyGrid;assembly=WPFToolkit.Extended"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:dmai="clr-namespace:Skill.DataModels.AI;assembly=Skill.DataModels"
              xmlns:ctrl="clr-namespace:Skill.Studio.Controls"
              xmlns:ai="clr-namespace:Skill.Studio.AI"
@@ -59,7 +59,7 @@
                 <RowDefinition Height="30" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <extToolkit:PropertyGrid  x:Name="_PropertyGrid" Margin="4" SelectedObject="{Binding ElementName=_LbParameters,Path=SelectedItem}" Grid.Row="1" />
+            <xctk:PropertyGrid  x:Name="_PropertyGrid" Margin="4" SelectedObject="{Binding ElementName=_LbParameters,Path=SelectedItem}" Grid.Row="1" />
         </Grid>
         <Grid Grid.Row="2" Grid.ColumnSpan="3" Background="{StaticResource ButtonPanelBg}" >
             <Grid.ColumnDefinitions>

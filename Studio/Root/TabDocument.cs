@@ -111,9 +111,9 @@ namespace Skill.Studio
             {
                 Data.CommiteChanges();
                 ViewModel.SaveData(Data.GetDataModel());
-                History.ResetChangeCount();
-                SetChanged(false);
+                History.ResetChangeCount();                
             }
+            SetChanged(false);
         }
         #endregion
 

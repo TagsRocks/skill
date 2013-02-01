@@ -7,7 +7,7 @@ namespace Skill.Framework.UI
     /// <summary>
     /// Make a button that is active as long as the user holds it down.
     /// </summary>
-    public class RepeatButton : Control
+    public class RepeatButton : FocusableControl
     {
         private bool _IsDown;
 
@@ -69,7 +69,7 @@ namespace Skill.Framework.UI
         protected override void Render()
         {
             bool result;
-            //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
+            if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)
             {
                 result = GUI.RepeatButton(RenderArea, Content, Style);
@@ -92,7 +92,34 @@ namespace Skill.Framework.UI
                     OnUp();
                 _IsDown = false;
             }
-        }        
+        }
+
+        /// <summary>
+        /// Handle specified command. button respond to Enter command
+        /// </summary>
+        /// <param name="command">Command to handle</param>
+        /// <returns>True if command is handled, otherwise false</returns>   
+        public override bool HandleCommand(UICommand command)
+        {
+            if (command.Key == KeyCommand.Enter)
+            {
+                if (_IsDown == false)
+                    OnDown();
+                _IsDown = true;
+                OnRepeat();
+                return true;
+            }
+            else
+            {
+                if (_IsDown == true)
+                {
+                    OnUp();
+                    _IsDown = false;
+                    return true;
+                }
+            }
+            return base.HandleCommand(command);
+        }
     }
 
 }

@@ -6,8 +6,8 @@ namespace Skill.Framework.Weapons
     /// <summary>
     /// Bullet to use by weapons. if bullet has RigidBody with low speed controlled by physics engine. it is possible to enable gravity to fall down after spawn or
     /// disable gravity to go in straight direction. The weapon do AddForce to RigidBody bullets at spawn time.
-    /// if collider is a trigger this bullet check collision by OnTriggerEnter method
-    /// if collider is not a trigger this bullet check collision by OnCollisionEnter method
+    /// if collider is a trigger the bullet check collision by OnTriggerEnter method
+    /// if collider is not a trigger the bullet check collision by OnCollisionEnter method
     /// </summary>
     [AddComponentMenu("Skill/Weapons/Bullets/Bullet")]  
     public class Bullet : DynamicBehaviour

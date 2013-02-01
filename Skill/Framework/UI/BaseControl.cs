@@ -28,8 +28,29 @@ namespace Skill.Framework.UI
     /// </summary>
     public abstract class BaseControl
     {
-
         #region Properties
+
+        private bool _IsEnabled = true;
+        /// <summary>
+        /// Gets or sets a value indicating whether this element is enabled in the user interface (UI).
+        /// </summary>
+        /// <returns>  true if the element is enabled; otherwise, false. The default value is true. </returns>
+        public bool IsEnabled
+        {
+            get
+            {
+                if (Parent != null && !Parent.IsEnabled)
+                    return false;
+                else
+                    return _IsEnabled;
+            }
+            set
+            {
+                _IsEnabled = value;
+            }
+        }
+
+
 
         private Rect _Position;
         /// <summary>
@@ -366,7 +387,7 @@ namespace Skill.Framework.UI
                 if (_Visibility != value)
                 {
                     _Visibility = value;
-                    OnVisibilityChanged();                    
+                    OnVisibilityChanged();
                 }
             }
         }
@@ -416,6 +437,120 @@ namespace Skill.Framework.UI
                 VisibilityChanged(this, EventArgs.Empty);
             OnLayoutChanged();
         }
+
+
+        /// <summary> Occurs when mouse button was pressed.</summary>
+        public event MouseClickEventHandler MouseDown;
+        /// <summary>
+        /// Occurs when mouse button was pressed.(if MouseDown hooked )
+        /// </summary>
+        /// <param name="args"> MouseClickEventArgs </param>
+        protected virtual void OnMouseDown(MouseClickEventArgs args)
+        {
+            if (MouseDown != null)
+                MouseDown(this, args);
+        }
+
+        /// <summary> Occurs when mouse button was released. </summary>
+        public event MouseClickEventHandler MouseUp;
+        /// <summary>
+        /// Occurs when mouse button was released.(if MouseUp hooked )
+        /// </summary>
+        /// <param name="args"> MouseClickEventArgs </param>
+        private void OnMouseUp(MouseClickEventArgs args)
+        {
+            if (MouseUp != null)
+                MouseUp(this, args);
+        }
+
+        /// <summary> Occurs when mouse was dragged. </summary>
+        public event MouseMoveEventHandler MouseDrag;
+        /// <summary>
+        /// Occurs when mouse was dragged.(if MouseDrag hooked )
+        /// </summary>
+        /// <param name="args"> MouseMoveEventArgs </param>
+        private void OnMouseDrag(MouseMoveEventArgs args)
+        {
+            if (MouseDrag != null)
+                MouseDrag(this, args);
+        }
+
+
+        /// <summary> Occurs when mouse was dragged. </summary>
+        public event MouseMoveEventHandler MouseMove;
+        /// <summary>
+        /// Occurs when mouse was dragged.(if MouseMove hooked )
+        /// </summary>
+        /// <param name="args"> MouseMoveEventArgs </param>
+        private void OnMouseMove(MouseMoveEventArgs args)
+        {
+            if (MouseMove != null)
+                MouseMove(this, args);
+        }
+
+        /// <summary> Occurs when The scroll wheel was moved. </summary>
+        public event MouseMoveEventHandler ScrollWheel;
+        /// <summary>
+        /// Occurs when The scroll wheel was moved.(if ScrollWheel hooked )
+        /// </summary>
+        /// <param name="args"> MouseMoveEventArgs </param>
+        private void OnScrollWheel(MouseMoveEventArgs args)
+        {
+            if (ScrollWheel != null)
+                ScrollWheel(this, args);
+        }
+
+        /// <summary>
+        /// Is any mouse events hooked?
+        /// </summary>
+        /// <returns>True if hooked, otherwise false</returns>
+        private bool IsAnyMouseEventHooked()
+        {
+            return MouseDown != null || MouseUp != null || MouseDrag != null || MouseMove != null || ScrollWheel != null;
+        }
+
+        /// <summary>
+        /// Check for events
+        /// </summary>
+        protected virtual void CheckEvents()
+        {
+            if (IsAnyMouseEventHooked())
+            {
+                Event e = Event.current;
+                if (e != null && e.isMouse && _RenderArea.Contains(e.mousePosition))
+                {
+                    EventType type = e.type;
+                    if ((type == EventType.MouseDown || type == EventType.MouseUp) && (MouseDown != null || MouseUp != null))
+                    {
+                        MouseButton mb = MouseButton.Other;
+                        if (e.button < 3) mb = (MouseButton)e.button;
+                        MouseClickEventArgs args = new MouseClickEventArgs(e.mousePosition, e.modifiers, mb, e.clickCount);
+                        if (type == EventType.MouseDown)
+                            OnMouseDown(args);
+                        else
+                            OnMouseUp(args);
+                        if (args.Handled)
+                            e.Use();
+                    }
+                    else if ((type == EventType.ScrollWheel || type == EventType.mouseMove || type == EventType.mouseDrag) && (MouseDrag != null || MouseMove != null || ScrollWheel != null))
+                    {
+                        MouseButton mb = MouseButton.Other;
+                        if (e.button < 3) mb = (MouseButton)e.button;
+                        MouseMoveEventArgs args = new MouseMoveEventArgs(e.mousePosition, e.modifiers, mb, e.delta);
+                        if (type == EventType.ScrollWheel)
+                            OnScrollWheel(args);
+                        else if (type == EventType.mouseMove)
+                            OnMouseMove(args);
+                        else
+                            OnMouseDrag(args);
+                        if (args.Handled)
+                            e.Use();
+                    }
+                }
+            }
+        }
+
+
         #endregion
 
         #region Contstructor
@@ -433,20 +568,59 @@ namespace Skill.Framework.UI
             this._ColumnSpan = 1;
             this.Width = 100;
             this.Height = 16;
+            this.IsEnabled = true;
         }
         #endregion
 
-
         #region Abstract methods
+
+        private bool _ApplyGUIEnableCalled;
 
         /// <summary> Specify type of Control  </summary>
         public abstract ControlType ControlType { get; }
         /// <summary> Render control's content </summary>
         protected abstract void Render();
         /// <summary> Begin Render control's content </summary>
-        protected virtual void BeginRender() { }
+        protected virtual void BeginRender()
+        {
+            if (Parent != null)
+            {
+                if (Parent.IsEnabled && !_IsEnabled)
+                {
+                    ApplyGUIEnable(false);
+                    _ApplyGUIEnableCalled = true;
+                }
+            }
+            else
+            {
+                ApplyGUIEnable(_IsEnabled);
+                _ApplyGUIEnableCalled = true;
+            }
+        }
         /// <summary> End Render control's content </summary>
-        protected virtual void EndRender() { }
+        protected virtual void EndRender()
+        {
+            if (_ApplyGUIEnableCalled)
+            {
+                RestoreGUIEnable();
+                _ApplyGUIEnableCalled = false;
+            }
+        }
+
+        /// <summary> Make control enabled or disabled</summary>
+        /// <param name="enable">Enabled value</param>        
+        protected virtual void ApplyGUIEnable(bool enable)
+        {
+            GUI.enabled = enable;
+        }
+
+        /// <summary>
+        /// Restore previous value of GUI enable
+        /// </summary>        
+        protected virtual void RestoreGUIEnable()
+        {
+            GUI.enabled = true;
+        }
 
         #endregion
 
@@ -459,7 +633,8 @@ namespace Skill.Framework.UI
             if (Visibility == UI.Visibility.Visible)
             {
                 BeginRender();
-                Render();
+                CheckEvents();
+                Render();                
                 EndRender();
             }
         }
@@ -499,6 +674,16 @@ namespace Skill.Framework.UI
         public bool Containes(Vector2 point)
         {
             return _RenderArea.Contains(point);
+        }
+
+        /// <summary>
+        /// Handle specified command
+        /// </summary>
+        /// <param name="command">Command to handle</param>
+        /// <returns>True if command is handled, otherwise false</returns>        
+        public virtual bool HandleCommand(UICommand command)
+        {
+            return false;
         }
         #endregion
     }
@@ -697,7 +882,7 @@ namespace Skill.Framework.UI
             }
         }
 
-        
+
         /// <summary>
         /// Searches for the specified BaseControl and returns the zero-based index of the first occurrence within the entire Controls.
         /// </summary>
@@ -708,7 +893,7 @@ namespace Skill.Framework.UI
         public int IndexOf(BaseControl control)
         {
             return _Items.IndexOf(control);
-        }            
+        }
     }
     #endregion
 

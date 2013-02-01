@@ -125,7 +125,7 @@ namespace Skill.Framework.AI
         {
             if (Result == BehaviorResult.Running)
             {
-                if (!IsTracing)
+                if (LastUpdateId != state.UpdateId)
                 {
                     if (state.RunningActions.Remove(this))
                     {

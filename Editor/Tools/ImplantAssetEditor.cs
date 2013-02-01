@@ -24,7 +24,7 @@ namespace Skill.Editor.Tools
 
         private void CreateUI()
         {
-            _PrefabsLB = new ListBox() { Margin = new Thickness(2), SelectionMode = Skill.Framework.UI.SelectionMode.Single, Position = new Rect(0, 22, 320, 560)};
+            _PrefabsLB = new ListBox() { Margin = new Thickness(2), SelectionMode = Skill.Framework.UI.SelectionMode.Single, Position = new Rect(0, 22, 320, 560) };
             _PrefabsLB.SelectionChanged += new System.EventHandler(_PrefabsLB_SelectionChanged);
 
             GUIStyleState selectedItemState = new GUIStyleState() { background = Resources.SelectedItemBackground };
@@ -56,7 +56,7 @@ namespace Skill.Editor.Tools
             _ChangeCheck.Controls.Add(_PrefabsLB);
             _ChangeCheck.Changed += new EventHandler(_ChangeCheck_Changed);
 
-            _Frame = new Frame();
+            _Frame = new Frame("Frame");
             _Frame.Grid.Controls.Add(_ChangeCheck);
         }
 

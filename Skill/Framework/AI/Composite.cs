@@ -156,8 +156,13 @@ namespace Skill.Framework.AI
         {
             if (Result == BehaviorResult.Running)
             {
-                if (!IsTracing)
+                if (LastUpdateId != state.UpdateId)
                     RunningChildIndex = -1;
+                foreach (var child in this)
+                {
+                    if (child != null)
+                        child.Behavior.ResetBehavior(state);
+                }
             }
             base.ResetBehavior(state);
         }

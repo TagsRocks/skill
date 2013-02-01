@@ -6,7 +6,7 @@
              xmlns:ad="clr-namespace:AvalonDock;assembly=AvalonDock"
              xmlns:vm="clr-namespace:Skill.Studio.AI"
              xmlns:dmai="clr-namespace:Skill.DataModels.AI;assembly=Skill.DataModels"
-             xmlns:extToolkit="clr-namespace:Xceed.Wpf.Toolkit.Zoombox;assembly=WPFToolkit.Extended"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:sk="clr-namespace:Skill.Studio"
              xmlns:my="clr-namespace:Skill.Studio.Controls"             
              xmlns:bedit="clr-namespace:Skill.Studio.AI.Editor"             
@@ -232,7 +232,7 @@
             </Grid>
             <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="2" Background="Gray" />
             <Grid Grid.Column="2" >
-                <extToolkit:Zoombox x:Name="_Zoombox" >                    
+                <xctk:Zoombox x:Name="_Zoombox" >                    
                         <ItemsControl ItemsSource="{Binding BehaviorTree.Behaviors}" >
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -311,7 +311,7 @@
                                 </Style>
                             </ItemsControl.ItemContainerStyle>
                         </ItemsControl>                    
-                </extToolkit:Zoombox>
+                </xctk:Zoombox>
                 <ItemsControl ItemsSource="{Binding Animations}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,8,0" Height="{Binding AnimationSize}"  Visibility="{Binding ShowAnimations, Converter={StaticResource BToVisConverter}, ConverterParameter=False}" >
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>

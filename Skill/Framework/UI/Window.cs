@@ -17,7 +17,7 @@ namespace Skill.Framework.UI
         /// </summary>
         public int Id { get; private set; }
         /// <summary>
-        /// Whether the window Is draggable or not?
+        /// Whether the window Is draggable or not? (Do not update position of window each frame when this value is true.)
         /// </summary>
         public bool IsDraggable { get; set; }
         /// <summary>
@@ -26,7 +26,7 @@ namespace Skill.Framework.UI
         public bool FullDraggable { get; set; }
         /// <summary>
         /// the part of the window that can be dragged. This is clipped to the actual window.
-        /// </summary>
+        /// </summary>        
         public Rect DraggableArea { get; set; }
         /// <summary>
         /// Title of window
@@ -44,9 +44,11 @@ namespace Skill.Framework.UI
         protected override bool LocalGrid { get { return true; } }
 
         /// <summary>
-        /// Create a window
-        /// </summary>
-        public Window()
+        /// Initializes a new instance of the Frame class.
+        /// </summary>        
+        /// <param name="name">Valid and unique name of frame</param>
+        public Window(string name)
+            : base(name)
         {
             _DrawWindowFunction = DrawWindow;
             Id = _IdGenerator++;

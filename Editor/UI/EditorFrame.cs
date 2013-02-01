@@ -46,9 +46,11 @@ namespace Skill.Editor.UI
 
         /// <summary>
         /// Create an EditorFrame
-        /// </summary>
+        /// </summary>        
+        /// <param name="name">Valid and unique name of frame</param>
         /// <param name="owner"> The EditorWindow that owns EditorFrame. </param>
-        public EditorFrame(EditorWindow owner)
+        public EditorFrame(string name, EditorWindow owner)
+            : base(name)
         {
             if (owner == null)
                 throw new ArgumentNullException("Invalid EditorWindow");

@@ -93,9 +93,11 @@ namespace Skill.Framework.UI
             this.Content = new GUIContent();
             this.Name = "ToolbarButton";
         }
-    } 
+
+        
+    }
     #endregion
-    
+
 
     #region ToolbarButtonCollection
     /// <summary>

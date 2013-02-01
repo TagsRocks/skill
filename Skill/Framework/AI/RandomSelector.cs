@@ -141,23 +141,6 @@ namespace Skill.Framework.AI
                 if (sum >= rnd) return i;
             }
             return 0;
-        }
-
-        /// <summary>
-        /// Reset behavior
-        /// </summary>        
-        /// <param name="state">State of BehaviorTree</param>                
-        public override void ResetBehavior(BehaviorTreeState state)
-        {
-            if (Result == BehaviorResult.Running)
-            {
-                foreach (var child in this)
-                {
-                    if (child != null)
-                        child.Behavior.ResetBehavior(state);
-                }
-            }
-            base.ResetBehavior(state);
-        }
+        }        
     }
 }

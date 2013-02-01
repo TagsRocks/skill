@@ -52,9 +52,9 @@ namespace Skill.Framework.AI
         }
 
         /// <summary>
-        /// Whether behavior is in execution sequence and tracing
+        /// Last update id
         /// </summary>
-        public bool IsTracing { get; private set; }
+        public uint LastUpdateId { get; private set; }
 
         /// <summary>
         /// handle execution of behavior and call appropriate events
@@ -63,7 +63,7 @@ namespace Skill.Framework.AI
         /// <returns>Result of execution</returns>
         public BehaviorResult Trace(BehaviorTreeState state)
         {
-            IsTracing = true;
+            LastUpdateId = state.UpdateId;
             state.RegisterForExecution(this); // register in execution sequence
             try
             {
@@ -73,10 +73,6 @@ namespace Skill.Framework.AI
             {
                 state.Exception = e;// store exception
                 Result = BehaviorResult.Failure; // set result to failure
-            }
-            finally
-            {
-                IsTracing = false;
             }
             return Result;
         }
@@ -103,7 +99,7 @@ namespace Skill.Framework.AI
         /// <param name="state">State of BehaviorTree</param>                
         public virtual void ResetBehavior(BehaviorTreeState state)
         {
-            if (Result == BehaviorResult.Running && !IsTracing)
+            if (Result == BehaviorResult.Running && LastUpdateId != state.UpdateId)
                 Result = BehaviorResult.Failure;
         }
 

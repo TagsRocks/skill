@@ -56,7 +56,7 @@ namespace Skill.Framework
         public void RecalculateWeights()
         {
             _TotalWeight = 0;
-            if (SpawnObjects != null)
+            if (SpawnObjects != null && SpawnObjects.Objects != null)
             {
                 foreach (SpawnObject item in SpawnObjects.Objects)
                 {

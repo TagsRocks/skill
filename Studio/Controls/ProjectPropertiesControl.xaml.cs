@@ -78,5 +78,11 @@ namespace Skill.Studio.Controls
         {
             Project.Settings.OutputLocaltion = ((TextBox)sender).Text;
         }
+
+        public override void Save()
+        {
+            Project.Save();
+            base.Save();
+        }
     }
 }

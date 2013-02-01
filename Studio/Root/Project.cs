@@ -117,7 +117,7 @@ namespace Skill.Studio
 
         public string Name { get { return Model.Name; } }
 
-        public string DesignerName { get { return "SkillDesigner"; } }
+        public string DesignerName { get { return "Designer"; } }
 
         public string GifAnimationDirectory
         {

@@ -219,6 +219,27 @@ namespace Skill.Framework.Weapons
                 Reload(this, new WeaponReloadEventArgs(isCompleteReload));
         }
 
+        /// <summary> Occurs when a reload completed and clip refills </summary>
+        public event EventHandler ReloadCompleted;
+        /// <summary>
+        /// Occurs when a reload completed and clip refills
+        /// </summary>        
+        protected virtual void OnReloadCompleted()
+        {
+            int ammoToFillClip = CurrentProjectile.ClipSize - CurrentClipAmmo;
+
+            if (!CurrentProjectile.InfinitClip)
+            {
+                if (CurrentProjectile.TotalAmmo < ammoToFillClip)
+                    ammoToFillClip = CurrentProjectile.TotalAmmo;
+                CurrentProjectile.TotalAmmo -= ammoToFillClip;
+            }
+            CurrentClipAmmo += ammoToFillClip;
+
+            if (ReloadCompleted != null)
+                ReloadCompleted(this, EventArgs.Empty);
+        }
+
         /// <summary> Occurs when projectile of weapon changes </summary>
         public event WeaponChangeProjectileEventHandler ProjectileChanged;
         /// <summary>
@@ -261,10 +282,12 @@ namespace Skill.Framework.Weapons
         protected override void Start()
         {
             base.Start();
-            DamageFactor = 1.0f;
-            CurrentClipAmmo = CurrentProjectile.ClipSize;
+            DamageFactor = 1.0f;            
             if (Projectiles == null || Projectiles.Length == 0)
                 Debug.LogError("A weapon must have at least one projectile.");
+            if (CurrentProjectile.TotalAmmo <= 0)
+                CurrentProjectile.TotalAmmo = CurrentProjectile.DefaultAmmo;
+            CurrentClipAmmo = CurrentProjectile.ClipSize;
         }
 
         /// <summary>
@@ -412,8 +435,13 @@ namespace Skill.Framework.Weapons
                 else if (SelfDestory)
                     _DestroyTW.Begin(DestroyTime);
 
-                _RequestReload = false;
+
+                if (State == WeaponState.ChangeProjectile)
+                    _SelectedProjectile = _SwitchProjectileIndex; //cancel change projectile
+                _RequestReload = false; // cancel reload
                 IsFiring = false;
+                _BusyTW.End();
+                State = WeaponState.Busy;
             }
             else
             {
@@ -421,12 +449,21 @@ namespace Skill.Framework.Weapons
                 if (_BusyTW.EnabledAndOver)
                 {
                     _BusyTW.End();
+                    if (State == WeaponState.Reloading)
+                    {
+                        OnReloadCompleted();
+                    }
+                    else if (State == WeaponState.ChangeProjectile)
+                    {
+                        OnProjectileChanged(_SelectedProjectile, _SwitchProjectileIndex);
+                        _SwitchProjectileIndex = _SelectedProjectile;
+                    }
                     State = WeaponState.Ready;
                 }
 
                 if (State == WeaponState.Ready)
                 {
-                    if (_RequestReload)
+                    if (_RequestReload && CurrentProjectile.TotalAmmo > 0)
                     {
                         bool completeReload = CurrentClipAmmo == 0;
                         if (completeReload)
@@ -446,11 +483,8 @@ namespace Skill.Framework.Weapons
                     }
                     else if (_SwitchProjectileIndex != _SelectedProjectile)
                     {
-                        int preIndex = _SwitchProjectileIndex;
-                        _SelectedProjectile = _SwitchProjectileIndex;
                         _BusyTW.Begin(CurrentProjectile.EquipTime);
                         State = WeaponState.ChangeProjectile;
-                        OnProjectileChanged(preIndex, _SelectedProjectile);
                     }
                     else if (IsFiring)
                     {
@@ -538,7 +572,7 @@ namespace Skill.Framework.Weapons
             {
                 if (Global.Instance != null)
                 {
-                    Global.Instance.PlayOneShot(_AudioSource, sound, Sounds.SoundCategory.FX);
+                    Global.Instance.PlaySound(_AudioSource, sound, Sounds.SoundCategory.FX);
                 }
                 else
                 {

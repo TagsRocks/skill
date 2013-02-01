@@ -45,6 +45,11 @@ namespace Skill.Framework.AI
         /// <summary> Number of valid Behaviors in ExecutionSequence</summary>
         public int SequenceCount { get { return _CurrnetExecutionIndex + 1; } }
 
+        /// <summary>
+        /// Update id (counter)
+        /// </summary>
+        public uint UpdateId { get; private set; }
+
         private Behavior _Root;
 
         /// <summary>
@@ -59,8 +64,7 @@ namespace Skill.Framework.AI
         }
 
         private Behavior[] _ExecutionSequence = new Behavior[MaxSequenceLength];// 200 is maximum node trace in tree (i hope).
-        private int _CurrnetExecutionIndex = -1;
-        private bool _Reseted;
+        private int _CurrnetExecutionIndex = -1;        
 
 
         /// <summary>
@@ -69,7 +73,7 @@ namespace Skill.Framework.AI
         public void Begin()
         {
             _CurrnetExecutionIndex = -1;
-            _Reseted = false;
+            UpdateId++;
         }
 
         /// <summary>
@@ -88,19 +92,7 @@ namespace Skill.Framework.AI
             _CurrnetExecutionIndex++;// move to next place  
             if (_CurrnetExecutionIndex >= _ExecutionSequence.Length)
                 throw new IndexOutOfRangeException("ExecutionSequence buffer is low. to avoid this error set higher value to 'BehaviorState.MaxSequenceLength'.");
-            _ExecutionSequence[_CurrnetExecutionIndex] = behavior;
-
-            if (!_Reseted)
-            {
-                if (behavior.Type == BehaviorType.Action)
-                {
-                    if (!RunningActions.Contains((Action)behavior))
-                    {
-                        _Root.ResetBehavior(this);
-                        _Reseted = true;
-                    }
-                }
-            }
+            _ExecutionSequence[_CurrnetExecutionIndex] = behavior;            
         }
 
         private bool IsChildOf(Behavior parent, Behavior child)
@@ -145,38 +137,30 @@ namespace Skill.Framework.AI
         /// Write ExecutionSequence to UnityEngin.Debug.Log in tree style
         /// </summary>
         /// <param name="copyToClipboard">Copy all text to clipboard</param>
-        public void LogExecutionSequenceTree(bool copyToClipboard)
+        public void LogExecutionSequenceTree()
         {
-
-            StringBuilder logBuffer = null;
-            if (copyToClipboard)
-                logBuffer = new StringBuilder();
             int sqIndex = 0;
-            LogExecutionSequenceTree(_Root, logBuffer, ref sqIndex, 0);
-            if (copyToClipboard)
-                UnityEditor.EditorGUIUtility.systemCopyBuffer = logBuffer.ToString();
+            LogExecutionSequenceTree(_Root, ref sqIndex, 0);
         }
 
-        private void LogExecutionSequenceTree(Behavior b, StringBuilder logBuffer, ref int sqIndex, int tabCount)
+        private void LogExecutionSequenceTree(Behavior b, ref int sqIndex, int tabCount)
         {
             if (b == null || _ExecutionSequence[sqIndex] == null || sqIndex >= _CurrnetExecutionIndex) return;
             if (b == _ExecutionSequence[sqIndex])
             {
                 string log = string.Format("{0} - {1}{2} : {3}", sqIndex, GetTabSpace(tabCount), b.ToString(), b.Result);
                 UnityEngine.Debug.Log(log);
-                if (logBuffer != null)
-                    logBuffer.AppendLine(log);
                 sqIndex++;
             }
             if (b.Type == BehaviorType.Decorator)
             {
-                LogExecutionSequenceTree(((Decorator)b).Child.Behavior, logBuffer, ref sqIndex, tabCount + 1);
+                LogExecutionSequenceTree(((Decorator)b).Child.Behavior, ref sqIndex, tabCount + 1);
             }
             else if (b.Type == BehaviorType.Composite)
             {
                 foreach (var child in ((Composite)b))
                 {
-                    LogExecutionSequenceTree(child.Behavior, logBuffer, ref sqIndex, tabCount + 1);
+                    LogExecutionSequenceTree(child.Behavior, ref sqIndex, tabCount + 1);
                 }
             }
         }

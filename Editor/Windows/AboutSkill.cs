@@ -42,7 +42,7 @@ namespace Skill.Editor
 
         private void CreateUI()
         {
-            _Frame = new UI.EditorFrame(this);
+            _Frame = new UI.EditorFrame("Frame", this);
 
             _Frame.Grid.RowDefinitions.Add(new Skill.Framework.UI.RowDefinition() { Height = new Skill.Framework.UI.GridLength(1, Skill.Framework.UI.GridUnitType.Star) });
             _Frame.Grid.RowDefinitions.Add(new Skill.Framework.UI.RowDefinition() { Height = new Skill.Framework.UI.GridLength(20, Skill.Framework.UI.GridUnitType.Pixel) });

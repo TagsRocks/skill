@@ -4,11 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ad="clr-namespace:AvalonDock;assembly=AvalonDock"
-             xmlns:extToolkit="clr-namespace:Xceed.Wpf.Toolkit.PropertyGrid;assembly=WPFToolkit.Extended"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" Title="Properties" Background="White">
     <Grid>
-        <extToolkit:PropertyGrid x:Name="_PropertyGrid" >
-        </extToolkit:PropertyGrid>
+        <xctk:PropertyGrid x:Name="_PropertyGrid" >
+        </xctk:PropertyGrid>
     </Grid>
 </ad:DockableContent>

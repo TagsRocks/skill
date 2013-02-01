@@ -69,7 +69,7 @@ namespace Skill.Editor.Tools
 
         private void CreateUI()
         {
-            _Frame = new Skill.Editor.UI.EditorFrame(this);
+            _Frame = new Skill.Editor.UI.EditorFrame("Frame", this);
             _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) });
             _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) });
             _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30, GridUnitType.Pixel) });
@@ -151,7 +151,7 @@ namespace Skill.Editor.Tools
         }
 
         void UpdateScene(SceneView sceneview)
-        {            
+        {
             if (_IsImplantEnable)
             {
                 Event e = Event.current;

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 namespace Skill.Framework.UI
 {
-
     /// <summary>
     /// Provides a base class for all Panel elements. Use Panel elements to position and arrange child objects
     /// </summary>
@@ -182,7 +181,7 @@ namespace Skill.Framework.UI
                     }
                     else if (c.ControlType == ControlType.Panel)
                     {
-                        Control result = FindControlByName((Panel)c, controlName);
+                        Control result = ((Panel)c).FindControlByName(controlName);
                         if (result != null)
                             return result;
                     }
@@ -191,32 +190,122 @@ namespace Skill.Framework.UI
             return null;
         }
 
-        private Control FindControlByName(Panel panel, string controlName)
+
+        /// <summary>
+        /// Find control in hierarchy with specified tab index
+        /// </summary>
+        /// <param name="tabIndex">Tab index of control to search</param>
+        /// <returns>FocusableControl with specified tab index</returns>
+        internal FocusableControl FindControlByTabIndex(uint tabIndex)
         {
-            if (panel != null)
+            foreach (var c in Controls)
             {
-                foreach (var c in panel.Controls)
+                if (c != null && c.IsEnabled)
                 {
-                    if (c != null)
+                    if (c.ControlType == ControlType.Control)
                     {
-                        if (c.ControlType == ControlType.Control)
+                        Control control = (Control)c;
+                        if (control.Focusable)
                         {
-                            Control control = (Control)c;
-                            if (control.Name == controlName)
-                                return control;
+                            FocusableControl focusableControl = (FocusableControl)control;
+                            if (focusableControl.TabIndex == tabIndex)
+                                return focusableControl;
                         }
-                        else if (c.ControlType == ControlType.Panel)
-                        {
-                            Control result = FindControlByName((Panel)c, controlName);
-                            if (result != null)
-                                return result;
-                        }
+                    }
+                    else if (c.ControlType == ControlType.Panel)
+                    {
+                        FocusableControl result = ((Panel)c).FindControlByTabIndex(tabIndex);
+                        if (result != null)
+                            return result;
                     }
                 }
             }
             return null;
         }
 
+        /// <summary>
+        /// Find control in hierarchy with maximum tab index
+        /// </summary>
+        /// <param name="tabIndex">Tab index of control to search</param>
+        /// <returns>FocusableControl with specified tab index</returns>
+        internal FocusableControl FindControlByMaxTabIndex(ref uint tabIndex)
+        {
+            FocusableControl result = null;
+            foreach (var c in Controls)
+            {
+                if (c != null && c.IsEnabled)
+                {
+                    if (c.ControlType == ControlType.Control)
+                    {
+                        Control control = (Control)c;
+                        if (control.Focusable)
+                        {
+                            FocusableControl focusableControl = (FocusableControl)control;
+                            if (focusableControl.TabIndex >= tabIndex)
+                            {
+                                result = focusableControl;
+                                tabIndex = focusableControl.TabIndex;
+                            }
+                        }
+                    }
+                    else if (c.ControlType == ControlType.Panel)
+                    {
+                        FocusableControl focusableControl = ((Panel)c).FindControlByMaxTabIndex(ref tabIndex);
+                        if (focusableControl != null)
+                        {
+                            if (result == null)
+                                result = focusableControl;
+                            else if (focusableControl.TabIndex >= result.TabIndex)
+                                result = focusableControl;
+                            tabIndex = result.TabIndex;
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Find control in hierarchy with minimum tab index
+        /// </summary>
+        /// <param name="tabIndex">Tab index of control to search</param>
+        /// <returns>FocusableControl with specified tab index</returns>
+        internal FocusableControl FindControlByMinTabIndex(ref uint tabIndex)
+        {
+            FocusableControl result = null;
+            foreach (var c in Controls)
+            {
+                if (c != null && c.IsEnabled)
+                {
+                    if (c.ControlType == ControlType.Control)
+                    {
+                        Control control = (Control)c;
+                        if (control.Focusable)
+                        {
+                            FocusableControl focusableControl = (FocusableControl)control;
+                            if (focusableControl.TabIndex < tabIndex)
+                            {
+                                result = focusableControl;
+                                tabIndex = focusableControl.TabIndex;
+                            }
+                        }
+                    }
+                    else if (c.ControlType == ControlType.Panel)
+                    {
+                        FocusableControl focusableControl = ((Panel)c).FindControlByMinTabIndex(ref tabIndex);
+                        if (focusableControl.IsEnabled)
+                        {
+                            if (result == null)
+                                result = focusableControl;
+                            else if (focusableControl.TabIndex < result.TabIndex)
+                                result = focusableControl;
+                            tabIndex = result.TabIndex;
+                        }
+                    }
+                }
+            }
+            return result;
+        }
 
         /// <summary>
         /// calculate RenderArea of Control based on given available Rect
@@ -275,6 +364,38 @@ namespace Skill.Framework.UI
 
 
             c.RenderArea = renderArea;
+        }
+
+
+        /// <summary>
+        /// Handle specified command.
+        /// </summary>
+        /// <param name="command">Command to handle</param>
+        /// <returns>True if command is handled, otherwise false</returns>   
+        /// <remarks>
+        /// First let controls that contains mouse position to handle input
+        /// if not then go through controls and let each to handle command
+        /// as soon as first control handled the command ignore next steps
+        /// </remarks>        
+        public override bool HandleCommand(UICommand command)
+        {
+            for (int i = 0; i < Controls.Count; i++)
+            {
+                var c = Controls[i];
+                Rect cRA = c.RenderArea;
+                if (cRA.Contains(command.MousePosition))
+                {
+                    if (c.HandleCommand(command))
+                        return true;
+                }
+            }
+            for (int i = 0; i < Controls.Count; i++)
+            {
+                var c = Controls[i];
+                if (c.HandleCommand(command))
+                    return true;
+            }
+            return base.HandleCommand(command);
         }
     }
 }

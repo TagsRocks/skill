@@ -167,29 +167,32 @@ namespace Skill.Framework
             if (Events != null)
                 Events.OnDamage(sender, new DamageEventArgs(args.Hit.Damage));
 
-            if (HitParticles != null)
+            if (args.Hit.CauseParticle)
             {
-                int selectedParticle = SelectHitParticleToSpawn(args);
-                if (selectedParticle >= 0 && selectedParticle < HitParticles.Length)
+                if (HitParticles != null)
                 {
-                    GameObject particle = HitParticles[selectedParticle];
-                    if (particle != null)
+                    int selectedParticle = SelectHitParticleToSpawn(args);
+                    if (selectedParticle >= 0 && selectedParticle < HitParticles.Length)
                     {
-                        Vector3 normal = InverseHit ? -args.Hit.Normal : args.Hit.Normal;
-                        CacheSpawner.Spawn(particle, args.Hit.Point, Quaternion.LookRotation(normal));
+                        GameObject particle = HitParticles[selectedParticle];
+                        if (particle != null)
+                        {
+                            Vector3 normal = InverseHit ? -args.Hit.Normal : args.Hit.Normal;
+                            CacheSpawner.Spawn(particle, args.Hit.Point, Quaternion.LookRotation(normal));
+                        }
                     }
                 }
-            }
-            if (Decals != null)
-            {
-                int selectedDecale = SelectDecaleToSpawn(args);
-                if (selectedDecale >= 0 && selectedDecale < Decals.Length)
+                if (Decals != null)
                 {
-                    GameObject decal = Decals[selectedDecale];
-                    if (decal != null)
+                    int selectedDecale = SelectDecaleToSpawn(args);
+                    if (selectedDecale >= 0 && selectedDecale < Decals.Length)
                     {
-                        Vector3 normal = InverseHit ? -args.Hit.Normal : args.Hit.Normal;
-                        CacheSpawner.Spawn(decal, args.Hit.Point + DecalOffset * args.Hit.Normal, Quaternion.Euler(args.Hit.Normal));
+                        GameObject decal = Decals[selectedDecale];
+                        if (decal != null)
+                        {
+                            Vector3 normal = InverseHit ? -args.Hit.Normal : args.Hit.Normal;
+                            CacheSpawner.Spawn(decal, args.Hit.Point + DecalOffset * args.Hit.Normal, Quaternion.Euler(args.Hit.Normal));
+                        }
                     }
                 }
             }

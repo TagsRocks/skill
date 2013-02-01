@@ -271,6 +271,17 @@ namespace Skill.Framework.UI
             }
         }
 
+        /// <summary> Gets or sets a value that indicates the dimension by which child elements are stacked. </summary>
+        public override Orientation Orientation
+        {
+            get { return base.Orientation; }
+            set
+            {
+                Thickness padding = Padding;
+                base.Orientation = value;
+                Padding = padding;
+            }
+        }
 
         private bool _IgnoreScrollbarThickness;
         /// <summary>
@@ -290,13 +301,19 @@ namespace Skill.Framework.UI
                 else
                 {
                     Thickness padding = base.Padding;
-                    padding.Right -= ScrollbarThickness;
+                    if (Orientation == UI.Orientation.Vertical)
+                        padding.Right -= ScrollbarThickness;
+                    else
+                        padding.Bottom -= ScrollbarThickness;
                     return padding;
                 }
             }
             set
             {
-                value.Right += ScrollbarThickness;
+                if (Orientation == UI.Orientation.Vertical)
+                    value.Right += ScrollbarThickness;
+                else
+                    value.Bottom += ScrollbarThickness;
                 base.Padding = value;
             }
         }
@@ -323,7 +340,7 @@ namespace Skill.Framework.UI
             _ScrollViewRect = ra;
             Size ds = DesiredSize;
             _ScrollViewRect.width = Mathf.Max(ra.width, ds.Width) - ScrollbarThickness;
-            _ScrollViewRect.height = Mathf.Max(ra.height, ds.Height);
+            _ScrollViewRect.height = Mathf.Max(ra.height, ds.Height) - ScrollbarThickness;
 
             if (this.Background.Visibility == Skill.Framework.UI.Visibility.Visible)
             {
@@ -394,6 +411,7 @@ namespace Skill.Framework.UI
                                     {
                                         _SelectedItems.Clear();
                                         _SelectedItems.Add(c);
+                                        _SelectedIndex = i;
                                         selectionChange = true;
                                     }
                                 }
@@ -480,8 +498,9 @@ namespace Skill.Framework.UI
                         }
                     }
                 }
-                if (selectionChange) OnSelectionChanged();
             }
+
+            if (selectionChange) OnSelectionChanged();
 
             if (_SelectedItems.Count > 0)
             {
@@ -489,17 +508,39 @@ namespace Skill.Framework.UI
                     SelectedStyle = GUI.skin.box;
 
                 Rect boxRA = RenderAreaShrinksByPadding;
-                boxRA.x += 1;
-                boxRA.width -= 1;
+                if (Orientation == UI.Orientation.Vertical)
+                {
+                    boxRA.x += 1;
+                    boxRA.width -= 2;
+                }
+                else
+                {
+                    boxRA.y += 1;
+                    boxRA.height -= 2;
+                }
                 foreach (var c in _SelectedItems)
                 {
                     Rect cRA = c.RenderArea;
                     Thickness cMargin = c.Margin;
 
-                    boxRA.y = cRA.y - cMargin.Top + 1;
-                    boxRA.height = cRA.height + cMargin.Vertical - 1;
+                    if (Orientation == UI.Orientation.Vertical)
+                    {
+                        cRA.x = boxRA.x;
+                        cRA.width = boxRA.width;
 
-                    GUI.Box(boxRA, string.Empty, SelectedStyle);
+                        cRA.y -= cMargin.Top;
+                        cRA.height += cMargin.Vertical;
+                    }
+                    else
+                    {
+                        cRA.x -= cMargin.Left;
+                        cRA.width += cMargin.Horizontal;
+
+                        cRA.y = boxRA.y;
+                        cRA.height = boxRA.height;
+                    }
+
+                    GUI.Box(cRA, string.Empty, SelectedStyle);
                 }
             }
 
@@ -511,6 +552,120 @@ namespace Skill.Framework.UI
         {
             GUI.EndScrollView(HandleScrollWheel);
             base.EndRender();
+        }
+
+        /// <summary>
+        /// Handle specified command. (Up and Down command to switch selected index)
+        /// </summary>
+        /// <param name="command">Command to handle</param>
+        /// <returns>True if command is handled, otherwise false</returns>        
+        public override bool HandleCommand(UICommand command)
+        {
+            if (base.HandleCommand(command))
+                return true;
+            if (SelectionMode == UI.SelectionMode.Single)
+            {
+                if (command.Key == KeyCommand.Up)
+                {
+                    // try to select previous item
+                    if (_SelectedIndex > 0)
+                    {
+                        SelectedIndex--;
+                        OnSelectionChanged();
+                        return true;
+                    }
+                }
+                else if (command.Key == KeyCommand.Down)
+                {
+                    // try to select next item
+                    if (_SelectedIndex < Controls.Count - 1)
+                    {
+                        SelectedIndex++;
+                        OnSelectionChanged();
+                        return true;
+                    }
+                }
+            }
+            else if (command.Shift)
+            {
+                if (command.Key == KeyCommand.Up)
+                {
+                    // try to add previous item to selection
+                    int firstSelectedIndex = -1;
+                    for (int i = 0; i < Controls.Count; i++)
+                    {
+                        if (_SelectedItems.Contains(Controls[i]))
+                        {
+                            firstSelectedIndex = i;
+                            break;
+                        }
+                    }
+                    if (firstSelectedIndex != -1 && firstSelectedIndex > 0)
+                    {
+                        _SelectedItems.Add(Controls[firstSelectedIndex - 1]);
+                        OnSelectionChanged();
+                        return true;
+                    }
+                }
+                else if (command.Key == KeyCommand.Down)
+                {
+                    // try to add next item to selection
+                    int lastSelectedIndex = -1;
+                    // find first selected item after this item
+                    for (int i = Controls.Count - 1; i >= 0; i--)
+                    {
+                        if (_SelectedItems.Contains(Controls[i]))
+                        {
+                            lastSelectedIndex = i;
+                            break;
+                        }
+                    }
+                    if (lastSelectedIndex != -1 && lastSelectedIndex < Controls.Count - 1)
+                    {
+                        _SelectedItems.Add(Controls[lastSelectedIndex + 1]);
+                        OnSelectionChanged();
+                        return true;
+                    }
+                }
+                else if (_SelectedItems.Count == 1)
+                {
+                    if (command.Key == KeyCommand.Home)
+                    {
+                        // try to add previous items to selection
+                        int selectedIndex = Controls.IndexOf(_SelectedItems[0]);
+                        if (selectedIndex > 0)
+                        {
+                            bool change = false;
+                            for (int k = selectedIndex - 1; k >= 0; k--)
+                            {
+                                _SelectedItems.Add(Controls[k]);
+                                change = true;
+                            }
+                            if (change)
+                                OnSelectionChanged();
+                            return true;
+                        }
+                    }
+                    else if (command.Key == KeyCommand.End)
+                    {
+                        // try to add next items to selection
+                        int selectedIndex = Controls.IndexOf(_SelectedItems[0]);
+                        if (selectedIndex < Controls.Count - 1)
+                        {
+                            bool change = false;
+                            for (int k = selectedIndex + 1; k < Controls.Count; k++)
+                            {
+                                _SelectedItems.Add(Controls[k]);
+                                change = true;
+                            }
+                            if (change)
+                                OnSelectionChanged();
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
     }
 }

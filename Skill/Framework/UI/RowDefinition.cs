@@ -19,10 +19,30 @@ namespace Skill.Framework.UI
         }
 
         /// <summary>
+        /// Occurs when any changes happens to definition
+        /// </summary>
+        internal event EventHandler Change;
+        private void OnChange()
+        {
+            if (Change != null) Change(this, EventArgs.Empty);
+        }
+
+        private GridLength _Height;
+        /// <summary>
         ///  Gets the calculated height of a RowDefinition element,
         ///  or sets the GridLength value of a column that is defined by the RowDefinition.
         /// </summary>
-        public GridLength Height { get; set; }
+        public GridLength Height
+        {
+            get { return _Height; }
+            set
+            {
+                if (_Height != value)
+                {
+                    _Height = value; OnChange();
+                }
+            }
+        }
 
         private float _MaxHeight;
         /// <summary>
@@ -33,8 +53,12 @@ namespace Skill.Framework.UI
             get { return _MaxHeight; }
             set
             {
-                _MaxHeight = value;
-                if (_MaxHeight > 0 && _MaxHeight < _MinHeight) _MaxHeight = _MinHeight;
+                if (_MaxHeight != value)
+                {
+                    _MaxHeight = value;
+                    if (_MaxHeight > 0 && _MaxHeight < _MinHeight) _MaxHeight = _MinHeight;
+                    OnChange();
+                }
             }
         }
 
@@ -47,14 +71,18 @@ namespace Skill.Framework.UI
             get { return _MinHeight; }
             set
             {
-                _MinHeight = value;
-                if (_MinHeight < 0) _MinHeight = 0;
-                else if (_MinHeight > _MaxHeight) _MinHeight = _MaxHeight;
+                if (_MinHeight != value)
+                {
+                    _MinHeight = value;
+                    if (_MinHeight < 0) _MinHeight = 0;
+                    else if (_MinHeight > _MaxHeight) _MinHeight = _MaxHeight;
+                    OnChange();
+                }
             }
         }
 
-    } 
-    #endregion    
+    }
+    #endregion
 
     #region RowDefinitionCollection
     /// <summary>
@@ -96,7 +124,16 @@ namespace Skill.Framework.UI
         /// <param name="value">Identifies the RowDefinition to add to the collection.</param>
         public void Add(RowDefinition value)
         {
-            _Rows.Add(value);
+            if (!_Rows.Contains(value))
+            {
+                _Rows.Add(value);
+                value.Change += RowDefinition_Change;
+                OnChange();
+            }
+        }
+
+        void RowDefinition_Change(object sender, EventArgs e)
+        {
             OnChange();
         }
 
@@ -105,6 +142,8 @@ namespace Skill.Framework.UI
         /// </summary>
         public void Clear()
         {
+            foreach (var d in _Rows)
+                d.Change -= RowDefinition_Change;
             _Rows.Clear();
             OnChange();
         }
@@ -155,6 +194,7 @@ namespace Skill.Framework.UI
         {
             if (_Rows.Remove(value))
             {
+                value.Change -= RowDefinition_Change;
                 OnChange();
                 return true;
             }

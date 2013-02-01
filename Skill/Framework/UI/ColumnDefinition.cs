@@ -20,11 +20,32 @@ namespace Skill.Framework.UI
         {
         }
 
+
+        /// <summary>
+        /// Occurs when any changes happens to definition
+        /// </summary>
+        internal event EventHandler Change;
+        private void OnChange()
+        {
+            if (Change != null) Change(this, EventArgs.Empty);
+        }
+
+        private GridLength _Width;
         /// <summary>
         ///  Gets the calculated width of a ColumnDefinition element,
         ///  or sets the GridLength value of a column that is defined by the ColumnDefinition.
         /// </summary>
-        public GridLength Width { get; set; }
+        public GridLength Width
+        {
+            get { return _Width; }
+            set
+            {
+                if (_Width != value)
+                {
+                    _Width = value; OnChange();
+                }
+            }
+        }
 
         private float _MaxWidth;
 
@@ -36,8 +57,12 @@ namespace Skill.Framework.UI
             get { return _MaxWidth; }
             set
             {
-                _MaxWidth = value;
-                if (_MaxWidth > 0 && _MaxWidth < _MinWidth) _MaxWidth = _MinWidth;
+                if (_MaxWidth != value)
+                {
+                    _MaxWidth = value;
+                    if (_MaxWidth > 0 && _MaxWidth < _MinWidth) _MaxWidth = _MinWidth;
+                    OnChange();
+                }
             }
         }
 
@@ -50,13 +75,17 @@ namespace Skill.Framework.UI
             get { return _MinWidth; }
             set
             {
-                _MinWidth = value;
-                if (_MinWidth < 0) _MinWidth = 0;
-                else if (_MinWidth > _MaxWidth) _MinWidth = _MaxWidth;
+                if (_MinWidth != value)
+                {
+                    _MinWidth = value;
+                    if (_MinWidth < 0) _MinWidth = 0;
+                    else if (_MinWidth > _MaxWidth) _MinWidth = _MaxWidth;
+                    OnChange();
+                }
             }
         }
 
-    } 
+    }
     #endregion
 
 
@@ -70,7 +99,7 @@ namespace Skill.Framework.UI
     {
         // Variables
         private List<ColumnDefinition> _Columns;
-      
+
         /// <summary>
         /// Gets a value that indicates the current item within a ColumnDefinitionCollection.
         /// </summary>
@@ -95,22 +124,33 @@ namespace Skill.Framework.UI
         {
             _Columns = new List<ColumnDefinition>();
         }
-        
+
         /// <summary>
         /// Adds a ColumnDefinition element to a ColumnDefinitionCollection.
         /// </summary>
         /// <param name="value">Identifies the ColumnDefinition to add to the collection.</param>
         public void Add(ColumnDefinition value)
         {
-            _Columns.Add(value);
+            if (!_Columns.Contains(value))
+            {
+                _Columns.Add(value);
+                value.Change += ColumnDefinition_Change;
+                OnChange();
+            }
+        }
+
+        void ColumnDefinition_Change(object sender, EventArgs e)
+        {
             OnChange();
         }
-                
+
         /// <summary>
         /// Clears the content of the ColumnDefinitionCollection.
         /// </summary>
         public void Clear()
         {
+            foreach (var d in _Columns)
+                d.Change -= ColumnDefinition_Change;
             _Columns.Clear();
             OnChange();
         }
@@ -161,6 +201,7 @@ namespace Skill.Framework.UI
         {
             if (_Columns.Remove(value))
             {
+                value.Change -= ColumnDefinition_Change;
                 OnChange();
                 return true;
             }
@@ -182,7 +223,7 @@ namespace Skill.Framework.UI
         {
             return ((System.Collections.IEnumerable)_Columns).GetEnumerator();
         }
-    } 
+    }
     #endregion
 
 }

@@ -87,7 +87,7 @@ namespace Skill.Editor
             _BtnCopyAimations.Content.text = "Copy Animations to Clipboard";
             _BtnCopyAimations.Click += new EventHandler(_BtnCopyAimations_Click);
 
-            _Frame = new UI.EditorFrame(this);
+            _Frame = new UI.EditorFrame("Frame", this);
 
             _Frame.Grid.Margin = new Skill.Framework.UI.Thickness(0, 10, 0, 0);
             _Frame.Grid.RowDefinitions.Add(new Skill.Framework.UI.RowDefinition() { Height = new Skill.Framework.UI.GridLength(20, Skill.Framework.UI.GridUnitType.Pixel) });

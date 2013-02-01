@@ -11,7 +11,7 @@ namespace Skill.Framework.UI
         /// <summary>
         /// Gets or sets a value that indicates the dimension by which child elements are stacked.
         /// </summary>       
-        public Orientation Orientation { get; set; }        
+        public virtual Orientation Orientation { get; set; }        
 
         /// <summary>
         /// Ensures that all visual child elements of this element are properly updated for layout.

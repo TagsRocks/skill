@@ -25,7 +25,28 @@ namespace Skill.Studio.IO
             {
                 foreach (var item in model.Classes)
                 {
-                    this.Classes.Add(new SaveClassViewModel(this, item));
+                    SaveClassViewModel cl = new SaveClassViewModel(this, item);
+                    cl.PropertyChanged += Class_NameChanged;
+                    this.Classes.Add(cl);
+                }
+            }
+        }
+
+        void Class_NameChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Name")
+            {
+                ObjectPropertyChangedEventArgs oe = e as ObjectPropertyChangedEventArgs;
+                if (oe.PreviousValue != null)
+                {
+                    this.NotifyChangeClassName(oe.PreviousValue as string, oe.NewValue as string);
+                    foreach (var cl in Classes)
+                    {
+                        if (cl != sender)
+                        {
+                            cl.NotifyChangeClassName(oe.PreviousValue as string, oe.NewValue as string);
+                        }
+                    }
                 }
             }
         }
@@ -34,8 +55,8 @@ namespace Skill.Studio.IO
         {
             SaveClass c = new SaveClass();
             c.Name = GetValidClassName(c.Name);
-
             SaveClassViewModel cVM = new SaveClassViewModel(this, c);
+            cVM.PropertyChanged += Class_NameChanged;
             this.Classes.Add(cVM);
             SaveData.History.Insert(new AddSaveClassUnDoRedo(cVM, this, this.Classes.Count - 1));
         }
@@ -45,7 +66,10 @@ namespace Skill.Studio.IO
             if (index >= 0 && index < this.Classes.Count)
             {
                 SaveClassViewModel cl = this.Classes[index];
+                cl.PropertyChanged -= Class_NameChanged;
                 this.Classes.RemoveAt(index);
+
+                Class_NameChanged(cl, new ObjectPropertyChangedEventArgs("Name", cl.Name, null));
                 SaveData.History.Insert(new AddSaveClassUnDoRedo(cl, this, index, true));
             }
         }

@@ -39,10 +39,12 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="UnityEditor">
+    <Reference Include="UnityEditor, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Skill\Unity\UnityEditor.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine">
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Skill\Unity\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
@@ -68,7 +70,6 @@
     <Compile Include="UI\EditorFrame.cs" />
     <Compile Include="UI\IntPopup.cs" />
     <Compile Include="UI\CurveField.cs" />
-    <Compile Include="UI\DisabledGroup.cs" />
     <Compile Include="UI\DropShadowLabel.cs" />
     <Compile Include="UI\EditorControl.cs" />
     <Compile Include="UI\EnumMaskField.cs" />

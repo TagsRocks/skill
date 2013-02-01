@@ -253,11 +253,11 @@ namespace Skill.Framework.AI
         {
             if (_Lock && Result == BehaviorResult.Running)
             {
-                if (!IsTracing)
+                if (LastUpdateId != state.UpdateId)
                 {
                     AccessKey.Unlock();
-                    _Lock = false;                    
-                }                
+                    _Lock = false;
+                }
             }
             base.ResetBehavior(state);
         }

@@ -45,9 +45,9 @@ namespace Skill.Framework.Weapons
         public float InstantHitDamage = 20;
         /// <summary> DamageTypes for Instant Hit Weapons </summary>
         public int DamageType = 0;
-        /// <summary> whether this projectile has infinite clips </summary>
+        /// <summary> whether this projectile has infinite clips( reload happens but no ammo consumes ). </summary>
         public bool InfinitClip = false;
-        /// <summary> whether this projectile has infinite ammo </summary>
+        /// <summary> whether this projectile has infinite ammo.( no reload no consume ammo ).   </summary>
         public bool InfinitAmmo = false;
         
         /// <summary> Number of ammo in current clip </summary>

@@ -38,6 +38,7 @@ namespace Skill.Studio.IO
                 if (value == null) value = "";
                 if (Model.Name != value)
                 {
+                    value = value.Trim();
                     if (OwnerClass.SaveData.Editor.History != null)
                     {
                         OwnerClass.SaveData.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "Name", value, Model.Name));
@@ -108,8 +109,7 @@ namespace Skill.Studio.IO
             {
                 handler(this, new PropertyChangedEventArgs(name));
             }
-        }
-
+        }        
         #endregion
     }
 
@@ -194,8 +194,9 @@ namespace Skill.Studio.IO
             set
             {
                 if (value == null) value = "";
+                value = value.Trim();
                 if (((ClassProperty)Model).ClassName != value)
-                {
+                {                    
                     if (OwnerClass.SaveData.Editor.History != null)
                     {
                         OwnerClass.SaveData.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "ClassName", value, ((ClassProperty)Model).ClassName));

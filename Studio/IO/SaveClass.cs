@@ -32,12 +32,13 @@ namespace Skill.Studio.IO
                 if (value == null) value = "";
                 if (Model.Name != value)
                 {
+                    string preName = Model.Name;
                     if (SaveData.Editor.History != null)
                     {
                         SaveData.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "Name", value, Model.Name));
                     }
                     Model.Name = value;
-                    OnPropertyChanged("Name");
+                    OnPropertyChanged("Name", preName, value);
                     OnPropertyChanged("CodeString");
                 }
             }
@@ -107,7 +108,6 @@ namespace Skill.Studio.IO
             this.Properties.Add(newP);
             SaveData.History.Insert(new AddSavePropertyUnDoRedo(newP, this, this.Properties.Count - 1));
         }
-
         public void RemovePropertyAt(int index)
         {
             if (index >= 0 && index < this.Properties.Count)
@@ -145,6 +145,21 @@ namespace Skill.Studio.IO
         public string CodeString { get { return string.Format("class {0}", Name); } }
 
 
+        public void NotifyChangeClassName(string oldName, string newName)
+        {
+            foreach (var p in Properties)
+            {
+                if (p is ClassPropertyViewModel)
+                {
+                    ClassPropertyViewModel cp = p as ClassPropertyViewModel;
+                    if (cp.ClassName == oldName)
+                    {
+                        cp.ClassName = newName;
+                    }
+                }
+            }
+        }
+
         #region INotifyPropertyChanged Members
 
         // we could use DependencyProperties as well to inform others of property changes
@@ -157,7 +172,14 @@ namespace Skill.Studio.IO
                 handler(this, new PropertyChangedEventArgs(name));
             }
         }
-
+        protected void OnPropertyChanged(string name, object preValue, object newValue)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new ObjectPropertyChangedEventArgs(name, preValue, newValue));
+            }
+        }
         #endregion
 
         #region UnDoRedo helper classes

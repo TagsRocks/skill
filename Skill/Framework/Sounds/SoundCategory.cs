@@ -17,6 +17,8 @@ namespace Skill.Framework.Sounds
         /// <summary> Background music </summary>
         Music,
         /// <summary> Dialog of characters </summary>
-        Dialog
+        Voice,
+        /// <summary> sound of Cutscenes and Cinematics </summary>
+        Cinematic
     }
 }

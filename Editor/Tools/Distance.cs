@@ -86,7 +86,7 @@ namespace Skill.Editor.Tools
                 padding = new RectOffset(2, 2, 2, 2)
             };
 
-            _Frame = new Skill.Editor.UI.EditorFrame(this);
+            _Frame = new Skill.Editor.UI.EditorFrame("Frame", this);
 
             _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30, GridUnitType.Pixel) });
             _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30, GridUnitType.Pixel) });

@@ -144,7 +144,7 @@ namespace Skill.Framework.Animation
                 base.Update(state);// update to make sure lenght of child is valid
                 if (OverrideNode != null)
                 {
-                    _OverrideTimer.Begin(OverrideNode.Length);
+                    _OverrideTimer.Begin(OverrideNode.Length - BlendTime);
                     _Timer.End();
                     _OverrideOneShot = false;
                 }
@@ -162,7 +162,7 @@ namespace Skill.Framework.Animation
                         base.Update(state);// update to make sure lenght of child is valid
                         if (OverrideNode != null)
                         {
-                            _OverrideTimer.Begin(OverrideNode.Length);
+                            _OverrideTimer.Begin(OverrideNode.Length - BlendTime);
                             _Timer.End();
                             return;// avoid update twice
                         }

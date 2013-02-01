@@ -7,7 +7,7 @@ namespace Skill.Framework.UI
     /// <summary>
     /// Make an on/off toggle button.
     /// </summary>
-    public class ToggleButton : Control
+    public class ToggleButton : FocusableControl
     {
         /// <summary>
         /// Text, image and tooltip for this button.
@@ -73,6 +73,23 @@ namespace Skill.Framework.UI
                 Changed(this, EventArgs.Empty);
         }
 
+        private ToggleButtonGroup _Group;
+        /// <summary>
+        /// only one of ToggleButtons inside a group is checked
+        /// </summary>
+        public ToggleButtonGroup Group
+        {
+            get { return _Group; }
+            set
+            {
+                if (_Group != null)
+                    _Group.Remove(this);
+                _Group = value;
+                if (_Group != null)
+                    _Group.Add(this);
+            }
+        }
+
         /// <summary>
         /// Create an instance of ToggleButton
         /// </summary>
@@ -86,7 +103,7 @@ namespace Skill.Framework.UI
         /// </summary>
         protected override void Render()
         {
-            //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
+            if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)
             {
                 IsChecked = GUI.Toggle(RenderArea, _IsChecked, Content, Style);
@@ -95,6 +112,21 @@ namespace Skill.Framework.UI
             {
                 IsChecked = GUI.Toggle(RenderArea, _IsChecked, Content);
             }
-        }        
+        }
+
+        /// <summary>
+        /// Handle specified command. toggle button respond to Enter command
+        /// </summary>
+        /// <param name="command">Command to handle</param>
+        /// <returns>True if command is handled, otherwise false</returns>   
+        public override bool HandleCommand(UICommand command)
+        {
+            if (command.Key == KeyCommand.Enter)
+            {
+                IsChecked = !IsChecked;
+                return true;
+            }
+            return base.HandleCommand(command);
+        }
     }
 }

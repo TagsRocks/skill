@@ -77,24 +77,7 @@ namespace Skill.Framework.AI
                 }
             }
             return result;
-        }
-
-        /// <summary>
-        /// Reset behavior
-        /// </summary>        
-        /// <param name="state">State of BehaviorTree</param>                
-        public override void ResetBehavior(BehaviorTreeState state)
-        {
-            if (Result == BehaviorResult.Running)
-            {
-                foreach (var child in this)
-                {
-                    if (child != null)
-                        child.Behavior.ResetBehavior(state);
-                }
-            }
-            base.ResetBehavior(state);
-        }
+        }        
     }
     #endregion
 }

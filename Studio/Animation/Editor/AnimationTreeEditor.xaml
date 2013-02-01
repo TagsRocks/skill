@@ -9,7 +9,7 @@
              xmlns:anim="clr-namespace:Skill.Studio.Animation"             
              xmlns:animedit="clr-namespace:Skill.Studio.Animation.Editor"
              xmlns:dmanim="clr-namespace:Skill.DataModels.Animation;assembly=Skill.DataModels"
-             xmlns:extToolkit="clr-namespace:Xceed.Wpf.Toolkit.Zoombox;assembly=WPFToolkit.Extended"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              d:DesignHeight="473" d:DesignWidth="977" x:Name="This" >
     <sk:TabDocument.Resources>
         <!-- DragThumb Default Template -->
@@ -98,7 +98,7 @@
 
     </sk:TabDocument.CommandBindings>
     <Grid Background="LightGray" >
-        <extToolkit:Zoombox x:Name="_Zoombox" >
+        <xctk:Zoombox x:Name="_Zoombox" >
             <ItemsControl ItemsSource="{Binding Elements}" >
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -267,6 +267,6 @@
                     </Style>
                 </ItemsControl.ItemContainerStyle>
             </ItemsControl>
-        </extToolkit:Zoombox>
+        </xctk:Zoombox>
     </Grid>
 </sk:TabDocument>

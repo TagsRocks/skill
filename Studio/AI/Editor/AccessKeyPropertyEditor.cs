@@ -42,7 +42,7 @@ namespace Skill.Studio.AI.Editor
             binding.ValidatesOnDataErrors = true;
             binding.Mode = propertyItem.IsReadOnly ? BindingMode.OneWay : BindingMode.TwoWay;
             BindingOperations.SetBinding(_TextBlock, TextBlock.TextProperty, binding);
-            return _TextBlock;
+            return _TextBlock;            
         }
     }
 }

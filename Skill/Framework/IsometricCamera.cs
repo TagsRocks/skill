@@ -14,8 +14,14 @@ namespace Skill.Framework
         public Transform Target;
         /// <summary> How to smooth movement of camera when following target</summary>
         public SmoothingParameters MovementSmoothing;
-        /// <summary> How to smooth motion of camera ( zooming, rotation, fov )</summary>
-        public SmoothingParameters MotionSmoothing;
+        /// <summary> How to smooth offset value of camera relative to target</summary>
+        public SmoothingParameters OffsetSmoothing;
+        /// <summary> How to smooth rotation of camera</summary>
+        public SmoothingParameters RotationSmoothing;
+        /// <summary> How to smooth zoom of camera</summary>
+        public SmoothingParameters ZoomSmoothing;
+        /// <summary> How to smooth fov of camera</summary>
+        public SmoothingParameters FovSmoothing;
         /// <summary> Camera moves by mouse when mouse position gets far from center of screen. </summary>
         public float CameraPreview = 2.0f;
         /// <summary> Rotation angle around target ( 0 - 360) </summary>
@@ -154,7 +160,7 @@ namespace Skill.Framework
                     _LengthOffset = 0;
                     _Offset.Target = Vector3.zero;
                 }
-                _Offset.Update(MotionSmoothing);
+                _Offset.Update(OffsetSmoothing);
 
                 // if AroundAngle changed in previous update make sure that it is between 0 - 360 degree
                 if (this.AroundAngle != this._AroundAngle.TargetAngle)
@@ -170,7 +176,7 @@ namespace Skill.Framework
                 if (ZoomIn < 0) ZoomIn = 0;
                 if (ZoomOut < ZoomIn) ZoomOut = ZoomIn;
 
-                float zoomFactor = _LengthOffset / MaxTargetOffset;
+                float zoomFactor = _LengthOffset / Mathf.Max(0.01f, MaxTargetOffset);
                 _Zoom.Target = Mathf.Lerp(ZoomIn, ZoomOut, zoomFactor);
 
                 // update angles
@@ -178,10 +184,10 @@ namespace Skill.Framework
                 _LookAngle.TargetAngle = this.LookAngle;
                 _Fov.TargetAngle = Fov;
 
-                _AroundAngle.Update(MotionSmoothing);
-                _LookAngle.Update(MotionSmoothing);
-                _Fov.Update(MotionSmoothing);
-                _Zoom.Update(MotionSmoothing);
+                _AroundAngle.Update(RotationSmoothing);
+                _LookAngle.Update(RotationSmoothing);
+                _Fov.Update(FovSmoothing);
+                _Zoom.Update(ZoomSmoothing);
 
                 // update position of camera
                 UpdateCamera();
