@@ -9,7 +9,12 @@ namespace Skill.Framework.Weapons
     /// </summary>
     [AddComponentMenu("Skill/Weapons/Bullets/StraightLine")]
     public class StraightLineBullet : Bullet
-    {        
+    {
+        /// <summary>
+        /// Amount of damage fall of per unit.
+        /// </summary>
+        public float DamageFallOf = 0;
+
         /// <summary>
         /// Layers to raycast. (should be setted by weapon)
         /// </summary>
@@ -27,7 +32,23 @@ namespace Skill.Framework.Weapons
         /// </summary>
         public virtual bool HitAtSpawn { get { return true; } }
 
-
+        /// <summary>
+        /// Amount of damage caused by this bullet.
+        /// </summary>
+        public override float Damage
+        {
+            get
+            {
+                if (DamageFallOf > 0)
+                    return base.Damage - DamageFallOf * _TravelledDistance;
+                else
+                    return base.Damage;
+            }
+            set
+            {
+                base.Damage = value;
+            }
+        }
 
         /// <summary>
         /// This function is called when the object becomes enabled and active.
@@ -44,7 +65,7 @@ namespace Skill.Framework.Weapons
         protected override void Update()
         {
             if (Time.timeScale == 0.0f) return;
-            
+
             float move = Speed * Time.deltaTime;
             _Transform.position += Direction * move;
             _TravelledDistance += move;

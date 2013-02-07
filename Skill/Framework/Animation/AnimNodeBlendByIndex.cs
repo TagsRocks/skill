@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Skill.Framework.Animation
@@ -10,7 +9,9 @@ namespace Skill.Framework.Animation
     /// </summary>
     public class AnimNodeBlendByIndex : AnimNodeSingleLayer
     {
-
+        private bool _SwitchOneShot;
+        private TimeWatch _SwitchTimer;
+        private int _PreChildIndex;
         private int _SelectedChildIndex;
 
         /// <summary>
@@ -24,7 +25,34 @@ namespace Skill.Framework.Animation
                 if (value < 0) value = 0;
                 else if (value >= ChildCount) value = ChildCount - 1;
                 _SelectedChildIndex = value;
+                DisableSwitch();
             }
+        }
+
+        private void DisableSwitch()
+        {
+            _PreChildIndex = _SelectedChildIndex;
+            _SwitchOneShot = false;
+            _SwitchTimer.End();
+        }
+
+        /// <summary>
+        /// call BecameRelevant event
+        /// </summary>
+        /// <param name="state">State of AnimationTree</param>
+        protected override void OnBecameRelevant(AnimationTreeState state)
+        {
+            DisableSwitch();
+            base.OnBecameRelevant(state);
+        }
+        /// <summary>
+        /// call CeaseRelevant event
+        /// </summary>
+        /// <param name="state">State of AnimationTree</param>
+        protected override void OnCeaseRelevant(AnimationTreeState state)
+        {
+            DisableSwitch();
+            base.OnCeaseRelevant(state);
         }
 
         /// <summary>
@@ -112,6 +140,55 @@ namespace Skill.Framework.Animation
                 }
 
                 blendWeights[i].SetBoth(f);
+            }
+        }
+
+        /// <summary>
+        /// Update
+        /// </summary>
+        /// <param name="state">State of AnimationTree</param>
+        internal override void Update(AnimationTreeState state)
+        {
+            if (_SwitchTimer.Enabled)
+            {
+                if (_SwitchTimer.IsOver)
+                {
+                    CancelSwitchOneShot();
+                }
+            }
+            else if (_SwitchOneShot)
+            {
+                base.Update(state);// update to make sure lenght of child is valid
+                if (SelectedChildNode != null)
+                    _SwitchTimer.Begin(SelectedChildNode.Length - BlendTime);
+
+                _SwitchOneShot = false;
+                return;// avoid update twice
+            }
+            base.Update(state);
+        }
+
+        /// <summary>        
+        /// For example you can play reload one shot
+        /// </summary>
+        /// <param name="switchIndex"> switch node by index (index is between '0' - 'ChildCount -1' ) </param>
+        public void SwitchOneShot(int switchIndex)
+        {
+            if (_SwitchTimer.Enabled) return;
+            _PreChildIndex = _SelectedChildIndex;
+            _SelectedChildIndex = switchIndex;
+            _SwitchOneShot = true;
+        }
+
+        /// <summary>
+        /// Cancel SwitchOneShot operation
+        /// </summary>
+        public void CancelSwitchOneShot()
+        {
+            if (_SwitchTimer.Enabled)
+            {
+                _SelectedChildIndex = _PreChildIndex;
+                DisableSwitch();
             }
         }
     }

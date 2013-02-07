@@ -5,6 +5,42 @@ using System.Collections.Generic;
 
 namespace Skill.Framework.UI
 {
+
+    #region IControl
+    /// <summary>
+    /// Defines Control interface
+    /// </summary>
+    public interface IControl
+    {
+        /// <summary>
+        /// Gets or sets a value indicating whether this element is enabled in the user interface (UI).
+        /// </summary>
+        /// <returns>  true if the element is enabled; otherwise, false. The default value is true. </returns>
+        bool IsEnabled { get; set; }
+
+        /// <summary> Position of control relative to parent </summary>
+        Rect Position { get; set; }
+
+        /// <summary> Gets or sets Position.X </summary>
+        float X { get; set; }
+
+        /// <summary> Gets or sets Position.Y </summary>
+        float Y { get; set; }
+
+        /// <summary> Gets or sets the suggested width of the element </summary>
+        float Width { get; set; }
+
+        /// <summary> Gets or sets the suggested height of the element. </summary>
+        float Height { get; set; }
+
+        /// <summary> Specify type of Control  </summary>
+        ControlType ControlType { get; }
+
+        /// <summary> Parent Panel that host this control.(this value should be setted by parent) </summary>
+        IControl Parent { get; }
+    }
+    #endregion
+
     #region ControlType
     /// <summary>
     /// Types of Controls
@@ -18,7 +54,11 @@ namespace Skill.Framework.UI
         /// <summary>
         /// Panels that contains another Controls
         /// </summary>
-        Panel
+        Panel,
+        /// <summary>
+        /// Frame 
+        /// </summary>
+        Frame
     }
     #endregion
 
@@ -26,10 +66,15 @@ namespace Skill.Framework.UI
     /// <summary>
     /// Defines base class for all controls
     /// </summary>
-    public abstract class BaseControl
+    public abstract class BaseControl : IControl
     {
         #region Properties
 
+        /// <summary>
+        /// Indicates whether the element can receive focus.
+        /// </summary>
+        public virtual bool IsFocusable { get { return false; } }
+        
         private bool _IsEnabled = true;
         /// <summary>
         /// Gets or sets a value indicating whether this element is enabled in the user interface (UI).
@@ -39,7 +84,7 @@ namespace Skill.Framework.UI
         {
             get
             {
-                if (Parent != null && !Parent.IsEnabled)
+                if (Parent != null && Parent.ControlType != UI.ControlType.Frame && !Parent.IsEnabled) // if we reach frame break operation                
                     return false;
                 else
                     return _IsEnabled;
@@ -48,8 +93,7 @@ namespace Skill.Framework.UI
             {
                 _IsEnabled = value;
             }
-        }
-
+        }        
 
 
         private Rect _Position;
@@ -228,8 +272,8 @@ namespace Skill.Framework.UI
             }
         }
 
-        /// <summary> Parent Panel that host this control.(do not modify it manually) </summary>
-        public BaseControl Parent { get; set; }
+        /// <summary> Parent Panel that host this control.(this value should be setted by parent) </summary>
+        public virtual IControl Parent { get; set; }
 
         private VerticalAlignment _VerticalAlignment;
 
@@ -392,6 +436,34 @@ namespace Skill.Framework.UI
             }
         }
 
+        private Frame _OwnerFrame;
+        /// <summary>
+        /// Retrieves Owner frame
+        /// </summary>
+        public Frame OwnerFrame
+        {
+            get
+            {
+                if (_OwnerFrame == null)
+                    FindFrame();
+                return _OwnerFrame;
+            }
+        }
+
+        private void FindFrame()
+        {
+            IControl parent = Parent;
+            while (parent != null)
+            {
+                if (parent.ControlType == UI.ControlType.Frame)
+                {
+                    _OwnerFrame = parent as Frame;
+                    break;
+                }
+                parent = parent.Parent;
+            }
+        }
+
         #endregion
 
         #region Events
@@ -510,6 +582,15 @@ namespace Skill.Framework.UI
         }
 
         /// <summary>
+        /// Convert mouse to local position
+        /// </summary>
+        /// <param name="mousePosition">Position of mouse</param>
+        protected virtual Vector2 ConvertToLocal(Vector2 mousePosition)
+        {
+            return mousePosition;
+        }
+
+        /// <summary>
         /// Check for events
         /// </summary>
         protected virtual void CheckEvents()
@@ -517,34 +598,38 @@ namespace Skill.Framework.UI
             if (IsAnyMouseEventHooked())
             {
                 Event e = Event.current;
-                if (e != null && e.isMouse && _RenderArea.Contains(e.mousePosition))
+                if (e != null && e.isMouse)
                 {
-                    EventType type = e.type;
-                    if ((type == EventType.MouseDown || type == EventType.MouseUp) && (MouseDown != null || MouseUp != null))
+                    Vector2 localMouse = ConvertToLocal(e.mousePosition);
+                    if (_RenderArea.Contains(localMouse))
                     {
-                        MouseButton mb = MouseButton.Other;
-                        if (e.button < 3) mb = (MouseButton)e.button;
-                        MouseClickEventArgs args = new MouseClickEventArgs(e.mousePosition, e.modifiers, mb, e.clickCount);
-                        if (type == EventType.MouseDown)
-                            OnMouseDown(args);
-                        else
-                            OnMouseUp(args);
-                        if (args.Handled)
-                            e.Use();
-                    }
-                    else if ((type == EventType.ScrollWheel || type == EventType.mouseMove || type == EventType.mouseDrag) && (MouseDrag != null || MouseMove != null || ScrollWheel != null))
-                    {
-                        MouseButton mb = MouseButton.Other;
-                        if (e.button < 3) mb = (MouseButton)e.button;
-                        MouseMoveEventArgs args = new MouseMoveEventArgs(e.mousePosition, e.modifiers, mb, e.delta);
-                        if (type == EventType.ScrollWheel)
-                            OnScrollWheel(args);
-                        else if (type == EventType.mouseMove)
-                            OnMouseMove(args);
-                        else
-                            OnMouseDrag(args);
-                        if (args.Handled)
-                            e.Use();
+                        EventType type = e.type;
+                        if ((type == EventType.MouseDown || type == EventType.MouseUp) && (MouseDown != null || MouseUp != null))
+                        {
+                            MouseButton mb = MouseButton.Other;
+                            if (e.button < 3) mb = (MouseButton)e.button;
+                            MouseClickEventArgs args = new MouseClickEventArgs(e.mousePosition, e.modifiers, mb, e.clickCount);
+                            if (type == EventType.MouseDown)
+                                OnMouseDown(args);
+                            else
+                                OnMouseUp(args);
+                            if (args.Handled)
+                                e.Use();
+                        }
+                        else if ((type == EventType.ScrollWheel || type == EventType.mouseMove || type == EventType.mouseDrag) && (MouseDrag != null || MouseMove != null || ScrollWheel != null))
+                        {
+                            MouseButton mb = MouseButton.Other;
+                            if (e.button < 3) mb = (MouseButton)e.button;
+                            MouseMoveEventArgs args = new MouseMoveEventArgs(e.mousePosition, e.modifiers, mb, e.delta);
+                            if (type == EventType.ScrollWheel)
+                                OnScrollWheel(args);
+                            else if (type == EventType.mouseMove)
+                                OnMouseMove(args);
+                            else
+                                OnMouseDrag(args);
+                            if (args.Handled)
+                                e.Use();
+                        }
                     }
                 }
             }
@@ -634,7 +719,7 @@ namespace Skill.Framework.UI
             {
                 BeginRender();
                 CheckEvents();
-                Render();                
+                Render();
                 EndRender();
             }
         }

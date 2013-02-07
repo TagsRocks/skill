@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using UnityEngine;
 using System.IO;
@@ -116,23 +115,23 @@ namespace Skill.Framework
             {
                 return new AudioSettings();
             }
-            public void Save(System.Xml.XmlElement e, Skill.Framework.IO.XmlSaveStream stream)
+            public void Save(IO.XmlElement e, Skill.Framework.IO.XmlSaveStream stream)
             {
-                System.Xml.XmlElement _SubtitleElement = stream.Create("Subtitle", _Subtitle);
+                IO.XmlElement _SubtitleElement = stream.Create("Subtitle", _Subtitle);
                 e.AppendChild(_SubtitleElement);
-                System.Xml.XmlElement _FxVolumeElement = stream.Create("FxVolume", _FxVolume);
+                IO.XmlElement _FxVolumeElement = stream.Create("FxVolume", _FxVolume);
                 e.AppendChild(_FxVolumeElement);
-                System.Xml.XmlElement _VoiceVolumeElement = stream.Create("VoiceVolume", _VoiceVolume);
+                IO.XmlElement _VoiceVolumeElement = stream.Create("VoiceVolume", _VoiceVolume);
                 e.AppendChild(_VoiceVolumeElement);
-                System.Xml.XmlElement _MusicVolumeElement = stream.Create("MusicVolume", _MusicVolume);
+                IO.XmlElement _MusicVolumeElement = stream.Create("MusicVolume", _MusicVolume);
                 e.AppendChild(_MusicVolumeElement);
-                System.Xml.XmlElement _CinematicVolumeElement = stream.Create("CinematicVolume", _CinematicVolume);
+                IO.XmlElement _CinematicVolumeElement = stream.Create("CinematicVolume", _CinematicVolume);
                 e.AppendChild(_CinematicVolumeElement);
-                System.Xml.XmlElement _MasterVolumeElement = stream.Create("MasterVolume", _MasterVolume);
+                IO.XmlElement _MasterVolumeElement = stream.Create("MasterVolume", _MasterVolume);
                 e.AppendChild(_MasterVolumeElement);
-                System.Xml.XmlElement _OutputSampleRateElement = stream.Create("OutputSampleRate", _OutputSampleRate);
+                IO.XmlElement _OutputSampleRateElement = stream.Create("OutputSampleRate", _OutputSampleRate);
                 e.AppendChild(_OutputSampleRateElement);
-                System.Xml.XmlElement _SpeakerModeElement = stream.Create("SpeakerMode", (int)_SpeakerMode);
+                IO.XmlElement _SpeakerModeElement = stream.Create("SpeakerMode", (int)_SpeakerMode);
                 e.AppendChild(_SpeakerModeElement);
 
             }
@@ -148,9 +147,9 @@ namespace Skill.Framework
                 stream.Write((int)_SpeakerMode);
 
             }
-            public void Load(System.Xml.XmlElement e, Skill.Framework.IO.XmlLoadStream stream)
+            public void Load(IO.XmlElement e, Skill.Framework.IO.XmlLoadStream stream)
             {
-                System.Xml.XmlElement element = e.FirstChild as System.Xml.XmlElement;
+                IO.XmlElement element = e.FirstChild as IO.XmlElement;
                 while (element != null)
                 {
                     switch (element.Name)
@@ -180,7 +179,7 @@ namespace Skill.Framework
                             this._SpeakerMode = (AudioSpeakerMode)stream.ReadInt(element);
                             break;
                     }
-                    element = element.NextSibling as System.Xml.XmlElement;
+                    element = element.NextSibling as IO.XmlElement;
                 }
 
             }
@@ -450,55 +449,55 @@ namespace Skill.Framework
             {
                 return new QualitySettings();
             }
-            public void Save(System.Xml.XmlElement e, Skill.Framework.IO.XmlSaveStream stream)
+            public void Save(IO.XmlElement e, Skill.Framework.IO.XmlSaveStream stream)
             {
-                System.Xml.XmlElement _AnisotropicFilteringElement = stream.Create("AnisotropicFiltering", (int)_AnisotropicFiltering);
+                IO.XmlElement _AnisotropicFilteringElement = stream.Create("AnisotropicFiltering", (int)_AnisotropicFiltering);
                 e.AppendChild(_AnisotropicFilteringElement);
-                System.Xml.XmlElement _AntiAliasingElement = stream.Create("AntiAliasing", (int)_AntiAliasing);
+                IO.XmlElement _AntiAliasingElement = stream.Create("AntiAliasing", (int)_AntiAliasing);
                 e.AppendChild(_AntiAliasingElement);
-                System.Xml.XmlElement _BlendWeightsElement = stream.Create("BlendWeights", (int)_BlendWeights);
+                IO.XmlElement _BlendWeightsElement = stream.Create("BlendWeights", (int)_BlendWeights);
                 e.AppendChild(_BlendWeightsElement);
-                System.Xml.XmlElement _LodBiasElement = stream.Create("LodBias", _LodBias);
+                IO.XmlElement _LodBiasElement = stream.Create("LodBias", _LodBias);
                 e.AppendChild(_LodBiasElement);
-                System.Xml.XmlElement _MasterTextureLimitElement = stream.Create("MasterTextureLimit", _MasterTextureLimit);
+                IO.XmlElement _MasterTextureLimitElement = stream.Create("MasterTextureLimit", _MasterTextureLimit);
                 e.AppendChild(_MasterTextureLimitElement);
-                System.Xml.XmlElement _MaximumLODLevelElement = stream.Create("MaximumLODLevel", _MaximumLODLevel);
+                IO.XmlElement _MaximumLODLevelElement = stream.Create("MaximumLODLevel", _MaximumLODLevel);
                 e.AppendChild(_MaximumLODLevelElement);
-                System.Xml.XmlElement _MaxQueuedFramesElement = stream.Create("MaxQueuedFrames", _MaxQueuedFrames);
+                IO.XmlElement _MaxQueuedFramesElement = stream.Create("MaxQueuedFrames", _MaxQueuedFrames);
                 e.AppendChild(_MaxQueuedFramesElement);
-                System.Xml.XmlElement _ParticleRaycastBudgetElement = stream.Create("ParticleRaycastBudget", _ParticleRaycastBudget);
+                IO.XmlElement _ParticleRaycastBudgetElement = stream.Create("ParticleRaycastBudget", _ParticleRaycastBudget);
                 e.AppendChild(_ParticleRaycastBudgetElement);
-                System.Xml.XmlElement _PixelLightCountElement = stream.Create("PixelLightCount", _PixelLightCount);
+                IO.XmlElement _PixelLightCountElement = stream.Create("PixelLightCount", _PixelLightCount);
                 e.AppendChild(_PixelLightCountElement);
-                System.Xml.XmlElement _ShadowCascadesElement = stream.Create("ShadowCascades", (int)_ShadowCascades);
+                IO.XmlElement _ShadowCascadesElement = stream.Create("ShadowCascades", (int)_ShadowCascades);
                 e.AppendChild(_ShadowCascadesElement);
-                System.Xml.XmlElement _ShadowDistanceElement = stream.Create("ShadowDistance", _ShadowDistance);
+                IO.XmlElement _ShadowDistanceElement = stream.Create("ShadowDistance", _ShadowDistance);
                 e.AppendChild(_ShadowDistanceElement);
-                System.Xml.XmlElement _ShadowProjectionElement = stream.Create("ShadowProjection", (int)_ShadowProjection);
+                IO.XmlElement _ShadowProjectionElement = stream.Create("ShadowProjection", (int)_ShadowProjection);
                 e.AppendChild(_ShadowProjectionElement);
-                System.Xml.XmlElement _SoftVegetationElement = stream.Create("SoftVegetation", _SoftVegetation);
+                IO.XmlElement _SoftVegetationElement = stream.Create("SoftVegetation", _SoftVegetation);
                 e.AppendChild(_SoftVegetationElement);
-                System.Xml.XmlElement _VSyncCountElement = stream.Create("VSyncCount", (int)_VSyncCount);
+                IO.XmlElement _VSyncCountElement = stream.Create("VSyncCount", (int)_VSyncCount);
                 e.AppendChild(_VSyncCountElement);
-                System.Xml.XmlElement _BloomElement = stream.Create("Bloom", _Bloom);
+                IO.XmlElement _BloomElement = stream.Create("Bloom", _Bloom);
                 e.AppendChild(_BloomElement);
-                System.Xml.XmlElement _HDRElement = stream.Create("HDR", _HDR);
+                IO.XmlElement _HDRElement = stream.Create("HDR", _HDR);
                 e.AppendChild(_HDRElement);
-                System.Xml.XmlElement _AmbientOcclusionElement = stream.Create("AmbientOcclusion", _AmbientOcclusion);
+                IO.XmlElement _AmbientOcclusionElement = stream.Create("AmbientOcclusion", _AmbientOcclusion);
                 e.AppendChild(_AmbientOcclusionElement);
-                System.Xml.XmlElement _PostprocessQualityElement = stream.Create("PostprocessQuality", _PostprocessQuality);
+                IO.XmlElement _PostprocessQualityElement = stream.Create("PostprocessQuality", _PostprocessQuality);
                 e.AppendChild(_PostprocessQualityElement);
-                System.Xml.XmlElement _ShadowQualityElement = stream.Create("ShadowQuality", _ShadowQuality);
+                IO.XmlElement _ShadowQualityElement = stream.Create("ShadowQuality", _ShadowQuality);
                 e.AppendChild(_ShadowQualityElement);
-                System.Xml.XmlElement _ResolutionWidthElement = stream.Create("ResolutionWidth", _ResolutionWidth);
+                IO.XmlElement _ResolutionWidthElement = stream.Create("ResolutionWidth", _ResolutionWidth);
                 e.AppendChild(_ResolutionWidthElement);
-                System.Xml.XmlElement _ResolutionHeightElement = stream.Create("ResolutionHeight", _ResolutionHeight);
+                IO.XmlElement _ResolutionHeightElement = stream.Create("ResolutionHeight", _ResolutionHeight);
                 e.AppendChild(_ResolutionHeightElement);
-                System.Xml.XmlElement _RefreshRateElement = stream.Create("RefreshRate", _RefreshRate);
+                IO.XmlElement _RefreshRateElement = stream.Create("RefreshRate", _RefreshRate);
                 e.AppendChild(_RefreshRateElement);
-                System.Xml.XmlElement _FullScreenElement = stream.Create("FullScreen", _FullScreen);
+                IO.XmlElement _FullScreenElement = stream.Create("FullScreen", _FullScreen);
                 e.AppendChild(_FullScreenElement);
-                System.Xml.XmlElement _QualityLevelElement = stream.Create("QualityLevel", _QualityLevel);
+                IO.XmlElement _QualityLevelElement = stream.Create("QualityLevel", _QualityLevel);
                 e.AppendChild(_QualityLevelElement);
 
             }
@@ -529,9 +528,9 @@ namespace Skill.Framework
                 stream.Write(_FullScreen);
                 stream.Write(_QualityLevel);
             }
-            public void Load(System.Xml.XmlElement e, Skill.Framework.IO.XmlLoadStream stream)
+            public void Load(IO.XmlElement e, Skill.Framework.IO.XmlLoadStream stream)
             {
-                System.Xml.XmlElement element = e.FirstChild as System.Xml.XmlElement;
+                IO.XmlElement element = e.FirstChild as IO.XmlElement;
                 while (element != null)
                 {
                     switch (element.Name)
@@ -609,7 +608,7 @@ namespace Skill.Framework
                             this._QualityLevel = stream.ReadInt(element);
                             break;
                     }
-                    element = element.NextSibling as System.Xml.XmlElement;
+                    element = element.NextSibling as IO.XmlElement;
                 }
                 CopyNewValues();
             }
@@ -665,13 +664,13 @@ namespace Skill.Framework
             {
                 return new KeyMap();
             }
-            public void Save(System.Xml.XmlElement e, Skill.Framework.IO.XmlSaveStream stream)
+            public void Save(IO.XmlElement e, Skill.Framework.IO.XmlSaveStream stream)
             {
-                System.Xml.XmlElement _NameElement = stream.Create("Name", _Name);
+                IO.XmlElement _NameElement = stream.Create("Name", _Name);
                 e.AppendChild(_NameElement);
-                System.Xml.XmlElement _PrimaryKeyElement = stream.Create("PrimaryKey", (int)_PrimaryKey);
+                IO.XmlElement _PrimaryKeyElement = stream.Create("PrimaryKey", (int)_PrimaryKey);
                 e.AppendChild(_PrimaryKeyElement);
-                System.Xml.XmlElement _SecondaryKeyElement = stream.Create("SecondaryKey", (int)_SecondaryKey);
+                IO.XmlElement _SecondaryKeyElement = stream.Create("SecondaryKey", (int)_SecondaryKey);
                 e.AppendChild(_SecondaryKeyElement);
 
             }
@@ -682,9 +681,9 @@ namespace Skill.Framework
                 stream.Write((int)_SecondaryKey);
 
             }
-            public void Load(System.Xml.XmlElement e, Skill.Framework.IO.XmlLoadStream stream)
+            public void Load(IO.XmlElement e, Skill.Framework.IO.XmlLoadStream stream)
             {
-                System.Xml.XmlElement element = e.FirstChild as System.Xml.XmlElement;
+                IO.XmlElement element = e.FirstChild as IO.XmlElement;
                 while (element != null)
                 {
                     switch (element.Name)
@@ -699,7 +698,7 @@ namespace Skill.Framework
                             this._SecondaryKey = (KeyCode)stream.ReadInt(element);
                             break;
                     }
-                    element = element.NextSibling as System.Xml.XmlElement;
+                    element = element.NextSibling as IO.XmlElement;
                 }
 
             }
@@ -799,15 +798,15 @@ namespace Skill.Framework
             {
                 return new InputSettings();
             }
-            public void Save(System.Xml.XmlElement e, Skill.Framework.IO.XmlSaveStream stream)
+            public void Save(IO.XmlElement e, Skill.Framework.IO.XmlSaveStream stream)
             {
-                System.Xml.XmlElement _InvertMouseXElement = stream.Create("InvertMouseX", _InvertMouseX);
+                IO.XmlElement _InvertMouseXElement = stream.Create("InvertMouseX", _InvertMouseX);
                 e.AppendChild(_InvertMouseXElement);
-                System.Xml.XmlElement _InvertMouseYElement = stream.Create("InvertMouseY", _InvertMouseY);
+                IO.XmlElement _InvertMouseYElement = stream.Create("InvertMouseY", _InvertMouseY);
                 e.AppendChild(_InvertMouseYElement);
-                System.Xml.XmlElement _MouseSensitivityElement = stream.Create("MouseSensitivity", _MouseSensitivity);
+                IO.XmlElement _MouseSensitivityElement = stream.Create("MouseSensitivity", _MouseSensitivity);
                 e.AppendChild(_MouseSensitivityElement);
-                System.Xml.XmlElement _KeysElement = stream.Create<KeyMap>("Keys", _Keys);
+                IO.XmlElement _KeysElement = stream.Create<KeyMap>("Keys", _Keys);
                 e.AppendChild(_KeysElement);
 
             }
@@ -819,9 +818,9 @@ namespace Skill.Framework
                 stream.Write<KeyMap>(_Keys);
 
             }
-            public void Load(System.Xml.XmlElement e, Skill.Framework.IO.XmlLoadStream stream)
+            public void Load(IO.XmlElement e, Skill.Framework.IO.XmlLoadStream stream)
             {
-                System.Xml.XmlElement element = e.FirstChild as System.Xml.XmlElement;
+                IO.XmlElement element = e.FirstChild as IO.XmlElement;
                 while (element != null)
                 {
                     switch (element.Name)
@@ -839,7 +838,7 @@ namespace Skill.Framework
                             this._Keys = stream.ReadSavableArray<KeyMap>(element, KeyMap.CreateKeyMap);
                             break;
                     }
-                    element = element.NextSibling as System.Xml.XmlElement;
+                    element = element.NextSibling as IO.XmlElement;
                 }
 
             }
@@ -889,13 +888,13 @@ namespace Skill.Framework
         {
             return new Settings();
         }
-        public void Save(System.Xml.XmlElement e, Skill.Framework.IO.XmlSaveStream stream)
+        public void Save(IO.XmlElement e, Skill.Framework.IO.XmlSaveStream stream)
         {
-            System.Xml.XmlElement _AudioElement = stream.Create<AudioSettings>("Audio", _Audio);
+            IO.XmlElement _AudioElement = stream.Create<AudioSettings>("Audio", _Audio);
             e.AppendChild(_AudioElement);
-            System.Xml.XmlElement _QualityElement = stream.Create<QualitySettings>("Quality", _Quality);
+            IO.XmlElement _QualityElement = stream.Create<QualitySettings>("Quality", _Quality);
             e.AppendChild(_QualityElement);
-            System.Xml.XmlElement _InputElement = stream.Create<InputSettings>("Input", _Input);
+            IO.XmlElement _InputElement = stream.Create<InputSettings>("Input", _Input);
             e.AppendChild(_InputElement);
 
         }
@@ -906,9 +905,9 @@ namespace Skill.Framework
             stream.Write<InputSettings>(_Input);
 
         }
-        public void Load(System.Xml.XmlElement e, Skill.Framework.IO.XmlLoadStream stream)
+        public void Load(IO.XmlElement e, Skill.Framework.IO.XmlLoadStream stream)
         {
-            System.Xml.XmlElement element = e.FirstChild as System.Xml.XmlElement;
+            IO.XmlElement element = e.FirstChild as IO.XmlElement;
             while (element != null)
             {
                 switch (element.Name)
@@ -923,7 +922,7 @@ namespace Skill.Framework
                         this._Input = stream.ReadSavable<InputSettings>(element, InputSettings.CreateInputSettings);
                         break;
                 }
-                element = element.NextSibling as System.Xml.XmlElement;
+                element = element.NextSibling as IO.XmlElement;
             }
 
         }

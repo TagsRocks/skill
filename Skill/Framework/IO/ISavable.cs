@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Xml;
 using System.Text;
 
 namespace Skill.Framework.IO
@@ -12,7 +11,7 @@ namespace Skill.Framework.IO
     /// actually you do not need to use this interface and implent it. Skill Studio will generate this class for you.
     /// </remarks>
     public interface ISavable
-    {
+    {        
         /// <summary>
         /// Save data to given XmlElement e
         /// </summary>

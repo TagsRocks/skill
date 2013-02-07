@@ -156,6 +156,15 @@ namespace Skill.Framework.UI
             this.Padding = new Thickness(0);
         }
 
+        /// <summary>
+        /// Convert mouse to local position
+        /// </summary>
+        /// <param name="mousePosition">Position of mouse</param>
+        protected override Vector2 ConvertToLocal(Vector2 mousePosition)
+        {
+            return mousePosition - _ScrollPosition;
+        }
+
         /// <summary> Begin Render control's content </summary>
         protected override void BeginRender()
         {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using UnityEngine;
 
@@ -28,7 +27,9 @@ namespace Skill.Framework.UI
         /// <summary> User pressed home </summary>
         Home,
         /// <summary> User pressed end </summary>
-        End,                
+        End,
+        /// <summary> User pressed tab </summary>
+        Tab,
     }
 
     /// <summary>
@@ -53,6 +54,70 @@ namespace Skill.Framework.UI
             Key = KeyCommand.None;
             MousePosition = Vector2.zero;
             Control = Shift = Alt = false;
+        }
+
+        /// <summary>
+        /// Get default input data from keyboard
+        /// </summary>
+        /// <returns>True if at least one key command is occured</returns>
+        public bool GetDefaultInput()
+        {
+            Reset();
+
+            this.MousePosition = Input.mousePosition;
+            this.Shift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+            this.Control = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+            this.Alt = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
+
+            bool handleCommand = this.Shift || this.Control || this.Control;
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                this.Key = KeyCommand.Cancel;
+                handleCommand = true;
+            }
+            if (Input.GetKeyDown(KeyCode.UpArrow))
+            {
+                this.Key = KeyCommand.Up;
+                handleCommand = true;
+            }
+            else if (Input.GetKeyDown(KeyCode.DownArrow))
+            {
+                this.Key = KeyCommand.Down;
+                handleCommand = true;
+            }
+            else if (Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                this.Key = KeyCommand.Left;
+                handleCommand = true;
+            }
+            else if (Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                this.Key = KeyCommand.Right;
+                handleCommand = true;
+            }
+            else if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                this.Key = KeyCommand.Tab;
+                handleCommand = true;
+            }
+            else if (Input.GetKeyDown(KeyCode.Home))
+            {
+                this.Key = KeyCommand.Home;
+                handleCommand = true;
+            }
+            else if (Input.GetKeyDown(KeyCode.End))
+            {
+                this.Key = KeyCommand.End;
+                handleCommand = true;
+            }
+            else if (Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return))
+            {
+                this.Key = KeyCommand.Enter;
+                handleCommand = true;
+            }
+
+            return handleCommand;
         }
     }
 }

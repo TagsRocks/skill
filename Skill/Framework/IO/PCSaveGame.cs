@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.IO;
-using System.Xml;
 
 namespace Skill.Framework.IO
 {
@@ -44,8 +42,19 @@ namespace Skill.Framework.IO
             if (savable == null) throw new ArgumentNullException("Invalid ISavable object.");
             if (!File.Exists(fileName)) throw new FileNotFoundException("Invalie fileName.");
             PCBinaryLoadStream stream = new PCBinaryLoadStream(fileName);
-            LoadFromStream(savable, stream);
-            stream.Close();
+            try
+            {
+                LoadFromStream(savable, stream);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            finally
+            {
+                stream.Close();
+            }
         }
 
         /// <summary>
@@ -82,13 +91,13 @@ namespace Skill.Framework.IO
         /// </summary>
         /// <param name="savable">ISavable to load</param>
         /// <param name="keyString">key of binarydata in PlayerPrefs</param>
-        public static void LoadBinatyFromPlayerPrefs(ISavable savable, string keyString)
+        public static void LoadBinaryFromPlayerPrefs(ISavable savable, string keyString)
         {
             if (savable == null) throw new ArgumentNullException("Invalid ISavable object.");
             if (string.IsNullOrEmpty(keyString)) throw new ArgumentException("Invalid key.");
 
             string binaryAsStringData = UnityEngine.PlayerPrefs.GetString(keyString);
-            byte[] binaryData = Encoding.Unicode.GetBytes(binaryAsStringData);
+            byte[] binaryData = ConvertStringToBytes(binaryAsStringData);
 
             MemoryStream stream = new MemoryStream(binaryData, false);
             PCBinaryLoadStream loadStream = new PCBinaryLoadStream(stream);
@@ -123,7 +132,7 @@ namespace Skill.Framework.IO
 
             if (root != null)
             {
-                XmlLoadStream stream = new XmlLoadStream();                
+                XmlLoadStream stream = new XmlLoadStream();
                 savable.Load(root, stream);
             }
             else
@@ -154,10 +163,20 @@ namespace Skill.Framework.IO
                 tempFile = System.IO.Path.Combine(dir, name + "_Tmp" + tempPostfix);
             }
 
-            System.IO.FileStream file = new System.IO.FileStream(tempFile, System.IO.FileMode.Create, System.IO.FileAccess.Write);
-            PCBinarySaveStream stream = new PCBinarySaveStream(fileName);
-            SaveToStream(savable, stream);
-            stream.Close();
+            PCBinarySaveStream stream = new PCBinarySaveStream(tempFile);
+            try
+            {
+                SaveToStream(savable, stream);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            finally
+            {
+                stream.Close();
+            }
 
             if (System.IO.File.Exists(fileName))
                 System.IO.File.Delete(fileName);
@@ -208,27 +227,55 @@ namespace Skill.Framework.IO
             UnityEngine.PlayerPrefs.SetString(keyString, xmlContent);
         }
 
+        private static byte[] ConvertStringToBytes(string str)
+        {
+            byte[] data = new byte[str.Length / 2];
+            int k = 0;
+            for (int i = 0; i < str.Length; i += 2)
+            {
+                data[k++] = byte.Parse(str.Substring(i, 2), System.Globalization.NumberStyles.AllowHexSpecifier);
+            }
+            return data;
+        }
+
+        private static string ConvertBytesToString(byte[] data)
+        {
+            StringBuilder str = new StringBuilder(data.Length * 2);
+            for (int i = 0; i < data.Length; i++)
+            {
+                str.Append(data[i].ToString("X2"));
+            }
+            return str.ToString();
+        }
+
+        /// <summary>
+        /// Save specified ISavable object to binary string
+        /// </summary>
+        /// <param name="savable">ISavable to save</param>         
+        public static string SaveToBinaryString(ISavable savable)
+        {
+            if (savable == null) throw new ArgumentNullException("Invalid ISavable object.");
+            MemoryStream stream = new MemoryStream();
+            PCBinarySaveStream saveStream = new PCBinarySaveStream(stream);
+            SaveToStream(savable, saveStream);
+            stream.Flush();
+            string saveData = ConvertBytesToString(stream.ToArray());
+            saveStream.Close();
+            return saveData;
+        }
+
         /// <summary>
         /// Save specified ISavable object to binary data as string in PlayerPrefs
         /// </summary>
         /// <param name="savable">ISavable to save</param> 
         /// <param name="keyString">key of binarydata in PlayerPrefs</param>
-        public static void SaveBinatyToPlayerPrefs(ISavable savable, string keyString)
+        public static void SaveBinaryToPlayerPrefs(ISavable savable, string keyString)
         {
             if (savable == null) throw new ArgumentNullException("Invalid ISavable object.");
             if (string.IsNullOrEmpty(keyString)) throw new ArgumentException("Invalid key.");
 
-            string binaryAsStringData = UnityEngine.PlayerPrefs.GetString(keyString);
-            byte[] binaryData = Encoding.Unicode.GetBytes(binaryAsStringData);
-
-            MemoryStream stream = new MemoryStream();
-            PCBinarySaveStream saveStream = new PCBinarySaveStream(stream);
-            SaveToStream(savable, saveStream);
-
-            string saveData = Encoding.Unicode.GetString(stream.GetBuffer());
+            string saveData = SaveToBinaryString(savable);
             UnityEngine.PlayerPrefs.SetString(keyString, saveData);
-
-            saveStream.Close();
         }
 
         /// <summary>

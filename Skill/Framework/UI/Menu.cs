@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Skill.Framework.UI
@@ -17,7 +16,7 @@ namespace Skill.Framework.UI
         private Frame _FrameToShowNext;     // to don't modify stack of frames when rendering frames
         private Frame _DialogToShowNext;    // to don't modify stack of dialogs when rendering dialogs
         private bool _BackRequest;          // request to show previous frame in view stack
-        private bool _ClearRequest;         // request to show clear view stack
+        private bool _ClearRequest;         // request to show clear view stack        
 
         // Find a frame by name
         private Frame FindFrame(string name)
@@ -64,6 +63,20 @@ namespace Skill.Framework.UI
         public string ExitDialog { get; set; }
 
         /// <summary>
+        /// if true, use event when user pressed tab key on keyboard and allow to handle tab key by commands
+        /// </summary>
+        /// <remarks>
+        /// Because Skill UI use commands to handle tab and cycle through controls, it must disable tab index that unity gui used internally.
+        /// Remember if you draw custom control before Menu.OnGUI(), this method may not works correctly, so you have to eat tab key yourself at the begin of MonoBehaviour OnGUI.
+        /// by writting this code :
+        /// <code>
+        /// if (UnityEngine.Event.current.keyCode == UnityEngine.KeyCode.Tab || UnityEngine.Event.current.character == '\t')
+        ///        UnityEngine.Event.current.Use();
+        /// </code>        
+        /// </remarks>
+        public bool EatTabKey { get; set; }
+
+        /// <summary>
         /// Retrieves frames by name
         /// </summary>
         /// <param name="name">Name of frame</param>
@@ -90,6 +103,7 @@ namespace Skill.Framework.UI
         /// <param name="frames">Frames to use by menu</param>
         public Menu(params Frame[] frames)
         {
+            this.EatTabKey = true;
             this._ViewStack = new Stack<Frame>();
             this._DialogStack = new Stack<Frame>();
 
@@ -204,6 +218,46 @@ namespace Skill.Framework.UI
         /// </summary>
         public void OnGUI()
         {
+            if (EatTabKey && UnityEngine.Event.current.keyCode == UnityEngine.KeyCode.Tab || UnityEngine.Event.current.character == '\t')
+                UnityEngine.Event.current.Use();
+
+            bool preEnabledValue = true;
+            // draw top most frame
+            if (_ViewStack.Count > 0)
+            {
+                Frame top = _ViewStack.Peek();
+
+                preEnabledValue = top.IsEnabled;// save value
+                if (_DialogStack.Count > 0) // disable frame if a dialog is on top
+                    top.IsEnabled = false;
+                top.OnGUI();
+                top.IsEnabled = preEnabledValue; // restore value
+            }
+            // draw dialogs
+            if (_DialogStack.Count > 0)
+            {
+                int dialogIndex = 1;
+                foreach (Frame dialog in _DialogStack)
+                {
+                    preEnabledValue = dialog.IsEnabled; // save value
+                    if (dialogIndex < _DialogStack.Count) // disable frame if a dialog is on top
+                        dialog.IsEnabled = false;
+                    // draw a block screen to deavtive lower visible frames and do not let user do something undesired                    
+                    dialog.OnGUI(); // draw dialog
+
+                    dialog.IsEnabled = preEnabledValue; // restore value
+                    dialogIndex++;
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// Update Menu
+        /// </summary>
+        public virtual void Update()
+        {
+
             if (_ClearRequest)
             {
                 _ViewStack.Clear();
@@ -261,34 +315,14 @@ namespace Skill.Framework.UI
             }
 
 
-            bool preEnabledValue = true;
-            // draw top most frame
-            if (_ViewStack.Count > 0)
-            {
-                Frame top = _ViewStack.Peek();
-
-                preEnabledValue = top.IsEnabled;// save value
-                if (_DialogStack.Count > 0) // disable frame if a dialog is on top
-                    top.IsEnabled = false;
-                top.OnGUI();
-                top.IsEnabled = preEnabledValue; // restore value
-            }
-            // draw dialogs
+            if (TopFrame != null)
+                TopFrame.Update();
             if (_DialogStack.Count > 0)
             {
-                int dialogIndex = 1;
                 foreach (Frame dialog in _DialogStack)
-                {
-                    preEnabledValue = dialog.IsEnabled; // save value
-                    if (dialogIndex < _DialogStack.Count) // disable frame if a dialog is on top
-                        dialog.IsEnabled = false;
-                    // draw a block screen to deavtive lower visible frames and do not let user do something undesired                    
-                    dialog.OnGUI(); // draw dialog
-
-                    dialog.IsEnabled = preEnabledValue; // restore value
-                    dialogIndex++;
-                }
+                    dialog.Update();
             }
+
             // check to see if top most dialog provides a valid result and needs to close
             if (_DialogStack.Count > 0)
             {
@@ -311,7 +345,6 @@ namespace Skill.Framework.UI
                 }
             }
         }
-
         #region Commands
         /// <summary>
         /// Handle specified command

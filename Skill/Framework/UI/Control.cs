@@ -19,13 +19,7 @@ namespace Skill.Framework.UI
         /// <summary>
         /// The style to use. If null, the style from the current GUISkin is used.
         /// </summary>
-        public virtual GUIStyle Style { get; set; }
-
-        /// <summary>
-        /// Indicates whether the element can receive focus.
-        /// </summary>
-        public virtual bool Focusable { get { return false; } }
-
+        public virtual GUIStyle Style { get; set; }       
 
     }
 

@@ -34,9 +34,9 @@ namespace Skill.Framework.Triggers
                 {
                     if (other.tag == tag)
                     {
-                        if (!Unlimite)
+                        bool b = OnEnter(other);
+                        if (!Unlimite && b)
                             TriggerCount--;
-                        OnEnter(other);
                         break;
                     }
                 }
@@ -90,18 +90,19 @@ namespace Skill.Framework.Triggers
 
         /// <summary>
         /// called when the Collider other enters the trigger.
-        /// </summary>
+        /// </summary>        
         /// <param name="other">other Collider</param>
-        protected virtual void OnEnter(Collider other) { }
+        /// <returns>True if event handled, otherwise false</returns>
+        protected virtual bool OnEnter(Collider other) { return false; }
         /// <summary>
         /// called when the Collider other has stopped touching the trigger.
         /// </summary>
-        /// <param name="other">other Collider</param>
+        /// <param name="other">other Collider</param>        
         protected virtual void OnExit(Collider other) { }
         /// <summary>
         /// called almost all the frames for every Collider other that is touching the trigger.
         /// </summary>
-        /// <param name="other">other Collider</param>
+        /// <param name="other">other Collider</param>        
         protected virtual void OnStay(Collider other) { }
 
         /// <summary>

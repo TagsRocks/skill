@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using UnityEngine;
 
@@ -149,14 +148,19 @@ namespace Skill.Framework
         /// <summary> Amount of damage </summary>
         public float Damage { get; private set; }
 
+        /// <summary>
+        /// Tag of object that cause damage
+        /// </summary>
+        public string Tag { get; private set; }
 
         /// <summary>
         /// Create DamageEventArgs
         /// </summary>
         /// <param name="damage"> Amount of damage </param>
-        public DamageEventArgs(float damage)
+        public DamageEventArgs(float damage, string tag)
         {
             this.Damage = damage;
+            this.Tag = tag;
         }
     }
 

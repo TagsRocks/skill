@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Skill.Framework.UI
@@ -130,6 +129,16 @@ namespace Skill.Framework.UI
                 value.Change += RowDefinition_Change;
                 OnChange();
             }
+        }
+
+        /// <summary>
+        /// Adds a RowDefinition element to a ColumnDefinitionCollection.
+        /// </summary>
+        /// <param name="value"> The initial value of this instance of GridLength. </param>
+        /// <param name="type"> The GridUnitType held by this instance of GridLength. </param>
+        public void Add(float value, GridUnitType type)
+        {
+            Add(new RowDefinition() { Height = new GridLength(value, type) });
         }
 
         void RowDefinition_Change(object sender, EventArgs e)

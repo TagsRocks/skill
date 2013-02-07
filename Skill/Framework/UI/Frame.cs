@@ -9,15 +9,22 @@ namespace Skill.Framework.UI
     /// <summary>
     /// Frame is a content control that supports navigation.
     /// </summary>
-    public class Frame
+    public class Frame : IControl
     {
         #region Properties
+
+        /// <summary> Frame does not have parent </summary>
+        public IControl Parent { get { return null; } }
+
+
+        /// <summary> Specify type of Control  </summary>
+        public ControlType ControlType { get { return UI.ControlType.Frame; } }
 
         /// <summary>
         /// Gets or sets a value indicating whether this element is enabled in the user interface (UI).
         /// </summary>
         /// <returns>  true if the element is enabled; otherwise, false. The default value is true. </returns>
-        public virtual bool IsEnabled { get { return Grid.IsEnabled; } set { Grid.IsEnabled = value; } }
+        public virtual bool IsEnabled { get; set; }
 
         private Rect _Position;
         /// <summary>
@@ -123,11 +130,11 @@ namespace Skill.Framework.UI
         /// </summary>
         public Grid Grid { get; private set; }
 
-        private FocusableControl _FocusedControl;
+        private IFocusable _FocusedControl;
         /// <summary>
         /// Get focused FocusableControl in last update or null if no FocusableControl got focus
         /// </summary>
-        public FocusableControl FocusedControl
+        public IFocusable FocusedControl
         {
             get { return _FocusedControl; }
             private set
@@ -138,7 +145,14 @@ namespace Skill.Framework.UI
                         _FocusedControl.IsFocused = false;
                     _FocusedControl = value;
                     if (_FocusedControl != null)
-                        _FocusedControl.IsFocused = true;                    
+                    {
+                        _FocusedControl.IsFocused = true;
+                        if (_FocusedControl.IsExtendedFocusable)
+                        {
+                            _UnFocusRequestDotoExtendedIsFocused = true;
+                            _UnFocusRequestExecuted = false;
+                        }
+                    }
                 }
             }
         }
@@ -153,7 +167,6 @@ namespace Skill.Framework.UI
         /// </summary>
         public DialogResult DialogResult { get; protected set; }
 
-        private string _FocusedRequest = null;
         /// <summary>
         /// Move keyboard focus to a named control.
         /// </summary>
@@ -161,34 +174,34 @@ namespace Skill.Framework.UI
         public void FocusControl(string controlName)
         {
             Control fc = Grid.FindControlByName(controlName);
-            if (fc != null)
-                _FocusedRequest = controlName;
+            if (fc != null && fc.IsFocusable)
+                FocusedControl = fc as IFocusable;
             else
-                _FocusedRequest = null;
+                FocusedControl = null;
         }
 
         /// <summary>
         /// Move keyboard focus to a named control.
         /// </summary>
-        /// <param name="control">focusable control</param>
-        public void FocusControl(FocusableControl control)
+        /// <param name="focusable">focusable control</param>
+        public void FocusControl(IFocusable focusable)
         {
-            if (string.IsNullOrEmpty(control.Name))
-                throw new InvalidOperationException("Can not focus unnamed control");
-            Control fc = Grid.FindControlByName(control.Name);
-            if (fc != null)
-                _FocusedRequest = control.Name;
-            else
-                _FocusedRequest = null;
-
+            FocusedControl = focusable;
         }
 
+        // because OnGUI method called multiple times per frame this is a helper value to make sure unfocuse request called at all of OnGUI calls
+        private bool _UnFocusRequestExecuted;
+        private bool _UnFocusRequest;
+        private bool _UnFocusRequestDotoExtendedIsFocused;
+        private string _FocusedControlName; // name of focusable control by GUI.GetNameOfFocusedControl()
         /// <summary>
         /// remove keyboard focus.
         /// </summary>        
         public void UnFocusControls()
         {
             FocusedControl = null;
+            _UnFocusRequest = true;
+            _UnFocusRequestExecuted = false;
         }
 
         /// <summary>
@@ -199,14 +212,11 @@ namespace Skill.Framework.UI
         /// </remarks>
         public void NextTab()
         {
-            FocusableControl fc = null;
+            IFocusable fc = null;
             if (_FocusedControl != null)
-                fc = Grid.FindControlByTabIndex(_FocusedControl.TabIndex + 1);
+                fc = Grid.FindControlByMinTabIndexAfter(_FocusedControl.TabIndex);
             if (fc == null)
-            {
-                uint ti = uint.MaxValue;
-                fc = Grid.FindControlByMinTabIndex(ref ti);
-            }
+                fc = Grid.FindControlByMinTabIndex();
             if (fc != null)
                 FocusControl(fc);
         }
@@ -219,17 +229,15 @@ namespace Skill.Framework.UI
         /// </remarks>
         public void PreviousTab()
         {
-            FocusableControl fc = null;
-            if (_FocusedControl != null && _FocusedControl.TabIndex > 0)
-                fc = Grid.FindControlByTabIndex(_FocusedControl.TabIndex - 1);
+            IFocusable fc = null;
+            if (_FocusedControl != null)
+                fc = Grid.FindControlByMaxTabIndexBefore(_FocusedControl.TabIndex);
             if (fc == null)
-            {
-                uint ti = uint.MinValue;
-                fc = Grid.FindControlByMaxTabIndex(ref ti);
-            }
+                fc = Grid.FindControlByMaxTabIndex();
+
             if (fc != null)
                 FocusControl(fc);
-        }        
+        }
         #endregion
 
         #region Events
@@ -245,55 +253,46 @@ namespace Skill.Framework.UI
         }
 
         /// <summary>
-        /// Is any key events hooked?
-        /// </summary>
-        /// <returns>True if hooked, otherwise false</returns>
-        private bool IsAnyKeyEventHooked()
-        {
-            return KeyDown != null || KeyUp != null;
-        }
-
-        /// <summary>
         /// Check for events
         /// </summary>
         private void CheckEvents()
         {
-            if (IsAnyKeyEventHooked())
+            Event e = Event.current;
+            if (e != null && e.isKey && e.keyCode != KeyCode.None)
             {
-                Event e = Event.current;
-                if (e != null && e.isKey && e.keyCode != KeyCode.None)
+                EventType type = e.type;
+                if (type == EventType.keyDown || type == EventType.KeyUp)
                 {
-                    EventType type = e.type;
-                    if (type == EventType.keyDown || type == EventType.KeyUp)
-                    {
-                        KeyEventArgs args = new KeyEventArgs(e.keyCode, e.character);
-                        if (type == EventType.keyDown)
-                            OnKeyDown(args);
-                        else
-                            OnKeyUp(args);
-                        if (args.Handled)
-                            e.Use();
-                    }
+                    KeyEventArgs args = new KeyEventArgs(e.keyCode, e.character);
+                    if (type == EventType.keyDown)
+                        OnKeyDown(args);
+                    else
+                        OnKeyUp(args);
+                    if (args.Handled)
+                        e.Use();
                 }
             }
         }
 
+
+
         /// <summary> Occurs when a keyboard key was pressed.() </summary>
         public event KeyEventHandler KeyDown;
         /// <summary>
-        /// Occurs when a keyboard key was pressed.(if KeyDown hooked )
+        /// Occurs when a keyboard key was pressed.
         /// </summary>
         /// <param name="args"> KeyEventArgs </param>
         protected virtual void OnKeyDown(KeyEventArgs args)
         {
             if (KeyDown != null)
                 KeyDown(this, args);
+
         }
 
         /// <summary> Occurs when a keyboard key was released. </summary>
         public event KeyEventHandler KeyUp;
         /// <summary>
-        /// Occurs when a keyboard key was released.(if KeyUp hooked )
+        /// Occurs when a keyboard key was released.
         /// </summary>
         /// <param name="args"> KeyEventArgs </param>
         protected virtual void OnKeyUp(KeyEventArgs args)
@@ -314,6 +313,24 @@ namespace Skill.Framework.UI
         /// to render control you have to call this method in OnGUI method of MonoBehavior.(call this for Frame class)
         /// </summary>
         public virtual void OnGUI()
+        {
+            UpdateLayout();
+
+            CheckEvents();
+
+            DrawControls();
+
+            if (_UnFocusRequest || _UnFocusRequestDotoExtendedIsFocused)
+            {
+                GUI.FocusControl(string.Empty);
+                if (_UnFocusRequest)
+                    FocusedControl = null;
+                _UnFocusRequestExecuted = true;
+            }
+            _FocusedControlName = GUI.GetNameOfFocusedControl();
+        }
+
+        private void UpdateLayout()
         {
             Rect rect = Position;
 
@@ -337,36 +354,26 @@ namespace Skill.Framework.UI
             rect.x += x;
             rect.y += y;
             Grid.RenderArea = rect;
+        }
 
-            CheckEvents();
-
-            if (_FocusedRequest != null)
+        /// <summary>
+        /// Update GUI Frame
+        /// </summary>
+        public virtual void Update()
+        {
+            if (_UnFocusRequestExecuted)
             {
-                GUI.FocusControl(_FocusedRequest);
-                _FocusedRequest = null;
-            }
-            else if (_FocusedControl != null)
-                GUI.FocusControl(_FocusedControl.Name);
-            else
-                GUI.FocusControl(string.Empty);
-
-            DrawControls();            
-
-            string focusedControlName = GUI.GetNameOfFocusedControl();
-            if (!string.IsNullOrEmpty(focusedControlName))
-            {
-                if (FocusedControl == null || FocusedControl.Name != focusedControlName)
+                _UnFocusRequest = false;
+                _UnFocusRequestDotoExtendedIsFocused = false;
+                _UnFocusRequestExecuted = false;
+                if (!string.IsNullOrEmpty(_FocusedControlName))
                 {
-                    Control c = Grid.FindControlByName(focusedControlName);
-                    if (c != null && c.Focusable)
-                        FocusedControl = (FocusableControl)c;
-                    else
-                        FocusedControl = null;
+                    if (_FocusedControl == null || _FocusedControl.Name != _FocusedControlName)
+                    {
+                        FocusedControl = Grid.FindControlByName(_FocusedControlName) as IFocusable;
+                    }
                 }
-            }
-            else
-                FocusedControl = null;
-
+            }            
         }
 
         /// <summary>
@@ -390,7 +397,7 @@ namespace Skill.Framework.UI
                 throw new ArgumentException("Invalid name of Frame");
 
             this.Name = name;
-            Grid = new Grid();
+            Grid = new Grid() { Parent = this };
             this.Width = 200;
             this.Height = 200;
         }
@@ -403,7 +410,7 @@ namespace Skill.Framework.UI
         /// <returns>Whehter enter is success or still needs time to success</returns>
         internal bool EnterFrame()
         {
-            FocusedControl = null;
+            UnFocusControls();
             this.DialogResult = UI.DialogResult.None;
             return OnEnter();
         }
@@ -429,7 +436,7 @@ namespace Skill.Framework.UI
         /// <returns>Whehter leave is success or still needs time to success</returns>        
         internal bool LeaveFrame(ref bool cancel)
         {
-            FocusedControl = null;
+            UnFocusControls();
             return OnLeave(ref cancel);
         }
 
@@ -445,6 +452,7 @@ namespace Skill.Framework.UI
         /// </remarks>
         protected virtual bool OnLeave(ref bool cancel)
         {
+            FocusedControl = null;
             return true;
         }
         #endregion
@@ -456,7 +464,7 @@ namespace Skill.Framework.UI
         /// <returns>Whehter hide is success or still needs time to success</returns>
         internal bool HideFrame()
         {
-            FocusedControl = null;
+            UnFocusControls();
             this.DialogResult = UI.DialogResult.None;
             return OnHide();
         }
@@ -481,6 +489,7 @@ namespace Skill.Framework.UI
         /// <returns>Whehter show is success or still needs time to success</returns>
         internal bool ShowFrame()
         {
+            UnFocusControls();
             this.DialogResult = UI.DialogResult.None;
             return OnShow();
         }
@@ -527,9 +536,8 @@ namespace Skill.Framework.UI
         /// <returns>True if command is handled, otherwise false</returns>        
         /// <remarks>
         /// 1- This method first allow focused control (if exist) to handle command
-        /// 2- if not let the control that is under mouse cursor to handle command
-        /// 3- if not then go through controls and let each to handle command
-        /// 4- if not and handleTabIndex is true : 
+        /// 2- if not let the control that is under mouse cursor to handle command        
+        /// 3- if not and handleTabIndex is true : 
         ///     if command is Up   : PreviousTab()
         ///     if command is Down : NextTab()
         /// as soon as first control handled the command ignore next steps
@@ -543,14 +551,14 @@ namespace Skill.Framework.UI
                 handled = this.Grid.HandleCommand(command);
             if (!handled && handleTabIndex)
             {
-                if (command.Key == KeyCommand.Up)
-                {
-                    PreviousTab();
-                    handled = true;
-                }
-                else if (command.Key == KeyCommand.Down)
+                if (command.Key == KeyCommand.Down || command.Key == KeyCommand.Right || command.Key == KeyCommand.Tab)
                 {
                     NextTab();
+                    handled = true;
+                }
+                else if (command.Key == KeyCommand.Up || command.Key == KeyCommand.Left)
+                {
+                    PreviousTab();
                     handled = true;
                 }
             }

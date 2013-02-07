@@ -2,14 +2,14 @@
 using Skill.Framework.Managers;
 
 namespace Skill.Framework.Weapons
-{    
+{
     /// <summary>
     /// Bullet to use by weapons. if bullet has RigidBody with low speed controlled by physics engine. it is possible to enable gravity to fall down after spawn or
     /// disable gravity to go in straight direction. The weapon do AddForce to RigidBody bullets at spawn time.
     /// if collider is a trigger the bullet check collision by OnTriggerEnter method
     /// if collider is not a trigger the bullet check collision by OnCollisionEnter method
     /// </summary>
-    [AddComponentMenu("Skill/Weapons/Bullets/Bullet")]  
+    [AddComponentMenu("Skill/Weapons/Bullets/Bullet")]
     public class Bullet : DynamicBehaviour
     {
         /// <summary> Object to spawn on collision </summary>
@@ -28,7 +28,7 @@ namespace Skill.Framework.Weapons
         /// <summary>
         /// Amount of damage caused by this bullet.
         /// </summary>
-        public float Damage { get; set; }
+        public virtual float Damage { get; set; }
 
         /// <summary>
         /// Speed of bullet in air. (should be setted by weapon)
@@ -42,7 +42,7 @@ namespace Skill.Framework.Weapons
         /// <summary>
         /// Range of bullet after spawn. (should be setted by weapon)
         /// </summary>
-        public float Range { get; set; }        
+        public float Range { get; set; }
 
         /// <summary> Target of projectile </summary>
         public Vector3? Target { get; set; }
@@ -93,7 +93,7 @@ namespace Skill.Framework.Weapons
                 EventManager eventManager = cp.otherCollider.GetComponent<EventManager>();
                 if (eventManager != null)
                 {
-                    eventManager.OnDamage(this, new DamageEventArgs(this.Damage));
+                    eventManager.OnDamage(this, new DamageEventArgs(this.Damage, tag));
                 }
                 OnDie();
             }
@@ -113,7 +113,7 @@ namespace Skill.Framework.Weapons
                 EventManager eventManager = other.GetComponent<EventManager>();
                 if (eventManager != null)
                 {
-                    eventManager.OnDamage(this, new DamageEventArgs(this.Damage));
+                    eventManager.OnDamage(this, new DamageEventArgs(this.Damage, tag));
                 }
                 OnDie();
             }
@@ -147,7 +147,7 @@ namespace Skill.Framework.Weapons
                 return true;
         }
 
-        
+
 
         /// <summary>
         /// Call this when bullet reach end of range or hit something or out of life time

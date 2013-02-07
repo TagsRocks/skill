@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace Skill.Framework.UI
+namespace Skill.Framework.UI.Extended
 {
     /// <summary> Defines the selection behavior for a ListBox. </summary>
     public enum SelectionMode
@@ -50,8 +49,81 @@ namespace Skill.Framework.UI
     /// <summary>
     /// Contains a list of selectable items.
     /// </summary>
-    public class ListBox : StackPanel
+    public class ListBox : StackPanel, IFocusable
     {
+
+        /// <summary> Tab index of control. </summary>
+        public int TabIndex { get; set; }
+
+        private bool _IsFocused;
+        /// <summary>
+        /// Gets a value that determines whether this element has logical focus. (You must set valid name to enable this behavior)
+        /// </summary>
+        /// <returns>
+        /// true if this element has logical focus; otherwise, false.(You must set valid name to enable this behavior)
+        /// </returns>
+        /// <remarks>
+        /// Set used for internal use
+        /// </remarks>
+        public bool IsFocused
+        {
+            get { return _IsFocused; }
+            set
+            {
+                if (_IsFocused != value)
+                {
+                    _IsFocused = value;
+                    if (_IsFocused)
+                        OnGotFocus();
+                    else
+                        OnLostFocus();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether the element can receive focus.(You must set valid name to enable this behavior)
+        /// </summary>
+        public override bool IsFocusable { get { return true; } }
+
+        /// <summary> it is an extended focusable </summary>
+        public bool IsExtendedFocusable { get { return true; } }
+
+        /// <summary>
+        /// Occurs when this element gets logical focus.(You must set valid name to enable this behavior)
+        /// </summary>
+        public event EventHandler GotFocus;
+        /// <summary>
+        /// when this element gets logical focus.(You must set valid name to enable this behavior)
+        /// </summary>
+        protected virtual void OnGotFocus()
+        {
+            if (GotFocus != null) GotFocus(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Occurs when this element loses logical focus.(You must set valid name to enable this behavior)
+        /// </summary>
+        public event EventHandler LostFocus;
+        /// <summary>
+        /// when this element loses logical focus.(You must set valid name to enable this behavior)
+        /// </summary>
+        protected virtual void OnLostFocus()
+        {
+            if (LostFocus != null) LostFocus(this, EventArgs.Empty);
+        }
+
+        /// <summary> Try focuse control </summary>
+        public void Focus()
+        {
+            if (OwnerFrame != null)
+                OwnerFrame.FocusControl(this);
+        }
+
+        /// <summary>
+        /// This is same as Controls property (for adaptability)
+        /// </summary>
+        public BaseControlCollection Items { get { return Controls; } }
 
         // variables
         private List<BaseControl> _SelectedItems;
@@ -155,10 +227,19 @@ namespace Skill.Framework.UI
         }
 
         /// <summary>
-        /// Style to use for Box used for background of selected items
+        /// Style to use for Box used as background of selected items
         /// </summary>
         public GUIStyle SelectedStyle { get; set; }
 
+
+        /// <summary>
+        /// Is background visible
+        /// </summary>
+        public bool BackgroundVisible
+        {
+            get { return Background.Visibility == UI.Visibility.Visible; }
+            set { Background.Visibility = value ? UI.Visibility.Visible : UI.Visibility.Hidden; }
+        }
 
         /// <summary>
         /// Border and Background.
@@ -167,6 +248,11 @@ namespace Skill.Framework.UI
         /// To draw border and background if ListBox set visibility of Background property to true and set valid style
         /// </remarks>
         public Box Background { get; private set; }
+
+        /// <summary>
+        /// Border and Background to use when listbox is focused.
+        /// </summary>                
+        public Box FocusedBackground { get; private set; }
 
         /// <summary>
         /// Optional GUIStyle to use for the horizontal scrollbar. If left out, the horizontalScrollbar style from the current GUISkin is used.
@@ -327,6 +413,7 @@ namespace Skill.Framework.UI
             this.HandleScrollWheel = true;
             this._SelectedItems = new List<BaseControl>();
             this.Background = new Box() { Parent = this, Visibility = Skill.Framework.UI.Visibility.Hidden };
+            this.FocusedBackground = new Box() { Parent = this, Visibility = Skill.Framework.UI.Visibility.Visible };
             this.Padding = new Thickness(0);
         }
 
@@ -336,16 +423,53 @@ namespace Skill.Framework.UI
             _IgnoreScrollbarThickness = true;
             base.BeginRender();
             _IgnoreScrollbarThickness = false;
-            Rect ra = RenderArea;
+            Rect ra = RenderAreaShrinksByPadding;
             _ScrollViewRect = ra;
             Size ds = DesiredSize;
-            _ScrollViewRect.width = Mathf.Max(ra.width, ds.Width) - ScrollbarThickness;
-            _ScrollViewRect.height = Mathf.Max(ra.height, ds.Height) - ScrollbarThickness;
+            _ScrollViewRect.width = Mathf.Max(ra.width, ds.Width);
+            _ScrollViewRect.height = Mathf.Max(ra.height, ds.Height);
+
+            if (Orientation == UI.Orientation.Vertical)
+                _ScrollViewRect.width -= ScrollbarThickness;
+            else
+                _ScrollViewRect.height -= ScrollbarThickness;
 
             if (this.Background.Visibility == Skill.Framework.UI.Visibility.Visible)
             {
                 this.Background.RenderArea = RenderArea;
                 this.Background.OnGUI();
+            }
+            if (_IsFocused && this.FocusedBackground.Visibility == Skill.Framework.UI.Visibility.Visible)
+            {
+                this.FocusedBackground.RenderArea = RenderArea;
+                this.FocusedBackground.OnGUI();
+            }
+
+            if (SelectionMode == SelectionMode.Single)
+            {
+                // make sure selected item is always visible
+                if (SelectedItem != null)
+                {
+                    Rect selectedRA = SelectedItem.RenderArea;
+                    if (Orientation == UI.Orientation.Vertical)
+                    {
+                        float localMinY = selectedRA.y - ra.y;
+                        float localMaxY = selectedRA.height + localMinY;
+                        if (_ScrollPosition.y > localMaxY)
+                            _ScrollPosition.y = localMinY;
+                        else if (_ScrollPosition.y + ra.height < localMaxY)
+                            _ScrollPosition.y = localMaxY - ra.height;
+                    }
+                    else
+                    {
+                        float localMinX = selectedRA.x - ra.x;
+                        float localMaxX = selectedRA.width + localMinX;
+                        if (_ScrollPosition.x > localMaxX)
+                            _ScrollPosition.x = localMinX;
+                        else if (_ScrollPosition.x + ra.width < localMaxX)
+                            _ScrollPosition.x = localMaxX - ra.width;
+                    }
+                }
             }
             if (HorizontalScrollbarStyle != null && VerticalScrollbarStyle != null)
             {
@@ -381,6 +505,15 @@ namespace Skill.Framework.UI
         }
 
         /// <summary>
+        /// Convert mouse to local position
+        /// </summary>
+        /// <param name="mousePosition">Position of mouse</param>
+        protected override Vector2 ConvertToLocal(Vector2 mousePosition)
+        {
+            return mousePosition - _ScrollPosition;
+        }
+
+        /// <summary>
         /// Render ListBox
         /// </summary>
         protected override void Render()
@@ -395,7 +528,7 @@ namespace Skill.Framework.UI
                 if (e.isMouse && e.type == EventType.MouseDown && e.button == 0)
                 {
                     Vector2 mousePos = e.mousePosition;
-                    Vector2 localMouse = mousePos - _ScrollPosition;
+                    Vector2 localMouse = ConvertToLocal(mousePos);
                     Rect ra = RenderAreaShrinksByPadding;
                     if (ra.Contains(localMouse))
                     {
@@ -500,7 +633,11 @@ namespace Skill.Framework.UI
                 }
             }
 
-            if (selectionChange) OnSelectionChanged();
+            if (selectionChange)
+            {
+                Focus();
+                OnSelectionChanged();
+            }
 
             if (_SelectedItems.Count > 0)
             {
@@ -561,111 +698,141 @@ namespace Skill.Framework.UI
         /// <returns>True if command is handled, otherwise false</returns>        
         public override bool HandleCommand(UICommand command)
         {
-            if (base.HandleCommand(command))
-                return true;
-            if (SelectionMode == UI.SelectionMode.Single)
+            bool handled = false;
+            if (Items.Count > 0)
             {
-                if (command.Key == KeyCommand.Up)
+                if (SelectionMode == SelectionMode.Single)
                 {
-                    // try to select previous item
-                    if (_SelectedIndex > 0)
+                    if (_SelectedIndex < 0 && (command.Key == KeyCommand.Up || command.Key == KeyCommand.Down))
                     {
-                        SelectedIndex--;
+                        SelectedIndex = 0;
                         OnSelectionChanged();
-                        return true;
+                        handled = true;
                     }
-                }
-                else if (command.Key == KeyCommand.Down)
-                {
-                    // try to select next item
-                    if (_SelectedIndex < Controls.Count - 1)
+                    else if (command.Key == KeyCommand.Up)
                     {
-                        SelectedIndex++;
-                        OnSelectionChanged();
-                        return true;
-                    }
-                }
-            }
-            else if (command.Shift)
-            {
-                if (command.Key == KeyCommand.Up)
-                {
-                    // try to add previous item to selection
-                    int firstSelectedIndex = -1;
-                    for (int i = 0; i < Controls.Count; i++)
-                    {
-                        if (_SelectedItems.Contains(Controls[i]))
+                        // try to select previous item
+                        if (_SelectedIndex > 0)
                         {
-                            firstSelectedIndex = i;
-                            break;
+                            SelectedIndex--;
+                            OnSelectionChanged();
+                            handled = true;
                         }
                     }
-                    if (firstSelectedIndex != -1 && firstSelectedIndex > 0)
+                    else if (command.Key == KeyCommand.Down)
                     {
-                        _SelectedItems.Add(Controls[firstSelectedIndex - 1]);
-                        OnSelectionChanged();
-                        return true;
-                    }
-                }
-                else if (command.Key == KeyCommand.Down)
-                {
-                    // try to add next item to selection
-                    int lastSelectedIndex = -1;
-                    // find first selected item after this item
-                    for (int i = Controls.Count - 1; i >= 0; i--)
-                    {
-                        if (_SelectedItems.Contains(Controls[i]))
+                        // try to select next item
+                        if (_SelectedIndex < Controls.Count - 1)
                         {
-                            lastSelectedIndex = i;
-                            break;
+                            SelectedIndex++;
+                            OnSelectionChanged();
+                            handled = true;
                         }
                     }
-                    if (lastSelectedIndex != -1 && lastSelectedIndex < Controls.Count - 1)
+                    else if (command.Key == KeyCommand.Home)
                     {
-                        _SelectedItems.Add(Controls[lastSelectedIndex + 1]);
-                        OnSelectionChanged();
-                        return true;
-                    }
-                }
-                else if (_SelectedItems.Count == 1)
-                {
-                    if (command.Key == KeyCommand.Home)
-                    {
-                        // try to add previous items to selection
-                        int selectedIndex = Controls.IndexOf(_SelectedItems[0]);
-                        if (selectedIndex > 0)
+                        if (SelectedIndex > 0)
                         {
-                            bool change = false;
-                            for (int k = selectedIndex - 1; k >= 0; k--)
-                            {
-                                _SelectedItems.Add(Controls[k]);
-                                change = true;
-                            }
-                            if (change)
-                                OnSelectionChanged();
-                            return true;
+                            SelectedIndex = 0;
+                            OnSelectionChanged();
+                            handled = true;
                         }
                     }
                     else if (command.Key == KeyCommand.End)
                     {
-                        // try to add next items to selection
-                        int selectedIndex = Controls.IndexOf(_SelectedItems[0]);
-                        if (selectedIndex < Controls.Count - 1)
+                        if (SelectedIndex < Items.Count - 1)
                         {
-                            bool change = false;
-                            for (int k = selectedIndex + 1; k < Controls.Count; k++)
+                            SelectedIndex = Items.Count - 1;
+                            OnSelectionChanged();
+                            handled = true;
+                        }
+                    }
+                }
+                else if (command.Shift)
+                {
+                    if (command.Key == KeyCommand.Up)
+                    {
+                        // try to add previous item to selection
+                        int firstSelectedIndex = -1;
+                        for (int i = 0; i < Controls.Count; i++)
+                        {
+                            if (_SelectedItems.Contains(Controls[i]))
                             {
-                                _SelectedItems.Add(Controls[k]);
-                                change = true;
+                                firstSelectedIndex = i;
+                                break;
                             }
-                            if (change)
-                                OnSelectionChanged();
-                            return true;
+                        }
+                        if (firstSelectedIndex != -1 && firstSelectedIndex > 0)
+                        {
+                            _SelectedItems.Add(Controls[firstSelectedIndex - 1]);
+                            OnSelectionChanged();
+                            handled = true;
+                        }
+                    }
+                    else if (command.Key == KeyCommand.Down)
+                    {
+                        // try to add next item to selection
+                        int lastSelectedIndex = -1;
+                        // find first selected item after this item
+                        for (int i = Controls.Count - 1; i >= 0; i--)
+                        {
+                            if (_SelectedItems.Contains(Controls[i]))
+                            {
+                                lastSelectedIndex = i;
+                                break;
+                            }
+                        }
+                        if (lastSelectedIndex != -1 && lastSelectedIndex < Controls.Count - 1)
+                        {
+                            _SelectedItems.Add(Controls[lastSelectedIndex + 1]);
+                            OnSelectionChanged();
+                            handled = true;
+                        }
+                    }
+                    else if (_SelectedItems.Count == 1)
+                    {
+                        if (command.Key == KeyCommand.Home)
+                        {
+                            // try to add previous items to selection
+                            int selectedIndex = Controls.IndexOf(_SelectedItems[0]);
+                            if (selectedIndex > 0)
+                            {
+                                bool change = false;
+                                for (int k = selectedIndex - 1; k >= 0; k--)
+                                {
+                                    _SelectedItems.Add(Controls[k]);
+                                    change = true;
+                                }
+                                if (change)
+                                    OnSelectionChanged();
+                                handled = true;
+                            }
+                        }
+                        else if (command.Key == KeyCommand.End)
+                        {
+                            // try to add next items to selection
+                            int selectedIndex = Controls.IndexOf(_SelectedItems[0]);
+                            if (selectedIndex < Controls.Count - 1)
+                            {
+                                bool change = false;
+                                for (int k = selectedIndex + 1; k < Controls.Count; k++)
+                                {
+                                    _SelectedItems.Add(Controls[k]);
+                                    change = true;
+                                }
+                                if (change)
+                                    OnSelectionChanged();
+                                handled = true;
+                            }
                         }
                     }
                 }
             }
-            return false;
+            if (!handled)
+                handled = base.HandleCommand(command);
+            else if (!_IsFocused)
+                Focus();
+            return handled;
         }
     }
 }

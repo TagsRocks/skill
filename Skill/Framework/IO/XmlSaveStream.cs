@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Xml;
 using UnityEngine;
 
 namespace Skill.Framework.IO
@@ -43,11 +42,9 @@ namespace Skill.Framework.IO
         /// <param name="savable">ISavable to save</param>
         public XmlSaveStream(ISavable savable)
         {
-            Document = new XmlDocument();
-            XmlDeclaration xmlDeclaration = Document.CreateXmlDeclaration("1.0", "utf-8", null);
+            Document = new XmlDocument();            
             XmlElement rootNode = Document.CreateElement("SaveData");
-            savable.Save(rootNode, this);
-            Document.InsertBefore(xmlDeclaration, Document.DocumentElement);
+            savable.Save(rootNode, this);            
             Document.AppendChild(rootNode);
         }
 

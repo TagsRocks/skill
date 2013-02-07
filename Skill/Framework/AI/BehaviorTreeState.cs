@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Skill.Framework.AI
@@ -93,22 +92,7 @@ namespace Skill.Framework.AI
             if (_CurrnetExecutionIndex >= _ExecutionSequence.Length)
                 throw new IndexOutOfRangeException("ExecutionSequence buffer is low. to avoid this error set higher value to 'BehaviorState.MaxSequenceLength'.");
             _ExecutionSequence[_CurrnetExecutionIndex] = behavior;            
-        }
-
-        private bool IsChildOf(Behavior parent, Behavior child)
-        {
-            if (parent.Type == BehaviorType.Composite)
-            {
-                if (((Composite)parent).Count(c => c.Behavior == child) > 0)
-                    return true;
-            }
-            else if (parent.Type == BehaviorType.Decorator)
-            {
-                if (((Decorator)parent).Child.Behavior == child)
-                    return true;
-            }
-            return false;
-        }
+        }        
 
         private string GetTabSpace(int tabCount)
         {

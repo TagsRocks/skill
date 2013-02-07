@@ -165,7 +165,7 @@ namespace Skill.Framework
         protected virtual void OnHit(object sender, HitEventArgs args)
         {
             if (Events != null)
-                Events.OnDamage(sender, new DamageEventArgs(args.Hit.Damage));
+                Events.OnDamage(sender, new DamageEventArgs(args.Hit.Damage, args.Hit.Tag));
 
             if (args.Hit.CauseParticle)
             {

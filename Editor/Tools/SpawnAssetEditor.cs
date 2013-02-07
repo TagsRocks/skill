@@ -6,6 +6,7 @@ using Skill.Editor.UI;
 using UnityEngine;
 using Skill.Editor;
 using Skill.Framework;
+using Skill.Framework.UI.Extended;
 
 
 namespace Skill.Editor.Tools
@@ -15,7 +16,7 @@ namespace Skill.Editor.Tools
     class SpawnAssetEditor : UnityEditor.Editor
     {
         #region CreateUI
-        private Skill.Framework.UI.ListBox _PrefabsLB;
+        private Skill.Framework.UI.Extended.ListBox _PrefabsLB;
         private Skill.Framework.UI.StackPanel _ButtonsPanel;
         private Skill.Editor.UI.Button _BtnAdd;
         private Skill.Editor.UI.Button _BtnRemove;
@@ -25,7 +26,7 @@ namespace Skill.Editor.Tools
 
         private void CreateUI()
         {
-            _PrefabsLB = new ListBox() { Margin = new Thickness(2), SelectionMode = Skill.Framework.UI.SelectionMode.Single, Position = new Rect(0, 22, 320, 560) };            
+            _PrefabsLB = new  ListBox() { Margin = new Thickness(2), SelectionMode = Skill.Framework.UI.Extended.SelectionMode.Single, Position = new Rect(0, 22, 320, 560) };            
             _PrefabsLB.SelectionChanged += new System.EventHandler(_PrefabsLB_SelectionChanged);
 
             GUIStyleState selectedItemState = new GUIStyleState() { background = Resources.SelectedItemBackground };

@@ -25,7 +25,7 @@ namespace Skill.Framework.Triggers
         public float Range = 3;
         /// <summary> Decrease amount of damage by distance </summary>
         public bool DecreaseByDistance = false;
-        
+
         private List<ColliderInfo> _Colliders;
         private Ray _IntersectRay;
 
@@ -34,7 +34,7 @@ namespace Skill.Framework.Triggers
         /// </summary>
         protected override void Awake()
         {
-            base.Awake();            
+            base.Awake();
             _Colliders = new List<ColliderInfo>();
             _IntersectRay.origin = _Transform.position;
         }
@@ -43,9 +43,11 @@ namespace Skill.Framework.Triggers
         /// called when the Collider other enters the trigger.
         /// </summary>
         /// <param name="other">other Collider</param>
-        protected override void OnEnter(Collider other)
+        /// <returns>True if event handled, otherwise false</returns>
+        protected override bool OnEnter(Collider other)
         {
             ApplyDamage(other);
+            return true;
         }
         /// <summary>
         /// called when the Collider other has stopped touching the trigger.
@@ -126,7 +128,7 @@ namespace Skill.Framework.Triggers
                             d = Damage * (1.0f - Mathf.Min(Range, dis) / Range);
                         }
 
-                        em.OnDamage(this, new DamageEventArgs(d));
+                        em.OnDamage(this, new DamageEventArgs(d, tag));
                         cInfo.DamageTW.Begin(Interval);
                     }
                 }

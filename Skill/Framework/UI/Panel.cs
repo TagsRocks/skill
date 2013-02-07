@@ -56,6 +56,7 @@ namespace Skill.Framework.UI
         /// </summary>
         protected void RequestUpdateLayout() { _NeedUpdateLayout = true; }
 
+
         #region Constructor
         /// <summary>
         /// Create a panel
@@ -196,25 +197,21 @@ namespace Skill.Framework.UI
         /// </summary>
         /// <param name="tabIndex">Tab index of control to search</param>
         /// <returns>FocusableControl with specified tab index</returns>
-        internal FocusableControl FindControlByTabIndex(uint tabIndex)
+        internal IFocusable FindControlByTabIndex(uint tabIndex)
         {
-            foreach (var c in Controls)
+            foreach (var control in Controls)
             {
-                if (c != null && c.IsEnabled)
+                if (control != null && control.IsEnabled)
                 {
-                    if (c.ControlType == ControlType.Control)
+                    if (control.IsFocusable)
                     {
-                        Control control = (Control)c;
-                        if (control.Focusable)
-                        {
-                            FocusableControl focusableControl = (FocusableControl)control;
-                            if (focusableControl.TabIndex == tabIndex)
-                                return focusableControl;
-                        }
+                        IFocusable focusableControl = (IFocusable)control;
+                        if (focusableControl.TabIndex == tabIndex)
+                            return focusableControl;
                     }
-                    else if (c.ControlType == ControlType.Panel)
+                    else if (control.ControlType == ControlType.Panel)
                     {
-                        FocusableControl result = ((Panel)c).FindControlByTabIndex(tabIndex);
+                        IFocusable result = ((Panel)control).FindControlByTabIndex(tabIndex);
                         if (result != null)
                             return result;
                     }
@@ -225,37 +222,47 @@ namespace Skill.Framework.UI
 
         /// <summary>
         /// Find control in hierarchy with maximum tab index
-        /// </summary>
-        /// <param name="tabIndex">Tab index of control to search</param>
+        /// </summary>        
         /// <returns>FocusableControl with specified tab index</returns>
-        internal FocusableControl FindControlByMaxTabIndex(ref uint tabIndex)
+        internal IFocusable FindControlByMaxTabIndex()
         {
-            FocusableControl result = null;
-            foreach (var c in Controls)
+            int ti = int.MinValue;
+            return FindControlByMaxTabIndexBefore(ti, int.MaxValue);
+        }
+
+        /// <summary>
+        /// Find control in hierarchy with maximum tab index before specified index
+        /// </summary>
+        /// <param name="before">Tab index of control to search</param>
+        /// <returns>FocusableControl with specified tab index</returns>
+        internal IFocusable FindControlByMaxTabIndexBefore(int before)
+        {
+            int ti = int.MinValue;
+            return FindControlByMaxTabIndexBefore(ti, before);
+        }
+
+        private IFocusable FindControlByMaxTabIndexBefore(int tabIndex, int before)
+        {
+            IFocusable result = null;
+            foreach (var control in Controls)
             {
-                if (c != null && c.IsEnabled)
+                if (control != null && control.IsEnabled)
                 {
-                    if (c.ControlType == ControlType.Control)
+                    if (control.IsFocusable)
                     {
-                        Control control = (Control)c;
-                        if (control.Focusable)
+                        IFocusable focusableControl = (IFocusable)control;
+                        if (focusableControl.TabIndex < before && focusableControl.TabIndex > tabIndex)
                         {
-                            FocusableControl focusableControl = (FocusableControl)control;
-                            if (focusableControl.TabIndex >= tabIndex)
-                            {
-                                result = focusableControl;
-                                tabIndex = focusableControl.TabIndex;
-                            }
+                            result = focusableControl;
+                            tabIndex = focusableControl.TabIndex;
                         }
                     }
-                    else if (c.ControlType == ControlType.Panel)
+                    else if (control.ControlType == ControlType.Panel)
                     {
-                        FocusableControl focusableControl = ((Panel)c).FindControlByMaxTabIndex(ref tabIndex);
+                        IFocusable focusableControl = ((Panel)control).FindControlByMaxTabIndexBefore(tabIndex, before);
                         if (focusableControl != null)
                         {
-                            if (result == null)
-                                result = focusableControl;
-                            else if (focusableControl.TabIndex >= result.TabIndex)
+                            if (result == null || (result.TabIndex < focusableControl.TabIndex && focusableControl.TabIndex < before && focusableControl.TabIndex > tabIndex))
                                 result = focusableControl;
                             tabIndex = result.TabIndex;
                         }
@@ -267,38 +274,49 @@ namespace Skill.Framework.UI
 
         /// <summary>
         /// Find control in hierarchy with minimum tab index
+        /// </summary>        
+        /// <returns>FocusableControl with specified tab index</returns>
+        internal IFocusable FindControlByMinTabIndex()
+        {
+            int ti = int.MaxValue;
+            return FindControlByMinTabIndexAfter(ti, int.MinValue);
+        }
+
+        /// <summary>
+        /// Find control in hierarchy with minimum tab index but greater than specified index
         /// </summary>
         /// <param name="tabIndex">Tab index of control to search</param>
         /// <returns>FocusableControl with specified tab index</returns>
-        internal FocusableControl FindControlByMinTabIndex(ref uint tabIndex)
+        internal IFocusable FindControlByMinTabIndexAfter(int tabIndex)
         {
-            FocusableControl result = null;
-            foreach (var c in Controls)
+            int ti = int.MaxValue;
+            return FindControlByMinTabIndexAfter(ti, tabIndex);
+        }
+
+        private IFocusable FindControlByMinTabIndexAfter(int tabIndex, int after)
+        {
+            IFocusable result = null;
+            foreach (var control in Controls)
             {
-                if (c != null && c.IsEnabled)
+                if (control != null && control.IsEnabled)
                 {
-                    if (c.ControlType == ControlType.Control)
+                    if (control.IsFocusable)
                     {
-                        Control control = (Control)c;
-                        if (control.Focusable)
+                        IFocusable focusableControl = (IFocusable)control;
+                        if (focusableControl.TabIndex > after && focusableControl.TabIndex < tabIndex)
                         {
-                            FocusableControl focusableControl = (FocusableControl)control;
-                            if (focusableControl.TabIndex < tabIndex)
-                            {
-                                result = focusableControl;
-                                tabIndex = focusableControl.TabIndex;
-                            }
+                            result = focusableControl;
+                            tabIndex = focusableControl.TabIndex;
                         }
                     }
-                    else if (c.ControlType == ControlType.Panel)
+                    else if (control.ControlType == ControlType.Panel)
                     {
-                        FocusableControl focusableControl = ((Panel)c).FindControlByMinTabIndex(ref tabIndex);
-                        if (focusableControl.IsEnabled)
+                        IFocusable focusableControl = ((Panel)control).FindControlByMinTabIndexAfter(tabIndex, after);
+                        if (focusableControl != null)
                         {
-                            if (result == null)
+                            if (result == null || (result.TabIndex >= focusableControl.TabIndex && focusableControl.TabIndex > after && focusableControl.TabIndex < result.TabIndex))
                                 result = focusableControl;
-                            else if (focusableControl.TabIndex < result.TabIndex)
-                                result = focusableControl;
+
                             tabIndex = result.TabIndex;
                         }
                     }
@@ -373,8 +391,7 @@ namespace Skill.Framework.UI
         /// <param name="command">Command to handle</param>
         /// <returns>True if command is handled, otherwise false</returns>   
         /// <remarks>
-        /// First let controls that contains mouse position to handle input
-        /// if not then go through controls and let each to handle command
+        /// let controls that contains mouse position to handle input        
         /// as soon as first control handled the command ignore next steps
         /// </remarks>        
         public override bool HandleCommand(UICommand command)
@@ -388,12 +405,6 @@ namespace Skill.Framework.UI
                     if (c.HandleCommand(command))
                         return true;
                 }
-            }
-            for (int i = 0; i < Controls.Count; i++)
-            {
-                var c = Controls[i];
-                if (c.HandleCommand(command))
-                    return true;
             }
             return base.HandleCommand(command);
         }
