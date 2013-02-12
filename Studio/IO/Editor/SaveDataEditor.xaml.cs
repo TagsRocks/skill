@@ -107,6 +107,7 @@ namespace Skill.Studio.IO.Editor
         {
             Skill.DataModels.IO.PropertyType type = (Skill.DataModels.IO.PropertyType)_CmbSaveDataMembers.SelectedItem;
             SaveData.AddProperty(type);
+            _LbSaveDataMembers.SelectedIndex = _LbSaveDataMembers.Items.Count - 1;
         }
 
         private void LbSaveDataMembers_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -140,6 +141,7 @@ namespace Skill.Studio.IO.Editor
         private void BtnAddClass_Click(object sender, RoutedEventArgs e)
         {
             SaveData.AddClass();
+            _LbClasses.SelectedIndex = _LbClasses.Items.Count - 1;
         }
 
         private void LbClasses_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -182,7 +184,10 @@ namespace Skill.Studio.IO.Editor
             Skill.DataModels.IO.PropertyType type = (Skill.DataModels.IO.PropertyType)_CmbClassProperties.SelectedItem;
             SaveClassViewModel cl = _LbClasses.SelectedItem as SaveClassViewModel;
             if (cl != null)
+            {
                 cl.AddProperty(type);
+                _LbClassPoperties.SelectedIndex = _LbClassPoperties.Items.Count - 1;
+            }
         }
 
         private void LbClassPoperties_SelectionChanged(object sender, SelectionChangedEventArgs e)

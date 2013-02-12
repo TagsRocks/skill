@@ -668,7 +668,7 @@ namespace Skill.Framework.UI
         /// <summary> Begin Render control's content </summary>
         protected virtual void BeginRender()
         {
-            if (Parent != null)
+            if (Parent != null && Parent.ControlType != UI.ControlType.Frame)
             {
                 if (Parent.IsEnabled && !_IsEnabled)
                 {

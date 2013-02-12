@@ -55,6 +55,7 @@ namespace Skill.Framework.UI.Extended
         /// <summary> Tab index of control. </summary>
         public int TabIndex { get; set; }
 
+        private bool _KeyHandled;
         private bool _IsFocused;
         /// <summary>
         /// Gets a value that determines whether this element has logical focus. (You must set valid name to enable this behavior)
@@ -179,6 +180,11 @@ namespace Skill.Framework.UI.Extended
                 }
             }
         }
+
+        /// <summary>
+        /// If true : Listbox scroll to view selected item whenever user changed SelectedItem with key command in SelectionMode.Single.
+        /// </summary>
+        public bool AutoScroll { get; set; }
 
         /// <summary> 
         /// Gets or sets the index of the first item in the current selection or returns
@@ -409,11 +415,12 @@ namespace Skill.Framework.UI.Extended
         /// </summary>
         public ListBox()
         {
+            this.AutoScroll = true;
             this.ScrollbarThickness = 16;
             this.HandleScrollWheel = true;
             this._SelectedItems = new List<BaseControl>();
-            this.Background = new Box() { Parent = this, Visibility = Skill.Framework.UI.Visibility.Hidden };
-            this.FocusedBackground = new Box() { Parent = this, Visibility = Skill.Framework.UI.Visibility.Visible };
+            this.Background = new Box() { Parent = this, Visibility = Visibility.Hidden };
+            this.FocusedBackground = new Box() { Parent = this, Visibility = Visibility.Visible };
             this.Padding = new Thickness(0);
         }
 
@@ -434,19 +441,19 @@ namespace Skill.Framework.UI.Extended
             else
                 _ScrollViewRect.height -= ScrollbarThickness;
 
-            if (this.Background.Visibility == Skill.Framework.UI.Visibility.Visible)
+            if (this.Background.Visibility == Visibility.Visible)
             {
                 this.Background.RenderArea = RenderArea;
                 this.Background.OnGUI();
             }
-            if (_IsFocused && this.FocusedBackground.Visibility == Skill.Framework.UI.Visibility.Visible)
+            if (_IsFocused && this.FocusedBackground.Visibility == Visibility.Visible)
             {
                 this.FocusedBackground.RenderArea = RenderArea;
                 this.FocusedBackground.OnGUI();
             }
 
-            if (SelectionMode == SelectionMode.Single)
-            {
+            if (this.AutoScroll && _KeyHandled && SelectionMode == SelectionMode.Single)
+            {                
                 // make sure selected item is always visible
                 if (SelectedItem != null)
                 {
@@ -455,22 +462,27 @@ namespace Skill.Framework.UI.Extended
                     {
                         float localMinY = selectedRA.y - ra.y;
                         float localMaxY = selectedRA.height + localMinY;
-                        if (_ScrollPosition.y > localMaxY)
+                        float localAvgY = selectedRA.height * 0.5f + localMinY;
+                        if (_ScrollPosition.y > localAvgY)
                             _ScrollPosition.y = localMinY;
-                        else if (_ScrollPosition.y + ra.height < localMaxY)
+                        else if (_ScrollPosition.y + ra.height < localAvgY)
                             _ScrollPosition.y = localMaxY - ra.height;
                     }
                     else
                     {
                         float localMinX = selectedRA.x - ra.x;
                         float localMaxX = selectedRA.width + localMinX;
-                        if (_ScrollPosition.x > localMaxX)
+                        float localAvgX = selectedRA.width * 0.5f + localMinX;
+                        if (_ScrollPosition.x > localAvgX)
                             _ScrollPosition.x = localMinX;
-                        else if (_ScrollPosition.x + ra.width < localMaxX)
+                        else if (_ScrollPosition.x + ra.width < localAvgX)
                             _ScrollPosition.x = localMaxX - ra.width;
                     }
                 }
             }
+
+            _KeyHandled = false;
+
             if (HorizontalScrollbarStyle != null && VerticalScrollbarStyle != null)
             {
                 ScrollPosition = GUI.BeginScrollView(ra, _ScrollPosition, _ScrollViewRect, AlwayShowHorizontal, AlwayShowVertical, HorizontalScrollbarStyle, VerticalScrollbarStyle);
@@ -703,31 +715,31 @@ namespace Skill.Framework.UI.Extended
             {
                 if (SelectionMode == SelectionMode.Single)
                 {
-                    if (_SelectedIndex < 0 && (command.Key == KeyCommand.Up || command.Key == KeyCommand.Down))
+                    if (_SelectedIndex < 0 && ((Orientation == UI.Orientation.Vertical && (command.Key == KeyCommand.Up || command.Key == KeyCommand.Down)) || (Orientation == UI.Orientation.Horizontal && (command.Key == KeyCommand.Left || command.Key == KeyCommand.Right))))
                     {
                         SelectedIndex = 0;
                         OnSelectionChanged();
                         handled = true;
                     }
-                    else if (command.Key == KeyCommand.Up)
+                    else if ((command.Key == KeyCommand.Up && Orientation == UI.Orientation.Vertical) || (command.Key == KeyCommand.Left && Orientation == UI.Orientation.Horizontal))
                     {
                         // try to select previous item
                         if (_SelectedIndex > 0)
                         {
                             SelectedIndex--;
                             OnSelectionChanged();
-                            handled = true;
                         }
+                        handled = true;
                     }
-                    else if (command.Key == KeyCommand.Down)
+                    else if ((command.Key == KeyCommand.Down && Orientation == UI.Orientation.Vertical) || (command.Key == KeyCommand.Right && Orientation == UI.Orientation.Horizontal))
                     {
                         // try to select next item
                         if (_SelectedIndex < Controls.Count - 1)
                         {
                             SelectedIndex++;
                             OnSelectionChanged();
-                            handled = true;
                         }
+                        handled = true;
                     }
                     else if (command.Key == KeyCommand.Home)
                     {
@@ -735,8 +747,8 @@ namespace Skill.Framework.UI.Extended
                         {
                             SelectedIndex = 0;
                             OnSelectionChanged();
-                            handled = true;
                         }
+                        handled = true;
                     }
                     else if (command.Key == KeyCommand.End)
                     {
@@ -744,13 +756,13 @@ namespace Skill.Framework.UI.Extended
                         {
                             SelectedIndex = Items.Count - 1;
                             OnSelectionChanged();
-                            handled = true;
                         }
+                        handled = true;
                     }
                 }
                 else if (command.Shift)
                 {
-                    if (command.Key == KeyCommand.Up)
+                    if ((command.Key == KeyCommand.Up && Orientation == UI.Orientation.Vertical) || (command.Key == KeyCommand.Left && Orientation == UI.Orientation.Horizontal))
                     {
                         // try to add previous item to selection
                         int firstSelectedIndex = -1;
@@ -766,10 +778,10 @@ namespace Skill.Framework.UI.Extended
                         {
                             _SelectedItems.Add(Controls[firstSelectedIndex - 1]);
                             OnSelectionChanged();
-                            handled = true;
                         }
+                        handled = true;
                     }
-                    else if (command.Key == KeyCommand.Down)
+                    else if ((command.Key == KeyCommand.Down && Orientation == UI.Orientation.Vertical) || (command.Key == KeyCommand.Right && Orientation == UI.Orientation.Horizontal))
                     {
                         // try to add next item to selection
                         int lastSelectedIndex = -1;
@@ -786,8 +798,8 @@ namespace Skill.Framework.UI.Extended
                         {
                             _SelectedItems.Add(Controls[lastSelectedIndex + 1]);
                             OnSelectionChanged();
-                            handled = true;
                         }
+                        handled = true;
                     }
                     else if (_SelectedItems.Count == 1)
                     {
@@ -805,8 +817,8 @@ namespace Skill.Framework.UI.Extended
                                 }
                                 if (change)
                                     OnSelectionChanged();
-                                handled = true;
                             }
+                            handled = true;
                         }
                         else if (command.Key == KeyCommand.End)
                         {
@@ -822,12 +834,13 @@ namespace Skill.Framework.UI.Extended
                                 }
                                 if (change)
                                     OnSelectionChanged();
-                                handled = true;
                             }
+                            handled = true;
                         }
                     }
                 }
             }
+            _KeyHandled = handled;
             if (!handled)
                 handled = base.HandleCommand(command);
             else if (!_IsFocused)

@@ -24,7 +24,7 @@ namespace Skill.Framework.UI
         /// Gets or sets a value indicating whether this element is enabled in the user interface (UI).
         /// </summary>
         /// <returns>  true if the element is enabled; otherwise, false. The default value is true. </returns>
-        public virtual bool IsEnabled { get; set; }
+        public virtual bool IsEnabled { get { return Grid.IsEnabled; } set { Grid.IsEnabled = value; } }
 
         private Rect _Position;
         /// <summary>
@@ -373,7 +373,7 @@ namespace Skill.Framework.UI
                         FocusedControl = Grid.FindControlByName(_FocusedControlName) as IFocusable;
                     }
                 }
-            }            
+            }
         }
 
         /// <summary>

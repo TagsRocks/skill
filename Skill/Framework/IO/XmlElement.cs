@@ -183,7 +183,7 @@ namespace Skill.Framework.IO
             {
                 buffer.Append('>');
                 foreach (var child in _Childs)
-                    buffer.Append(child.ToString());
+                    child.ToString(buffer);
 
                 buffer.Append("</");
                 buffer.Append(Name);
