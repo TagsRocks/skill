@@ -133,6 +133,7 @@ namespace Skill.Framework.IO
         /// <returns>The node added.</returns>
         public XmlElement AppendChild(XmlElement newChild)
         {
+            newChild.Parent = null;
             this._Elements.Add(newChild);
             return newChild;
         }

@@ -9,7 +9,7 @@ namespace Skill.Framework.IO
     /// </summary>
     public class XmlElement : IEnumerable<XmlElement>
     {
-        private List<XmlElement> _Childs;
+        private List<XmlElement> _Elements;
         private List<XmlAttribute> _Attributes;
 
         internal XmlElement(XmlDocument ownerDocument, string name)
@@ -18,7 +18,7 @@ namespace Skill.Framework.IO
                 throw new ArgumentException("Invalid name for XmlElement");
             this.Name = name;
             this.OwnerDocument = ownerDocument;
-            _Childs = new List<XmlElement>();
+            _Elements = new List<XmlElement>();
             _Attributes = new List<XmlAttribute>();
         }
 
@@ -34,13 +34,16 @@ namespace Skill.Framework.IO
 
         private XmlElement FindChild(string name)
         {
-            foreach (var child in _Childs)
+            foreach (var child in _Elements)
             {
                 if (child.Name == name)
                     return child;
             }
             return null;
         }
+
+        /// <summary> Parent element </summary>
+        public XmlElement Parent { get; internal set; }
 
         /// <summary>
         /// Gets the first child element with the specified Name.
@@ -52,7 +55,7 @@ namespace Skill.Framework.IO
         /// <summary>
         /// Gets the first child of the node.
         /// </summary>
-        public XmlElement FirstChild { get { if (_Childs.Count > 0)return _Childs[0]; else return null; } }
+        public XmlElement FirstChild { get { if (_Elements.Count > 0)return _Elements[0]; else return null; } }
 
         /// <summary>
         /// Gets the qualified name of the node.
@@ -65,7 +68,17 @@ namespace Skill.Framework.IO
         /// <summary>
         /// Gets the XmlElement immediately following this element.
         /// </summary>
-        public XmlElement NextSibling { get { return OwnerDocument.GetNextSibling(this); } }
+        public XmlElement NextSibling
+        {
+            get
+            {
+                if (Parent != null)
+                    return Parent.GetNextSibling(this);
+                else
+
+                    return OwnerDocument.GetNextSibling(this);
+            }
+        }
 
 
         /// <summary>
@@ -89,7 +102,8 @@ namespace Skill.Framework.IO
         /// <returns>The node added.</returns>
         public virtual XmlElement AppendChild(XmlElement newChild)
         {
-            this._Childs.Add(newChild);
+            newChild.Parent = this;
+            this._Elements.Add(newChild);
             return newChild;
         }
 
@@ -146,7 +160,9 @@ namespace Skill.Framework.IO
         /// </summary>
         public void RemoveAll()
         {
-            _Childs.Clear();
+            foreach (var e in _Elements)
+                if (e != null) e.Parent = null;
+            _Elements.Clear();
             RemoveAllAttributes();
         }
 
@@ -166,7 +182,16 @@ namespace Skill.Framework.IO
         {
             XmlAttribute att = FindAttribute(name);
             if (att != null) _Attributes.Remove(att);
-        }        
+        }
+
+        internal XmlElement GetNextSibling(XmlElement xmlElement)
+        {
+            int index = _Elements.IndexOf(xmlElement);
+            if (index >= 0 && index < _Elements.Count - 1)
+                return _Elements[index + 1];
+            else
+                return null;
+        }
 
         internal void ToString(StringBuilder buffer)
         {
@@ -179,10 +204,10 @@ namespace Skill.Framework.IO
             }
             buffer.Append(' ');
 
-            if (_Childs.Count > 0)
+            if (_Elements.Count > 0)
             {
                 buffer.Append('>');
-                foreach (var child in _Childs)
+                foreach (var child in _Elements)
                     child.ToString(buffer);
 
                 buffer.Append("</");
@@ -195,12 +220,12 @@ namespace Skill.Framework.IO
 
         public IEnumerator<XmlElement> GetEnumerator()
         {
-            return _Childs.GetEnumerator();
+            return _Elements.GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return _Childs.GetEnumerator();
+            return _Elements.GetEnumerator();
         }
     }
 }
