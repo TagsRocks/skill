@@ -19,9 +19,10 @@ namespace Skill.Studio
     public class Project : IXElement
     {
         #region Variables
-        public static int EditorVersion = 1; // current version of editor
+        public static int EditorVersion = 2; // current version of editor
         public static string Extension = ".skproj"; // extension of priject file
         public static string FilterExtension = "Skill project|*" + Extension; // filer used in OpenFileDialog 
+        public static string GetFilename(string unityProjectDir, string name) { return System.IO.Path.Combine(unityProjectDir, "Assets\\Editor\\Skill", name + Extension); }
         #endregion
 
         #region Properties
@@ -29,8 +30,6 @@ namespace Skill.Studio
         public string Path { get; set; }
         /// <summary> Name of project file </summary>
         public string Name { get { return Root.Name; } set { Root.Name = value; } }
-        /// <summary> Project Settings </summary>
-        public ProjectSettings Settings { get; private set; }
         /// <summary> Root node of project </summary>
         public ProjectRootNode Root { get; private set; }
         #endregion
@@ -41,7 +40,6 @@ namespace Skill.Studio
         /// </summary>
         public Project()
         {
-            this.Settings = new ProjectSettings();
             this.Root = new ProjectRootNode();
         }
         #endregion
@@ -55,7 +53,6 @@ namespace Skill.Studio
         {
             XElement project = new XElement("Skill_Studio_Project");
             project.SetAttributeValue("Version", EditorVersion);
-            project.Add(Settings.ToXElement());
             project.Add(Root.ToXElement());
             return project;
         }
@@ -65,9 +62,7 @@ namespace Skill.Studio
         /// <param name="e">XElement</param>
         public void Load(XElement e)
         {
-            int version = e.GetAttributeValueAsInt("Version", 1);
-            XElement settings = e.FindChildByName("Settings");
-            if (settings != null) Settings.Load(settings);
+            int version = e.GetAttributeValueAsInt("Version", 2);
             XElement root = e.FindChildByName(EntityType.Root.ToString());
             if (root != null) Root.Load(root);
         }
@@ -160,8 +155,6 @@ namespace Skill.Studio
 
         /// <summary> Project model</summary>
         public Project Model { get; private set; }
-        /// <summary> Project Settings model</summary>
-        public ProjectSettingsViewModel Settings { get; private set; }
         /// <summary> Root of project </summary>
         public ProjectRootNodeViewModel Root { get; private set; }
         /// <summary> Contains root node to bind to treeview</summary>
@@ -176,7 +169,6 @@ namespace Skill.Studio
         public ProjectViewModel(Project project)
         {
             this.Model = project;
-            this.Settings = new ProjectSettingsViewModel(project.Settings);
             this.Root = new ProjectRootNodeViewModel(this, Model.Root);
             this.Nodes = new ReadOnlyCollection<EntityNodeViewModel>(new EntityNodeViewModel[] { Root });
         }
@@ -329,6 +321,21 @@ namespace Skill.Studio
         #endregion
 
         #region Path
+
+        public string AssetsPath
+        {
+            get
+            {
+                int index = this.Path.IndexOf("assets", StringComparison.OrdinalIgnoreCase);
+                if (index >= 0)
+                    return this.Path.Substring(0, index + 6); // 6 : lenght of assets
+                return "assets";
+            }
+        }
+
+        public string EditorPath { get { return System.IO.Path.Combine(AssetsPath, "Editor\\Skill"); } }
+        public string ScriptsPath { get { return System.IO.Path.Combine(AssetsPath, "Scripts"); } }
+
         /// <summary>
         /// Get full path of file in projetc directory
         /// </summary>
@@ -346,7 +353,7 @@ namespace Skill.Studio
         /// <returns>path</returns>
         public string GetOutputPath(string localPath)
         {
-            return System.IO.Path.Combine(this.Settings.OutputLocaltion, localPath);
+            return System.IO.Path.Combine(ScriptsPath, localPath);
         }
 
         /// <summary>
@@ -356,7 +363,7 @@ namespace Skill.Studio
         /// <returns>path</returns>
         public string GetDesignerOutputPath(string localPath)
         {
-            return System.IO.Path.Combine(this.Settings.OutputLocaltion, DesignerName, localPath);
+            return System.IO.Path.Combine(this.ScriptsPath, DesignerName, localPath);
         }
 
         /// <summary>
@@ -364,17 +371,17 @@ namespace Skill.Studio
         /// </summary>
         /// <param name="localPath">local path of file</param>
         /// <returns>path</returns>
-        public string GetEditorOutputPath(string localPath)
-        {
-            int index = this.Settings.OutputLocaltion.IndexOf("assets", StringComparison.OrdinalIgnoreCase);
-            if (index >= 0)
-            {
-                string assetsDir = this.Settings.OutputLocaltion.Substring(0, index + 6); // 6 : lenght of assets
-                return System.IO.Path.Combine(assetsDir, "Editor", localPath);
-            }
+        //public string GetEditorOutputPath(string localPath)
+        //{
+        //    int index = this.Settings.OutputLocaltion.IndexOf("assets", StringComparison.OrdinalIgnoreCase);
+        //    if (index >= 0)
+        //    {
+        //        string assetsDir = this.Settings.OutputLocaltion.Substring(0, index + 6); // 6 : lenght of assets
+        //        return System.IO.Path.Combine(assetsDir, "Editor", localPath);
+        //    }
 
-            return GetDesignerOutputPath(localPath);
-        }
+        //    return GetDesignerOutputPath(localPath);
+        //}
 
         /// <summary>
         /// Get full path of file in RequiredFile destination directory
@@ -383,16 +390,10 @@ namespace Skill.Studio
         /// <returns>path</returns>        
         public string GetRequiredFilePath(Skill.CodeGeneration.RequiredFile rf)
         {
-            string destDir = null;
-            if (!string.IsNullOrEmpty(rf.SearchPath))
-            {
-                int index = this.Settings.OutputLocaltion.IndexOf(rf.SearchPath, StringComparison.OrdinalIgnoreCase);
-                if (index >= 0)
-                    destDir = this.Settings.OutputLocaltion.Substring(0, index + rf.SearchPath.Length);
-            }
-            if (destDir == null)
-                destDir = this.Settings.OutputLocaltion;
-            return System.IO.Path.Combine(destDir, rf.DestinationDirectory, System.IO.Path.GetFileName(rf.SourceFile));
+            if (rf.IsEditor)
+                return System.IO.Path.Combine(EditorPath, rf.DestinationDirectory, System.IO.Path.GetFileName(rf.SourceFile));
+            else
+                return System.IO.Path.Combine(ScriptsPath, DesignerName, rf.DestinationDirectory, System.IO.Path.GetFileName(rf.SourceFile));
         }
 
         /// <summary>

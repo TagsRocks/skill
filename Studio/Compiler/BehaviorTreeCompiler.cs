@@ -33,15 +33,16 @@ namespace Skill.Studio.Compiler
         private void CreateBehaviorList()
         {
             _Behaviors.Clear();
-            AddChilds(_Tree.Root);
+            foreach (var b in _Tree.States)
+                CreateBehaviorList(b);
         }
 
-        private void AddChilds(Behavior b)
+        private void CreateBehaviorList(Behavior parent)
         {
-            if (!_Behaviors.Contains(b)) _Behaviors.Add(b);
-            foreach (var child in b)
+            if (!_Behaviors.Contains(parent)) _Behaviors.Add(parent);
+            foreach (var child in parent)
             {
-                AddChilds(child);
+                CreateBehaviorList(child);
             }
         }
         #endregion

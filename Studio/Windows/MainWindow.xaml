@@ -25,10 +25,7 @@
         <KeyBinding Command="ApplicationCommands.Delete" Gesture="Del" />
         <KeyBinding Command="ApplicationCommands.Help" Gesture="F1" />
     </Window.InputBindings>
-    <Window.CommandBindings>
-        <CommandBinding Command="{x:Static local:MainWindow.ShowSettingsCommand}"                        
-                  Executed="ShowSettingsCmdExecuted"
-                  CanExecute="ShowSettingsCmdCanExecute"/>
+    <Window.CommandBindings>        
         <CommandBinding Command="{x:Static local:MainWindow.BuildCommand}"
                   Executed="BuildCmdExecuted"
                   CanExecute="BuildCmdCanExecute"/>
@@ -136,13 +133,7 @@
                 </MenuItem>
                 <Separator />
                 <MenuItem Header="Gif Animations" Click="MnuShowGifAnimations_Click"  IsEnabled="{Binding IsProjectLoaded,ElementName=This}" >                    
-                </MenuItem>
-                <Separator />
-                <MenuItem Header="Project Properties" Command="{x:Static local:MainWindow.ShowSettingsCommand}" >
-                    <MenuItem.Icon>
-                        <my:ButtonImage NormalImage="{StaticResource ImgSettings}" DisableImage="{StaticResource ImgSettings_D}" />
-                    </MenuItem.Icon>
-                </MenuItem>
+                </MenuItem>                
             </MenuItem>
             <MenuItem Header="View">
                 <MenuItem Header="Project Explorer"  Click="Mnu_ShowProjectExplorer_Click"/>
@@ -180,7 +171,8 @@
                 <MenuItem Header="Heightmap to Mesh" Click="MnuHToM_Click"  />
                 <MenuItem Header="Merge Mesh Tool" Click="MnuMeshOpt_Click"  />
                 <Separator/>
-                <MenuItem Header="Copy Required Files" Click="MnuCopyRequiredFiles_Click"  IsEnabled="{Binding IsProjectLoaded,ElementName=This}" />
+                <MenuItem Header="Copy Required Files" Click="MnuCopyRequiredFiles_Click"  IsEnabled="{Binding IsProjectLoaded,ElementName=This}"
+                         ToolTip="copy required Dlls and Files to editor folder" />
                 <Separator/>
                 <MenuItem Header="Plugins" Click="MnuSelectPlugin_Click" >
                     <MenuItem.Icon>

@@ -24,8 +24,6 @@ namespace Skill.Studio
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         #region Commands
-        static RoutedCommand _ShowSettingsCommand = new RoutedCommand();
-        public static RoutedCommand ShowSettingsCommand { get { return _ShowSettingsCommand; } }
 
         static RoutedCommand _SaveAllCommand = new RoutedCommand();
         public static RoutedCommand SaveAllCommand { get { return _SaveAllCommand; } }
@@ -229,7 +227,14 @@ namespace Skill.Studio
             if (_StartPage != null)
             {
                 _StartPage.LoadRecents();
-                DocumentPane_DocsCenter.Items.Add(_StartPage);
+                if (!DocumentPane_DocsCenter.Items.Contains(_StartPage))
+                {
+                    DocumentPane_DocsCenter.Items.Add(_StartPage);
+                }
+                else
+                {
+                    _StartPage.Show();
+                }
             }
         }
 
@@ -326,18 +331,9 @@ namespace Skill.Studio
         #region Recent Projects
         private void AddToRecent(string path)
         {
-            if (Properties.Settings.Default.RecentProjects == null)
-                Properties.Settings.Default.RecentProjects = new System.Collections.Specialized.StringCollection();
-            var recentProjects = Properties.Settings.Default.RecentProjects;
-
-            if (recentProjects.Contains(path))
-            {
-                recentProjects.Remove(path);
-            }
-            recentProjects.Insert(0, path);
-            Properties.Settings.Default.Save();
-            if (_StartPage != null)
-                _StartPage.LoadRecents();
+            CreateStartPage();
+            _StartPage.RecentProjects.AddFirst(path);
+            _StartPage.RecentProjects.Save();
         }
         #endregion
 
@@ -360,7 +356,7 @@ namespace Skill.Studio
                     {
                         if (Properties.Settings.Default.CloseSPAfterProjectLoad)
                             CloseStartPage();
-                        AddToRecent(wizard.ProjectInfo.Filename);
+                        AddToRecent(Project.Path);
                         IsProjectLoaded = true;
                         CopyRequiredFiles(true);
                     }
@@ -408,39 +404,6 @@ namespace Skill.Studio
                 else
                     IsProjectLoaded = false;
                 ApplicationCommands.Properties.Execute(null, null);
-            }
-        }
-        #endregion
-
-        #region Project Settings
-
-        private Controls.ProjectPropertiesControl _ProjectProperties;
-        void ShowSettingsCmdCanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = IsProjectLoaded;
-        }
-        void ShowSettingsCmdExecuted(object target, ExecutedRoutedEventArgs e)
-        {
-            if (IsProjectLoaded)
-            {
-                if (_ProjectProperties == null)
-                {
-                    _ProjectProperties = new Controls.ProjectPropertiesControl(Project);
-                    _ProjectProperties.Closing += new EventHandler<CancelEventArgs>(ProjectProperties_Closing);
-                }
-            }
-            if (!DocumentPane_DocsCenter.Items.Contains(_ProjectProperties))
-                DocumentPane_DocsCenter.Items.Add(_ProjectProperties);
-            DocumentPane_DocsCenter.SelectedItem = _ProjectProperties;
-            e.Handled = true;
-        }
-
-        void ProjectProperties_Closing(object sender, CancelEventArgs e)
-        {
-            if (sender == _ProjectProperties)
-            {
-                DocumentPane_DocsCenter.Items.Remove(_ProjectProperties);
-                _ProjectProperties = null;
             }
         }
         #endregion
@@ -649,14 +612,14 @@ namespace Skill.Studio
         private void CopyRequiredFiles(bool overWrite = false)
         {
 
-//#if DEBUG
-//            CopyEditorFile("Editor", "Skill.Editor.dll", overWrite);
-//            CopyEditorFile("Editor", "Skill.Editor.pdb", overWrite);
-//            CopyEditorFile("DataModels", "Skill.DataModels.dll", overWrite);
-//            CopyFile("Skill", "Skill.Framework.dll", overWrite);
-//            CopyFile("Skill", "Skill.Framework.pdb", overWrite);
-//            CopyFile("Skill", "Skill.Framework.xml", overWrite);
-//#else
+            //#if DEBUG
+            //            CopyEditorFile("Editor", "Skill.Editor.dll", overWrite);
+            //            CopyEditorFile("Editor", "Skill.Editor.pdb", overWrite);
+            //            CopyEditorFile("DataModels", "Skill.DataModels.dll", overWrite);
+            //            CopyFile("Skill", "Skill.Framework.dll", overWrite);
+            //            CopyFile("Skill", "Skill.Framework.pdb", overWrite);
+            //            CopyFile("Skill", "Skill.Framework.xml", overWrite);
+            //#else
             Skill.CodeGeneration.RequiredFile[] files = PluginManager.Plugin.RequiredFiles;
             if (files != null && files.Length > 0)
             {
@@ -665,7 +628,7 @@ namespace Skill.Studio
                     CopyFile(rf, overWrite);
                 }
             }
-//#endif
+            //#endif
 
 
         }

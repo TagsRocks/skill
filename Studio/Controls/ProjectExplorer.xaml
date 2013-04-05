@@ -93,13 +93,7 @@
                             <my:ButtonImage NormalImage="{StaticResource ImgDelete}" DisableImage="{StaticResource ImgDelete_D}" />
                         </MenuItem.Icon>
                     </MenuItem>
-                    <MenuItem Header="Rename" IsEnabled="{Binding CanRename}" Click="Mnu_Rename_Click" />
-                    <Separator Visibility="{Binding Path=CanProperties, Converter={StaticResource BToVisConverter}, ConverterParameter=False}" />
-                    <MenuItem Header="Properties" Visibility="{Binding Path=CanProperties, Converter={StaticResource BToVisConverter}, ConverterParameter=False}" Click="Mnu_Properties_Click" >
-                        <MenuItem.Icon>
-                            <my:ButtonImage NormalImage="{StaticResource ImgProperties}" DisableImage="{StaticResource ImgProperties_D}" />
-                        </MenuItem.Icon>
-                    </MenuItem>
+                    <MenuItem Header="Rename" IsEnabled="{Binding CanRename}" Click="Mnu_Rename_Click" />                    
                 </ContextMenu>
             </TreeView.ContextMenu>
             <TreeView.ItemContainerStyle>

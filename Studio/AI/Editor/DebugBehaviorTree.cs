@@ -21,7 +21,7 @@ namespace Skill.Studio.AI.Editor
         /// <summary>
         /// State of BehaviorTree
         /// </summary>
-        public BehaviorTreeState State { get; private set; }
+        public BehaviorTreeStatus State { get; private set; }
 
         /// <summary>
         /// Create an instance of BehaviorTree
@@ -33,7 +33,7 @@ namespace Skill.Studio.AI.Editor
         public DebugBehaviorTree(Behavior root)
         {
             this.Root = root;
-            this.State = new BehaviorTreeState(root);
+            this.State = new BehaviorTreeStatus(null);
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Skill.Studio.AI.Editor
         public void Update()
         {
             State.Begin();
-            Root.Trace(State);
+            Root.Execute(State);
             if (State.Exception != null)
             {
                 //System.Diagnostics.Debugger.Log(0,"",State.Exception.ToString);

@@ -10,14 +10,18 @@ namespace Skill.Studio
     /// </summary>
     public class NewProjectInfo
     {
+
         /// <summary> Name of project </summary>
-        public string Name { get; set; }
-        /// <summary> localtion to save project </summary>
-        public string Location { get; set; }
-        /// <summary> localtion generate code </summary>
-        public string OutputLocaltion { get; set; }
-
-
-        public string Filename { get { return System.IO.Path.Combine(Location, Name, Name + Project.Extension); } }
+        public string Name
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(UnityProjectDirectory))
+                    return System.IO.Path.GetFileNameWithoutExtension(UnityProjectDirectory);
+                return "";
+            }
+        }
+        /// <summary> directory of unity project </summary>
+        public string UnityProjectDirectory { get; set; }        
     }
 }

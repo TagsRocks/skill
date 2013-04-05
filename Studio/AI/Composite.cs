@@ -57,25 +57,6 @@ namespace Skill.Studio.AI
     [DisplayName("ConcurrentSelector")]
     public class ConcurrentSelectorViewModel : CompositeViewModel
     {
-        [DefaultValue(true)]
-        [Category("Concurrency")]
-        [DisplayName("FirstConditions")]
-        [Description("First check conditions then rest of children")]
-        public bool FirstConditions
-        {
-            get { return ((ConcurrentSelector)Model).FirstConditions; }
-            set
-            {
-                if (value != ((ConcurrentSelector)Model).FirstConditions)
-                {
-                    ((ConcurrentSelector)Model).FirstConditions = value;
-                    ((Skill.Framework.AI.ConcurrentSelector)Debug.Behavior).FirstConditions = value;
-                    OnPropertyChanged(new PropertyChangedEventArgs("FirstConditions"));
-                    Tree.History.Insert(new ChangePropertyUnDoRedo(this, "FirstConditions", value, !value));
-                }
-            }
-        }
-
         [DefaultValue(false)]
         [Category("Concurrency")]
         [DisplayName("BreakOnConditionFailure")]

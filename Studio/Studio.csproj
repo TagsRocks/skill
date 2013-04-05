@@ -103,6 +103,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AI\ChangeState.cs" />
     <Compile Include="AI\DebugBehavior.cs" />
     <Compile Include="AI\Editor\AccessKeyPropertyEditor.cs" />
     <Compile Include="AI\Editor\BehaviorBrushes.cs" />
@@ -214,9 +215,6 @@
       <DependentUpon>ToggleMediaButton.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Controls\ProjectPropertiesControl.xaml.cs">
-      <DependentUpon>ProjectPropertiesControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Diagram\BezierCurve.cs" />
     <Compile Include="Diagram\ConnectorOrientation.cs" />
     <Compile Include="Diagram\ISelectable.cs" />
@@ -312,7 +310,6 @@
     <Compile Include="Root\Project.cs" />
     <Compile Include="Root\UnDoRedo.cs" />
     <Compile Include="Images.cs" />
-    <Compile Include="Root\ProjectSettings.cs" />
     <Compile Include="Windows\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
@@ -403,10 +400,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\ToggleMediaButton.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Controls\ProjectPropertiesControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

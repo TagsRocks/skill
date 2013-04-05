@@ -297,7 +297,7 @@ namespace Skill.Studio.AI.Editor
                 e.Handled = true;
             }
         }
-        #endregion        
+        #endregion
 
         #region UpdatePositions
 
@@ -310,7 +310,7 @@ namespace Skill.Studio.AI.Editor
 
         public event EventHandler UpdateTreeNodes;
 
-        private void UpdatePositions()
+        public void UpdatePositions()
         {
             this.BehaviorTree.Root.UpdatePosition();
             OnUpdateTreeNodes();
@@ -972,6 +972,51 @@ namespace Skill.Studio.AI.Editor
         private void Back_MouseDown(object sender, MouseButtonEventArgs e)
         {
             this.Focus();
+        }
+        #endregion
+
+        #region State
+
+        public bool IsDefaultStateSelected
+        {
+            get
+            {
+                if (BehaviorTree.Root != null)
+                    return BehaviorTree.DefaultState == BehaviorTree.Root.Name;
+                return false;
+            }
+        }
+
+        private void MnuAddState_Click(object sender, RoutedEventArgs e)
+        {
+            BehaviorTree.AddNewState();
+            UpdatePositions();
+        }
+
+        private void MnuDeleteState_Click(object sender, RoutedEventArgs e)
+        {
+            BehaviorTree.RemoveState(BehaviorTree.Root);
+        }
+
+        private void MnuSetasDefaultState_Click(object sender, RoutedEventArgs e)
+        {
+            if (BehaviorTree.Root != null && !BehaviorTree.Root.IsDefaultState)
+            {
+                BehaviorTree.DefaultState = BehaviorTree.Root.Name;                
+                RaisePropertyChanged("IsDefaultStateSelected");
+                SetChanged(true);
+            }
+        }
+
+        private void Mnu_ChangeState_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem)
+            {
+                MenuItem mnu = (MenuItem)sender;
+                BehaviorViewModel b = (BehaviorViewModel)mnu.Tag;
+                BehaviorTree.ChangeState(b.Name);
+                RaisePropertyChanged("IsDefaultStateSelected");
+            }
         }
         #endregion
 

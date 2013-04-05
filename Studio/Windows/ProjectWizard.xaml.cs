@@ -15,7 +15,6 @@ using System.ComponentModel;
 namespace Skill.Studio
 {
 
-
     /// <summary>
     /// Interaction logic for ProjectWizard.xaml
     /// </summary>
@@ -30,46 +29,20 @@ namespace Skill.Studio
                 Info = new NewProjectInfo();
             }
 
-            public string Name
+            public string Name { get; private set; }
+
+            public string UnityProjectDirectory
             {
-                get { return Info.Name; }
+                get { return Info.UnityProjectDirectory; }
                 set
                 {
-                    if (Info.Name != value)
+                    if (Info.UnityProjectDirectory != value)
                     {
-                        if (value != null)
-                            value = value.Trim();
-                        if (Validation.VariableNameValidator.IsValid(value))
-                            Info.Name = value;
+                        if (Validation.LocationValidator.IsValid(value))
+                            Info.UnityProjectDirectory = value;
+                        OnPropertyChanged(new PropertyChangedEventArgs("UnityProjectDirectory"));
+                        Name = Info.Name;
                         OnPropertyChanged(new PropertyChangedEventArgs("Name"));
-                    }
-                }
-            }
-
-            public string Location
-            {
-                get { return Info.Location; }
-                set
-                {
-                    if (Info.Location != value)
-                    {
-                        if (Validation.LocationValidator.IsValid(value))
-                            Info.Location = value;
-                        OnPropertyChanged(new PropertyChangedEventArgs("Location"));
-                    }
-                }
-            }
-
-            public string OutputLocaltion
-            {
-                get { return Info.OutputLocaltion; }
-                set
-                {
-                    if (Info.OutputLocaltion != value)
-                    {
-                        if (Validation.LocationValidator.IsValid(value))
-                            Info.OutputLocaltion = value;
-                        OnPropertyChanged(new PropertyChangedEventArgs("OutputLocaltion"));
                     }
                 }
             }
@@ -83,61 +56,39 @@ namespace Skill.Studio
         }
 
         ProjectWizardViewModel _ViewModel;
-        public NewProjectInfo ProjectInfo { get { return _ViewModel.Info; } }        
+        public NewProjectInfo ProjectInfo { get { return _ViewModel.Info; } }
 
-        string GetDefaultDir()
-        {
-            return System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skill\\Projects\\");
-        }
+        //string GetDefaultDir()
+        //{
+        //      System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skill\\Projects\\");
+        //}
 
         public ProjectWizard()
         {
             InitializeComponent();
             this.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             _ViewModel = new ProjectWizardViewModel();
-            string dir = Properties.Settings.Default.LastProjectDir;
-            if (!string.IsNullOrEmpty(dir))
-            {
-                if (System.IO.Directory.Exists(dir))
-                    _ViewModel.Location = dir;
-                else
-                    _ViewModel.Location = GetDefaultDir();
-            }
-            else
-                _ViewModel.Location = GetDefaultDir();
-            _ViewModel.Name = "SkillProject1";
-            _ViewModel.OutputLocaltion = "C:\\Unity\\SkillProject1\\Assets\\Scripts\\";
-            this.DataContext = _ViewModel;            
+            this.DataContext = _ViewModel;
         }
 
         private void BtnOk_Click(object sender, RoutedEventArgs e)
         {
-            if (!Validation.LocationValidator.IsValid(_ViewModel.Location))
+            if (!Validation.LocationValidator.IsValid(_ViewModel.UnityProjectDirectory))
             {
-                System.Windows.MessageBox.Show("Invalid location");
+                System.Windows.MessageBox.Show("Invalid directory");
                 return;
             }
-            if (!Validation.LocationValidator.IsValid(_ViewModel.OutputLocaltion))
+            if (!Validation.LocationValidator.IsValid(System.IO.Path.Combine(_ViewModel.UnityProjectDirectory, "Assets")))
             {
-                System.Windows.MessageBox.Show("Invalid Output Directory");
+                System.Windows.MessageBox.Show("Invalid unity project directory - 'Assets' directory does not exist.");
                 return;
             }
-            if (!Validation.VariableNameValidator.IsValid(_ViewModel.Name))
-            {
-                System.Windows.MessageBox.Show("Invalid Name");
-                return;
-            }
-
-            string projectfilename = ProjectInfo.Filename;
-            if (System.IO.File.Exists(projectfilename))
+            if (System.IO.File.Exists(Project.GetFilename(_ViewModel.UnityProjectDirectory, _ViewModel.Name)))
             {
                 System.Windows.MessageBox.Show("The project already exists.");
                 return;
             }
 
-
-            Properties.Settings.Default.LastProjectDir = _ViewModel.Location;
-            Properties.Settings.Default.Save();
             this.DialogResult = true;
             Close();
         }
@@ -152,24 +103,14 @@ namespace Skill.Studio
         {
             using (System.Windows.Forms.FolderBrowserDialog dialog = new System.Windows.Forms.FolderBrowserDialog())
             {
-                dialog.SelectedPath = _ViewModel.Location;
+                if (!string.IsNullOrEmpty(Properties.Settings.Default.LastProjectDir) && System.IO.Directory.Exists(Properties.Settings.Default.LastProjectDir))
+                    dialog.SelectedPath = Properties.Settings.Default.LastProjectDir;
                 dialog.ShowNewFolderButton = true;
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    _ViewModel.Location = dialog.SelectedPath;
-                }
-            }
-        }
-
-        private void Btn_BrowseUPlocation_Click(object sender, RoutedEventArgs e)
-        {
-            using (System.Windows.Forms.FolderBrowserDialog dialog = new System.Windows.Forms.FolderBrowserDialog())
-            {
-                dialog.SelectedPath = _ViewModel.OutputLocaltion;
-                dialog.ShowNewFolderButton = true;
-                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    _ViewModel.OutputLocaltion = dialog.SelectedPath;
+                    _ViewModel.UnityProjectDirectory = dialog.SelectedPath;
+                    Properties.Settings.Default.LastProjectDir = dialog.SelectedPath;
+                    Properties.Settings.Default.Save();
                 }
             }
         }

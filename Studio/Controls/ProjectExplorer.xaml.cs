@@ -132,10 +132,10 @@ namespace Skill.Studio.Controls
         {
             Project p = new Project();
             CurrentProject = new ProjectViewModel(p);
-            p.Settings.OutputLocaltion = info.OutputLocaltion;
-            string dir = System.IO.Path.Combine(info.Location, info.Name);
+            string fileName = Project.GetFilename(info.UnityProjectDirectory, info.Name);
+            string dir = System.IO.Path.GetDirectoryName(fileName);
             if (!System.IO.Directory.Exists(dir)) System.IO.Directory.CreateDirectory(dir);
-            CurrentProject.Path = System.IO.Path.Combine(dir, info.Name + Project.Extension);
+            CurrentProject.Path = fileName;
             CurrentProject.Save();
         }
         #endregion
@@ -552,21 +552,7 @@ namespace Skill.Studio.Controls
                 }
             }
         }
-        #endregion
-
-        #region Properties
-        private void Mnu_Properties_Click(object sender, RoutedEventArgs e)
-        {
-            if (CanProperties)
-            {
-                var selected = GetSelectedEntity();
-                if (selected != null && selected.EntityType == EntityType.Root)
-                {
-                    MainWindow.ShowSettingsCommand.Execute(selected, null);
-                }
-            }
-        }
-        #endregion
+        #endregion        
 
         #region Paste
         private void Mnu_Paste_Click(object sender, RoutedEventArgs e)

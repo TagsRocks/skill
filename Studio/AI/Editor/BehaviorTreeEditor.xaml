@@ -152,88 +152,100 @@
         </ContextMenu>
     </sk:TabDocument.Resources>
     <Grid Background="LightGray" MouseDown="Back_MouseDown"  >
-        <Grid.RowDefinitions>
-            <RowDefinition Height="24" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250" MinWidth="160" />
-                <ColumnDefinition Width="*" MinWidth="300" />
-            </Grid.ColumnDefinitions>
-            <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Background="{StaticResource ToolbarBackColor}" >
-                <Menu Height="20" Background="{StaticResource ToolbarBackColor}" VerticalAlignment="Center"  >
-                    <MenuItem Header="Edit">
-                        <MenuItem Header="AccessKeys" Click="Mnu_EditAccessKeys_Click" />
-                    </MenuItem>
-                    <MenuItem Header="Show">
-                        <MenuItem Header="Parameters" Click="Mnu_ShowParameters_Click" IsChecked="{Binding BehaviorTree.ShowParameters}" />
-                        <MenuItem Header="Animations" Click="Mnu_ShowAnimations_Click" IsChecked="{Binding ShowAnimations}" />
-                    </MenuItem>
-                </Menu>
-            </StackPanel>
-            <Grid Grid.Row="0" Grid.Column="2" Background="{StaticResource ToolbarBackColor}" >
-                <Button Click="BtnRefresh_Click" ToolTip="Refresh" HorizontalAlignment="Left" VerticalAlignment="Center" Height="20" Width="20" Margin="2,0,0,0" >
-                    <Image Source="{StaticResource ImgRefresh}" />
-                </Button>
-                <StackPanel  Orientation="Horizontal" HorizontalAlignment="Center"  >
-                    <StackPanel.Resources>
-                        <Style TargetType="Control" x:Key="BtnStyle" >
-                            <Setter Property="Width" Value="22" />
-                            <Setter Property="Height" Value="22" />
-                            <Setter Property="VerticalAlignment" Value="Center" />
-                            <Setter Property="HorizontalAlignment" Value="Center" />
-                            <Setter Property="Margin" Value="2,0" />
-                        </Style>
-                    </StackPanel.Resources>
-                    <my:ToggleMediaButton x:Name="_BtnPlayStop" NormalImage="{StaticResource ImgPlayStopBtn}" PressedImage="{StaticResource ImgPlayStopPressedBtn}" HoverImage="{StaticResource ImgPlayStopHoverBtn}" Style="{StaticResource BtnStyle}" Click="BtnPlayStop_Click" />
-                    <my:ToggleMediaButton x:Name="_BtnPause" NormalImage="{StaticResource ImgPauseBtn}" PressedImage="{StaticResource ImgPausePressedBtn}" HoverImage="{StaticResource ImgPauseHoverBtn}" Style="{StaticResource BtnStyle}" Click="BtnPause_Click" />
-                    <my:MediaButton IsEnabled="{Binding IsChecked,ElementName=_BtnPause}" x:Name="_BtnStep" NormalImage="{StaticResource ImgStepBtn}" PressedImage="{StaticResource ImgStepPressedBtn}" HoverImage="{StaticResource ImgStepHoverBtn}" Style="{StaticResource BtnStyle}" Click="BtnStep_Click" />
-                    <ComboBox x:Name="_CmbTimeInterval" ItemsSource="{Binding TimeIntervals,ElementName=BTEditor }" Style="{StaticResource BtnStyle}" Width="60" SelectionChanged="CmbTimeInterval_SelectionChanged" />
-                    <TextBox Text="{Binding BehaviorTree.DebugTimerString, Mode=OneWay}" />
-                    <Slider Width="100" Value="{Binding AnimationSize}" Minimum="64" Maximum="194" ToolTip="Animation Size" Margin="4,0,0,0" />
-                </StackPanel>
-            </Grid>
-        </Grid>
-        <Grid Grid.Row="1" >
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250" MinWidth="160" />
-                <ColumnDefinition Width="Auto"  />
-                <ColumnDefinition Width="*" MinWidth="300" />
-            </Grid.ColumnDefinitions>
-            <Grid >
-                <TreeView ItemsSource="{Binding BehaviorTree.Nodes}" BorderThickness="0" Name="_BTTree" Background="White" 
-                  SelectedItemChanged="_BTTree_SelectedItemChanged" Grid.Row="1" Grid.Column="0" ContextMenu="{StaticResource TVContextMenu}"  >
-                    <TreeView.ItemContainerStyle>
-                        <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource TreeViewItemStyle}">
-                            <EventSetter Event="TreeViewItem.PreviewMouseRightButtonDown" Handler="TreeViewItem_PreviewMouseRightButtonDown"/>
-                            <EventSetter Event="TreeViewItem.KeyDown" Handler="TreeViewItem_KeyDown"/>
-                        </Style>
-                    </TreeView.ItemContainerStyle>
+        <TabControl Grid.Row="1" >
+            <TabItem Header="Tree View" >
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="24" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Background="{StaticResource ToolbarBackColor}" >
+                        <Menu Height="20" Background="{StaticResource ToolbarBackColor}" VerticalAlignment="Center" >
+                            <MenuItem Header="Edit">
+                                <MenuItem.Resources>
+                                    <DataTemplate DataType="{x:Type  vm:BehaviorViewModel}">
+                                        <TextBlock Text="{Binding Name}"/>
+                                    </DataTemplate>
+                                    <Style x:Key="MenuStateStyle" >
+                                        <Setter Property="MenuItem.Tag" Value="{Binding}" />
+                                        <Setter Property="MenuItem.IsChecked" Value="{Binding IsSelectedState, Mode=OneWay}" />
+                                        <EventSetter Event="MenuItem.Click" Handler="Mnu_ChangeState_Click" />
+                                    </Style>
+                                </MenuItem.Resources>
+                                <MenuItem Header="State" ItemsSource="{Binding BehaviorTree.States}" ItemContainerStyle="{StaticResource MenuStateStyle}" />
+                                <MenuItem Header="Add New State" Click="MnuAddState_Click" />
+                                <MenuItem Header="Delete State" Click="MnuDeleteState_Click" />
+                                <MenuItem x:Name="ischecked" Header="Set as Default State" IsChecked="{Binding IsDefaultStateSelected, Mode=OneWay}" Click="MnuSetasDefaultState_Click" />
+                                <Separator/>
+                                <MenuItem Header="AccessKeys" Click="Mnu_EditAccessKeys_Click" />
+                            </MenuItem>
+                            <MenuItem Header="Show">
+                                <MenuItem Header="Parameters" Click="Mnu_ShowParameters_Click" IsChecked="{Binding BehaviorTree.ShowParameters}" />
+                            </MenuItem>
+                        </Menu>
+                    </StackPanel>
+                    <TreeView Grid.Row="1" ItemsSource="{Binding BehaviorTree.Nodes}" BorderThickness="0" Name="_BTTree" Background="White" 
+                  SelectedItemChanged="_BTTree_SelectedItemChanged" Grid.Column="0" ContextMenu="{StaticResource TVContextMenu}"  >
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource TreeViewItemStyle}">
+                                <EventSetter Event="TreeViewItem.PreviewMouseRightButtonDown" Handler="TreeViewItem_PreviewMouseRightButtonDown"/>
+                                <EventSetter Event="TreeViewItem.KeyDown" Handler="TreeViewItem_KeyDown"/>
+                            </Style>
+                        </TreeView.ItemContainerStyle>
 
-                    <TreeView.Resources>
-                        <HierarchicalDataTemplate DataType="{x:Type vm:BehaviorViewModel}"
+                        <TreeView.Resources>
+                            <HierarchicalDataTemplate DataType="{x:Type vm:BehaviorViewModel}"
                     ItemsSource="{Binding}">
-                            <Grid>
-                                <StackPanel Orientation="Horizontal" Height="16" >
-                                    <Image Width="16" Height="16" Margin="3,0" Source="{Binding ImageName}" />
-                                    <TextBlock Text="{Binding DisplayName}" />
-                                </StackPanel>
-                            </Grid>
-                        </HierarchicalDataTemplate>
-                        <LinearGradientBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" EndPoint="0,1" StartPoint="0,0">
-                            <GradientStop Color="#f2f8ff" Offset="0.05"/>
-                            <GradientStop Color="#d0e5ff" Offset="1"/>
-                        </LinearGradientBrush>
-                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black" />
-                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="Black" />
-                    </TreeView.Resources>
-                </TreeView>
-            </Grid>
-            <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="2" Background="Gray" />
-            <Grid Grid.Column="2" >
-                <xctk:Zoombox x:Name="_Zoombox" >                    
-                        <ItemsControl ItemsSource="{Binding BehaviorTree.Behaviors}" >
+                                <Grid>
+                                    <StackPanel Orientation="Horizontal" Height="16" >
+                                        <Image Width="16" Height="16" Margin="3,0" Source="{Binding ImageName}" />
+                                        <TextBlock Text="{Binding DisplayName}" />
+                                    </StackPanel>
+                                </Grid>
+                            </HierarchicalDataTemplate>
+                            <LinearGradientBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" EndPoint="0,1" StartPoint="0,0">
+                                <GradientStop Color="#f2f8ff" Offset="0.05"/>
+                                <GradientStop Color="#d0e5ff" Offset="1"/>
+                            </LinearGradientBrush>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black" />
+                            <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="Black" />
+                        </TreeView.Resources>
+                    </TreeView>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Grapgh View">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="24" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" Grid.Column="2" >
+                        <ToolBar Grid.Column="0" Grid.ColumnSpan="3" Background="{StaticResource ToolbarBackColor}" >
+                            <ToolBar.Resources>
+                                <Style TargetType="Control" x:Key="BtnStyle" >
+                                    <Setter Property="Width" Value="22" />
+                                    <Setter Property="Height" Value="22" />
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                    <Setter Property="Margin" Value="2,0" />
+                                </Style>
+                            </ToolBar.Resources>
+                            <my:ToggleMediaButton x:Name="_BtnPlayStop" NormalImage="{StaticResource ImgPlayStopBtn}" PressedImage="{StaticResource ImgPlayStopPressedBtn}" HoverImage="{StaticResource ImgPlayStopHoverBtn}" Style="{StaticResource BtnStyle}" Click="BtnPlayStop_Click" />
+                            <my:ToggleMediaButton x:Name="_BtnPause" NormalImage="{StaticResource ImgPauseBtn}" PressedImage="{StaticResource ImgPausePressedBtn}" HoverImage="{StaticResource ImgPauseHoverBtn}" Style="{StaticResource BtnStyle}" Click="BtnPause_Click" />
+                            <my:MediaButton IsEnabled="{Binding IsChecked,ElementName=_BtnPause}" x:Name="_BtnStep" NormalImage="{StaticResource ImgStepBtn}" PressedImage="{StaticResource ImgStepPressedBtn}" HoverImage="{StaticResource ImgStepHoverBtn}" Style="{StaticResource BtnStyle}" Click="BtnStep_Click" />
+                            <ComboBox x:Name="_CmbTimeInterval" ItemsSource="{Binding TimeIntervals,ElementName=BTEditor }" Style="{StaticResource BtnStyle}" Width="60" SelectionChanged="CmbTimeInterval_SelectionChanged" />
+                            <TextBlock Text="{Binding BehaviorTree.DebugTimerString, Mode=OneWay}" MinWidth="40" />
+                            <Separator Margin="4,0" />
+                            <CheckBox Content="Animation" IsChecked="{Binding ShowAnimations}" VerticalAlignment="Center" />
+                            <Slider Width="100" Value="{Binding AnimationSize}" Minimum="64" Maximum="194" ToolTip="Animation Size" Margin="4,0,0,0" IsEnabled="{Binding ShowAnimations}" />
+                            <Separator Margin="8,0" />
+                            <Button Click="BtnRefresh_Click" ToolTip="Refresh" HorizontalAlignment="Left" VerticalAlignment="Center" Height="20" Width="20" Margin="2,2,0,2" >
+                                <Image Source="{StaticResource ImgRefresh}" />
+                            </Button>
+                        </ToolBar>
+                    </Grid>
+                    <xctk:Zoombox Grid.Row="1" x:Name="_Zoombox" >
+                        <ItemsControl ItemsSource="{Binding BehaviorTree.SelectedBehaviors}" >
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <bedit:BehaviorTreeCanvas Editor="{Binding ElementName=BTEditor}"  >
@@ -310,16 +322,17 @@
                                     <Setter Property="Canvas.Left" Value="{Binding Path=X,Mode=TwoWay}" />
                                 </Style>
                             </ItemsControl.ItemContainerStyle>
-                        </ItemsControl>                    
-                </xctk:Zoombox>
-                <ItemsControl ItemsSource="{Binding Animations}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,8,0" Height="{Binding AnimationSize}"  Visibility="{Binding ShowAnimations, Converter={StaticResource BToVisConverter}, ConverterParameter=False}" >
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Horizontal" Margin="0" HorizontalAlignment="Right" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                </ItemsControl>
-            </Grid>
-        </Grid>
+                        </ItemsControl>
+                    </xctk:Zoombox>
+                    <ItemsControl ItemsSource="{Binding Animations}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,8,0" Height="{Binding AnimationSize}"  Visibility="{Binding ShowAnimations, Converter={StaticResource BToVisConverter}, ConverterParameter=False}" >
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="0" HorizontalAlignment="Right" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </sk:TabDocument>

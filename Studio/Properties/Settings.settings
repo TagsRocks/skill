@@ -17,10 +17,10 @@
     <Setting Name="CloseSPAfterProjectLoad" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="RecentProjects" Type="System.Collections.Specialized.StringCollection" Scope="User">
+    <Setting Name="Plugin" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="Plugin" Type="System.String" Scope="User">
+    <Setting Name="RecentProjects" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>

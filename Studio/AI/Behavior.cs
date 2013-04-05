@@ -124,6 +124,39 @@ namespace Skill.Studio.AI
         public BehaviorTreeViewModel Tree { get; private set; }
 
 
+        /// <summary> Is this behavior root of state? </summary>
+        [Browsable(false)]
+        public bool IsState
+        {
+            get { return Model.IsState; }
+            set { Model.IsState = value; }
+        }
+
+        [Browsable(false)]
+        public bool IsDefaultState
+        {
+            get
+            {
+                return Tree.DefaultState == Name;
+            }
+        }
+
+        private bool _IsSelectedState;
+        [Browsable(false)]
+        public bool IsSelectedState
+        {
+            get { return _IsSelectedState; }
+            set
+            {
+                if (_IsSelectedState != value)
+                {
+                    _IsSelectedState = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("IsSelectedState"));
+                }
+            }
+        }
+
+
         private PathGeometry _ConnectionToP;
         [Browsable(false)]
         public PathGeometry ConnectionToP
@@ -286,7 +319,7 @@ namespace Skill.Studio.AI
         {
             get
             {
-                return _Border != null ? _Border.DesiredSize.Width : MINWIDTH;                
+                return _Border != null ? _Border.DesiredSize.Width : MINWIDTH;
             }
         }
 
@@ -525,6 +558,24 @@ namespace Skill.Studio.AI
                     Model.Weight = value;
                     Debug.Behavior.Weight = value;
                     this.OnPropertyChanged(new PropertyChangedEventArgs("Weight"));
+                }
+            }
+        }
+
+        [DefaultValue(false)]
+        [DisplayName("Concurrency")]
+        [Description("If true : when a condition child fails, return failure")]
+        public ConcurrencyMode Concurrency
+        {
+            get { return Model.Concurrency; }
+            set
+            {
+                if (value != Model.Concurrency)
+                {
+                    Tree.History.Insert(new ChangePropertyUnDoRedo(this, "Concurrency", value, Model.Concurrency));
+                    Model.Concurrency = value;
+                    Debug.Behavior.Concurrency = (Framework.AI.ConcurrencyMode)((int)value);
+                    OnPropertyChanged(new PropertyChangedEventArgs("Concurrency"));
                 }
             }
         }

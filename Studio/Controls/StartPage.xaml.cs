@@ -23,30 +23,25 @@ namespace Skill.Studio.Controls
     {
 
 
-        public ObservableCollection<RecentProjectInfo> RecentProjects { get; private set; }
+
+        public RecentProjectInfoCollection RecentProjects { get; private set; }
 
         public StartPage()
         {
-            RecentProjects = new ObservableCollection<RecentProjectInfo>();
+            RecentProjects = new RecentProjectInfoCollection();
+            RecentProjects.Load();
             InitializeComponent();
 
             _CbCloseAfterLoad.IsChecked = Properties.Settings.Default.CloseSPAfterProjectLoad;
             _CbShowOnStartup.IsChecked = Properties.Settings.Default.ShowSPOnStartup;
 
             _CbCloseAfterLoad.Click += new RoutedEventHandler(_CbCloseAfterLoad_Click);
-            _CbShowOnStartup.Click += new RoutedEventHandler(_CbShowOnStartup_Click);            
+            _CbShowOnStartup.Click += new RoutedEventHandler(_CbShowOnStartup_Click);
         }
 
         public void LoadRecents()
         {
-            RecentProjects.Clear();
-            if (Properties.Settings.Default.RecentProjects != null)
-            {
-                foreach (var rp in Properties.Settings.Default.RecentProjects)
-                {
-                    RecentProjects.Add(new RecentProjectInfo(System.IO.Path.GetFileNameWithoutExtension(rp), rp));
-                }
-            }
+            RecentProjects.Load();
         }
 
         void _CbShowOnStartup_Click(object sender, RoutedEventArgs e)
@@ -69,18 +64,7 @@ namespace Skill.Studio.Controls
                 string path = item.Tag as string;
                 if (path != null)
                 {
-                    RecentProjectInfo rpInfo = null;
-
-                    foreach (var rp in RecentProjects)
-                    {
-                        if (rp.Path == path)
-                        {
-                            rpInfo = rp;
-                            break;
-                        }
-                    }
-
-                    if (rpInfo != null)
+                    if (RecentProjects.Contains(path))
                     {
                         if (System.IO.File.Exists(path))
                         {
@@ -91,13 +75,8 @@ namespace Skill.Studio.Controls
                             var msgResult = System.Windows.MessageBox.Show("File does not exist \n remove it from list?", "Load", MessageBoxButton.YesNo);
                             if (msgResult == MessageBoxResult.Yes)
                             {
-                                if (Properties.Settings.Default.RecentProjects == null)
-                                    Properties.Settings.Default.RecentProjects = new System.Collections.Specialized.StringCollection();
-                                var recentProjects = Properties.Settings.Default.RecentProjects;
-
-                                recentProjects.Remove(path);
-                                RecentProjects.Remove(rpInfo);
-                                Properties.Settings.Default.Save();
+                                RecentProjects.Remove(path);
+                                RecentProjects.Save();
                             }
                         }
                     }
@@ -108,6 +87,7 @@ namespace Skill.Studio.Controls
 
     }
 
+
     public class RecentProjectInfo
     {
         public string Name { get; private set; }
@@ -117,6 +97,76 @@ namespace Skill.Studio.Controls
         {
             this.Name = name;
             this.Path = path;
+        }
+    }
+
+    public class RecentProjectInfoCollection : ObservableCollection<RecentProjectInfo>
+    {
+        private static string[] Splitter = new string[] { "||" };
+
+
+        public void Load()
+        {
+            this.Clear();
+            if (!string.IsNullOrEmpty(Properties.Settings.Default.RecentProjects))
+            {
+                string[] projects = Properties.Settings.Default.RecentProjects.Split(Splitter, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var p in projects)
+                {
+                    //if (System.IO.File.Exists(p))
+                    this.Add(p);
+                }
+            }
+        }
+        public void Save()
+        {
+            StringBuilder builder = new StringBuilder();
+            foreach (var p in this)
+            {
+                builder.Append(p.Path);
+                builder.Append(Splitter[0]);
+            }
+            Properties.Settings.Default.RecentProjects = builder.ToString();
+            Properties.Settings.Default.Save();
+        }
+        public void Add(string project)
+        {
+            if (!Contains(project))
+                this.Add(new RecentProjectInfo(System.IO.Path.GetFileNameWithoutExtension(project), project));
+        }
+        public void AddFirst(string project)
+        {
+            Remove(project);
+            this.Insert(0, new RecentProjectInfo(System.IO.Path.GetFileNameWithoutExtension(project), project));
+        }
+        public bool Remove(string project)
+        {
+            RecentProjectInfo pr = null;
+            foreach (var p in this)
+            {
+                if (p.Path.Equals(project, StringComparison.OrdinalIgnoreCase))
+                {
+                    pr = p;
+                    break;
+                }
+            }
+            if (pr != null)
+                return this.Remove(pr);
+            return false;
+        }
+
+        public bool Contains(string project)
+        {
+            bool exists = false;
+            foreach (var p in this)
+            {
+                if (p.Path.Equals(project, StringComparison.OrdinalIgnoreCase))
+                {
+                    exists = true;
+                    break;
+                }
+            }
+            return exists;
         }
     }
 }
