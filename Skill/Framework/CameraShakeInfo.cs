@@ -10,10 +10,13 @@ namespace Skill.Framework
     [Serializable]
     public class CameraShakeInfo
     {
-        /// <summary> Intensity of shake in left and right direction </summary>
-        public float SideIntensity = 0.1f;
-        /// <summary> Intensity of shake in up and Down direction </summary>
-        public float UpDownIntensity = 0.0f;
+        /// <summary> Intensity of shake
+        /// x in left/right direction 
+        /// y in up/down direction
+        /// z in back/forward (zoom) direction
+        /// </summary>
+        public Vector3 Intensity = new Vector3(0.1f, 0.1f, 0.0f);
+
         /// <summary> Intensity of camera roll</summary>
         public float Roll = 0.1f;
         /// <summary> Duration of shake </summary>
@@ -30,8 +33,7 @@ namespace Skill.Framework
         /// <param name="other">Other CameraShakeInfo to copy</param>
         public CameraShakeInfo(CameraShakeInfo other)
         {
-            this.SideIntensity = other.SideIntensity;
-            this.UpDownIntensity = other.UpDownIntensity;
+            this.Intensity = other.Intensity;            
             this.Roll = other.Roll;
             this.Duration = other.Duration;
             this.Range = other.Range;

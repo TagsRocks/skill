@@ -22,6 +22,9 @@ namespace Skill.Studio.AI
 
         [Browsable(false)]
         public CompositeType CompositeType { get { return ((Composite)Model).CompositeType; } }
+
+        public override double CornerRadius { get { return 2; } }
+        public override double MinHeight { get { return 42; } }
     }
     #endregion
 
@@ -150,6 +153,23 @@ namespace Skill.Studio.AI
 
         [Browsable(false)]
         public override string ImageName { get { return Images.Priority; } }
+
+        public override string Name
+        {
+            get
+            {
+                return base.Name;
+            }
+            set
+            {
+                if (base.Name != value)
+                {
+                    string preName = base.Name;
+                    base.Name = value;
+                    Tree.NotifyChangeDestinationState(preName, value);
+                }
+            }
+        }
 
         public PrioritySelectorViewModel(BehaviorViewModel parent, PrioritySelector selector)
             : base(parent, selector)

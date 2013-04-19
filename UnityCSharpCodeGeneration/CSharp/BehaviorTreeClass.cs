@@ -42,11 +42,16 @@ namespace Skill.CodeGeneration.CSharp
                 this.Add(new SharedAccessKeysClass(this._Tree.AccessKeys));
             }
 
+            // add DefaultState property
+
+            Property defaultState = new Property("string", "DefaultState", string.Format("\"{0}\"", _Tree.DefaultState), false) { Modifiers = Modifiers.Public, SubMethod = CSharp.SubMethod.Override };
+            Add(defaultState);
+
             Method constructor = new Method("", Name, "", "");
-            constructor.Modifiers = Modifiers.Public;            
+            constructor.Modifiers = Modifiers.Public;
             Add(constructor);
 
-            Method createTree = new Method("Skill.Framework.AI.Behavior", "CreateTree", this._CreateTreeMethodBody.ToString());
+            Method createTree = new Method("Skill.Framework.AI.Behavior[]", "CreateTree", this._CreateTreeMethodBody.ToString());
             createTree.IsPartial = false;
             createTree.SubMethod = SubMethod.Override;
             createTree.Modifiers = Modifiers.Protected;
@@ -61,7 +66,10 @@ namespace Skill.CodeGeneration.CSharp
         /// </summary>
         private void CreateBehaviorList()
         {
-            AddToBehaviors(_Tree.Root);
+            foreach (var s in _Tree.States)
+            {
+                AddToBehaviors(s);
+            }
         }
         private bool IsInBehavior(Behavior behavior)
         {
@@ -131,23 +139,23 @@ namespace Skill.CodeGeneration.CSharp
         {
             StringBuilder result = new StringBuilder();
 
-            result.Append("new Skill.Framework.AI.BehaviorParameterCollection( new BehaviorParameter[] { ");
+            result.Append("new Skill.Framework.AI.BehaviorParameterCollection( new Skill.Framework.AI.BehaviorParameter[] { ");
 
             foreach (var p in parameters)
             {
                 switch (p.Type)
                 {
                     case ParameterType.Int:
-                        result.Append(string.Format("new BehaviorParameter(\"{0}\",{1}),", p.Name, p.Value));
+                        result.Append(string.Format("new Skill.Framework.AI.BehaviorParameter(\"{0}\",{1}),", p.Name, p.Value));
                         break;
                     case ParameterType.Bool:
-                        result.Append(string.Format("new BehaviorParameter(\"{0}\",{1}),", p.Name, p.Value.ToString().ToLower()));
+                        result.Append(string.Format("new Skill.Framework.AI.BehaviorParameter(\"{0}\",{1}),", p.Name, p.Value.ToString().ToLower()));
                         break;
                     case ParameterType.Float:
-                        result.Append(string.Format("new BehaviorParameter(\"{0}\",{1}f),", p.Name, p.Value));
+                        result.Append(string.Format("new Skill.Framework.AI.BehaviorParameter(\"{0}\",{1}f),", p.Name, p.Value));
                         break;
                     case ParameterType.String:
-                        result.Append(string.Format("new BehaviorParameter(\"{0}\",\"{1}\"),", p.Name, p.Value));
+                        result.Append(string.Format("new Skill.Framework.AI.BehaviorParameter(\"{0}\",\"{1}\"),", p.Name, p.Value));
                         break;
                 }
             }
@@ -177,6 +185,9 @@ namespace Skill.CodeGeneration.CSharp
                         break;
                     case BehaviorType.Composite:
                         CreateComposite((Composite)b);
+                        break;
+                    case BehaviorType.ChangeState:
+                        CreateChangeState((ChangeState)b);
                         break;
                 }
             }
@@ -223,9 +234,15 @@ namespace Skill.CodeGeneration.CSharp
             }
 
             // then return root of tree
-            if (_Tree.Root != null)
+            if (_Tree.States != null)
             {
-                _CreateTreeMethodBody.AppendLine(string.Format("return {0};", Variable.GetName(_Tree.Root.Name)));
+                _CreateTreeMethodBody.AppendLine(string.Format("Skill.Framework.AI.Behavior[] states = new Skill.Framework.AI.Behavior[{0}];", _Tree.States.Length));
+                for (int i = 0; i < _Tree.States.Length; i++)
+                {
+                    _CreateTreeMethodBody.AppendLine(string.Format("states[{0}] = {1};", i, Variable.GetName(_Tree.States[i].Name)));
+                }
+
+                _CreateTreeMethodBody.AppendLine("return states;");
             }
             else
                 _CreateTreeMethodBody.AppendLine("return null;");
@@ -277,6 +294,16 @@ namespace Skill.CodeGeneration.CSharp
             Method m = new Method("bool", GetConditionHandlerName(condition.Name), "return false;", ConditionHandlerParams);
             m.IsPartial = true;
             Add(m);
+        }
+
+        private void CreateChangeState(ChangeState changeState)
+        {
+            // create condition variable
+            Add(new Variable("Skill.Framework.AI.ChangeState", changeState.Name, "null"));
+            // new condition variable inside CreateTree method
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Framework.AI.ChangeState(\"{1}\",\"{2}\");", Variable.GetName(changeState.Name), changeState.Name, changeState.DestinationState));
+            // set weight
+            SetWeight(changeState);
         }
 
         private void CreateDecorator(Decorator decorator)

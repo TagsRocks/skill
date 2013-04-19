@@ -35,9 +35,9 @@ namespace Skill.Framework.AI
         /// <summary>
         /// Behave
         /// </summary>
-        /// <param name="state">State of BehaviorTree</param>
+        /// <param name="status">Status of BehaviorTree</param>
         /// <returns>esult</returns>
-        protected override BehaviorResult Behave(BehaviorTreeState state)
+        protected override BehaviorResult Behave(BehaviorTreeStatus status)
         {
 
             BehaviorResult result = BehaviorResult.Failure;
@@ -45,8 +45,8 @@ namespace Skill.Framework.AI
             for (int i = RunningChildIndex; i < ChildCount; i++)
             {
                 BehaviorContainer node = this[i];
-                state.Parameters = node.Parameters;
-                result = node.Behavior.Trace(state);
+                status.Parameters = node.Parameters;
+                result = node.Behavior.Execute(status);
                 if (result == BehaviorResult.Running)
                 {
                     RunningChildIndex = i;
@@ -77,14 +77,14 @@ namespace Skill.Framework.AI
         /// <summary>
         /// Reset behavior
         /// </summary>        
-        /// <param name="state">State of BehaviorTree</param>                
-        public override void ResetBehavior(BehaviorTreeState state)
+        /// <param name="status">Status of BehaviorTree</param>                
+        public override void ResetBehavior(BehaviorTreeStatus status)
         {
-            if (Result == BehaviorResult.Running && state.UpdateId != LastUpdateId)
+            if (Result == BehaviorResult.Running && status.UpdateId != LastUpdateId)
             {
                 _LoopCounter = 0;
             }
-            base.ResetBehavior(state);
+            base.ResetBehavior(status);
         }
     }
     #endregion

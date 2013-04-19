@@ -19,11 +19,11 @@ namespace Skill.Framework.AI
     /// Represents the method that will handle execution of action by user
     /// </summary>    
     /// <param name="parameters">Parameters for action</param>
-    /// <returns>State of action</returns>
+    /// <returns>Status of action</returns>
     public delegate BehaviorResult ActionHandler(BehaviorParameterCollection parameters);
 
     /// <summary>
-    /// Actions which finally implement an actors or game world state changes, for example to plan a path and move on it, to sense for the nearest enemies,
+    /// Actions which finally implement an actors or game world status changes, for example to plan a path and move on it, to sense for the nearest enemies,
     /// to show certain animations, switch weapons, or run a specified sound. Actions will typically coordinate and call into different game systems.
     /// They might run for one simulation tick – one frame – or might need to be ticked for multiple frames to finish their work.
     /// Action is leaf node.
@@ -58,13 +58,13 @@ namespace Skill.Framework.AI
         internal bool AlreadyUpdated { get; set; }
 
         // update action manually when action is running
-        internal void UpdateImmediately(BehaviorTreeState state)
+        internal void UpdateImmediately(BehaviorTreeStatus status)
         {
             try
             {
                 // execute handler and get result back
                 if (this._Handler != null)
-                    this.Result = this._Handler(state.Parameters);
+                    this.Result = this._Handler(status.Parameters);
                 else
                     this.Result = BehaviorResult.Failure;// by default failure
 
@@ -75,7 +75,7 @@ namespace Skill.Framework.AI
             }
             catch (Exception ex)
             {
-                state.Exception = ex;
+                status.Exception = ex;
                 this.Result = BehaviorResult.Failure;
                 return;
             }
@@ -84,9 +84,9 @@ namespace Skill.Framework.AI
         /// <summary>
         /// Behave
         /// </summary>
-        /// <param name="state">State of BehaviorTree</param>
+        /// <param name="status">Status of BehaviorTree</param>
         /// <returns>Result of action</returns>
-        protected override BehaviorResult Behave(BehaviorTreeState state)
+        protected override BehaviorResult Behave(BehaviorTreeStatus status)
         {
             if (AlreadyUpdated)
             {
@@ -97,13 +97,13 @@ namespace Skill.Framework.AI
             BehaviorResult result = BehaviorResult.Failure;// by default failure
 
             // execute handler and get result back            
-            if (_Handler != null) result = _Handler(state.Parameters);
+            if (_Handler != null) result = _Handler(status.Parameters);
 
             // if action needs to run next frame store it's reference
             if (result == BehaviorResult.Running)
-                state.RunningActions.Add(this, state.Parameters);
+                status.RunningActions.Add(this, status.Parameters);
             else
-                state.RunningActions.Remove(this);
+                status.RunningActions.Remove(this);
             return result;
         }
 
@@ -119,17 +119,17 @@ namespace Skill.Framework.AI
         /// <summary>
         /// Reset behavior. For internal use. when a branch with higher priority executed, let nodes in previous branch reset
         /// </summary>        
-        /// <param name="state">State of BehaviorTree</param>                
-        public override void ResetBehavior(BehaviorTreeState state)
+        /// <param name="status">Status of BehaviorTree</param>                
+        public override void ResetBehavior(BehaviorTreeStatus status)
         {
             if (Result == BehaviorResult.Running)
             {
-                if (LastUpdateId != state.UpdateId)
+                if (LastUpdateId != status.UpdateId)
                 {
-                    if (state.RunningActions.Remove(this))
+                    if (status.RunningActions.Remove(this))
                     {
                         OnReset();
-                        base.ResetBehavior(state);
+                        base.ResetBehavior(status);
                     }
                 }
             }
@@ -139,11 +139,11 @@ namespace Skill.Framework.AI
         /// <summary>
         /// for internal use when behavior tree let action continue (when result is BehaviorResult.Running)
         /// </summary>
-        /// <param name="state">State of BehaviorTree</param>
+        /// <param name="status">Status of BehaviorTree</param>
         /// <returns>Result</returns>
-        internal BehaviorResult Continue(BehaviorTreeState state)
+        internal BehaviorResult Continue(BehaviorTreeStatus status)
         {
-            return Behave(state);
+            return Behave(status);
         }
     }
     #endregion

@@ -56,8 +56,10 @@ namespace Skill.Editor
         private WrapPanel _ConditionPanel, _DecoratorPanel, _ActionPanel;
         private StackPanel _InfoPanel;
         private Label _SuccessState, _FailurState, _RunningState;
+        private Label _CurrentState;
 
         private GUIStyle _SuccessStyle, _FailurStyle, _RunningStyle;
+        private string _State;
 
         void CreateGUI()
         {
@@ -72,6 +74,7 @@ namespace Skill.Editor
             _Frame.Grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
 
             _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(22, GridUnitType.Pixel) }); // for _ControllerField
+            _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) }); // for current state
             _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) }); // for captions
             _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) }); // for panels and scrollviews
             _Frame.Grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, GridUnitType.Pixel) }); // for infos
@@ -79,13 +82,15 @@ namespace Skill.Editor
             _ControllerField = new ObjectField<Skill.Framework.Controller>() { Row = 0, Column = 0, ColumnSpan = 3, VerticalAlignment = VerticalAlignment.Center, Height = 18 };
             _ControllerField.ObjectChanged += new EventHandler(_ControllerField_ObjectChanged);
 
-            _ConditionCaption = new Box() { Row = 1, Column = 0 };
+            _CurrentState = new Label() { Row = 1, Column = 0, ColumnSpan = 2 };
+
+            _ConditionCaption = new Box() { Row = 2, Column = 0 };
             _ConditionCaption.Content.text = "Conditions";
             _ConditionCaption.Content.image = Resources.Condition;
-            _DecoratorCaption = new Box() { Row = 1, Column = 1 };
+            _DecoratorCaption = new Box() { Row = 2, Column = 1 };
             _DecoratorCaption.Content.text = "Decorators";
             _DecoratorCaption.Content.image = Resources.Decorator;
-            _ActionCaption = new Box() { Row = 1, Column = 2 };
+            _ActionCaption = new Box() { Row = 2, Column = 2 };
             _ActionCaption.Content.text = "Actions";
             _ActionCaption.Content.image = Resources.Action;
 
@@ -123,6 +128,8 @@ namespace Skill.Editor
 
 
             _Frame.Grid.Controls.Add(_ControllerField);
+
+            _Frame.Grid.Controls.Add(_CurrentState);
 
             _Frame.Grid.Controls.Add(_ConditionCaption);
             _Frame.Grid.Controls.Add(_DecoratorCaption);
@@ -188,18 +195,27 @@ namespace Skill.Editor
                     _BehaviorTree.Updated -= _BehaviorTree_Updated;
                 _BehaviorTree = value;
                 if (_BehaviorTree != null)
+                {
                     _BehaviorTree.Updated += _BehaviorTree_Updated;
+                    _BehaviorTree.EnterState += _BehaviorTree_EnterState;
+                }
 
                 RebuildTree();
             }
         }
 
+        void _BehaviorTree_EnterState(object sender, string stateName)
+        {
+            if (_State != stateName)
+                RebuildTree();
+        }
+
         private bool IsInExecutionSequence(Skill.Framework.AI.Behavior behavior)
         {
             if (_BehaviorTree == null) return false;
-            for (int i = 0; i < _BehaviorTree.State.SequenceCount; i++)
+            for (int i = 0; i < _BehaviorTree.Status.SequenceCount; i++)
             {
-                if (_BehaviorTree.State.ExecutionSequence[i] == behavior)
+                if (_BehaviorTree.Status.ExecutionSequence[i] == behavior)
                     return true;
             }
             return false;
@@ -248,9 +264,11 @@ namespace Skill.Editor
             _Decorators.Clear();
             _Conditions.Clear();
 
-            if (BehaviorTree != null)
+            if (BehaviorTree != null && BehaviorTree.CurrentState != null)
             {
-                RebuildTree(BehaviorTree.Root);
+                _CurrentState.Text = string.Format("Current State : {0}", _BehaviorTree.CurrentState.Name);
+
+                RebuildTree(BehaviorTree.CurrentState);
 
                 foreach (var bt in _Conditions) _ConditionPanel.Controls.Add(bt.Label);
                 foreach (var bt in _Actions) _ActionPanel.Controls.Add(bt.Label);

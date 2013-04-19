@@ -65,8 +65,11 @@ namespace Skill.Studio.AI.Editor
             // add margin 
             size.Width += 100;
             size.Height += 100;
+
+            if (Editor != null)
+                Editor.UpdatePositions();
             return size;
-        }        
+        }
 
         #region INotifyPropertyChanged Members
 

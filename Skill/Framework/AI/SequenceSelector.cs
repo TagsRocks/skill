@@ -29,17 +29,17 @@ namespace Skill.Framework.AI
         /// <summary>
         /// Behave
         /// </summary>
-        /// <param name="state">State od BehaviorTree</param>
+        /// <param name="status">Status od BehaviorTree</param>
         /// <returns>Result</returns>
-        protected override BehaviorResult Behave(BehaviorTreeState state)
+        protected override BehaviorResult Behave(BehaviorTreeStatus status)
         {
             BehaviorResult result = BehaviorResult.Failure;
             if (RunningChildIndex < 0) RunningChildIndex = 0;
             for (int i = RunningChildIndex; i < ChildCount; i++)
             {
                 BehaviorContainer node = this[i];
-                state.Parameters = node.Parameters;
-                result = node.Behavior.Trace(state);
+                status.Parameters = node.Parameters;
+                result = node.Behavior.Execute(status);
                 if (result == BehaviorResult.Running)
                 {
                     RunningChildIndex = i;

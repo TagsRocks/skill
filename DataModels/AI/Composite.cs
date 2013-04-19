@@ -75,6 +75,20 @@ namespace Skill.DataModels.AI
     #region ConcurrentSelector
 
     /// <summary>
+    /// Defines behavior of node when is child of a ConcurrentSelector
+    /// </summary>
+    public enum ConcurrencyMode
+    {
+        /// <summary>  Execute every update regardless of success or failure </summary>
+        Unlimit,
+        /// <summary>  Execute until success </summary>
+        UntilSuccess,
+        /// <summary>  Execute until failure </summary>
+        UntilFailure,
+
+    }
+
+    /// <summary>
     /// Enumerates the options for when a ConcurrentSelector is considered to have failed.
     /// </summary>
     /// <remarks> If FailOnOne and SuceedOnOne are both active and are both trigerred in the same time step, failure will take precedence. </remarks>

@@ -10,6 +10,8 @@ namespace Skill.CodeGeneration.CSharp
     /// </summary>
     class Property
     {
+        /// <summary> whether this method is override,virtual or usual </summary>
+        public SubMethod SubMethod { get; set; }
         /// <summary> Modifier of property (public, internal, private, protected) </summary>
         public Modifiers Modifiers { get; set; }
         /// <summary> whether this variable settable</summary>
@@ -59,7 +61,10 @@ namespace Skill.CodeGeneration.CSharp
             CommentWriter.Write(writer, Comment);
             if (Multiline)
             {
-                writer.WriteLine(string.Format("{0} {1} {2} {3} ", Modifiers.ToString().ToLower(), IsStatic ? "static" : string.Empty, Type, GetName(Name)));
+                writer.WriteLine(string.Format("{0} {1} {2} {3} {4}", Modifiers.ToString().ToLower(),
+                    IsStatic ? "static" : string.Empty,
+                    (SubMethod != CSharp.SubMethod.None) ? SubMethod.ToString().ToLower() : string.Empty,
+                    Type, GetName(Name)));
                 writer.WriteLine("{");
 
                 writer.WriteLine("get");
@@ -81,14 +86,16 @@ namespace Skill.CodeGeneration.CSharp
             {
                 if (HasSet)
                 {
-                    writer.WriteLine(string.Format("{0} {1} {2} {3} {{ get {{ {4} }} set {{ {5} }} }}", Modifiers.ToString().ToLower(),
+                    writer.WriteLine(string.Format("{0} {1} {2} {3} {4} {{ get {{ {5} }} set {{ {6} }} }}", Modifiers.ToString().ToLower(),
                         IsStatic ? "static" : string.Empty,
+                        (SubMethod != CSharp.SubMethod.None) ? SubMethod.ToString().ToLower() : string.Empty,
                         Type, GetName(Name), _Get, _Set));
                 }
                 else
                 {
-                    writer.WriteLine(string.Format("{0} {1} {2} {3} {{ get {{ {4} }} }}", Modifiers.ToString().ToLower(),
+                    writer.WriteLine(string.Format("{0} {1} {2} {3} {4} {{ get {{ {5} }} }}", Modifiers.ToString().ToLower(),
                         IsStatic ? "static" : string.Empty,
+                        (SubMethod != CSharp.SubMethod.None) ? SubMethod.ToString().ToLower() : string.Empty,
                         Type, GetName(Name), _Get));
                 }
             }

@@ -1,4 +1,4 @@
-﻿<ad:DockableContent xmlns:my="clr-namespace:Skill.Studio.Controls"  x:Class="Skill.Studio.Controls.PropertyGrid"
+﻿<UserControl xmlns:my="clr-namespace:Skill.Studio.Controls"  x:Class="Skill.Studio.Controls.PropertyGrid"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -6,9 +6,9 @@
              xmlns:ad="clr-namespace:AvalonDock;assembly=AvalonDock"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" Title="Properties" Background="White">
+             d:DesignHeight="300" d:DesignWidth="300"  Background="White">
     <Grid>
         <xctk:PropertyGrid x:Name="_PropertyGrid" >
         </xctk:PropertyGrid>
     </Grid>
-</ad:DockableContent>
+</UserControl>

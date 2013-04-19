@@ -23,7 +23,7 @@ namespace Skill.Studio.Controls
     /// <summary>
     /// Interaction logic for ErrorList.xaml
     /// </summary>
-    public partial class ErrorList : DockableContent
+    public partial class ErrorList : UserControl
     {
         #region SortType
         private enum SortType
@@ -50,11 +50,16 @@ namespace Skill.Studio.Controls
         private BehaviorTreeCompiler _BehaviorTreeCompiler;
         private AnimationTreeCompiler _AnimationTreeCompiler;
         private SkinMeshCompiler _SkinMeshCompiler;
-        private SaveDataCompiler _SaveDataCompiler;        
+        private SaveDataCompiler _SaveDataCompiler;
         #endregion
 
         #region Properties
         public ObservableCollection<CompileError> Errors { get; private set; }
+
+        public int ErrorCount { get; private set; }
+        public int WarningCount { get; private set; }
+        public int MessageCount { get; private set; }
+
         #endregion
 
         #region Methods
@@ -62,23 +67,23 @@ namespace Skill.Studio.Controls
         {
             return _AllErrors.Count(e => (e.Type & errortype) != 0);
         }
-        public void GetErrorCount(out int errCount, out int warCount, out int msgCount)
+        public void UpdateErrorCount()
         {
-            errCount = 0;
-            warCount = 0;
-            msgCount = 0;
+            ErrorCount = 0;
+            WarningCount = 0;
+            MessageCount = 0;
             foreach (var item in _AllErrors)
             {
                 switch (item.Type)
                 {
                     case ErrorType.Error:
-                        errCount++;
+                        ErrorCount++;
                         break;
                     case ErrorType.Warning:
-                        warCount++;
+                        WarningCount++;
                         break;
                     case ErrorType.Message:
-                        msgCount++;
+                        MessageCount++;
                         break;
                 }
             }
@@ -253,11 +258,10 @@ namespace Skill.Studio.Controls
 
         private void SetButtonTexts()
         {
-            int errCount, warCount, msgCount;
-            GetErrorCount(out errCount, out warCount, out msgCount);
-            _TxtErrors.Text = (errCount > 0) ? string.Format("Errors ({0})", errCount) : "Errors";
-            _TxtWarnings.Text = (warCount > 0) ? string.Format("Warnings ({0})", warCount) : "Warnings";
-            _TxtMessages.Text = (msgCount > 0) ? string.Format("Messages ({0})", msgCount) : "Messages";
+            UpdateErrorCount();
+            _TxtErrors.Text = (ErrorCount > 0) ? string.Format("Errors ({0})", ErrorCount) : "Errors";
+            _TxtWarnings.Text = (WarningCount > 0) ? string.Format("Warnings ({0})", WarningCount) : "Warnings";
+            _TxtMessages.Text = (MessageCount > 0) ? string.Format("Messages ({0})", MessageCount) : "Messages";
         }
 
         #endregion

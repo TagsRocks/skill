@@ -48,6 +48,8 @@ namespace Skill.Studio.AI
             }
         }
 
+        public override bool IsValidable { get { return true; } }
+
         private void SetValid(bool value)
         {
             ((Skill.DataModels.AI.Condition)Model).IsValid = value;

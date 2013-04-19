@@ -93,7 +93,7 @@ namespace Skill.Framework.Dynamics
         protected override void Update()
         {
             if (Time.timeScale == 0) return;
-            if (_DestroyTW.EnabledAndOver)
+            if (_DestroyTW.IsEnabledAndOver)
             {
                 _DestroyTW.End();
                 CacheSpawner.DestroyCache(gameObject);

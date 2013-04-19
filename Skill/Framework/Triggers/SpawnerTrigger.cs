@@ -35,7 +35,7 @@ namespace Skill.Framework.Triggers
         /// </summary>
         protected virtual void Update()
         {
-            if (_DelayTW.EnabledAndOver)
+            if (_DelayTW.IsEnabledAndOver)
             {
                 _DelayTW.End();
                 if (Spawners != null)

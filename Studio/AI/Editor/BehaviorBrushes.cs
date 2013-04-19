@@ -100,5 +100,31 @@ namespace Skill.Studio.AI.Editor
                 return _DefaultBorderBrush;
             }
         }
+
+        private static Brush _DebugTextBrush;
+        public static Brush DebugTextBrush
+        {
+            get
+            {
+                if (_DebugTextBrush == null)
+                {
+                    _DebugTextBrush = Brushes.Black;
+                }
+                return _DebugTextBrush;
+            }
+        }
+
+        private static Brush _DefaultTextBrush;
+        public static Brush DefaultTextBrush
+        {
+            get
+            {
+                if (_DefaultTextBrush == null)
+                {
+                    _DefaultTextBrush = Brushes.White;
+                }
+                return _DefaultTextBrush;
+            }
+        }
     }
 }

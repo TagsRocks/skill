@@ -119,50 +119,7 @@ namespace Skill.Framework
             if (Cached != null)
                 Cached(sender, args);
         }
-    }
-
-
-    /// <summary>
-    /// containing hit event data.
-    /// </summary>
-    public class HitEventArgs : EventArgs
-    {
-        /// <summary> Hit information </summary>
-        public HitInfo Hit { get; private set; }
-
-        /// <summary>
-        /// Create HitEventArgs
-        /// </summary>
-        /// <param name="hit"> Hit information </param>
-        public HitEventArgs(HitInfo hit)
-        {
-            this.Hit = hit;
-        }
-    }
-
-    /// <summary>
-    /// containing damage event data.
-    /// </summary>
-    public class DamageEventArgs : EventArgs
-    {
-        /// <summary> Amount of damage </summary>
-        public float Damage { get; private set; }
-
-        /// <summary>
-        /// Tag of object that cause damage
-        /// </summary>
-        public string Tag { get; private set; }
-
-        /// <summary>
-        /// Create DamageEventArgs
-        /// </summary>
-        /// <param name="damage"> Amount of damage </param>
-        public DamageEventArgs(float damage, string tag)
-        {
-            this.Damage = damage;
-            this.Tag = tag;
-        }
-    }
+    }    
 
     /// <summary>
     /// Handle a ray or somthing Hit this GameObject

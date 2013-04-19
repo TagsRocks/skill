@@ -29,7 +29,7 @@ namespace Skill.Framework.Modules
         /// </summary>
         protected override void Update()
         {
-            if (_StartTW.EnabledAndOver)
+            if (_StartTW.IsEnabledAndOver)
             {
                 if (this.renderer != null)
                     this.renderer.enabled = true;

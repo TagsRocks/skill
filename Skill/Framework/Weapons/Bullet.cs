@@ -44,6 +44,9 @@ namespace Skill.Framework.Weapons
         /// </summary>
         public float Range { get; set; }
 
+        /// <summary> User Data </summary>
+        public object UserData { get; set; }
+
         /// <summary> Target of projectile </summary>
         public Vector3? Target { get; set; }
 
@@ -76,7 +79,7 @@ namespace Skill.Framework.Weapons
         /// </summary>
         protected override void Update()
         {
-            if (_LifeTimeTW.EnabledAndOver) OnDie();
+            if (_LifeTimeTW.IsEnabledAndOver) OnDie();
             base.Update();
         }
 
@@ -93,7 +96,7 @@ namespace Skill.Framework.Weapons
                 EventManager eventManager = cp.otherCollider.GetComponent<EventManager>();
                 if (eventManager != null)
                 {
-                    eventManager.OnDamage(this, new DamageEventArgs(this.Damage, tag));
+                    eventManager.OnDamage(this, new DamageEventArgs(this.Damage, tag) { UserData = this.UserData });
                 }
                 OnDie();
             }
@@ -113,7 +116,7 @@ namespace Skill.Framework.Weapons
                 EventManager eventManager = other.GetComponent<EventManager>();
                 if (eventManager != null)
                 {
-                    eventManager.OnDamage(this, new DamageEventArgs(this.Damage, tag));
+                    eventManager.OnDamage(this, new DamageEventArgs(this.Damage, tag) { UserData = this.UserData });
                 }
                 OnDie();
             }

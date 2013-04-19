@@ -19,7 +19,7 @@ namespace Skill.Studio.Controls
     /// <summary>
     /// Interaction logic for ProjectExplorer.xaml
     /// </summary>
-    public partial class ProjectExplorer : AvalonDock.DockableContent
+    public partial class ProjectExplorer : UserControl, INotifyPropertyChanged
     {
 
         #region Variables
@@ -599,5 +599,21 @@ namespace Skill.Studio.Controls
             }
         }
         #endregion
+
+        #region INotifyPropertyChanged Members
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            if (this.PropertyChanged != null)
+                this.PropertyChanged(this, e);
+        }
+
+        protected void RaisePropertyChanged(string propertyName)
+        {
+            OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+        }
+        #endregion // INotifyPropertyChanged Members
     }
 }

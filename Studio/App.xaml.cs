@@ -13,16 +13,7 @@ namespace Skill.Studio
     public partial class App : Application
     {
         protected override void OnStartup(StartupEventArgs e)
-        {
-            //string theme = Skill.Studio.Properties.Settings.Default.Theme;
-            //if (string.IsNullOrEmpty(theme))
-            //{
-            //    theme = Skill.Studio.Themes.ThemeManager.GetThemes()[0];
-            //}
-            //Skill.Studio.Themes.ThemeManager.ApplyTheme(this, theme);
-
-            AvalonDock.ThemeFactory.ChangeTheme(new Uri("/AvalonDock.Themes;component/themes/dev2010.xaml", UriKind.RelativeOrAbsolute));
-
+        {            
             string file = null;
             if (e.Args != null && e.Args.Length > 0)
             {

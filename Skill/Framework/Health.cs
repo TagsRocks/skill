@@ -98,6 +98,9 @@ namespace Skill.Framework
             }
         }
 
+        /// <summary> Retrieve tag of last object that caused damage to this health </summary>
+        public string LastCausedDamage { get; private set; }
+
         /// <summary>
         /// Whether agent is dead or not.
         /// </summary>
@@ -165,9 +168,9 @@ namespace Skill.Framework
         protected virtual void OnHit(object sender, HitEventArgs args)
         {
             if (Events != null)
-                Events.OnDamage(sender, new DamageEventArgs(args.Hit.Damage, args.Hit.Tag));
+                Events.OnDamage(sender, new DamageEventArgs(args.Damage, args.Tag) { UserData = args.UserData });
 
-            if (args.Hit.CauseParticle)
+            if (args.CauseParticle)
             {
                 if (HitParticles != null)
                 {
@@ -177,8 +180,8 @@ namespace Skill.Framework
                         GameObject particle = HitParticles[selectedParticle];
                         if (particle != null)
                         {
-                            Vector3 normal = InverseHit ? -args.Hit.Normal : args.Hit.Normal;
-                            CacheSpawner.Spawn(particle, args.Hit.Point, Quaternion.LookRotation(normal));
+                            Vector3 normal = InverseHit ? -args.Normal : args.Normal;
+                            CacheSpawner.Spawn(particle, args.Point, Quaternion.LookRotation(normal));
                         }
                     }
                 }
@@ -190,8 +193,8 @@ namespace Skill.Framework
                         GameObject decal = Decals[selectedDecale];
                         if (decal != null)
                         {
-                            Vector3 normal = InverseHit ? -args.Hit.Normal : args.Hit.Normal;
-                            CacheSpawner.Spawn(decal, args.Hit.Point + DecalOffset * args.Hit.Normal, Quaternion.Euler(args.Hit.Normal));
+                            Vector3 normal = InverseHit ? -args.Normal : args.Normal;
+                            CacheSpawner.Spawn(decal, args.Point + DecalOffset * args.Normal, Quaternion.Euler(args.Normal));
                         }
                     }
                 }
@@ -246,8 +249,8 @@ namespace Skill.Framework
         /// <param name="args"> An DamageEventArgs that contains damage event data.</param>
         protected virtual void OnDamage(object sender, DamageEventArgs args)
         {
-            if (IsDead) return;
-
+            if (IsDead || _CurrentHealth <= 0) return;
+            LastCausedDamage = args.Tag;
             // Take no damage if invincible, dead, or if the damage is zero
             if (Invincible)
                 return;
@@ -265,7 +268,7 @@ namespace Skill.Framework
         protected override void Update()
         {
             if (Time.timeScale == 0) return;
-            if (_DieDelayTW.Enabled)
+            if (_DieDelayTW.IsEnabled)
             {
                 if (_DieDelayTW.IsOver)
                 {
@@ -288,7 +291,7 @@ namespace Skill.Framework
         {
             if (RegenerateSpeed != 0.0f)
             {
-                if (_RegenerateDelayTW.Enabled)
+                if (_RegenerateDelayTW.IsEnabled)
                 {
                     if (_RegenerateDelayTW.IsOver || RegenerateSpeed < 0)
                     {

@@ -22,8 +22,6 @@ namespace Skill.Studio.Controls
     public partial class StartPage : TabDocument
     {
 
-
-
         public RecentProjectInfoCollection RecentProjects { get; private set; }
 
         public StartPage()
@@ -37,6 +35,7 @@ namespace Skill.Studio.Controls
 
             _CbCloseAfterLoad.Click += new RoutedEventHandler(_CbCloseAfterLoad_Click);
             _CbShowOnStartup.Click += new RoutedEventHandler(_CbShowOnStartup_Click);
+            SetChanged(false);
         }
 
         public void LoadRecents()

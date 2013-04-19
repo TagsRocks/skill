@@ -13,6 +13,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using AvalonDock;
+using AvalonDock.Layout;
+using AvalonDock.Layout.Serialization;
 using System.ComponentModel;
 using Microsoft.Win32;
 
@@ -61,9 +63,8 @@ namespace Skill.Studio
         public static string ProjectAddressToOpen { get; set; }
         public static MainWindow Instance { get; private set; }
 
-
+        private Controls.LayoutDocument _StartPageDocument = null;
         private Controls.StartPage _StartPage = null;
-
         #endregion
 
         #region Properties
@@ -119,7 +120,6 @@ namespace Skill.Studio
             this.WindowState = System.Windows.WindowState.Maximized;
 #endif
             Instance = this;
-            _DocumentCloseHandler = new EventHandler<CancelEventArgs>(this.TabDocument_Closing);
 
             if (ProjectAddressToOpen != null)
             {
@@ -130,20 +130,38 @@ namespace Skill.Studio
             {
                 ShowStartPage();
             }
-            _DockManager.DeserializationCallback = CustomDeserializationCallbackHandler;
             _DockManager.Loaded += new RoutedEventHandler(_DockManager_Loaded);
-            _DockManager.DocumentClosed += new EventHandler(_DockManager_DocumentClosed);
-            DocumentPane_DocsCenter.SelectionChanged += new SelectionChangedEventHandler(DocumentPane_DocsCenter_SelectionChanged);
+            _DockManager.DocumentClosed += _DockManager_DocumentClosed;
+            _DockManager.DocumentClosing += _DockManager_DocumentClosing;
+            DocumentPane_DocsCenter.ChildrenCollectionChanged += DocumentPane_DocsCenter_ChildrenCollectionChanged;
         }
 
-        void DocumentPane_DocsCenter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        void _DockManager_DocumentClosing(object sender, DocumentClosingEventArgs e)
         {
-            //_PropertyGrid.SetViewModel(null);
+            if (e.Document is Controls.LayoutDocument)
+            {
+                TabDocument doc = ((Controls.LayoutDocument)e.Document).Document;
+                if (doc.IsChanged)
+                {
+                    if (!AskForSave(doc))
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
+                }
+                doc.UnLoad();
+                _Documents.Remove(doc);
+            }
         }
 
-        void _DockManager_DocumentClosed(object sender, EventArgs e)
+        void DocumentPane_DocsCenter_ChildrenCollectionChanged(object sender, EventArgs e)
         {
-            _PropertyGrid.SetViewModel(null);
+            ApplicationCommands.Properties.Execute(null, null);
+        }
+
+        void _DockManager_DocumentClosed(object sender, DocumentClosedEventArgs e)
+        {
+            ApplicationCommands.Properties.Execute(null, null);
         }
 
         void _DockManager_Loaded(object sender, RoutedEventArgs e)
@@ -155,57 +173,48 @@ namespace Skill.Studio
 
         #region Layout
 
-        private void CustomDeserializationCallbackHandler(object sender, DeserializationCallbackEventArgs e)
-        {
-
-            //if (IsProjectLoaded)
-            //{
-            //    string localFileName = Project.FindFirstLocalFileName(e.Name);
-            //    if (localFileName != null)
-            //    {
-            //        TabDocument doc = OpenContent(localFileName);
-            //        e.Content = doc;
-            //    }
-            //}
-
-            switch (e.Name)
-            {
-                case "StartPage":
-                    CreateStartPage();
-                    e.Content = _StartPage;
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        public string LayoutFile { get { return System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skill\\Layout.Xml"); } }
+        public string LayoutFile { get { return System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skill\\Layout.xml"); } }
 
         private void SaveLayout()
         {
-            string layoutFilename = LayoutFile;
-            string dir = System.IO.Path.GetDirectoryName(layoutFilename);
-            if (!System.IO.Directory.Exists(dir))
-                System.IO.Directory.CreateDirectory(dir);
-            _DockManager.SaveLayout(LayoutFile);
+
+            /////////// ********* i down know why this code does not work !!!  ********* //////////////////
+
+            //string layoutFilename = LayoutFile;
+            //string dir = System.IO.Path.GetDirectoryName(layoutFilename);
+            //if (!System.IO.Directory.Exists(dir))
+            //    System.IO.Directory.CreateDirectory(dir);
+
+            //XmlLayoutSerializer serializer = new XmlLayoutSerializer(_DockManager);
+            //if (System.IO.File.Exists(layoutFilename))
+            //    System.IO.File.Delete(layoutFilename);
+
+            //System.IO.FileStream file = new System.IO.FileStream(layoutFilename, System.IO.FileMode.Create, System.IO.FileAccess.ReadWrite);
+            //System.IO.StreamWriter stream = new System.IO.StreamWriter(file);
+            //serializer.Serialize(stream);
+            //stream.Dispose();
+            //file.Dispose();
         }
         private void RestoreLayout()
         {
-            if (IsProjectLoaded)
-            {
-                if (System.IO.File.Exists(LayoutFile))
-                {
-                    try
-                    {
-                        _DockManager.RestoreLayout(LayoutFile);
-                    }
-                    catch (Exception ex)
-                    {
-                        ShowError(ex.Message);
-                        System.IO.File.Delete(LayoutFile);
-                    }
-                }
-            }
+            //if (IsProjectLoaded)
+            //{
+            //    if (System.IO.File.Exists(LayoutFile))
+            //    {
+            //        try
+            //        {
+            //            //var currentContentsList = _DockManager.Layout.Descendents().OfType<LayoutContent>().Where(c => c.ContentId != null).ToArray();
+            //            XmlLayoutSerializer serializer = new XmlLayoutSerializer(_DockManager);
+            //            using (var stream = new System.IO.StreamReader(LayoutFile))
+            //                serializer.Deserialize(stream);
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            ShowError(ex.Message);
+            //            System.IO.File.Delete(LayoutFile);
+            //        }
+            //    }
+            //}
         }
 
         #endregion
@@ -216,9 +225,14 @@ namespace Skill.Studio
         {
             if (_StartPage == null)
             {
-                _StartPage = new Controls.StartPage() { Name = "StartPage" };
-                _StartPage.Closing += new EventHandler<CancelEventArgs>(_StartPage_Closing);
+                _StartPage = new Controls.StartPage();
+                _StartPageDocument = new Controls.LayoutDocument(_StartPage) { Title = "Start Page" };
             }
+        }
+
+        void _StartPage_Closed(object sender, EventArgs e)
+        {
+            DocumentPane_DocsCenter.Children.Remove(_StartPageDocument);
         }
 
         private void ShowStartPage()
@@ -227,31 +241,22 @@ namespace Skill.Studio
             if (_StartPage != null)
             {
                 _StartPage.LoadRecents();
-                if (!DocumentPane_DocsCenter.Items.Contains(_StartPage))
+                if (!DocumentPane_DocsCenter.Children.Contains(_StartPageDocument))
                 {
-                    DocumentPane_DocsCenter.Items.Add(_StartPage);
+                    DocumentPane_DocsCenter.Children.Add(_StartPageDocument);
                 }
                 else
                 {
-                    _StartPage.Show();
+                    DocumentPane_DocsCenter.SelectedContentIndex = DocumentPane_DocsCenter.IndexOf(_StartPageDocument);
                 }
             }
         }
 
-        void _StartPage_Closing(object sender, CancelEventArgs e)
-        {
-            if (sender == _StartPage)
-            {
-                CloseStartPage();
-            }
-        }
-
-        void CloseStartPage()
+        private void CloseStartPage()
         {
             if (_StartPage != null)
             {
-                DocumentPane_DocsCenter.Items.Remove(_StartPage);
-                _StartPage = null;
+                _StartPageDocument.Close();
             }
         }
         #endregion
@@ -263,7 +268,7 @@ namespace Skill.Studio
         private void ChangeTitle()
         {
             if (IsProjectLoaded)
-                Title = string.Format("{0} - {1}", _ProjectExplorer.CurrentProject.Model.Name, Properties.Resources.AppTitle);
+                Title = string.Format("{0} - {1}", Project.Model.Name, Properties.Resources.AppTitle);
             else
                 Title = string.Format(Properties.Resources.AppTitle);
         }
@@ -320,6 +325,7 @@ namespace Skill.Studio
                 doc.UnLoad();
             }
             _Documents.Clear();
+            DocumentPane_DocsCenter.Children.Clear();
             ApplicationCommands.Properties.Execute(null, null);
             return true;
         }
@@ -344,12 +350,12 @@ namespace Skill.Studio
         }
         void NewCmdExecuted(object target, ExecutedRoutedEventArgs e)
         {
-            if (CloseAllDocuments())
+            ProjectWizard wizard = new ProjectWizard();
+            wizard.Owner = this;
+            wizard.ShowDialog();
+            if (wizard.DialogResult == true)
             {
-                ProjectWizard wizard = new ProjectWizard();
-                wizard.Owner = this;
-                wizard.ShowDialog();
-                if (wizard.DialogResult == true)
+                if (CloseAllDocuments())
                 {
                     _ProjectExplorer.New(wizard.ProjectInfo);
                     if (Project != null)
@@ -486,7 +492,7 @@ namespace Skill.Studio
                 ShowError("Invalid plugin. Please select valid plugin.");
                 return;
             }
-            CheckErrors();
+            Compile();
             if (_ErrorList.GetErrorCount(Skill.Studio.Compiler.ErrorType.Error) == 0)
             {
                 BackupRestore backup = new BackupRestore();
@@ -542,15 +548,18 @@ namespace Skill.Studio
         }
         void CheckForErrorsCmdExecuted(object target, ExecutedRoutedEventArgs e)
         {
-            CheckErrors();
+            Compile();
         }
 
-        private void CheckErrors()
+        public void Compile()
         {
             SaveAllDocuments();
             _ErrorList.CheckForErrors();
             _StatusText.Text = "Ready";
         }
+
+        internal Controls.ErrorList ErrorList { get { return _ErrorList; } }        
+
         #endregion
 
         #region Undo
@@ -670,9 +679,6 @@ namespace Skill.Studio
             if (!dir.Exists)
             {
                 return;
-                //throw new System.IO.DirectoryNotFoundException(
-                //    "Source directory does not exist or could not be found: "
-                //    + sourceDirName);
             }
 
             if (!System.IO.Directory.Exists(destDirName))
@@ -693,70 +699,25 @@ namespace Skill.Studio
                 DirectoryCopy(subdir.FullName, temppath, overWrite);
             }
         }
-
-
-        //private void CopyFile(string projectName, string filename, bool overWrite)
-        //{
-        //    string destinaion = Project.GetDesignerOutputPath(filename);
-
-        //    if (System.IO.File.Exists(destinaion) && !overWrite)
-        //        return;
-
-        //    string appDir = AppDomain.CurrentDomain.BaseDirectory;
-
-        //    string name = System.IO.Path.GetFileNameWithoutExtension(filename);
-
-        //    string filePath = System.IO.Path.Combine(appDir, string.Format("../../../{0}/bin/Debug", projectName), filename);
-
-        //    Project.CreateDirectory(destinaion);
-
-        //    if (System.IO.File.Exists(filePath))
-        //    {
-        //        System.IO.File.Copy(filePath, destinaion, overWrite);
-        //    }
-        //}
-
-        //private void CopyEditorFile(string projectName, string filename, bool overWrite)
-        //{
-        //    string destinaion = Project.GetEditorOutputPath(System.IO.Path.Combine("Skill", filename));
-
-        //    if (System.IO.File.Exists(destinaion) && !overWrite)
-        //        return;
-
-        //    string appDir = AppDomain.CurrentDomain.BaseDirectory;
-
-        //    string name = System.IO.Path.GetFileNameWithoutExtension(filename);
-
-        //    string filePath = System.IO.Path.Combine(appDir, string.Format("../../../{0}/bin/Debug", projectName), filename);
-
-        //    Project.CreateDirectory(destinaion);
-
-        //    if (System.IO.File.Exists(filePath))
-        //    {
-        //        System.IO.File.Copy(filePath, destinaion, true);
-        //    }
-
-        //}
-
         #endregion
 
         #region Menu
 
         private void Mnu_ShowProjectExplorer_Click(object sender, RoutedEventArgs e)
         {
-            _ProjectExplorer.Show(_DockManager);
+            _ProjectExplorerAnchorable.Show();
             e.Handled = true;
         }
 
         private void Mnu_ShowProperties_Click(object sender, RoutedEventArgs e)
         {
-            _PropertyGrid.Show(_DockManager);
+            _PropertyGridAnchorable.Show();
             e.Handled = true;
         }
 
         private void Mnu_ShowErrorList_Click(object sender, RoutedEventArgs e)
         {
-            _ErrorList.Show(_DockManager);
+            _ErrorListAnchorable.Show();
             e.Handled = true;
         }
 
@@ -813,15 +774,14 @@ namespace Skill.Studio
         #region Documents
         // list of openet documents for edit
         List<TabDocument> _Documents = new List<TabDocument>();
-        EventHandler<CancelEventArgs> _DocumentCloseHandler;
         // get selected active document
         TabDocument GetSelectedDocument()
         {
             if (DocumentPane_DocsCenter == null) return null;
-            if (DocumentPane_DocsCenter.SelectedItem != null)
+            if (DocumentPane_DocsCenter.SelectedContent != null)
             {
-                if (DocumentPane_DocsCenter.SelectedItem is TabDocument)
-                    return (TabDocument)DocumentPane_DocsCenter.SelectedItem;
+                if (DocumentPane_DocsCenter.SelectedContent is Controls.LayoutDocument)
+                    return ((Controls.LayoutDocument)DocumentPane_DocsCenter.SelectedContent).Document;
             }
             return null;
         }
@@ -869,15 +829,13 @@ namespace Skill.Studio
                 }
                 if (docToShow != null)
                 {
-                    DocumentPane_DocsCenter.Items.Add(docToShow);
+                    DocumentPane_DocsCenter.Children.Add(docToShow.ParentDocument);
                     _Documents.Add(docToShow);
-                    docToShow.Closing += _DocumentCloseHandler;
                 }
             }
             if (docToShow != null)
             {
-                DocumentPane_DocsCenter.SelectedItem = docToShow;
-                docToShow.Show(_DockManager);
+                DocumentPane_DocsCenter.SelectedContentIndex = DocumentPane_DocsCenter.IndexOfChild(docToShow.ParentDocument);
             }
             return docToShow;
         }
@@ -892,29 +850,9 @@ namespace Skill.Studio
             {
                 if (item.ViewModel == vm)
                 {
-                    item.Close();
+                    item.ParentDocument.Close();
                     return;
                 }
-            }
-        }
-
-        void TabDocument_Closing(object sender, CancelEventArgs e)
-        {
-            if (sender is TabDocument)
-            {
-                TabDocument doc = (TabDocument)sender;
-                if (doc.IsChanged)
-                {
-                    if (!AskForSave(doc))
-                    {
-                        e.Cancel = true;
-                        return;
-                    }
-                }
-                doc.Closing -= _DocumentCloseHandler;
-                doc.UnLoad();
-                _Documents.Remove(doc);
-                DocumentPane_DocsCenter.Items.Remove(doc);
             }
         }
 
@@ -924,14 +862,13 @@ namespace Skill.Studio
         /// <returns>True if user save file, and false if user cancel save</returns>
         private bool AskForSave(TabDocument doc)
         {
-            var result = System.Windows.MessageBox.Show(this, "Save changes to " + doc.Title, Properties.Resources.Save,
+            var result = System.Windows.MessageBox.Show(this, "Save changes to " + doc.Name, Properties.Resources.Save,
                    System.Windows.MessageBoxButton.YesNoCancel, System.Windows.MessageBoxImage.Question, System.Windows.MessageBoxResult.No);
             if (result == System.Windows.MessageBoxResult.Yes)
                 doc.Save();
             else if (result == System.Windows.MessageBoxResult.Cancel)
                 return false;
 
-            doc.UnLoad();
             return true;
         }
         #endregion
@@ -965,8 +902,5 @@ namespace Skill.Studio
         }
 
         #endregion
-
-
-
     }
 }

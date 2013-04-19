@@ -11,7 +11,7 @@
              xmlns:my="clr-namespace:Skill.Studio.Controls"             
              xmlns:bedit="clr-namespace:Skill.Studio.AI.Editor"             
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="700" x:Name="BTEditor" Title="BehaviorTree Editor"  >
+             d:DesignHeight="300" d:DesignWidth="900" x:Name="BTEditor" >
 
     <sk:TabDocument.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Undo"
@@ -62,6 +62,11 @@
                 <MenuItem Header="Condition" Click="Mnu_NewCondition_Click" Tag="{x:Static dmai:BehaviorType.Condition}"  >
                     <MenuItem.Icon>
                         <my:ButtonImage NormalImage="{StaticResource ImgCondition}" DisableImage="{StaticResource ImgCondition_D}" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Change State" Click="Mnu_NewChangeState_Click" Tag="{x:Static dmai:BehaviorType.ChangeState}" >
+                    <MenuItem.Icon>
+                        <my:ButtonImage NormalImage="{StaticResource ImgChangeState}" DisableImage="{StaticResource ImgChangeState_D}" />
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Header="Decorators" >
@@ -134,6 +139,11 @@
                         <my:ButtonImage NormalImage="{StaticResource ImgCondition}" DisableImage="{StaticResource ImgCondition_D}" />
                     </MenuItem.Icon>
                 </MenuItem>
+                <MenuItem Header="Change States" ItemsSource="{Binding BehaviorTree.ChangeStates}" ItemContainerStyle="{StaticResource MenuClickStyle}" >
+                    <MenuItem.Icon>
+                        <my:ButtonImage NormalImage="{StaticResource ImgChangeState}" DisableImage="{StaticResource ImgChangeState_D}" />
+                    </MenuItem.Icon>
+                </MenuItem>
                 <MenuItem Header="Decorators" ItemsSource="{Binding BehaviorTree.Decorators}" ItemContainerStyle="{StaticResource MenuClickStyle}" >
                     <MenuItem.Icon>
                         <my:ButtonImage NormalImage="{StaticResource ImgDecorator}" DisableImage="{StaticResource ImgDecorator_D}" />
@@ -151,39 +161,51 @@
             <MenuItem Header="Delete" Command="ApplicationCommands.Delete"/>
         </ContextMenu>
     </sk:TabDocument.Resources>
-    <Grid Background="LightGray" MouseDown="Back_MouseDown"  >
-        <TabControl Grid.Row="1" >
-            <TabItem Header="Tree View" >
+    <Grid Background="White" MouseDown="Back_MouseDown" >
+        <TabControl x:Name="_Tb" Grid.Row="1" SelectionChanged="Tb_SelectionChanged" >
+            <TabItem Header="Design" ToolTip="Edit and Design tree" >
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
+                        <RowDefinition Height="32" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Background="{StaticResource ToolbarBackColor}" >
-                        <Menu Height="20" Background="{StaticResource ToolbarBackColor}" VerticalAlignment="Center" >
-                            <MenuItem Header="Edit">
-                                <MenuItem.Resources>
-                                    <DataTemplate DataType="{x:Type  vm:BehaviorViewModel}">
-                                        <TextBlock Text="{Binding Name}"/>
-                                    </DataTemplate>
-                                    <Style x:Key="MenuStateStyle" >
-                                        <Setter Property="MenuItem.Tag" Value="{Binding}" />
-                                        <Setter Property="MenuItem.IsChecked" Value="{Binding IsSelectedState, Mode=OneWay}" />
-                                        <EventSetter Event="MenuItem.Click" Handler="Mnu_ChangeState_Click" />
+                    <ToolBar Grid.Row="0" Grid.Column="0" Background="{StaticResource ToolbarBackColor}" >
+                        <ToolBarPanel Orientation="Horizontal" Margin="2,0,6,0" >
+                            <TextBlock Text="States : " VerticalAlignment="Center" x:Name="_Txt" />
+                            <ComboBox MinWidth="140" ItemsSource="{Binding BehaviorTree.States}" SelectionChanged="CmbStates_Changed" x:Name="_CmbStates" VerticalAlignment="Center" >
+                                <ComboBox.Resources>
+                                    <Style TargetType="TextBlock" x:Key="TxtStyle" >
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsDefaultState}" Value="true" >
+                                                <Setter Property="Foreground" Value="Blue" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
                                     </Style>
-                                </MenuItem.Resources>
-                                <MenuItem Header="State" ItemsSource="{Binding BehaviorTree.States}" ItemContainerStyle="{StaticResource MenuStateStyle}" />
-                                <MenuItem Header="Add New State" Click="MnuAddState_Click" />
-                                <MenuItem Header="Delete State" Click="MnuDeleteState_Click" />
-                                <MenuItem x:Name="ischecked" Header="Set as Default State" IsChecked="{Binding IsDefaultStateSelected, Mode=OneWay}" Click="MnuSetasDefaultState_Click" />
-                                <Separator/>
-                                <MenuItem Header="AccessKeys" Click="Mnu_EditAccessKeys_Click" />
-                            </MenuItem>
-                            <MenuItem Header="Show">
-                                <MenuItem Header="Parameters" Click="Mnu_ShowParameters_Click" IsChecked="{Binding BehaviorTree.ShowParameters}" />
-                            </MenuItem>
-                        </Menu>
-                    </StackPanel>
+                                    <DataTemplate DataType="{x:Type  vm:BehaviorViewModel}">
+                                        <TextBlock Text="{Binding Name}" Style="{StaticResource TxtStyle}" />
+                                    </DataTemplate>
+                                </ComboBox.Resources>
+                            </ComboBox>
+                        </ToolBarPanel>
+                        <Separator Width="2" Background="Gray" />
+                        <ToolBarPanel Orientation="Horizontal" Margin="4,0,6,0" >
+                            <Button ToolTip="Add New State"  Click="BtnAddNewState_Click" Margin="2,2,0,2" >
+                                <Image Source="{StaticResource ImgAdd2}" />
+                            </Button>
+                            <Button ToolTip="Delete State" Click="BtnDeleteState_Click" Margin="2,2,0,2">
+                                <Image Source="{StaticResource ImgDelete2}" />
+                            </Button>
+                            <Button ToolTip="Set as Default State" Click="BtnSetasDefaultState_Click" Margin="2,2,0,2" >
+                                <Image Source="{StaticResource ImgSetAsDefault}" />
+                            </Button>
+                        </ToolBarPanel>
+                        <Separator Width="2" Background="Gray" />
+                        <ToolBarPanel Orientation="Horizontal" Margin="4,0,2,0">
+                            <Button ToolTip="AccessKeys" Click="BtnEditAccessKeys_Click" Margin="2,2,0,2" >
+                                <Image Source="{StaticResource ImgSharedAccessKeys}" />
+                            </Button>
+                        </ToolBarPanel>
+                    </ToolBar>
                     <TreeView Grid.Row="1" ItemsSource="{Binding BehaviorTree.Nodes}" BorderThickness="0" Name="_BTTree" Background="White" 
                   SelectedItemChanged="_BTTree_SelectedItemChanged" Grid.Column="0" ContextMenu="{StaticResource TVContextMenu}"  >
                         <TreeView.ItemContainerStyle>
@@ -213,124 +235,112 @@
                     </TreeView>
                 </Grid>
             </TabItem>
-            <TabItem Header="Grapgh View">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Row="0" Grid.Column="2" >
-                        <ToolBar Grid.Column="0" Grid.ColumnSpan="3" Background="{StaticResource ToolbarBackColor}" >
-                            <ToolBar.Resources>
-                                <Style TargetType="Control" x:Key="BtnStyle" >
-                                    <Setter Property="Width" Value="22" />
-                                    <Setter Property="Height" Value="22" />
-                                    <Setter Property="VerticalAlignment" Value="Center" />
-                                    <Setter Property="HorizontalAlignment" Value="Center" />
-                                    <Setter Property="Margin" Value="2,0" />
-                                </Style>
-                            </ToolBar.Resources>
-                            <my:ToggleMediaButton x:Name="_BtnPlayStop" NormalImage="{StaticResource ImgPlayStopBtn}" PressedImage="{StaticResource ImgPlayStopPressedBtn}" HoverImage="{StaticResource ImgPlayStopHoverBtn}" Style="{StaticResource BtnStyle}" Click="BtnPlayStop_Click" />
-                            <my:ToggleMediaButton x:Name="_BtnPause" NormalImage="{StaticResource ImgPauseBtn}" PressedImage="{StaticResource ImgPausePressedBtn}" HoverImage="{StaticResource ImgPauseHoverBtn}" Style="{StaticResource BtnStyle}" Click="BtnPause_Click" />
-                            <my:MediaButton IsEnabled="{Binding IsChecked,ElementName=_BtnPause}" x:Name="_BtnStep" NormalImage="{StaticResource ImgStepBtn}" PressedImage="{StaticResource ImgStepPressedBtn}" HoverImage="{StaticResource ImgStepHoverBtn}" Style="{StaticResource BtnStyle}" Click="BtnStep_Click" />
-                            <ComboBox x:Name="_CmbTimeInterval" ItemsSource="{Binding TimeIntervals,ElementName=BTEditor }" Style="{StaticResource BtnStyle}" Width="60" SelectionChanged="CmbTimeInterval_SelectionChanged" />
-                            <TextBlock Text="{Binding BehaviorTree.DebugTimerString, Mode=OneWay}" MinWidth="40" />
-                            <Separator Margin="4,0" />
-                            <CheckBox Content="Animation" IsChecked="{Binding ShowAnimations}" VerticalAlignment="Center" />
-                            <Slider Width="100" Value="{Binding AnimationSize}" Minimum="64" Maximum="194" ToolTip="Animation Size" Margin="4,0,0,0" IsEnabled="{Binding ShowAnimations}" />
-                            <Separator Margin="8,0" />
-                            <Button Click="BtnRefresh_Click" ToolTip="Refresh" HorizontalAlignment="Left" VerticalAlignment="Center" Height="20" Width="20" Margin="2,2,0,2" >
-                                <Image Source="{StaticResource ImgRefresh}" />
-                            </Button>
+            <TabItem Header="Preview" ToolTip="Preview and Test tree" >
+                <Grid >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="2"/>
+                        <ColumnDefinition Width="6*"/>
+                    </Grid.ColumnDefinitions>
+                    <TabControl Grid.Row="0" x:Name="_TbChecks" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0" BorderThickness="1,1,0,0" >
+                        <TabControl.Resources>
+                            <Style TargetType="ListView" >
+                                <Style.Resources>
+                                    <DataTemplate DataType="{x:Type vm:BehaviorViewModel}">
+                                        <CheckBox IsChecked="{Binding IsValid}" Margin="2,0" >
+                                            <TextBlock Text="{Binding Name}"  />
+                                        </CheckBox>
+                                    </DataTemplate>
+                                </Style.Resources>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            </Style>
+                        </TabControl.Resources>
+                        <TabItem >
+                            <TabItem.Header>
+                                <Image Source="{StaticResource ImgCondition}" Width="16" Height="16" ToolTip="Conditions" />
+                            </TabItem.Header>
+                            <ListView ItemsSource="{Binding BehaviorTree.Conditions}" />
+                        </TabItem>
+                        <TabItem >
+                            <TabItem.Header>
+                                <Image Source="{StaticResource ImgDecorator}" Width="16" Height="16" ToolTip="Decorators"  />
+                            </TabItem.Header>
+                            <ListView ItemsSource="{Binding BehaviorTree.Decorators}" />
+                        </TabItem>
+                        <TabItem >
+                            <TabItem.Header>
+                                <Image Source="{StaticResource ImgAction}" Width="16" Height="16" ToolTip="Actions"  />
+                            </TabItem.Header>
+                            <ListView ItemsSource="{Binding BehaviorTree.Actions}"/>
+                        </TabItem>
+                    </TabControl>
+                    <GridSplitter Background="Gray" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch"  />
+                    <Grid Grid.Column="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="32" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <ToolBar Grid.Row="0" Background="{StaticResource ToolbarBackColor}" >
+                            <ToolBarPanel Orientation="Horizontal" >
+                                <my:ToggleMediaButton x:Name="_BtnPlayStop" NormalImage="{StaticResource ImgPlayStopBtn}" PressedImage="{StaticResource ImgStopPressedBtn}" HoverImage="{StaticResource ImgPlayStopHoverBtn}"  Click="BtnPlayStop_Click" Margin="1" ToolTip="Start/Stop Simulation" />
+                                <my:ToggleMediaButton x:Name="_BtnPause" NormalImage="{StaticResource ImgPauseBtn}" PressedImage="{StaticResource ImgPausePressedBtn}" HoverImage="{StaticResource ImgPauseHoverBtn}" Click="BtnPause_Click" Margin="1" ToolTip="Pause Simulation" />
+                                <my:MediaButton IsEnabled="{Binding IsChecked,ElementName=_BtnPause}" x:Name="_BtnStep" NormalImage="{StaticResource ImgStepBtn}" PressedImage="{StaticResource ImgStepPressedBtn}" HoverImage="{StaticResource ImgStepHoverBtn}" Click="BtnStep_Click" Margin="1" ToolTip="Step Simulation" />
+                                <TextBlock Text="TimeStep :" VerticalAlignment="Center" Margin="6,0,2,0" />
+                                <ComboBox x:Name="_CmbTimeInterval" ItemsSource="{Binding TimeIntervals,ElementName=BTEditor }" Width="50" SelectionChanged="CmbTimeInterval_SelectionChanged" Margin="0,3,2,3" />
+                                <TextBlock Text="Timer : " Margin="4,0" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding BehaviorTree.DebugTimerString, Mode=OneWay}" Width="80" Margin="0,0,4,0" VerticalAlignment="Center" Foreground="AliceBlue" FontFamily="Courier New" FontSize="14" />
+                            </ToolBarPanel>
+                            <Separator Width="2" Background="Gray" />
+                            <ToolBarPanel Orientation="Horizontal" >
+                                <TextBlock Text="Animation Size" VerticalAlignment="Center" Margin="4,0,2,0" />
+                                <Slider x:Name="_SliAnims" Width="100" Value="{Binding AnimationSize}" Minimum="64" Maximum="194" ToolTip="Animation Size" Margin="4,0,0,0" VerticalAlignment="Center" />
+                            </ToolBarPanel>
                         </ToolBar>
+                        <Grid Grid.Row="1" >
+                            <xctk:Zoombox x:Name="_Zoombox" >
+                                <ItemsControl ItemsSource="{Binding BehaviorTree.SelectedBehaviors}" >
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <bedit:BehaviorTreeCanvas Editor="{Binding ElementName=BTEditor}"  >
+                                            </bedit:BehaviorTreeCanvas>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.Resources>
+                                        <DataTemplate DataType="{x:Type vm:BehaviorViewModel}"  >
+                                            <bedit:BehaviorBorder ViewModel="{Binding}" x:Name="Bd" >
+                                                <Grid>
+                                                    <Canvas VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  >
+                                                        <Path  Data="{Binding ConnectionToParent}" Stroke="{Binding BorderBrush}" StrokeThickness="{Binding ConnectionStroke}" />
+                                                    </Canvas>
+                                                    <Border Background="{Binding BackBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="2" CornerRadius="{Binding CornerRadius}" Padding="6" MinWidth="80" MinHeight="{Binding MinHeight}" >
+                                                        <StackPanel Orientation="Horizontal" >
+                                                            <Image Source="{Binding ImageName}" Width="16" Height="16" Margin="2,0" />
+                                                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="2,0" Foreground="{Binding TextBrush}" />
+                                                            <CheckBox IsChecked="{Binding IsValid}" Margin="2,0" VerticalAlignment="Center" Visibility="{Binding IsValidable, ConverterParameter=false, Converter={StaticResource BToVisConverter}}" />
+                                                        </StackPanel>
+                                                    </Border>
+                                                </Grid>
+                                            </bedit:BehaviorBorder>
+                                        </DataTemplate>
+                                    </ItemsControl.Resources>
+                                    <ItemsControl.ItemContainerStyle >
+                                        <Style >
+                                            <Setter Property="Canvas.Top" Value="{Binding Path=Y,Mode=TwoWay}" />
+                                            <Setter Property="Canvas.Left" Value="{Binding Path=X,Mode=TwoWay}" />
+                                        </Style>
+                                    </ItemsControl.ItemContainerStyle>
+                                </ItemsControl>
+                            </xctk:Zoombox>
+                            <ItemsControl ItemsSource="{Binding Animations}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,8,0" Height="{Binding AnimationSize}"  Visibility="{Binding ShowAnimations, Converter={StaticResource BToVisConverter}, ConverterParameter=False}" >
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" Margin="0" HorizontalAlignment="Right" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </Grid>
                     </Grid>
-                    <xctk:Zoombox Grid.Row="1" x:Name="_Zoombox" >
-                        <ItemsControl ItemsSource="{Binding BehaviorTree.SelectedBehaviors}" >
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <bedit:BehaviorTreeCanvas Editor="{Binding ElementName=BTEditor}"  >
-                                    </bedit:BehaviorTreeCanvas>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.Resources>
-                                <DataTemplate DataType="{x:Type vm:ActionViewModel}"  >
-                                    <bedit:BehaviorBorder ViewModel="{Binding}" x:Name="Bd" >
-                                        <Grid>
-                                            <Canvas VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  >
-                                                <Path  Data="{Binding ConnectionToP}" Stroke="{Binding BorderBrush}" StrokeThickness="{Binding ConnectionStroke}" />
-                                            </Canvas>
-                                            <Border Background="{Binding BackBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="{Binding ConnectionStroke}" CornerRadius="8" Padding="6" MouseLeftButtonDown="Behavior_MouseLeftButtonDown" MinWidth="80" >
-                                                <StackPanel Orientation="Horizontal" >
-                                                    <Image Source="{Binding ImageName}" Width="16" Height="16" Margin="2,0" />
-                                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="2,0" />
-                                                </StackPanel>
-                                            </Border>
-                                        </Grid>
-                                    </bedit:BehaviorBorder>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type vm:CompositeViewModel}"  >
-                                    <bedit:BehaviorBorder ViewModel="{Binding}" x:Name="Bd" >
-                                        <Grid>
-                                            <Canvas VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  >
-                                                <Path  Data="{Binding ConnectionToP}" Stroke="{Binding BorderBrush}" StrokeThickness="{Binding ConnectionStroke}" />
-                                            </Canvas>
-                                            <Border Background="{Binding BackBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="{Binding ConnectionStroke}" CornerRadius="2" Padding="6" MouseLeftButtonDown="Behavior_MouseLeftButtonDown" MinWidth="80" MinHeight="50" >
-                                                <StackPanel Orientation="Horizontal" >
-                                                    <Image Source="{Binding ImageName}" Width="16" Height="16" Margin="2,0" VerticalAlignment="Center" />
-                                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="2,0" />
-                                                </StackPanel>
-                                            </Border>
-                                        </Grid>
-                                    </bedit:BehaviorBorder>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type vm:DecoratorViewModel}"  >
-                                    <bedit:BehaviorBorder ViewModel="{Binding}" x:Name="Bd" >
-                                        <Grid>
-                                            <Canvas VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  >
-                                                <Path  Data="{Binding ConnectionToP}" Stroke="{Binding BorderBrush}" StrokeThickness="{Binding ConnectionStroke}" />
-                                            </Canvas>
-                                            <Border Background="{Binding BackBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="{Binding ConnectionStroke}" CornerRadius="30" Padding="6" MouseLeftButtonDown="Behavior_MouseLeftButtonDown" MinWidth="80" MinHeight="40"  >
-                                                <StackPanel Orientation="Horizontal" >
-                                                    <Image Source="{Binding ImageName}" Width="16" Height="16" Margin="2,0" VerticalAlignment="Center" />
-                                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="2,0" />
-                                                    <CheckBox IsChecked="{Binding IsValid}" Margin="2,0" VerticalAlignment="Center" />
-                                                </StackPanel>
-                                            </Border>
-                                        </Grid>
-                                    </bedit:BehaviorBorder>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type vm:ConditionViewModel}"  >
-                                    <bedit:BehaviorBorder ViewModel="{Binding}" x:Name="Bd" >
-                                        <Grid>
-                                            <Canvas VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  >
-                                                <Path  Data="{Binding ConnectionToP}" Stroke="{Binding BorderBrush}" StrokeThickness="{Binding ConnectionStroke}" />
-                                            </Canvas>
-                                            <Border Background="{Binding BackBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="{Binding ConnectionStroke}" CornerRadius="8" Padding="6" MouseLeftButtonDown="Behavior_MouseLeftButtonDown" MinWidth="80" >
-                                                <StackPanel Orientation="Horizontal" >
-                                                    <Image Source="{Binding ImageName}" Width="16" Height="16" Margin="2,0" />
-                                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="2,0" />
-                                                    <CheckBox IsChecked="{Binding IsValid}" Margin="2,0" />
-                                                </StackPanel>
-                                            </Border>
-                                        </Grid>
-                                    </bedit:BehaviorBorder>
-                                </DataTemplate>
-                            </ItemsControl.Resources>
-                            <ItemsControl.ItemContainerStyle >
-                                <Style >
-                                    <Setter Property="Canvas.Top" Value="{Binding Path=Y,Mode=TwoWay}" />
-                                    <Setter Property="Canvas.Left" Value="{Binding Path=X,Mode=TwoWay}" />
-                                </Style>
-                            </ItemsControl.ItemContainerStyle>
-                        </ItemsControl>
-                    </xctk:Zoombox>
-                    <ItemsControl ItemsSource="{Binding Animations}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,8,0" Height="{Binding AnimationSize}"  Visibility="{Binding ShowAnimations, Converter={StaticResource BToVisConverter}, ConverterParameter=False}" >
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal" Margin="0" HorizontalAlignment="Right" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                    </ItemsControl>
                 </Grid>
             </TabItem>
         </TabControl>

@@ -178,7 +178,7 @@ namespace Skill.Framework.Animation
                     {
                         if (anim.IsJustBecameRelevant)// if AnimNodeSequence is already enable and was disabled previous frame
                             state.normalizedTime = 0;// force to start from beginning
-                        if (anim.RelevantTime.Enabled && anim.RelevantTime.IsOver)// if reach end of animation : stop it
+                        if (anim.RelevantTime.IsEnabled && anim.RelevantTime.IsOver)// if reach end of animation : stop it
                         {
                             if (anim.WrapMode == UnityEngine.WrapMode.Once)
                                 state.normalizedTime = 0; // stop at first frame

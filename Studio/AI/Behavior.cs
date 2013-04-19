@@ -68,6 +68,25 @@ namespace Skill.Studio.AI
                 }
             }
         }
+
+        private Brush _TextBrush;
+        [Browsable(false)]
+        public Brush TextBrush
+        {
+            get
+            {
+                return _TextBrush;
+            }
+            set
+            {
+                if (_TextBrush != value)
+                {
+                    _TextBrush = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("TextBrush"));
+                }
+            }
+        }
+
         #endregion
 
         #region Debug
@@ -93,9 +112,18 @@ namespace Skill.Studio.AI
             }
         }
 
+        [Browsable(false)]
+        public virtual bool IsValidable { get { return false; } }
+
         #endregion
 
         #region Properties
+
+        [Browsable(false)]
+        public virtual double CornerRadius { get { return 8; } }
+
+        [Browsable(false)]
+        public virtual double MinHeight { get { return 10; } }
 
         [Browsable(false)]
         public override bool IsSelected
@@ -132,12 +160,18 @@ namespace Skill.Studio.AI
             set { Model.IsState = value; }
         }
 
+        private bool _IsDefaultState;
         [Browsable(false)]
         public bool IsDefaultState
         {
-            get
+            get { return _IsDefaultState; }
+            set
             {
-                return Tree.DefaultState == Name;
+                if (_IsDefaultState != value)
+                {
+                    _IsDefaultState = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("IsDefaultState"));
+                }
             }
         }
 
@@ -157,16 +191,16 @@ namespace Skill.Studio.AI
         }
 
 
-        private PathGeometry _ConnectionToP;
+        private PathGeometry _ConnectionToParent;
         [Browsable(false)]
-        public PathGeometry ConnectionToP
+        public PathGeometry ConnectionToParent
         {
-            get { return _ConnectionToP; }
+            get { return _ConnectionToParent; }
             set
             {
-                if (_ConnectionToP != value)
+                if (_ConnectionToParent != value)
                 {
-                    _ConnectionToP = value;
+                    _ConnectionToParent = value;
                     OnPropertyChanged(new PropertyChangedEventArgs("ConnectionToP"));
                 }
             }
@@ -174,10 +208,10 @@ namespace Skill.Studio.AI
 
         private PathFigure _PathFigure;
         private BezierSegment _BezierSegment;
-        private void UpdateConnectionToP()
+        private void UpdateConnectionToParent()
         {
 
-            if (_ConnectionToP == null)
+            if (_ConnectionToParent == null)
             {
                 _PathFigure = new PathFigure();
                 _BezierSegment = new BezierSegment();
@@ -187,11 +221,11 @@ namespace Skill.Studio.AI
             BehaviorViewModel parent = Parent as BehaviorViewModel;
             if (parent != null)
             {
-                double deltaX = parent.X - this.X;
-                double deltaY = parent.Y - this.Y;
+                double deltaX = parent.X - this.X + parent.Width;
+                double deltaY = (parent.Y + parent.Height * 0.5) - (this.Y + this.Height * 0.5);
 
-                Point targetPosition = new Point(OFFSET, Height / 2);
-                Point sourcePosition = new Point(deltaX + parent.Width - OFFSET, deltaY + Height / 2);
+                Point targetPosition = new Point(OFFSET, Height * 0.5);
+                Point sourcePosition = new Point(deltaX - OFFSET, deltaY + this.Height * 0.5);
 
                 deltaX = System.Math.Abs(targetPosition.X - sourcePosition.X) * 0.5;
                 deltaY = System.Math.Abs(targetPosition.Y - sourcePosition.Y) * 0.5;
@@ -204,11 +238,11 @@ namespace Skill.Studio.AI
                 _BezierSegment.Point2 = endBezierPoint;
                 _BezierSegment.Point3 = targetPosition;
 
-                if (_ConnectionToP == null)
+                if (_ConnectionToParent == null)
                 {
                     PathGeometry pathGeometry = new System.Windows.Media.PathGeometry();
                     pathGeometry.Figures.Add(_PathFigure);
-                    this.ConnectionToP = pathGeometry;
+                    this.ConnectionToParent = pathGeometry;
                 }
             }
 
@@ -229,19 +263,19 @@ namespace Skill.Studio.AI
 
         private void UpdateConnection()
         {
-            this.UpdateConnectionToP();
+            this.UpdateConnectionToParent();
             foreach (BehaviorViewModel child in this) if (child != null) child.UpdateConnection();
         }
 
         private double UpdatePosition(double x, double y)
         {
+
             X = x;
 
             double delta;
-            if (Count == 0)
+            if (Count == 0) // this is a leaf node
             {
                 delta = Height;
-                Y = y + delta * 0.5;
             }
             else
             {
@@ -250,14 +284,13 @@ namespace Skill.Studio.AI
                 foreach (BehaviorViewModel child in this)
                 {
                     if (child != null)
-                        delta += child.UpdatePosition(x + Width + MARGINLEFT, y + delta + i * MARGINBOTTOM);
+                        delta += child.UpdatePosition(x + Width + MARGINLEFT, y + delta) + MARGINBOTTOM;
                     i++;
                 }
 
-                delta += (Count - 1) * MARGINBOTTOM;
-
-                Y = y + delta * 0.5;
+                if (Count > 1) delta -= MARGINBOTTOM;
             }
+            Y = y + (delta - Height) * 0.5;
             return delta;
         }
 
@@ -266,31 +299,11 @@ namespace Skill.Studio.AI
         {
             get
             {
-                if (ShowParameters && Parent != null && Model.BehaviorType != BehaviorType.Composite)
+                if (Parent != null && Model.BehaviorType != BehaviorType.Composite)
                     return string.Format("{0} {1}", Name, ((BehaviorViewModel)Parent).GetParametersString(this));
                 else
                     return Name;
             }
-        }
-
-        private bool _ShowParameters;
-        [Browsable(false)]
-        public bool ShowParameters
-        {
-            get { return _ShowParameters; }
-
-            set
-            {
-                if (_ShowParameters != value)
-                {
-                    _ShowParameters = value;
-                    foreach (BehaviorViewModel child in this)
-                        child.ShowParameters = value;
-                    if (Model.BehaviorType != BehaviorType.Composite)
-                        OnPropertyChanged(new PropertyChangedEventArgs("DisplayName"));
-                }
-            }
-
         }
 
         public void RaiseChangeDisplayName()
@@ -402,10 +415,13 @@ namespace Skill.Studio.AI
                     return new ActionViewModel(this, (Skill.DataModels.AI.Action)behavior);
                 case BehaviorType.Condition:
                     return new ConditionViewModel(this, (Skill.DataModels.AI.Condition)behavior);
+                case BehaviorType.ChangeState:
+                    return new ChangeStateViewModel(this, (Skill.DataModels.AI.ChangeState)behavior);
                 case BehaviorType.Decorator:
                     return CreateDecoratorViewModel((Skill.DataModels.AI.Decorator)behavior);
                 case BehaviorType.Composite:
                     return CreateCompositeViewModel((Composite)behavior);
+
             }
             return null;
         }
@@ -495,7 +511,7 @@ namespace Skill.Studio.AI
         #region Browsable Properties
         [DisplayName("Name")]
         [Description("Name of Behavior.")]
-        public string Name
+        public virtual string Name
         {
             get { return Model.Name; }
             set
@@ -714,14 +730,12 @@ namespace Skill.Studio.AI
             this.Insert(index, toAdd);
 
             Tree.RegisterViewModel(toAdd);
-            toAdd.ShowParameters = this.ShowParameters;
 
             foreach (var vm in Tree.GetSharedModel(Model))
             {
                 if (vm != this)
                 {
                     BehaviorViewModel newVM = CreateViewModel(child.Model);
-                    newVM.ShowParameters = this.ShowParameters;
                     vm.Insert(index, newVM);
                 }
             }
@@ -741,6 +755,23 @@ namespace Skill.Studio.AI
             Tree.CreateNewName(behaviorVM);
             return AddBehavior(behaviorVM, null, false, -1);
 
+        }
+
+        /// <summary>
+        /// Create new child (ChangeState)
+        /// </summary>        
+        /// <returns>added child</returns>
+        public BehaviorViewModel AddChangeState()
+        {
+            Skill.DataModels.AI.ChangeState behavior = new Skill.DataModels.AI.ChangeState() { Name = "GoTo State" };
+            if (Tree.States.Count > 0)
+            {
+                behavior.Name = ChangeStateViewModel.CreateName(Tree.States[0].Name);
+                behavior.DestinationState = Tree.States[0].Name;
+            }
+            BehaviorViewModel behaviorVM = CreateViewModel(behavior);
+            Tree.CreateNewName(behaviorVM);
+            return AddBehavior(behaviorVM, null, false, -1);
         }
 
         /// <summary>

@@ -423,7 +423,7 @@ namespace Skill.Framework.Weapons
             if (Time.timeScale == 0) return;
             if (Controller == null)
             {
-                if (_DestroyTW.Enabled)
+                if (_DestroyTW.IsEnabled)
                 {
                     if (_DestroyTW.IsOver)
                     {
@@ -445,7 +445,7 @@ namespace Skill.Framework.Weapons
             else
             {
                 _DestroyTW.End();
-                if (_BusyTW.EnabledAndOver)
+                if (_BusyTW.IsEnabledAndOver)
                 {
                     _BusyTW.End();
                     if (State == WeaponState.Reloading)

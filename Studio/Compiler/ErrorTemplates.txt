@@ -13,7 +13,8 @@ AI:
 			5- Two or more Accesskeys with same name. (this must avoided in editor)						
 			6- CounterLimitAccessKey with zero or less than zero MaxAccessCount.
 			7- TimeLimitAccessKey with with zero or less than zero TimeInterval.
-			8- Two parameters of a Behavior with same name (ignorecase).			
+			8- Two parameters of a Behavior with same name (ignorecase).	
+			9- Invalid DefaultState.		
 
 		Warnings :			
 			1- Composite With no children.

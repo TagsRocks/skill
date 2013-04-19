@@ -12,15 +12,20 @@ namespace Skill.DataModels.AI
     /// </summary>
     public class BehaviorTree : IXElement
     {
+        public const string DefaultDestinationState = "Default";
+
         #region Properties
         /// <summary> Internal Access keys  </summary>
         public SharedAccessKeys AccessKeys { get; private set; }
+
         /// <summary> Root of tree </summary>
-        public PrioritySelector Root { get; private set; }
+        public Behavior[] States { get; set; }
         /// <summary> Name of tree. this name is based on filename and will set after loading from file </summary>
         public string Name { get; set; }
 
-        public double Scale { get; set; }
+        /// <summary> Name of default state </summary>
+        public string DefaultState { get; set; }
+
         public double HorizontalOffset { get; set; }
         public double VerticalOffset { get; set; }
         #endregion
@@ -33,9 +38,8 @@ namespace Skill.DataModels.AI
         {
             this.AccessKeys = new SharedAccessKeys();
             this.Name = "NewBehaviorTree";
-            this.Root = new PrioritySelector();
-            this.Root.Name = "Root";
-            this.Scale = 1;
+            this.States = new Behavior[] { new PrioritySelector() { Name = DefaultDestinationState } };
+            this.DefaultState = DefaultDestinationState;
         }
         #endregion
 
@@ -47,7 +51,15 @@ namespace Skill.DataModels.AI
         /// <returns>True if is in hierarchy, otherwise false</returns>
         public bool IsInHierarchy(Behavior behavior)
         {
-            return IsInHierarchy(Root, behavior);
+            if (States != null)
+            {
+                foreach (var s in States)
+                {
+                    bool result = IsInHierarchy(s, behavior);
+                    if (result) return result;
+                }
+            }
+            return false;
         }
 
         private bool IsInHierarchy(Behavior node, Behavior behavior)
@@ -88,14 +100,20 @@ namespace Skill.DataModels.AI
         public XElement ToXElement()
         {
             List<Behavior> list = new List<Behavior>();
-            CreateList(list, Root);
+
+            if (States != null)
+            {
+                foreach (var s in States)
+                {
+                    CreateList(list, s);
+                }
+            }
             GenerateIds(list); // first regenerate ids for all behaviors
 
             XElement behaviorTree = new XElement("BehaviorTree");
             behaviorTree.SetAttributeValue("Name", Name);
-            behaviorTree.SetAttributeValue("RootId", Root.Id);
+            behaviorTree.SetAttributeValue("DefaultState", DefaultState);
 
-            behaviorTree.SetAttributeValue("Scale", Scale);
             behaviorTree.SetAttributeValue("HorizontalOffset", HorizontalOffset);
             behaviorTree.SetAttributeValue("VerticalOffset", VerticalOffset);
 
@@ -213,6 +231,9 @@ namespace Skill.DataModels.AI
                                 break;
                         }
                         break;
+                    case BehaviorType.ChangeState:
+                        result = new ChangeState();
+                        break;
                 }
             }
             return result;
@@ -231,7 +252,7 @@ namespace Skill.DataModels.AI
         public void Load(XElement e)
         {
             this.Name = e.GetAttributeValueAsString("Name", this.Name);
-            this.Scale = e.GetAttributeValueAsDouble("Scale", Scale);
+            this.DefaultState = e.GetAttributeValueAsString("DefaultState", DefaultDestinationState);
             this.HorizontalOffset = e.GetAttributeValueAsDouble("HorizontalOffset", HorizontalOffset);
             this.VerticalOffset = e.GetAttributeValueAsDouble("VerticalOffset", VerticalOffset);
 
@@ -250,6 +271,13 @@ namespace Skill.DataModels.AI
                     }
                 }
             }
+
+            List<Behavior> states = new List<Behavior>();
+            foreach (var b in list) if (b.IsState) states.Add(b);
+            if (states.Count > 0)
+                this.States = states.ToArray();
+            else
+                this.States = new Behavior[] { new PrioritySelector() { Name = DefaultDestinationState } };
 
             XElement accessKeys = e.FindChildByName("AccessKeys");
             if (accessKeys != null)
@@ -286,13 +314,6 @@ namespace Skill.DataModels.AI
 
                 }
             }
-
-
-            // find root
-            int rootId = e.GetAttributeValueAsInt("RootId", 0);
-            Behavior root = FindById(list, rootId);
-            if (root != null)
-                this.Root = root as PrioritySelector;
         }
         #endregion
 

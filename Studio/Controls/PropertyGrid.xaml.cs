@@ -17,7 +17,7 @@ namespace Skill.Studio.Controls
     /// <summary>
     /// Interaction logic for Properties.xaml
     /// </summary>
-    public partial class PropertyGrid : AvalonDock.DockableContent
+    public partial class PropertyGrid : UserControl
     {
         public PropertyGrid()
         {

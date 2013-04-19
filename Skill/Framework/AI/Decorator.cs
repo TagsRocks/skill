@@ -32,7 +32,7 @@ namespace Skill.Framework.AI
 
     #region Decorator
     /// <summary>
-    /// Typically have only one child and are used to enforce a certain return state 
+    /// Typically have only one child and are used to enforce a certain return status 
     /// or to implement timers to restrict how often the child will run in a given amount of time
     /// or how often it can be executed without a pause.(none leaf node)
     /// </summary>
@@ -83,9 +83,9 @@ namespace Skill.Framework.AI
         /// <summary>
         /// Behave
         /// </summary>
-        /// <param name="state">State od BehaviorTree</param>
+        /// <param name="status">Status od BehaviorTree</param>
         /// <returns></returns>
-        protected override BehaviorResult Behave(BehaviorTreeState state)
+        protected override BehaviorResult Behave(BehaviorTreeStatus status)
         {
             BehaviorResult result = BehaviorResult.Failure;
             if (Child != null)
@@ -94,16 +94,16 @@ namespace Skill.Framework.AI
                 {
                     if (Result == BehaviorResult.Running)// continue execution of child
                     {
-                        result = TraceChild(state);
+                        result = TraceChild(status);
                     }
-                    else if (_Handler(state.Parameters))
+                    else if (_Handler(status.Parameters))
                     {
-                        result = TraceChild(state);
+                        result = TraceChild(status);
                     }
                 }
                 else
                 {
-                    result = TraceChild(state);
+                    result = TraceChild(status);
                 }
             }
 
@@ -115,14 +115,14 @@ namespace Skill.Framework.AI
         /// <summary>
         /// Trace Child - subclasses should implement this method
         /// </summary>
-        /// <param name="state">State od BehaviorTree</param>
+        /// <param name="status">Status od BehaviorTree</param>
         /// <returns></returns>
-        protected virtual BehaviorResult TraceChild(BehaviorTreeState state)
+        protected virtual BehaviorResult TraceChild(BehaviorTreeStatus status)
         {
             if (Child != null)
             {
-                state.Parameters = Child.Parameters;
-                return Child.Behavior.Trace(state);
+                status.Parameters = Child.Parameters;
+                return Child.Behavior.Execute(status);
             }
             return BehaviorResult.Failure;
         }
@@ -131,17 +131,17 @@ namespace Skill.Framework.AI
         /// <summary>
         /// Reset behavior
         /// </summary>        
-        /// <param name="state">State of BehaviorTree</param>                
-        public override void ResetBehavior(BehaviorTreeState state)
+        /// <param name="status">Status of BehaviorTree</param>                
+        public override void ResetBehavior(BehaviorTreeStatus status)
         {
             if (Result == BehaviorResult.Running)
             {
                 if (Child != null)
                 {
-                    Child.Behavior.ResetBehavior(state);
+                    Child.Behavior.ResetBehavior(status);
                 }
             }
-            base.ResetBehavior(state);
+            base.ResetBehavior(status);
         }
     }
     #endregion

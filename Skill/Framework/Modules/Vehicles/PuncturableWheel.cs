@@ -31,7 +31,7 @@ namespace Skill.Framework.Modules.Vehicles
         /// <param name="args"> An HitEventArgs that contains hit event data. </param>
         protected override void OnHit(object sender, HitEventArgs args)
         {
-            if ((args.Hit.Type & PunctureHitType) == 0) return;
+            if ((args.Type & PunctureHitType) == 0) return;
             base.OnHit(sender, args);
         }
 

@@ -125,7 +125,7 @@ namespace Skill.Framework.IO
         public static void LoadFromXmlContent(ISavable savable, string xmlContent)
         {
             if (savable == null) throw new ArgumentNullException("Invalid ISavable object.");
-            if (string.IsNullOrEmpty(xmlContent)) throw new InvalidDataException("Invalid Xml content");
+            if (string.IsNullOrEmpty(xmlContent)) throw new Exception("Invalid Xml content");
             XmlDocument document = new XmlDocument();
             document.LoadXml(xmlContent);
             XmlElement root = document[RootXmlElementName];
@@ -136,7 +136,7 @@ namespace Skill.Framework.IO
                 savable.Load(root, stream);
             }
             else
-                throw new InvalidDataException("Invalid Xml content");
+                throw new Exception("Invalid Xml content");
         }
         #endregion
 

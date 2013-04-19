@@ -17,26 +17,31 @@ namespace Skill.Studio.AI
     {
         public override string ImageName { get { return Images.ChangeState; } }        
 
-        [DefaultValue(BehaviorTree.DefaultStateName)]        
+        [DefaultValue(BehaviorTree.DefaultDestinationState)]
         [Description("Destination state")]
-        public string StateName
+        [System.ComponentModel.Editor(typeof(Editor.DestinationStatePropertyEditor), typeof(Editor.DestinationStatePropertyEditor))]
+        public string DestinationState
         {
-            get { return ((ChangeState)Model).StateName; }
+            get { return ((ChangeState)Model).DestinationState; }
             set
             {
-                if (value != ((ChangeState)Model).StateName)
+                if (value != ((ChangeState)Model).DestinationState)
                 {
-                    Tree.History.Insert(new ChangePropertyUnDoRedo(this, "StateName", value, ((ChangeState)Model).StateName));
-                    ((ChangeState)Model).StateName = value;
-                    //((Skill.Framework.AI.PrioritySelector)Debug.Behavior).Priority = (Skill.Framework.AI.PriorityType)value;
-                    OnPropertyChanged(new PropertyChangedEventArgs("StateName"));
+                    Tree.History.Insert(new ChangePropertyUnDoRedo(this, "DestinationState", value, ((ChangeState)Model).DestinationState));
+                    ((ChangeState)Model).DestinationState = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("DestinationState"));                    
                 }
             }
         }
 
+        public static string CreateName(string destinationState)
+        {
+            return string.Format("GoTo{0}", destinationState);
+        }
+
         public ChangeStateViewModel(BehaviorViewModel parent, Skill.DataModels.AI.ChangeState changeState)
             : base(parent, changeState)
-        {            
+        {
         }
     }
     #endregion

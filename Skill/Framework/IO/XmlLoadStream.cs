@@ -22,7 +22,7 @@ namespace Skill.Framework.IO
     /// so in Xml mode (debug time) you can add or remove new variables in Savable class designed in Skill Studio, and load savable class from previous data ( from HDD or PlayerPrefs and ...).
     /// when your game is created and ready to release switch to binary format.
     /// </remarks>
-    public sealed class XmlLoadStream 
+    public sealed class XmlLoadStream
     {
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Skill.Framework.IO
                     return i;
             }
             return 0;
-        }
+        }        
 
         /// <summary>
         /// Read data of given XmlElement as float

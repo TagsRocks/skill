@@ -24,10 +24,34 @@ namespace Skill.Studio.Compiler
             this._Tree = Node.SavedData as BehaviorTree;
             if (this._Tree == null) return;
             CreateBehaviorList();
+            CheckDefaultState();
             SearchForBehaviorErrors();
             SearchForBehaviorWarnings();
             AccessKeysCompiler.Compile(_Tree.AccessKeys);
         }
+
+        #region CheckDefaultState
+        private void CheckDefaultState()
+        {
+            if (string.IsNullOrEmpty(this._Tree.DefaultState))
+                AddError(string.Format("Invalid DefaultState for BehaviorTree : {0}.", _Tree.Name));
+            else
+            {
+                bool found = false;
+                foreach (var s in _Tree.States)
+                {
+                    if (s.Name == _Tree.DefaultState)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                    AddError(string.Format("Invalid DefaultState for BehaviorTree : {0}.", _Tree.Name));
+            }
+
+        }
+        #endregion
 
         #region Create list of behaviors
         private void CreateBehaviorList()
@@ -157,7 +181,7 @@ namespace Skill.Studio.Compiler
                     Composite composite = (Composite)b;
                     if (composite.Count == 0)
                     {
-                        AddWarning(string.Format("Behaviors node {0} has not any children.", composite.Name));
+                        AddError(string.Format("Composite node {0} has not any children.", composite.Name));
                     }
                     if (composite.CompositeType == CompositeType.Priority || composite.CompositeType == CompositeType.Concurrent) // check if a Decorator with NeverFaile property is child of PrioritySelector or ConcurrentSelector
                     {
@@ -177,6 +201,14 @@ namespace Skill.Studio.Compiler
                                 }
                             }
                         }
+                    }
+                }
+                else if (b.BehaviorType == BehaviorType.Decorator)
+                {
+                    Decorator decorator = (Decorator)b;
+                    if (decorator.Count == 0)
+                    {
+                        AddError(string.Format("Decorator node {0} has not any children.", decorator.Name));
                     }
                 }
             }

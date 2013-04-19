@@ -170,9 +170,9 @@ namespace Skill.Framework.Animation
                 {
                     if (_PreActiveIndex > index)
                     {
-                        if (!_DelayTW.Enabled)
+                        if (!_DelayTW.IsEnabled)
                             _DelayTW.Begin(BlendDownDelay);
-                        if (_DelayTW.Enabled)
+                        if (_DelayTW.IsEnabled)
                         {
                             if (_DelayTW.IsOver)
                             {
@@ -184,9 +184,9 @@ namespace Skill.Framework.Animation
                     }
                     else
                     {
-                        if (!_DelayTW.Enabled)
+                        if (!_DelayTW.IsEnabled)
                             _DelayTW.Begin(BlendUpDelay);
-                        if (_DelayTW.Enabled)
+                        if (_DelayTW.IsEnabled)
                         {
                             if (_DelayTW.IsOver)
                             {

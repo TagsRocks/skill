@@ -8,6 +8,7 @@ namespace Skill.Framework
     /// Isometric camera to view target from above. Add this component to 'UnityEngine.Camera' GameObject and set Target to player or a movable object.
     /// </summary>
     [AddComponentMenu("Skill/Camera/Isometric")]
+    [RequireComponent(typeof(Camera))]
     public class IsometricCamera : DynamicBehaviour
     {
         /// <summary> Target to follow </summary>
@@ -16,12 +17,8 @@ namespace Skill.Framework
         public SmoothingParameters MovementSmoothing;
         /// <summary> How to smooth offset value of camera relative to target</summary>
         public SmoothingParameters OffsetSmoothing;
-        /// <summary> How to smooth rotation of camera</summary>
-        public SmoothingParameters RotationSmoothing;
         /// <summary> How to smooth zoom of camera</summary>
         public SmoothingParameters ZoomSmoothing;
-        /// <summary> How to smooth fov of camera</summary>
-        public SmoothingParameters FovSmoothing;
         /// <summary> Camera moves by mouse when mouse position gets far from center of screen. </summary>
         public float CameraPreview = 2.0f;
         /// <summary> Rotation angle around target ( 0 - 360) </summary>
@@ -75,12 +72,7 @@ namespace Skill.Framework
         public virtual Vector3 PointOfInterest { get { return Target.position; } }
 
 
-        // Private memeber data        
-
-        private SmoothingAngle _AroundAngle;
-        private SmoothingAngle _LookAngle;
-        private SmoothingAngle _Fov;
-
+        // Private memeber data                
         private Transform _CameraTransform;
         private Vector3 _CameraVelocity;
 
@@ -97,7 +89,15 @@ namespace Skill.Framework
         protected override void Awake()
         {
             base.Awake();
-            _CameraVelocity = Vector3.zero;
+            _CameraVelocity = Vector3.zero;            
+            _CameraTransform = Camera.transform;
+            // Set the initial cursor position to the center of the screen
+            CursorScreenPosition = new Vector3(0.5f * Screen.width, 0.5f * Screen.height, 0);
+        }
+
+        protected override void GetReferences()
+        {
+            base.GetReferences();
             // Set main camera
             Camera = GetComponent<Camera>();
             if (Camera == null)
@@ -105,9 +105,6 @@ namespace Skill.Framework
                 Debug.LogError("Camera component not found. Isometric camera shold assigned to a camera GameOject.");
                 return;
             }
-            _CameraTransform = Camera.transform;
-            // Set the initial cursor position to the center of the screen
-            CursorScreenPosition = new Vector3(0.5f * Screen.width, 0.5f * Screen.height, 0);
         }
 
         /// <summary>
@@ -123,10 +120,6 @@ namespace Skill.Framework
             if (ZoomIn < 0) ZoomIn = 0;
             if (ZoomOut < ZoomIn) ZoomOut = ZoomIn;
 
-            //this._MotionDuration = 0.3f;
-            this._AroundAngle.Reset(AroundAngle);
-            this._LookAngle.Reset(LookAngle);
-            this._Fov.Reset(Fov);
             this._Zoom.Reset((ZoomIn + ZoomOut) * 0.5f);
 
             UpdateCamera(true);
@@ -162,31 +155,12 @@ namespace Skill.Framework
                 }
                 _Offset.Update(OffsetSmoothing);
 
-                // if AroundAngle changed in previous update make sure that it is between 0 - 360 degree
-                if (this.AroundAngle != this._AroundAngle.TargetAngle)
-                {
-                    float deltaAngle = Mathf.DeltaAngle(this.AroundAngle, Mathf.Repeat(this.AroundAngle, 360));
-                    this.AroundAngle = Mathf.Repeat(this.AroundAngle + deltaAngle, 360);
-                }
-                // make sure LookAngle is between 0 - 90
-                if (this.LookAngle < 0) this.LookAngle = 0;
-                else if (this.LookAngle > 90) this.LookAngle = 90;
-
                 // make sure zoom factors are in correct range
                 if (ZoomIn < 0) ZoomIn = 0;
                 if (ZoomOut < ZoomIn) ZoomOut = ZoomIn;
 
                 float zoomFactor = _LengthOffset / Mathf.Max(0.01f, MaxTargetOffset);
                 _Zoom.Target = Mathf.Lerp(ZoomIn, ZoomOut, zoomFactor);
-
-                // update angles
-                _AroundAngle.TargetAngle = this.AroundAngle;
-                _LookAngle.TargetAngle = this.LookAngle;
-                _Fov.TargetAngle = Fov;
-
-                _AroundAngle.Update(RotationSmoothing);
-                _LookAngle.Update(RotationSmoothing);
-                _Fov.Update(FovSmoothing);
                 _Zoom.Update(ZoomSmoothing);
 
                 // update position of camera
@@ -208,11 +182,11 @@ namespace Skill.Framework
 
         private void UpdateCamera(bool force = false)
         {
-            float radianLookAngle = _LookAngle.CurrentAngle * Mathf.Deg2Rad;
+            float radianLookAngle = LookAngle * Mathf.Deg2Rad;
             float zDistace = Mathf.Cos(radianLookAngle) * Zoom;
             float yDistace = Mathf.Sin(radianLookAngle) * Zoom;
 
-            _ScreenMovementSpace = Quaternion.Euler(0, _AroundAngle.CurrentAngle, 0);
+            _ScreenMovementSpace = Quaternion.Euler(0, AroundAngle, 0);
             ScreenForward = _ScreenMovementSpace * Vector3.forward;
             ScreenRight = _ScreenMovementSpace * Vector3.right;
 
@@ -242,7 +216,7 @@ namespace Skill.Framework
                 cameraAdjustmentVector.y = 0.0f;
             }
 
-            Camera.fov = _Fov.CurrentAngle;
+            Camera.fov = Fov;
 
             Vector3 finalPosition = _CameraTransform.position;
             // HANDLE CAMERA POSITION

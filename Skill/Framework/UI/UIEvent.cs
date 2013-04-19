@@ -19,14 +19,28 @@ namespace Skill.Framework.UI
     /// </summary>
     public enum MouseButton
     {
+        /// <summary> Mouse0 </summary>
+        Mouse0 = 0,
+        /// <summary> Mouse1 </summary>
+        Mouse1 = 1,
+        /// <summary> Mouse2 </summary>
+        Mouse2 = 2,
+        /// <summary> Mouse3 </summary>
+        Mouse3 = 3,
+        /// <summary> Mouse4 </summary>
+        Mouse4 = 4,
+        /// <summary> Mouse5 </summary>
+        Mouse5 = 5,
+        /// <summary> Mouse6 </summary>
+        Mouse6 = 6,
         /// <summary> Left mouse button </summary>
-        Left = 0,
+        Left = Mouse0,
         /// <summary> Right mouse button </summary>
-        Right = 1,
+        Right = Mouse1,
         /// <summary> Middle mouse button </summary>
-        Middle = 2,
+        Middle = Mouse2,
         /// <summary> Another button in the mouse </summary>
-        Other
+        Other = 7,
     }
 
     /// <summary>
@@ -98,7 +112,7 @@ namespace Skill.Framework.UI
         /// <param name="mousePosition"> The mouse position. </param>
         /// <param name="modifiers"> Which modifier keys are held down. </param>
         /// <param name="button"> Which mouse button was pressed. </param>
-        /// <param name="Delta"> The relative movement of the mouse compared to last event. </param>
+        /// <param name="delta"> The relative movement of the mouse compared to last event. </param>
         public MouseMoveEventArgs(Vector2 mousePosition, EventModifiers modifiers, MouseButton button, Vector2 delta)
             : base(mousePosition, modifiers)
         {

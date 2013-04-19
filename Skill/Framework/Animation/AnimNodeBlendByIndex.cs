@@ -149,7 +149,7 @@ namespace Skill.Framework.Animation
         /// <param name="state">State of AnimationTree</param>
         internal override void Update(AnimationTreeState state)
         {
-            if (_SwitchTimer.Enabled)
+            if (_SwitchTimer.IsEnabled)
             {
                 if (_SwitchTimer.IsOver)
                 {
@@ -174,7 +174,7 @@ namespace Skill.Framework.Animation
         /// <param name="switchIndex"> switch node by index (index is between '0' - 'ChildCount -1' ) </param>
         public void SwitchOneShot(int switchIndex)
         {
-            if (_SwitchTimer.Enabled) return;
+            if (_SwitchTimer.IsEnabled) return;
             _PreChildIndex = _SelectedChildIndex;
             _SelectedChildIndex = switchIndex;
             _SwitchOneShot = true;
@@ -185,7 +185,7 @@ namespace Skill.Framework.Animation
         /// </summary>
         public void CancelSwitchOneShot()
         {
-            if (_SwitchTimer.Enabled)
+            if (_SwitchTimer.IsEnabled)
             {
                 _SelectedChildIndex = _PreChildIndex;
                 DisableSwitch();

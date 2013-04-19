@@ -12,7 +12,7 @@ namespace Skill.Framework.AI
     public delegate bool ConditionHandler(BehaviorParameterCollection parameters);
 
     /// <summary>
-    /// Check that certain actor or game world states hold true.(leaf node)
+    /// Check that certain actor or game world statuss hold true.(leaf node)
     /// </summary>
     public class Condition : Behavior
     {
@@ -43,14 +43,14 @@ namespace Skill.Framework.AI
         /// <summary>
         /// Behave
         /// </summary>
-        /// <param name="state">State of BehaviorTree</param>
+        /// <param name="status">Status of BehaviorTree</param>
         /// <returns></returns>
-        protected override BehaviorResult Behave(BehaviorTreeState state)
+        protected override BehaviorResult Behave(BehaviorTreeStatus status)
         {
             BehaviorResult result = BehaviorResult.Failure;
             if (_Handler != null)
             {
-                bool b = _Handler(state.Parameters);
+                bool b = _Handler(status.Parameters);
                 if (Reverse)
                     result = b ? BehaviorResult.Failure : BehaviorResult.Success;
                 else

@@ -21,6 +21,12 @@ namespace Skill.Framework.AI
         /// Last ecexution result of behavior
         /// </summary>
         public BehaviorResult Result { get; protected set; }
+
+        /// <summary>
+        /// Behavior of node when is child of a ConcurrentSelector
+        /// </summary>
+        public ConcurrencyMode Concurrency { get; set; }
+
         /// <summary>
         /// Wheight or chance of behavior when is behavior is child of a RandomSelector
         /// </summary>
@@ -58,19 +64,19 @@ namespace Skill.Framework.AI
         /// <summary>
         /// handle execution of behavior and call appropriate events
         /// </summary>
-        /// <param name="state">State of BehaviorTree</param>
+        /// <param name="status">Status of BehaviorTree</param>
         /// <returns>Result of execution</returns>
-        public BehaviorResult Trace(BehaviorTreeState state)
+        public BehaviorResult Execute(BehaviorTreeStatus status)
         {
-            LastUpdateId = state.UpdateId;
-            state.RegisterForExecution(this); // register in execution sequence
+            LastUpdateId = status.UpdateId;
+            status.RegisterForExecution(this); // register in execution sequence
             try
             {
-                Result = Behave(state);// let subclass behave
+                Result = Behave(status);// let subclass behave
             }
             catch (Exception e)
             {
-                state.Exception = e;// store exception
+                status.Exception = e;// store exception
                 Result = BehaviorResult.Failure; // set result to failure
             }
             return Result;
@@ -81,9 +87,9 @@ namespace Skill.Framework.AI
         /// <summary>
         /// Let subclass implement behaveior
         /// </summary>
-        /// <param name="state">State of BehaviorTre</param>
+        /// <param name="status">Status of BehaviorTre</param>
         /// <returns>Result of behavior</returns>
-        protected abstract BehaviorResult Behave(BehaviorTreeState state);
+        protected abstract BehaviorResult Behave(BehaviorTreeStatus status);
 
         /// <summary>
         /// Represent Behavior as string
@@ -95,10 +101,10 @@ namespace Skill.Framework.AI
         /// <summary>
         /// Reset behavior. For internal use. when a branch with higher priority executed, let nodes in previous branch reset (internal use)
         /// </summary>
-        /// <param name="state">State of BehaviorTree</param>                
-        public virtual void ResetBehavior(BehaviorTreeState state)
+        /// <param name="status">Status of BehaviorTree</param>                
+        public virtual void ResetBehavior(BehaviorTreeStatus status)
         {
-            if (Result == BehaviorResult.Running && LastUpdateId != state.UpdateId)
+            if (Result == BehaviorResult.Running && LastUpdateId != status.UpdateId)
                 Result = BehaviorResult.Failure;
         }
 

@@ -13,6 +13,9 @@ namespace Skill.Studio.AI
     [DisplayName("Decorator")]
     public class DecoratorViewModel : BehaviorViewModel
     {
+        public override double CornerRadius { get { return 26; } }
+        public override double MinHeight { get { return 36; } }
+
         [Browsable(false)]
         public override string ImageName { get { return Images.Decorator; } }
 
@@ -70,6 +73,8 @@ namespace Skill.Studio.AI
                 }
             }
         }
+
+        public override bool IsValidable { get { return true; } }
 
         private void SetValid(bool value)
         {

@@ -51,9 +51,9 @@ namespace Skill.Framework.AI
         /// <summary>
         /// Behave
         /// </summary>
-        /// <param name="state">State of BehaviorTree</param>
+        /// <param name="status">Status of BehaviorTree</param>
         /// <returns>Result</returns>
-        protected override BehaviorResult Behave(BehaviorTreeState state)
+        protected override BehaviorResult Behave(BehaviorTreeStatus status)
         {
             if (Priority == PriorityType.HighestPriority || RunningChildIndex < 0)
                 RunningChildIndex = 0;
@@ -61,8 +61,8 @@ namespace Skill.Framework.AI
             for (int i = RunningChildIndex; i < ChildCount; i++)
             {
                 BehaviorContainer node = this[i];
-                state.Parameters = node.Parameters;
-                result = node.Behavior.Trace(state);
+                status.Parameters = node.Parameters;
+                result = node.Behavior.Execute(status);
                 if (result == BehaviorResult.Running)
                 {
                     RunningChildIndex = i;

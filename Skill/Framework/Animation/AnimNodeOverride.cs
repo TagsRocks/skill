@@ -130,7 +130,7 @@ namespace Skill.Framework.Animation
         /// <param name="state">State of AnimationTree</param>
         internal override void Update(AnimationTreeState state)
         {
-            if (_OverrideTimer.Enabled)
+            if (_OverrideTimer.IsEnabled)
             {
                 if (_OverrideTimer.IsOver)
                 {
@@ -151,9 +151,9 @@ namespace Skill.Framework.Animation
                     IsOverriding = false;
                 return;// avoid update twice
             }
-            else if (OverridePeriod > 0 && !_OverrideTimer.Enabled)
+            else if (OverridePeriod > 0 && !_OverrideTimer.IsEnabled)
             {
-                if (_Timer.Enabled)
+                if (_Timer.IsEnabled)
                 {
                     if (_Timer.IsOver)
                     {
@@ -211,7 +211,7 @@ namespace Skill.Framework.Animation
         {
             if (OverrideNode != null)
             {
-                if (_OverrideTimer.Enabled)
+                if (_OverrideTimer.IsEnabled)
                 {
                     return;
                 }

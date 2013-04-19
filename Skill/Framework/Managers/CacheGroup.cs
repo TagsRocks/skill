@@ -55,7 +55,7 @@ namespace Skill.Framework.Managers
         {
             if (CleanInterval > 0)
             {
-                if (_CleanTW.Enabled)
+                if (_CleanTW.IsEnabled)
                 {
                     if (_CleanTW.IsOver)
                     {

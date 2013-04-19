@@ -5,9 +5,9 @@ using System.Text;
 namespace Skill.Framework.AI
 {
     /// <summary>
-    /// Represent State of behaviorTree and send data between nodes
+    /// Represent Status of behaviorTree and send data between nodes
     /// </summary>
-    public class BehaviorTreeState
+    public class BehaviorTreeStatus
     {
         /// <summary>
         /// Maximum lenght of visited behaviors in each BehaviorTree update
@@ -49,21 +49,23 @@ namespace Skill.Framework.AI
         /// </summary>
         public uint UpdateId { get; private set; }
 
-        private Behavior _Root;
+        /// <summary>
+        /// BehaviorTree 
+        /// </summary>
+        public IBehaviorTree Tree { get; private set; }
 
         /// <summary>
-        /// Create a BehaviorState
+        /// Create a BehaviorStatus
         /// </summary>
-        /// <param name="root">root of BehaviorTree</param>
-        public BehaviorTreeState(Behavior root)
+        /// <param name="tree">BehaviorTree</param>
+        public BehaviorTreeStatus(IBehaviorTree tree)
         {
-            this._Root = root;
+            this.Tree = tree;
             this.Exception = null;
             this.RunningActions = new RunningActionCollection();
-        }
-
+        }        
         private Behavior[] _ExecutionSequence = new Behavior[MaxSequenceLength];// 200 is maximum node trace in tree (i hope).
-        private int _CurrnetExecutionIndex = -1;        
+        private int _CurrnetExecutionIndex = -1;
 
 
         /// <summary>
@@ -71,8 +73,9 @@ namespace Skill.Framework.AI
         /// </summary>
         public void Begin()
         {
-            _CurrnetExecutionIndex = -1;
-            UpdateId++;
+            this.Exception = null;
+            this._CurrnetExecutionIndex = -1;
+            this.UpdateId++;
         }
 
         /// <summary>
@@ -90,9 +93,9 @@ namespace Skill.Framework.AI
         {
             _CurrnetExecutionIndex++;// move to next place  
             if (_CurrnetExecutionIndex >= _ExecutionSequence.Length)
-                throw new IndexOutOfRangeException("ExecutionSequence buffer is low. to avoid this error set higher value to 'BehaviorState.MaxSequenceLength'.");
-            _ExecutionSequence[_CurrnetExecutionIndex] = behavior;            
-        }        
+                throw new IndexOutOfRangeException("ExecutionSequence buffer is low. to avoid this error set higher value to 'BehaviorStatus.MaxSequenceLength'.");
+            _ExecutionSequence[_CurrnetExecutionIndex] = behavior;
+        }
 
         private string GetTabSpace(int tabCount)
         {
@@ -119,12 +122,11 @@ namespace Skill.Framework.AI
 
         /// <summary>
         /// Write ExecutionSequence to UnityEngin.Debug.Log in tree style
-        /// </summary>
-        /// <param name="copyToClipboard">Copy all text to clipboard</param>
+        /// </summary>        
         public void LogExecutionSequenceTree()
         {
             int sqIndex = 0;
-            LogExecutionSequenceTree(_Root, ref sqIndex, 0);
+            LogExecutionSequenceTree(Tree.CurrentState, ref sqIndex, 0);
         }
 
         private void LogExecutionSequenceTree(Behavior b, ref int sqIndex, int tabCount)

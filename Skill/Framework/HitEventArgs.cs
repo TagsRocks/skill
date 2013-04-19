@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System;
 
 namespace Skill.Framework
 {
@@ -31,7 +32,7 @@ namespace Skill.Framework
     /// <summary>
     /// Defines information about when an object hits
     /// </summary>
-    public class HitInfo
+    public class HitEventArgs : EventArgs
     {
         /// <summary> Type of hit </summary>
         public HitType Type { get; private set; }
@@ -62,7 +63,7 @@ namespace Skill.Framework
         /// <param name="owner"> The object that caused this hit </param>
         /// <param name="type"> Type of hit </param>
         /// <param name="other"> Other collider </param>       
-        public HitInfo(GameObject owner, HitType type, UnityEngine.Collider other)
+        public HitEventArgs(GameObject owner, HitType type, UnityEngine.Collider other)
         {
             this.Type = type;
             this.Owner = owner;
@@ -73,7 +74,7 @@ namespace Skill.Framework
     /// <summary>
     /// Defines information about when an object hits by raycast
     /// </summary>
-    public class RaycastHitInfo : HitInfo
+    public class RaycastHitEventArgs : HitEventArgs
     {
         /// <summary>
         /// Raycast hit information
@@ -86,7 +87,7 @@ namespace Skill.Framework
         /// <param name="owner"> The object that caused this hit </param>
         /// <param name="type"> Type of hit </param>
         /// <param name="other"> Other collider </param>       
-        public RaycastHitInfo(GameObject owner, HitType type, UnityEngine.Collider other)
+        public RaycastHitEventArgs(GameObject owner, HitType type, UnityEngine.Collider other)
             : base(owner, type, other)
         {
         }
@@ -95,7 +96,7 @@ namespace Skill.Framework
     /// <summary>
     /// Defines information about when an object hits by another object
     /// </summary>
-    public class CollisionHitInfo : HitInfo
+    public class CollisionHitEventArgs : HitEventArgs
     {
         /// <summary>
         /// Collision hit information
@@ -108,9 +109,33 @@ namespace Skill.Framework
         /// <param name="owner"> The object that caused this hit </param>
         /// <param name="type"> Type of hit </param>
         /// <param name="other"> Other collider </param>       
-        public CollisionHitInfo(GameObject owner, HitType type, UnityEngine.Collider other)
+        public CollisionHitEventArgs(GameObject owner, HitType type, UnityEngine.Collider other)
             : base(owner, type, other)
         {
+        }
+    }    
+    /// <summary>
+    /// containing damage event data.
+    /// </summary>
+    public class DamageEventArgs : EventArgs
+    {
+        /// <summary> Amount of damage </summary>
+        public float Damage { get; private set; }
+
+        /// <summary> Tag of object that cause damage </summary>
+        public string Tag { get; private set; }
+
+        /// <summary> User Data </summary>
+        public object UserData { get; set; }
+
+        /// <summary>
+        /// Create DamageEventArgs
+        /// </summary>
+        /// <param name="damage"> Amount of damage </param>
+        public DamageEventArgs(float damage, string tag)
+        {
+            this.Damage = damage;
+            this.Tag = tag;
         }
     }
 }

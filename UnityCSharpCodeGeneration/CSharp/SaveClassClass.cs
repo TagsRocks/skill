@@ -124,13 +124,13 @@ namespace Skill.CodeGeneration.CSharp
             {
                 variable = string.Format("_{0}Element", p.Name);
                 if (p.Type == PropertyType.Primitive)
-                    toXmlElementBody.AppendLine(string.Format("System.Xml.XmlElement {0} = stream.Create(\"{1}\",{2});", variable, p.Name, Variable.GetName(p.Name)));
+                    toXmlElementBody.AppendLine(string.Format("Skill.Framework.IO.XmlElement {0} = stream.Create(\"{1}\",{2});", variable, p.Name, Variable.GetName(p.Name)));
                 else
-                    toXmlElementBody.AppendLine(string.Format("System.Xml.XmlElement {0} = stream.Create<{1}>(\"{2}\",{3});", variable, ((ClassProperty)p).ClassName, p.Name, Variable.GetName(p.Name)));
+                    toXmlElementBody.AppendLine(string.Format("Skill.Framework.IO.XmlElement {0} = stream.Create<{1}>(\"{2}\",{3});", variable, ((ClassProperty)p).ClassName, p.Name, Variable.GetName(p.Name)));
                 toXmlElementBody.AppendLine(string.Format("e.AppendChild({0});", variable));
             }
 
-            Method toXmlElement = new Method("void", "Save", toXmlElementBody.ToString(), "System.Xml.XmlElement e", "Skill.Framework.IO.XmlSaveStream stream");
+            Method toXmlElement = new Method("void", "Save", toXmlElementBody.ToString(), "Skill.Framework.IO.XmlElement e", "Skill.Framework.IO.XmlSaveStream stream");
             toXmlElement.Modifiers = Modifiers.Public;
             Add(toXmlElement);
         }
@@ -220,7 +220,7 @@ namespace Skill.CodeGeneration.CSharp
         {
             StringBuilder loadXmlBody = new StringBuilder();
 
-            loadXmlBody.AppendLine("System.Xml.XmlElement element = e.FirstChild as System.Xml.XmlElement;");
+            loadXmlBody.AppendLine("Skill.Framework.IO.XmlElement element = e.FirstChild as Skill.Framework.IO.XmlElement;");
             loadXmlBody.AppendLine("while (element != null)");
             loadXmlBody.AppendLine("{");
 
@@ -248,10 +248,10 @@ namespace Skill.CodeGeneration.CSharp
             }
 
             loadXmlBody.AppendLine("}");
-            loadXmlBody.AppendLine("element = element.NextSibling as System.Xml.XmlElement;");
+            loadXmlBody.AppendLine("element = element.NextSibling as Skill.Framework.IO.XmlElement;");
             loadXmlBody.AppendLine("}");
 
-            Method loadMethod = new Method("void", "Load", loadXmlBody.ToString(), "System.Xml.XmlElement e", "Skill.Framework.IO.XmlLoadStream stream");
+            Method loadMethod = new Method("void", "Load", loadXmlBody.ToString(), "Skill.Framework.IO.XmlElement e", "Skill.Framework.IO.XmlLoadStream stream");
             loadMethod.Modifiers = Modifiers.Public;
             Add(loadMethod);
         }

@@ -10,11 +10,11 @@ namespace Skill.Framework.Weapons
     [AddComponentMenu("Skill/Weapons/Bullets/Raycast")]
     public class RaycastBullet : StraightLineBullet
     {
-        
+
         /// <summary>
         /// Whether weapon check hit posint of this bullet at spawn time or let bullet check hits itself.
         /// </summary>
-        public override bool HitAtSpawn { get { return false; } }        
+        public override bool HitAtSpawn { get { return false; } }
 
         private Vector3 _PrePosition;
         private Ray _Ray;
@@ -48,7 +48,7 @@ namespace Skill.Framework.Weapons
                 EventManager events = _Hit.collider.GetComponent<EventManager>();
                 if (events != null)
                 {
-                    RaycastHitInfo hitInfo = CreateHitInfo(_Hit.collider);
+                    RaycastHitEventArgs hitInfo = CreateHitInfo(_Hit.collider);
                     hitInfo.Normal = _Hit.normal;
                     hitInfo.Point = _Hit.point;
 
@@ -56,7 +56,7 @@ namespace Skill.Framework.Weapons
                     _Hit.distance = TravelledDistance - (distance - _Hit.distance);
                     hitInfo.RaycastHit = _Hit;
 
-                    events.OnHit(this, new HitEventArgs(hitInfo));
+                    events.OnHit(this, hitInfo);
                 }
 
                 OnDie();
@@ -70,9 +70,9 @@ namespace Skill.Framework.Weapons
         /// </summary>
         /// <param name="other">The collider that this bullet hits with</param>
         /// <returns> RaycastHitInfo </returns>
-        protected virtual RaycastHitInfo CreateHitInfo(UnityEngine.Collider other)
+        protected virtual RaycastHitEventArgs CreateHitInfo(UnityEngine.Collider other)
         {
-            RaycastHitInfo info = new RaycastHitInfo(Shooter, HitType.Bullet | HitType.Raycast, other);
+            RaycastHitEventArgs info = new RaycastHitEventArgs(Shooter, HitType.Bullet | HitType.Raycast, other);
             info.Damage = Damage;
             info.Tag = this.tag;
             return info;

@@ -74,7 +74,7 @@ namespace Skill.Framework.UI
         /// Indicates whether the element can receive focus.
         /// </summary>
         public virtual bool IsFocusable { get { return false; } }
-        
+
         private bool _IsEnabled = true;
         /// <summary>
         /// Gets or sets a value indicating whether this element is enabled in the user interface (UI).
@@ -93,7 +93,7 @@ namespace Skill.Framework.UI
             {
                 _IsEnabled = value;
             }
-        }        
+        }
 
 
         private Rect _Position;
@@ -607,7 +607,7 @@ namespace Skill.Framework.UI
                         if ((type == EventType.MouseDown || type == EventType.MouseUp) && (MouseDown != null || MouseUp != null))
                         {
                             MouseButton mb = MouseButton.Other;
-                            if (e.button < 3) mb = (MouseButton)e.button;
+                            if (e.button <= (int)MouseButton.Other) mb = (MouseButton)e.button;
                             MouseClickEventArgs args = new MouseClickEventArgs(e.mousePosition, e.modifiers, mb, e.clickCount);
                             if (type == EventType.MouseDown)
                                 OnMouseDown(args);
@@ -619,7 +619,7 @@ namespace Skill.Framework.UI
                         else if ((type == EventType.ScrollWheel || type == EventType.mouseMove || type == EventType.mouseDrag) && (MouseDrag != null || MouseMove != null || ScrollWheel != null))
                         {
                             MouseButton mb = MouseButton.Other;
-                            if (e.button < 3) mb = (MouseButton)e.button;
+                            if (e.button < (int)MouseButton.Other) mb = (MouseButton)e.button;
                             MouseMoveEventArgs args = new MouseMoveEventArgs(e.mousePosition, e.modifiers, mb, e.delta);
                             if (type == EventType.ScrollWheel)
                                 OnScrollWheel(args);

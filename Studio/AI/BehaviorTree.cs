@@ -24,7 +24,23 @@ namespace Skill.Studio.AI
             {
                 if (Model.DefaultState != value)
                 {
+                    foreach (var s in States)
+                    {
+                        if (s.Name == Model.DefaultState)
+                        {
+                            s.IsDefaultState = false;
+                            break;
+                        }
+                    }
                     Model.DefaultState = value;
+                    foreach (var s in States)
+                    {
+                        if (s.Name == Model.DefaultState)
+                        {
+                            s.IsDefaultState = true;
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -57,31 +73,14 @@ namespace Skill.Studio.AI
         public UnDoRedo History { get; set; }
         /// <summary> internal AccessKeys </summary>
         public SharedAccessKeysViewModel AccessKeys { get; private set; }
-        /// <summary> Whether show parameters of behaviors or not </summary>
-        public bool ShowParameters
-        {
-            get
-            {
-                return (Root != null) ? Root.ShowParameters : false;
-            }
-            set
-            {
-                if (Root != null && Root.ShowParameters != value)
-                {
-                    Root.ShowParameters = value;
-                    OnPropertyChanged(new PropertyChangedEventArgs("ShowParameters"));
-                }
-            }
-
-        }
 
         private BehaviorViewModel _PreState;
-        public bool ChangeState(string stateName)
+        public bool ChangeState(string destinationState)
         {
-            if (string.IsNullOrEmpty(stateName) || (Root != null && Root.Name == stateName)) return false;
+            if (string.IsNullOrEmpty(destinationState) || (Root != null && Root.Name == destinationState)) return false;
             foreach (var b in States)
             {
-                if (b.Name == stateName)
+                if (b.Name == destinationState)
                 {
                     if (Nodes.Count > 0)
                     {
@@ -91,18 +90,33 @@ namespace Skill.Studio.AI
                     Nodes.Clear();
                     Nodes.Add(b);
                     Nodes[0].IsSelectedState = true;
-                    if (_PreState != null)
-                        this.History.Insert(new ChangeStateUnDoRedo(this, Root.Name, (_PreState != null) ? _PreState.Name : string.Empty));
-                    AddSelectedBehaviors();
+
                     if (Editor != null)
-                    Editor.UpdatePositions();
+                        Editor.RefreshDiagram();
+                    if (!IsDebuging && _PreState != null)
+                        this.History.Insert(new ChangeStateUnDoRedo(this, Root.Name, (_PreState != null) ? _PreState.Name : string.Empty));
                     return true;
                 }
             }
             return false;
         }
 
-        private void AddSelectedBehaviors()
+        public void NotifyChangeDestinationState(string preDestinationState, string newDestinationState)
+        {
+            History.IsEnable = false;
+
+            if (DefaultState == preDestinationState)
+                DefaultState = newDestinationState;
+
+            foreach (ChangeStateViewModel cs in ChangeStates)
+            {
+                if (cs.DestinationState == preDestinationState)
+                    cs.DestinationState = newDestinationState;
+            }
+            History.IsEnable = true;
+        }
+
+        public void UpdateSelectedBehaviors()
         {
             SelectedBehaviors.Clear();
             AddSelectedBehaviors(Root);
@@ -169,7 +183,7 @@ namespace Skill.Studio.AI
             }
         }
 
-        public string DebugTimerString { get { return string.Format("Time : {0:D2}.{1:D2}.{2:D3}", _DebugTimer.Minutes, _DebugTimer.Seconds, _DebugTimer.Milliseconds); } }
+        public string DebugTimerString { get { return string.Format("{0:D2}.{1:D2}.{2:D3}", _DebugTimer.Minutes, _DebugTimer.Seconds, _DebugTimer.Milliseconds); } }
 
 
         public double HorizontalOffset
@@ -223,7 +237,6 @@ namespace Skill.Studio.AI
                 BehaviorViewModel svm = new PrioritySelectorViewModel(this, (PrioritySelector)s);
                 // each state register itself
             }
-
             this.SelectDefaultState();
             this.AccessKeys = new SharedAccessKeysViewModel(Model.AccessKeys);
         }
@@ -423,6 +436,30 @@ namespace Skill.Studio.AI
             foreach (var s in States)
                 states.Add(s.Model);
             this.Model.States = states.ToArray();
+        }
+
+        private void OptimizeChangeStates(BehaviorViewModel behavior, List<DataModels.AI.ChangeState> changestateList)
+        {
+            for (int i = 0; i < behavior.Count; i++)
+            {
+                BehaviorViewModel bvm = behavior[i] as BehaviorViewModel;
+
+                if (bvm.Model.BehaviorType == BehaviorType.ChangeState)
+                {
+                    ChangeState cs = (ChangeState)bvm.Model;
+                    ChangeState existCS = changestateList.Find(p => p.DestinationState == cs.DestinationState);
+                    if (existCS != null)
+                        behavior.Model.Replace(cs, existCS);
+                    else
+                        changestateList.Add(cs);
+
+                }
+                else if (bvm.Model.BehaviorType == BehaviorType.Composite || bvm.Model.BehaviorType == BehaviorType.Decorator)
+                {
+                    OptimizeChangeStates(bvm, changestateList);
+                }
+            }
+
         }
         #endregion
 

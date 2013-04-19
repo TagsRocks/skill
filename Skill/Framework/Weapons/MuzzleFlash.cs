@@ -44,7 +44,7 @@ namespace Skill.Framework.Weapons
         /// </summary>
         protected override void Update()
         {
-            if (_LifeTimeTW.EnabledAndOver)
+            if (_LifeTimeTW.IsEnabledAndOver)
             {
                 gameObject.SetActive(false);
             }

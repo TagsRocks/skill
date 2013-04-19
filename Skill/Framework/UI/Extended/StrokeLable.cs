@@ -23,15 +23,15 @@ namespace Skill.Framework.UI.Extended
 
         private Color _StrokeColor;
         /// <summary> Gets or set Stroke Color </summary>
-        public Color StrokeColor { get { return _StrokeColor; } set { _StrokeColor = value; _Changed = true; } }
+        public Color StrokeColor { get { return _StrokeColor; } set { _StrokeColor = value; } }
 
         private Thickness _StrokeThickness;
         /// <summary> Gets of sets Stroke Thickness </summary>
-        public Thickness StrokeThickness { get { return _StrokeThickness; } set { _StrokeThickness = value; _Changed = true; } }
+        public Thickness StrokeThickness { get { return _StrokeThickness; } set { _StrokeThickness = value; } }
 
         private int _StrokeFont;
         /// <summary> it is possible to change the font used as stroke </summary>
-        public int StrokeFont { get { return _StrokeFont; } set { _StrokeFont = value; _Changed = true; } }
+        public int StrokeFont { get { return _StrokeFont; } set { _StrokeFont = value; } }
 
         /// <summary> Style of label </summary>
         public override GUIStyle Style { get { return base.Style; } set { base.Style = value; _Changed = true; } }
@@ -106,11 +106,17 @@ namespace Skill.Framework.UI.Extended
         // apply changes to stroke labels
         private void ApplyChange()
         {
-            if (!_Changed) return;
-
             if (Style != null)
             {
-                _StrokeStyle = new GUIStyle(Style);
+                if (_StrokeStyle == null || _Changed)
+                {
+                    _StrokeStyle = new GUIStyle(Style);
+                    _LblLeft.Style = _StrokeStyle;
+                    _LblDown.Style = _StrokeStyle;
+                    _LblUp.Style = _StrokeStyle;
+                    _LblRight.Style = _StrokeStyle;
+                    _Changed = false;
+                }
                 _StrokeStyle.normal.textColor = StrokeColor;
                 _StrokeStyle.hover.textColor = StrokeColor;
                 _StrokeStyle.fontSize = Style.fontSize + StrokeFont;
@@ -119,13 +125,6 @@ namespace Skill.Framework.UI.Extended
             {
                 _StrokeStyle = null;
             }
-
-            _LblLeft.Style = _StrokeStyle;
-            _LblDown.Style = _StrokeStyle;
-            _LblUp.Style = _StrokeStyle;
-            _LblRight.Style = _StrokeStyle;
-
-            _Changed = false;
         }
     }
 }

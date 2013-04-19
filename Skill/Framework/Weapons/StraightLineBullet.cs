@@ -16,6 +16,11 @@ namespace Skill.Framework.Weapons
         public float DamageFallOf = 0;
 
         /// <summary>
+        /// Damage of bullet do not be lower that this do to fallof
+        /// </summary>
+        public float MinDamage = 0;
+
+        /// <summary>
         /// Layers to raycast. (should be setted by weapon)
         /// </summary>
         public int LayerMask { get; set; }
@@ -40,7 +45,7 @@ namespace Skill.Framework.Weapons
             get
             {
                 if (DamageFallOf > 0)
-                    return base.Damage - DamageFallOf * _TravelledDistance;
+                    return Mathf.Max(MinDamage, base.Damage - (DamageFallOf * _TravelledDistance));
                 else
                     return base.Damage;
             }

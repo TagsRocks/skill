@@ -57,13 +57,13 @@ namespace Skill.Framework.Weapons
                             EventManager events = _HitInfo.collider.GetComponent<EventManager>();
                             if (events != null)
                             {
-                                RaycastHitInfo info = new RaycastHitInfo(bullet.Shooter, HitType.Bullet | HitType.Raycast, _HitInfo.collider);
+                                RaycastHitEventArgs info = new RaycastHitEventArgs(bullet.Shooter, HitType.Bullet | HitType.Raycast, _HitInfo.collider);
                                 info.Damage = bullet.Damage;
                                 info.Tag = this.tag;
                                 info.Normal = _HitInfo.normal;
                                 info.Point = _HitInfo.point;
                                 info.RaycastHit = _HitInfo;
-                                events.OnHit(this, new HitEventArgs(info));
+                                events.OnHit(this, info);
                             }
                         }
                     }

@@ -150,20 +150,20 @@ namespace Skill.Framework.AI
         /// <summary>
         /// Reset behavior. For internal use. when a branch with higher priority executed, let nodes in previous branch reset
         /// </summary>        
-        /// <param name="state">State of BehaviorTree</param>                
-        public override void ResetBehavior(BehaviorTreeState state)
+        /// <param name="status">Status of BehaviorTree</param>                
+        public override void ResetBehavior(BehaviorTreeStatus status)
         {
             if (Result == BehaviorResult.Running)
             {
-                if (LastUpdateId != state.UpdateId)
+                if (LastUpdateId != status.UpdateId)
                     RunningChildIndex = -1;
                 foreach (var child in this)
                 {
                     if (child != null)
-                        child.Behavior.ResetBehavior(state);
+                        child.Behavior.ResetBehavior(status);
                 }
             }
-            base.ResetBehavior(state);
+            base.ResetBehavior(status);
         }
 
         /// <summary>

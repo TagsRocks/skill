@@ -45,7 +45,7 @@ namespace Skill.Framework.Managers
         /// </summary>
         protected override void Update()
         {
-            if (_LifeTimeTW.EnabledAndOver)
+            if (_LifeTimeTW.IsEnabledAndOver)
             {
                 CacheSpawner.DestroyCache(this.gameObject);
             }

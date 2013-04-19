@@ -26,7 +26,8 @@ namespace Skill.Studio.AI.Editor
     /// Interaction logic for BehaviorTreeEditor.xaml
     /// </summary>
     public partial class BehaviorTreeEditor : TabDocument
-    {
+    {        
+
         #region SelectedItem
 
         /// <summary>
@@ -142,6 +143,10 @@ namespace Skill.Studio.AI.Editor
         #endregion
 
         #region Properties
+
+        protected override bool UndoAvailable { get { return _Tb.SelectedIndex == 0; } }
+        protected override bool RedoAvailable { get { return _Tb.SelectedIndex == 0; } }
+
         /// <summary> BehaviorTree ViewModel </summary>
         public BehaviorTreeViewModel BehaviorTree { get; private set; }
 
@@ -171,6 +176,7 @@ namespace Skill.Studio.AI.Editor
                 {
                     _AnimationSize = value;
                     RaisePropertyChanged("AnimationSize");
+                    ShowAnimations = _AnimationSize > _SliAnims.Minimum;
                 }
             }
         }
@@ -202,12 +208,24 @@ namespace Skill.Studio.AI.Editor
                 }
             }
 
-            History.UndoChange += new UnDoRedoChangeEventHandler(History_UndoChange);
-            History.RedoChange += new UnDoRedoChangeEventHandler(History_RedoChange);
+            //History.UndoChange += new UnDoRedoChangeEventHandler(History_UndoChange);
+            //History.RedoChange += new UnDoRedoChangeEventHandler(History_RedoChange);
+
+            this.ParentDocument.Closed += ParentDocument_Closed;
 
             this.Loaded += BehaviorTreeEditor_Loaded;
 
             InitialDebug();
+
+            for (int i = 0; i < BehaviorTree.States.Count; i++)
+            {
+                if (BehaviorTree.States[i].Name == BehaviorTree.DefaultState)
+                {
+                    BehaviorTree.States[i].IsDefaultState = true;
+                    _CmbStates.SelectedIndex = i;
+                    break;
+                }
+            }
         }
 
         void BehaviorTreeEditor_Loaded(object sender, RoutedEventArgs e)
@@ -218,17 +236,17 @@ namespace Skill.Studio.AI.Editor
 
         #region History events
         // hook events of History
-        void History_RedoChange(UnDoRedo sender, UnDoRedoChangeEventArgs e)
-        {
-            if (e.Command is AddBehaviorUnDoRedo || e.Command is MoveUpBehaviorUnDoRedo)
-                UpdatePositions();
-        }
+        //void History_RedoChange(UnDoRedo sender, UnDoRedoChangeEventArgs e)
+        //{
+        //    if (e.Command is AddBehaviorUnDoRedo || e.Command is MoveUpBehaviorUnDoRedo)
+        //        UpdatePositions();
+        //}
 
-        void History_UndoChange(UnDoRedo sender, UnDoRedoChangeEventArgs e)
-        {
-            if (e.Command is AddBehaviorUnDoRedo || e.Command is MoveUpBehaviorUnDoRedo)
-                UpdatePositions();
-        }
+        //void History_UndoChange(UnDoRedo sender, UnDoRedoChangeEventArgs e)
+        //{
+        //    if (e.Command is AddBehaviorUnDoRedo || e.Command is MoveUpBehaviorUnDoRedo)
+        //        UpdatePositions();
+        //}
 
         // when any change occurs in history, update title
         void History_Change(object sender, EventArgs e)
@@ -300,22 +318,29 @@ namespace Skill.Studio.AI.Editor
         #endregion
 
         #region UpdatePositions
-
-        protected override void OnContentLoaded()
+        public void RefreshDiagram()
         {
+            if (_Tb.SelectedIndex != 1) return;
+            BehaviorTree.UpdateSelectedBehaviors();
+            _NeedUpdatePosition = false;
             UpdatePositions();
-            base.OnContentLoaded();
+            _NeedUpdatePosition = true;
+            OnUpdateTreeNodes();
+            ApplicationCommands.Properties.Execute(null, null);
         }
 
-
-        public event EventHandler UpdateTreeNodes;
-
+        private bool _NeedUpdatePosition;
         public void UpdatePositions()
         {
             this.BehaviorTree.Root.UpdatePosition();
-            OnUpdateTreeNodes();
+            if (_NeedUpdatePosition)
+            {
+                _NeedUpdatePosition = false;
+                OnUpdateTreeNodes();
+            }
         }
 
+        public event EventHandler UpdateTreeNodes;
         private void OnUpdateTreeNodes()
         {
             if (UpdateTreeNodes != null)
@@ -367,7 +392,7 @@ namespace Skill.Studio.AI.Editor
                                         }
 
                                     }
-                                    UpdatePositions();
+                                    //UpdatePositions();
                                 }
                                 else
                                     MainWindow.Instance.ShowError(message);
@@ -422,7 +447,7 @@ namespace Skill.Studio.AI.Editor
                     {
                         newVM.IsSelected = true;
                     }
-                    UpdatePositions();
+                    //UpdatePositions();
                 }
             }
         }
@@ -440,7 +465,23 @@ namespace Skill.Studio.AI.Editor
 
                         newVM.IsSelected = true;
                     }
-                    UpdatePositions();
+                    //UpdatePositions();
+                }
+            }
+        }
+
+        private void AddChangeState()
+        {
+            if (IsNewAv)
+            {
+                var selected = GetSelectedItem();
+                if (selected != null)
+                {
+                    var newVM = selected.AddChangeState();
+                    if (newVM != null)
+                    {
+                        newVM.IsSelected = true;
+                    }
                 }
             }
         }
@@ -457,7 +498,7 @@ namespace Skill.Studio.AI.Editor
                     {
                         newVM.IsSelected = true;
                     }
-                    UpdatePositions();
+                    //UpdatePositions();
                 }
             }
         }
@@ -474,7 +515,7 @@ namespace Skill.Studio.AI.Editor
                     {
                         newVM.IsSelected = true;
                     }
-                    UpdatePositions();
+                    //UpdatePositions();
                 }
             }
         }
@@ -484,6 +525,15 @@ namespace Skill.Studio.AI.Editor
             if (sender is MenuItem)
             {
                 AddAction();
+            }
+            else System.Windows.MessageBox.Show("Menu Item not clicked");
+        }
+
+        private void Mnu_NewChangeState_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem)
+            {
+                AddChangeState();
             }
             else System.Windows.MessageBox.Show("Menu Item not clicked");
         }
@@ -529,7 +579,7 @@ namespace Skill.Studio.AI.Editor
                     if (selected.Parent != null)
                     {
                         ((BehaviorViewModel)selected.Parent).MoveUp(selected);
-                        UpdatePositions();
+                        //UpdatePositions();
                     }
                 }
 
@@ -546,7 +596,7 @@ namespace Skill.Studio.AI.Editor
                     if (selected.Parent != null)
                     {
                         ((BehaviorViewModel)selected.Parent).MoveDown(selected);
-                        UpdatePositions();
+                        //UpdatePositions();
                     }
                 }
             }
@@ -564,7 +614,7 @@ namespace Skill.Studio.AI.Editor
                     if (selected.Parent is BehaviorViewModel)
                     {
                         ((BehaviorViewModel)selected.Parent).RemoveBehavior(selected);
-                        UpdatePositions();
+                        //UpdatePositions();
                     }
                 }
                 CheckContextMnuAvailability();
@@ -650,7 +700,7 @@ namespace Skill.Studio.AI.Editor
         void PasteCmdExecuted(object target, ExecutedRoutedEventArgs e)
         {
             PasteFromClipboard();
-            UpdatePositions();
+            //UpdatePositions();
             e.Handled = true;
         }
 
@@ -747,7 +797,7 @@ namespace Skill.Studio.AI.Editor
         #endregion
 
         #region AccessKeys
-        private void Mnu_EditAccessKeys_Click(object sender, RoutedEventArgs e)
+        private void BtnEditAccessKeys_Click(object sender, RoutedEventArgs e)
         {
             SharedAccessKeysEditorWindow editor = new SharedAccessKeysEditorWindow(this.BehaviorTree.AccessKeys);
             editor.ShowDialog();
@@ -755,23 +805,82 @@ namespace Skill.Studio.AI.Editor
         }
         #endregion
 
-        #region ShowParameters
-
-        private void Mnu_ShowParameters_Click(object sender, RoutedEventArgs e)
+        #region Focus on click
+        private void Back_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            BehaviorTree.ShowParameters = !BehaviorTree.ShowParameters;
+            this.Focus();
+        }
+        #endregion
+
+        #region State
+
+        public bool IsDefaultStateSelected
+        {
+            get
+            {
+                if (BehaviorTree.Root != null)
+                    return BehaviorTree.DefaultState == BehaviorTree.Root.Name;
+                return false;
+            }
         }
 
+        private void BtnAddNewState_Click(object sender, RoutedEventArgs e)
+        {
+            BehaviorTree.AddNewState();
+        }
+
+        private void BtnDeleteState_Click(object sender, RoutedEventArgs e)
+        {
+            if (BehaviorTree.States.Count <= 1)
+            {
+                System.Windows.Forms.MessageBox.Show("Can not delete state. Behavior Tree needs at least one state");
+                return;
+            }
+            BehaviorTree.RemoveState(BehaviorTree.Root);
+        }
+
+        private void BtnSetasDefaultState_Click(object sender, RoutedEventArgs e)
+        {
+            if (BehaviorTree.Root != null && !BehaviorTree.Root.IsDefaultState)
+            {
+                BehaviorTree.DefaultState = BehaviorTree.Root.Name;
+                RaisePropertyChanged("IsDefaultStateSelected");
+                SetChanged(true);
+            }
+        }
+        private void CmbStates_Changed(object sender, SelectionChangedEventArgs e)
+        {
+            BehaviorViewModel b = _CmbStates.SelectedItem as BehaviorViewModel;
+            if (b != null)
+            {
+                BehaviorTree.ChangeState(b.Name);
+                RaisePropertyChanged("IsDefaultStateSelected");
+            }
+        }
+        #endregion
+
+        #region Tab changed
+        private int _PreTabIndex = 0;
+        private void Tb_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_PreTabIndex == _Tb.SelectedIndex) return;
+            if (_Tb.SelectedIndex == 0)
+            {
+                StopDebug();
+                _BtnPlayStop.IsChecked = false;
+                _BtnPause.IsChecked = false;
+            }
+            else if (_Tb.SelectedIndex == 1)
+            {                
+                RefreshDiagram();
+            }
+            _PreTabIndex = _Tb.SelectedIndex;
+        }
         #endregion
 
         #region Debug
 
-        private void Mnu_ShowAnimations_Click(object sender, RoutedEventArgs e)
-        {
-            ShowAnimations = !ShowAnimations;
-        }
-
-
+        private string _PreState;
         private TimeSpan _DebugTimeInterval;
         private DispatcherTimer _DebugTimer;
         private DebugBehaviorTree _DebugBehaviorTree;
@@ -795,7 +904,7 @@ namespace Skill.Studio.AI.Editor
         {
             _DebugTimer = new DispatcherTimer(DispatcherPriority.Normal, this.Dispatcher);
             _DebugTimer.Tick += new EventHandler(DebugTimer_Tick);
-            _DebugBehaviorTree = new DebugBehaviorTree(BehaviorTree.Root.Debug.Behavior);
+            _DebugBehaviorTree = new DebugBehaviorTree(BehaviorTree);
             _DebugRandomService = new DebugRandomService();
 
             ObservableCollection<double> timeIntervals = new ObservableCollection<double>();
@@ -816,8 +925,12 @@ namespace Skill.Studio.AI.Editor
 
         private void StartDebug()
         {
+            _PreState = BehaviorTree.Root.Name;
             Skill.Framework.AI.RandomSelector.RandomService = _DebugRandomService;
-            BehaviorTree.Root.Debug.UpdateChildren();
+            foreach (var s in BehaviorTree.States)
+            {
+                s.Debug.UpdateChildren();
+            }
             BehaviorTree.IsDebuging = true;
             BehaviorTree.DebugTimer = new TimeSpan();
             _DebugTimer.IsEnabled = _BtnPause.IsChecked == false;
@@ -836,8 +949,13 @@ namespace Skill.Studio.AI.Editor
         {
             if (BehaviorTree != null)
             {
+                if (!string.IsNullOrEmpty(_PreState))
+                    BehaviorTree.ChangeState(_PreState);
                 BehaviorTree.IsDebuging = false;
-                BehaviorTree.Root.Debug.ValidateBrush(false);
+                foreach (var s in BehaviorTree.States)
+                {
+                    s.Debug.ValidateBrush(false);
+                }
                 BehaviorTree.DebugTimer = new TimeSpan();
             }
             _DebugTimer.IsEnabled = false;
@@ -853,12 +971,12 @@ namespace Skill.Studio.AI.Editor
 
             if (!BehaviorTree.IsDebuging) return;
             BehaviorTree.DebugTimer += _DebugTimeInterval;
-            _DebugBehaviorTree.Update();
+            _DebugBehaviorTree.Update(null);
 
             // notify debug behaviors that all ExecutionSequence is visited
-            for (int i = 0; i < _DebugBehaviorTree.State.SequenceCount; i++)
+            for (int i = 0; i < _DebugBehaviorTree.Status.SequenceCount; i++)
             {
-                var item = _DebugBehaviorTree.State.ExecutionSequence[i];
+                var item = _DebugBehaviorTree.Status.ExecutionSequence[i];
                 if (item == null) break;
                 BehaviorViewModel d = item.Tag as BehaviorViewModel;
                 if (d != null)
@@ -872,7 +990,7 @@ namespace Skill.Studio.AI.Editor
         private void UpdateDebugAnimations()
         {
             List<GifImage> activeAnimations = new List<GifImage>();
-            foreach (var item in _DebugBehaviorTree.State.RunningActions)
+            foreach (var item in _DebugBehaviorTree.Status.RunningActions)
             {
                 ActionViewModel ac = item.Action.Tag as ActionViewModel;
                 if (ac != null)
@@ -914,6 +1032,22 @@ namespace Skill.Studio.AI.Editor
         {
             if (_BtnPlayStop.IsChecked == true)
             {
+                if (IsChanged)
+                {
+                    if (System.Windows.MessageBox.Show("Save all changes?", "Save", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.No)
+                    {
+                        _BtnPlayStop.IsChecked = false;
+                        return;
+                    }
+                }
+                MainWindow.Instance.Compile();
+                if (MainWindow.Instance.ErrorList.ErrorCount > 0)
+                {
+                    System.Windows.MessageBox.Show("You have to fix errors.");
+                    _BtnPlayStop.IsChecked = false;
+                    return;
+                }
+
                 StartDebug();
             }
             else
@@ -948,77 +1082,11 @@ namespace Skill.Studio.AI.Editor
             }
         }
 
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            PauseDebug();
-            base.OnClosing(e);
-        }
-
-        protected override void OnClosed()
+        void ParentDocument_Closed(object sender, EventArgs e)
         {
             StopDebug();
-            base.OnClosed();
         }
+
         #endregion
-
-        #region Refresh
-        private void BtnRefresh_Click(object sender, RoutedEventArgs e)
-        {
-            UpdatePositions();
-        }
-        #endregion
-
-        #region Focus on click
-        private void Back_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            this.Focus();
-        }
-        #endregion
-
-        #region State
-
-        public bool IsDefaultStateSelected
-        {
-            get
-            {
-                if (BehaviorTree.Root != null)
-                    return BehaviorTree.DefaultState == BehaviorTree.Root.Name;
-                return false;
-            }
-        }
-
-        private void MnuAddState_Click(object sender, RoutedEventArgs e)
-        {
-            BehaviorTree.AddNewState();
-            UpdatePositions();
-        }
-
-        private void MnuDeleteState_Click(object sender, RoutedEventArgs e)
-        {
-            BehaviorTree.RemoveState(BehaviorTree.Root);
-        }
-
-        private void MnuSetasDefaultState_Click(object sender, RoutedEventArgs e)
-        {
-            if (BehaviorTree.Root != null && !BehaviorTree.Root.IsDefaultState)
-            {
-                BehaviorTree.DefaultState = BehaviorTree.Root.Name;                
-                RaisePropertyChanged("IsDefaultStateSelected");
-                SetChanged(true);
-            }
-        }
-
-        private void Mnu_ChangeState_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is MenuItem)
-            {
-                MenuItem mnu = (MenuItem)sender;
-                BehaviorViewModel b = (BehaviorViewModel)mnu.Tag;
-                BehaviorTree.ChangeState(b.Name);
-                RaisePropertyChanged("IsDefaultStateSelected");
-            }
-        }
-        #endregion
-
     }
 }

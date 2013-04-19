@@ -36,6 +36,20 @@ namespace Skill.Framework.AI
     }
     #endregion
 
+    /// <summary>
+    /// Defines behavior of node when is child of a ConcurrentSelector
+    /// </summary>
+    public enum ConcurrencyMode
+    {
+        /// <summary>  Execute every update regardless of success or failure </summary>
+        Unlimit,
+        /// <summary>  Execute until success </summary>
+        UntilSuccess,
+        /// <summary>  Execute until failure </summary>
+        UntilFailure,
+
+    }
+
     #region ConcurrentSelector
     /// <summary>
     /// visit all of their children during each traversal.
@@ -47,36 +61,32 @@ namespace Skill.Framework.AI
     {
 
         private int _FailureCount; // number of children that returns BehaviorResult.Failure
-        //private bool[] _ChildrenResults;// state of children that finish their jobs and result is not BehaviorResult.Running
+        private bool[] _ChildrenFirstExecution; // status of children that finish their jobs and result is not BehaviorResult.Running
 
 
-        //// <summary>
-        //// At first time execution, make sure the  _ChildrenResults array is valid
-        //// </summary>
-        //private void CreateChildrenResults()
-        //{
-        //    if (_ChildrenResults == null || _ChildrenResults.Length != ChildCount)
-        //    {
-        //        _ChildrenResults = new bool[ChildCount];
-        //        ResetChildrenResults();
-        //    }
-        //}
+        /// <summary>
+        /// At first time execution, make sure the  _ChildrenResults array is valid
+        /// </summary>
+        private void CreateChildrenExecution()
+        {
+            if (_ChildrenFirstExecution == null || _ChildrenFirstExecution.Length != ChildCount)
+            {
+                _ChildrenFirstExecution = new bool[ChildCount];
+                ResetChildrenExecution();
+            }
+        }
 
-        ///// <summary>
-        ///// Reset _ChildrenResults array
-        ///// </summary>
-        //private void ResetChildrenResults()
-        //{
-        //    _FailureCount = 0;
-        //    for (int i = 0; i < _ChildrenResults.Length; i++)
-        //    {
-        //        _ChildrenResults[i] = false;
-        //    }
-        //}
+        /// <summary>
+        /// Reset _ChildrenResults array
+        /// </summary>
+        private void ResetChildrenExecution()
+        {            
+            for (int i = 0; i < _ChildrenFirstExecution.Length; i++)
+            {
+                _ChildrenFirstExecution[i] = false;
+            }
+        }
 
-
-        /// <summary> First check for conditions then rest of childs (default true)</summary>
-        public bool FirstConditions { get; set; }
         /// <summary>
         /// if true, by first condition failure, ConcurrentSelector returns BehaviorResult.Failure
         /// </summary>
@@ -105,39 +115,49 @@ namespace Skill.Framework.AI
         {
             FailurePolicy = AI.FailurePolicy.FailOnAll;
             SuccessPolicy = AI.SuccessPolicy.SucceedOnAll;
-            FirstConditions = true;
             BreakOnConditionFailure = false;
         }
 
         /// <summary>
         /// Behave
         /// </summary>
-        /// <param name="state">state of BehaviorTree</param>
+        /// <param name="status">status of BehaviorTree</param>
         /// <returns>Result</returns>
-        protected override BehaviorResult Behave(BehaviorTreeState state)
+        protected override BehaviorResult Behave(BehaviorTreeStatus status)
         {
             _FailureCount = 0;
-            //CreateChildrenResults(); // make sure the  _ChildrenResults array is valid
+            CreateChildrenExecution(); // make sure the  _ChildrenResults array is valid
             BehaviorResult result = BehaviorResult.Success; // by default success
-            if (FirstConditions) // first check conditions
-                result = CheckConditions(state);
-            if (result == BehaviorResult.Failure)// if fails no need to execute other nodes
-                return result;
+            //if (FirstConditions) // first check conditions
+            //result = CheckConditions(status);
+            //if (result == BehaviorResult.Failure)// if fails no need to execute other nodes
+            //return result;
 
             // itrate throw children an execute them
             for (int i = 0; i < ChildCount; i++)
             {
-                //if (_ChildrenResults[i]) continue;// if this child already executed ignore it
-
                 BehaviorContainer node = this[i];
-                state.Parameters = node.Parameters;
+                status.Parameters = node.Parameters;
+
+                if (_ChildrenFirstExecution[i])
+                {
+                    if (node.Behavior.Concurrency == ConcurrencyMode.UntilFailure && node.Behavior.Result == BehaviorResult.Failure)
+                    {
+                        _FailureCount++;
+                        continue;
+                    }
+                    else if (node.Behavior.Concurrency == ConcurrencyMode.UntilSuccess && node.Behavior.Result == BehaviorResult.Success)
+                    {
+                        continue;
+                    }
+                }
 
                 // if this node executed first ignore it
-                if (FirstConditions && node.Behavior.Type == BehaviorType.Condition) continue;
+                //if (FirstConditions && node.Behavior.Type == BehaviorType.Condition) continue;
 
-                BehaviorResult r = node.Behavior.Trace(state);// execute child node
+                BehaviorResult childResult = node.Behavior.Execute(status);// execute child node
 
-                if (r == BehaviorResult.Failure)
+                if (childResult == BehaviorResult.Failure)
                 {
                     if (BreakOnConditionFailure && node.Behavior.Type == BehaviorType.Condition)
                     {
@@ -154,41 +174,41 @@ namespace Skill.Framework.AI
                     break;
                 }
                 // check success policity
-                if (SuccessPolicy == AI.SuccessPolicy.SucceedOnOne && r == BehaviorResult.Success)
+                if (SuccessPolicy == AI.SuccessPolicy.SucceedOnOne && childResult == BehaviorResult.Success)
                 {
                     result = BehaviorResult.Success;
                     break;
                 }
 
                 // if result of this node is running or result of any previous node is running, set result to running
-                if (r == BehaviorResult.Running || result != BehaviorResult.Running)
-                    result = r;
-                //if (r != BehaviorResult.Running)
-                //    _ChildrenResults[i] = true; // set ; child node at index i executed and finished it's job
+                if (childResult == BehaviorResult.Running || result != BehaviorResult.Running)
+                    result = childResult;
+
+                _ChildrenFirstExecution[i] = true;
             }
 
 
-            //if (result != BehaviorResult.Running)
-            //    ResetChildrenResults();
+            if (result != BehaviorResult.Running)
+                ResetChildrenExecution();
             return result;
         }
 
         /// <summary>
         /// iterate throw children and evaluate conditions
         /// </summary>
-        /// <param name="state">State of BehaviorTree</param>
+        /// <param name="status">Status of BehaviorTree</param>
         /// <returns></returns>
-        private BehaviorResult CheckConditions(BehaviorTreeState state)
+        private BehaviorResult CheckConditions(BehaviorTreeStatus status)
         {
             BehaviorResult result = BehaviorResult.Success;
             for (int i = 0; i < ChildCount; i++)
             {
                 BehaviorContainer node = this[i];
-                state.Parameters = node.Parameters;
+                status.Parameters = node.Parameters;
 
                 if (node.Behavior.Type == BehaviorType.Condition)
                 {
-                    BehaviorResult r = node.Behavior.Trace(state);
+                    BehaviorResult r = node.Behavior.Execute(status);
 
                     if (r == BehaviorResult.Failure)
                     {
@@ -220,7 +240,21 @@ namespace Skill.Framework.AI
                 }
             }
             return result;
-        }       
+        }
+
+        /// <summary>
+        /// Reset behavior. For internal use. when a branch with higher priority executed, let nodes in previous branch reset
+        /// </summary>        
+        /// <param name="status">Status of BehaviorTree</param>   
+        public override void ResetBehavior(BehaviorTreeStatus status)
+        {
+            if (Result == BehaviorResult.Running)
+            {
+                if (LastUpdateId != status.UpdateId)
+                    ResetChildrenExecution();
+            }
+            base.ResetBehavior(status);
+        }
     }
     #endregion
 }

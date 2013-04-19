@@ -46,9 +46,36 @@ namespace Skill.Studio.AI
             }
         }
 
+        [Category("Debug")]
+        [Description("Is action valid in simulation?")]
+        public bool IsValid
+        {
+            get { return ((Skill.DataModels.AI.Action)Model).IsValid; }
+            set
+            {
+                if (((Skill.DataModels.AI.Action)Model).IsValid != value)
+                {
+                    SetValid(value);
+                    foreach (ActionViewModel avm in Tree.GetSharedModel(Model))
+                        if (avm != this) avm.SetValid(value);
+                    Tree.Editor.SetChanged(true);
+                }
+            }
+        }
+
+        public override bool IsValidable { get { return true; } }
+
+        private void SetValid(bool value)
+        {
+            ((Skill.DataModels.AI.Action)Model).IsValid = value;
+            Debug.IsValid = value;
+            if (IsDebuging) BackBrush = value ? Editor.BehaviorBrushes.EnableBrush : Editor.BehaviorBrushes.DisableBrush;
+            OnPropertyChanged(new PropertyChangedEventArgs("IsValid"));
+        }
 
         [Category("Debug")]
-        [Description("ExecutionTime of action in simulation runtime")]
+        [Description("ExecutionTime of action in simulation")]
+        [DefaultValue(1.0)]
         public float ExecutionTime
         {
             get { return ((Skill.DataModels.AI.Action)Model).ExecutionTime; }

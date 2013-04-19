@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Windows.Input;
@@ -9,7 +10,7 @@ namespace Skill.Studio
     /// <summary>
     /// Defines base class for all editor tabs
     /// </summary>
-    public class TabDocument : AvalonDock.DocumentContent
+    public class TabDocument : System.Windows.Controls.UserControl, INotifyPropertyChanged
     {
         #region Variables
         private EventHandler _ChangeNameHandler;
@@ -41,6 +42,8 @@ namespace Skill.Studio
 
         /// <summary> Whether is changed or not </summary>
         public virtual bool IsChanged { get { return _IsChanged; } }
+
+        public Controls.LayoutDocument ParentDocument { get; private set; }
         #endregion
 
         #region Constructor
@@ -52,6 +55,7 @@ namespace Skill.Studio
         public TabDocument(EntityNodeViewModel vm)
             : this()
         {
+            this.ParentDocument = new Controls.LayoutDocument(this);
             ViewModel = vm;
             _ChangeNameHandler = ViewModel_NameChanged;
             vm.NameChanged += _ChangeNameHandler;
@@ -65,7 +69,7 @@ namespace Skill.Studio
         {
             if (ViewModel != null)
                 SetChanged(false);
-        }        
+        }
 
         void History_Change(object sender, EventArgs e)
         {
@@ -80,8 +84,11 @@ namespace Skill.Studio
 
         protected virtual void ChangeTitle()
         {
-            string newTitle = ViewModel.Name + (IsChanged ? "*" : "");
-            if (this.Title != newTitle) this.Title = newTitle;
+            if (ViewModel != null)
+            {
+                string newTitle = ViewModel.Name + (IsChanged ? "*" : "");
+                if (this.ParentDocument.Title != newTitle) this.ParentDocument.Title = newTitle;
+            }
         }
 
         public virtual void SetChanged(bool changed)
@@ -111,16 +118,19 @@ namespace Skill.Studio
             {
                 Data.CommiteChanges();
                 ViewModel.SaveData(Data.GetDataModel());
-                History.ResetChangeCount();                
+                History.ResetChangeCount();
             }
             SetChanged(false);
         }
         #endregion
 
         #region Undo
+
+        protected virtual bool UndoAvailable { get { return true; } }
+
         protected void UndoCmdCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = History.CanUndo;
+            e.CanExecute = UndoAvailable && History.CanUndo;
             e.Handled = true;
         }
         protected void UndoCmdExecuted(object target, ExecutedRoutedEventArgs e)
@@ -131,9 +141,10 @@ namespace Skill.Studio
         #endregion
 
         #region Redo
+        protected virtual bool RedoAvailable { get { return true; } }
         protected void RedoCmdCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = History.CanRedo;
+            e.CanExecute = RedoAvailable && History.CanRedo;
             e.Handled = true;
         }
         protected void RedoCmdExecuted(object target, ExecutedRoutedEventArgs e)
@@ -142,5 +153,21 @@ namespace Skill.Studio
             e.Handled = true;
         }
         #endregion
+
+        #region INotifyPropertyChanged Members
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            if (this.PropertyChanged != null)
+                this.PropertyChanged(this, e);
+        }
+
+        protected void RaisePropertyChanged(string propertyName)
+        {
+            OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+        }
+        #endregion // INotifyPropertyChanged Members
     }
 }

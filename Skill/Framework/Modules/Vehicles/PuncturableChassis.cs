@@ -35,7 +35,7 @@ namespace Skill.Framework.Modules.Vehicles
             _Euler.Update(PunctureSmoothing);
             transform.rotation = Quaternion.Euler(_Euler.Current);
 
-            if (!_UpdateTW.Enabled || _UpdateTW.EnabledAndOver)
+            if (!_UpdateTW.IsEnabled || _UpdateTW.IsEnabledAndOver)
             {
                 _UpdateTW.End();
                 enabled = false;

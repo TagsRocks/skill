@@ -86,7 +86,7 @@ namespace Skill.Framework
         /// <summary>
         /// Whether game is in slow motion mode or not
         /// </summary>
-        public bool IsSlowingMotion { get { return _FreezeTW.Enabled || _MotionTW.Enabled; } }
+        public bool IsSlowingMotion { get { return _FreezeTW.IsEnabled || _MotionTW.IsEnabled; } }
 
         private SlowMotionInfo _Info;
         private TimeWatch _MotionTW;
@@ -115,7 +115,7 @@ namespace Skill.Framework
 
         private void Global_SlowMotion(object sender, SlowMotionEventArgs args)
         {
-            if (_MotionTW.Enabled) return;
+            if (_MotionTW.IsEnabled) return;
             if (args == null || args.Motion == null) return;
 
             _Info = args.Motion;
@@ -185,7 +185,7 @@ namespace Skill.Framework
                 _FreezTimeLeftWhenPaused = 0;
             }
 
-            if (_MotionTW.Enabled)
+            if (_MotionTW.IsEnabled)
             {
                 if (_MotionTW.IsOver)
                 {
@@ -201,12 +201,12 @@ namespace Skill.Framework
                 }
                 else
                 {
-                    if (_FreezeTW.EnabledAndOver)
+                    if (_FreezeTW.IsEnabledAndOver)
                         _FreezeTW.End();
 
                     if (Skill.Framework.Sounds.PitchController.Instance != null)
                         Skill.Framework.Sounds.PitchController.Instance.Pitch = _Info.Pitch;
-                    if (!_FreezeTW.Enabled)
+                    if (!_FreezeTW.IsEnabled)
                     {
                         Time.timeScale = _Info.TimeScale;
                     }

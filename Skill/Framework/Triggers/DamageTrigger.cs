@@ -29,6 +29,9 @@ namespace Skill.Framework.Triggers
         private List<ColliderInfo> _Colliders;
         private Ray _IntersectRay;
 
+        /// <summary> User Data </summary>
+        public object UserData { get; set; }
+
         /// <summary>
         /// Awake
         /// </summary>
@@ -107,10 +110,10 @@ namespace Skill.Framework.Triggers
         {
             if (cInfo != null)
             {
-                if (!cInfo.DamageTW.EnabledAndOver)
+                if (!cInfo.DamageTW.IsEnabledAndOver)
                     cInfo.DamageTW.End();
 
-                if (!cInfo.DamageTW.Enabled)
+                if (!cInfo.DamageTW.IsEnabled)
                 {
                     EventManager em = cInfo.Collider.GetComponent<EventManager>();
                     if (em != null)
@@ -128,7 +131,7 @@ namespace Skill.Framework.Triggers
                             d = Damage * (1.0f - Mathf.Min(Range, dis) / Range);
                         }
 
-                        em.OnDamage(this, new DamageEventArgs(d, tag));
+                        em.OnDamage(this, new DamageEventArgs(d, tag) { UserData = this.UserData });
                         cInfo.DamageTW.Begin(Interval);
                     }
                 }

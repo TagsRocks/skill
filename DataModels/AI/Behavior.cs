@@ -16,8 +16,10 @@ namespace Skill.DataModels.AI
         Condition,
         Decorator,
         Composite,
+        ChangeState
     }
     #endregion
+
 
     #region Behavior
     /// <summary>
@@ -39,7 +41,15 @@ namespace Skill.DataModels.AI
         public float Weight { get; set; }
 
         /// <summary> User comment for this behavior </summary>
-        public string Comment { get; set; }       
+        public string Comment { get; set; }
+
+        /// <summary> Is this behavior root of state? </summary>
+        public bool IsState { get; set; }
+
+        /// <summary>
+        /// Behavior of node when is child of a ConcurrentSelector
+        /// </summary>
+        public ConcurrencyMode Concurrency { get; set; }
         #endregion
 
         #region Constructor
@@ -52,7 +62,8 @@ namespace Skill.DataModels.AI
             _Behaviors = new List<Behavior>();
             _Parameters = new List<ParameterCollection>();
             this.Name = name;
-            this.Weight = 1;            
+            this.Weight = 1;
+            this.IsState = false;
         }
         #endregion
 
@@ -106,13 +117,15 @@ namespace Skill.DataModels.AI
             behavior.SetAttributeValue("Name", Name);
             behavior.SetAttributeValue("Id", Id);
             behavior.SetAttributeValue("Weight", Weight);
+            behavior.SetAttributeValue("IsState", IsState);
+            behavior.SetAttributeValue("Concurrency", Concurrency.ToString());
 
             if (!string.IsNullOrEmpty(Comment))
             {
                 XElement comment = new XElement("Comment");
                 comment.SetValue(Comment);
                 behavior.Add(comment);
-            }            
+            }
 
 
             WriteAttributes(behavior); // allow subclass to add additional data
@@ -144,6 +157,16 @@ namespace Skill.DataModels.AI
             Name = e.GetAttributeValueAsString("Name", Name);
             Id = int.Parse(e.GetAttributeValueAsString("Id", "-1"));
             Weight = e.GetAttributeValueAsFloat("Weight", 1);
+            IsState = e.GetAttributeValueAsBoolean("IsState", false);
+
+            try
+            {
+                Concurrency = (ConcurrencyMode)Enum.Parse(typeof(ConcurrencyMode), e.GetAttributeValueAsString("Concurrency", "Unlimit"), false);
+            }
+            catch (Exception)
+            {
+                Concurrency = ConcurrencyMode.Unlimit;
+            }
 
             XElement comment = FindChild(e, "Comment");
             if (comment != null)
@@ -301,6 +324,24 @@ namespace Skill.DataModels.AI
             {
                 _Behaviors.RemoveAt(index);
                 _Parameters.RemoveAt(index);
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Replace specified child
+        /// </summary>
+        /// <param name="oldItem">old child to replace</param>
+        /// <param name="newItem">new child to place</param>
+        /// <returns>True if sucess, otherwise false</returns>
+        public bool Replace(Behavior oldItem, Behavior newItem)
+        {
+            int index = _Behaviors.IndexOf(oldItem);
+            if (index >= 0)
+            {
+                _Behaviors.RemoveAt(index);
+                _Behaviors.Insert(index, newItem);
                 return true;
             }
             return false;

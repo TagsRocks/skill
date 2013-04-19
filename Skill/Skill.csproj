@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="Framework\AI\BehaviorParameter.cs" />
     <Compile Include="Framework\AI\BehaviorType.cs" />
+    <Compile Include="Framework\AI\ChangeState.cs" />
     <Compile Include="Framework\AI\CompositeType.cs" />
     <Compile Include="Framework\AI\RunningActionCollection.cs" />
     <Compile Include="Framework\Animation\AnimationTreeState.cs" />
@@ -60,11 +61,12 @@
     <Compile Include="Framework\Cursor.cs" />
     <Compile Include="Framework\Global.cs" />
     <Compile Include="Framework\Health.cs" />
-    <Compile Include="Framework\HitInfo.cs" />
+    <Compile Include="Framework\HitEventArgs.cs" />
     <Compile Include="Framework\IO\SmallXmlParser.cs" />
     <Compile Include="Framework\IO\XmlAttribute.cs" />
     <Compile Include="Framework\IO\XmlDocument.cs" />
     <Compile Include="Framework\IsometricCamera.cs" />
+    <Compile Include="Framework\IsometricCameraMotion.cs" />
     <Compile Include="Framework\Modules\ShakeOnEnable.cs" />
     <Compile Include="Framework\Modules\ShakeOnDie.cs" />
     <Compile Include="Framework\SlowMotionController.cs" />
@@ -107,7 +109,7 @@
     <Compile Include="Framework\AI\Action.cs" />
     <Compile Include="Framework\AI\Behavior.cs" />
     <Compile Include="Framework\AI\BehaviorResult.cs" />
-    <Compile Include="Framework\AI\BehaviorTreeState.cs" />
+    <Compile Include="Framework\AI\BehaviorTreeStatus.cs" />
     <Compile Include="Framework\AI\BehaviorTree.cs" />
     <Compile Include="Framework\AI\ConcurrentSelector.cs" />
     <Compile Include="Framework\AI\Condition.cs" />
@@ -215,10 +217,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram1.cd" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Unity\UnityEditor.dll" />
-    <Content Include="Unity\UnityEngine.dll" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

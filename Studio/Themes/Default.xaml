@@ -124,6 +124,9 @@
     <BitmapImage x:Key="ImgAction"  UriSource="/SkillStudio;component/Images/Default/Action.png" />
     <BitmapImage x:Key="ImgAction_D"  UriSource="/SkillStudio;component/Images/Default/Disabled/Action.png" />
 
+    <BitmapImage x:Key="ImgChangeState"  UriSource="/SkillStudio;component/Images/Default/ChangeState.png" />
+    <BitmapImage x:Key="ImgChangeState_D"  UriSource="/SkillStudio;component/Images/Default/Disabled/ChangeState.png" />    
+
     <BitmapImage x:Key="ImgACDecorator"   UriSource="/SkillStudio;component/Images/Default/AccessLimitDecorator.png" />
     <BitmapImage x:Key="ImgACDecorator_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/AccessLimitDecorator.png" />
 
@@ -263,6 +266,7 @@
     <BitmapImage x:Key="ImgStopHoverBtn"   UriSource="/SkillStudio;component/Images/Default/Player/Stop_H.png" />
     <BitmapImage x:Key="ImgStepHoverBtn"   UriSource="/SkillStudio;component/Images/Default/Player/Step_H.png" />
 
+    <BitmapImage x:Key="ImgSetAsDefault"   UriSource="/SkillStudio;component/Images/Default/SetAsDefault.png" />
 
     <Style x:Key="AnimationText" TargetType="TextBlock" >
         <Setter Property="Foreground" Value="White" />

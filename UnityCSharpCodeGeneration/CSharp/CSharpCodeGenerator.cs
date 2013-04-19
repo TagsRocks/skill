@@ -18,14 +18,14 @@ namespace Skill.CodeGeneration.CSharp
     {
         private RequiredFile[] _RequiredFiles = new RequiredFile[]
         {
-            new RequiredFile("Skill.Framework.dll","Skill","Assets"),
-            new RequiredFile("Skill.Framework.xml","Skill","Assets"),            
-            new RequiredFile("Skill.Framework.pdb","Skill","Assets"),            
-            new RequiredFile("Skill.Editor.dll","Skill\\Editor","Assets"),
-            new RequiredFile("Skill.Editor.xml","Skill\\Editor","Assets"),
-            new RequiredFile("Skill.Editor.pdb","Skill\\Editor","Assets"),
-            new RequiredFile("Resources","Skill\\Editor","Assets"),
-            new RequiredFile("Skill.DataModels.dll","Skill\\Editor","Assets"),
+            new RequiredFile("Skill.Framework.dll","",false),
+            new RequiredFile("Skill.Framework.xml","",false),
+            new RequiredFile("Skill.Framework.pdb","",false),
+            new RequiredFile("Skill.Editor.dll","",true),
+            new RequiredFile("Skill.Editor.xml","",true),
+            new RequiredFile("Skill.Editor.pdb","",true),
+            new RequiredFile("Resources","",true),
+            new RequiredFile("Skill.DataModels.dll","",true),
         };
         public RequiredFile[] RequiredFiles { get { return _RequiredFiles; } }
 

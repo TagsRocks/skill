@@ -28,6 +28,9 @@ namespace Skill.DataModels.AI
         /// <summary> use for simulation AnimationTree</summary>
         public int AnimationFrameRate { get; set; }
 
+        /// <summary> use for simulation AnimationTree</summary>
+        public bool IsValid { get; set; }
+
         /// <summary>
         /// Create an instance of action
         /// </summary>
@@ -38,7 +41,7 @@ namespace Skill.DataModels.AI
             AnimationSource = "";
             AnimationWrapMode = 0;
             AnimationFrameRate = 30;
-        }
+        }        
 
         protected override void WriteAttributes(System.Xml.Linq.XElement e)
         {
@@ -47,6 +50,7 @@ namespace Skill.DataModels.AI
 
             XElement debug = new XElement("Debug");
 
+            debug.SetAttributeValue("IsValid", IsValid);
             debug.SetAttributeValue("WrapMode", AnimationWrapMode);
             debug.SetAttributeValue("Source", AnimationSource);
             debug.SetAttributeValue("FrameRate", AnimationFrameRate);
@@ -61,6 +65,7 @@ namespace Skill.DataModels.AI
             XElement debug = e.FindChildByName("Debug");
             if (debug != null)
             {
+                IsValid = debug.GetAttributeValueAsBoolean("IsValid", true);
                 AnimationWrapMode = debug.GetAttributeValueAsInt("WrapMode", 0);
                 AnimationSource = debug.GetAttributeValueAsString("Source", "");
                 AnimationFrameRate = debug.GetAttributeValueAsInt("FrameRate", 0);

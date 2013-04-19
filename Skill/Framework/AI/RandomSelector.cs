@@ -111,16 +111,16 @@ namespace Skill.Framework.AI
         /// <summary>
         /// Behave
         /// </summary>
-        /// <param name="state">State od BehaviorTree</param>
+        /// <param name="status">Status od BehaviorTree</param>
         /// <returns>Result</returns>
-        protected override BehaviorResult Behave(BehaviorTreeState state)
+        protected override BehaviorResult Behave(BehaviorTreeStatus status)
         {
             if (RunningChildIndex < 0)
                 RunningChildIndex = GetRandomIndex();// pick random node
             BehaviorResult result = BehaviorResult.Failure;
             BehaviorContainer node = this[RunningChildIndex];
-            state.Parameters = node.Parameters;
-            result = node.Behavior.Trace(state);
+            status.Parameters = node.Parameters;
+            result = node.Behavior.Execute(status);
             if (result != BehaviorResult.Running)
                 RunningChildIndex = -1;
             return result;

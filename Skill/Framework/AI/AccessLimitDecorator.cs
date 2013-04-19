@@ -126,7 +126,7 @@ namespace Skill.Framework.AI
         {
             if (!_Lock)
             {
-                if (_TimeTW.Enabled)
+                if (_TimeTW.IsEnabled)
                 {
                     if (_TimeTW.IsOver)
                     {
@@ -167,7 +167,7 @@ namespace Skill.Framework.AI
     /// </remarks>
     public class AccessLimitDecorator : Decorator
     {
-        private bool _Lock;// state of lock
+        private bool _Lock;// status of lock
 
         /// <summary>
         /// Shared AccessKey
@@ -196,9 +196,9 @@ namespace Skill.Framework.AI
         /// <summary>
         /// Behave
         /// </summary>
-        /// <param name="state">State of BehaviorTree</param>
+        /// <param name="status">Status of BehaviorTree</param>
         /// <returns>Result</returns>
-        //protected override BehaviorResult Behave(BehaviorState state)
+        //protected override BehaviorResult Behave(BehaviorStatus status)
         //{
         //    BehaviorResult result = BehaviorResult.Failure;
         //    if (Child != null)
@@ -209,8 +209,8 @@ namespace Skill.Framework.AI
         //                _Lock = AccessKey.Lock();// try to lock key
         //            if (_Lock)// if success, execute child
         //            {
-        //                state.Parameters = Child.Parameters;
-        //                result = Child.Behavior.Trace(state);
+        //                status.Parameters = Child.Parameters;
+        //                result = Child.Behavior.Trace(status);
         //            }
         //            if (_Lock && result != BehaviorResult.Running)// if finish job, unlock key
         //            {
@@ -224,7 +224,7 @@ namespace Skill.Framework.AI
         //    return result;
         //}
 
-        protected override BehaviorResult TraceChild(BehaviorTreeState state)
+        protected override BehaviorResult TraceChild(BehaviorTreeStatus status)
         {
             BehaviorResult result = BehaviorResult.Failure;
             if (AccessKey != null)
@@ -233,7 +233,7 @@ namespace Skill.Framework.AI
                     _Lock = AccessKey.Lock();// try to lock key
                 if (_Lock)// if success, execute child
                 {
-                    result = base.TraceChild(state);
+                    result = base.TraceChild(status);
                 }
                 if (_Lock && result != BehaviorResult.Running)// if finish job, unlock key
                 {
@@ -247,18 +247,18 @@ namespace Skill.Framework.AI
         /// <summary>
         /// Reset behavior. For internal use. when a branch with higher priority executed, let nodes in previous branch reset
         /// </summary>        
-        /// <param name="state">State of BehaviorTree</param>                
-        public override void ResetBehavior(BehaviorTreeState state)
+        /// <param name="status">Status of BehaviorTree</param>                
+        public override void ResetBehavior(BehaviorTreeStatus status)
         {
             if (_Lock && Result == BehaviorResult.Running)
             {
-                if (LastUpdateId != state.UpdateId)
+                if (LastUpdateId != status.UpdateId)
                 {
                     AccessKey.Unlock();
                     _Lock = false;
                 }
             }
-            base.ResetBehavior(state);
+            base.ResetBehavior(status);
         }
     }
     #endregion

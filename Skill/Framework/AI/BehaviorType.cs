@@ -11,23 +11,27 @@ namespace Skill.Framework.AI
     public enum BehaviorType
     {
         /// <summary>
-        /// Contains childeren and execute them in specific order.(none leaf node)
+        /// Implement an actors or game world status changes.(leaf node) 
         /// </summary>
-        Composite,
+        Action,
         /// <summary>
-        /// Check that certain actor or game world states hold true.(leaf node)
+        /// Check that certain actor or game world statuss hold true.(leaf node)
         /// </summary>
-        Condition,
+        Condition,                
         /// <summary>
-        /// Typically have only one child and are used to enforce a certain return state 
+        /// Typically have only one child and are used to enforce a certain return status 
         /// or to implement timers to restrict how often the child will run in a given amount of time
         /// or how often it can be executed without a pause.(none leaf node)
         /// </summary>
         Decorator,
         /// <summary>
-        /// Implement an actors or game world state changes.(leaf node) 
+        /// Contains childeren and execute them in specific order.(none leaf node)
         /// </summary>
-        Action
+        Composite,
+        /// <summary>
+        /// Change state of behavior tree
+        /// </summary>
+        ChangeState
     }
     #endregion
 }

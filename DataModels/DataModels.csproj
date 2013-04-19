@@ -43,6 +43,7 @@
     <Compile Include="AI\Action.cs" />
     <Compile Include="AI\Behavior.cs" />
     <Compile Include="AI\BehaviorTree.cs" />
+    <Compile Include="AI\ChangeState.cs" />
     <Compile Include="AI\Composite.cs" />
     <Compile Include="AI\Condition.cs" />
     <Compile Include="AI\Decorator.cs" />
