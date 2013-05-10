@@ -12,6 +12,12 @@ namespace Skill.Framework
     [RequireComponent(typeof(Skill.Framework.EventManager))]
     public abstract class Controller : DynamicBehaviour
     {
+        /// <summary>
+        /// An optional meaningful identifier for controller to be distinguishable from others.
+        /// (set this to a valid value to be visible in BehaviorTree debugger)
+        /// </summary>
+        public string Identifier;
+
         private Skill.Framework.AI.BehaviorTree _Behavior;
         /// <summary>
         /// BehaviorTree of controller (should provide by subclass)
@@ -66,20 +72,30 @@ namespace Skill.Framework
         {
             if (Behavior != null)
                 Behavior.Reset();
+            Global.UnRegister(this);
             base.OnDestroy();
         }
 
         /// <summary>
         /// Destroy controller
         /// </summary>
-        public virtual void Destroy()
+        public virtual void DestroySelf()
         {
             if (Spawner != null)
                 this.Spawner.DestroySpawnedObject(this.gameObject);
             else
-                GameObject.Destroy(this.gameObject);
+                GameObject.Destroy(this.gameObject);            
         }
 
+
+        /// <summary>
+        /// Use this for initialization
+        /// </summary>
+        protected override void Start()
+        {
+            base.Start();
+            Global.Register(this);
+        }  
         /// <summary>
         /// Hooks required events of EventManager. ('Die' and 'Hit' events)
         /// </summary>
@@ -101,5 +117,7 @@ namespace Skill.Framework
             base.GetReferences();
             Health = GetComponent<Health>();
         }
+
+              
     }
 }

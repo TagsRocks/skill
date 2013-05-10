@@ -38,8 +38,8 @@ namespace Skill.Framework
         public HitType Type { get; private set; }
         /// <summary> The object that caused this hit </summary>
         public GameObject Owner { get; private set; }
-        /// <summary> Other collider </summary>
-        public UnityEngine.Collider Other { get; private set; }
+        /// <summary> Collider </summary>
+        public UnityEngine.Collider Collider { get; private set; }
         /// <summary> User data </summary>
         public System.Object UserData { get; set; }
 
@@ -62,12 +62,12 @@ namespace Skill.Framework
         /// </summary>
         /// <param name="owner"> The object that caused this hit </param>
         /// <param name="type"> Type of hit </param>
-        /// <param name="other"> Other collider </param>       
-        public HitEventArgs(GameObject owner, HitType type, UnityEngine.Collider other)
+        /// <param name="collider"> Collider </param>       
+        public HitEventArgs(GameObject owner, HitType type, UnityEngine.Collider collider)
         {
             this.Type = type;
             this.Owner = owner;
-            this.Other = other;            
+            this.Collider = collider;            
         }
     }
 

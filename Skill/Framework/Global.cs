@@ -67,10 +67,13 @@ namespace Skill.Framework
         /// <param name="source">Source of sound</param>
         /// <param name="clip">Sound to play</param>
         /// <param name="category">Category of sound</param>
-        public virtual void PlaySound(AudioSource source, AudioClip clip, Skill.Framework.Sounds.SoundCategory category)
+        public virtual void PlaySoundOneShot(AudioSource source, AudioClip clip, Skill.Framework.Sounds.SoundCategory category)
         {
-            float volume = Settings.Audio.GetVolume(category);            
-            source.PlayOneShot(clip, volume);
+            if (source != null && clip != null)
+            {
+                float volume = Settings.Audio.GetVolume(category);
+                source.PlayOneShot(clip, volume);
+            }
         }
 
         // ********** static events **********
@@ -107,6 +110,57 @@ namespace Skill.Framework
         {
             if (SlowMotion != null)
                 SlowMotion(sender, new SlowMotionEventArgs(new SlowMotionInfo(info)));
+        }
+
+
+        private static List<IControllerManager> _ControllerManagerList;
+
+        public static void Register(IControllerManager host)
+        {
+            if (host != null)
+            {
+                if (_ControllerManagerList == null)
+                    _ControllerManagerList = new List<IControllerManager>();
+                if (!_ControllerManagerList.Contains(host))
+                    _ControllerManagerList.Add(host);
+            }
+        }
+        public static bool UnRegister(IControllerManager host)
+        {
+            if (host != null && _ControllerManagerList != null)
+            {
+                return _ControllerManagerList.Remove(host);
+            }
+            return false;
+        }
+
+        internal static void Register(Controller controller)
+        {
+            if (controller != null)
+            {
+                if (_ControllerManagerList != null && _ControllerManagerList.Count > 0)
+                {
+                    foreach (var manager in _ControllerManagerList)
+                    {
+                        manager.Register(controller);
+                    }
+                }
+            }
+        }
+        internal static bool UnRegister(Controller controller)
+        {
+            bool result = false;
+            if (controller != null)
+            {
+                if (_ControllerManagerList != null && _ControllerManagerList.Count > 0)
+                {
+                    foreach (var manager in _ControllerManagerList)
+                    {
+                        result |= manager.UnRegister(controller);
+                    }
+                }
+            }
+            return result;
         }
     }
 }

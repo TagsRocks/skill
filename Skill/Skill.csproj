@@ -62,6 +62,7 @@
     <Compile Include="Framework\Global.cs" />
     <Compile Include="Framework\Health.cs" />
     <Compile Include="Framework\HitEventArgs.cs" />
+    <Compile Include="Framework\IControllerManager.cs" />
     <Compile Include="Framework\IO\SmallXmlParser.cs" />
     <Compile Include="Framework\IO\XmlAttribute.cs" />
     <Compile Include="Framework\IO\XmlDocument.cs" />

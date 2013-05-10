@@ -43,7 +43,7 @@ namespace Skill.Framework.Sounds
                 if (randomSound != null)
                 {
                     if (Global.Instance != null)
-                        Global.Instance.PlaySound(_Audio, randomSound, Category);
+                        Global.Instance.PlaySoundOneShot(_Audio, randomSound, Category);
                     else
                         _Audio.PlayOneShot(randomSound);
                 }

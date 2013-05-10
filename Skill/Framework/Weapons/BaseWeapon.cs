@@ -571,7 +571,7 @@ namespace Skill.Framework.Weapons
             {
                 if (Global.Instance != null)
                 {
-                    Global.Instance.PlaySound(_AudioSource, sound, Sounds.SoundCategory.FX);
+                    Global.Instance.PlaySoundOneShot(_AudioSource, sound, Sounds.SoundCategory.FX);
                 }
                 else
                 {

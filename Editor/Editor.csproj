@@ -110,6 +110,7 @@
     <Compile Include="Windows\AboutSkill.cs" />
     <Compile Include="Windows\AnimationAssigner.cs" />
     <Compile Include="Windows\BehaviorTreeStateDebugger.cs" />
+    <Compile Include="Windows\BehaviorTreeDebugger.cs" />
     <Compile Include="Windows\Exporter.cs" />
     <Compile Include="Tools\Implant.cs" />
     <Compile Include="Tools\ImplantObjectField.cs" />

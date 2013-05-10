@@ -277,7 +277,20 @@ namespace Skill.DataModels.AI
             if (states.Count > 0)
                 this.States = states.ToArray();
             else
-                this.States = new Behavior[] { new PrioritySelector() { Name = DefaultDestinationState } };
+            {
+                // try to load as previouse version format
+                int rootId = e.GetAttributeValueAsInt("RootId", 0);
+                Behavior root = FindById(list, rootId);
+                if (root != null)
+                {
+                    root.Name = DefaultDestinationState;
+                    this.States = new Behavior[] { root };
+                }
+                else
+                {
+                    this.States = new Behavior[] { new PrioritySelector() { Name = DefaultDestinationState } };
+                }
+            }
 
             XElement accessKeys = e.FindChildByName("AccessKeys");
             if (accessKeys != null)

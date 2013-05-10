@@ -42,6 +42,8 @@ namespace Skill.Framework
         public GameObject[] HitParticles;
         /// <summary> Offset of decale to hit surface </summary>
         public float DecalOffset = 0.1f;
+        /// <summary> If true, it takes additional raycast to find position of decale with more precision  </summary>
+        public bool UseRaycastForDecal = false;
         /// <summary> True if you want HitParticle spawn at inverse direction of hit normal </summary>
         public bool InverseHit;
         /// <summary> Maximum amount of health (if RegenerateSpeed > 0) </summary>
@@ -59,6 +61,8 @@ namespace Skill.Framework
 
         private TimeWatch _RegenerateDelayTW;
         private TimeWatch _DieDelayTW;
+        Ray _DecaleRay;
+        RaycastHit _DecalHit;
 
         private float _CurrentHealth;
         /// <summary>
@@ -185,7 +189,7 @@ namespace Skill.Framework
                         }
                     }
                 }
-                if (Decals != null)
+                if (Decals != null && args.Collider != null)
                 {
                     int selectedDecale = SelectDecaleToSpawn(args);
                     if (selectedDecale >= 0 && selectedDecale < Decals.Length)
@@ -193,8 +197,20 @@ namespace Skill.Framework
                         GameObject decal = Decals[selectedDecale];
                         if (decal != null)
                         {
-                            Vector3 normal = InverseHit ? -args.Normal : args.Normal;
-                            CacheSpawner.Spawn(decal, args.Point + DecalOffset * args.Normal, Quaternion.Euler(args.Normal));
+                            if (UseRaycastForDecal)
+                            {
+                                _DecaleRay.origin = args.Point + 10 * args.Normal;
+                                _DecaleRay.direction = -args.Normal;
+
+                                if (args.Collider.Raycast(_DecaleRay, out _DecalHit, 12))
+                                {
+                                    CacheSpawner.Spawn(decal, _DecalHit.point + (DecalOffset * _DecalHit.normal), Quaternion.LookRotation(_DecalHit.normal));
+                                }
+                            }
+                            else
+                            {
+                                CacheSpawner.Spawn(decal, args.Point + (DecalOffset * args.Normal), Quaternion.LookRotation(args.Normal));
+                            }
                         }
                     }
                 }
