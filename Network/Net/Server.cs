@@ -25,7 +25,7 @@ namespace Skill.Net
         // An ArrayList is used to keep track of worker sockets that are designed
         // to communicate with each connected client. Make it a synchronized ArrayList
         // For thread safety
-        private IList _WorkerList;
+        private ArrayList _WorkerList;
         // An ArrayList is used to keep track of worker sockets that are designed
         // to communicate with each connected client. Make it a synchronized ArrayList
         // For thread safety
@@ -62,13 +62,16 @@ namespace Skill.Net
         {
             get
             {
-                foreach (var w in _WorkerList)
+                lock (_WorkerList)
                 {
-                    ServerWorker sw = w as ServerWorker;
-                    if (sw.Name == name)
-                        return sw;
+                    foreach (var w in _WorkerList)
+                    {
+                        ServerWorker sw = w as ServerWorker;
+                        if (sw.Name == name)
+                            return sw;
+                    }
+                    return null;
                 }
-                return null;
             }
         }
 
@@ -110,10 +113,9 @@ namespace Skill.Net
             if (messageTranslator == null) throw new ArgumentNullException("Invalid MessageTranslator");
             this._MessageTranslator = messageTranslator;
             this._IdGenerator = 0;
-            if (bufferSize <= 0) throw new ArgumentException("Invalid bufferSize. size of buffer must be greater than zero");
+            if (bufferSize <= MessageHeader.HeaderSize * 2) throw new ArgumentException(string.Format("Invalid bufferSize. size of buffer must be at least {0} bytes", MessageHeader.HeaderSize * 2));
             this.BufferSize = bufferSize;
-            var list = System.Collections.ArrayList.Synchronized(new List<ServerWorker>());
-            this._WorkerList = list as IList;
+            this._WorkerList = System.Collections.ArrayList.Synchronized(new ArrayList());
         }
 
         /// <summary>
@@ -147,14 +149,16 @@ namespace Skill.Net
             if (_Listener != null)
                 _Listener.Close();
             _Listener = null;
-
-            while (_WorkerList.Count > 0)
+            lock (_WorkerList)
             {
-                ServerWorker serverWorker = _WorkerList[0] as ServerWorker;
-                if (serverWorker != null)
-                    serverWorker.Close(); // by closing a worker it remove itself
-                else
-                    _WorkerList.RemoveAt(0);
+                while (_WorkerList.Count > 0)
+                {
+                    ServerWorker serverWorker = _WorkerList[0] as ServerWorker;
+                    if (serverWorker != null)
+                        serverWorker.Close(); // by closing a worker it remove itself
+                    else
+                        _WorkerList.RemoveAt(0);
+                }
             }
             IsListening = false;
         }
@@ -163,7 +167,7 @@ namespace Skill.Net
         {
             try
             {
-                if (_Listener == null) 
+                if (_Listener == null)
                     return;
                 Socket socketWorker = _Listener.EndAccept(asyn);
                 ServerWorker serverWorker = new ServerWorker(_MessageTranslator, BufferSize, this);
@@ -171,7 +175,10 @@ namespace Skill.Net
                 System.Threading.Interlocked.Increment(ref _IdGenerator);
 
                 // Add the workerSocket reference to our ArrayList
-                _WorkerList.Add(serverWorker);
+                lock (_WorkerList)
+                {
+                    _WorkerList.Add(serverWorker);
+                }
 
                 // Since the main Socket is now free, it can go back and wait for
                 // other clients who are attempting to connect
@@ -201,7 +208,10 @@ namespace Skill.Net
         {
             // Remove the reference to the worker socket of the closed client
             // so that this object will get garbage collected
-            _WorkerList.Remove(serverWorker);
+            lock (_WorkerList)
+            {
+                _WorkerList.Remove(serverWorker);
+            }
             OnClientDisconnected(serverWorker);
         }
 

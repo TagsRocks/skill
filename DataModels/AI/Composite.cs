@@ -118,7 +118,7 @@ namespace Skill.DataModels.AI
     public class ConcurrentSelector : Composite
     {
         /// <summary> first check conditions then rest of childs (default true)</summary>
-        public bool FirstConditions { get; set; }
+        //public bool FirstConditions { get; set; }
 
         /// <summary> if true : when a condition child failes return failure </summary>
         public bool BreakOnConditionFailure { get; set; }
@@ -140,14 +140,14 @@ namespace Skill.DataModels.AI
         {
             FailurePolicy = AI.FailurePolicy.FailOnAll;
             SuccessPolicy = AI.SuccessPolicy.SucceedOnAll;
-            FirstConditions = true;
+            //FirstConditions = true;
             BreakOnConditionFailure = false;
         }
 
         protected override void WriteAttributes(System.Xml.Linq.XElement e)
         {
             System.Xml.Linq.XElement concurrentData = new System.Xml.Linq.XElement("ConcurrentProperties");
-            concurrentData.SetAttributeValue("FirstConditions", FirstConditions);
+            //concurrentData.SetAttributeValue("FirstConditions", FirstConditions);
             concurrentData.SetAttributeValue("BreakOnConditionFailure", BreakOnConditionFailure);
             concurrentData.SetAttributeValue("FailurePolicy", FailurePolicy);
             concurrentData.SetAttributeValue("SuccessPolicy", SuccessPolicy);
@@ -165,7 +165,7 @@ namespace Skill.DataModels.AI
                 var failurePolicy = concurrentData.Attribute("FailurePolicy");
                 var successPolicy = concurrentData.Attribute("SuccessPolicy");
 
-                if (firstConditions != null) FirstConditions = bool.Parse(firstConditions.Value);
+                //if (firstConditions != null) FirstConditions = bool.Parse(firstConditions.Value);
                 if (breakOnConditionFailure != null) BreakOnConditionFailure = bool.Parse(breakOnConditionFailure.Value);
                 if (failurePolicy != null) FailurePolicy = (FailurePolicy)Enum.Parse(typeof(FailurePolicy), failurePolicy.Value);
                 if (successPolicy != null) SuccessPolicy = (SuccessPolicy)Enum.Parse(typeof(SuccessPolicy), successPolicy.Value);

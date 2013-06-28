@@ -38,7 +38,7 @@ namespace Skill.DataModels.AI
         {
             this.AccessKeys = new SharedAccessKeys();
             this.Name = "NewBehaviorTree";
-            this.States = new Behavior[] { new PrioritySelector() { Name = DefaultDestinationState } };
+            this.States = new Behavior[] { new PrioritySelector() { Name = DefaultDestinationState , IsState = true } };
             this.DefaultState = DefaultDestinationState;
         }
         #endregion
@@ -284,11 +284,12 @@ namespace Skill.DataModels.AI
                 if (root != null)
                 {
                     root.Name = DefaultDestinationState;
+                    root.IsState = true;
                     this.States = new Behavior[] { root };
                 }
                 else
                 {
-                    this.States = new Behavior[] { new PrioritySelector() { Name = DefaultDestinationState } };
+                    this.States = new Behavior[] { new PrioritySelector() { Name = DefaultDestinationState , IsState = true } };
                 }
             }
 

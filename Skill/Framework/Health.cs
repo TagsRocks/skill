@@ -105,6 +105,15 @@ namespace Skill.Framework
         /// <summary> Retrieve tag of last object that caused damage to this health </summary>
         public string LastCausedDamage { get; private set; }
 
+        /// <summary> Amount of last damage </summary>
+        public float LastDamage { get; private set; }
+
+        /// <summary> Position of last hit </summary>
+        public Vector3 LastHitPoint { get; private set; }
+
+        /// <summary> Normal of last hit </summary>
+        public Vector3 LastHitNormal { get; private set; }
+
         /// <summary>
         /// Whether agent is dead or not.
         /// </summary>
@@ -133,20 +142,54 @@ namespace Skill.Framework
             base.HookEvents();
             if (Events != null)
             {
-                Events.Hit += OnHit;
-                Events.Damage += OnDamage;
+                Events.Hit += Events_Hit;
+                Events.Damage += Events_Damage;
+                Events.Cached += Events_Cached;
+                Events.Die += Events_Die;
             }
         }
 
         /// <summary>
-        /// GameObject is dead
-        /// </summary>        
-        protected virtual void OnDie()
+        /// Unhook hooked events
+        /// </summary>
+        protected override void UnhookEvents()
         {
-            IsDead = true;
-            enabled = false;
+            base.UnhookEvents();
             if (Events != null)
-                Events.OnDie(this, System.EventArgs.Empty);
+            {
+                Events.Hit -= Events_Hit;
+                Events.Damage -= Events_Damage;
+                Events.Cached -= Events_Cached;
+                Events.Die -= Events_Die;
+            }
+        }
+
+        /// <summary>
+        /// When Health GameObject is dead
+        /// </summary>
+        /// <param name="sender">sender</param>
+        /// <param name="e">EventArgs</param>
+        protected virtual void Events_Die(object sender, System.EventArgs e)
+        {            
+        }
+
+
+        /// <summary>
+        /// Restore health to initial values and alive
+        /// </summary>
+        public void Restore()
+        {
+            IsDead = false;
+            LastCausedDamage = string.Empty;
+            CurrentHealth = InitialHealth;
+        }
+
+        /// <summary>
+        /// Occurs when health cached by CacheSpawner
+        /// </summary>
+        protected virtual void Events_Cached(object sender, CacheEventArgs args)
+        {
+            Restore();
         }
 
         /// <summary>
@@ -169,8 +212,12 @@ namespace Skill.Framework
         /// </summary>
         /// <param name="sender"> sender </param>
         /// <param name="args"> An HitEventArgs that contains hit event data. </param>        
-        protected virtual void OnHit(object sender, HitEventArgs args)
+        protected virtual void Events_Hit(object sender, HitEventArgs args)
         {
+
+            LastHitPoint = args.Point;
+            LastHitNormal = args.Normal;
+
             if (Events != null)
                 Events.OnDamage(sender, new DamageEventArgs(args.Damage, args.Tag) { UserData = args.UserData });
 
@@ -185,7 +232,7 @@ namespace Skill.Framework
                         if (particle != null)
                         {
                             Vector3 normal = InverseHit ? -args.Normal : args.Normal;
-                            CacheSpawner.Spawn(particle, args.Point, Quaternion.LookRotation(normal));
+                            Cache.Spawn(particle, args.Point, Quaternion.LookRotation(normal));
                         }
                     }
                 }
@@ -204,12 +251,12 @@ namespace Skill.Framework
 
                                 if (args.Collider.Raycast(_DecaleRay, out _DecalHit, 12))
                                 {
-                                    CacheSpawner.Spawn(decal, _DecalHit.point + (DecalOffset * _DecalHit.normal), Quaternion.LookRotation(_DecalHit.normal));
+                                    Cache.Spawn(decal, _DecalHit.point + (DecalOffset * _DecalHit.normal), Quaternion.LookRotation(_DecalHit.normal));
                                 }
                             }
                             else
                             {
-                                CacheSpawner.Spawn(decal, args.Point + (DecalOffset * args.Normal), Quaternion.LookRotation(args.Normal));
+                                Cache.Spawn(decal, args.Point + (DecalOffset * args.Normal), Quaternion.LookRotation(args.Normal));
                             }
                         }
                     }
@@ -263,10 +310,11 @@ namespace Skill.Framework
         /// </summary>    
         /// <param name="sender">The source of the event.</param>
         /// <param name="args"> An DamageEventArgs that contains damage event data.</param>
-        protected virtual void OnDamage(object sender, DamageEventArgs args)
+        protected virtual void Events_Damage(object sender, DamageEventArgs args)
         {
             if (IsDead || _CurrentHealth <= 0) return;
             LastCausedDamage = args.Tag;
+            LastDamage = args.Damage;
             // Take no damage if invincible, dead, or if the damage is zero
             if (Invincible)
                 return;
@@ -289,7 +337,10 @@ namespace Skill.Framework
                 if (_DieDelayTW.IsOver)
                 {
                     _DieDelayTW.End();
-                    OnDie();
+                    IsDead = true;
+                    enabled = false;
+                    if (Events != null)
+                        Events.OnDie(this, System.EventArgs.Empty);
                 }
             }
             else

@@ -26,126 +26,48 @@ namespace Skill.Studio.AI.Editor
     /// Interaction logic for BehaviorTreeEditor.xaml
     /// </summary>
     public partial class BehaviorTreeEditor : TabDocument
-    {        
-
-        #region SelectedItem
-
-        /// <summary>
-        /// Get selected Behavior
-        /// </summary>
-        /// <returns>selected Behavior</returns>
-        private BehaviorViewModel GetSelectedItem()
-        {
-            return _BTTree.SelectedItem as BehaviorViewModel;
-        }
-        #endregion
+    {
 
         #region Menu Availability
 
-        private bool _IsNewAv;
-        public bool IsNewAv
-        {
-            get { return _IsNewAv; }
-            set
-            {
-                if (value != _IsNewAv)
-                {
-                    _IsNewAv = value;
-                    this.RaisePropertyChanged("IsNewAv");
-                }
-            }
-        }
-        private bool _IsMoveUpAv;
-        public bool IsMoveUpAv
-        {
-            get { return _IsMoveUpAv; }
-            set
-            {
-                if (value != _IsMoveUpAv)
-                {
-                    _IsMoveUpAv = value;
-                    this.RaisePropertyChanged("IsMoveUpAv");
-                }
-            }
-        }
-        private bool _IsMoveDownAv;
-        public bool IsMoveDownAv
-        {
-            get { return _IsMoveDownAv; }
-            set
-            {
-                if (value != _IsMoveDownAv)
-                {
-                    _IsMoveDownAv = value;
-                    this.RaisePropertyChanged("IsMoveDownAv");
-                }
-            }
-        }
-        private bool _IsDeleteAv;
-        public bool IsDeleteAv
-        {
-            get { return _IsDeleteAv; }
-            set
-            {
-                if (value != _IsDeleteAv)
-                {
-                    _IsDeleteAv = value;
-                    this.RaisePropertyChanged("IsDeleteAv");
-                }
-            }
-        }
-        private bool _IsCopyAv;
-        public bool IsCopyAv
-        {
-            get { return _IsCopyAv; }
-            set
-            {
-                if (value != _IsCopyAv)
-                {
-                    _IsCopyAv = value;
-                    this.RaisePropertyChanged("IsCopyAv");
-                }
-            }
-        }
-
         void CheckContextMnuAvailability()
         {
-            BehaviorViewModel selected = GetSelectedItem();
+            BehaviorViewModel selected = _TreeView.SelectedItem;
             if (selected != null && !BehaviorTree.IsDebuging)
             {
-                IsDeleteAv = IsCopyAv = selected != BehaviorTree.Root;
+                _TreeView.IsDeleteAv = _GraphView.IsCopyAv = selected != BehaviorTree.Root;
                 if (selected.Model.BehaviorType == BehaviorType.Composite)
                 {
-                    IsNewAv = true;
+                    _TreeView.IsNewAv = _GraphView.IsNewAv = true;
                 }
                 else if (selected.Model.BehaviorType == BehaviorType.Decorator)
                 {
-                    IsNewAv = selected.Count == 0;
+                    _TreeView.IsNewAv = _GraphView.IsNewAv = selected.Count == 0;
                 }
                 else
                 {
-                    IsNewAv = false;
+                    _TreeView.IsNewAv = _GraphView.IsNewAv = false;
                 }
 
-                IsMoveUpAv = selected.CanMoveUp;
-                IsMoveDownAv = selected.CanMoveDown;
+                _TreeView.IsMoveUpAv = _GraphView.IsMoveUpAv = selected.CanMoveUp;
+                _TreeView.IsMoveDownAv = _GraphView.IsMoveDownAv = selected.CanMoveDown;
 
             }
             else
             {
-                IsNewAv = false;
-                IsMoveDownAv = false;
-                IsMoveUpAv = false;
-                IsDeleteAv = false;
-                IsCopyAv = false;
+                _TreeView.IsNewAv = _GraphView.IsNewAv = false;
+                _TreeView.IsMoveDownAv = _GraphView.IsMoveDownAv = false;
+                _TreeView.IsMoveUpAv = _GraphView.IsMoveUpAv = false;
+                _TreeView.IsDeleteAv = _GraphView.IsDeleteAv = false;
+                _TreeView.IsCopyAv = _GraphView.IsCopyAv = false;
             }
         }
         #endregion
 
         #region Properties
 
-        protected override bool UndoAvailable { get { return _Tb.SelectedIndex == 0; } }
-        protected override bool RedoAvailable { get { return _Tb.SelectedIndex == 0; } }
+        protected override bool UndoAvailable { get { return !BehaviorTree.IsDebuging; } }
+        protected override bool RedoAvailable { get { return !BehaviorTree.IsDebuging; } }
 
         /// <summary> BehaviorTree ViewModel </summary>
         public BehaviorTreeViewModel BehaviorTree { get; private set; }
@@ -181,6 +103,21 @@ namespace Skill.Studio.AI.Editor
             }
         }
 
+
+        private bool _AllowEdit = true;
+        public bool AllowEdit
+        {
+            get { return _AllowEdit; }
+            set
+            {
+                if (_AllowEdit != value)
+                {
+                    _AllowEdit = value;
+                    RaisePropertyChanged("AllowEdit");                    
+                }
+            }
+        }
+
         #endregion
 
         #region Constructor
@@ -203,50 +140,51 @@ namespace Skill.Studio.AI.Editor
                 Skill.DataModels.AI.BehaviorTree bt = viewModel.LoadData() as Skill.DataModels.AI.BehaviorTree;
                 if (bt != null)
                 {
-                    Data = BehaviorTree = new BehaviorTreeViewModel(bt) { Editor = this };
+                    Data = BehaviorTree = _GraphView.BehaviorTree = _TreeView.BehaviorTree = new BehaviorTreeViewModel(bt);
                     RaisePropertyChanged("BehaviorTree");
                 }
             }
 
-            //History.UndoChange += new UnDoRedoChangeEventHandler(History_UndoChange);
-            //History.RedoChange += new UnDoRedoChangeEventHandler(History_RedoChange);
-
+            this._GraphView.Editor = this;
+            this._TreeView.Editor = this;
             this.ParentDocument.Closed += ParentDocument_Closed;
 
-            this.Loaded += BehaviorTreeEditor_Loaded;
-
             InitialDebug();
+
+            History.RedoChange += History_RedoChange;
+            History.UndoChange += History_UndoChange;
 
             for (int i = 0; i < BehaviorTree.States.Count; i++)
             {
                 if (BehaviorTree.States[i].Name == BehaviorTree.DefaultState)
                 {
                     BehaviorTree.States[i].IsDefaultState = true;
-                    _CmbStates.SelectedIndex = i;
+                    SetState(i);
                     break;
                 }
             }
         }
 
-        void BehaviorTreeEditor_Loaded(object sender, RoutedEventArgs e)
+        private void SetState(int index)
         {
-            _Zoombox.FillToBounds();
+            _CmbStatesDesign.SelectedIndex = index;
         }
+
         #endregion
 
         #region History events
         // hook events of History
-        //void History_RedoChange(UnDoRedo sender, UnDoRedoChangeEventArgs e)
-        //{
-        //    if (e.Command is AddBehaviorUnDoRedo || e.Command is MoveUpBehaviorUnDoRedo)
-        //        UpdatePositions();
-        //}
+        void History_RedoChange(UnDoRedo sender, UnDoRedoChangeEventArgs e)
+        {
+            if (e.Command is AddBehaviorUnDoRedo || e.Command is MoveUpBehaviorUnDoRedo)
+                _GraphView.RefreshGraph();
+        }
 
-        //void History_UndoChange(UnDoRedo sender, UnDoRedoChangeEventArgs e)
-        //{
-        //    if (e.Command is AddBehaviorUnDoRedo || e.Command is MoveUpBehaviorUnDoRedo)
-        //        UpdatePositions();
-        //}
+        void History_UndoChange(UnDoRedo sender, UnDoRedoChangeEventArgs e)
+        {
+            if (e.Command is AddBehaviorUnDoRedo || e.Command is MoveUpBehaviorUnDoRedo)
+                _GraphView.RefreshGraph();
+        }
 
         // when any change occurs in history, update title
         void History_Change(object sender, EventArgs e)
@@ -271,23 +209,15 @@ namespace Skill.Studio.AI.Editor
             }
         }
 
-        private void TreeViewItem_PreviewMouseRightButtonDown(object sender, MouseEventArgs e)
-        {
-            TreeViewItem item = sender as TreeViewItem;
-            if (item != null)
-            {
-                item.Focus();
-            }
-        }
 
-        private void _BTTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        public void SelectedItemChanged()
         {
             CheckContextMnuAvailability();
-            ApplicationCommands.Properties.Execute(_BTTree.SelectedItem, null);
-
+            BehaviorViewModel vm = _TreeView.SelectedItem;
+            ApplicationCommands.Properties.Execute(vm, null);
             if (!BehaviorTree.IsDebuging)
             {
-                BehaviorViewModel vm = GetSelectedItem();
+
                 if (vm != null)
                 {
                     if (vm.Model.BehaviorType == BehaviorType.Action)
@@ -308,100 +238,55 @@ namespace Skill.Studio.AI.Editor
                 }
             }
         }
-        private void TreeViewItem_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Escape)
-            {
-                e.Handled = true;
-            }
-        }
-        #endregion
 
-        #region UpdatePositions
-        public void RefreshDiagram()
-        {
-            if (_Tb.SelectedIndex != 1) return;
-            BehaviorTree.UpdateSelectedBehaviors();
-            _NeedUpdatePosition = false;
-            UpdatePositions();
-            _NeedUpdatePosition = true;
-            OnUpdateTreeNodes();
-            ApplicationCommands.Properties.Execute(null, null);
-        }
-
-        private bool _NeedUpdatePosition;
-        public void UpdatePositions()
-        {
-            this.BehaviorTree.Root.UpdatePosition();
-            if (_NeedUpdatePosition)
-            {
-                _NeedUpdatePosition = false;
-                OnUpdateTreeNodes();
-            }
-        }
-
-        public event EventHandler UpdateTreeNodes;
-        private void OnUpdateTreeNodes()
-        {
-            if (UpdateTreeNodes != null)
-                UpdateTreeNodes(this, EventArgs.Empty);
-        }
         #endregion
 
         #region Insert
-        private void Mnu_Insert_Click(object sender, RoutedEventArgs e)
+        public void Insert(BehaviorViewModel insertItem)
         {
-            if (IsNewAv)
+            if (insertItem != null)
             {
-                MenuItem menu = sender as MenuItem;
-                if (menu != null)
+                var selected = _TreeView.SelectedItem;
+                if (selected != null)
                 {
-                    BehaviorViewModel insertItem = menu.Tag as BehaviorViewModel;
-                    if (insertItem != null)
+                    try
                     {
-                        var selected = GetSelectedItem();
-                        if (selected != null)
+                        string message;
+                        if (selected.CanAddBehavior(insertItem, out message))
                         {
-                            try
+                            var newVM = selected.AddBehavior(insertItem, null, true);
+                            if (newVM != null)
                             {
-                                string message;
-                                if (selected.CanAddBehavior(insertItem, out message))
+                                newVM.IsSelected = true;
+                                foreach (BehaviorViewModel vm in BehaviorTree.GetSharedModel(newVM.Model))
                                 {
-                                    var newVM = selected.AddBehavior(insertItem, null, true);
-                                    if (newVM != null)
+                                    if (vm != newVM)
                                     {
-                                        newVM.IsSelected = true;
-                                        foreach (BehaviorViewModel vm in BehaviorTree.GetSharedModel(newVM.Model))
+                                        ParameterCollectionViewModel parameters = null;
+                                        if (vm.Model.BehaviorType == DataModels.AI.BehaviorType.Action)
+                                            parameters = ((ActionViewModel)vm).Parameters;
+                                        else if (vm.Model.BehaviorType == DataModels.AI.BehaviorType.Decorator)
+                                            parameters = ((DecoratorViewModel)vm).Parameters;
+                                        else if (vm.Model.BehaviorType == DataModels.AI.BehaviorType.Condition)
+                                            parameters = ((ConditionViewModel)vm).Parameters;
+
+                                        if (parameters != null)
                                         {
-                                            if (vm != newVM)
-                                            {
-                                                ParameterCollectionViewModel parameters = null;
-                                                if (vm.Model.BehaviorType == DataModels.AI.BehaviorType.Action)
-                                                    parameters = ((ActionViewModel)vm).Parameters;
-                                                else if (vm.Model.BehaviorType == DataModels.AI.BehaviorType.Decorator)
-                                                    parameters = ((DecoratorViewModel)vm).Parameters;
-                                                else if (vm.Model.BehaviorType == DataModels.AI.BehaviorType.Condition)
-                                                    parameters = ((ConditionViewModel)vm).Parameters;
-
-                                                if (parameters != null)
-                                                {
-                                                    newVM.MatchParameters(parameters.Model);
-                                                    break;
-                                                }
-                                            }
+                                            newVM.MatchParameters(parameters.Model);
+                                            break;
                                         }
-
                                     }
-                                    //UpdatePositions();
                                 }
-                                else
-                                    MainWindow.Instance.ShowError(message);
+
                             }
-                            catch (Exception ex)
-                            {
-                                MainWindow.Instance.ShowError(ex.Message);
-                            }
+                            _GraphView.RefreshGraph();
                         }
+                        else
+                            MainWindow.Instance.ShowError(message);
+                    }
+                    catch (Exception ex)
+                    {
+                        MainWindow.Instance.ShowError(ex.Message);
                     }
                 }
             }
@@ -435,169 +320,105 @@ namespace Skill.Studio.AI.Editor
         #endregion
 
         #region New
-        private void AddCondition()
+        public void AddCondition()
         {
-            if (IsNewAv)
+            var selected = _TreeView.SelectedItem;
+            if (selected != null)
             {
-                var selected = GetSelectedItem();
-                if (selected != null)
+                var newVM = selected.AddCondition();
+                if (newVM != null)
                 {
-                    var newVM = selected.AddCondition();
-                    if (newVM != null)
-                    {
-                        newVM.IsSelected = true;
-                    }
-                    //UpdatePositions();
+                    newVM.IsSelected = true;
+                }
+                _GraphView.RefreshGraph();
+            }
+        }
+
+        public void AddAction()
+        {
+
+            var selected = _TreeView.SelectedItem;
+            if (selected != null)
+            {
+                var newVM = selected.AddAction();
+                if (newVM != null)
+                {
+
+                    newVM.IsSelected = true;
+                }
+                _GraphView.RefreshGraph();
+            }
+
+        }
+
+        public void AddChangeState()
+        {
+            var selected = _TreeView.SelectedItem;
+            if (selected != null)
+            {
+                var newVM = selected.AddChangeState();
+                if (newVM != null)
+                {
+                    newVM.IsSelected = true;
                 }
             }
         }
 
-        private void AddAction()
+        public void AddComposite(CompositeType compositeType)
         {
-            if (IsNewAv)
+
+            var selected = _TreeView.SelectedItem;
+            if (selected != null)
             {
-                var selected = GetSelectedItem();
-                if (selected != null)
+                var newVM = selected.AddComposite(compositeType);
+                if (newVM != null)
                 {
-                    var newVM = selected.AddAction();
-                    if (newVM != null)
-                    {
-
-                        newVM.IsSelected = true;
-                    }
-                    //UpdatePositions();
+                    newVM.IsSelected = true;
                 }
+                _GraphView.RefreshGraph();
             }
         }
 
-        private void AddChangeState()
+        public void AddDecorator(DecoratorType decoratorType)
         {
-            if (IsNewAv)
+            var selected = _TreeView.SelectedItem;
+            if (selected != null)
             {
-                var selected = GetSelectedItem();
-                if (selected != null)
+                var newVM = selected.AddDecorator(decoratorType);
+                if (newVM != null)
                 {
-                    var newVM = selected.AddChangeState();
-                    if (newVM != null)
-                    {
-                        newVM.IsSelected = true;
-                    }
+                    newVM.IsSelected = true;
                 }
+                _GraphView.RefreshGraph();
             }
         }
 
-        private void AddComposite(CompositeType compositeType)
-        {
-            if (IsNewAv)
-            {
-                var selected = GetSelectedItem();
-                if (selected != null)
-                {
-                    var newVM = selected.AddComposite(compositeType);
-                    if (newVM != null)
-                    {
-                        newVM.IsSelected = true;
-                    }
-                    //UpdatePositions();
-                }
-            }
-        }
 
-        private void AddDecorator(DecoratorType decoratorType)
-        {
-            if (IsNewAv)
-            {
-                var selected = GetSelectedItem();
-                if (selected != null)
-                {
-                    var newVM = selected.AddDecorator(decoratorType);
-                    if (newVM != null)
-                    {
-                        newVM.IsSelected = true;
-                    }
-                    //UpdatePositions();
-                }
-            }
-        }
-
-        private void Mnu_NewAction_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is MenuItem)
-            {
-                AddAction();
-            }
-            else System.Windows.MessageBox.Show("Menu Item not clicked");
-        }
-
-        private void Mnu_NewChangeState_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is MenuItem)
-            {
-                AddChangeState();
-            }
-            else System.Windows.MessageBox.Show("Menu Item not clicked");
-        }
-
-        private void Mnu_NewCondition_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is MenuItem)
-            {
-                AddCondition();
-            }
-            else System.Windows.MessageBox.Show("Menu Item not clicked");
-        }
-
-        private void Mnu_NewDecorator_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is MenuItem)
-            {
-                MenuItem mnu = (MenuItem)sender;
-                AddDecorator((DecoratorType)mnu.Tag);
-            }
-            else System.Windows.MessageBox.Show("Menu Item not clicked");
-        }
-
-        private void Mnu_NewComposite_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is MenuItem)
-            {
-                MenuItem mnu = (MenuItem)sender;
-                AddComposite((CompositeType)mnu.Tag);
-            }
-            else System.Windows.MessageBox.Show("Menu Item not clicked");
-        }
         #endregion
 
         #region Move
-        private void Mnu_MoveUp_Click(object sender, RoutedEventArgs e)
+        public void MoveSelectedUp()
         {
-            if (IsMoveUpAv)
+            var selected = _TreeView.SelectedItem;
+            if (selected != null && selected.CanMoveUp)
             {
-                var selected = GetSelectedItem();
-                if (selected != null && selected.CanMoveUp)
+                if (selected.Parent != null)
                 {
-                    if (selected.Parent != null)
-                    {
-                        ((BehaviorViewModel)selected.Parent).MoveUp(selected);
-                        //UpdatePositions();
-                    }
+                    ((BehaviorViewModel)selected.Parent).MoveUp(selected);
+                    _GraphView.RefreshGraph();
                 }
-
             }
         }
 
-        private void Mnu_MoveDown_Click(object sender, RoutedEventArgs e)
+        public void MoveSelectedDown()
         {
-            if (IsMoveDownAv)
+            var selected = _TreeView.SelectedItem;
+            if (selected != null && selected.CanMoveDown)
             {
-                var selected = GetSelectedItem();
-                if (selected != null && selected.CanMoveDown)
+                if (selected.Parent != null)
                 {
-                    if (selected.Parent != null)
-                    {
-                        ((BehaviorViewModel)selected.Parent).MoveDown(selected);
-                        //UpdatePositions();
-                    }
+                    ((BehaviorViewModel)selected.Parent).MoveDown(selected);
+                    _GraphView.RefreshGraph();
                 }
             }
         }
@@ -606,7 +427,7 @@ namespace Skill.Studio.AI.Editor
         #region Delete
         private void DeleteSelected()
         {
-            var selected = GetSelectedItem();
+            var selected = _TreeView.SelectedItem;
             if (selected != null)
             {
                 if (selected.Parent != null)
@@ -614,7 +435,7 @@ namespace Skill.Studio.AI.Editor
                     if (selected.Parent is BehaviorViewModel)
                     {
                         ((BehaviorViewModel)selected.Parent).RemoveBehavior(selected);
-                        //UpdatePositions();
+                        _GraphView.RefreshGraph();
                     }
                 }
                 CheckContextMnuAvailability();
@@ -680,12 +501,12 @@ namespace Skill.Studio.AI.Editor
 
         void CopyCmdCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = IsCopyAv;
+            e.CanExecute = _TreeView.IsCopyAv;
             e.Handled = true;
         }
         void CopyCmdExecuted(object target, ExecutedRoutedEventArgs e)
         {
-            var selected = GetSelectedItem();
+            var selected = _TreeView.SelectedItem;
             if (selected != null)
                 CopyBehaviorToClipboard(selected);
             e.Handled = true;
@@ -693,14 +514,14 @@ namespace Skill.Studio.AI.Editor
 
         void PasteCmdCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            var selected = GetSelectedItem();
-            e.CanExecute = Clipboard.ContainsData(Skill.DataModels.SkillDataFormats.Behavior) && selected != null && IsNewAv;
+            var selected = _TreeView.SelectedItem;
+            e.CanExecute = Clipboard.ContainsData(Skill.DataModels.SkillDataFormats.Behavior) && selected != null && _TreeView.IsNewAv;
             e.Handled = true;
         }
         void PasteCmdExecuted(object target, ExecutedRoutedEventArgs e)
         {
             PasteFromClipboard();
-            //UpdatePositions();
+            _GraphView.RefreshGraph();
             e.Handled = true;
         }
 
@@ -708,9 +529,9 @@ namespace Skill.Studio.AI.Editor
         {
             if (Clipboard.ContainsData(Skill.DataModels.SkillDataFormats.Behavior))
             {
-                var selected = GetSelectedItem();
+                var selected = _TreeView.SelectedItem;
                 string text = Clipboard.GetData(Skill.DataModels.SkillDataFormats.Behavior) as string;
-                if (text != null && selected != null && IsNewAv)
+                if (text != null && selected != null && _TreeView.IsNewAv)
                 {
                     try
                     {
@@ -785,12 +606,12 @@ namespace Skill.Studio.AI.Editor
 
         void DeleteCmdCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = IsDeleteAv;
+            e.CanExecute = _TreeView.IsDeleteAv;
             e.Handled = true;
         }
         void DeleteCmdExecuted(object target, ExecutedRoutedEventArgs e)
         {
-            if (IsDeleteAv)
+            if (_TreeView.IsDeleteAv)
                 DeleteSelected();
             e.Handled = true;
         }
@@ -833,10 +654,14 @@ namespace Skill.Studio.AI.Editor
         {
             if (BehaviorTree.States.Count <= 1)
             {
-                System.Windows.Forms.MessageBox.Show("Can not delete state. Behavior Tree needs at least one state");
+                System.Windows.MessageBox.Show("Can not delete state. Behavior Tree needs at least one state");
                 return;
             }
             BehaviorTree.RemoveState(BehaviorTree.Root);
+            if (BehaviorTree.Root != null)
+                SetState(_CmbStatesDesign.Items.IndexOf(BehaviorTree.Root));
+            else
+                SetState(-1);
         }
 
         private void BtnSetasDefaultState_Click(object sender, RoutedEventArgs e)
@@ -850,31 +675,16 @@ namespace Skill.Studio.AI.Editor
         }
         private void CmbStates_Changed(object sender, SelectionChangedEventArgs e)
         {
-            BehaviorViewModel b = _CmbStates.SelectedItem as BehaviorViewModel;
+            if (BehaviorTree.IsDebuging) return;
+            BehaviorViewModel b = ((ComboBox)sender).SelectedItem as BehaviorViewModel;
+
             if (b != null)
             {
                 BehaviorTree.ChangeState(b.Name);
                 RaisePropertyChanged("IsDefaultStateSelected");
+                SetState(((ComboBox)sender).Items.IndexOf(b));
             }
-        }
-        #endregion
 
-        #region Tab changed
-        private int _PreTabIndex = 0;
-        private void Tb_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (_PreTabIndex == _Tb.SelectedIndex) return;
-            if (_Tb.SelectedIndex == 0)
-            {
-                StopDebug();
-                _BtnPlayStop.IsChecked = false;
-                _BtnPause.IsChecked = false;
-            }
-            else if (_Tb.SelectedIndex == 1)
-            {                
-                RefreshDiagram();
-            }
-            _PreTabIndex = _Tb.SelectedIndex;
         }
         #endregion
 
@@ -925,6 +735,7 @@ namespace Skill.Studio.AI.Editor
 
         private void StartDebug()
         {
+            AllowEdit = false;
             _PreState = BehaviorTree.Root.Name;
             Skill.Framework.AI.RandomSelector.RandomService = _DebugRandomService;
             foreach (var s in BehaviorTree.States)
@@ -947,6 +758,7 @@ namespace Skill.Studio.AI.Editor
         }
         private void StopDebug()
         {
+            AllowEdit = true;
             if (BehaviorTree != null)
             {
                 if (!string.IsNullOrEmpty(_PreState))

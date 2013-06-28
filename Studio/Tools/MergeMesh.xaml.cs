@@ -228,16 +228,15 @@ namespace Skill.Studio.Tools
 
         private void BtnBatchConvert_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.FolderBrowserDialog sourceDialog = new System.Windows.Forms.FolderBrowserDialog();            
-            if (sourceDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            WPFFolderBrowser.WPFFolderBrowserDialog sourceDialog = new WPFFolderBrowser.WPFFolderBrowserDialog();
+            if (sourceDialog.ShowDialog() == true)
             {
-                System.Windows.Forms.FolderBrowserDialog destDialog = new System.Windows.Forms.FolderBrowserDialog();
-                destDialog.SelectedPath = sourceDialog.SelectedPath;
-
-                if (destDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                WPFFolderBrowser.WPFFolderBrowserDialog destDialog = new WPFFolderBrowser.WPFFolderBrowserDialog();
+                destDialog.FileName = sourceDialog.FileName;
+                if (destDialog.ShowDialog() == true)
                 {
-                    string[] files = System.IO.Directory.GetFiles(sourceDialog.SelectedPath, "*.Fbx");
-                    ConvertBatch(files, destDialog.SelectedPath);
+                    string[] files = System.IO.Directory.GetFiles(sourceDialog.FileName, "*.Fbx");
+                    ConvertBatch(files, destDialog.FileName);
                 }
             }
         }

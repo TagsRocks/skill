@@ -218,7 +218,7 @@ namespace Skill.Framework.UI
             if (fc == null)
                 fc = Grid.FindControlByMinTabIndex();
             if (fc != null)
-                FocusControl(fc);
+                FocusControl(fc);            
         }
 
         /// <summary>

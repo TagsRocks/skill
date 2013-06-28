@@ -6,11 +6,11 @@ namespace Skill.Framework.Triggers
     /// <summary>
     /// Base class for all triggers
     /// </summary>
-    public class Trigger : StaticBehaviour
+    public abstract class Trigger : StaticBehaviour
     {
         /// <summary> Filter other colliders by tags </summary>
         public string[] Tags = new string[] { "Player" };
-        /// <summary> How many time to execute trigger</summary>
+        /// <summary> How many times execute trigger</summary>
         public int TriggerCount = 1;
         /// <summary> Execution of trigger is unlimited</summary>
         public bool Unlimite = false;

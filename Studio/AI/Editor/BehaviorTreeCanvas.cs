@@ -13,22 +13,22 @@ namespace Skill.Studio.AI.Editor
     class BehaviorTreeCanvas : Canvas, INotifyPropertyChanged
     {
 
-        public BehaviorTreeEditor Editor
+        public IBehaviorTreeGraphView Viewer
         {
-            get { return (BehaviorTreeEditor)GetValue(EditorProperty); }
+            get { return (IBehaviorTreeGraphView)GetValue(EditorProperty); }
             set { SetValue(EditorProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for Editor.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty EditorProperty =
-            DependencyProperty.Register("Editor", typeof(BehaviorTreeEditor), typeof(BehaviorTreeCanvas), new UIPropertyMetadata(null, Editor_Changed));
+            DependencyProperty.Register("Viewer", typeof(IBehaviorTreeGraphView), typeof(BehaviorTreeCanvas), new UIPropertyMetadata(null, Editor_Changed));
 
         static void Editor_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             BehaviorTreeCanvas canvas = d as BehaviorTreeCanvas;
             if (canvas != null)
             {
-                BehaviorTreeEditor editor = e.NewValue as BehaviorTreeEditor;
+                IBehaviorTreeGraphView editor = e.NewValue as IBehaviorTreeGraphView;
                 if (editor != null)
                 {
                     editor.UpdateTreeNodes += new EventHandler(canvas.Editor_UpdateTreeNodes);
@@ -66,8 +66,8 @@ namespace Skill.Studio.AI.Editor
             size.Width += 100;
             size.Height += 100;
 
-            if (Editor != null)
-                Editor.UpdatePositions();
+            if (Viewer != null)
+                Viewer.UpdateNodes();
             return size;
         }
 

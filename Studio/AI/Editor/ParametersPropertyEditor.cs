@@ -42,8 +42,8 @@ namespace Skill.Studio.AI.Editor
                     window.Owner = MainWindow.Instance;
                     window.ShowDialog();
 
-                    if (_Behavior.Tree.Editor != null)
-                        _Behavior.Tree.Editor.SetChanged(true);
+                    if (_Behavior.Tree.GraphView != null)
+                        _Behavior.Tree.GraphView.SetChanged(true);
 
                     _Behavior.RaiseChangeDisplayName();
                     foreach (BehaviorViewModel vm in _Behavior.Tree.GetSharedModel(_Behavior.Model))

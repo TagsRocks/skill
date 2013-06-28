@@ -48,17 +48,19 @@ namespace Skill.Studio
 
         #region Constructor
         public TabDocument()
+            : this(null)
         {
-            History = new UnDoRedo();
+            
         }
 
-        public TabDocument(EntityNodeViewModel vm)
-            : this()
+        public TabDocument(EntityNodeViewModel vm)            
         {
+            History = new UnDoRedo();
             this.ParentDocument = new Controls.LayoutDocument(this);
             ViewModel = vm;
             _ChangeNameHandler = ViewModel_NameChanged;
-            vm.NameChanged += _ChangeNameHandler;
+            if (ViewModel != null)
+                ViewModel.NameChanged += _ChangeNameHandler;
             //SetChanged(false);
             History.Change += new EventHandler(History_Change);
 
@@ -67,7 +69,7 @@ namespace Skill.Studio
 
         void TabDocument_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
-            if (ViewModel != null)
+            //if (ViewModel != null)
                 SetChanged(false);
         }
 

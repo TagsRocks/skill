@@ -1,0 +1,168 @@
+﻿<bedit:BehaviorTreeViewControl x:Class="Skill.Studio.AI.Editor.BehaviorTreeTreeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:vm="clr-namespace:Skill.Studio.AI"
+             xmlns:bedit="clr-namespace:Skill.Studio.AI.Editor"
+             xmlns:dmai="clr-namespace:Skill.DataModels.AI;assembly=Skill.DataModels"
+             xmlns:my="clr-namespace:Skill.Studio.Controls" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <bedit:BehaviorTreeViewControl.Resources>
+        <ContextMenu x:Key="TVContextMenu" >
+            <ContextMenu.Resources>
+                <Style TargetType="{x:Type Image}">
+                    <Setter Property="Width" Value="16"/>
+                    <Setter Property="Height" Value="16"/>
+                </Style>
+            </ContextMenu.Resources>
+            <MenuItem Header="Move Up" IsEnabled="{Binding Path=IsMoveUpAv}" Click="Mnu_MoveUp_Click" >
+                <MenuItem.Icon>
+                    <my:ButtonImage NormalImage="{StaticResource ImgUp}" DisableImage="{StaticResource ImgUp_D}" />
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem Header="Move Down" IsEnabled="{Binding Path=IsMoveDownAv}" Click="Mnu_MoveDown_Click"  >
+                <MenuItem.Icon>
+                    <my:ButtonImage NormalImage="{StaticResource ImgDown}" DisableImage="{StaticResource ImgDown_D}" />
+                </MenuItem.Icon>
+            </MenuItem>
+            <Separator />
+            <MenuItem Header="New" IsEnabled="{Binding Path=IsNewAv}">
+                <MenuItem Header="Action" Click="Mnu_NewAction_Click" Tag="{x:Static dmai:BehaviorType.Action}" >
+                    <MenuItem.Icon>
+                        <my:ButtonImage NormalImage="{StaticResource ImgAction}" DisableImage="{StaticResource ImgAction_D}" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Condition" Click="Mnu_NewCondition_Click" Tag="{x:Static dmai:BehaviorType.Condition}"  >
+                    <MenuItem.Icon>
+                        <my:ButtonImage NormalImage="{StaticResource ImgCondition}" DisableImage="{StaticResource ImgCondition_D}" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Change State" Click="Mnu_NewChangeState_Click" Tag="{x:Static dmai:BehaviorType.ChangeState}" >
+                    <MenuItem.Icon>
+                        <my:ButtonImage NormalImage="{StaticResource ImgChangeState}" DisableImage="{StaticResource ImgChangeState_D}" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Decorators" >
+                    <MenuItem.Icon>
+                        <my:ButtonImage NormalImage="{StaticResource ImgDecorator}" DisableImage="{StaticResource ImgDecorator_D}" />
+                    </MenuItem.Icon>
+                    <MenuItem Header="Decorator" Click="Mnu_NewDecorator_Click" Tag="{x:Static dmai:DecoratorType.Default}"  >
+                        <MenuItem.Icon>
+                            <my:ButtonImage NormalImage="{StaticResource ImgDecorator}" DisableImage="{StaticResource ImgDecorator_D}" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="AccessLimitDecorator" Click="Mnu_NewDecorator_Click" Tag="{x:Static dmai:DecoratorType.AccessLimit}"  >
+                        <MenuItem.Icon>
+                            <my:ButtonImage NormalImage="{StaticResource ImgACDecorator}" DisableImage="{StaticResource ImgACDecorator_D}" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="Composites" >
+                    <MenuItem.Icon>
+                        <my:ButtonImage NormalImage="{StaticResource ImgComposite}" DisableImage="{StaticResource ImgComposite_D}" />
+                    </MenuItem.Icon>
+                    <MenuItem Header="Sequence" Click="Mnu_NewComposite_Click" Tag="{x:Static dmai:CompositeType.Sequence}" >
+                        <MenuItem.Icon>
+                            <my:ButtonImage NormalImage="{StaticResource ImgSequence}" DisableImage="{StaticResource ImgSequence_D}" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Concurrent" Click="Mnu_NewComposite_Click" Tag="{x:Static dmai:CompositeType.Concurrent}"  >
+                        <MenuItem.Icon>
+                            <my:ButtonImage NormalImage="{StaticResource ImgConcurrent}" DisableImage="{StaticResource ImgConcurrent_D}" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Random" Click="Mnu_NewComposite_Click" Tag="{x:Static dmai:CompositeType.Random}" >
+                        <MenuItem.Icon>
+                            <my:ButtonImage NormalImage="{StaticResource ImgRandom}" DisableImage="{StaticResource ImgRandom_D}" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Priority" Click="Mnu_NewComposite_Click" Tag="{x:Static dmai:CompositeType.Priority}" >
+                        <MenuItem.Icon>
+                            <my:ButtonImage NormalImage="{StaticResource ImgPriority}" DisableImage="{StaticResource ImgPriority_D}" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Loop" Click="Mnu_NewComposite_Click" Tag="{x:Static dmai:CompositeType.Loop}"  >
+                        <MenuItem.Icon>
+                            <my:ButtonImage NormalImage="{StaticResource ImgLoop}" DisableImage="{StaticResource ImgLoop_D}" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
+            </MenuItem>
+            <Separator />
+            <MenuItem Header="Insert" IsEnabled="{Binding Path=IsNewAv}" >
+                <MenuItem.Resources>
+                    <DataTemplate DataType="{x:Type  vm:BehaviorViewModel}">
+                        <StackPanel Orientation="Horizontal" >
+                            <Image Width="16" Height="16" Margin="2" Source="{Binding ImageName}"  />
+                            <TextBlock Text="{Binding Name}" Tag="{Binding}" />
+                        </StackPanel>
+                    </DataTemplate>
+                    <Style x:Key="MenuClickStyle" >
+                        <Setter Property="MenuItem.Tag" Value="{Binding}" />
+                        <EventSetter Event="MenuItem.Click" Handler="Mnu_Insert_Click" />
+                    </Style>
+                </MenuItem.Resources>
+                <MenuItem Header="Actions" ItemsSource="{Binding BehaviorTree.Actions}" ItemContainerStyle="{StaticResource MenuClickStyle}" >
+                    <MenuItem.Icon>
+                        <my:ButtonImage NormalImage="{StaticResource ImgAction}" DisableImage="{StaticResource ImgAction_D}" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Conditions" ItemsSource="{Binding BehaviorTree.Conditions}" ItemContainerStyle="{StaticResource MenuClickStyle}" >
+                    <MenuItem.Icon>
+                        <my:ButtonImage NormalImage="{StaticResource ImgCondition}" DisableImage="{StaticResource ImgCondition_D}" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Change States" ItemsSource="{Binding BehaviorTree.ChangeStates}" ItemContainerStyle="{StaticResource MenuClickStyle}" >
+                    <MenuItem.Icon>
+                        <my:ButtonImage NormalImage="{StaticResource ImgChangeState}" DisableImage="{StaticResource ImgChangeState_D}" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Decorators" ItemsSource="{Binding BehaviorTree.Decorators}" ItemContainerStyle="{StaticResource MenuClickStyle}" >
+                    <MenuItem.Icon>
+                        <my:ButtonImage NormalImage="{StaticResource ImgDecorator}" DisableImage="{StaticResource ImgDecorator_D}" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Composites" ItemsSource="{Binding BehaviorTree.Composites}" ItemContainerStyle="{StaticResource MenuClickStyle}" >
+                    <MenuItem.Icon>
+                        <my:ButtonImage NormalImage="{StaticResource ImgComposite}" DisableImage="{StaticResource ImgComposite_D}" />
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+            <Separator />
+            <MenuItem Header="Copy" Command="ApplicationCommands.Copy"/>
+            <MenuItem Header="Paste"  Command="ApplicationCommands.Paste"/>
+            <MenuItem Header="Delete" Command="ApplicationCommands.Delete"/>
+        </ContextMenu>
+    </bedit:BehaviorTreeViewControl.Resources>
+    <Grid>
+        <TreeView  ItemsSource="{Binding BehaviorTree.Nodes}" BorderThickness="0" Name="_BTTree" Background="{StaticResource TabDocumentBg}" 
+                  SelectedItemChanged="_BTTree_SelectedItemChanged" Grid.Column="0" ContextMenu="{StaticResource TVContextMenu}"  >
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource TreeViewItemStyle}">
+                    <EventSetter Event="TreeViewItem.PreviewMouseRightButtonDown" Handler="TreeViewItem_PreviewMouseRightButtonDown"/>
+                    <EventSetter Event="TreeViewItem.KeyDown" Handler="TreeViewItem_KeyDown"/>
+                </Style>
+            </TreeView.ItemContainerStyle>
+            <TreeView.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type vm:BehaviorViewModel}"
+                    ItemsSource="{Binding}">
+                    <Grid>
+                        <StackPanel Orientation="Horizontal" Height="16" >
+                            <Image Width="16" Height="16" Margin="3,0" Source="{Binding ImageName}" />
+                            <TextBlock Text="{Binding DisplayName}" />
+                        </StackPanel>
+                    </Grid>
+                </HierarchicalDataTemplate>
+                <LinearGradientBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" EndPoint="0,1" StartPoint="0,0">
+                    <GradientStop Color="#f2f8ff" Offset="0.05"/>
+                    <GradientStop Color="#d0e5ff" Offset="1"/>
+                </LinearGradientBrush>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="Black" />
+            </TreeView.Resources>            
+        </TreeView>
+    </Grid>
+</bedit:BehaviorTreeViewControl>

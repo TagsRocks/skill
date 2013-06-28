@@ -10,7 +10,7 @@ namespace Skill.Framework.Weapons
     public class MuzzleFlash : DynamicBehaviour
     {
         /// <summary> Weapon that own's this muzzle flash </summary>
-        public BaseWeapon Weapon;
+        public Weapon Weapon;
         /// <summary> Time of muzzle flash </summary>
         public float LifeTime = 0.2f;
         /// <summary> Minmum value of random scale </summary>

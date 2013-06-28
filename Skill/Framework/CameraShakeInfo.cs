@@ -21,8 +21,10 @@ namespace Skill.Framework
         public float Roll = 0.1f;
         /// <summary> Duration of shake </summary>
         public float Duration = 0.1f;
-        /// <summary> Max distance to camera. the shake will be more stronger by distance to camera </summary>
+        /// <summary> Max distance to camera. </summary>
         public float Range = 50;
+        /// <summary> The shake will be more stronger near to camera </summary>
+        public bool ByDistance = true;
 
         /// <summary> Default constructor </summary>
         public CameraShakeInfo() { }
@@ -33,10 +35,11 @@ namespace Skill.Framework
         /// <param name="other">Other CameraShakeInfo to copy</param>
         public CameraShakeInfo(CameraShakeInfo other)
         {
-            this.Intensity = other.Intensity;            
+            this.Intensity = other.Intensity;
             this.Roll = other.Roll;
             this.Duration = other.Duration;
             this.Range = other.Range;
+            this.ByDistance = other.ByDistance;
         }
     }
 

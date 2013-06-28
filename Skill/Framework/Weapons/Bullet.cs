@@ -15,6 +15,9 @@ namespace Skill.Framework.Weapons
         /// <summary> Object to spawn on collision </summary>
         public GameObject Explosion;
 
+        /// <summary> Position of explosion </summary>
+        public Transform ExplosionPos;
+
         /// <summary>
         /// Lift time of bullet after spawn. A time with this value begins OnEnable and destroy gameobject when timer end. ( zero or negative for infinit lift time)
         /// </summary>
@@ -65,6 +68,11 @@ namespace Skill.Framework.Weapons
         }
 
         /// <summary>
+        /// Called by weapon when initialize bullet
+        /// </summary>
+        public virtual void StartJourney() { }
+
+        /// <summary>
         /// This function is called when the behaviour becomes disabled () or inactive.
         /// </summary>
         protected virtual void OnDisable()
@@ -72,6 +80,9 @@ namespace Skill.Framework.Weapons
             Shooter = null;
             Damage = 0;
             Target = null;
+
+            if (rigidbody != null && !rigidbody.isKinematic)
+                rigidbody.velocity = Vector3.zero;
         }
 
         /// <summary>
@@ -79,7 +90,11 @@ namespace Skill.Framework.Weapons
         /// </summary>
         protected override void Update()
         {
-            if (_LifeTimeTW.IsEnabledAndOver) OnDie();
+            if (_LifeTimeTW.IsEnabledAndOver)
+            {
+                _LifeTimeTW.End();
+                OnDie();
+            }
             base.Update();
         }
 
@@ -160,11 +175,11 @@ namespace Skill.Framework.Weapons
             if (_IsDead) return;
             _IsDead = true;
             if (Explosion != null)
-                Skill.Framework.Managers.CacheSpawner.Spawn(Explosion, _Transform.position, Explosion.transform.rotation);
+                Skill.Framework.Managers.Cache.Spawn(Explosion, (ExplosionPos != null) ? ExplosionPos.position : _Transform.position, Explosion.transform.rotation);
             if (Events != null)
                 Events.OnDie(this, System.EventArgs.Empty);
             Target = null;
-            CacheSpawner.DestroyCache(gameObject);
+            Cache.DestroyCache(gameObject);
         }
     }
 }

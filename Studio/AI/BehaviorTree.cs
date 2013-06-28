@@ -91,8 +91,10 @@ namespace Skill.Studio.AI
                     Nodes.Add(b);
                     Nodes[0].IsSelectedState = true;
 
-                    if (Editor != null)
-                        Editor.RefreshDiagram();
+                    if (GraphView != null)
+                    {
+                        GraphView.RefreshGraph();
+                    }
                     if (!IsDebuging && _PreState != null)
                         this.History.Insert(new ChangeStateUnDoRedo(this, Root.Name, (_PreState != null) ? _PreState.Name : string.Empty));
                     return true;
@@ -116,7 +118,7 @@ namespace Skill.Studio.AI
             History.IsEnable = true;
         }
 
-        public void UpdateSelectedBehaviors()
+        internal void UpdateSelectedBehaviors()
         {
             SelectedBehaviors.Clear();
             AddSelectedBehaviors(Root);
@@ -154,7 +156,7 @@ namespace Skill.Studio.AI
         }
 
         /// <summary> Editor owner </summary>
-        public Editor.BehaviorTreeEditor Editor { get; set; }
+        public Editor.IBehaviorTreeGraphView GraphView { get; set; }
 
         private bool _IsDebuging;
         [Browsable(false)]

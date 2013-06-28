@@ -51,10 +51,9 @@ namespace Skill.Framework
             if (distanceToSource <= shakeInfo.Range)
             {
                 this._Shake = new CameraShakeInfo(shakeInfo);
-                float modifier = (1 - (distanceToSource / this._Shake.Range));
+                float modifier = (this._Shake.ByDistance) ? (1 - (distanceToSource / this._Shake.Range)) : 1.0f;
                 this._Shake.Roll *= modifier;
-                this._Shake.Intensity *= modifier;                
-                //this._Shake.Duration *= modifier;
+                this._Shake.Intensity *= modifier;
                 this._ShakeTime.Begin(this._Shake.Duration);
                 base.enabled = true;
             }
@@ -65,6 +64,7 @@ namespace Skill.Framework
         /// </summary>
         protected virtual void LateUpdate()
         {
+            if (Global.IsGamePaused) return;
             if (_ShakeTime.IsEnabled)
             {
                 if (_ShakeTime.IsOver)

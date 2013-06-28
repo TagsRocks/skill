@@ -26,12 +26,24 @@ public class HealthCollider : StaticBehaviour
         if (Events != null)
         {
             if (HitEnable)
-                Events.Hit += OnHit;
+                Events.Hit += Events_Hit;
             if (DamageEnable)
-                Events.Damage += OnDamage;
+                Events.Damage += Events_Damage;
         }
         else
             Debug.LogWarning("Miss EventManager behaviour for HealthCollider");
+    }
+
+    protected override void UnhookEvents()
+    {
+        base.UnhookEvents();
+        if (Events != null)
+        {
+            if (HitEnable)
+                Events.Hit -= Events_Hit;
+            if (DamageEnable)
+                Events.Damage -= Events_Damage;
+        }
     }
 
     /// <summary>
@@ -39,7 +51,7 @@ public class HealthCollider : StaticBehaviour
     /// </summary>    
     /// <param name="sender">The source of the event.</param>
     /// <param name="args"> An DamageEventArgs that contains damage event data.</param>
-    protected virtual void OnDamage(object sender, DamageEventArgs args)
+    protected virtual void Events_Damage(object sender, DamageEventArgs args)
     {
         Health.Events.OnDamage(sender, args);
     }
@@ -51,7 +63,7 @@ public class HealthCollider : StaticBehaviour
     /// </summary>
     /// <param name="sender"> sender </param>
     /// <param name="args"> An HitEventArgs that contains hit event data. </param>        
-    protected virtual void OnHit(object sender, HitEventArgs args)
+    protected virtual void Events_Hit(object sender, HitEventArgs args)
     {
         Health.Events.OnHit(sender, args);
     }

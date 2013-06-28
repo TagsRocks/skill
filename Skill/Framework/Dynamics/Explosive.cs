@@ -29,7 +29,16 @@ namespace Skill.Framework.Dynamics
             base.HookEvents();
             if (Events != null)
             {
-                Events.Die += OnDie;
+                Events.Die += Events_Die;
+            }
+        }
+
+        protected override void UnhookEvents()
+        {
+            base.UnhookEvents();
+            if (Events != null)
+            {
+                Events.Die -= Events_Die;
             }
         }
 
@@ -39,7 +48,7 @@ namespace Skill.Framework.Dynamics
         /// </summary>
         /// <param name="sender"> The source of the event. </param>
         /// <param name="e"> An System.EventArgs that contains no event data. </param>        
-        protected virtual void OnDie(object sender, System.EventArgs e)
+        protected virtual void Events_Die(object sender, System.EventArgs e)
         {
             Skill.Framework.Global.OnCameraShake(this, Shake, transform.position);
 
@@ -63,7 +72,7 @@ namespace Skill.Framework.Dynamics
         /// <param name="position">Where to spawn</param>
         protected virtual void SpawnExplosionPrefab(Transform position)
         {
-            CacheSpawner.Spawn(ExpPrefab, position.position, ExpPrefab.transform.rotation);
+            Cache.Spawn(ExpPrefab, position.position, ExpPrefab.transform.rotation);
         }
 
         /// <summary>
@@ -96,7 +105,7 @@ namespace Skill.Framework.Dynamics
             if (_DestroyTW.IsEnabledAndOver)
             {
                 _DestroyTW.End();
-                CacheSpawner.DestroyCache(gameObject);
+                Cache.DestroyCache(gameObject);
             }
             base.Update();
         }

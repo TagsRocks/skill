@@ -15,36 +15,41 @@ namespace Skill.Net
 
     public static class Logger
     {
-        public static ILogger LoggerInstance { get; set; }
+        private static ILogger _LoggerInstance;
+
+        public static void ReplaceInstance(ILogger logger)
+        {
+            _LoggerInstance = logger;
+        }
 
         public static void LogError(Exception ex)
         {
-            if (LoggerInstance != null)
-                LoggerInstance.LogError(ex);
+            if (_LoggerInstance != null)
+                _LoggerInstance.LogError(ex);
             else
                 System.Diagnostics.Debugger.Log(0, "Errors", ex.Message);
         }
 
         public static void LogError(string errorMsg)
         {
-            if (LoggerInstance != null)
-                LoggerInstance.LogError(errorMsg);
+            if (_LoggerInstance != null)
+                _LoggerInstance.LogError(errorMsg);
             else
                 System.Diagnostics.Debugger.Log(0, "Errors", errorMsg);
         }
 
         public static void LogWarning(string warningMsg)
         {
-            if (LoggerInstance != null)
-                LoggerInstance.LogWarning(warningMsg);
+            if (_LoggerInstance != null)
+                _LoggerInstance.LogWarning(warningMsg);
             else
                 System.Diagnostics.Debugger.Log(0, "Warnings", warningMsg);
         }
 
         public static void LogMessage(string msg)
         {
-            if (LoggerInstance != null)
-                LoggerInstance.LogMessage(msg);
+            if (_LoggerInstance != null)
+                _LoggerInstance.LogMessage(msg);
             else
                 System.Diagnostics.Debugger.Log(0, "Messages", msg);
         }

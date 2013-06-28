@@ -62,6 +62,7 @@
     <Compile Include="Framework\Global.cs" />
     <Compile Include="Framework\Health.cs" />
     <Compile Include="Framework\HitEventArgs.cs" />
+    <Compile Include="Framework\IBehavioural.cs" />
     <Compile Include="Framework\IControllerManager.cs" />
     <Compile Include="Framework\IO\SmallXmlParser.cs" />
     <Compile Include="Framework\IO\XmlAttribute.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="Framework\Sounds\RandomSound.cs" />
     <Compile Include="Framework\Sounds\SoundCategory.cs" />
     <Compile Include="Framework\Sounds\PitchListener.cs" />
+    <Compile Include="Framework\SpawnQueue.cs" />
     <Compile Include="Framework\StaticBehaviour.cs" />
     <Compile Include="Framework\Smoothing.cs" />
     <Compile Include="Framework\Text\CharInfo.cs" />
@@ -151,7 +153,7 @@
     <Compile Include="Framework\IO\XmlElement.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Framework\Controller.cs" />
-    <Compile Include="Framework\Managers\CacheSpawner.cs" />
+    <Compile Include="Framework\Managers\Cache.cs" />
     <Compile Include="Framework\Modules\DelayRender.cs" />
     <Compile Include="Framework\Triggers\CameraShakeTrigger.cs" />
     <Compile Include="Framework\Triggers\DamageTrigger.cs" />
@@ -205,13 +207,11 @@
     <Compile Include="Framework\UI\Window.cs" />
     <Compile Include="Framework\UI\WrapImage.cs" />
     <Compile Include="Framework\UI\WrapPanel.cs" />
-    <Compile Include="Framework\Weapons\BaseWeapon.cs" />
+    <Compile Include="Framework\Weapons\Weapon.cs" />
     <Compile Include="Framework\Weapons\Bullet.cs" />
-    <Compile Include="Framework\Weapons\StraightLineWeapon.cs" />
     <Compile Include="Framework\Weapons\MuzzleFlash.cs" />
-    <Compile Include="Framework\Weapons\ProjectileWeapon.cs" />
+    <Compile Include="Framework\Weapons\CurveProjectileParams.cs" />
     <Compile Include="Framework\Weapons\RaycastBullet.cs" />
-    <Compile Include="Framework\Weapons\RaycastWeapon.cs" />
     <Compile Include="Framework\Weapons\StraightLineBullet.cs" />
     <Compile Include="Framework\Weapons\Projectile.cs" />
     <Compile Include="Framework\Weapons\WeaponState.cs" />
@@ -219,7 +219,6 @@
   <ItemGroup>
     <None Include="ClassDiagram1.cd" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

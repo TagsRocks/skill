@@ -58,7 +58,7 @@ namespace Skill.Studio.AI
                     SetValid(value);
                     foreach (ActionViewModel avm in Tree.GetSharedModel(Model))
                         if (avm != this) avm.SetValid(value);
-                    Tree.Editor.SetChanged(true);
+                    Tree.GraphView.SetChanged(true);
                 }
             }
         }
@@ -86,7 +86,7 @@ namespace Skill.Studio.AI
                     ((Skill.DataModels.AI.Action)Model).ExecutionTime = value;
                     Debug.ExecutionTime = value;
                     OnPropertyChanged(new PropertyChangedEventArgs("ExecutionTime"));
-                    Tree.Editor.SetChanged(true);
+                    Tree.GraphView.SetChanged(true);
                 }
             }
         }
@@ -103,7 +103,7 @@ namespace Skill.Studio.AI
                     ((Skill.DataModels.AI.Action)Model).AnimationFrameRate = value;
                     _GifAnimation.FrameRate = value;
                     OnPropertyChanged(new PropertyChangedEventArgs("FrameRate"));
-                    Tree.Editor.SetChanged(true);
+                    Tree.GraphView.SetChanged(true);
                 }
             }
         }
@@ -120,7 +120,7 @@ namespace Skill.Studio.AI
                     ((Skill.DataModels.AI.Action)Model).AnimationWrapMode = (int)value;
                     _GifAnimation.WrapMode = value;
                     OnPropertyChanged(new PropertyChangedEventArgs("WrapMode"));
-                    Tree.Editor.SetChanged(true);
+                    Tree.GraphView.SetChanged(true);
                 }
             }
         }
@@ -143,7 +143,7 @@ namespace Skill.Studio.AI
                 {
                     ((Skill.DataModels.AI.Action)Model).AnimationSource = value;
                     OnPropertyChanged(new PropertyChangedEventArgs("Animation"));
-                    Tree.Editor.SetChanged(true);
+                    Tree.GraphView.SetChanged(true);
                 }
             }
         }

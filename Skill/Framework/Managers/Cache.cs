@@ -36,7 +36,7 @@ namespace Skill.Framework.Managers
     /// <summary>
     /// Manage spawning cache objects
     /// </summary>
-    public static class CacheSpawner
+    public static class Cache
     {
         private static CacheObject GetCacheObject(GameObject prefab)
         {
@@ -71,12 +71,12 @@ namespace Skill.Framework.Managers
         /// <param name="prefab">GameObject with CacheBehavior component</param>
         /// <param name="position">Position</param>
         /// <param name="rotation">Rotation</param>
-        /// <param name="enabled">Enable at spawn time or let caller enable it itself</param>
+        /// <param name="active">Activate at spawn time or let caller activate it self</param>
         /// <returns>Spawned GameObject</returns>
         /// <remarks>
         /// If GameObject has not a CacheBehavior component, spawner instantiate it normally ( by GameObject.Instantiate method )
         /// </remarks>
-        public static GameObject Spawn(GameObject prefab, Vector3 position, Quaternion rotation, bool enabled = true)
+        public static GameObject Spawn(GameObject prefab, Vector3 position, Quaternion rotation, bool active = true)
         {
             if (prefab == null)
             {
@@ -108,8 +108,9 @@ namespace Skill.Framework.Managers
                 throw;
             }
 
-            // Set the object to be active
-            obj.SetActive(enabled);
+            if (obj != null)
+                // Set the object to be active
+                obj.SetActive(active);
             return obj;
         }
 

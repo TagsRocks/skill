@@ -15,22 +15,30 @@ namespace TestClient
     {
 
         public delegate void UpdateRichEditCallback(string text);
+        public delegate void UpdateControlsCallback(bool isConnected);
 
         Client _Client;
 
         public ClientSocketForm()
         {
             InitializeComponent();
-            Logger.LoggerInstance = new MessageBoxLogger();
+            Logger.ReplaceInstance(new MessageBoxLogger());
             _TxtServerIP.Text = Server.GetMyIP();
         }
 
-        private void UpdateControls(bool connected)
+        private void UpdateControls(bool isConnected)
         {
-            _BtnConnect.Enabled = !connected;
-            _BtnDisconnect.Enabled = connected;
-            string connectStatus = connected ? "Connected" : "Not Connected";
-            _TxtConnectStatus.Text = connectStatus;
+            if (InvokeRequired)
+            {
+                this.BeginInvoke(new UpdateControlsCallback(UpdateControls), isConnected);
+            }
+            else
+            {
+                _BtnConnect.Enabled = !isConnected;
+                _BtnDisconnect.Enabled = isConnected;
+                string connectStatus = isConnected ? "Connected" : "Not Connected";
+                _TxtConnectStatus.Text = connectStatus;
+            }
         }
 
         private void _BtnConnect_Click(object sender, EventArgs e)
@@ -50,6 +58,7 @@ namespace TestClient
                 if (_Client.IsConnected)
                     UpdateControls(true);
                 _Client.Message += _Client_Message;
+                _Client.Closed += _Client_Closed;
             }
             catch (SocketException se)
             {
@@ -58,6 +67,13 @@ namespace TestClient
                 MessageBox.Show(str);
                 UpdateControls(false);
             }
+        }
+
+        void _Client_Closed(object sender, EventArgs e)
+        {
+            _Client.Message -= _Client_Message;
+            _Client.Closed -= _Client_Closed;
+            UpdateControls(false);
         }
 
         void _Client_Message(object sender, Skill.Net.Message msg)
@@ -90,7 +106,7 @@ namespace TestClient
         private void OnUpdateRichEdit(string msg)
         {
             _RTRxMessage.AppendText(msg);
-            _RTRxMessage.AppendText("\n");            
+            _RTRxMessage.AppendText("\n");
         }
 
         private void Disconnect()

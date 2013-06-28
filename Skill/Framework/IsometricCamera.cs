@@ -69,7 +69,7 @@ namespace Skill.Framework
         /// <summary> Current zoom distance </summary>
         public float Zoom { get { return _Zoom.Current; } }
         /// <summary> It can be center of all enemies around player </summary>
-        public virtual Vector3 PointOfInterest { get { return Target.position; } }
+        public Vector3? PointOfInterest { get; set; }
 
 
         // Private memeber data                
@@ -89,7 +89,7 @@ namespace Skill.Framework
         protected override void Awake()
         {
             base.Awake();
-            _CameraVelocity = Vector3.zero;            
+            _CameraVelocity = Vector3.zero;
             _CameraTransform = Camera.transform;
             // Set the initial cursor position to the center of the screen
             CursorScreenPosition = new Vector3(0.5f * Screen.width, 0.5f * Screen.height, 0);
@@ -131,12 +131,11 @@ namespace Skill.Framework
         protected override void Update()
         {
             if (Camera == null) return;
-
-            if (!Global.CutSceneEnable) // do not modify camera if game is in cutscene mode
-            {
-                Vector3 center = PointOfInterest;
+            if (!Global.IsGamePaused && !Global.CutSceneEnable) // do not modify camera if game is in cutscene mode
+            {                
                 if (Target != null)
                 {
+                    Vector3 center = (PointOfInterest != null) ? PointOfInterest.Value : Target.position;
                     Vector3 dir = Target.position - center;
                     _LengthOffset = dir.magnitude;
                     if (_LengthOffset > MaxTargetOffset)// if PointOfInterest is far than MaxTargetOffset

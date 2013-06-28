@@ -10,7 +10,7 @@ namespace Skill.Framework
     /// Base class for controllers
     /// </summary>
     [RequireComponent(typeof(Skill.Framework.EventManager))]
-    public abstract class Controller : DynamicBehaviour
+    public abstract class Controller : DynamicBehaviour, IBehavioural
     {
         /// <summary>
         /// An optional meaningful identifier for controller to be distinguishable from others.
@@ -43,17 +43,56 @@ namespace Skill.Framework
         /// </summary>
         public Spawner Spawner { get; internal set; }
 
+
+        /// <summary>
+        /// Hooks required events of EventManager.
+        /// </summary>
+        protected override void HookEvents()
+        {
+            base.HookEvents();
+            if (Events != null)
+            {
+                Events.Die += Events_Die;
+                Events.Hit += Events_Hit;
+                Events.Cached += Events_Cached;
+            }
+        }
+
+
+
+        /// <summary>
+        /// Unhooks hooked events
+        /// </summary>
+        protected override void UnhookEvents()
+        {
+            base.UnhookEvents();
+            if (Events != null)
+            {
+                Events.Die -= Events_Die;
+                Events.Hit -= Events_Hit;
+                Events.Cached -= Events_Cached;
+            }
+        }
+
+        private void ResetValues()
+        {
+            if (Behavior != null)
+                Behavior.Reset();
+            if (Spawner != null)
+            {
+                Spawner.NotifySpawnedObjectIsDead(this.gameObject);
+                Spawner = null;
+            }
+        }
+
         /// <summary>
         /// Notify GameObject is dead
         /// </summary>
         /// <param name="sender"> The source of the event. </param>
         /// <param name="e"> An System.EventArgs that contains no event data. </param>
-        protected virtual void OnDie(object sender, EventArgs e)
+        protected virtual void Events_Die(object sender, EventArgs e)
         {
-            if (Behavior != null)
-                Behavior.Reset();
-            if (Spawner != null)
-                Spawner.NotifySpawnedObjectIsDead(this.gameObject);
+            ResetValues();
         }
 
         /// <summary>
@@ -61,8 +100,18 @@ namespace Skill.Framework
         /// </summary>
         /// <param name="sender"> sender </param>
         /// <param name="args"> An HitEventArgs that contains hit event data. </param>        
-        protected virtual void OnHit(object sender, HitEventArgs args)
+        protected virtual void Events_Hit(object sender, HitEventArgs args)
         {
+        }
+
+        /// <summary>
+        /// Handle when object cached by CacheSpawner
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        protected virtual void Events_Cached(object sender, Managers.CacheEventArgs args)
+        {
+            ResetValues();
         }
 
         /// <summary>
@@ -70,8 +119,7 @@ namespace Skill.Framework
         /// </summary>
         protected override void OnDestroy()
         {
-            if (Behavior != null)
-                Behavior.Reset();
+            ResetValues();
             Global.UnRegister(this);
             base.OnDestroy();
         }
@@ -81,10 +129,8 @@ namespace Skill.Framework
         /// </summary>
         public virtual void DestroySelf()
         {
-            if (Spawner != null)
-                this.Spawner.DestroySpawnedObject(this.gameObject);
-            else
-                GameObject.Destroy(this.gameObject);            
+            ResetValues();
+            Managers.Cache.DestroyCache(this.gameObject);
         }
 
 
@@ -95,19 +141,8 @@ namespace Skill.Framework
         {
             base.Start();
             Global.Register(this);
-        }  
-        /// <summary>
-        /// Hooks required events of EventManager. ('Die' and 'Hit' events)
-        /// </summary>
-        protected override void HookEvents()
-        {
-            base.HookEvents();
-            if (Events != null)
-            {
-                Events.Die += OnDie;
-                Events.Hit += OnHit;
-            }
         }
+
 
         /// <summary>
         /// Get required references
@@ -118,6 +153,6 @@ namespace Skill.Framework
             Health = GetComponent<Health>();
         }
 
-              
+
     }
 }

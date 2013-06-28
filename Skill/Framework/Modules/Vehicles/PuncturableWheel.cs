@@ -29,27 +29,25 @@ namespace Skill.Framework.Modules.Vehicles
         /// </summary>
         /// <param name="sender"> sender </param>
         /// <param name="args"> An HitEventArgs that contains hit event data. </param>
-        protected override void OnHit(object sender, HitEventArgs args)
+        protected override void Events_Hit(object sender, HitEventArgs args)
         {
             if ((args.Type & PunctureHitType) == 0) return;
-            base.OnHit(sender, args);
+            base.Events_Hit(sender, args);
         }
 
-        /// <summary>
-        /// When agent is dead
-        /// </summary>        
-        protected override void OnDie()
+        protected override void Events_Die(object sender, System.EventArgs e)
         {
             if (Chassis != null)
                 Chassis.NotifyWheelPuncture(this);
 
             if (PuncturePrefab != null)
-                CacheSpawner.Spawn(PuncturePrefab, transform.position, Quaternion.LookRotation(transform.TransformDirection(PuncturePrefabDirection)));
+                Cache.Spawn(PuncturePrefab, transform.position, Quaternion.LookRotation(transform.TransformDirection(PuncturePrefabDirection)));
 
             Vector3 pos = transform.position;
             pos.y -= PunctureHeight;
             transform.position = pos;
-            base.OnDie();
+
+            base.Events_Die(sender, e);
         }
     }
 

@@ -21,7 +21,7 @@ namespace TestServer
         public ServerForm()
         {
             InitializeComponent();
-            Logger.LoggerInstance = new MessageBoxLogger();
+            Logger.ReplaceInstance(new MessageBoxLogger());
             _TxtIP.Text = Server.GetMyIP();
             _Server = new Server(new DefaultMessageTranslator());
             _Server.ClientConnected += _Server_ClientConnected;

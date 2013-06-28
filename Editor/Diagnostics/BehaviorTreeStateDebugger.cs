@@ -7,7 +7,7 @@ using UnityEditor;
 using Skill.Editor.UI;
 using Skill.Framework.UI;
 
-namespace Skill.Editor
+namespace Skill.Editor.Diagnostics
 {
     class BehaviorTreeStateDebugger : UnityEditor.EditorWindow
     {
@@ -207,7 +207,10 @@ namespace Skill.Editor
         void _BehaviorTree_EnterState(object sender, string stateName)
         {
             if (_State != stateName)
+            {
+                _State = stateName;
                 RebuildTree();
+            }
         }
 
         private bool IsInExecutionSequence(Skill.Framework.AI.Behavior behavior)

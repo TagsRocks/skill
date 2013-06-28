@@ -45,6 +45,10 @@ namespace Skill.Net
         public IAsyncResult Result { get { return _Result; } }
         /// <summary> Is worker connected? </summary>
         public bool IsConnected { get; private set; }
+        /// <summary>
+        /// Exception if conection closed by
+        /// </summary>
+        public Exception Exception { get; private set; }
 
         /// <summary> Occurs when worker closed </summary>
         public event EventHandler Closed;
@@ -76,10 +80,8 @@ namespace Skill.Net
         {
             if (messageTranslator == null) throw new ArgumentNullException("Invalid MessageTranslator");
             this._MessageTranslator = messageTranslator;
-            if (bufferSize <= 0) throw new ArgumentException("Invalid bufferSize. size of buffer must be greater than zero");
+            if (bufferSize <= MessageHeader.HeaderSize * 2) throw new ArgumentException(string.Format("Invalid bufferSize. size of buffer must be at least {0} bytes", MessageHeader.HeaderSize * 2));
             this._DataBuffer = new byte[bufferSize];
-            this._InStream = new MessageStream(_DataBuffer);
-            this._OutStream = new MessageStream(bufferSize);
             this._InHeader = new MessageHeader();
             this._OutHeader = new MessageHeader();
             this._AsyncCallback = new AsyncCallback(OnDataReceived);
@@ -91,6 +93,9 @@ namespace Skill.Net
         internal void Start(Socket socket)
         {
             IsConnected = true;
+            Exception = null;
+            this._InStream = new MessageStream(_DataBuffer) { CanRead = true };
+            this._OutStream = new MessageStream(_DataBuffer.Length) { CanWrite = true };
             this.Socket = socket;
             WaitForData();
         }
@@ -104,7 +109,9 @@ namespace Skill.Net
             }
             catch (SocketException se)
             {
+                Exception = se;
                 Logger.LogError(se);
+                Close();
             }
         }
 
@@ -117,72 +124,97 @@ namespace Skill.Net
 
             try
             {
-                if (Socket == null)
-                    return;                
+                if (Socket == null || !IsConnected)
+                    return;
 
                 // Complete the BeginReceive() asynchronous call by EndReceive() method
                 // which will return the number of characters written to the stream 
                 // by the client
                 int dataLenght = Socket.EndReceive(asyn);
 
-                if (_MultipartMsg) // this should be the next part of a previous message
+                if (dataLenght > 0)
                 {
-                    _LargeInStream.Write(_DataBuffer, 0, dataLenght);
-                    this._DataRecieved += dataLenght;
-                }
-                else // this is the first part of a message
-                {
-                    this._InHeader.ReadFrom(_DataBuffer);
-                    this._DataRecieved = dataLenght - MessageHeader.HeaderSize;
-                    if (this._InHeader.SizeInBytes > this._DataRecieved)
+                    if (_MultipartMsg) // this should be the next part of a previous message
                     {
-                        // the message has another part
-                        _MultipartMsg = true;
-                        if (_LargeInStream == null)
-                            _LargeInStream = new MessageStream(this._InHeader.SizeInBytes);
-                        else
+                        if (dataLenght > 0)
+                        {
+                            _LargeInStream.CanWrite = true;
+                            _LargeInStream.Write(_DataBuffer, 0, dataLenght);
+                            _LargeInStream.CanWrite = false;
+                            this._DataRecieved += dataLenght;
+                        }
+                    }
+                    else // this is the first part of a message
+                    {
+                        if (dataLenght > MessageHeader.HeaderSize)
+                        {
+                            this._InHeader.ReadFrom(_DataBuffer);
+                            this._DataRecieved = dataLenght - MessageHeader.HeaderSize;
+                            if (this._InHeader.SizeInBytes > this._DataRecieved)
+                            {
+                                // the message has another part
+                                _MultipartMsg = true;
+                                if (_LargeInStream == null)
+                                {
+                                    _LargeInStream = new MessageStream(this._InHeader.SizeInBytes) { CanRead = true };
+                                    Logger.LogWarning(string.Format("Size of message({0}) is greater than buffersize({1})", this._InHeader.SizeInBytes, _DataBuffer.Length));
+                                }
+                                else
+                                {
+                                    _LargeInStream.Seek(0, SeekOrigin.Begin);
+                                }
+                                _LargeInStream.CanWrite = true;
+                                _LargeInStream.Write(_DataBuffer, MessageHeader.HeaderSize, _DataRecieved);
+                                _LargeInStream.CanWrite = false;
+                            }
+                            else
+                            {
+
+                                _InStream.CanWrite = true;
+                                _InStream.Seek(0, SeekOrigin.Begin);
+                                _InStream.Write(_DataBuffer, MessageHeader.HeaderSize, _DataRecieved);
+                                _InStream.CanWrite = false;
+                            }
+                        }
+                    }
+
+                    Message msg = null;
+
+                    if (_MultipartMsg)
+                    {
+                        if (this._DataRecieved >= this._InHeader.SizeInBytes)
+                        {
+                            // this is the last part of message
+                            _MultipartMsg = false;
                             _LargeInStream.Seek(0, SeekOrigin.Begin);
-                        _LargeInStream.Write(_DataBuffer, MessageHeader.HeaderSize, _DataRecieved);
+                            msg = HandleMessage(_LargeInStream, this._InHeader);
+                            this._InHeader.SizeInBytes = 0;
+                        }
                     }
                     else
                     {
                         _InStream.Seek(0, SeekOrigin.Begin);
-                        _InStream.Write(_DataBuffer, MessageHeader.HeaderSize, _DataRecieved);
+                        msg = HandleMessage(_InStream, this._InHeader);
+                        this._InHeader.SizeInBytes = 0;
                     }
-                }
 
-                Message msg = null;
-
-                if (_MultipartMsg)
-                {
-                    if (this._InHeader.SizeInBytes >= this._DataRecieved)
+                    if (msg != null && msg.Type == (int)MessageType.Disconnect)
                     {
-                        // this is the last part of message
-                        _MultipartMsg = false;
-                        _LargeInStream.Seek(0, SeekOrigin.Begin);
-                        msg = HandleMessage(_LargeInStream, this._InHeader);
+                        CloseConnection();
                     }
-                }
-                else
-                {
-                    _InStream.Seek(0, SeekOrigin.Begin);
-                    msg = HandleMessage(_InStream, this._InHeader);
-                }
-
-                if (msg != null && msg.Type == (int)MessageType.Disconnect)
-                {
-                    CloseConnection();
-                }
-                else
-                {
-                    // Continue the waiting for data on the Socket
-                    WaitForData();
+                    else
+                    {
+                        // Continue the waiting for data on the Socket
+                        WaitForData();
+                    }
                 }
 
             }
-            catch (ObjectDisposedException)
+            catch (ObjectDisposedException ex)
             {
+                Exception = ex;
                 System.Diagnostics.Debugger.Log(0, "Errors", "Socket has been closed");
+                Close();
             }
             catch (SocketException se)
             {
@@ -190,12 +222,14 @@ namespace Skill.Net
                 {
                     string msg = string.Format("Client {0} Disconnected", Name);
                     Logger.LogMessage(msg);
-                    Close();
+
                 }
                 else
                 {
                     Logger.LogError(se);
                 }
+                Exception = se;
+                Close();
             }
         }
 
@@ -211,10 +245,14 @@ namespace Skill.Net
             {
                 stream.Flush();
                 Message msg = _MessageTranslator.Translate(header.Type);
-                if (msg != null) msg.SizeInBytes = header.SizeInBytes;
-                msg.ReadData(stream);
-                OnMessage(msg);
-
+                if (msg != null)
+                {
+                    msg.SizeInBytes = header.SizeInBytes;
+                    msg.ReadData(stream);
+                    OnMessage(msg);
+                }
+                else
+                    Logger.LogWarning(string.Format("Can not translate message id : ", header.Type));
                 return msg;
             }
             else
@@ -226,7 +264,7 @@ namespace Skill.Net
         /// </summary>
         public void Close()
         {
-            if (IsConnected)
+            if (IsConnected && Exception == null)
             {
                 DisconnectMessage msg = new DisconnectMessage();
                 SendMessage(msg);
@@ -242,6 +280,7 @@ namespace Skill.Net
             if (this._OutStream != null) this._OutStream.Close();
             if (this.Socket != null) this.Socket.Close();
 
+            this._OutStream = null;
             this._InStream = null;
             this._LargeInStream = null;
             this.Socket = null;
@@ -277,7 +316,7 @@ namespace Skill.Net
                 }
             }
             else
-                throw new InvalidOperationException("Can not send message via diconnected connection");
+                Logger.LogError("Can not send message via diconnected connection");
         }
 
     }

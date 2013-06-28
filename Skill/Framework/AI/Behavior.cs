@@ -18,9 +18,9 @@ namespace Skill.Framework.AI
         /// </summary>
         public BehaviorType Type { get; private set; }
         /// <summary>
-        /// Last ecexution result of behavior
+        /// Last ecexution result of behavior - (setter is for internal use - do not change this manually)
         /// </summary>
-        public BehaviorResult Result { get; protected set; }
+        public BehaviorResult Result { get; set; }
 
         /// <summary>
         /// Behavior of node when is child of a ConcurrentSelector

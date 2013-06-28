@@ -68,6 +68,21 @@ namespace Skill.Framework
         }
 
         /// <summary>
+        /// Is enabled (begined) and current time is lower than OverTime
+        /// </summary>
+        public bool IsEnabledButNotOver
+        {
+            get
+            {
+                if (!_IsEnabled) return false;
+                if (_UseRealTime)
+                    return UnityEngine.Time.realtimeSinceStartup < _OverTime;
+                else
+                    return UnityEngine.Time.time < _OverTime;
+            }
+        }
+
+        /// <summary>
         /// Whether TimeWatch is disabled or enabled and current time is greater than OverTime
         /// </summary>
         public bool IsOver

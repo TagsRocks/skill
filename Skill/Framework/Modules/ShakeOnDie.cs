@@ -21,7 +21,7 @@ namespace Skill.Framework.Modules
         {
             base.HookEvents();
             if (Events != null)
-                Events.Die += OnDie;
+                Events.Die += Events_Die;
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace Skill.Framework.Modules
         {
             base.UnhookEvents();
             if (Events != null)
-                Events.Die += OnDie;
+                Events.Die -= Events_Die;
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Skill.Framework.Modules
         /// </summary>
         /// <param name="sender">Source of event</param>
         /// <param name="e"> EventArgs </param>
-        protected virtual void OnDie(object sender, EventArgs e)
+        protected virtual void Events_Die(object sender, EventArgs e)
         {
             Global.OnCameraShake(this, Shake, _Transform.position);
         }

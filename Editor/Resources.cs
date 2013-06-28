@@ -39,7 +39,7 @@ namespace Skill.Editor
             Texture2D result = AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
             if (result == null)
                 Debug.LogWarning("Can not load " + path);
-            return result;
+            return result;            
         }
 
         private static Texture2D _SelectedItemBackground;

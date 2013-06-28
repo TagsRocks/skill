@@ -31,6 +31,12 @@ namespace Skill.Studio.AI.Editor
                     bvm.Border = bb;
                 }
             }
+        }        
+
+        protected override void OnPreviewMouseDown(System.Windows.Input.MouseButtonEventArgs e)
+        {
+            ViewModel.IsSelected = true;
+            base.OnPreviewMouseDown(e);
         }
     }
 }

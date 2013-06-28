@@ -80,13 +80,17 @@ namespace Skill.Studio
             }
             if (!Validation.LocationValidator.IsValid(System.IO.Path.Combine(_ViewModel.UnityProjectDirectory, "Assets")))
             {
-                System.Windows.MessageBox.Show("Invalid unity project directory - 'Assets' directory does not exist.");
-                return;
+                var result = System.Windows.MessageBox.Show(this, "Seems not to be a unity project directory - Continue?\n'Assets' directory does not exist.", "Invalid project directory", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
+                if (result == MessageBoxResult.No)
+                    return;
             }
             if (System.IO.File.Exists(Project.GetFilename(_ViewModel.UnityProjectDirectory, _ViewModel.Name)))
             {
-                System.Windows.MessageBox.Show("The project already exists.");
-                return;
+                var result = System.Windows.MessageBox.Show(this, "The project already exists - Overwrite?", "project already exists", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
+                if (result == MessageBoxResult.No)
+                    return;
+                else
+                    System.IO.File.Delete(Project.GetFilename(_ViewModel.UnityProjectDirectory, _ViewModel.Name));
             }
 
             this.DialogResult = true;
@@ -101,18 +105,16 @@ namespace Skill.Studio
 
         private void Btn_BrowseLocation_Click(object sender, RoutedEventArgs e)
         {
-            using (System.Windows.Forms.FolderBrowserDialog dialog = new System.Windows.Forms.FolderBrowserDialog())
+            WPFFolderBrowser.WPFFolderBrowserDialog dialog = new WPFFolderBrowser.WPFFolderBrowserDialog();
+            if (!string.IsNullOrEmpty(Properties.Settings.Default.LastProjectDir) && System.IO.Directory.Exists(Properties.Settings.Default.LastProjectDir))
+                dialog.FileName = Properties.Settings.Default.LastProjectDir;
+            if (dialog.ShowDialog() == true)
             {
-                if (!string.IsNullOrEmpty(Properties.Settings.Default.LastProjectDir) && System.IO.Directory.Exists(Properties.Settings.Default.LastProjectDir))
-                    dialog.SelectedPath = Properties.Settings.Default.LastProjectDir;
-                dialog.ShowNewFolderButton = true;
-                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    _ViewModel.UnityProjectDirectory = dialog.SelectedPath;
-                    Properties.Settings.Default.LastProjectDir = dialog.SelectedPath;
-                    Properties.Settings.Default.Save();
-                }
+                _ViewModel.UnityProjectDirectory = dialog.FileName;
+                Properties.Settings.Default.LastProjectDir = dialog.FileName;
+                Properties.Settings.Default.Save();
             }
+
         }
     }
 }

@@ -33,14 +33,14 @@
                     </HierarchicalDataTemplate>
                 </TreeView.Resources>
             </TreeView>
-            <StackPanel Grid.Column="1" IsEnabled="{Binding IsFileOpened,ElementName=This}" >
+            <StackPanel Grid.Column="1" >
                 <StackPanel.Resources>
                     <Style TargetType="Button">
                         <Setter Property="Margin" Value="4,2" />
                     </Style>
                 </StackPanel.Resources>
-                <Button Content="Merge Selected"  Click="BtnMerge_Click" />
-                <GroupBox Header="Optimize" Margin="2" >
+                <Button Content="Merge Selected"  Click="BtnMerge_Click" IsEnabled="{Binding IsFileOpened,ElementName=This}" />
+                <GroupBox Header="Optimize" Margin="2" IsEnabled="{Binding IsFileOpened,ElementName=This}" >
                     <StackPanel Margin="2,6,2,0" >
                         <Grid>                            
                             <Grid.RowDefinitions>
@@ -76,7 +76,7 @@
                     </StackPanel>
                 </GroupBox>
                 <tools:SaveOptionControl x:Name="_SaveOptions" />
-                <Button Content="Save" Click="BtnSave_Click"  Margin="4,2" />
+                <Button Content="Save" Click="BtnSave_Click"  Margin="4,2" IsEnabled="{Binding IsFileOpened,ElementName=This}" />
             </StackPanel>
         </Grid>
         <Grid Grid.Row="2" Background="{StaticResource ButtonPanelBg}" >

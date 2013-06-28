@@ -68,7 +68,8 @@ namespace Skill.Framework.UI
         /// <remarks>
         /// Because Skill UI use commands to handle tab and cycle through controls, it must disable tab index that unity gui used internally.
         /// Remember if you draw custom control before Menu.OnGUI(), this method may not works correctly, so you have to eat tab key yourself at the begin of MonoBehaviour OnGUI.
-        /// by writting this code :
+        /// use Menu.EatTabKeyImplementation method
+        /// or writting this code at begin of OnGUI:
         /// <code>
         /// if (UnityEngine.Event.current.keyCode == UnityEngine.KeyCode.Tab || UnityEngine.Event.current.character == '\t')
         ///        UnityEngine.Event.current.Use();
@@ -218,8 +219,8 @@ namespace Skill.Framework.UI
         /// </summary>
         public void OnGUI()
         {
-            if (EatTabKey && UnityEngine.Event.current.keyCode == UnityEngine.KeyCode.Tab || UnityEngine.Event.current.character == '\t')
-                UnityEngine.Event.current.Use();
+            if (EatTabKey)
+                EatTabKeyImplementation();
 
             bool preEnabledValue = true;
             // draw top most frame
@@ -398,6 +399,15 @@ namespace Skill.Framework.UI
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return this._Frames.GetEnumerator();
+        }
+
+        /// <summary>
+        /// Default implamentation of eat tab key
+        /// </summary>
+        public static void EatTabKeyImplementation()
+        {
+            if (UnityEngine.Event.current.keyCode == UnityEngine.KeyCode.Tab || UnityEngine.Event.current.character == '\t')
+                UnityEngine.Event.current.Use();
         }
     }
 }

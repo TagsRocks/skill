@@ -24,14 +24,14 @@ namespace Skill.Editor
         [MenuItem("Skill/Tools/Animation Assigner", false, 2)]
         static void ShowAnimationAssigner()
         {
-            AnimationAssigner.Instance.Show();
+            Tools.AnimationAssigner.Instance.Show();
         }
 
-        [MenuItem("Skill/Debug/BehaviorTree State", false, 50)]
+        [MenuItem("Skill/Diagnostics/BehaviorTree State", false, 50)]
         static void ShowBTreeStateDebugger()
         {
-            BehaviorTreeStateDebugger.Instance.Show();
-        }
+            Diagnostics.BehaviorTreeStateDebugger.Instance.Show();
+        }        
 
         [MenuItem("Skill/Export to Skill Studio", false, 1001)]
         static void ShowExporter()

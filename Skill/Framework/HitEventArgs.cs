@@ -37,7 +37,7 @@ namespace Skill.Framework
         /// <summary> Type of hit </summary>
         public HitType Type { get; private set; }
         /// <summary> The object that caused this hit </summary>
-        public GameObject Owner { get; private set; }
+        public GameObject Hitter { get; private set; }
         /// <summary> Collider </summary>
         public UnityEngine.Collider Collider { get; private set; }
         /// <summary> User data </summary>
@@ -66,7 +66,7 @@ namespace Skill.Framework
         public HitEventArgs(GameObject owner, HitType type, UnityEngine.Collider collider)
         {
             this.Type = type;
-            this.Owner = owner;
+            this.Hitter = owner;
             this.Collider = collider;            
         }
     }
@@ -132,6 +132,7 @@ namespace Skill.Framework
         /// Create DamageEventArgs
         /// </summary>
         /// <param name="damage"> Amount of damage </param>
+        /// <param name="tag"> tag of object that caused damage</param>
         public DamageEventArgs(float damage, string tag)
         {
             this.Damage = damage;

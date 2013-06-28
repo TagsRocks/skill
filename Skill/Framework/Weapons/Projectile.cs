@@ -5,21 +5,46 @@ using UnityEngine;
 
 namespace Skill.Framework.Weapons
 {
+
+    /// <summary>
+    /// Type of bullet
+    /// </summary>
+    public enum ProjectileType
+    {
+        /// <summary>
+        /// A weapon that uses velocity for rigidbody bullets and speed/Direction for none rigidbody bullets to shoot bullets.
+        /// The RigidBody of bullets use no gravity to go straight.
+        /// If Target of weapon is valid it shoots on Target, otherwise shoots in front direction.
+        /// </summary>
+        StraightLine,
+        /// <summary>        
+        /// use raycasting to shoot bullets and needs StraightLineBullet.
+        /// If Target of weapon is valid it shoots on Target, otherwise shoots in front direction.        
+        /// </summary>
+        Raycast,
+        /// <summary>
+        /// Bullet of this projectile needs rigidbody and use gravity to move.
+        /// </summary>
+        Curve
+    }
+
     [Serializable]
     public class Projectile
     {
         /// <summary> Name of projectile </summary>
         public string Name;
         /// <summary> where to spawn bullets. usually it is a point in child of weapon that moves by weapon </summary>
-        public Transform SpawnPoint;        
+        public Transform SpawnPoint;
         /// <summary> A prefab that has a Bullet script component </summary>
-        public GameObject BulletPrefab;        
+        public GameObject BulletPrefab;
+        /// <summary> Type of bullet. each type needs deferent parameters and components</summary>
+        public ProjectileType Type;
         /// <summary> Sound to play on fire </summary>
         public AudioClip[] FireSounds;
         /// <summary> Sound to play on reload </summary>
         public AudioClip ReloadSound;
         /// <summary> Sound to play on reload when clip is empty and complete reload needed</summary>
-        public AudioClip CompleteReloadSound;        
+        public AudioClip CompleteReloadSound;
         /// <summary> Initial speed of bullet at spawn time </summary>
         public float InitialSpeed = 30;
         /// <summary> </summary>
@@ -39,7 +64,7 @@ namespace Skill.Framework.Weapons
         /// <summary> How long does it take to change a clip when current clip is empty and complete reload needed </summary>
         public float CompleteReloadTime = 1.2f;
         /// <summary> Holds the amount of time a single shot takes </summary>
-        public float FireInterval;        
+        public float FireInterval;
         /// <summary> How much damage does a given instanthit shot do </summary>
         public float InstantHitDamage = 20;
         /// <summary> DamageTypes for Instant Hit Weapons </summary>
@@ -48,10 +73,17 @@ namespace Skill.Framework.Weapons
         public bool InfinitClip = false;
         /// <summary> whether this projectile has infinite ammo.( no reload no consume ammo ).   </summary>
         public bool InfinitAmmo = false;
-        
+        /// <summary> Curve projectile specific parameters </summary>
+        public CurveProjectileParams CurveParams;
+        /// <summary> Layer mask to use in raycasting </summary>
+        public int LayerMask = 0xFFFFFFF;
+        /// <summary> Whether weapon check hit posint of this bullet at spawn time or let bullet check hits itself.</summary>
+        public bool HitAtSpawn;
+
         /// <summary> Number of ammo in current clip </summary>
         public int ClipAmmo { get; set; }
         /// <summary> Total number of ammo without clip ammo </summary>
-        public int TotalAmmo { get; set; }        
+        public int TotalAmmo { get; set; }
+
     }
 }

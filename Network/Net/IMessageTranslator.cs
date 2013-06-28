@@ -12,29 +12,17 @@ namespace Skill.Net
 
     public class DefaultMessageTranslator : IMessageTranslator
     {
-        public Message Translate(int messageType)
+        public Skill.Net.Message Translate(int messageType)
         {
             switch ((MessageType)messageType)
             {
                 case MessageType.Disconnect:
-                    return new DisconnectMessage();
+                    return new Skill.Net.DisconnectMessage();
                 case MessageType.Text:
-                    return new TextMessage();
-                case MessageType.RequestBTList:
-                    break;
-                case MessageType.BTList:
-                    break;
-                case MessageType.RequestBT:
-                    break;
-                case MessageType.BT:
-                    break;
-                case MessageType.BTUpdate:
-                    break;
+                    return new Skill.Net.TextMessage();
                 default:
                     return null;
             }
-
-            return null;
         }
     }
 }

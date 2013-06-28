@@ -206,93 +206,92 @@ namespace Skill.Studio.AI
             }
         }
 
-        private PathFigure _PathFigure;
-        private BezierSegment _BezierSegment;
-        private void UpdateConnectionToParent()
-        {
+        internal PathFigure _PathFigure;
+        internal BezierSegment _BezierSegment;
+        //private void UpdateConnectionToParent()
+        //{
 
-            if (_ConnectionToParent == null)
-            {
-                _PathFigure = new PathFigure();
-                _BezierSegment = new BezierSegment();
-                _BezierSegment.IsStroked = true;
-                _PathFigure.Segments.Add(_BezierSegment);
-            }
-            BehaviorViewModel parent = Parent as BehaviorViewModel;
-            if (parent != null)
-            {
-                double deltaX = parent.X - this.X + parent.Width;
-                double deltaY = (parent.Y + parent.Height * 0.5) - (this.Y + this.Height * 0.5);
+        //    if (_ConnectionToParent == null)
+        //    {
+        //        _PathFigure = new PathFigure();
+        //        _BezierSegment = new BezierSegment();
+        //        _BezierSegment.IsStroked = true;
+        //        _PathFigure.Segments.Add(_BezierSegment);
+        //    }
+        //    BehaviorViewModel parent = Parent as BehaviorViewModel;
+        //    if (parent != null)
+        //    {
+        //        double deltaX = parent.X - this.X + parent.Width;
+        //        double deltaY = (parent.Y + parent.Height * 0.5) - (this.Y + this.Height * 0.5);
 
-                Point targetPosition = new Point(OFFSET, Height * 0.5);
-                Point sourcePosition = new Point(deltaX - OFFSET, deltaY + this.Height * 0.5);
+        //        Point targetPosition = new Point(OFFSET, Height * 0.5);
+        //        Point sourcePosition = new Point(deltaX - OFFSET, deltaY + this.Height * 0.5);
 
-                deltaX = System.Math.Abs(targetPosition.X - sourcePosition.X) * 0.5;
-                deltaY = System.Math.Abs(targetPosition.Y - sourcePosition.Y) * 0.5;
+        //        deltaX = System.Math.Abs(targetPosition.X - sourcePosition.X) * 0.5;
+        //        deltaY = System.Math.Abs(targetPosition.Y - sourcePosition.Y) * 0.5;
 
-                Point startBezierPoint = Skill.Studio.Diagram.BezierCurve.GetBezierPoint(deltaX, deltaY, Diagram.ConnectorOrientation.Right, sourcePosition);
-                Point endBezierPoint = Skill.Studio.Diagram.BezierCurve.GetBezierPoint(deltaX, deltaY, Diagram.ConnectorOrientation.Left, targetPosition);
+        //        Point startBezierPoint = Skill.Studio.Diagram.BezierCurve.GetBezierPoint(deltaX, deltaY, Diagram.ConnectorOrientation.Right, sourcePosition);
+        //        Point endBezierPoint = Skill.Studio.Diagram.BezierCurve.GetBezierPoint(deltaX, deltaY, Diagram.ConnectorOrientation.Left, targetPosition);
 
-                _PathFigure.StartPoint = sourcePosition;
-                _BezierSegment.Point1 = startBezierPoint;
-                _BezierSegment.Point2 = endBezierPoint;
-                _BezierSegment.Point3 = targetPosition;
+        //        _PathFigure.StartPoint = sourcePosition;
+        //        _BezierSegment.Point1 = startBezierPoint;
+        //        _BezierSegment.Point2 = endBezierPoint;
+        //        _BezierSegment.Point3 = targetPosition;
 
-                if (_ConnectionToParent == null)
-                {
-                    PathGeometry pathGeometry = new System.Windows.Media.PathGeometry();
-                    pathGeometry.Figures.Add(_PathFigure);
-                    this.ConnectionToParent = pathGeometry;
-                }
-            }
+        //        if (_ConnectionToParent == null)
+        //        {
+        //            PathGeometry pathGeometry = new System.Windows.Media.PathGeometry();
+        //            pathGeometry.Figures.Add(_PathFigure);
+        //            this.ConnectionToParent = pathGeometry;
+        //        }
+        //    }
 
-        }
+        //}
 
-        private static double MINWIDTH = 80;
-        private static double MINHEIGHT = 30;
-        private static double MARGINLEFT = 50;
-        private static double MARGINBOTTOM = 10;
-        private static double OFFSET = 2;
+        //private static double MINWIDTH = 80;
+        //private static double MINHEIGHT = 30;
+        //private static double MARGINLEFT = 50;
+        //private static double MARGINBOTTOM = 10;
+        //private static double OFFSET = 2;
 
+        //public void UpdatePosition()
+        //{
+        //    UpdatePosition(MARGINLEFT, 10);
+        //    UpdateConnection();
+        //}
 
-        public void UpdatePosition()
-        {
-            UpdatePosition(MARGINLEFT, 10);
-            UpdateConnection();
-        }
+        //private void UpdateConnection()
+        //{
+        //    this.UpdateConnectionToParent();
+        //    foreach (BehaviorViewModel child in this) if (child != null) child.UpdateConnection();
+        //}
 
-        private void UpdateConnection()
-        {
-            this.UpdateConnectionToParent();
-            foreach (BehaviorViewModel child in this) if (child != null) child.UpdateConnection();
-        }
+        //private double UpdatePosition(double x, double y)
+        //{
 
-        private double UpdatePosition(double x, double y)
-        {
+        //    X = x;
 
-            X = x;
+        //    double delta;
+        //    if (Count == 0) // this is a leaf node
+        //    {
+        //        delta = Height;
+        //    }
+        //    else
+        //    {
+        //        delta = 0;
+        //        int i = 0;
+        //        foreach (BehaviorViewModel child in this)
+        //        {
+        //            if (child != null)
+        //                delta += child.UpdatePosition(x + Width + MARGINLEFT, y + delta) + MARGINBOTTOM;
+        //            i++;
+        //        }
 
-            double delta;
-            if (Count == 0) // this is a leaf node
-            {
-                delta = Height;
-            }
-            else
-            {
-                delta = 0;
-                int i = 0;
-                foreach (BehaviorViewModel child in this)
-                {
-                    if (child != null)
-                        delta += child.UpdatePosition(x + Width + MARGINLEFT, y + delta) + MARGINBOTTOM;
-                    i++;
-                }
-
-                if (Count > 1) delta -= MARGINBOTTOM;
-            }
-            Y = y + (delta - Height) * 0.5;
-            return delta;
-        }
+        //        if (Count > 1) delta -= MARGINBOTTOM;
+        //    }
+        //    Y = y + (delta - Height) * 0.5;
+        //    return delta;
+        //}
 
         [Browsable(false)]
         public string DisplayName
@@ -332,7 +331,7 @@ namespace Skill.Studio.AI
         {
             get
             {
-                return _Border != null ? _Border.DesiredSize.Width : MINWIDTH;
+                return _Border != null ? _Border.DesiredSize.Width : 80;
             }
         }
 
@@ -342,7 +341,7 @@ namespace Skill.Studio.AI
         {
             get
             {
-                return _Border != null ? _Border.DesiredSize.Height : MINHEIGHT;
+                return _Border != null ? _Border.DesiredSize.Height : 30;
             }
         }
 
@@ -380,6 +379,7 @@ namespace Skill.Studio.AI
             : base(parent)
         {
             this._BorderBrush = Editor.BehaviorBrushes.DefaultBorderBrush;
+            this._TextBrush = Editor.BehaviorBrushes.DefaultTextBrush;
             this._ConnectionStroke = 2;
             this.Model = behavior;
             this.Tree = tree;

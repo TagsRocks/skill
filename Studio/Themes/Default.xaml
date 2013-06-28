@@ -4,6 +4,7 @@
                     xmlns:diag="clr-namespace:Skill.Studio.Diagram"
                     xmlns:clr="clr-namespace:System;assembly=mscorlib">
 
+    <SolidColorBrush x:Key="TabDocumentBg"  Color="#FFF6F6F6" />
     <SolidColorBrush x:Key="WindowBg"  Color="#BCC7D8" />
     <SolidColorBrush x:Key="ButtonPanelBg"  Color="#293A56" />
     <SolidColorBrush x:Key="ControlBg" Color="#FFF0F0F0" />
@@ -267,6 +268,14 @@
     <BitmapImage x:Key="ImgStepHoverBtn"   UriSource="/SkillStudio;component/Images/Default/Player/Step_H.png" />
 
     <BitmapImage x:Key="ImgSetAsDefault"   UriSource="/SkillStudio;component/Images/Default/SetAsDefault.png" />
+
+    <BitmapImage x:Key="ImgFlipHorizontal"   UriSource="/SkillStudio;component/Images/Default/Flip_Horizontal.png" />
+    <BitmapImage x:Key="ImgFlipVertical"   UriSource="/SkillStudio;component/Images/Default/Flip_Vertical.png" />
+    <BitmapImage x:Key="ImgConnect"   UriSource="/SkillStudio;component/Images/Default/Connect.png" />
+    <BitmapImage x:Key="ImgConnect_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/Connect.png" />
+    <BitmapImage x:Key="ImgDisConnect"   UriSource="/SkillStudio;component/Images/Default/DisConnect.png" />
+    <BitmapImage x:Key="ImgDisConnect_D"   UriSource="/SkillStudio;component/Images/Default/Disabled/DisConnect.png" />
+    
 
     <Style x:Key="AnimationText" TargetType="TextBlock" >
         <Setter Property="Foreground" Value="White" />

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Skill.Studio.Controls
 {
-    public class LayoutDocument : AvalonDock.Layout.LayoutDocument
+    public class LayoutDocument : Xceed.Wpf.AvalonDock.Layout.LayoutDocument
     {
         public LayoutDocument()
         {

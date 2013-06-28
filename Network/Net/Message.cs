@@ -58,6 +58,6 @@ namespace Skill.Net
             bytes = BitConverter.GetBytes(Type);
             startIndex += bytes.Length;
             Array.Copy(bytes, 0, data, startIndex, bytes.Length);
-        }
+        }        
     }
 }

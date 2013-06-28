@@ -47,7 +47,7 @@ namespace Skill.Framework.Managers
         {
             if (_LifeTimeTW.IsEnabledAndOver)
             {
-                CacheSpawner.DestroyCache(this.gameObject);
+                Cache.DestroyCache(this.gameObject);
             }
             base.Update();
         }

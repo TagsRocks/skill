@@ -69,7 +69,7 @@ namespace Skill.Studio.AI
 
                     foreach (DecoratorViewModel dvm in Tree.GetSharedModel(Model))
                         if (dvm != this) dvm.SetValid(value);
-                    Tree.Editor.SetChanged(true);
+                    Tree.GraphView.SetChanged(true);
                 }
             }
         }

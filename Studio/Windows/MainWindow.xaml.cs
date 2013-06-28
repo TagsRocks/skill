@@ -12,9 +12,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
-using AvalonDock;
-using AvalonDock.Layout;
-using AvalonDock.Layout.Serialization;
+using Xceed.Wpf.AvalonDock;
+using Xceed.Wpf.AvalonDock.Layout;
+using Xceed.Wpf.AvalonDock.Layout.Serialization;
 using System.ComponentModel;
 using Microsoft.Win32;
 
@@ -65,6 +65,9 @@ namespace Skill.Studio
 
         private Controls.LayoutDocument _StartPageDocument = null;
         private Controls.StartPage _StartPage = null;
+
+        private Controls.LayoutDocument _BehaviorTreeRemoteDebuggerDocument = null;
+        private AI.Editor.BehaviorTreeRemoteDebugger _BehaviorTreeRemoteDebugger;
         #endregion
 
         #region Properties
@@ -219,6 +222,38 @@ namespace Skill.Studio
 
         #endregion
 
+        #region BehaviorTreeRemoteDebugger
+        private void CreateBehaviorTreeRemoteDebugger()
+        {
+            if (_BehaviorTreeRemoteDebugger == null)
+            {
+                _BehaviorTreeRemoteDebugger = new AI.Editor.BehaviorTreeRemoteDebugger();
+                _BehaviorTreeRemoteDebuggerDocument = new Controls.LayoutDocument(_BehaviorTreeRemoteDebugger) { Title = "BehaviorTree Debugger" };
+            }
+        }
+
+        private void ShowBehaviorTreeRemoteDebugger()
+        {
+            CreateBehaviorTreeRemoteDebugger();
+            if (_BehaviorTreeRemoteDebugger != null)
+            {
+                if (!DocumentPane_DocsCenter.Children.Contains(_BehaviorTreeRemoteDebuggerDocument))
+                {
+                    DocumentPane_DocsCenter.Children.Add(_BehaviorTreeRemoteDebuggerDocument);
+                }
+                DocumentPane_DocsCenter.SelectedContentIndex = DocumentPane_DocsCenter.IndexOf(_BehaviorTreeRemoteDebuggerDocument);
+            }
+        }
+
+        private void CloseBehaviorTreeRemoteDebugger()
+        {
+            if (_BehaviorTreeRemoteDebugger != null)
+            {
+                _BehaviorTreeRemoteDebuggerDocument.Close();
+            }
+        }
+        #endregion
+
         #region Start Page
 
         private void CreateStartPage()
@@ -228,11 +263,6 @@ namespace Skill.Studio
                 _StartPage = new Controls.StartPage();
                 _StartPageDocument = new Controls.LayoutDocument(_StartPage) { Title = "Start Page" };
             }
-        }
-
-        void _StartPage_Closed(object sender, EventArgs e)
-        {
-            DocumentPane_DocsCenter.Children.Remove(_StartPageDocument);
         }
 
         private void ShowStartPage()
@@ -245,10 +275,7 @@ namespace Skill.Studio
                 {
                     DocumentPane_DocsCenter.Children.Add(_StartPageDocument);
                 }
-                else
-                {
-                    DocumentPane_DocsCenter.SelectedContentIndex = DocumentPane_DocsCenter.IndexOf(_StartPageDocument);
-                }
+                DocumentPane_DocsCenter.SelectedContentIndex = DocumentPane_DocsCenter.IndexOf(_StartPageDocument);
             }
         }
 
@@ -256,7 +283,8 @@ namespace Skill.Studio
         {
             if (_StartPage != null)
             {
-                _StartPageDocument.Close();
+                if (DocumentPane_DocsCenter.Children.Contains(_StartPageDocument))
+                    _StartPageDocument.Close();
             }
         }
         #endregion
@@ -558,7 +586,7 @@ namespace Skill.Studio
             _StatusText.Text = "Ready";
         }
 
-        internal Controls.ErrorList ErrorList { get { return _ErrorList; } }        
+        internal Controls.ErrorList ErrorList { get { return _ErrorList; } }
 
         #endregion
 
@@ -727,6 +755,12 @@ namespace Skill.Studio
             e.Handled = true;
         }
 
+        private void Mnu_ShowBehaviorTreeRemoteDebugger_Click(object sender, RoutedEventArgs e)
+        {
+            ShowBehaviorTreeRemoteDebugger();
+            e.Handled = true;
+        }
+
         private void Mnu_About_Click(object sender, RoutedEventArgs e)
         {
             AboutWindow about = new AboutWindow();
@@ -862,7 +896,7 @@ namespace Skill.Studio
         /// <returns>True if user save file, and false if user cancel save</returns>
         private bool AskForSave(TabDocument doc)
         {
-            var result = System.Windows.MessageBox.Show(this, "Save changes to " + doc.Name, Properties.Resources.Save,
+            var result = System.Windows.MessageBox.Show(this, "Save changes to " + doc.ViewModel.Name, Properties.Resources.Save,
                    System.Windows.MessageBoxButton.YesNoCancel, System.Windows.MessageBoxImage.Question, System.Windows.MessageBoxResult.No);
             if (result == System.Windows.MessageBoxResult.Yes)
                 doc.Save();
@@ -902,5 +936,7 @@ namespace Skill.Studio
         }
 
         #endregion
+
+
     }
 }

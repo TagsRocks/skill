@@ -106,5 +106,41 @@ namespace Skill.Studio.Properties {
                 this["RecentProjects"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string UnityServerIP {
+            get {
+                return ((string)(this["UnityServerIP"]));
+            }
+            set {
+                this["UnityServerIP"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("8000")]
+        public int UnityServerPort {
+            get {
+                return ((int)(this["UnityServerPort"]));
+            }
+            set {
+                this["UnityServerPort"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("20")]
+        public int UnityServerBufferSize {
+            get {
+                return ((int)(this["UnityServerBufferSize"]));
+            }
+            set {
+                this["UnityServerBufferSize"] = value;
+            }
+        }
     }
 }

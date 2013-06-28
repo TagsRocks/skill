@@ -111,7 +111,8 @@ namespace Skill.Framework.Weapons
     /// Defines base class for weapons
     /// </summary>
     [RequireComponent(typeof(AudioSource))]
-    public abstract class BaseWeapon : DynamicBehaviour
+    [AddComponentMenu("Skill/Weapons/Weapon")]
+    public class Weapon : DynamicBehaviour
     {
         /// <summary> Name of weapon </summary>
         public string Name = "Weapon";
@@ -150,8 +151,8 @@ namespace Skill.Framework.Weapons
         public virtual bool HasAmmo { get { return CurrentProjectile.TotalAmmo > 0; } }
         /// <summary> Is trigger down and weapon keeps firing </summary>
         public bool IsFiring { get; private set; }
-        /// <summary> Who holds this weapon? modify this value when equip or drop weapon.</summary>
-        public virtual Controller Controller { get; set; }
+        /// <summary> Is equipped? weapon works when equipped </summary>
+        public bool IsEquipped { get; set; }
         /// <summary> Current equipped projectile </summary>
         public Projectile CurrentProjectile { get { return Projectiles[_SelectedProjectile]; } }
         /// <summary> Can fire immediately? </summary>
@@ -203,7 +204,26 @@ namespace Skill.Framework.Weapons
         /// </summary>
         /// <param name="bulletCount">Number of bullet to shoot</param>
         /// <returns> Array of spawned bullets </returns>
-        protected abstract Bullet[] ShootBullets(int bulletCount);
+        private Bullet[] ShootBullets(int bulletCount)
+        {
+            if (CurrentProjectile != null)
+            {
+                switch (CurrentProjectile.Type)
+                {
+                    case ProjectileType.StraightLine:
+                        return ShootStraightLineBullets(bulletCount);
+                    case ProjectileType.Raycast:
+                        return ShootRaycastBullets(bulletCount);
+                    case ProjectileType.Curve:
+                        return ShootCurveBullets(bulletCount);
+                }
+            }
+            else
+            {
+                UnityEngine.Debug.LogWarning("Invalid bullet to shoot");
+            }
+            return null;
+        }
 
         /// <summary> Occurs when a reload happpened </summary>
         public event WeaponReloadEventHandler Reload;
@@ -281,7 +301,7 @@ namespace Skill.Framework.Weapons
         protected override void Start()
         {
             base.Start();
-            DamageFactor = 1.0f;            
+            DamageFactor = 1.0f;
             if (Projectiles == null || Projectiles.Length == 0)
                 Debug.LogError("A weapon must have at least one projectile.");
             if (CurrentProjectile.TotalAmmo <= 0)
@@ -400,6 +420,7 @@ namespace Skill.Framework.Weapons
         {
             if (Time.timeScale == 0)
                 return;
+
             if (State == WeaponState.Ready)
             {
                 if (!IsFiring)
@@ -421,14 +442,14 @@ namespace Skill.Framework.Weapons
         protected override void Update()
         {
             if (Time.timeScale == 0) return;
-            if (Controller == null)
+            if (!IsEquipped)
             {
                 if (_DestroyTW.IsEnabled)
                 {
                     if (_DestroyTW.IsOver)
                     {
                         _DestroyTW.End();
-                        CacheSpawner.DestroyCache(gameObject);
+                        Cache.DestroyCache(gameObject);
                     }
                 }
                 else if (SelfDestory)
@@ -578,6 +599,213 @@ namespace Skill.Framework.Weapons
                     _AudioSource.PlayOneShot(sound);
                 }
             }
+        }
+
+
+        /// <summary>
+        /// Instantiate a bullet and throw it at correct direction and force 
+        /// </summary>
+        /// <param name="bulletCount">Number of bullet to shoot</param>
+        /// <returns> Array of spawned bullets </returns>
+        protected virtual Bullet[] ShootCurveBullets(int bulletCount)
+        {
+            Bullet[] bullets = new Bullet[bulletCount];
+
+            Quaternion iniRotation = Quaternion.identity;
+
+            switch (CurrentProjectile.CurveParams.InitialRotation)
+            {
+                case InitialCurveProjectileRotation.Forward:
+                    Quaternion.LookRotation(_Transform.forward, _Transform.up);
+                    break;
+                case InitialCurveProjectileRotation.AbsoluteCustom:
+                    iniRotation = CurrentProjectile.CurveParams.Rotation;
+                    break;
+                case InitialCurveProjectileRotation.RelativeCustom:
+                    iniRotation = CurrentProjectile.CurveParams.Rotation * _Transform.rotation;
+                    break;
+            }
+
+            for (int i = 0; i < bulletCount; i++)
+            {
+                // spawn a bullet but inactive
+                GameObject go = Cache.Spawn(CurrentProjectile.BulletPrefab, CurrentProjectile.SpawnPoint.position, iniRotation) as GameObject;
+
+                Bullet bullet = go.GetComponent<Bullet>();// get reference to bullet
+                if (bullet != null) // set bullet parameters
+                {
+                    bullet.Shooter = this.gameObject;
+                    bullet.Damage = CurrentProjectile.InstantHitDamage * DamageFactor;
+                    bullet.Range = CurrentProjectile.Range;
+                    bullet.Speed = CurrentProjectile.InitialSpeed;
+                }
+
+                Rigidbody rb = go.rigidbody;
+                if (rb != null)
+                {
+                    if (rb.collider != null)
+                    {
+                        Rigidbody weaponRB = this.rigidbody;
+                        if (weaponRB != null && weaponRB.collider)
+                            Physics.IgnoreCollision(weaponRB.collider, rb.collider);
+                    }
+                    float range = CurrentProjectile.Range;
+                    Vector3 dir = _Transform.forward;
+                    dir.y = 0;
+
+                    if (Target != null && Target.HasValue)
+                    {
+                        Vector3 target = Target.Value;
+                        Vector3 position = _Transform.position;
+                        dir = target - position;
+                        dir.y = 0;
+                        range = dir.magnitude;
+                        if (range > CurrentProjectile.Range)
+                            range = CurrentProjectile.Range;
+                    }
+
+                    dir.Normalize();
+                    Quaternion rotation = Quaternion.AngleAxis(CurrentProjectile.CurveParams.ThrowAngle, dir);
+
+                    float speed = (Physics.gravity * range).sqrMagnitude;
+                    dir = rotation * Vector3.forward;
+                    rb.AddForce(dir * speed * rb.mass, ForceMode.Impulse);
+
+                    bullet.Direction = dir;
+                    bullet.Speed = speed;
+                }
+
+                bullet.StartJourney();
+                bullets[i] = bullet;
+            }
+            return bullets;
+        }
+
+        /// <summary>
+        /// Instantiate a bullet and throw it at correct direction and force 
+        /// </summary>
+        /// <param name="bulletCount">Number of bullet to shoot</param>
+        /// <returns> Array of spawned bullets </returns>
+        protected virtual Bullet[] ShootStraightLineBullets(int bulletCount)
+        {
+            Bullet[] bullets = new Bullet[bulletCount];
+
+            Vector3 direction;
+            if (Target != null && Target.HasValue)
+                direction = (Target.Value - CurrentProjectile.SpawnPoint.position).normalized;
+            else
+                direction = _Transform.forward;
+
+            for (int i = 0; i < bulletCount; i++)
+            {
+                Quaternion spreadRot = Quaternion.Euler(UnityEngine.Random.Range(-Spread.x, Spread.x), UnityEngine.Random.Range(-Spread.y, Spread.y), 0);
+                Quaternion bulletRotation = Quaternion.LookRotation(spreadRot * direction);
+                Vector3 bulletDirection = (bulletRotation * Vector3.forward).normalized;
+
+                // spawn a bullet but inactive
+                GameObject go = Cache.Spawn(CurrentProjectile.BulletPrefab, CurrentProjectile.SpawnPoint.position, bulletRotation) as GameObject;
+                Rigidbody rb = go.rigidbody;
+                if (rb != null && !rb.isKinematic)
+                {
+                    if (rb.collider != null)
+                    {
+                        Rigidbody weaponRB = this.rigidbody;
+                        if (weaponRB != null && weaponRB.collider)
+                            Physics.IgnoreCollision(weaponRB.collider, rb.collider);
+                    }
+
+                    if (rb.useGravity)
+                    {
+                        rb.AddForce(bulletDirection * CurrentProjectile.InitialSpeed, ForceMode.Impulse);
+                    }
+                    else
+                    {
+                        rb.velocity = Vector3.zero;
+                        rb.AddForce(bulletDirection * CurrentProjectile.InitialSpeed, ForceMode.VelocityChange);
+                    }
+                }
+
+                Bullet bullet = go.GetComponent<Bullet>();// get reference to bullet
+                if (bullet != null) // set bullet parameters
+                {
+                    bullet.Shooter = this.gameObject;
+                    bullet.Damage = CurrentProjectile.InstantHitDamage * DamageFactor;
+                    bullet.Direction = bulletDirection;
+                    bullet.Range = CurrentProjectile.Range;
+                    bullet.Speed = CurrentProjectile.InitialSpeed;
+                }
+
+                bullet.StartJourney();
+                bullets[i] = bullet;
+            }
+            return bullets;
+        }
+
+        private RaycastHit _HitInfo;
+        private Ray _Ray;
+
+        /// <summary>
+        /// Instantiate a bullet and throw it at correct direction and force 
+        /// </summary>
+        /// <param name="bulletCount">Number of bullet to shoot</param>
+        /// <returns> Array of spawned bullets </returns>
+        protected virtual Bullet[] ShootRaycastBullets(int bulletCount)
+        {
+            Bullet[] bullets = new Bullet[bulletCount];
+
+            Vector3 direction;
+            if (Target != null && Target.HasValue)
+                direction = (Target.Value - CurrentProjectile.SpawnPoint.position).normalized;
+            else
+                direction = _Transform.forward;
+
+            for (int i = 0; i < bulletCount; i++)
+            {
+                Quaternion spreadRot = Quaternion.Euler(UnityEngine.Random.Range(-Spread.x, Spread.x), UnityEngine.Random.Range(-Spread.y, Spread.y), 0);
+                Quaternion bulletRotation = Quaternion.LookRotation(spreadRot * direction);
+                Vector3 bulletDirection = (bulletRotation * Vector3.forward).normalized;
+
+                // spawn a bullet but inactive
+                GameObject go = Cache.Spawn(CurrentProjectile.BulletPrefab, CurrentProjectile.SpawnPoint.position, bulletRotation, false) as GameObject;
+                StraightLineBullet bullet = go.GetComponent<StraightLineBullet>();// get reference to bullet
+
+                if (bullet != null) // set bullet parameters
+                {
+                    bullet.Shooter = this.gameObject;
+                    bullet.Damage = CurrentProjectile.InstantHitDamage * DamageFactor;
+                    bullet.Direction = bulletDirection;
+                    bullet.Range = CurrentProjectile.Range;
+                    bullet.Speed = CurrentProjectile.InitialSpeed;
+                    bullet.LayerMask = CurrentProjectile.LayerMask;
+
+                    if (CurrentProjectile.HitAtSpawn) // if is is needed to check hit at spawn time
+                    {
+                        _Ray.direction = bulletDirection;
+                        _Ray.origin = CurrentProjectile.SpawnPoint.position;
+
+                        if (Physics.Raycast(_Ray, out _HitInfo, CurrentProjectile.Range, CurrentProjectile.LayerMask))
+                        {
+                            bullet.Range = _HitInfo.distance;
+
+                            EventManager events = _HitInfo.collider.GetComponent<EventManager>();
+                            if (events != null)
+                            {
+                                RaycastHitEventArgs info = new RaycastHitEventArgs(bullet.Shooter, HitType.Bullet | HitType.Raycast, _HitInfo.collider);
+                                info.Damage = bullet.Damage;
+                                info.Tag = this.tag;
+                                info.Normal = _HitInfo.normal;
+                                info.Point = _HitInfo.point;
+                                info.RaycastHit = _HitInfo;
+                                events.OnHit(this, info);
+                            }
+                        }
+                    }
+                }
+                bullet.StartJourney();
+                go.SetActive(true);
+                bullets[i] = bullet;
+            }
+            return bullets;
         }
     }
 

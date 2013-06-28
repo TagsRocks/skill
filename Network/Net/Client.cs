@@ -68,6 +68,7 @@ namespace Skill.Net
             {
                 string str = string.Format("Connection failed, is the server running? {0}", se.Message);
                 Logger.LogError(str);
+                Close();
             }
         }
 

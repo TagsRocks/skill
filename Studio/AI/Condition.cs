@@ -43,7 +43,7 @@ namespace Skill.Studio.AI
                     SetValid(value);
                     foreach (ConditionViewModel cvm in Tree.GetSharedModel(Model))
                         if (cvm != this) cvm.SetValid(value);
-                    Tree.Editor.SetChanged(true);
+                    Tree.GraphView.SetChanged(true);
                 }
             }
         }

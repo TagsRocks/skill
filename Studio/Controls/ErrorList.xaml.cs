@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using AvalonDock;
+using Xceed.Wpf.AvalonDock;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Skill.DataModels.Animation;

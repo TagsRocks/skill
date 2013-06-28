@@ -87,7 +87,7 @@ namespace Skill.Framework.Dynamics
                 else
                     Health.RegenerateSpeed = FireDamageSpeed;
                 Health.enabled = true;
-                _DamageFireInstance = CacheSpawner.Spawn(FirePrefab, FirePosition.position, FirePrefab.transform.rotation);
+                _DamageFireInstance = Cache.Spawn(FirePrefab, FirePosition.position, FirePrefab.transform.rotation);
             }
         }
 
@@ -96,9 +96,9 @@ namespace Skill.Framework.Dynamics
         /// </summary>
         /// <param name="sender"> The source of the event. </param>
         /// <param name="e"> An System.EventArgs that contains no event data. </param>   
-        protected override void OnDie(object sender, System.EventArgs e)
+        protected override void Events_Die(object sender, System.EventArgs e)
         {
-            base.OnDie(sender, e);
+            base.Events_Die(sender, e);
             
             // if there are spread objects then spread some objects
             if (SpreadObjects != null && SpreadObjects.Length > 0)
@@ -113,7 +113,7 @@ namespace Skill.Framework.Dynamics
             // the object is exploded so destroy spawned fire
             if (_DamageFireInstance != null)
             {
-                CacheSpawner.DestroyCache(_DamageFireInstance);
+                Cache.DestroyCache(_DamageFireInstance);
             }
         }
 
@@ -141,7 +141,7 @@ namespace Skill.Framework.Dynamics
         protected virtual void SpawnSpreadObject(GameObject so)
         {
             Vector3 pos = _Transform.position + SpreadOffset * Random.onUnitSphere;
-            CacheSpawner.Spawn(so, pos, so.transform.rotation);
+            Cache.Spawn(so, pos, so.transform.rotation);
             if (so.rigidbody != null)
                 so.rigidbody.AddExplosionForce(ExplosionForce, _Transform.position, ExplosionRadius, UpwardsModifier);
         }

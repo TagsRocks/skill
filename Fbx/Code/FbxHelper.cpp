@@ -223,7 +223,7 @@ namespace Skill
 			if(lExporter->Initialize(pFilename, pFileFormat, pSdkManager->GetIOSettings()) == false)
 			{				
 				System::Diagnostics::Debugger::Log(0,"Warning","Call to FbxExporter::Initialize() failed.");
-				FBXSDK_printf("Error returned: %s\n\n", lExporter->GetLastErrorString());
+				//FBXSDK_printf("Error returned: %s\n\n", lExporter->GetLastErrorString());
 				return false;
 			}
 
@@ -231,7 +231,7 @@ namespace Skill
 			FbxHelper::GetVersion(options.Version , &lMajor, &lMinor, &lRevision);
 
 			FbxManager::GetFileFormatVersion(lMajor, lMinor, lRevision);			
-			FBXSDK_printf("FBX file format version %d.%d.%d\n\n", lMajor, lMinor, lRevision);
+			//FBXSDK_printf("FBX file format version %d.%d.%d\n\n", lMajor, lMinor, lRevision);
 
 			// Export the scene.
 			lStatus = lExporter->Export(pScene); 
@@ -270,7 +270,7 @@ namespace Skill
 					lNodeAttribute->GetAttributeType() == FbxNodeAttribute::ePatch)
 				{
 					FbxGeometryConverter lConverter(pNode->GetFbxManager());
-					lConverter.TriangulateInPlace(pNode);
+					lConverter.Triangulate(lNodeAttribute,true);
 				}
 			}
 

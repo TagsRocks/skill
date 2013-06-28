@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEditor;
 
-namespace Skill.Editor
+namespace Skill.Editor.Tools
 {
     class AnimationAssigner : UnityEditor.EditorWindow
     {

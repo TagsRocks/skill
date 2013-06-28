@@ -46,7 +46,15 @@ namespace Skill.Framework.AI
 
             if (!_States.TryGetValue(destinationState, out _NextState))
                 throw new ArgumentException("Invalid state");
-        }
+        }        
+
+        /// <summary>
+        /// If true, the tree updates 'running actions' everyframe and update whole tree if required
+        /// </summary>
+        public bool ContinuousUpdate { get; set; }
+
+        /// <summary> States of BehaviorTree </summary>
+        public Behavior[] States { get; private set; }
 
         /// <summary>
         /// Current state of behavior tree.
@@ -54,7 +62,7 @@ namespace Skill.Framework.AI
         public Behavior CurrentState { get { return _CurrentState; } }
 
         /// <summary> 
-        /// To enable update time interval set this to more than zero (default is 0.5f). Keep call Update() each frame.
+        /// To enable update time interval set this to more than zero (default is 1.0f). Keep call Update() each frame.
         /// </summary>
         public float UpdateTimeInterval { get; set; }
 
@@ -116,15 +124,15 @@ namespace Skill.Framework.AI
         {
             this._Reset = false;
             this._LastUpdateTime = 0;
-            this.UpdateTimeInterval = 0.5f;
+            this.UpdateTimeInterval = 1.0f;
             this._FinishedActions = new List<Action>();
 
-            Behavior[] states = CreateTree();
-            if (states == null || states.Length == 0)
+            States = CreateTree();
+            if (States == null || States.Length == 0)
                 throw new InvalidProgramException("You must provide at least one valid state");
 
             _States = new Dictionary<string, Behavior>();
-            foreach (var s in states)
+            foreach (var s in States)
                 _States.Add(s.Name, s);
             ChangeState(DefaultState);
             this.Status = new BehaviorTreeStatus(this);
@@ -155,22 +163,27 @@ namespace Skill.Framework.AI
             {
                 if (UnityEngine.Time.time < (_LastUpdateTime + UpdateTimeInterval))
                 {
-                    // just update running actions
-                    foreach (var runningAction in Status.RunningActions)
+                    if (ContinuousUpdate)
                     {
-                        Status.Parameters = runningAction.Parameters;
-                        runningAction.Action.UpdateImmediately(Status);
-                        if (runningAction.Action.Result != BehaviorResult.Running)
-                            _FinishedActions.Add(runningAction.Action);
-                    }
-                    if (_FinishedActions.Count == 0) // we does not need to update BehaviorTree
-                    {
-                        if (Status.Exception != null)
+                        // just update running actions
+                        foreach (var runningAction in Status.RunningActions)
                         {
-                            UnityEngine.Debug.LogWarning(Status.Exception.ToString());
+                            Status.Parameters = runningAction.Parameters;
+                            runningAction.Action.UpdateImmediately(Status);
+                            if (runningAction.Action.Result != BehaviorResult.Running)
+                                _FinishedActions.Add(runningAction.Action);
                         }
-                        return;
+                        if (_FinishedActions.Count == 0) // we does not need to update BehaviorTree
+                        {
+                            if (Status.Exception != null)
+                            {
+                                UnityEngine.Debug.LogWarning(Status.Exception.ToString());
+                            }
+                            return;
+                        }
                     }
+                    else
+                        return;
                 }
             }
             ForceUpdate(controller);
@@ -235,7 +248,8 @@ namespace Skill.Framework.AI
         {
             if (_Reset) return;
             Status.Begin();
-            CurrentState.ResetBehavior(this.Status);
+            if (CurrentState != null)
+                CurrentState.ResetBehavior(this.Status);
             this._Reset = true;
             ChangeState(DefaultState);
         }

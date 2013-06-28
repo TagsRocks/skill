@@ -9,13 +9,7 @@ namespace Skill.Framework.Weapons
     /// </summary>
     [AddComponentMenu("Skill/Weapons/Bullets/Raycast")]
     public class RaycastBullet : StraightLineBullet
-    {
-
-        /// <summary>
-        /// Whether weapon check hit posint of this bullet at spawn time or let bullet check hits itself.
-        /// </summary>
-        public override bool HitAtSpawn { get { return false; } }
-
+    {                
         private Vector3 _PrePosition;
         private Ray _Ray;
         private RaycastHit _Hit;

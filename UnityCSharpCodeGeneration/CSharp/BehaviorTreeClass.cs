@@ -402,11 +402,7 @@ namespace Skill.CodeGeneration.CSharp
             // create ConcurrentSelector variable
             Add(new Variable("Skill.Framework.AI.ConcurrentSelector", concurrentSelector.Name, "null"));
             // new ConcurrentSelector variable inside CreateTree method
-            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Framework.AI.ConcurrentSelector(\"{1}\");", Variable.GetName(concurrentSelector.Name), concurrentSelector.Name));
-
-            // set FirstConditions Property
-            if (concurrentSelector.FirstConditions != true) // default is true            
-                _CreateTreeMethodBody.AppendLine(SetProperty(concurrentSelector.Name, "FirstConditions", concurrentSelector.FirstConditions.ToString().ToLower()));
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Framework.AI.ConcurrentSelector(\"{1}\");", Variable.GetName(concurrentSelector.Name), concurrentSelector.Name));            
 
             // set BreakOnConditionFailure Property
             if (concurrentSelector.BreakOnConditionFailure != false) // default is false                

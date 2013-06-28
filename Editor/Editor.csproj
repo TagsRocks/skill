@@ -108,9 +108,8 @@
     <Compile Include="UI\VerticalExpander.cs" />
     <Compile Include="UI\XYZComponent.cs" />
     <Compile Include="Windows\AboutSkill.cs" />
-    <Compile Include="Windows\AnimationAssigner.cs" />
-    <Compile Include="Windows\BehaviorTreeStateDebugger.cs" />
-    <Compile Include="Windows\BehaviorTreeDebugger.cs" />
+    <Compile Include="Tools\AnimationAssigner.cs" />
+    <Compile Include="Diagnostics\BehaviorTreeStateDebugger.cs" />
     <Compile Include="Windows\Exporter.cs" />
     <Compile Include="Tools\Implant.cs" />
     <Compile Include="Tools\ImplantObjectField.cs" />
@@ -159,6 +158,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

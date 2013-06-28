@@ -14,40 +14,47 @@ namespace Skill.Framework
     {
         /// <summary> GameObject to spawn </summary>
         public SpawnAsset SpawnObjects;
+        /// <summary>
+        /// A queue to place spawned objects.
+        /// it is possible to sync some spawners togather with same queue
+        /// </summary>
+        public SpawnQueue Queue;
         /// <summary> where to spawn objects </summary>
-        public Transform[] SpawnLocations;
+        public Transform[] Locations;
         /// <summary> If true, the spawner will cycle through the spawn locations instead of spawning from a randomly chosen one </summary>
-        public bool CycleSpawnLocations;
+        public bool CycleLocations;
         /// <summary> Delta time between spawns </summary>
-        public float SpawnInterval = 1f;
+        public float Interval = 1f;
         /// <summary> The maximum number of agents alive at one time. If agents are destroyed, more will spawn to meet this number. </summary>
         public int AliveCount = 2;
         /// <summary> The maximum number of agents to spawn.when number of spawned object reach this value the spawner will not spawn anymore  </summary>
-        public int MaxSpawnCount = 1;
-        /// <summary> If true, agents that are totally removed (ie blown up) are respawned </summary>
-        public bool RespawnDeadAgents;
+        public int SpawnCount = 1;
         /// <summary> Radius around spawn location to spawn agents. </summary>
         public float SpawnRadius = 0;
-        /// <summary> Spawn On Awake </summary>
-        public bool SpawnOnAwake = false;
         /// <summary> If true, only spawn agents if player can't see spawn point </summary>
         public bool OnlySpawnHidden;
-        // If true, controls whether we are actively spawning agents
-        //public bool SpawnActivate = false;
-
-        /// <summary> Spawner will disabled when (number of spawned object) reach MaxSpawnCount, in other words, when spawned all objects. </summary>
-        public bool DisableAfterAll { get; protected set; }
+        /// <summary> If true, wait Interval after one spawned gameobject is dead </summary>
+        public bool DeadInterval = false;
 
         /// <summary> List of all alive spawned objects </summary>
-        public List<GameObject> SpawnedObjects { get; private set; }
+        public IEnumerable<GameObject> AliveObjects { get { return _AliveObjects; } }
+        /// <summary> List of all alive spawned objects </summary>
+        public IEnumerable<GameObject> DeadObjects { get { return _DeadObjects; } }
+        /// <summary> Number of alive objects </summary>
+        public int NumberOfAliveObjects { get { return _AliveObjects.Count; } }
+        /// <summary> Number of dead objects </summary>
+        public int NumberOfDeadObjects { get { return _DeadObjects.Count; } }
 
-        private List<GameObject> _RespawnObjects;
         // Holds the last SpawnLocation index used
         private int _LastSpawnLocationIndex;
-        private float _LastSpawnTime;
-        private int _SpawnCount;
-        private int _DeadCount;
-        private float _TotalWeight = 0;
+        private TimeWatch _SpawnTW;
+        private int _SpawnCounter;
+        private int _DeadCounter;
+        private float _TotalWeight;
+
+        private SpawnObject[] _SpawnObjects;
+        private List<GameObject> _AliveObjects;
+        private List<GameObject> _DeadObjects;
 
         /// <summary>
         /// Call this method if you change SpawnObjects after the Spawner started.
@@ -62,7 +69,6 @@ namespace Skill.Framework
                     if (item != null)
                     {
                         if (item.Chance < 0.05f) item.Chance = 0.05f;
-                        else if (item.Chance > 1.0f) item.Chance = 1.0f;
                         _TotalWeight += item.Chance;
                     }
                 }
@@ -93,12 +99,28 @@ namespace Skill.Framework
         }
 
         /// <summary>
-        /// Spawn new game objects
+        /// Occurs when spawner complete and all spawned objects dead
         /// </summary>
-        /// <returns>True if success, otherwise false</returns>
-        public bool Spawn()
+        public event EventHandler AllDead;
+        /// <summary>
+        /// when spawner complete and all spawned objects dead
+        /// </summary>
+        protected virtual void OnAllDead()
         {
-            return Spawn(null);
+            if (AllDead != null) AllDead(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Awake
+        /// </summary>
+        protected override void Awake()
+        {
+            base.Awake();
+            _AliveObjects = new List<GameObject>(Mathf.Max(1, SpawnCount / 2));
+            _DeadObjects = new List<GameObject>(Mathf.Max(1, SpawnCount / 2));
+            _LastSpawnLocationIndex = -1;
+            _SpawnCounter = 0;
+            _DeadCounter = 0;
         }
 
         /// <summary>
@@ -106,9 +128,17 @@ namespace Skill.Framework
         /// subclass can change this behavior
         /// </summary>
         /// <returns>New GameObject from SpawnObjects to instantiate from</returns>
-        protected GameObject GetRandomSpawnObject()
+        protected virtual GameObject GetNextSpawnObject()
         {
-            if (_TotalWeight <= 0) RecalculateWeights();
+            if (SpawnObjects == null) return null;
+            if (SpawnObjects.Objects != null)
+            {
+                if (_SpawnObjects != SpawnObjects.Objects)
+                {
+                    RecalculateWeights();
+                    _SpawnObjects = SpawnObjects.Objects;
+                }
+            }
             float rnd = UnityEngine.Random.Range(0.0f, _TotalWeight);
             float sum = 0;
             foreach (SpawnObject item in SpawnObjects.Objects)
@@ -119,13 +149,16 @@ namespace Skill.Framework
             return null;
         }
 
-
-        private bool Spawn(GameObject spawnedObj)
+        /// <summary>
+        /// Spawn new game objects
+        /// </summary>
+        /// <returns>True if success, otherwise false</returns>
+        public bool Spawn()
         {
             if (!CanSpawn) return false;
             Vector3 position;
             Quaternion rotation;
-            GetNewLocation(out position, out rotation);
+            GetNextLocation(out position, out rotation);
 
             if (OnlySpawnHidden && Camera.main != null)
             {
@@ -135,43 +168,49 @@ namespace Skill.Framework
                     return false;
             }
 
-            if (spawnedObj == null)
+            var sp = GetNextSpawnObject();
+            if (sp == null)
             {
-                var sp = GetRandomSpawnObject();
-                if (sp == null)
-                {
-                    Debug.LogError("invalid object to spawn(No SpawnObject exist).");
-                    return false;
-                }
-                spawnedObj = CacheSpawner.Spawn(sp, position, rotation);
-                SpawnedObjects.Add(spawnedObj);
+                Debug.LogError("invalid object to spawn(No SpawnObject exist).");
+                return false;
             }
-            else
-            {
-                spawnedObj.transform.position = position;
-                spawnedObj.transform.rotation = rotation;
-            }
+            GameObject spawnedObj = Cache.Spawn(sp, position, rotation, Queue == null);
+            _AliveObjects.Add(spawnedObj);
+            _DeadObjects.Remove(spawnedObj);
+
             Controller controller = spawnedObj.GetComponent<Controller>();
             if (controller != null)
                 controller.Spawner = this;
 
-            _LastSpawnTime = Time.time;
+            if (Queue != null)
+                Queue.Enqueue(spawnedObj);
+
+            _SpawnTW.Begin(Interval);
+            _SpawnCounter++;
             InitializeSpawnedObject(spawnedObj);
-            spawnedObj.SetActive(true);
-            _SpawnCount++;
+
+            if (_SpawnCounter >= SpawnCount)
+            {
+                OnComplete();
+            }
             return true;
         }
 
-        private void GetNewLocation(out Vector3 position, out Quaternion rotation)
+        /// <summary>
+        /// Get next location to spawn object
+        /// </summary>
+        /// <param name="position">Position of spawn object</param>
+        /// <param name="rotation">Rotation of spawn object</param>
+        protected virtual void GetNextLocation(out Vector3 position, out Quaternion rotation)
         {
-            if (SpawnLocations != null && SpawnLocations.Length > 0) // get position and rotation from one of spawne locations
+            if (Locations != null && Locations.Length > 0) // get position and rotation from one of spawne locations
             {
-                if (CycleSpawnLocations) // move to next spawn location
-                    _LastSpawnLocationIndex = (_LastSpawnLocationIndex + 1) % SpawnLocations.Length;
+                if (CycleLocations) // move to next spawn location
+                    _LastSpawnLocationIndex = (_LastSpawnLocationIndex + 1) % Locations.Length;
                 else // pick random spawn location
-                    _LastSpawnLocationIndex = UnityEngine.Random.Range(0, SpawnLocations.Length);
+                    _LastSpawnLocationIndex = UnityEngine.Random.Range(0, Locations.Length);
 
-                Transform location = SpawnLocations[_LastSpawnLocationIndex];
+                Transform location = Locations[_LastSpawnLocationIndex];
                 rotation = location.rotation;
                 position = location.position;
             }
@@ -181,63 +220,29 @@ namespace Skill.Framework
                 position = transform.position;
             }
 
-            if (SpawnRadius != 0)
+            if (SpawnRadius > 0)
             {
                 Vector3 rndPosition = new Vector3();
                 rndPosition.x = UnityEngine.Random.Range(0, SpawnRadius);
-                position = position + rotation * rndPosition;
+                position += rotation * rndPosition;
             }
         }
 
-        /// <summary>
-        /// Awake
-        /// </summary>
-        protected override void Awake()
-        {
-            base.Awake();
-            SpawnedObjects = new List<GameObject>();
-            _RespawnObjects = new List<GameObject>();
-            _LastSpawnLocationIndex = -1;
-            _LastSpawnTime = -1000;
-            _SpawnCount = 0;
-            _DeadCount = 0;
-            DisableAfterAll = true;
-            enabled = SpawnOnAwake;
-        }
+
 
         /// <summary>
         /// Update
         /// </summary>
         protected override void Update()
         {
-            if ((_SpawnCount < MaxSpawnCount) &&
-                (Time.time > SpawnInterval + _LastSpawnTime))
+            if ((_SpawnCounter < SpawnCount) && _SpawnTW.IsOver)
             {
-                if (_RespawnObjects.Count > 0 && CanSpawn)
-                {
-                    int index = _RespawnObjects.Count - 1;
-                    GameObject obj = _RespawnObjects[index];
-                    _RespawnObjects.RemoveAt(index);
-                    Spawn(obj);
-                }
-                else if (SpawnedObjects.Count < AliveCount)
+                _SpawnTW.End();
+                if (CanSpawn && _AliveObjects.Count < AliveCount)
                 {
                     Spawn();
                 }
-                else if (_DeadCount > 0)
-                {
-                    _DeadCount--;
-                    Spawn();
-                }
             }
-            if (_SpawnCount >= MaxSpawnCount)
-            {
-                if (DisableAfterAll)
-                    enabled = false;
-                OnComplete();
-                DestroyRespawnedObjects();
-            }
-
             base.Update();
         }
 
@@ -246,55 +251,9 @@ namespace Skill.Framework
         /// </summary>
         protected override void OnDestroy()
         {
-            DestroySpawnedObjects();
-            DestroyRespawnedObjects();
+            _AliveObjects.Clear();
+            _DeadObjects.Clear();
             base.OnDestroy();
-        }
-
-        private void DestroySpawnedObjects()
-        {
-            foreach (var item in SpawnedObjects)
-            {
-                Destroy(item);
-            }
-            _RespawnObjects.Clear();
-        }
-
-        private void DestroyRespawnedObjects()
-        {
-            foreach (var item in _RespawnObjects)
-            {
-                Destroy(item);
-            }
-            _RespawnObjects.Clear();
-        }
-
-        private void Destroy(GameObject SpawnedObj)
-        {
-            if (SpawnedObj != null) // maybe engine destroy it before
-                CacheSpawner.DestroyCache(SpawnedObj);
-        }
-
-        /// <summary>
-        /// Destroy Spawned Object by this spawner
-        /// </summary>
-        /// <param name="spawnedObj">GameObject or destroy</param>
-        public void DestroySpawnedObject(GameObject spawnedObj)
-        {
-            if (SpawnedObjects.Contains(spawnedObj))
-            {
-                SpawnedObjects.Remove(spawnedObj);
-                if (RespawnDeadAgents)
-                {
-                    _RespawnObjects.Add(spawnedObj);
-                }
-                else
-                {
-                    Destroy(spawnedObj);
-                }
-            }
-            else
-                GameObject.Destroy(spawnedObj);
         }
 
         /// <summary>
@@ -303,10 +262,38 @@ namespace Skill.Framework
         /// <param name="deadSpawnedObj">dead spawned object</param>
         public void NotifySpawnedObjectIsDead(GameObject deadSpawnedObj)
         {
-            if (SpawnedObjects.Contains(deadSpawnedObj))
+            int index = _AliveObjects.IndexOf(deadSpawnedObj);
+            if (index >= 0)
             {
-                _DeadCount++;
+                _AliveObjects.RemoveAt(index);
+                if (!_DeadObjects.Contains(deadSpawnedObj))
+                    _DeadObjects.Add(deadSpawnedObj);
+
+                _DeadCounter++;
+                if (_DeadCounter == SpawnCount)
+                    OnAllDead();
+
+                if (DeadInterval)
+                    _SpawnTW.Begin(Interval);
+
+                SpawnedObjectIsDead(deadSpawnedObj);
+            }
+        }
+
+        protected virtual void SpawnedObjectIsDead(GameObject deadSpawnedObj)
+        {
+        }
+
+        /// <summary>
+        /// Destroy all alive objects
+        /// </summary>
+        public void KillAllAlives()
+        {
+            foreach (var obj in _AliveObjects)
+            {
+                Cache.DestroyCache(obj);
             }
         }
     }
+
 }

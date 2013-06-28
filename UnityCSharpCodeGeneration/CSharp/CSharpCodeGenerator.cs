@@ -21,11 +21,18 @@ namespace Skill.CodeGeneration.CSharp
             new RequiredFile("Skill.Framework.dll","",false),
             new RequiredFile("Skill.Framework.xml","",false),
             new RequiredFile("Skill.Framework.pdb","",false),
+            new RequiredFile("Skill.Net.dll","",false),
+            new RequiredFile("Skill.Net.pdb","",false),
+            new RequiredFile("Skill.Net.xml","",false),
+            new RequiredFile("Skill.Diagnostics.dll","",false),            
+            new RequiredFile("Skill.Diagnostics.pdb","",false),
+            new RequiredFile("Skill.Diagnostics.xml","",false),
+            new RequiredFile("Skill.DataModels.dll","",false),
             new RequiredFile("Skill.Editor.dll","",true),
             new RequiredFile("Skill.Editor.xml","",true),
             new RequiredFile("Skill.Editor.pdb","",true),
-            new RequiredFile("Resources","",true),
-            new RequiredFile("Skill.DataModels.dll","",true),
+            new RequiredFile("Resources","",true),            
+            
         };
         public RequiredFile[] RequiredFiles { get { return _RequiredFiles; } }
 
