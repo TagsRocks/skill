@@ -6,8 +6,7 @@ namespace Skill.Framework.Weapons
 {
     /// <summary>
     /// This bullet goes in a straight direction.
-    /// </summary>
-    [AddComponentMenu("Skill/Weapons/Bullets/StraightLine")]
+    /// </summary>    
     public class StraightLineBullet : Bullet
     {
         /// <summary>
@@ -71,7 +70,7 @@ namespace Skill.Framework.Weapons
         /// </summary>
         protected override void Update()
         {
-            if (Time.timeScale == 0.0f) return;
+            if (Global.IsGamePaused) return;
 
             float deltaMove = _V0CosAlpha * Time.deltaTime;
             _TravelledDistance += deltaMove;
@@ -98,7 +97,7 @@ namespace Skill.Framework.Weapons
 
             if (_TravelledDistance >= Range)
             {
-                OnDie();
+                OnDie(null);
             }
             base.Update();
         }

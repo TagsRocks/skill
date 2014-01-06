@@ -48,7 +48,7 @@ namespace Skill.Studio.IO.Editor
             {
                 Brush foreground = Brushes.Black;
 
-                if (str == "class" || str == "public")
+                if (str == "class" || str == "public" || str == "struct")
                 {
                     foreground = Brushes.Blue;
                     afterClassOrPublic = true;

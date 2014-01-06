@@ -325,6 +325,11 @@ namespace Skill.Framework.UI
         /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// The tag of this control. (optional)
+        /// </summary>
+        public string Tag { get; set; }
+
         private Dock _Dock;
         /// <summary>
         /// Dock of Control when it is a child of DockPanel
@@ -784,6 +789,25 @@ namespace Skill.Framework.UI
         private EventHandler _LayoutChangeHandler;
         private List<BaseControl> _Items;
 
+
+        // the following variables defined to avoid modification of collection during render        
+        private bool _IsRenderBegined;
+        enum CollectionChangeType
+        {
+            Add,
+            Remove,
+            Insert
+        }
+
+        class CollectionChange
+        {
+            public BaseControl Control;
+            public CollectionChangeType ChangeType;
+            public int Index;
+        }
+
+        private List<CollectionChange> _Changes;
+
         // Events
 
         /// <summary>
@@ -810,9 +834,39 @@ namespace Skill.Framework.UI
         internal BaseControlCollection(Panel panel)
         {
             this.Panel = panel;
+            _Changes = new List<CollectionChange>();
             _Items = new List<BaseControl>();
             _LayoutChangeHandler = Control_LayoutChange;
 
+        }
+
+        internal void BeginRender()
+        {
+            _IsRenderBegined = true;
+        }
+
+        internal void EndRender()
+        {
+            _IsRenderBegined = false;
+            if (_Changes.Count > 0)
+            {
+                for (int i = 0; i < _Changes.Count; i++)
+                {
+                    switch (_Changes[i].ChangeType)
+                    {
+                        case CollectionChangeType.Add:
+                            Add(_Changes[i].Control);
+                            break;
+                        case CollectionChangeType.Remove:
+                            Remove(_Changes[i].Control);
+                            break;
+                        case CollectionChangeType.Insert:
+                            Insert(_Changes[i].Index, _Changes[i].Control);
+                            break;
+                    }
+                }
+                _Changes.Clear();
+            }
         }
 
         void Control_LayoutChange(object sender, EventArgs e)
@@ -840,10 +894,41 @@ namespace Skill.Framework.UI
             if (control == null)
                 throw new ArgumentNullException("BaseControl is null");
             if (_Items.Contains(control)) return;
-            _Items.Add(control);
-            control.Parent = Panel;
-            control.LayoutChanged += _LayoutChangeHandler;
-            OnLayoutChange();
+
+            if (_IsRenderBegined)
+            {
+                _Changes.Add(new CollectionChange() { ChangeType = CollectionChangeType.Add, Control = control });
+            }
+            else
+            {
+                _Items.Add(control);
+                control.Parent = Panel;
+                control.LayoutChanged += _LayoutChangeHandler;
+                OnLayoutChange();
+            }
+        }
+
+        /// <summary>
+        /// Inserts an element into the collection at the specified index.
+        /// </summary>
+        /// <param name="index">The zero-based index at which item should be inserted.</param>
+        /// <param name="control"> The BaseControl to add to Collection </param>                
+        public void Insert(int index, BaseControl control)
+        {
+            if (control == null)
+                throw new ArgumentNullException("BaseControl is null");
+            if (_Items.Contains(control)) return;
+            if (_IsRenderBegined)
+            {
+                _Changes.Add(new CollectionChange() { ChangeType = CollectionChangeType.Insert, Control = control, Index = index });
+            }
+            else
+            {
+                _Items.Insert(index, control);
+                control.Parent = Panel;
+                control.LayoutChanged += _LayoutChangeHandler;
+                OnLayoutChange();
+            }
         }
 
         /// <summary>
@@ -913,14 +998,22 @@ namespace Skill.Framework.UI
         /// </returns>
         public bool Remove(BaseControl control)
         {
-            if (_Items.Remove(control))
+            if (_IsRenderBegined)
             {
-                control.Parent = null;
-                control.LayoutChanged -= _LayoutChangeHandler;
-                OnLayoutChange();
-                return true;
+                _Changes.Add(new CollectionChange() { ChangeType = CollectionChangeType.Remove, Control = control });
+                return _Items.Contains(control);
             }
-            return false;
+            else
+            {
+                if (_Items.Remove(control))
+                {
+                    control.Parent = null;
+                    control.LayoutChanged -= _LayoutChangeHandler;
+                    OnLayoutChange();
+                    return true;
+                }
+                return false;
+            }
         }
 
 

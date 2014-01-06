@@ -18,12 +18,12 @@ namespace Skill.Framework.Animation
         public AnimNode ProneNode { get { return this[2]; } set { this[2] = value; } }
 
 
-        private AnimPosture _Posture;
+        private Posture _Posture;
 
         /// <summary>
         /// Get or set posture of actor
         /// </summary>
-        public AnimPosture Posture
+        public Posture Posture
         {
             get
             {

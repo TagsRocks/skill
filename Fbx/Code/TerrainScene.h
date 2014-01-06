@@ -27,6 +27,7 @@ namespace Skill
 			bool _InverseY;
 			Dimension _PatchSize;
 			Dimension _TerrainSize;
+			int _LodFactor;
 			int _PatchCountX;
 			int _PatchCountZ;
 			double _MinHeight;
@@ -75,7 +76,7 @@ namespace Skill
 			property String^ Status { String^ get(){ return _Status; } }
 			property double Progress { double  get(){ return _Progress; } }
 
-			TerrainScene(String^ name, array<double>^ heights, Dimension terrainSize,  Dimension patchSize);
+			TerrainScene(String^ name, array<double>^ heights, Dimension terrainSize,  Dimension patchSize , int lod);
 			void Destroy();					
 			bool Save(String^ filename, SaveSceneOptions options);			
 			void Build();

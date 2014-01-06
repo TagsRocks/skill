@@ -13,7 +13,7 @@ namespace Skill.Framework.Weapons
     public enum ShootMode
     {
         /// <summary> Continue shooting until out of ammo or stop command.</summary>
-        Infinite = 0,
+        Continuous = 0,
         /// <summary> By each fire command it shoots one bullet.</summary>
         One = 1,
         /// <summary> By each fire command it shoots two bullets.</summary>
@@ -111,7 +111,6 @@ namespace Skill.Framework.Weapons
     /// Defines base class for weapons
     /// </summary>
     [RequireComponent(typeof(AudioSource))]
-    [AddComponentMenu("Skill/Weapons/Weapon")]
     public class Weapon : DynamicBehaviour
     {
         /// <summary> Name of weapon </summary>
@@ -123,23 +122,11 @@ namespace Skill.Framework.Weapons
         /// <summary> sound to play on empty fire </summary>
         public AudioClip EmptySound;
         /// <summary> Number of shot in each fire command. </summary>
-        public ShootMode Mode = ShootMode.Infinite;
-        /// <summary> How long does it take to Equip this weapon </summary>
-        public float EquipTime = 2;
-        /// <summary> How long does it take to put this weapon down </summary>
-        public float PutDownTime = 0.5f;
+        public ShootMode Mode = ShootMode.Continuous;
         /// <summary> Can player toss his weapon out? Typically false for default inventory. </summary>
         public bool CanThrow = false;
         /// <summary> Reload automatically when clip is empty</summary>
         public bool AutoReload = true;
-        /// <summary> Local position of weapon when mounted in player hands </summary>
-        public Vector3 LocalPosition;
-        /// <summary> Local rotation of weapon when mounted in player hands </summary>
-        public Vector3 LocalRotation;
-        /// <summary> If true, weapon will destory itself when controller is null </summary>
-        public bool SelfDestory = true;
-        /// <summary> How long does it take to destroy itself after controller is null</summary>
-        public float DestroyTime = 20.0f;
         /// <summary> Error in shooting </summary>
         public Vector2 Spread = Vector2.zero;
 
@@ -148,24 +135,56 @@ namespace Skill.Framework.Weapons
         /// <summary> State of weapon </summary>
         public WeaponState State { get; private set; }
         /// <summary> This function checks to see if the weapon has any ammo available </summary>
-        public virtual bool HasAmmo { get { return CurrentProjectile.TotalAmmo > 0; } }
+        public virtual bool HasAmmo { get { return SelectedProjectile.TotalAmmo > 0; } }
         /// <summary> Is trigger down and weapon keeps firing </summary>
         public bool IsFiring { get; private set; }
-        /// <summary> Is equipped? weapon works when equipped </summary>
-        public bool IsEquipped { get; set; }
         /// <summary> Current equipped projectile </summary>
-        public Projectile CurrentProjectile { get { return Projectiles[_SelectedProjectile]; } }
+        public Projectile SelectedProjectile { get { return Projectiles[_SelectedProjectileIndex]; } }
+        /// <summary> Current equipped projectile </summary>
+        public int SelectedProjectileIndex { get { return _SelectedProjectileIndex; } }
         /// <summary> Can fire immediately? </summary>
-        public virtual bool CanFire { get { return State == WeaponState.Ready && CurrentClipAmmo > 0; } }
+        public virtual bool CanFire { get { return State == WeaponState.Ready && (SelectedClipAmmo > 0 || SelectedProjectile.InfinitAmmo || SelectedProjectile.InfinitClip); } }
         /// <summary> Number of ammo in current clip </summary>
-        public int CurrentClipAmmo { get { return CurrentProjectile.ClipAmmo; } set { CurrentProjectile.ClipAmmo = value; } }
+        public int SelectedClipAmmo { get { return SelectedProjectile.ClipAmmo; } set { SelectedProjectile.ClipAmmo = value; } }
         /// <summary> Target of weapon. can be setted by Controller </summary>
         public Vector3? Target { get; set; }
         /// <summary> Gets or set damage factor  </summary>
         public float DamageFactor { get; set; }
 
-        // events
+        /// <summary> If true, weapon try to calculate initial speed of curve projectiles to hit Target(if valid) </summary>
+        public bool ThrowCurveProjectilesOnTarget { get; set; }
 
+        private List<Collider> _IgnoreColliders;
+        /// <summary>
+        /// Add collider to ignored by bullets
+        /// </summary>
+        /// <param name="collider">Collider to ignore</param>
+        public void AddIgnoreCollider(Collider collider)
+        {
+            if (_IgnoreColliders == null) _IgnoreColliders = new List<Collider>();
+            if (_IgnoreColliders == null) _IgnoreColliders = new List<Collider>();
+            if (!_IgnoreColliders.Contains(collider)) _IgnoreColliders.Add(collider);
+        }
+        /// <summary>
+        /// remove collider to ignored by bullets
+        /// </summary>
+        /// <param name="collider">Collider to ignore</param>
+        /// <returns></returns>
+        public bool RemoveIgnoreCollider(Collider collider)
+        {
+            if (_IgnoreColliders == null) return false;
+            return _IgnoreColliders.Remove(collider);
+        }
+        /// <summary>
+        /// Remove all ignored colliders
+        /// </summary>
+        public void ClearIgnoreColliders()
+        {
+            if (_IgnoreColliders != null)
+                _IgnoreColliders.Clear();
+        }
+
+        // events
         /// <summary> Occurs when a shoot happpened </summary>
         public event WeaponShootEventHandler Shoot;
         /// <summary> Occurs when a shoot happpened </summary>
@@ -174,15 +193,15 @@ namespace Skill.Framework.Weapons
             PlayFireSound();
             int consummed = ConsumeAmmo();
 
-            if (!CurrentProjectile.InfinitAmmo)
+            if (!SelectedProjectile.InfinitAmmo)
             {
-                if (CurrentClipAmmo > consummed)
+                if (SelectedClipAmmo > consummed)
                 {
-                    CurrentProjectile.ClipAmmo -= consummed;
+                    SelectedProjectile.ClipAmmo -= consummed;
                 }
                 else
                 {
-                    CurrentProjectile.ClipAmmo = 0;
+                    SelectedProjectile.ClipAmmo = 0;
                 }
             }
 
@@ -190,13 +209,23 @@ namespace Skill.Framework.Weapons
             if (bullets != null)
             {
                 for (int i = 0; i < bullets.Length; i++)
-                {
-                    bullets[i].Target = Target;
-                }
+                    PrepareBullet(bullets[i]);
             }
 
             if (Shoot != null)
                 Shoot(this, new WeaponShootEventArgs(consummed));
+        }
+
+        /// <summary>
+        /// Prepare bullet parameters just after spawn
+        /// </summary>
+        /// <param name="bullet">Bullet to prepare</param>
+        protected virtual void PrepareBullet(Bullet bullet)
+        {
+            bullet.DamageType = SelectedProjectile.DamageType;
+            bullet.Target = Target;
+            bullet.StartJourney();
+            bullet.gameObject.SetActive(true);
         }
 
         /// <summary>
@@ -206,9 +235,9 @@ namespace Skill.Framework.Weapons
         /// <returns> Array of spawned bullets </returns>
         private Bullet[] ShootBullets(int bulletCount)
         {
-            if (CurrentProjectile != null)
+            if (SelectedProjectile != null)
             {
-                switch (CurrentProjectile.Type)
+                switch (SelectedProjectile.Type)
                 {
                     case ProjectileType.StraightLine:
                         return ShootStraightLineBullets(bulletCount);
@@ -245,15 +274,15 @@ namespace Skill.Framework.Weapons
         /// </summary>        
         protected virtual void OnReloadCompleted()
         {
-            int ammoToFillClip = CurrentProjectile.ClipSize - CurrentClipAmmo;
+            int ammoToFillClip = SelectedProjectile.ClipSize - SelectedClipAmmo;
 
-            if (!CurrentProjectile.InfinitClip)
+            if (!SelectedProjectile.InfinitClip)
             {
-                if (CurrentProjectile.TotalAmmo < ammoToFillClip)
-                    ammoToFillClip = CurrentProjectile.TotalAmmo;
-                CurrentProjectile.TotalAmmo -= ammoToFillClip;
+                if (SelectedProjectile.Ammo < ammoToFillClip)
+                    ammoToFillClip = SelectedProjectile.Ammo;
+                SelectedProjectile.Ammo -= ammoToFillClip;
             }
-            CurrentClipAmmo += ammoToFillClip;
+            SelectedClipAmmo += ammoToFillClip;
 
             if (ReloadCompleted != null)
                 ReloadCompleted(this, EventArgs.Empty);
@@ -275,10 +304,9 @@ namespace Skill.Framework.Weapons
         // variables
 
         private AudioSource _AudioSource;
-        private int _SelectedProjectile = 0;
+        private int _SelectedProjectileIndex = 0;
 
         private TimeWatch _BusyTW;
-        private TimeWatch _DestroyTW;
         private bool _RequestReload;
         private float _RequestBusy;
         private int _SwitchProjectileIndex;
@@ -304,9 +332,13 @@ namespace Skill.Framework.Weapons
             DamageFactor = 1.0f;
             if (Projectiles == null || Projectiles.Length == 0)
                 Debug.LogError("A weapon must have at least one projectile.");
-            if (CurrentProjectile.TotalAmmo <= 0)
-                CurrentProjectile.TotalAmmo = CurrentProjectile.DefaultAmmo;
-            CurrentClipAmmo = CurrentProjectile.ClipSize;
+
+            foreach (var p in Projectiles)
+            {
+                if (p.Ammo <= 0)
+                    p.Ammo = p.DefaultAmmo - p.ClipSize;
+                p.ClipAmmo = p.ClipSize;
+            }
         }
 
         /// <summary>
@@ -325,23 +357,23 @@ namespace Skill.Framework.Weapons
         /// </summary>
         /// <param name="damageType"> Type of ammo. if this weapon contains a projectile with this type of ammo, then add ammo  </param>
         /// <param name="amount">Amount of ammo to add</param>
-        /// <returns> Amount actually added. (In case magazine is already full and some ammo is left </returns>
+        /// <returns> Amount actually added. (In case magazine is already full and some ammo is left) </returns>
         public virtual int AddAmmo(int damageType, int amount)
         {
             foreach (var item in Projectiles)
             {
                 if (item.DamageType == damageType)
                 {
-                    int preAmmoCount = item.TotalAmmo;
-                    if (item.TotalAmmo < item.MaxAmmo)
+                    int preAmmoCount = item.Ammo;
+                    if (item.Ammo < item.MaxAmmo)
                     {
-                        int count = item.TotalAmmo + amount;
+                        int count = item.Ammo + amount;
                         if (count > item.MaxAmmo) count = item.MaxAmmo;
                         else if (count < 0) count = 0;
-                        item.TotalAmmo = count;
+                        item.Ammo = count;
                     }
 
-                    return item.TotalAmmo - preAmmoCount;
+                    return item.Ammo - preAmmoCount;
                 }
             }
             return 0;
@@ -367,9 +399,9 @@ namespace Skill.Framework.Weapons
         {
             if (_RequestReload == false)
             {
-                if (CurrentClipAmmo < CurrentProjectile.ClipSize)
+                if (SelectedClipAmmo < SelectedProjectile.ClipSize)
                 {
-                    if (CurrentProjectile.TotalAmmo > 0 || CurrentProjectile.InfinitClip || CurrentProjectile.InfinitAmmo)
+                    if (SelectedProjectile.Ammo > 0 || SelectedProjectile.InfinitClip || SelectedProjectile.InfinitAmmo)
                     {
                         _RequestReload = true;
                     }
@@ -406,26 +438,34 @@ namespace Skill.Framework.Weapons
         public void ChangeProjectile(int projectileIndex)
         {
             if (projectileIndex >= 0 && projectileIndex < Projectiles.Length &&
-                projectileIndex != _SelectedProjectile &&
+                projectileIndex != _SelectedProjectileIndex &&
                 Projectiles[projectileIndex] != null)
             {
                 _SwitchProjectileIndex = projectileIndex;
             }
         }
 
+        private bool _StopFireCommand = true;
         /// <summary>
         /// Start fire command
         /// </summary>
         public virtual void StartFire()
         {
-            if (Time.timeScale == 0)
-                return;
-
             if (State == WeaponState.Ready)
             {
                 if (!IsFiring)
-                    _ShootCount = 0;
-                IsFiring = true;
+                {
+                    if (Mode != ShootMode.Continuous && !_StopFireCommand)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        _ShootCount = 0;
+                        IsFiring = true;
+                        _StopFireCommand = false;
+                    }
+                }
             }
         }
         /// <summary>
@@ -433,7 +473,13 @@ namespace Skill.Framework.Weapons
         /// </summary>
         public virtual void StopFire()
         {
-            IsFiring = false;
+            _StopFireCommand = true;
+            if (IsFiring)
+            {
+                int mode = (int)this.Mode;
+                if (mode <= 0 || _ShootCount >= mode || SelectedClipAmmo == 0)
+                    IsFiring = false;
+            }
         }
 
         /// <summary>
@@ -441,124 +487,106 @@ namespace Skill.Framework.Weapons
         /// </summary>
         protected override void Update()
         {
-            if (Time.timeScale == 0) return;
-            if (!IsEquipped)
+            if (Global.IsGamePaused) return;
+            if (_BusyTW.IsEnabledAndOver)
             {
-                if (_DestroyTW.IsEnabled)
-                {
-                    if (_DestroyTW.IsOver)
-                    {
-                        _DestroyTW.End();
-                        Cache.DestroyCache(gameObject);
-                    }
-                }
-                else if (SelfDestory)
-                    _DestroyTW.Begin(DestroyTime);
-
-
-                if (State == WeaponState.ChangeProjectile)
-                    _SelectedProjectile = _SwitchProjectileIndex; //cancel change projectile
-                _RequestReload = false; // cancel reload
-                IsFiring = false;
                 _BusyTW.End();
-                State = WeaponState.Busy;
-            }
-            else
-            {
-                _DestroyTW.End();
-                if (_BusyTW.IsEnabledAndOver)
+                if (State == WeaponState.Reloading)
                 {
-                    _BusyTW.End();
-                    if (State == WeaponState.Reloading)
-                    {
-                        OnReloadCompleted();
-                    }
-                    else if (State == WeaponState.ChangeProjectile)
-                    {
-                        OnProjectileChanged(_SelectedProjectile, _SwitchProjectileIndex);
-                        _SwitchProjectileIndex = _SelectedProjectile;
-                    }
-                    State = WeaponState.Ready;
+                    OnReloadCompleted();
                 }
-
-                if (State == WeaponState.Ready)
+                else if (State == WeaponState.ChangeProjectile)
                 {
-                    if (_RequestReload && CurrentProjectile.TotalAmmo > 0)
-                    {
-                        bool completeReload = CurrentClipAmmo == 0;
-                        if (completeReload)
-                            _BusyTW.Begin(CurrentProjectile.CompleteReloadTime);
-                        else
-                            _BusyTW.Begin(CurrentProjectile.ReloadTime);
+                    OnProjectileChanged(_SelectedProjectileIndex, _SwitchProjectileIndex);
+                    _SelectedProjectileIndex = _SwitchProjectileIndex;
+                }
+                State = WeaponState.Ready;
+            }
 
-                        State = WeaponState.Reloading;
-                        _RequestReload = false;
-                        OnReload(completeReload);
-                    }
-                    else if (_RequestBusy > 0)
+            if (State == WeaponState.Ready)
+            {
+                if (_RequestReload && (SelectedProjectile.Ammo > 0 || SelectedProjectile.InfinitClip || SelectedProjectile.InfinitAmmo))
+                {
+                    bool completeReload = SelectedClipAmmo == 0;
+                    if (completeReload)
+                        _BusyTW.Begin(SelectedProjectile.CompleteReloadTime);
+                    else
+                        _BusyTW.Begin(SelectedProjectile.ReloadTime);
+
+                    State = WeaponState.Reloading;
+                    _RequestReload = false;
+                    OnReload(completeReload);
+                }
+                else if (_RequestBusy > 0)
+                {
+                    _BusyTW.Begin(_RequestBusy);
+                    State = WeaponState.Busy;
+                    _RequestBusy = 0;
+                }
+                else if (_SwitchProjectileIndex != _SelectedProjectileIndex)
+                {
+                    _BusyTW.Begin(SelectedProjectile.EquipTime);
+                    State = WeaponState.ChangeProjectile;
+                }
+                else if (IsFiring)
+                {
+                    if (SelectedClipAmmo < 0) SelectedClipAmmo = 0;
+                    if (SelectedClipAmmo == 0)
                     {
-                        _BusyTW.Begin(_RequestBusy);
-                        State = WeaponState.Busy;
-                        _RequestBusy = 0;
-                    }
-                    else if (_SwitchProjectileIndex != _SelectedProjectile)
-                    {
-                        _BusyTW.Begin(CurrentProjectile.EquipTime);
-                        State = WeaponState.ChangeProjectile;
-                    }
-                    else if (IsFiring)
-                    {
-                        if (CurrentClipAmmo < 0) CurrentClipAmmo = 0;
-                        if (CurrentClipAmmo == 0)
+                        if (AutoReload)
                         {
-                            if (AutoReload)
+                            if (!RequestReload())
                             {
-                                if (!RequestReload())
-                                {
-                                    PlayEmptySound();
-                                }
-                                else
-                                {
-                                    IsFiring = false;
-                                }
+                                PlayEmptySound();
                             }
                             else
                             {
-                                PlayEmptySound();
                                 IsFiring = false;
                             }
                         }
                         else
                         {
-                            OnShoot();
-
-                            if (CurrentClipAmmo == 0)
-                            {
-                                if (AutoReload)
-                                {
-                                    RequestReload();
-                                    _ShootCount = 0;
-                                }
-                            }
-                            else
-                            {
-                                _BusyTW.Begin(CurrentProjectile.FireInterval);
-                                State = WeaponState.Refill;
-                            }
-                            _ShootCount++;
-                            int mode = (int)this.Mode;
-                            if (mode > 0 && _ShootCount >= mode)
-                                StopFire();
+                            PlayEmptySound();
+                            IsFiring = false;
                         }
                     }
-                }
+                    else
+                    {
+                        OnShoot();
 
+                        if (SelectedClipAmmo == 0)
+                        {
+                            if (AutoReload)
+                            {
+                                RequestReload();
+                                _ShootCount = 0;
+                            }
+                        }
+                        else
+                        {
+                            _BusyTW.Begin(SelectedProjectile.FireInterval);
+                            State = WeaponState.Refill;
+                        }
+                        _ShootCount++;
+                        int mode = (int)this.Mode;
+                        if (mode > 0 && _ShootCount >= mode)
+                            IsFiring = false;
+                    }
+                }
+                else if (AutoReload && SelectedClipAmmo == 0)
+                {
+                    if (!_RequestReload)
+                    {
+                        RequestReload();
+                        _ShootCount = 0;
+                    }
+                }
             }
+
             base.Update();
         }
 
         // play sound
-
         private void PlayEmptySound()
         {
             PlaySound(EmptySound);
@@ -566,10 +594,10 @@ namespace Skill.Framework.Weapons
 
         private void PlayFireSound()
         {
-            if (CurrentProjectile.FireSounds != null && CurrentProjectile.FireSounds.Length > 0)
+            if (SelectedProjectile.FireSounds != null && SelectedProjectile.FireSounds.Length > 0)
             {
-                int randomIndex = UnityEngine.Random.Range(0, CurrentProjectile.FireSounds.Length);
-                PlaySound(CurrentProjectile.FireSounds[randomIndex]);
+                int randomIndex = UnityEngine.Random.Range(0, SelectedProjectile.FireSounds.Length);
+                PlaySound(SelectedProjectile.FireSounds[randomIndex]);
             }
         }
 
@@ -577,13 +605,13 @@ namespace Skill.Framework.Weapons
         {
             if (completeReload)
             {
-                if (CurrentProjectile.CompleteReloadSound != null)
-                    PlaySound(CurrentProjectile.CompleteReloadSound);
+                if (SelectedProjectile.CompleteReloadSound != null)
+                    PlaySound(SelectedProjectile.CompleteReloadSound);
                 else
-                    PlaySound(CurrentProjectile.ReloadSound);
+                    PlaySound(SelectedProjectile.ReloadSound);
             }
             else
-                PlaySound(CurrentProjectile.ReloadSound);
+                PlaySound(SelectedProjectile.ReloadSound);
         }
 
         private void PlaySound(AudioClip sound)
@@ -592,7 +620,7 @@ namespace Skill.Framework.Weapons
             {
                 if (Global.Instance != null)
                 {
-                    Global.Instance.PlaySoundOneShot(_AudioSource, sound, Sounds.SoundCategory.FX);
+                    Global.Instance.PlayOneShot(_AudioSource, sound, Sounds.SoundCategory.FX);
                 }
                 else
                 {
@@ -613,31 +641,31 @@ namespace Skill.Framework.Weapons
 
             Quaternion iniRotation = Quaternion.identity;
 
-            switch (CurrentProjectile.CurveParams.InitialRotation)
+            switch (SelectedProjectile.CurveParams.InitialRotation)
             {
                 case InitialCurveProjectileRotation.Forward:
-                    Quaternion.LookRotation(_Transform.forward, _Transform.up);
+                    Quaternion.LookRotation(SelectedProjectile.SpawnPoint.forward, _Transform.up);
                     break;
                 case InitialCurveProjectileRotation.AbsoluteCustom:
-                    iniRotation = CurrentProjectile.CurveParams.Rotation;
+                    iniRotation = SelectedProjectile.CurveParams.Rotation;
                     break;
                 case InitialCurveProjectileRotation.RelativeCustom:
-                    iniRotation = CurrentProjectile.CurveParams.Rotation * _Transform.rotation;
+                    iniRotation = SelectedProjectile.CurveParams.Rotation * _Transform.rotation;
                     break;
             }
 
             for (int i = 0; i < bulletCount; i++)
             {
                 // spawn a bullet but inactive
-                GameObject go = Cache.Spawn(CurrentProjectile.BulletPrefab, CurrentProjectile.SpawnPoint.position, iniRotation) as GameObject;
+                GameObject go = Cache.Spawn(SelectedProjectile.BulletPrefab, SelectedProjectile.SpawnPoint.position, iniRotation) as GameObject;
 
                 Bullet bullet = go.GetComponent<Bullet>();// get reference to bullet
                 if (bullet != null) // set bullet parameters
                 {
                     bullet.Shooter = this.gameObject;
-                    bullet.Damage = CurrentProjectile.InstantHitDamage * DamageFactor;
-                    bullet.Range = CurrentProjectile.Range;
-                    bullet.Speed = CurrentProjectile.InitialSpeed;
+                    bullet.Damage = SelectedProjectile.InstantHitDamage * DamageFactor;
+                    bullet.Range = SelectedProjectile.Range;
+                    bullet.Speed = SelectedProjectile.InitialSpeed;
                 }
 
                 Rigidbody rb = go.rigidbody;
@@ -645,41 +673,72 @@ namespace Skill.Framework.Weapons
                 {
                     if (rb.collider != null)
                     {
-                        Rigidbody weaponRB = this.rigidbody;
-                        if (weaponRB != null && weaponRB.collider)
-                            Physics.IgnoreCollision(weaponRB.collider, rb.collider);
+                        IgnoreBulletColliders(rb.collider);
                     }
-                    float range = CurrentProjectile.Range;
-                    Vector3 dir = _Transform.forward;
+
+                    float speed = SelectedProjectile.InitialSpeed;
+                    Vector3 dir = SelectedProjectile.SpawnPoint.forward;
                     dir.y = 0;
 
-                    if (Target != null && Target.HasValue)
+                    if (ThrowCurveProjectilesOnTarget && Target != null && Target.HasValue)
                     {
+                        float range = SelectedProjectile.Range;
+                        if (range < 0) range = 0.0f;
+
                         Vector3 target = Target.Value;
                         Vector3 position = _Transform.position;
-                        dir = target - position;
-                        dir.y = 0;
-                        range = dir.magnitude;
-                        if (range > CurrentProjectile.Range)
-                            range = CurrentProjectile.Range;
+                        dir = target - position;  // get target direction
+                        float h = dir.y;  // get height difference
+                        dir.y = 0;  // retain only the horizontal direction
+                        range = dir.magnitude;  // get horizontal distance
+                        if (range > SelectedProjectile.Range) range = SelectedProjectile.Range;
+                        dir.y = range * SelectedProjectile.CurveParams.TangentThrowAngle;  // set dir to the elevation angle
+                        range += h / SelectedProjectile.CurveParams.TangentThrowAngle;  // correct for small height differences
+                        // calculate the velocity magnitude
+                        speed = Mathf.Sqrt(range * Physics.gravity.magnitude / SelectedProjectile.CurveParams.Sin2ThrowAngle);                        
+                        dir.Normalize();
                     }
 
-                    dir.Normalize();
-                    Quaternion rotation = Quaternion.AngleAxis(CurrentProjectile.CurveParams.ThrowAngle, dir);
-
-                    float speed = (Physics.gravity * range).sqrMagnitude;
+                    float euler = Skill.Framework.MathHelper.HorizontalAngle(dir);
+                    Quaternion rotation = Quaternion.Euler(-SelectedProjectile.CurveParams.ThrowAngle, euler, 0);
                     dir = rotation * Vector3.forward;
-                    rb.AddForce(dir * speed * rb.mass, ForceMode.Impulse);
+                    rb.AddForce(dir * speed, ForceMode.Impulse);
 
                     bullet.Direction = dir;
                     bullet.Speed = speed;
                 }
-
-                bullet.StartJourney();
                 bullets[i] = bullet;
             }
             return bullets;
         }
+
+        public static Vector3 CalculateBestThrowSpeed(Vector3 origin, Vector3 target, float timeToTarget)
+        {
+            // calculate vectors
+            Vector3 toTarget = target - origin;
+            Vector3 toTargetXZ = toTarget;
+            toTargetXZ.y = 0;
+
+            // calculate xz and y
+            float y = toTarget.y;
+            float xz = toTargetXZ.magnitude;
+
+            // calculate starting speeds for xz and y. Physics forumulase deltaX = v0 * t + 1/2 * a * t * t
+            // where a is "-gravity" but only on the y plane, and a is 0 in xz plane.
+            // so xz = v0xz * t => v0xz = xz / t
+            // and y = v0y * t - 1/2 * gravity * t * t => v0y * t = y + 1/2 * gravity * t * t => v0y = y / t + 1/2 * gravity * t
+            float t = timeToTarget;
+            float v0y = y / t + 0.5f * Physics.gravity.magnitude * t;
+            float v0xz = xz / t;
+
+            // create result vector for calculated starting speeds
+            Vector3 result = toTargetXZ.normalized; // get direction of xz but with magnitude 1
+            result *= v0xz; // set magnitude of xz to v0xz (starting speed in xz plane)
+            result.y = v0y; // set y to v0y (starting speed of y plane)
+
+            return result;
+        }
+
 
         /// <summary>
         /// Instantiate a bullet and throw it at correct direction and force 
@@ -692,9 +751,9 @@ namespace Skill.Framework.Weapons
 
             Vector3 direction;
             if (Target != null && Target.HasValue)
-                direction = (Target.Value - CurrentProjectile.SpawnPoint.position).normalized;
+                direction = (Target.Value - SelectedProjectile.SpawnPoint.position).normalized;
             else
-                direction = _Transform.forward;
+                direction = SelectedProjectile.SpawnPoint.forward;
 
             for (int i = 0; i < bulletCount; i++)
             {
@@ -703,25 +762,23 @@ namespace Skill.Framework.Weapons
                 Vector3 bulletDirection = (bulletRotation * Vector3.forward).normalized;
 
                 // spawn a bullet but inactive
-                GameObject go = Cache.Spawn(CurrentProjectile.BulletPrefab, CurrentProjectile.SpawnPoint.position, bulletRotation) as GameObject;
+                GameObject go = Cache.Spawn(SelectedProjectile.BulletPrefab, SelectedProjectile.SpawnPoint.position, bulletRotation) as GameObject;
                 Rigidbody rb = go.rigidbody;
                 if (rb != null && !rb.isKinematic)
                 {
                     if (rb.collider != null)
                     {
-                        Rigidbody weaponRB = this.rigidbody;
-                        if (weaponRB != null && weaponRB.collider)
-                            Physics.IgnoreCollision(weaponRB.collider, rb.collider);
+                        IgnoreBulletColliders(rb.collider);
                     }
 
                     if (rb.useGravity)
                     {
-                        rb.AddForce(bulletDirection * CurrentProjectile.InitialSpeed, ForceMode.Impulse);
+                        rb.AddForce(bulletDirection * SelectedProjectile.InitialSpeed, ForceMode.Impulse);
                     }
                     else
                     {
                         rb.velocity = Vector3.zero;
-                        rb.AddForce(bulletDirection * CurrentProjectile.InitialSpeed, ForceMode.VelocityChange);
+                        rb.AddForce(bulletDirection * SelectedProjectile.InitialSpeed, ForceMode.VelocityChange);
                     }
                 }
 
@@ -729,16 +786,29 @@ namespace Skill.Framework.Weapons
                 if (bullet != null) // set bullet parameters
                 {
                     bullet.Shooter = this.gameObject;
-                    bullet.Damage = CurrentProjectile.InstantHitDamage * DamageFactor;
+                    bullet.Damage = SelectedProjectile.InstantHitDamage * DamageFactor;
                     bullet.Direction = bulletDirection;
-                    bullet.Range = CurrentProjectile.Range;
-                    bullet.Speed = CurrentProjectile.InitialSpeed;
+                    bullet.Range = SelectedProjectile.Range;
+                    bullet.Speed = SelectedProjectile.InitialSpeed;
                 }
-
-                bullet.StartJourney();
                 bullets[i] = bullet;
             }
             return bullets;
+        }
+
+        protected void IgnoreBulletColliders(Collider bulletCollider)
+        {
+            Rigidbody weaponRB = this.rigidbody;
+            if (weaponRB != null && weaponRB.collider != null && weaponRB.collider.enabled)
+                Physics.IgnoreCollision(weaponRB.collider, bulletCollider);
+            if (_IgnoreColliders != null && _IgnoreColliders.Count > 0)
+            {
+                for (int cIndex = 0; cIndex < _IgnoreColliders.Count; cIndex++)
+                {
+                    if (_IgnoreColliders[cIndex].enabled)
+                        Physics.IgnoreCollision(_IgnoreColliders[cIndex], bulletCollider);
+                }
+            }
         }
 
         private RaycastHit _HitInfo;
@@ -755,9 +825,9 @@ namespace Skill.Framework.Weapons
 
             Vector3 direction;
             if (Target != null && Target.HasValue)
-                direction = (Target.Value - CurrentProjectile.SpawnPoint.position).normalized;
+                direction = (Target.Value - SelectedProjectile.SpawnPoint.position).normalized;
             else
-                direction = _Transform.forward;
+                direction = SelectedProjectile.SpawnPoint.forward;
 
             for (int i = 0; i < bulletCount; i++)
             {
@@ -766,24 +836,24 @@ namespace Skill.Framework.Weapons
                 Vector3 bulletDirection = (bulletRotation * Vector3.forward).normalized;
 
                 // spawn a bullet but inactive
-                GameObject go = Cache.Spawn(CurrentProjectile.BulletPrefab, CurrentProjectile.SpawnPoint.position, bulletRotation, false) as GameObject;
+                GameObject go = Cache.Spawn(SelectedProjectile.BulletPrefab, SelectedProjectile.SpawnPoint.position, bulletRotation, false) as GameObject;
                 StraightLineBullet bullet = go.GetComponent<StraightLineBullet>();// get reference to bullet
 
                 if (bullet != null) // set bullet parameters
                 {
                     bullet.Shooter = this.gameObject;
-                    bullet.Damage = CurrentProjectile.InstantHitDamage * DamageFactor;
+                    bullet.Damage = SelectedProjectile.InstantHitDamage * DamageFactor;
                     bullet.Direction = bulletDirection;
-                    bullet.Range = CurrentProjectile.Range;
-                    bullet.Speed = CurrentProjectile.InitialSpeed;
-                    bullet.LayerMask = CurrentProjectile.LayerMask;
+                    bullet.Range = SelectedProjectile.Range;
+                    bullet.Speed = SelectedProjectile.InitialSpeed;
+                    bullet.LayerMask = SelectedProjectile.LayerMask;
 
-                    if (CurrentProjectile.HitAtSpawn) // if is is needed to check hit at spawn time
+                    if (SelectedProjectile.HitAtSpawn) // if is is needed to check hit at spawn time
                     {
                         _Ray.direction = bulletDirection;
-                        _Ray.origin = CurrentProjectile.SpawnPoint.position;
+                        _Ray.origin = SelectedProjectile.SpawnPoint.position;
 
-                        if (Physics.Raycast(_Ray, out _HitInfo, CurrentProjectile.Range, CurrentProjectile.LayerMask))
+                        if (Physics.Raycast(_Ray, out _HitInfo, SelectedProjectile.Range, SelectedProjectile.LayerMask))
                         {
                             bullet.Range = _HitInfo.distance;
 
@@ -792,17 +862,16 @@ namespace Skill.Framework.Weapons
                             {
                                 RaycastHitEventArgs info = new RaycastHitEventArgs(bullet.Shooter, HitType.Bullet | HitType.Raycast, _HitInfo.collider);
                                 info.Damage = bullet.Damage;
+                                info.DamageType = bullet.DamageType;
                                 info.Tag = this.tag;
                                 info.Normal = _HitInfo.normal;
                                 info.Point = _HitInfo.point;
                                 info.RaycastHit = _HitInfo;
-                                events.OnHit(this, info);
+                                events.RaiseHit(this, info);
                             }
                         }
                     }
                 }
-                bullet.StartJourney();
-                go.SetActive(true);
                 bullets[i] = bullet;
             }
             return bullets;

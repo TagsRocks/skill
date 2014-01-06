@@ -20,8 +20,8 @@ namespace Skill.CodeGeneration.CSharp
         public SharedAccessKeysClass(SharedAccessKeys keys)
             : base(keys.Name)
         {
-            this.IsPublic = true;
-            this.IsStatic = true;
+            this.Modifier = Modifiers.Public ;
+            this.ClassModifier = ClassModifiers.Static ;
             this.IsPartial = false;
             this._Keys = keys;
             CreateAccessKeys();
@@ -50,7 +50,7 @@ namespace Skill.CodeGeneration.CSharp
                     }
                 }
 
-                Method staticConstructor = new Method(string.Empty, _Keys.Name, staticConstructorBody.ToString()) { IsStatic = true, Modifiers = Modifiers.None };
+                Method staticConstructor = new Method(string.Empty, _Keys.Name, staticConstructorBody.ToString()) { IsStatic = true, Modifier = Modifiers.None };
                 Add(staticConstructor);
             }
         }

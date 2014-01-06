@@ -186,7 +186,8 @@ namespace Skill.Framework.UI
         /// <param name="focusable">focusable control</param>
         public void FocusControl(IFocusable focusable)
         {
-            FocusedControl = focusable;
+            if (focusable.IsFocusable)
+                FocusedControl = focusable;
         }
 
         // because OnGUI method called multiple times per frame this is a helper value to make sure unfocuse request called at all of OnGUI calls

@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Check if any control was changed inside a block of code.
     /// </summary>
-    public class ChangeCheck : Canvas
+    public class ChangeCheck : Grid
     {
         private bool _IsChanged;
         /// <summary>

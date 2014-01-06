@@ -31,6 +31,9 @@ namespace Skill.DataModels.AI
         /// <summary> use for simulation AnimationTree</summary>
         public bool IsValid { get; set; }
 
+        /// <summary>Whether this action change posture of actor </summary>
+        public Posture ChangePosture { get; set; }
+
         /// <summary>
         /// Create an instance of action
         /// </summary>
@@ -41,12 +44,13 @@ namespace Skill.DataModels.AI
             AnimationSource = "";
             AnimationWrapMode = 0;
             AnimationFrameRate = 30;
-        }        
+        }
 
         protected override void WriteAttributes(System.Xml.Linq.XElement e)
         {
             e.SetAttributeValue("ResetEvent", ResetEvent);
             e.SetAttributeValue("ExecutionTime", ExecutionTime);
+            e.SetAttributeValue("ChangePosture", ChangePosture.ToString());
 
             XElement debug = new XElement("Debug");
 
@@ -73,6 +77,7 @@ namespace Skill.DataModels.AI
 
             this.ResetEvent = e.GetAttributeValueAsBoolean("ResetEvent", false);
             this.ExecutionTime = e.GetAttributeValueAsFloat("ExecutionTime", 1);
+            this.ChangePosture = e.GetAttributeValueAsEnum<Posture>("ChangePosture", Posture.Unknown);
             base.ReadAttributes(e);
         }
     }

@@ -13,15 +13,85 @@ namespace Skill.Studio.Tools.HToMesh.ViewModel
         public override string DisplayName { get { return "Export"; } }
         public override bool IsValid { get { return true; } }
 
+        private bool _IsLodAvailable;
+        public bool IsLodAvailable
+        {
+            get { return _IsLodAvailable; }
+            set
+            {
+                if (_IsLodAvailable != value)
+                {
+                    _IsLodAvailable = value;
+                    OnPropertyChanged("IsLodAvailable");
+                    if (_IsLodAvailable == false)
+                        SelectedLod = 0;
+                }
+            }
+        }
+
+        private int _SelectedLod;
+        public int SelectedLod
+        {
+            get { return _SelectedLod; }
+            set
+            {
+                if (_SelectedLod != value)
+                {
+                    _SelectedLod = value;
+                    OnPropertyChanged("SelectedLod");
+                }
+            }
+        }
+
+        public int[] Lods { get; private set; }
+
         public ExportPageViewModel(RawFile file)
             : base(file)
         {
             MinHeight = 0;
             MaxHeight = 255;
             ScaleX = ScaleY = ScaleZ = 1;
-            _InverseY = false;
+            InverseY = false;
         }
 
+        private bool IsPowerOf2(int num)
+        {
+            return num == 8 || num == 16 || num == 32 || num == 64 || num == 128 || num == 256 || num == 512 || num == 1024 || num == 2048;
+        }
+        private void RefreshLod()
+        {
+            if (Data.SplitSize.Width == Data.SplitSize.Height)
+                IsLodAvailable = IsPowerOf2(Data.SplitSize.Width);
+            else
+                IsLodAvailable = false;
+
+            if (IsLodAvailable)
+            {
+                List<int> lodlist = new List<int>();
+                lodlist.Add(0);
+
+                int lodCounter = 1;
+                int size = 8;
+                while (size < Data.SplitSize.Width)
+                {
+                    lodlist.Add(lodCounter++);
+                    size *= 2;
+                }
+                Lods = lodlist.ToArray();
+            }
+            else
+            {
+                Lods = new int[] { 0 };
+                SelectedLod = 0;
+
+            }
+        }
+
+        protected override void OnEnter()
+        {
+            base.OnEnter();
+            RefreshLod();
+        }
 
         #region Commands
 
@@ -44,7 +114,7 @@ namespace Skill.Studio.Tools.HToMesh.ViewModel
             save.Filter = "fbx|*.fbx";
             if (save.ShowDialog() == true)
             {
-                TerrainScene scene = new Skill.Fbx.TerrainScene("Terrain", Data.HeightsDouble, Data.Size, Data.SplitSize);
+                TerrainScene scene = new Skill.Fbx.TerrainScene("Terrain", Data.HeightsDouble, Data.Size, Data.SplitSize, _SelectedLod);
                 scene.Scale = new Vector3() { X = ScaleX, Y = ScaleY, Z = ScaleZ };
                 scene.MinHeight = this.MinHeight;
                 scene.MaxHeight = this.MaxHeight;

@@ -6,20 +6,32 @@ namespace Skill.Framework.AI
 {
     #region BehaviorTree
 
-    public delegate void StateTransitionHandler(object sender, string stateName);
+    public class ChangeStateEventArgs : EventArgs
+    {
+        public string PreviousState { get; private set; }
+        public string NextState { get; private set; }
+
+        public ChangeStateEventArgs(string previousState, string nextState)
+        {
+            this.PreviousState = previousState;
+            this.NextState = nextState;
+        }
+    }
+
+    public delegate void ChangeStateEventHandler(object sender, ChangeStateEventArgs args);
 
     public interface IBehaviorTree
     {
         event EventHandler Updated;
 
         void ChangeState(string destinationState);
-        Behavior CurrentState { get; }
+        BehaviorTreeState CurrentState { get; }
         BehaviorTreeStatus Status { get; }
         /// <summary>
         /// Default state of behavior tree
         /// </summary>
         string DefaultState { get; }
-        void Update(Controller controller);
+        void Update();
         void Reset();
     }
 
@@ -31,9 +43,9 @@ namespace Skill.Framework.AI
         private float _LastUpdateTime;// last update time
         private List<Action> _FinishedActions;
         private bool _Reset;
-        private Dictionary<string, Behavior> _States;
-        private Behavior _CurrentState;
-        private Behavior _NextState;
+        private Dictionary<string, BehaviorTreeState> _States;
+        private BehaviorTreeState _CurrentState;
+        private BehaviorTreeState _NextState;
 
         public void ChangeState(string destinationState)
         {
@@ -46,7 +58,8 @@ namespace Skill.Framework.AI
 
             if (!_States.TryGetValue(destinationState, out _NextState))
                 throw new ArgumentException("Invalid state");
-        }        
+            Status.Interrupt();
+        }
 
         /// <summary>
         /// If true, the tree updates 'running actions' everyframe and update whole tree if required
@@ -54,22 +67,19 @@ namespace Skill.Framework.AI
         public bool ContinuousUpdate { get; set; }
 
         /// <summary> States of BehaviorTree </summary>
-        public Behavior[] States { get; private set; }
+        public BehaviorTreeState[] States { get; private set; }
 
         /// <summary>
         /// Current state of behavior tree.
         /// </summary>
-        public Behavior CurrentState { get { return _CurrentState; } }
+        public BehaviorTreeState CurrentState { get { return _CurrentState; } }
 
         /// <summary> 
         /// To enable update time interval set this to more than zero (default is 1.0f). Keep call Update() each frame.
         /// </summary>
         public float UpdateTimeInterval { get; set; }
 
-        /// <summary>
-        /// The controller that using this BbehaviorTree
-        /// </summary>
-        public Controller Controller { get; private set; }
+
         /// <summary>
         /// User data
         /// </summary>
@@ -84,7 +94,7 @@ namespace Skill.Framework.AI
         /// Implement by subclass to create tree hierarchy and return state nodes.
         /// </summary>
         /// <returns>States of tree</returns>
-        protected abstract Behavior[] CreateTree();
+        protected abstract BehaviorTreeState[] CreateTree();
 
         /// <summary>
         /// Default state of behavior tree
@@ -92,29 +102,18 @@ namespace Skill.Framework.AI
         public abstract string DefaultState { get; }
 
         /// <summary>
-        /// Occurs when leave current state
+        /// Occurs when state of behaviortree changed
         /// </summary>
-        public event StateTransitionHandler LeaveState;
+        public event ChangeStateEventHandler StateChanged;
         /// <summary>
-        /// Called when leave current state
+        /// Occurs when state of behaviortree changed
         /// </summary>
-        protected virtual void OnLeaveState()
+        protected virtual void OnStateChanged(string preState, string newState)
         {
-            if (_CurrentState != null && LeaveState != null)
-                LeaveState(this, _CurrentState.Name);
-        }
-
-        /// <summary>
-        /// Occurs when enter new state
-        /// </summary>
-        public event StateTransitionHandler EnterState;
-        /// <summary>
-        /// Called when enter new state
-        /// </summary>
-        protected virtual void OnEnterState()
-        {
-            if (_CurrentState != null && EnterState != null)
-                EnterState(this, _CurrentState.Name);
+            if (StateChanged != null)
+            {
+                StateChanged(this, new ChangeStateEventArgs(preState, newState));
+            }
         }
 
         /// <summary>
@@ -131,11 +130,11 @@ namespace Skill.Framework.AI
             if (States == null || States.Length == 0)
                 throw new InvalidProgramException("You must provide at least one valid state");
 
-            _States = new Dictionary<string, Behavior>();
+            _States = new Dictionary<string, BehaviorTreeState>();
             foreach (var s in States)
-                _States.Add(s.Name, s);
-            ChangeState(DefaultState);
+                _States.Add(s.Name, s);            
             this.Status = new BehaviorTreeStatus(this);
+            Reset();
         }
 
         /// <summary> Occurs when Behavior Tree updated </summary>
@@ -148,16 +147,9 @@ namespace Skill.Framework.AI
 
         /// <summary>
         /// Update Tree
-        /// </summary>
-        /// <param name="controller">Controller to update</param>
-        /// <remarks>
-        /// By providing Controller as parameter, it is possible to reuse BehaviorTree by another Controller when current(previous) Controller is dead.
-        /// </remarks>
-        public void Update(Controller controller)
+        /// </summary>                
+        public void Update()
         {
-            this.Controller = controller;
-            if (Controller == null)
-                throw new ArgumentNullException("Controller is null");
             Status.Exception = null;
             if (UpdateTimeInterval > 0)
             {
@@ -173,7 +165,7 @@ namespace Skill.Framework.AI
                             if (runningAction.Action.Result != BehaviorResult.Running)
                                 _FinishedActions.Add(runningAction.Action);
                         }
-                        if (_FinishedActions.Count == 0) // we does not need to update BehaviorTree
+                        if (_FinishedActions.Count == 0 && _NextState == null) // we does not need to update BehaviorTree
                         {
                             if (Status.Exception != null)
                             {
@@ -186,7 +178,7 @@ namespace Skill.Framework.AI
                         return;
                 }
             }
-            ForceUpdate(controller);
+            ForceUpdate();
 
             if (_FinishedActions.Count > 0)
             {
@@ -202,28 +194,22 @@ namespace Skill.Framework.AI
 
         /// <summary>
         /// Force update tree even not reach UpdateTimeInterval
-        /// </summary>
-        /// <param name="controller">Controller to update</param>
-        /// <remarks>
-        /// By providing Controller as parameter, it is possible to reuse BehaviorTree by another Controller when current(previous) Controller is dead.
-        /// </remarks>
-        public void ForceUpdate(Controller controller)
+        /// </summary>                
+        public void ForceUpdate()
         {
             this._Reset = false;
-            this.Controller = controller;
-            if (Controller == null)
-                throw new ArgumentNullException("Controller is null");
             this._LastUpdateTime = UnityEngine.Time.time;
 
             if (_NextState != null && _NextState != _CurrentState)
             {
+                string preState = string.Empty;
                 if (_CurrentState != null)
                 {
                     _CurrentState.ResetBehavior(this.Status);
-                    OnLeaveState();
+                    preState = _CurrentState.Name;
                 }
                 _CurrentState = _NextState;
-                OnEnterState();
+                OnStateChanged(preState, _CurrentState.Name);
             }
             _NextState = null;
             Status.Begin();

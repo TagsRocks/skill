@@ -127,10 +127,10 @@ namespace Skill.Framework
         /// <summary>
         /// Destroy controller
         /// </summary>
-        public virtual void DestroySelf()
+        public override void DestroySelf()
         {
             ResetValues();
-            Managers.Cache.DestroyCache(this.gameObject);
+            base.DestroySelf();
         }
 
 

@@ -8,17 +8,11 @@ namespace Skill.Framework
 {
     /// <summary>
     /// Use this class to spawn object in scheduled time and with triggers
-    /// </summary>
-    [AddComponentMenu("Skill/Base/Spawner")]
+    /// </summary>    
     public class Spawner : DynamicBehaviour
     {
         /// <summary> GameObject to spawn </summary>
         public SpawnAsset SpawnObjects;
-        /// <summary>
-        /// A queue to place spawned objects.
-        /// it is possible to sync some spawners togather with same queue
-        /// </summary>
-        public SpawnQueue Queue;
         /// <summary> where to spawn objects </summary>
         public Transform[] Locations;
         /// <summary> If true, the spawner will cycle through the spawn locations instead of spawning from a randomly chosen one </summary>
@@ -68,8 +62,8 @@ namespace Skill.Framework
                 {
                     if (item != null)
                     {
-                        if (item.Chance < 0.05f) item.Chance = 0.05f;
-                        _TotalWeight += item.Chance;
+                        if (item.Weight < 0.0f) throw new ArgumentOutOfRangeException("weights", "element weight must be greater than or equal to zero");
+                        _TotalWeight += item.Weight;
                     }
                 }
             }
@@ -116,8 +110,8 @@ namespace Skill.Framework
         protected override void Awake()
         {
             base.Awake();
-            _AliveObjects = new List<GameObject>(Mathf.Max(1, SpawnCount / 2));
-            _DeadObjects = new List<GameObject>(Mathf.Max(1, SpawnCount / 2));
+            _AliveObjects = new List<GameObject>();
+            _DeadObjects = new List<GameObject>();
             _LastSpawnLocationIndex = -1;
             _SpawnCounter = 0;
             _DeadCounter = 0;
@@ -140,12 +134,12 @@ namespace Skill.Framework
                 }
             }
             float rnd = UnityEngine.Random.Range(0.0f, _TotalWeight);
-            float sum = 0;
             foreach (SpawnObject item in SpawnObjects.Objects)
             {
-                sum += item.Chance;
-                if (sum >= rnd) return item.Prefab;
+                if (rnd < item.Weight) return item.Prefab;
+                rnd -= item.Weight;
             }
+
             return null;
         }
 
@@ -174,16 +168,13 @@ namespace Skill.Framework
                 Debug.LogError("invalid object to spawn(No SpawnObject exist).");
                 return false;
             }
-            GameObject spawnedObj = Cache.Spawn(sp, position, rotation, Queue == null);
+            GameObject spawnedObj = Cache.Spawn(sp, position, rotation);
             _AliveObjects.Add(spawnedObj);
             _DeadObjects.Remove(spawnedObj);
 
             Controller controller = spawnedObj.GetComponent<Controller>();
             if (controller != null)
                 controller.Spawner = this;
-
-            if (Queue != null)
-                Queue.Enqueue(spawnedObj);
 
             _SpawnTW.Begin(Interval);
             _SpawnCounter++;

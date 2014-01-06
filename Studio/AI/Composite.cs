@@ -21,9 +21,7 @@ namespace Skill.Studio.AI
         }
 
         [Browsable(false)]
-        public CompositeType CompositeType { get { return ((Composite)Model).CompositeType; } }
-
-        public override double CornerRadius { get { return 2; } }
+        public CompositeType CompositeType { get { return ((Composite)Model).CompositeType; } }        
         public override double MinHeight { get { return 42; } }
     }
     #endregion
@@ -37,6 +35,10 @@ namespace Skill.Studio.AI
 
         public SequenceSelectorViewModel(BehaviorViewModel parent, SequenceSelector selector)
             : base(parent, selector)
+        {
+        }
+        public SequenceSelectorViewModel(BehaviorTreeViewModel tree, SequenceSelector selector)
+            : base(tree, selector)
         {
         }
     }
@@ -53,6 +55,10 @@ namespace Skill.Studio.AI
             : base(parent, selector)
         {
         }
+        public RandomSelectorViewModel(BehaviorTreeViewModel tree, RandomSelector selector)
+            : base(tree, selector)
+        {
+        }
     }
     #endregion
 
@@ -63,7 +69,7 @@ namespace Skill.Studio.AI
         [DefaultValue(false)]
         [Category("Concurrency")]
         [DisplayName("BreakOnConditionFailure")]
-        [Description("If true : when a condition child fails, return failure")]
+        [Description("If true : when one condition child failed, return failure")]
         public bool BreakOnConditionFailure
         {
             get { return ((ConcurrentSelector)Model).BreakOnConditionFailure; }
@@ -123,6 +129,10 @@ namespace Skill.Studio.AI
 
         public ConcurrentSelectorViewModel(BehaviorViewModel parent, ConcurrentSelector selector)
             : base(parent, selector)
+        {
+        }
+        public ConcurrentSelectorViewModel(BehaviorTreeViewModel tree, ConcurrentSelector selector)
+            : base(tree, selector)
         {
         }
     }
@@ -210,6 +220,43 @@ namespace Skill.Studio.AI
 
         public LoopSelectorViewModel(BehaviorViewModel parent, LoopSelector selector)
             : base(parent, selector)
+        {
+        }
+        public LoopSelectorViewModel(BehaviorTreeViewModel tree, LoopSelector selector)
+            : base(tree, selector)
+        {
+        }
+    }
+    #endregion
+
+    #region BehaviorTreeStateViewModel
+    [DisplayName("BehaviorTreeState")]
+    public class BehaviorTreeStateViewModel : PrioritySelectorViewModel
+    {
+
+        [DefaultValue(false)]
+        [DisplayName("Expand Methods")]
+        [Description("Used by code generation to decide how implement methods")]
+        public bool ExpandMethods
+        {
+            get { return ((BehaviorTree)Tree.Model).ExpandMethods; }
+            set
+            {
+                if (value != ((BehaviorTree)Tree.Model).ExpandMethods)
+                {
+                    Tree.History.Insert(new ChangePropertyUnDoRedo(this, "ExpandMethods", value, ((BehaviorTree)Tree.Model).ExpandMethods));
+                    ((BehaviorTree)Tree.Model).ExpandMethods = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("ExpandMethods"));
+                }
+            }
+        }
+
+        public BehaviorTreeStateViewModel(BehaviorViewModel parent, BehaviorTreeState state)
+            : base(parent, state)
+        {
+        }
+        public BehaviorTreeStateViewModel(BehaviorTreeViewModel tree, BehaviorTreeState state)
+            : base(tree, state)
         {
         }
     }

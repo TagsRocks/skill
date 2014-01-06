@@ -8,30 +8,24 @@ using UnityEngine;
 namespace Skill.Editor
 {
     class SkillMenu : ScriptableObject
-    {
-        [MenuItem("Skill/Tools/Implant", false, 0)]
-        static void ShowImplant()
-        {
-            Tools.Implant.Instance.Show();
-        }
-
-        [MenuItem("Skill/Tools/Distance", false, 1)]
+    {        
+        [MenuItem("Skill/Tools/Distance", false, 0)]
         static void ShowDistance()
         {
             Tools.Distance.Instance.Show();
         }
 
-        [MenuItem("Skill/Tools/Animation Assigner", false, 2)]
+        [MenuItem("Skill/Tools/Animation Copy", false, 1)]
         static void ShowAnimationAssigner()
         {
-            Tools.AnimationAssigner.Instance.Show();
+            Tools.AnimationCopy.Instance.Show();
         }
 
         [MenuItem("Skill/Diagnostics/BehaviorTree State", false, 50)]
         static void ShowBTreeStateDebugger()
         {
             Diagnostics.BehaviorTreeStateDebugger.Instance.Show();
-        }        
+        }
 
         [MenuItem("Skill/Export to Skill Studio", false, 1001)]
         static void ShowExporter()
@@ -52,40 +46,19 @@ namespace Skill.Editor
         }
 
 
+        
 
         // Create Menu
         [MenuItem("Assets/Create/Skill/Implant Asset")]
         static void CreateImplantAsset()
         {
-            Skill.Editor.Tools.ImplantAsset asset;
-            string name = "ImplantAsset";
-            int nameIdx = 0;
-
-            while (System.IO.File.Exists(Application.dataPath + "/" + name + nameIdx + ".asset"))
-                nameIdx++;
-
-
-            asset = CreateInstance<Skill.Editor.Tools.ImplantAsset>();
-            AssetDatabase.CreateAsset(asset, "Assets/" + name + nameIdx + ".asset");
-            Selection.activeObject = asset;
-            EditorUtility.FocusProjectWindow();
+           ScriptableObjectUtility.CreateAsset<Skill.Editor.Tools.ImplantAsset>("ImplantAsset");
         }
 
         [MenuItem("Assets/Create/Skill/Spawn Asset")]
         static void CreateSpawnData()
         {
-            Skill.Framework.SpawnAsset data;
-            string name = "SpawnAsset";
-            int nameIdx = 0;
-
-            while (System.IO.File.Exists(Application.dataPath + "/" + name + nameIdx + ".asset"))
-                nameIdx++;
-
-
-            data = CreateInstance<Skill.Framework.SpawnAsset>();
-            AssetDatabase.CreateAsset(data, "Assets/" + name + nameIdx + ".asset");
-            Selection.activeObject = data;
-            EditorUtility.FocusProjectWindow();
+            ScriptableObjectUtility.CreateAsset<Skill.Framework.SpawnAsset>("SpawnData");
         }
 
 

@@ -51,6 +51,20 @@ namespace Skill.Studio
             }
         }
 
+        private string _Posture;
+        public string Posture
+        {
+            get { return _Posture; }
+            private set
+            {
+                if (_Posture != value)
+                {
+                    _Posture = value;
+                    OnPropertyChanged("Posture");
+                }
+            }
+        }
+
         #region Constructor
 
         public GifBrowser()
@@ -137,7 +151,7 @@ namespace Skill.Studio
                 return;
             }
 
-            string newSetDir = MainWindow.Instance.Project.GetAnimationPath(_TxtNewSet.Text);
+            string newSetDir = MainWindow.Instance.Project.GetGifAnimationPath(_TxtNewSet.Text);
 
             if (!System.IO.Directory.Exists(newSetDir))
                 System.IO.Directory.CreateDirectory(newSetDir);
@@ -154,7 +168,7 @@ namespace Skill.Studio
                 try
                 {
                     _Preview.Unload();
-                    string dir = MainWindow.Instance.Project.GetAnimationPath(Sets[index]);
+                    string dir = MainWindow.Instance.Project.GetGifAnimationPath(Sets[index]);
                     if (System.IO.Directory.Exists(dir))
                         System.IO.Directory.Delete(dir, true);
 
@@ -176,15 +190,19 @@ namespace Skill.Studio
         {
             HasSelectedSet = _LbSets.SelectedIndex >= 0;
             if (_LbSets.SelectedIndex >= 0)
+            {
                 LoadAnimations(SelectedSet);
+            }
             else
+            {
                 Animations.Clear();
+            }
         }
 
         private void LoadAnimations(string setName)
         {
             Animations.Clear();
-            string[] gifFiles = System.IO.Directory.GetFiles(MainWindow.Instance.Project.GetAnimationPath(setName), "*.gif", System.IO.SearchOption.TopDirectoryOnly);
+            string[] gifFiles = System.IO.Directory.GetFiles(MainWindow.Instance.Project.GetGifAnimationPath(setName), "*.gif", System.IO.SearchOption.TopDirectoryOnly);
 
             foreach (var g in gifFiles)
                 Animations.Add(System.IO.Path.GetFileName(g));
@@ -233,7 +251,7 @@ namespace Skill.Studio
                         if (System.IO.File.Exists(item))
                         {
                             string filename = System.IO.Path.GetFileName(item);
-                            string newPath = MainWindow.Instance.Project.GetAnimationPath(System.IO.Path.Combine(SelectedSet, filename));
+                            string newPath = MainWindow.Instance.Project.GetGifAnimationPath(System.IO.Path.Combine(SelectedSet, filename));
                             System.IO.File.Copy(item, newPath, true);
                             if (!Animations.Contains(filename))
                                 Animations.Add(filename);
@@ -248,7 +266,7 @@ namespace Skill.Studio
             if (HasSelectedAnimation)
             {
                 string anim = SelectedAnimation;
-                string filename = MainWindow.Instance.Project.GetAnimationPath(System.IO.Path.Combine(SelectedSet, anim));
+                string filename = MainWindow.Instance.Project.GetGifAnimationPath(System.IO.Path.Combine(SelectedSet, anim));
                 if (System.IO.File.Exists(filename))
                 {
 
@@ -276,22 +294,30 @@ namespace Skill.Studio
             if (HasSelectedAnimation)
             {
                 string localPath = System.IO.Path.Combine(SelectedSet, SelectedAnimation);
-                string gifSource = MainWindow.Instance.Project.GetAnimationPath(localPath);
+                string gifSource = MainWindow.Instance.Project.GetGifAnimationPath(localPath);
                 if (System.IO.File.Exists(gifSource))
                 {
                     _Preview.GifSource = gifSource;
                     Animation = localPath;
+
+                    gifSource = gifSource.ToLower();
+                    if (gifSource.EndsWith("_standing.gif")) Posture = DataModels.Posture.Standing.ToString();
+                    else if (gifSource.EndsWith("_crouched.gif")) Posture = DataModels.Posture.Crouched.ToString();
+                    else if (gifSource.EndsWith("_prone.gif")) Posture = DataModels.Posture.Prone.ToString();
+                    else Posture = DataModels.Posture.Unknown.ToString();
                 }
                 else
                 {
-                    _Preview.GifSource = "";
-                    Animation = "";
+                    Posture = string.Empty;
+                    _Preview.GifSource = string.Empty;
+                    Animation = string.Empty;
                 }
             }
             else
             {
-                _Preview.GifSource = "";
-                Animation = "";
+                Posture = string.Empty;
+                _Preview.GifSource = string.Empty;
+                Animation = string.Empty;
             }
         }
 

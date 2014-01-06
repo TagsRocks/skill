@@ -20,7 +20,7 @@ namespace Skill.Framework.AI
     /// </summary>    
     /// <param name="parameters">Parameters for action</param>
     /// <returns>Status of action</returns>
-    public delegate BehaviorResult ActionHandler(BehaviorParameterCollection parameters);
+    public delegate BehaviorResult ActionHandler(object sender, BehaviorParameterCollection parameters);
 
     /// <summary>
     /// Actions which finally implement an actors or game world status changes, for example to plan a path and move on it, to sense for the nearest enemies,
@@ -37,6 +37,12 @@ namespace Skill.Framework.AI
         /// </summary>
         public override bool IsLeaf { get { return true; } }
 
+        /// <summary>Whether this action change posture of actor </summary>
+        public Posture ChangePosture { get; private set; }
+
+        /// <summary> Is action begined </summary>
+        public bool IsBegined { get; private set; }
+
         /// <summary>
         /// Occurs when behavior is reset
         /// </summary>
@@ -47,7 +53,8 @@ namespace Skill.Framework.AI
         /// </summary>
         /// <param name="name">Name of action</param>
         /// <param name="handler">the function to call at execution time</param>
-        public Action(string name, ActionHandler handler)
+        /// <param name="changePosture">Whether this action change posture of actor</param>
+        public Action(string name, ActionHandler handler, Posture changePosture = Posture.Unknown)
             : base(name, BehaviorType.Action)
         {
             this._Handler = handler;
@@ -64,9 +71,9 @@ namespace Skill.Framework.AI
             {
                 // execute handler and get result back
                 if (this._Handler != null)
-                    this.Result = this._Handler(status.Parameters);
+                    this.Result = ProcessResult(this._Handler(this, status.Parameters));
                 else
-                    this.Result = BehaviorResult.Failure;// by default failure
+                    this.Result = ProcessResult(BehaviorResult.Failure);// by default failure
 
                 this.AlreadyUpdated = true;
 
@@ -91,19 +98,29 @@ namespace Skill.Framework.AI
             if (AlreadyUpdated)
             {
                 AlreadyUpdated = false;
-                return Result;
+                return ProcessResult(this.Result);
             }
 
             BehaviorResult result = BehaviorResult.Failure;// by default failure
-
             // execute handler and get result back            
-            if (_Handler != null) result = _Handler(status.Parameters);
+            if (_Handler != null) result = _Handler(this, status.Parameters);
+
+            status.ChangePosture(this.ChangePosture);
 
             // if action needs to run next frame store it's reference
             if (result == BehaviorResult.Running)
                 status.RunningActions.Add(this, status.Parameters);
             else
                 status.RunningActions.Remove(this);
+            return ProcessResult(result);
+        }
+
+        private BehaviorResult ProcessResult(BehaviorResult result)
+        {
+            if (result == BehaviorResult.Running)
+                IsBegined = true;
+            else
+                IsBegined = false;
             return result;
         }
 
@@ -113,6 +130,7 @@ namespace Skill.Framework.AI
         protected virtual void OnReset()
         {
             AlreadyUpdated = false;
+            IsBegined = false;
             if (Reset != null) Reset(this);
         }
 

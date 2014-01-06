@@ -93,6 +93,7 @@ namespace Skill.Studio.AI.Editor
                         ViewModel.AddAccessKey(new TimeLimitAccessKey() { Key = GetValidKeyName("TimeLimit"), TimeInterval = 1 });
                         break;
                 }
+                _LbKeys.SelectedIndex = _LbKeys.Items.Count - 1;
             }
         }
 
@@ -104,7 +105,15 @@ namespace Skill.Studio.AI.Editor
         private void BtnRemove_Click(object sender, RoutedEventArgs e)
         {
             if (_LbKeys.SelectedItem != null)
-                ViewModel.RemoveAccessKey(_LbKeys.SelectedItem as AccessKeyViewModel);
+            {
+                int index = _LbKeys.SelectedIndex;
+                if (ViewModel.RemoveAccessKey(_LbKeys.SelectedItem as AccessKeyViewModel))
+                {
+                    index = Math.Max(0, index - 1);
+                    if (_LbKeys.Items.Count > index)
+                        _LbKeys.SelectedIndex = index;                    
+                }
+            }
         }
 
         #region INotifyPropertyChanged Members

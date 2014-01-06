@@ -12,8 +12,7 @@ namespace Skill.Studio.AI
     #region DecoratorViewModel
     [DisplayName("Decorator")]
     public class DecoratorViewModel : BehaviorViewModel
-    {
-        public override double CornerRadius { get { return 26; } }
+    {        
         public override double MinHeight { get { return 36; } }
 
         [Browsable(false)]
@@ -35,7 +34,7 @@ namespace Skill.Studio.AI
 
         [DefaultValue(true)]
         [DisplayName("NeverFail")]
-        [Description("if true : when handler function fail return success. the result will be Running or Success")]
+        [Description("if true : when handler function failed return success. the result will be Running or Success")]
         public virtual bool NeverFail
         {
             get { return ((Decorator)Model).NeverFail; }
@@ -54,6 +53,11 @@ namespace Skill.Studio.AI
         public DecoratorViewModel(BehaviorViewModel parent, Decorator decorator)
             : base(parent, decorator)
         {
+        }
+
+        public DecoratorViewModel(BehaviorTreeViewModel tree, Decorator decorator)
+            : base(tree, decorator)
+        {            
         }
 
         [Category("Debug")]
@@ -131,7 +135,10 @@ namespace Skill.Studio.AI
             : base(parent, decorator)
         {
         }
-
+        public AccessLimitDecoratorViewModel(BehaviorTreeViewModel tree, AccessLimitDecorator decorator)
+            : base(tree, decorator)
+        {            
+        }
     }
     #endregion
 }

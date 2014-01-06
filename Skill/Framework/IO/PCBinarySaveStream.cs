@@ -94,7 +94,15 @@ namespace Skill.Framework.IO
         /// <param name="s">value to write</param>
         public override void Write(string s)
         {
-            _BinaryWriter.Write(s);
+            if (s != null)
+            {
+                _BinaryWriter.Write(true);
+                _BinaryWriter.Write(s);
+            }
+            else
+            {
+                _BinaryWriter.Write(false);
+            }
         }
     }
 }

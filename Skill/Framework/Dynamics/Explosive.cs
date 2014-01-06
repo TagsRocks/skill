@@ -6,8 +6,7 @@ namespace Skill.Framework.Dynamics
 {
     /// <summary>
     /// Base class for explosive objects. it explode OnDie.
-    /// </summary>
-    [AddComponentMenu("Skill/Dynamics/Explosive")]
+    /// </summary>    
     public class Explosive : DynamicBehaviour
     {
         /// <summary> The GameObject to spawn on explosion </summary>
@@ -16,8 +15,8 @@ namespace Skill.Framework.Dynamics
         public Transform[] ExpPositions;
         /// <summary> Amount of self destruction delay after explosion (set it to negative to disable self destruction)</summary>
         public float DestroyDelay = 0;
-        /// <summary> Shakw camera on explosion </summary>
-        public CameraShakeInfo Shake;
+        /// <summary> Shake camera on explosion </summary>
+        public CameraShakeParams Shake;
 
         private TimeWatch _DestroyTW;
 
@@ -50,7 +49,7 @@ namespace Skill.Framework.Dynamics
         /// <param name="e"> An System.EventArgs that contains no event data. </param>        
         protected virtual void Events_Die(object sender, System.EventArgs e)
         {
-            Skill.Framework.Global.OnCameraShake(this, Shake, transform.position);
+            Skill.Framework.Global.RaiseCameraShake(this, Shake, transform.position);
 
             if (ExpPrefab != null) // spawn explosion prefab
             {
@@ -82,7 +81,7 @@ namespace Skill.Framework.Dynamics
         {
             base.Awake();
             if (ExpPositions == null || ExpPositions.Length == 0)
-                ExpPositions = new Transform[] { transform };
+                ExpPositions = new Transform[] { _Transform };
             enabled = false;
         }
 
@@ -101,10 +100,11 @@ namespace Skill.Framework.Dynamics
         /// </summary>
         protected override void Update()
         {
-            if (Time.timeScale == 0) return;
+            if (Global.IsGamePaused) return;
             if (_DestroyTW.IsEnabledAndOver)
             {
                 _DestroyTW.End();
+                enabled = false;
                 Cache.DestroyCache(gameObject);
             }
             base.Update();

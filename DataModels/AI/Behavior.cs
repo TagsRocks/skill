@@ -41,10 +41,7 @@ namespace Skill.DataModels.AI
         public float Weight { get; set; }
 
         /// <summary> User comment for this behavior </summary>
-        public string Comment { get; set; }
-
-        /// <summary> Is this behavior root of state? </summary>
-        public bool IsState { get; set; }
+        public string Comment { get; set; }        
 
         /// <summary>
         /// Behavior of node when is child of a ConcurrentSelector
@@ -62,8 +59,7 @@ namespace Skill.DataModels.AI
             _Behaviors = new List<Behavior>();
             _Parameters = new List<ParameterCollection>();
             this.Name = name;
-            this.Weight = 1;
-            this.IsState = false;
+            this.Weight = 1;            
         }
         #endregion
 
@@ -116,8 +112,7 @@ namespace Skill.DataModels.AI
             behavior.SetAttributeValue("BehaviorType", BehaviorType.ToString());
             behavior.SetAttributeValue("Name", Name);
             behavior.SetAttributeValue("Id", Id);
-            behavior.SetAttributeValue("Weight", Weight);
-            behavior.SetAttributeValue("IsState", IsState);
+            behavior.SetAttributeValue("Weight", Weight);            
             behavior.SetAttributeValue("Concurrency", Concurrency.ToString());
 
             if (!string.IsNullOrEmpty(Comment))
@@ -156,17 +151,8 @@ namespace Skill.DataModels.AI
         {
             Name = e.GetAttributeValueAsString("Name", Name);
             Id = int.Parse(e.GetAttributeValueAsString("Id", "-1"));
-            Weight = e.GetAttributeValueAsFloat("Weight", 1);
-            IsState = e.GetAttributeValueAsBoolean("IsState", false);
-
-            try
-            {
-                Concurrency = (ConcurrencyMode)Enum.Parse(typeof(ConcurrencyMode), e.GetAttributeValueAsString("Concurrency", "Unlimit"), false);
-            }
-            catch (Exception)
-            {
-                Concurrency = ConcurrencyMode.Unlimit;
-            }
+            Weight = e.GetAttributeValueAsFloat("Weight", 1);            
+            Concurrency = e.GetAttributeValueAsEnum<ConcurrencyMode>("Concurrency", ConcurrencyMode.Unlimit);
 
             XElement comment = FindChild(e, "Comment");
             if (comment != null)

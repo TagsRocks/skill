@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// <summary>
     /// Make a toggle.
     /// </summary>
-    public class ToggleButton : EditorControl
+    public class ToggleButton : EditorControl, IToggleButton
     {
         /// <summary>
         /// Optional label in front of the toggle.
@@ -74,6 +74,23 @@ namespace Skill.Editor.UI
         {
             if (Changed != null)
                 Changed(this, EventArgs.Empty);
+        }
+
+        private ToggleButtonGroup _Group;
+        /// <summary>
+        /// only one of ToggleButtons inside a group is checked
+        /// </summary>
+        public ToggleButtonGroup Group
+        {
+            get { return _Group; }
+            set
+            {
+                if (_Group != null)
+                    _Group.Remove(this);
+                _Group = value;
+                if (_Group != null)
+                    _Group.Add(this);
+            }
         }
 
         /// <summary>

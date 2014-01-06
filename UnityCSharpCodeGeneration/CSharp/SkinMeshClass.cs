@@ -22,8 +22,8 @@ namespace Skill.CodeGeneration.CSharp
         public KeyframesClass(string name, AnimationClip[] animationClips)
             : base(name)
         {
-            this.IsStatic = true;
-            this.IsPublic = true;
+            this.ClassModifier = ClassModifiers.Static ;
+            this.Modifier = Modifiers.Public ;
             this.IsPartial = false;
 
             foreach (var item in animationClips)
@@ -40,7 +40,7 @@ namespace Skill.CodeGeneration.CSharp
             : base("Skill.Framework.Animation.Vector3Keyframes", propertyName, "", false)
         {
             base.IsStatic = true;
-            base.Modifiers = CSharp.Modifiers.Public;
+            base.Modifier = CSharp.Modifiers.Public;
             base.Multiline = true;
 
             StringBuilder builder = new StringBuilder();

@@ -275,10 +275,16 @@ namespace Skill.Framework.UI.Extended
             }
         }
 
+        /// <summary> Disable focusable - sometimes in editor it is better to disable focusable </summary>
+        public void DisableFocusable() { _IsFocusable = false; }
+        /// <summary> Enable focusable </summary>
+        public void EnableFocusable() { _IsFocusable = true; }
+
+        private bool _IsFocusable = true;
         /// <summary>
         /// Indicates whether the element can receive focus.(You must set valid name to enable this behavior)
         /// </summary>
-        public override bool IsFocusable { get { return true; } }
+        public override bool IsFocusable { get { return _IsFocusable; } }
 
         /// <summary> it is an extended focusable </summary>
         public bool IsExtendedFocusable { get { return true; } }

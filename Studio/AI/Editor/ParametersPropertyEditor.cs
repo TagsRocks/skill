@@ -48,7 +48,7 @@ namespace Skill.Studio.AI.Editor
                     _Behavior.RaiseChangeDisplayName();
                     foreach (BehaviorViewModel vm in _Behavior.Tree.GetSharedModel(_Behavior.Model))
                     {
-                        if (vm != _Behavior)
+                        if (vm != _Behavior && ((BehaviorViewModel)vm.Parent).Model != ((BehaviorViewModel)_Behavior.Parent).Model)
                         {
                             vm.MatchParameters(parameters.Model);
                             vm.RaiseChangeDisplayName();

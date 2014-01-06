@@ -41,7 +41,7 @@ namespace Skill.Studio.AI
 
         private bool _Started;
         private TimeSpan _EndTime;
-        private Skill.Framework.AI.BehaviorResult ActionHandler(Skill.Framework.AI.BehaviorParameterCollection parameters)
+        private Skill.Framework.AI.BehaviorResult ActionHandler( object sender, Skill.Framework.AI.BehaviorParameterCollection parameters)
         {
             IsVisited = true;
 
@@ -67,7 +67,7 @@ namespace Skill.Studio.AI
                 return Skill.Framework.AI.BehaviorResult.Running;
             }
         }
-        private bool ConditionHandler(Skill.Framework.AI.BehaviorParameterCollection parameters)
+        private bool ConditionHandler(object sender, Skill.Framework.AI.BehaviorParameterCollection parameters)
         {
             IsVisited = true;
             return IsValid;
@@ -110,9 +110,13 @@ namespace Skill.Studio.AI
                         case Skill.DataModels.AI.CompositeType.Random:
                             Behavior = new Skill.Framework.AI.RandomSelector(ViewModel.Name);
                             break;
-                        case Skill.DataModels.AI.CompositeType.Priority:
+                        case Skill.DataModels.AI.CompositeType.Priority:                        
                             Behavior = new Skill.Framework.AI.PrioritySelector(ViewModel.Name);
                             ((Skill.Framework.AI.PrioritySelector)Behavior).Priority = (Skill.Framework.AI.PriorityType)((Skill.Studio.AI.PrioritySelectorViewModel)ViewModel).Priority;
+                            break;
+                        case Skill.DataModels.AI.CompositeType.State:
+                            Behavior = new Skill.Framework.AI.BehaviorTreeState(ViewModel.Name);
+                            ((Skill.Framework.AI.BehaviorTreeState)Behavior).Priority = (Skill.Framework.AI.PriorityType)((Skill.Studio.AI.BehaviorTreeStateViewModel)ViewModel).Priority;
                             break;
                         case Skill.DataModels.AI.CompositeType.Loop:
                             Behavior = new Skill.Framework.AI.LoopSelector(ViewModel.Name);

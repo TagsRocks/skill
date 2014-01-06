@@ -59,7 +59,7 @@ namespace Skill.CodeGeneration.CSharp
             BehaviorTreeClass btClass = new BehaviorTreeClass(bTree);
             _Document.AddUsingSkillAI();
             _Document.Add(btClass);
-            HasPartial = true;
+            HasPartial = bTree.ExpandMethods;
         }
 
         public void Reset()
@@ -137,6 +137,15 @@ namespace Skill.CodeGeneration.CSharp
             _Document.WritePartial(writer, oldCode);
         }
 
-
+        /// <summary> Local address of assets directory relative to game directory</summary>        
+        public string AssetsPath { get { return "Assets"; } }
+        /// <summary> Local address of editor directory relative to assets directory</summary>       
+        public string EditorPath { get { return "Skill\\Editor"; } }
+        /// <summary> Local address of scripts directory relative to assets directory</summary>        
+        public string ScriptsPath { get { return "Skill\\Scripts"; } }
+        /// <summary> Local address of plugins(skill dlls) directory relative to assets directory</summary>        
+        public string PluginsPath { get { return "Skill\\Plugins"; } }
+        /// <summary> Local address of designer(generated code files) directory relative to assets directory</summary>        
+        public string DesignerPath { get { return "Skill\\Designer"; } }
     }
 }

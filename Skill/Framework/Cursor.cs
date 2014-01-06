@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Skill.Framework
 {
-    //[AddComponentMenu("Skill/UI/Cursor")]
+    
     //public class Cursor : DynamicBehaviour
     //{
 

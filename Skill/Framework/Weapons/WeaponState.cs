@@ -13,7 +13,7 @@ namespace Skill.Framework.Weapons
         /// <summary> Weapon is reloading </summary>
         Reloading,
         /// <summary> Weapon is changing projectile </summary>
-        ChangeProjectile,
+        ChangeProjectile,        
         /// <summary> Weapon is busy for other reason </summary>
         Busy
     }

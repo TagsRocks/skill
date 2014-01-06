@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Skill.Framework.Managers;
+using System.Collections.Generic;
 
 namespace Skill.Framework.Weapons
 {
@@ -8,12 +9,11 @@ namespace Skill.Framework.Weapons
     /// disable gravity to go in straight direction. The weapon do AddForce to RigidBody bullets at spawn time.
     /// if collider is a trigger the bullet check collision by OnTriggerEnter method
     /// if collider is not a trigger the bullet check collision by OnCollisionEnter method
-    /// </summary>
-    [AddComponentMenu("Skill/Weapons/Bullets/Bullet")]
+    /// </summary>    
     public class Bullet : DynamicBehaviour
     {
         /// <summary> Object to spawn on collision </summary>
-        public GameObject Explosion;
+        public GameObject[] Explosions;
 
         /// <summary> Position of explosion </summary>
         public Transform ExplosionPos;
@@ -50,39 +50,26 @@ namespace Skill.Framework.Weapons
         /// <summary> User Data </summary>
         public object UserData { get; set; }
 
+        /// <summary> Damage Type of projectil</summary>
+        public int DamageType { get; set; }
+
         /// <summary> Target of projectile </summary>
         public Vector3? Target { get; set; }
 
         private TimeWatch _LifeTimeTW;
-        private bool _IsDead;
+        private bool _IsDead;        
+
+        
 
         /// <summary>
-        /// This function is called when the object becomes enabled and active.
+        /// Called by weapon when initialize bullet
         /// </summary>
-        protected virtual void OnEnable()
+        public virtual void StartJourney()
         {
             if (LifeTime > 0)
                 _LifeTimeTW.Begin(LifeTime);
             enabled = true;
             _IsDead = false;
-        }
-
-        /// <summary>
-        /// Called by weapon when initialize bullet
-        /// </summary>
-        public virtual void StartJourney() { }
-
-        /// <summary>
-        /// This function is called when the behaviour becomes disabled () or inactive.
-        /// </summary>
-        protected virtual void OnDisable()
-        {
-            Shooter = null;
-            Damage = 0;
-            Target = null;
-
-            if (rigidbody != null && !rigidbody.isKinematic)
-                rigidbody.velocity = Vector3.zero;
         }
 
         /// <summary>
@@ -93,7 +80,7 @@ namespace Skill.Framework.Weapons
             if (_LifeTimeTW.IsEnabledAndOver)
             {
                 _LifeTimeTW.End();
-                OnDie();
+                OnDie(null);
             }
             base.Update();
         }
@@ -111,9 +98,9 @@ namespace Skill.Framework.Weapons
                 EventManager eventManager = cp.otherCollider.GetComponent<EventManager>();
                 if (eventManager != null)
                 {
-                    eventManager.OnDamage(this, new DamageEventArgs(this.Damage, tag) { UserData = this.UserData });
+                    eventManager.RaiseDamage(this, new DamageEventArgs(this.Damage) { UserData = this.UserData, DamageType = DamageType, Tag = tag });
                 }
-                OnDie();
+                OnDie(cp.otherCollider);
             }
         }
 
@@ -131,9 +118,9 @@ namespace Skill.Framework.Weapons
                 EventManager eventManager = other.GetComponent<EventManager>();
                 if (eventManager != null)
                 {
-                    eventManager.OnDamage(this, new DamageEventArgs(this.Damage, tag) { UserData = this.UserData });
+                    eventManager.RaiseDamage(this, new DamageEventArgs(this.Damage) { UserData = this.UserData, DamageType = DamageType, Tag = tag });
                 }
-                OnDie();
+                OnDie(other);
             }
         }
 
@@ -166,20 +153,44 @@ namespace Skill.Framework.Weapons
         }
 
 
+        /// <summary>
+        /// Allow subclass to filter explosion particle based on collider bullet hit with
+        /// by default return random explosion if exist
+        /// </summary>
+        /// <param name="collider">The collider that bullet hit with (can be null)</param>
+        /// <returns>valid GameObjct if explosion required, otherwise null</returns>
+        protected virtual GameObject GetExplosion(Collider collider)
+        {
+            if (collider == null) return null;
+            if (Explosions != null && Explosions.Length > 0)
+                return Explosions[Random.Range(0, Explosions.Length)];
+            else
+                return null;
+        }
 
         /// <summary>
         /// Call this when bullet reach end of range or hit something or out of life time
         /// </summary>
-        protected virtual void OnDie()
+        protected virtual void OnDie(Collider collider)
         {
             if (_IsDead) return;
+
+            Shooter = null;
+            Damage = 0;
+            Target = null;
+
+            if (rigidbody != null && !rigidbody.isKinematic)
+                rigidbody.velocity = Vector3.zero;
+
             _IsDead = true;
-            if (Explosion != null)
-                Skill.Framework.Managers.Cache.Spawn(Explosion, (ExplosionPos != null) ? ExplosionPos.position : _Transform.position, Explosion.transform.rotation);
+
+            var exp = GetExplosion(collider);
+            if (exp != null)
+                Skill.Framework.Managers.Cache.Spawn(exp, (ExplosionPos != null) ? ExplosionPos.position : _Transform.position, exp.transform.rotation);
             if (Events != null)
-                Events.OnDie(this, System.EventArgs.Empty);
+                Events.RaiseDie(this, System.EventArgs.Empty);
             Target = null;
             Cache.DestroyCache(gameObject);
-        }
+        }        
     }
 }

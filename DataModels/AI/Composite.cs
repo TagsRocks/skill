@@ -11,11 +11,12 @@ namespace Skill.DataModels.AI
     /// </summary>
     public enum CompositeType
     {
-        Sequence,
-        Concurrent,
-        Random,
-        Priority,
-        Loop,
+        Sequence = 0,
+        Concurrent = 1,
+        Random = 2,
+        Priority = 3,
+        Loop = 4,
+        State = 1000
     }
     #endregion
 
@@ -272,5 +273,12 @@ namespace Skill.DataModels.AI
             base.ReadAttributes(e);
         }
     }
+    #endregion
+
+    #region BehaviorTreeState
+    public class BehaviorTreeState : PrioritySelector
+    {
+        public override CompositeType CompositeType { get { return AI.CompositeType.State; } }
+    } 
     #endregion
 }

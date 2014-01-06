@@ -52,14 +52,14 @@ namespace Skill.CodeGeneration.CSharp
 
             // create constructor
             Method constructor = new Method("", Name, constructorBody.ToString());
-            constructor.Modifiers = Modifiers.Public;
+            constructor.Modifier = Modifiers.Public;
             Add(constructor);
 
             // create protected CreateTree method
             Method createTree = new Method("Skill.Framework.Animation.AnimNode", "CreateTree", this._CreateTreeMethodBody.ToString());
             createTree.IsPartial = false;
             createTree.SubMethod = SubMethod.Override;
-            createTree.Modifiers = Modifiers.Protected;
+            createTree.Modifier = Modifiers.Protected;
             Add(createTree);
         }
         #endregion
@@ -207,7 +207,7 @@ namespace Skill.CodeGeneration.CSharp
         private void CreateProperty(string type, string name, string comment = null)
         {
             CreateVariable(type, name);
-            Add(new Property(type, name, Variable.GetName(name), false) { Modifiers = Modifiers.Public, Comment = comment });
+            Add(new Property(type, name, Variable.GetName(name), false) { Modifier = Modifiers.Public, Comment = comment });
         }
 
         private void CreateProperty(string type, AnimNode node)

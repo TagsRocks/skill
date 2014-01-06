@@ -65,10 +65,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationFramework.Aero" />
-    <Reference Include="Skill.Fbx, Version=1.0.4674.41233, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Release\Skill.Fbx.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -123,6 +119,9 @@
     <Compile Include="AI\Editor\BehaviorTreeGraphView.xaml.cs">
       <DependentUpon>BehaviorTreeGraphView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="AI\Editor\BehaviorTreeListView.xaml.cs">
+      <DependentUpon>BehaviorTreeListView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="AI\Editor\BehaviorTreeRemoteDebugger.xaml.cs">
       <DependentUpon>BehaviorTreeRemoteDebugger.xaml</DependentUpon>
     </Compile>
@@ -137,6 +136,7 @@
       <DependentUpon>ParametersEditorWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="AI\Editor\BehaviorTreeViewControl.cs" />
+    <Compile Include="AI\GifAnimationManager.cs" />
     <Compile Include="AI\Parameter.cs" />
     <Compile Include="AI\Editor\SelectAccessKeyWindow.xaml.cs">
       <DependentUpon>SelectAccessKeyWindow.xaml</DependentUpon>
@@ -233,6 +233,9 @@
       <DependentUpon>MediaButton.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\GifImage.cs" />
+    <Compile Include="Controls\ThreeStateImageButton.xaml.cs">
+      <DependentUpon>ThreeStateImageButton.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ToggleMediaButton.xaml.cs">
       <DependentUpon>ToggleMediaButton.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -357,6 +360,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="AI\Editor\BehaviorTreeListView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="AI\Editor\BehaviorTreeRemoteDebugger.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -432,6 +439,10 @@
     <Page Include="Controls\MediaButton.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\ThreeStateImageButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\ToggleMediaButton.xaml">
       <SubType>Designer</SubType>
@@ -836,6 +847,10 @@
     <ProjectReference Include="..\Editor\Editor.csproj">
       <Project>{DB02ABC1-D536-4EEA-84D5-A3736F7E4C39}</Project>
       <Name>Editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Fbx\Fbx.vcxproj">
+      <Project>{6db70f0e-475d-467c-828e-9a5e97a04660}</Project>
+      <Name>Fbx</Name>
     </ProjectReference>
     <ProjectReference Include="..\Network\Network.csproj">
       <Project>{695243ef-0d10-4f6f-a1ee-be923af7e32c}</Project>

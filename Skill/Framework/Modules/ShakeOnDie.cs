@@ -6,13 +6,12 @@ namespace Skill.Framework.Modules
 {
     /// <summary>
     /// Call Global.OnCameraShake event OnDie
-    /// </summary>
-    [AddComponentMenu("Skill/Modules/ShakeOnDie")]
+    /// </summary>    
     [RequireComponent(typeof(EventManager))]
     public class ShakeOnDie : StaticBehaviour
     {
         /// <summary> Shake parameter </summary>
-        public CameraShakeInfo Shake;
+        public CameraShakeParams Shake;
 
         /// <summary>
         /// Hook required events
@@ -41,7 +40,7 @@ namespace Skill.Framework.Modules
         /// <param name="e"> EventArgs </param>
         protected virtual void Events_Die(object sender, EventArgs e)
         {
-            Global.OnCameraShake(this, Shake, _Transform.position);
+            Global.RaiseCameraShake(this, Shake, _Transform.position);
         }
     }
 }

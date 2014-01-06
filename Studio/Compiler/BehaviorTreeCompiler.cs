@@ -183,7 +183,7 @@ namespace Skill.Studio.Compiler
                     {
                         AddError(string.Format("Composite node {0} has not any children.", composite.Name));
                     }
-                    if (composite.CompositeType == CompositeType.Priority || composite.CompositeType == CompositeType.Concurrent) // check if a Decorator with NeverFaile property is child of PrioritySelector or ConcurrentSelector
+                    if (composite.CompositeType == CompositeType.Priority || composite.CompositeType == CompositeType.Concurrent || composite.CompositeType == CompositeType.State) // check if a Decorator with NeverFaile property is child of PrioritySelector or ConcurrentSelector
                     {
                         foreach (var child in b)
                         {
@@ -191,7 +191,7 @@ namespace Skill.Studio.Compiler
                             {
                                 if (((Decorator)child).NeverFail)
                                 {
-                                    if (composite.CompositeType == CompositeType.Priority)
+                                    if (composite.CompositeType == CompositeType.Priority || composite.CompositeType == CompositeType.State)
                                         AddWarning(string.Format("Decorator '{0}' with 'NeverFail' property setted to 'true' is child of PrioritySelector '{1}'. This cause next children unreachable.", child.Name, b.Name));
                                     else if (composite.CompositeType == CompositeType.Concurrent)
                                     {

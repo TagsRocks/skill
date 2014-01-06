@@ -20,6 +20,9 @@ namespace Skill.Editor.UI
         /// </summary>
         public int Id { get; set; }
 
+        /// <summary> The unique ID of the control. If none specified, the ID of the following control is used.</summary>
+        public bool UseId { get; set; }
+
         /// <summary>
         /// Rectangle on the screen to use just for the control itself.
         /// </summary>
@@ -40,7 +43,10 @@ namespace Skill.Editor.UI
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
-            Result = EditorGUI.PrefixLabel(RenderArea, Id, Label);
+            if (UseId)
+                Result = EditorGUI.PrefixLabel(RenderArea, Id, Label);
+            else
+                Result = EditorGUI.PrefixLabel(RenderArea, Label);
         }
     }
 }

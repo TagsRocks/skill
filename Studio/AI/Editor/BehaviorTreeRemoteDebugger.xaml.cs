@@ -23,42 +23,53 @@ namespace Skill.Studio.AI.Editor
         #region MessageBoxLogger
         class BTLogger : Skill.Net.ILogger
         {
+            private delegate void LogHandler(string message);
+
             private BehaviorTreeRemoteDebugger _Debugger;
+            private LogHandler _LogHandler;
             public BTLogger(BehaviorTreeRemoteDebugger debugger)
             {
                 _Debugger = debugger;
+                _LogHandler = Log;
             }
 
             public void LogError(Exception ex)
             {
                 if (!ex.Message.EndsWith("\n"))
-                    _Debugger._RtxtLogs.AppendText(string.Format("{0}\n", ex.Message));
+                    _Debugger.Dispatcher.BeginInvoke(_LogHandler, string.Format("{0}\n", ex.Message));
                 else
-                    _Debugger._RtxtLogs.AppendText(ex.Message);
+                    _Debugger.Dispatcher.BeginInvoke(_LogHandler, ex.Message);
             }
 
             public void LogError(string errorMsg)
             {
                 if (!errorMsg.EndsWith("\n"))
-                    _Debugger._RtxtLogs.AppendText(string.Format("{0}\n", errorMsg));
+                    _Debugger.Dispatcher.BeginInvoke(_LogHandler, string.Format("{0}\n", errorMsg));
                 else
-                    _Debugger._RtxtLogs.AppendText(errorMsg);
+                    _Debugger.Dispatcher.BeginInvoke(_LogHandler, errorMsg);
             }
 
             public void LogWarning(string warningMsg)
             {
                 if (!warningMsg.EndsWith("\n"))
-                    _Debugger._RtxtLogs.AppendText(string.Format("{0}\n", warningMsg));
+                    _Debugger.Dispatcher.BeginInvoke(_LogHandler, string.Format("{0}\n", warningMsg));
                 else
-                    _Debugger._RtxtLogs.AppendText(warningMsg);
+                    _Debugger.Dispatcher.BeginInvoke(_LogHandler, warningMsg);
             }
 
             public void LogMessage(string msg)
             {
                 if (!msg.EndsWith("\n"))
-                    _Debugger._RtxtLogs.AppendText(string.Format("{0}\n", msg));
+                    _Debugger.Dispatcher.BeginInvoke(_LogHandler, string.Format("{0}\n", msg));
                 else
-                    _Debugger._RtxtLogs.AppendText(msg);
+                    _Debugger.Dispatcher.BeginInvoke(_LogHandler, msg);
+            }
+            void Log(string message)
+            {
+                if (!message.EndsWith("\n"))
+                    _Debugger._RtxtLogs.AppendText(string.Format("{0}\n", message));
+                else
+                    _Debugger._RtxtLogs.AppendText(message);
             }
         }
         #endregion

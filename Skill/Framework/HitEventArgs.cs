@@ -28,7 +28,7 @@ namespace Skill.Framework
         /// <summary> user define hit 5  </summary>
         Hit5 = 128
     }
-
+    
     /// <summary>
     /// Defines information about when an object hits
     /// </summary>
@@ -42,15 +42,17 @@ namespace Skill.Framework
         public UnityEngine.Collider Collider { get; private set; }
         /// <summary> User data </summary>
         public System.Object UserData { get; set; }
+        /// <summary> Damage Type of projectil</summary>
+        public int DamageType { get; set; }
 
         /// <summary> Tag </summary>
-        public string Tag;
+        public string Tag { get; set; }
         /// <summary> Position of hit </summary>
-        public Vector3 Point;
+        public Vector3 Point { get; set; }
         /// <summary> Normal of hit </summary>
-        public Vector3 Normal;
+        public Vector3 Normal { get; set; }
         /// <summary> Amount of damage imposed by this hit </summary>
-        public float Damage;
+        public float Damage { get; set; }
         /// <summary> Whether this hit cause particle on colliding object?</summary>
         /// <remarks>
         /// Maybe you don't want an explosion cause to particles spawns.
@@ -60,13 +62,13 @@ namespace Skill.Framework
         /// <summary>
         /// Create a HitInfo
         /// </summary>
-        /// <param name="owner"> The object that caused this hit </param>
+        /// <param name="hitter"> The object that caused this hit </param>
         /// <param name="type"> Type of hit </param>
         /// <param name="collider"> Collider </param>       
-        public HitEventArgs(GameObject owner, HitType type, UnityEngine.Collider collider)
+        public HitEventArgs(GameObject hitter, HitType type, UnityEngine.Collider collider)
         {
             this.Type = type;
-            this.Hitter = owner;
+            this.Hitter = hitter;
             this.Collider = collider;            
         }
     }
@@ -123,20 +125,22 @@ namespace Skill.Framework
         public float Damage { get; private set; }
 
         /// <summary> Tag of object that cause damage </summary>
-        public string Tag { get; private set; }
+        public string Tag { get; set; }
 
         /// <summary> User Data </summary>
         public object UserData { get; set; }
 
+        /// <summary> Damage Type of projectil</summary>
+        public int DamageType { get; set; }
+
         /// <summary>
         /// Create DamageEventArgs
         /// </summary>
-        /// <param name="damage"> Amount of damage </param>
-        /// <param name="tag"> tag of object that caused damage</param>
-        public DamageEventArgs(float damage, string tag)
+        /// <param name="damage"> Amount of damage </param>        
+        public DamageEventArgs(float damage)
         {
             this.Damage = damage;
-            this.Tag = tag;
+            this.Tag = string.Empty;
         }
     }
 }

@@ -85,7 +85,7 @@ namespace Skill.Studio
             BackupItem item = _TreeView.SelectedItem as BackupItem;
             if (item != null)
             {
-                _Backup.Restore(item);
+                _Backup.Restore(item, (_LbBackupNames.SelectedItem as BackupItem).Name);                
             }
         }
 
@@ -94,7 +94,7 @@ namespace Skill.Studio
             BackupItem item = _LbBackupNames.SelectedItem as BackupItem;
             if (item != null)
             {
-                _Backup.Restore(item);
+                _Backup.Restore(item, (_LbBackupNames.SelectedItem as BackupItem).Name);
             }
         }
 

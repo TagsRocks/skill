@@ -52,6 +52,7 @@
     <Compile Include="CSharp\CommentWriter.cs" />
     <Compile Include="CSharp\CSharpCodeGenerator.cs" />
     <Compile Include="CSharp\Document.cs" />
+    <Compile Include="CSharp\EnumClass.cs" />
     <Compile Include="CSharp\IPartialCode.cs" />
     <Compile Include="CSharp\Method.cs" />
     <Compile Include="CSharp\Modifiers.cs" />

@@ -6,19 +6,14 @@ namespace Skill.Framework
 {
     /// <summary>
     /// Isometric camera to view target from above. Add this component to 'UnityEngine.Camera' GameObject and set Target to player or a movable object.
-    /// </summary>
-    [AddComponentMenu("Skill/Camera/Isometric")]
+    /// </summary>    
     [RequireComponent(typeof(Camera))]
     public class IsometricCamera : DynamicBehaviour
     {
         /// <summary> Target to follow </summary>
         public Transform Target;
         /// <summary> How to smooth movement of camera when following target</summary>
-        public SmoothingParameters MovementSmoothing;
-        /// <summary> How to smooth offset value of camera relative to target</summary>
-        public SmoothingParameters OffsetSmoothing;
-        /// <summary> How to smooth zoom of camera</summary>
-        public SmoothingParameters ZoomSmoothing;
+        public float Smoothing = 0.3f;        
         /// <summary> Camera moves by mouse when mouse position gets far from center of screen. </summary>
         public float CameraPreview = 2.0f;
         /// <summary> Rotation angle around target ( 0 - 360) </summary>
@@ -30,31 +25,18 @@ namespace Skill.Framework
         /// <summary> Maximum distance to target when PointOfIntrest is far from target</summary>
         public float ZoomOut = 16;
         /// <summary> Maximum distance of PointOfIntrest from target</summary>
-        public float MaxTargetOffset = 6;
-        /// <summary> Maximum distance of camera position to desired camera position when smoothing follow motion </summary>
-        /// <remarks>
-        /// When target moves very fast it is important to keep target always in view. when distance of camera position to desired camera position is less than MinReachFactor
-        /// then smoothing performed normal speed, but when this distance gets far from MinReachFactor and towards MaxReachFactor smoothing performed faster to reach desired camera position.
-        /// by tweaking these factors you can get your desired result.
-        /// </remarks>
-        public float MaxReachFactor = 10;
-        /// <summary> Minimum distance of camera position to desired camera position when smoothing follow motion </summary>
-        /// <remarks>
-        /// When target moves very fast it is important to keep target always in view. when distance of camera position to desired camera position is less than MinReachFactor
-        /// then smoothing performed normal speed, but when this distance gets far from MinReachFactor and towards MaxReachFactor smoothing performed faster to reach desired camera position.
-        /// by tweaking these factors you can get your desired result.
-        /// </remarks>
-        public float MinReachFactor = 4;
+        public float MaxOffset = 6;
         /// <summary> Field of view </summary>
         public float Fov = 60;
-
         /// <summary> height of cursor plane above target </summary>
         public float CursorPlaneHeight = 0;
+        /// <summary> If target can move very fast do not allow camera to loose it</summary>
+        public bool FastMove;
 
         /// <summary>
-        /// Apply static offset to position of camera
+        /// Apply relative custom offset to position of camera
         /// </summary>
-        public Vector3 StaticOffset = Vector3.zero;
+        public Vector3 CustomOffset = Vector3.zero;
 
         /// <summary> Prepare a cursor point variable. This is the mouse position on PC and controlled by the thumbstick on mobiles. </summary>
         public Vector3 CursorScreenPosition { get; private set; }
@@ -67,9 +49,11 @@ namespace Skill.Framework
         /// <summary> Camera </summary>
         public Camera Camera { get; private set; }
         /// <summary> Current zoom distance </summary>
-        public float Zoom { get { return _Zoom.Current; } }
+        public float Zoom { get { return _Zoom; } }
         /// <summary> It can be center of all enemies around player </summary>
         public Vector3? PointOfInterest { get; set; }
+        /// <summary>  Camera screen space </summary>
+        public Quaternion ScreenSpace { get { return _ScreenMovementSpace; } }
 
 
         // Private memeber data                
@@ -79,9 +63,12 @@ namespace Skill.Framework
         private Quaternion _ScreenMovementSpace;
         private Plane _MovementPlane;
 
-        private Smoothing3 _Offset;
-        private Smoothing _Zoom;
+        private Vector3 _Offset;
+        private float _Zoom;
         private float _LengthOffset;
+
+        private float _PreAroundAngle, _PreZoom, _PreLookAngle;
+        private float _ZDistace, _YDistace;        
 
         /// <summary>
         /// Awake
@@ -89,10 +76,11 @@ namespace Skill.Framework
         protected override void Awake()
         {
             base.Awake();
+            _PreZoom = -1;
             _CameraVelocity = Vector3.zero;
             _CameraTransform = Camera.transform;
             // Set the initial cursor position to the center of the screen
-            CursorScreenPosition = new Vector3(0.5f * Screen.width, 0.5f * Screen.height, 0);
+            CursorScreenPosition = new Vector3(0.5f * Screen.width, 0.5f * Screen.height, 0);            
         }
 
         protected override void GetReferences()
@@ -114,13 +102,13 @@ namespace Skill.Framework
         {
             base.Start();
             // caching movement plane
-            _MovementPlane = new Plane(Vector3.up, Target.position);
+            _MovementPlane = new Plane(Vector3.up, Vector3.zero);
 
             // make sure zoom factors are in correct range
             if (ZoomIn < 0) ZoomIn = 0;
             if (ZoomOut < ZoomIn) ZoomOut = ZoomIn;
 
-            this._Zoom.Reset((ZoomIn + ZoomOut) * 0.5f);
+            this._Zoom = (ZoomIn + ZoomOut) * 0.5f;
 
             UpdateCamera(true);
         }
@@ -130,37 +118,42 @@ namespace Skill.Framework
         /// </summary>
         protected override void Update()
         {
-            if (Camera == null) return;
             if (!Global.IsGamePaused && !Global.CutSceneEnable) // do not modify camera if game is in cutscene mode
-            {                
+            {
                 if (Target != null)
                 {
-                    Vector3 center = (PointOfInterest != null) ? PointOfInterest.Value : Target.position;
-                    Vector3 dir = Target.position - center;
-                    _LengthOffset = dir.magnitude;
-                    if (_LengthOffset > MaxTargetOffset)// if PointOfInterest is far than MaxTargetOffset
+                    if (PointOfInterest != null)
                     {
-                        // keep distance of  PointOfInterest lower than MaxTargetOffset
-                        center += dir.normalized * (_LengthOffset - MaxTargetOffset);
-                        _LengthOffset = MaxTargetOffset;
+                        Vector3 center = PointOfInterest.Value;
+                        Vector3 dir = Target.position - center;
+                        _LengthOffset = dir.magnitude;
+                        if (_LengthOffset > MaxOffset)// if PointOfInterest is far than MaxTargetOffset
+                        {
+                            // keep distance of  PointOfInterest lower than MaxTargetOffset
+                            center += dir.normalized * (_LengthOffset - MaxOffset);
+                            _LengthOffset = MaxOffset;
+                        }
+                        // set offset
+                        _Offset = center - Target.position;
                     }
-                    // set offset
-                    _Offset.Target = center - Target.position;
+                    else
+                    {
+                        _Offset = Vector3.zero;
+                        _LengthOffset = 0;
+                    }
                 }
                 else
                 {
                     _LengthOffset = 0;
-                    _Offset.Target = Vector3.zero;
-                }
-                _Offset.Update(OffsetSmoothing);
+                    _Offset = Vector3.zero;
+                }                
 
                 // make sure zoom factors are in correct range
                 if (ZoomIn < 0) ZoomIn = 0;
                 if (ZoomOut < ZoomIn) ZoomOut = ZoomIn;
 
-                float zoomFactor = _LengthOffset / Mathf.Max(0.01f, MaxTargetOffset);
-                _Zoom.Target = Mathf.Lerp(ZoomIn, ZoomOut, zoomFactor);
-                _Zoom.Update(ZoomSmoothing);
+                float zoomFactor = _LengthOffset / Mathf.Max(0.01f, MaxOffset);
+                _Zoom = Mathf.Lerp(ZoomIn, ZoomOut, zoomFactor);                
 
                 // update position of camera
                 UpdateCamera();
@@ -179,17 +172,30 @@ namespace Skill.Framework
             return Input.mousePosition;
         }
 
+
+
+        private void UpdateScreenSpace()
+        {
+            if (_PreLookAngle != LookAngle || _PreZoom != Zoom || _PreAroundAngle != AroundAngle)
+            {
+                _PreLookAngle = LookAngle;
+                _PreZoom = Zoom;
+                _PreAroundAngle = AroundAngle;
+
+                float radianLookAngle = LookAngle * Mathf.Deg2Rad;
+                _ZDistace = Mathf.Cos(radianLookAngle) * Zoom;
+                _YDistace = Mathf.Sin(radianLookAngle) * Zoom;
+
+                _ScreenMovementSpace = Quaternion.Euler(0, AroundAngle, 0);
+                ScreenForward = _ScreenMovementSpace * Vector3.forward;
+                ScreenRight = _ScreenMovementSpace * Vector3.right;
+            }
+        }
+
         private void UpdateCamera(bool force = false)
         {
-            float radianLookAngle = LookAngle * Mathf.Deg2Rad;
-            float zDistace = Mathf.Cos(radianLookAngle) * Zoom;
-            float yDistace = Mathf.Sin(radianLookAngle) * Zoom;
+            UpdateScreenSpace();
 
-            _ScreenMovementSpace = Quaternion.Euler(0, AroundAngle, 0);
-            ScreenForward = _ScreenMovementSpace * Vector3.forward;
-            ScreenRight = _ScreenMovementSpace * Vector3.right;
-
-            //_MovementPlane.normal = Player.Character.up;
             _MovementPlane.distance = -Target.position.y + CursorPlaneHeight;
 
             CursorScreenPosition = HandleMousePosition();
@@ -215,37 +221,33 @@ namespace Skill.Framework
                 cameraAdjustmentVector.y = 0.0f;
             }
 
-            Camera.fov = Fov;
+            Camera.fieldOfView = Fov;
 
-            Vector3 finalPosition = _CameraTransform.position;
             // HANDLE CAMERA POSITION
-            Vector3 offsetToCenter = -zDistace * ScreenForward;
-            offsetToCenter.y = yDistace;
+            Vector3 offsetToCenter = -_ZDistace * ScreenForward;
+            offsetToCenter.y = _YDistace;
             // Set the target position of the camera to point at the focus point
 
-            Vector3 finalOffset = _Offset.Current + offsetToCenter + (cameraAdjustmentVector * CameraPreview);
+            Vector3 finalOffset = _Offset + offsetToCenter + (cameraAdjustmentVector * CameraPreview) + (_ScreenMovementSpace * CustomOffset);
+            Vector3 finalPosition = Target.position + finalOffset;
 
-            finalPosition = Target.position + finalOffset + StaticOffset;
-
-            // speed up smoothing if target moves fast
-            float moveDistance = Vector3.Distance(finalPosition, _CameraTransform.position);
-            float speedTime = Mathf.Max(0.01f, 1.0f - Mathf.InverseLerp(MinReachFactor, MaxReachFactor, moveDistance));
             if (!force)
             {
-                switch (MovementSmoothing.SmoothType)
+                if (FastMove)
                 {
-                    case SmoothType.Damp:
-                        finalPosition = Vector3.SmoothDamp(_CameraTransform.position, finalPosition, ref _CameraVelocity, MovementSmoothing.SmoothTime);
-                        break;
-                    case SmoothType.DampSpeed:
-                        finalPosition = Vector3.SmoothDamp(_CameraTransform.position, finalPosition, ref _CameraVelocity, MovementSmoothing.SmoothTime, MovementSmoothing.MaxSpeed);
-                        break;
-                    case SmoothType.DampSpeedAndTime:
-                        finalPosition = Vector3.SmoothDamp(_CameraTransform.position, finalPosition, ref _CameraVelocity, MovementSmoothing.SmoothTime, MovementSmoothing.MaxSpeed, Time.deltaTime * MovementSmoothing.DeltaTimeFactor);
-                        break;
+                    // speed up smoothing if target moves fast
+                    Vector3 dir = _CameraTransform.position - finalPosition;
+                    float distance = dir.magnitude;
+                    if (distance > MaxOffset)
+                    {
+                        finalPosition += dir.normalized * MaxOffset;
+                        _CameraTransform.position = finalPosition;
+                    }
                 }
 
+                finalPosition = Vector3.SmoothDamp(_CameraTransform.position, finalPosition, ref _CameraVelocity, Smoothing);
             }
+
 
             Vector3 look = -offsetToCenter.normalized;
             Quaternion finalRotation = Quaternion.LookRotation(look); // look at target

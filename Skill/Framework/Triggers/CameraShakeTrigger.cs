@@ -5,14 +5,13 @@ namespace Skill.Framework.Triggers
 {
     /// <summary>
     /// Shake camera on trigger enter
-    /// </summary>
-    [AddComponentMenu("Game/Triggers/CameraShake")]
+    /// </summary>    
     public class CameraShakeTrigger : Trigger
     {
         /// <summary>
         /// Camera shake config
         /// </summary>
-        public CameraShakeInfo Shake;
+        public CameraShakeParams Shake;
 
         /// <summary>
         /// called when the Collider other enters the trigger.
@@ -21,7 +20,7 @@ namespace Skill.Framework.Triggers
         /// <returns>True if event handled, otherwise false</returns>
         protected override bool OnEnter(Collider other)
         {
-            Skill.Framework.Global.OnCameraShake(this, Shake, transform.position);
+            Skill.Framework.Global.RaiseCameraShake(this, Shake, transform.position);
             return true;
         }
 

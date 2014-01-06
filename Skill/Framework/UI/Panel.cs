@@ -99,6 +99,7 @@ namespace Skill.Framework.UI
         protected override void BeginRender()
         {
             base.BeginRender();
+            Controls.BeginRender();
             if (_NeedUpdateLayout)
             {
                 UpdateLayout();
@@ -146,6 +147,13 @@ namespace Skill.Framework.UI
             {
                 c.OnGUI();
             }
+        }
+
+        /// <summary> End Render control's content </summary>
+        protected override void EndRender()
+        {
+            base.EndRender();
+            Controls.EndRender();
         }
 
 

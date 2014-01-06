@@ -5,8 +5,7 @@ namespace Skill.Framework.Sounds
     /// <summary>
     /// Place one instance of this component in scene to control pitch of sounds.
     /// Add PitchListener to every GameObjects that affets global pitch.
-    /// </summary>
-    [AddComponentMenu("Skill/Sounds/PitchController")]
+    /// </summary>    
     public class PitchController : DynamicBehaviour
     {
         /// <summary>
@@ -50,8 +49,7 @@ namespace Skill.Framework.Sounds
         /// </summary>
         protected override void Update()
         {
-            //if (Time.timeScale < 0.01 && G_PauseMenu.Pause) return;
-            if (Time.timeScale == 0.0f) return;
+            if (Global.IsGamePaused) return;
             _PitchSmoothing.Update(PitchSmoothing);
             base.Update();
         }

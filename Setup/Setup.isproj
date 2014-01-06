@@ -1,0 +1,60 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+	<PropertyGroup>
+		<!-- Select a Product Configuration -->
+		<InstallShieldProductConfiguration>Express</InstallShieldProductConfiguration>
+		<!-- Select a Visual Studio Configuration / InstallShield Release -->
+		<Configuration>Debug</Configuration>
+		<InstallShieldRelease>$(Configuration)</InstallShieldRelease>
+	</PropertyGroup>
+	<ItemGroup>
+		<!-- The InstallShieldProject item selects the project to build -->
+		<InstallShieldProject Include="$(MSBuildProjectDirectory)\$(MSBuildProjectName).isl"/>
+		<!-- The InstallShieldReleaseFlags sets Release Flags -->
+		<!--<InstallShieldReleaseFlags Include=""/>-->
+		<!-- The InstallShieldMergeModulePath specifies what directories are
+		searched for Merge Modules -->
+		<!--<InstallShieldMergeModulePath Include=""/>-->
+	</ItemGroup>
+	<ItemGroup>
+		<!-- The ProjectReference items refer to any Visual Studio solutions you want to automatically probe for Project Output Groups.  -->
+	</ItemGroup>
+	<ItemGroup>
+		<!-- The TaggedOutputs items allow you to explicitly add extra files to output groups. Each item must include both Name and OutputGroup, as well as TargetPath metadata values. -->
+		<!--<TaggedOutputs Include="C:\My Test Exe.exe">
+			<Name>My Test Project</Name>
+			<OutputGroup>Primary output</OutputGroup>
+			<TargetPath>My Test Exe.exe</TargetPath>
+		</TaggedOutputs> -->
+	</ItemGroup>
+	<Import Project="$(MSBuildExtensionsPath32)\InstallShield\2013Limited\InstallShield.targets"/>
+	<ItemGroup>
+		<ProjectReference Include="..\CodeGeneration\CodeGeneration.csproj">
+			<Name>CodeGeneration</Name>
+			<Project>{B8BC4418-E7A7-40CC-99C2-5174D1E11BB6}</Project>
+		</ProjectReference>
+		<ProjectReference Include="..\DataModels\DataModels.csproj">
+			<Name>DataModels</Name>
+			<Project>{EDE188CB-1A7D-4168-988B-33DBCCBAA21A}</Project>
+		</ProjectReference>
+		<ProjectReference Include="..\Editor\Editor.csproj">
+			<Name>Editor</Name>
+			<Project>{DB02ABC1-D536-4EEA-84D5-A3736F7E4C39}</Project>
+		</ProjectReference>
+		<ProjectReference Include="..\Skill\Skill.csproj">
+			<Name>Skill</Name>
+			<Project>{5AAE3714-704C-4150-91FE-B73B05808D14}</Project>
+		</ProjectReference>
+		<ProjectReference Include="..\Studio\Studio.csproj">
+			<Name>Studio</Name>
+			<Project>{CB9F3683-71C9-45B1-A7EC-834CE871A096}</Project>
+		</ProjectReference>
+		<ProjectReference Include="..\UnityCSharpCodeGeneration\UnityCSharpCodeGeneration.csproj">
+			<Name>UnityCSharpCodeGeneration</Name>
+			<Project>{C00A59BC-EC40-40BE-8A78-AB9754CBDBE3}</Project>
+		</ProjectReference>
+		<ProjectReference Include="..\Fbx\Fbx.vcxproj">
+			<Name>Fbx</Name>
+			<Project>{6DB70F0E-475D-467C-828E-9A5E97A04660}</Project>
+		</ProjectReference>
+	</ItemGroup>
+</Project>

@@ -26,7 +26,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Skill.Framework.xml</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -47,35 +48,65 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Framework\AI\BehaviorParameter.cs" />
+    <Compile Include="Framework\AI\BehaviorTreeState.cs" />
     <Compile Include="Framework\AI\BehaviorType.cs" />
     <Compile Include="Framework\AI\ChangeState.cs" />
     <Compile Include="Framework\AI\CompositeType.cs" />
     <Compile Include="Framework\AI\RunningActionCollection.cs" />
+    <Compile Include="Framework\AnimationCurve3D.cs" />
+    <Compile Include="Framework\AnimationCurveUtility.cs" />
     <Compile Include="Framework\Animation\AnimationTreeState.cs" />
     <Compile Include="Framework\Animation\AnimNodeMultilayer.cs" />
     <Compile Include="Framework\Animation\BlendWeight.cs" />
     <Compile Include="Framework\Animation\Vector3Keyframes.cs" />
     <Compile Include="Framework\Animation\RootMotion.cs" />
     <Compile Include="Framework\CameraShake.cs" />
-    <Compile Include="Framework\CameraShakeInfo.cs" />
+    <Compile Include="Framework\CameraShakeParams.cs" />
+    <Compile Include="Framework\CRSpline3D.cs" />
     <Compile Include="Framework\Cursor.cs" />
+    <Compile Include="Framework\Curve3D.cs" />
+    <Compile Include="Framework\Dynamics\Explosion.cs" />
+    <Compile Include="Framework\Dynamics\MoveAround.cs" />
     <Compile Include="Framework\Global.cs" />
     <Compile Include="Framework\Health.cs" />
     <Compile Include="Framework\HitEventArgs.cs" />
     <Compile Include="Framework\IBehavioural.cs" />
     <Compile Include="Framework\IControllerManager.cs" />
+    <Compile Include="Framework\IO\DragGestureDetector.cs" />
+    <Compile Include="Framework\IO\GestureDetector.cs" />
+    <Compile Include="Framework\IO\HoldGestureDetector.cs" />
+    <Compile Include="Framework\IO\InputButton.cs" />
+    <Compile Include="Framework\IO\InputManager.cs" />
+    <Compile Include="Framework\IO\ITouchStateProvider.cs" />
+    <Compile Include="Framework\IO\Move.cs" />
+    <Compile Include="Framework\IO\RotationGestureDetector.cs" />
+    <Compile Include="Framework\IO\ScaleGestureDetector.cs" />
     <Compile Include="Framework\IO\SmallXmlParser.cs" />
+    <Compile Include="Framework\IO\SwipeGestureDetector.cs" />
+    <Compile Include="Framework\IO\TapGestureDetector.cs" />
+    <Compile Include="Framework\IO\TouchState.cs" />
     <Compile Include="Framework\IO\XmlAttribute.cs" />
     <Compile Include="Framework\IO\XmlDocument.cs" />
     <Compile Include="Framework\IsometricCamera.cs" />
     <Compile Include="Framework\IsometricCameraMotion.cs" />
+    <Compile Include="Framework\Modules\Meter.cs" />
+    <Compile Include="Framework\Modules\Implant.cs" />
     <Compile Include="Framework\Modules\ShakeOnEnable.cs" />
     <Compile Include="Framework\Modules\ShakeOnDie.cs" />
+    <Compile Include="Framework\EventSequence.cs" />
+    <Compile Include="Framework\Modules\PaintColor.cs" />
+    <Compile Include="Framework\Path3D.cs" />
+    <Compile Include="Framework\Point3D.cs" />
+    <Compile Include="Framework\Rendering\Beam.cs" />
+    <Compile Include="Framework\Rendering\LaserBeam.cs" />
+    <Compile Include="Framework\Rendering\RandomizeBeam.cs" />
+    <Compile Include="Framework\Rendering\WaveBeam.cs" />
     <Compile Include="Framework\SlowMotionController.cs" />
+    <Compile Include="Framework\Sounds\SoundVolume.cs" />
     <Compile Include="Framework\SpawnAsset.cs" />
     <Compile Include="Framework\Spawner.cs" />
     <Compile Include="Framework\SpawnObject.cs" />
-    <Compile Include="Framework\Collision\HealthCollider.cs" />
+    <Compile Include="Framework\Collisions\HealthCollider.cs" />
     <Compile Include="Framework\DynamicBehaviour.cs" />
     <Compile Include="Framework\Dynamics\ExplosiveObject.cs" />
     <Compile Include="Framework\Dynamics\ThrowUp.cs" />
@@ -102,7 +133,6 @@
     <Compile Include="Framework\Sounds\RandomSound.cs" />
     <Compile Include="Framework\Sounds\SoundCategory.cs" />
     <Compile Include="Framework\Sounds\PitchListener.cs" />
-    <Compile Include="Framework\SpawnQueue.cs" />
     <Compile Include="Framework\StaticBehaviour.cs" />
     <Compile Include="Framework\Smoothing.cs" />
     <Compile Include="Framework\Text\CharInfo.cs" />
@@ -140,7 +170,7 @@
     <Compile Include="Framework\Animation\AnimNodeSingleLayer.cs" />
     <Compile Include="Framework\Animation\AnimNodeBlendByIndex.cs" />
     <Compile Include="Framework\Animation\AnimationTree.cs" />
-    <Compile Include="Framework\Animation\AnimPosture.cs" />
+    <Compile Include="Framework\Posture.cs" />
     <Compile Include="Framework\UI\Extended\ComboBox.cs" />
     <Compile Include="Framework\UI\DialogResult.cs" />
     <Compile Include="Framework\UI\Extended\OptionBox.cs" />
@@ -158,7 +188,7 @@
     <Compile Include="Framework\Triggers\CameraShakeTrigger.cs" />
     <Compile Include="Framework\Triggers\DamageTrigger.cs" />
     <Compile Include="Framework\Triggers\SlowMotionTrigger.cs" />
-    <Compile Include="Framework\Triggers\SpawnerTrigger.cs" />
+    <Compile Include="Framework\Triggers\EnableTrigger.cs" />
     <Compile Include="Framework\Triggers\Trigger.cs" />
     <Compile Include="Framework\Triggers\WeaponTrigger.cs" />
     <Compile Include="Framework\UI\BaseControl.cs" />
@@ -219,6 +249,7 @@
   <ItemGroup>
     <None Include="ClassDiagram1.cd" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

@@ -15,7 +15,7 @@ namespace Skill.Studio.AI
     [DisplayName("ChangeState")]
     public class ChangeStateViewModel : BehaviorViewModel
     {
-        public override string ImageName { get { return Images.ChangeState; } }        
+        public override string ImageName { get { return Images.ChangeState; } }
 
         [DefaultValue(BehaviorTree.DefaultDestinationState)]
         [Description("Destination state")]
@@ -29,7 +29,9 @@ namespace Skill.Studio.AI
                 {
                     Tree.History.Insert(new ChangePropertyUnDoRedo(this, "DestinationState", value, ((ChangeState)Model).DestinationState));
                     ((ChangeState)Model).DestinationState = value;
-                    OnPropertyChanged(new PropertyChangedEventArgs("DestinationState"));                    
+                    OnPropertyChanged(new PropertyChangedEventArgs("DestinationState"));
+                    this.Name = CreateName(value);
+                    Tree.CreateNewName(this);
                 }
             }
         }
@@ -43,6 +45,14 @@ namespace Skill.Studio.AI
             : base(parent, changeState)
         {
         }
+
+        public ChangeStateViewModel(BehaviorTreeViewModel tree, DataModels.AI.ChangeState changeState)
+            : base(tree, changeState)
+        {
+        }
+
+        [ReadOnly(true)]
+        public override string Name { get { return base.Name; } set { base.Name = value; } }
     }
     #endregion
 }

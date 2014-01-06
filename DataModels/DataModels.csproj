@@ -82,6 +82,7 @@
     <Compile Include="Matrix4x4.cs" />
     <Compile Include="Plane.cs" />
     <Compile Include="IPrimitive.cs" />
+    <Compile Include="Posture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Quaternion.cs" />
     <Compile Include="Ray.cs" />

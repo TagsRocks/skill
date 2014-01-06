@@ -11,7 +11,7 @@ namespace Skill.CodeGeneration.CSharp
     class Variable
     {
         /// <summary> Modifier of variable (public, internal, private, protected) </summary>
-        public Modifiers Modifiers { get; private set; }
+        public Modifiers Modifier { get; set; }
         /// <summary> string that represent type of variable (int, float, string, ....)</summary>
         public string Type { get; private set; }
         /// <summary> Name of variable without underline </summary>
@@ -31,7 +31,7 @@ namespace Skill.CodeGeneration.CSharp
         {
             this.Type = type;
             this.Name = name;
-            this.Modifiers = Modifiers.Private;
+            this.Modifier = Modifiers.Private;
             this.InitialValue = initialValue;
         }
 
@@ -42,7 +42,7 @@ namespace Skill.CodeGeneration.CSharp
         public void Write(System.IO.StreamWriter writer)
         {
             writer.WriteLine(string.Format("{0} {1} {2} {3}{4};",
-                (Modifiers != Modifiers.None) ? Modifiers.ToString().ToLower() : string.Empty,
+                (Modifier != Modifiers.None) ? Modifier.ToString().ToLower() : string.Empty,
                 IsStatic ? "static" : string.Empty,
                 Type, GetName(Name),
                 (InitialValue != null) ? " = " + InitialValue : ""));

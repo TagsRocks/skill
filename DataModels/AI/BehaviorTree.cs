@@ -20,14 +20,22 @@ namespace Skill.DataModels.AI
 
         /// <summary> Root of tree </summary>
         public Behavior[] States { get; set; }
+        public Behavior[] ExtraBehaviors { get; set; }
         /// <summary> Name of tree. this name is based on filename and will set after loading from file </summary>
         public string Name { get; set; }
 
         /// <summary> Name of default state </summary>
         public string DefaultState { get; set; }
 
+        /// <summary> Used by code generation to decide how implement methods</summary>
+        public bool ExpandMethods { get; set; }
+
         public double HorizontalOffset { get; set; }
+
         public double VerticalOffset { get; set; }
+
+        
+
         #endregion
 
         #region Constructor
@@ -38,8 +46,8 @@ namespace Skill.DataModels.AI
         {
             this.AccessKeys = new SharedAccessKeys();
             this.Name = "NewBehaviorTree";
-            this.States = new Behavior[] { new PrioritySelector() { Name = DefaultDestinationState , IsState = true } };
-            this.DefaultState = DefaultDestinationState;
+            this.States = new Behavior[] { new BehaviorTreeState() { Name = DefaultDestinationState } };
+            this.DefaultState = DefaultDestinationState;            
         }
         #endregion
 
@@ -55,8 +63,8 @@ namespace Skill.DataModels.AI
             {
                 foreach (var s in States)
                 {
-                    bool result = IsInHierarchy(s, behavior);
-                    if (result) return result;
+                    if (IsInHierarchy(s, behavior))
+                        return true;
                 }
             }
             return false;
@@ -108,12 +116,21 @@ namespace Skill.DataModels.AI
                     CreateList(list, s);
                 }
             }
+            if (ExtraBehaviors != null)
+            {// add extra behaviors
+                foreach (var b in ExtraBehaviors)
+                {
+                    if (!list.Contains(b))
+                        list.Add(b);
+                }
+            }
+
             GenerateIds(list); // first regenerate ids for all behaviors
 
             XElement behaviorTree = new XElement("BehaviorTree");
             behaviorTree.SetAttributeValue("Name", Name);
             behaviorTree.SetAttributeValue("DefaultState", DefaultState);
-
+            behaviorTree.SetAttributeValue("ExpandMethods", ExpandMethods);
             behaviorTree.SetAttributeValue("HorizontalOffset", HorizontalOffset);
             behaviorTree.SetAttributeValue("VerticalOffset", VerticalOffset);
 
@@ -177,7 +194,7 @@ namespace Skill.DataModels.AI
             bool isCorrect = false;
             try
             {
-                behaviorType = (BehaviorType)Enum.Parse(typeof(BehaviorType), behavior.GetAttributeValueAsString("BehaviorType", ""), false);
+                behaviorType = behavior.GetAttributeValueAsEnum<BehaviorType>("BehaviorType", BehaviorType.Condition);
                 isCorrect = true;
             }
             catch (Exception)
@@ -195,8 +212,7 @@ namespace Skill.DataModels.AI
                         result = new Condition();
                         break;
                     case BehaviorType.Decorator:
-
-                        DecoratorType decoratorType = (DecoratorType)Enum.Parse(typeof(DecoratorType), behavior.GetAttributeValueAsString("DecoratorType", DecoratorType.Default.ToString()), false);
+                        DecoratorType decoratorType = behavior.GetAttributeValueAsEnum<DecoratorType>("DecoratorType", DecoratorType.Default);
                         switch (decoratorType)
                         {
                             case DecoratorType.Default:
@@ -211,7 +227,7 @@ namespace Skill.DataModels.AI
 
                         break;
                     case BehaviorType.Composite:
-                        CompositeType selectorType = (CompositeType)Enum.Parse(typeof(CompositeType), behavior.GetAttributeValueAsString("CompositeType", ""), false);
+                        CompositeType selectorType = behavior.GetAttributeValueAsEnum<CompositeType>("CompositeType", CompositeType.Sequence);
                         switch (selectorType)
                         {
                             case CompositeType.Sequence:
@@ -228,6 +244,9 @@ namespace Skill.DataModels.AI
                                 break;
                             case CompositeType.Loop:
                                 result = new LoopSelector();
+                                break;
+                            case CompositeType.State:
+                                result = new BehaviorTreeState();
                                 break;
                         }
                         break;
@@ -255,7 +274,8 @@ namespace Skill.DataModels.AI
             this.DefaultState = e.GetAttributeValueAsString("DefaultState", DefaultDestinationState);
             this.HorizontalOffset = e.GetAttributeValueAsDouble("HorizontalOffset", HorizontalOffset);
             this.VerticalOffset = e.GetAttributeValueAsDouble("VerticalOffset", VerticalOffset);
-
+            this.ExpandMethods = e.GetAttributeValueAsBoolean("ExpandMethods", false);
+            this.ExtraBehaviors = null;
 
             List<Behavior> list = new List<Behavior>();
             XElement behaviorsElement = e.FindChildByName("Behaviors");
@@ -272,26 +292,9 @@ namespace Skill.DataModels.AI
                 }
             }
 
-            List<Behavior> states = new List<Behavior>();
-            foreach (var b in list) if (b.IsState) states.Add(b);
-            if (states.Count > 0)
-                this.States = states.ToArray();
-            else
-            {
-                // try to load as previouse version format
-                int rootId = e.GetAttributeValueAsInt("RootId", 0);
-                Behavior root = FindById(list, rootId);
-                if (root != null)
-                {
-                    root.Name = DefaultDestinationState;
-                    root.IsState = true;
-                    this.States = new Behavior[] { root };
-                }
-                else
-                {
-                    this.States = new Behavior[] { new PrioritySelector() { Name = DefaultDestinationState , IsState = true } };
-                }
-            }
+            List<BehaviorTreeState> states = new List<BehaviorTreeState>();
+            foreach (var b in list) if (b.BehaviorType == BehaviorType.Composite && ((Composite)b).CompositeType == CompositeType.State) states.Add(b as BehaviorTreeState);
+
 
             XElement accessKeys = e.FindChildByName("AccessKeys");
             if (accessKeys != null)
@@ -328,7 +331,48 @@ namespace Skill.DataModels.AI
 
                 }
             }
+            if (states.Count > 0)
+                this.States = states.ToArray();
+            else
+            {
+                // try to load as previouse version format
+                int rootId = e.GetAttributeValueAsInt("RootId", 0);
+                Behavior root = FindById(list, rootId);
+                if (root != null && root.BehaviorType == BehaviorType.Composite && ((Composite)root).CompositeType == CompositeType.Priority)
+                {
+                    PrioritySelector ps = root as PrioritySelector;
+                    BehaviorTreeState state = new BehaviorTreeState();
+
+                    state.Comment = ps.Comment;
+                    state.Concurrency = ps.Concurrency;
+                    state.Id = ps.Id;
+                    state.Name = ps.Name;
+                    state.Priority = ps.Priority;
+                    state.Weight = ps.Weight;
+
+                    foreach (var child in ps)
+                        state.Add(child);
+
+                    this.States = new BehaviorTreeState[] { state };
+
+                    DefaultState = state.Name;
+                }
+                else
+                {
+                    this.States = new BehaviorTreeState[] { new BehaviorTreeState() { Name = DefaultDestinationState } };
+                }
+            }
+
+            List<Behavior> extra = new List<Behavior>();
+            foreach (var b in list)
+            {
+                if (!IsInHierarchy(b))
+                    extra.Add(b);
+            }
+            if (extra.Count > 0)
+                ExtraBehaviors = extra.ToArray();
         }
+
         #endregion
 
     }

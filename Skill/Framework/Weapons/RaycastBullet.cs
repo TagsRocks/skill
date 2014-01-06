@@ -6,30 +6,20 @@ namespace Skill.Framework.Weapons
 {
     /// <summary>
     /// A very fast bullet and goes in a straight direction. this bullet check collisions by doing a raycast in travelled distance in current frame.
-    /// </summary>
-    [AddComponentMenu("Skill/Weapons/Bullets/Raycast")]
+    /// </summary>    
     public class RaycastBullet : StraightLineBullet
     {                
         private Vector3 _PrePosition;
         private Ray _Ray;
         private RaycastHit _Hit;
-
-
-        /// <summary>
-        /// This function is called when the object becomes enabled and active.
-        /// </summary>
-        protected override void OnEnable()
-        {
-            base.OnEnable();
-            _PrePosition = _Transform.position;
-        }
+        
 
         /// <summary>
         /// Update
         /// </summary>
         protected override void Update()
         {
-            if (Time.timeScale == 0) return;
+            if (Global.IsGamePaused) return;
             // update to move bullet forward
             base.Update();
 
@@ -50,10 +40,10 @@ namespace Skill.Framework.Weapons
                     _Hit.distance = TravelledDistance - (distance - _Hit.distance);
                     hitInfo.RaycastHit = _Hit;
 
-                    events.OnHit(this, hitInfo);
+                    events.RaiseHit(this, hitInfo);
                 }
 
-                OnDie();
+                OnDie(_Hit.collider);
             }
 
             _PrePosition = _Transform.position;
@@ -68,8 +58,18 @@ namespace Skill.Framework.Weapons
         {
             RaycastHitEventArgs info = new RaycastHitEventArgs(Shooter, HitType.Bullet | HitType.Raycast, other);
             info.Damage = Damage;
+            info.DamageType = DamageType;
             info.Tag = this.tag;
             return info;
+        }
+
+        /// <summary>
+        /// Called by weapon when initialize bullet
+        /// </summary>
+        public override void StartJourney()
+        {
+            base.StartJourney();
+            _PrePosition = _Transform.position;
         }
     }
 }

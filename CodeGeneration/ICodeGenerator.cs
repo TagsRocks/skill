@@ -58,7 +58,7 @@ namespace Skill.CodeGeneration
         /// <param name="saveData">SaveData</param>
         void Generate(Skill.DataModels.IO.SaveData saveData);
 
-        
+
 
         /// <summary>
         /// Generate Code for SharedAccessKeys that used by BehaviorTree
@@ -81,5 +81,17 @@ namespace Skill.CodeGeneration
         /// You should keep user code safe and generate additional code if needed
         /// </remarks>
         void WritePartial(StreamWriter writer, string oldCode);
+
+
+        /// <summary> Local address of assets directory relative to game directory</summary>
+        string AssetsPath { get; }
+        /// <summary> Local address of editor directory relative to assets directory</summary>
+        string EditorPath { get; }
+        /// <summary> Local address of scripts directory relative to assets directory</summary>
+        string ScriptsPath { get; }
+        /// <summary> Local address of plugins(skill dlls) directory relative to assets directory</summary>
+        string PluginsPath { get; }
+        /// <summary> Local address of designer(generated code files) directory relative to assets directory</summary>
+        string DesignerPath { get; }
     }
 }

@@ -7,8 +7,7 @@ namespace Skill.Framework.Triggers
 {
     /// <summary>
     /// Apply periodic damage to each collidion objects
-    /// </summary>
-    [AddComponentMenu("Skill/Triggers/Damage")]
+    /// </summary>    
     public class DamageTrigger : Trigger
     {
         private class ColliderInfo
@@ -25,9 +24,11 @@ namespace Skill.Framework.Triggers
         public float Range = 3;
         /// <summary> Decrease amount of damage by distance </summary>
         public bool DecreaseByDistance = false;
+        /// <summary> Damage Type </summary>
+        public int DamageType;
 
-        private List<ColliderInfo> _Colliders;
-        private Ray _IntersectRay;
+        private List<ColliderInfo> _EnteredColliders;
+        private List<ColliderInfo> _ExitedColliders;
 
         /// <summary> User Data </summary>
         public object UserData { get; set; }
@@ -38,8 +39,8 @@ namespace Skill.Framework.Triggers
         protected override void Awake()
         {
             base.Awake();
-            _Colliders = new List<ColliderInfo>();
-            _IntersectRay.origin = _Transform.position;
+            _EnteredColliders = new List<ColliderInfo>();
+            _ExitedColliders = new List<ColliderInfo>();
         }
 
         /// <summary>
@@ -49,7 +50,22 @@ namespace Skill.Framework.Triggers
         /// <returns>True if event handled, otherwise false</returns>
         protected override bool OnEnter(Collider other)
         {
-            ApplyDamage(other);
+            ColliderInfo cInfo = null;
+            int index = GetIndexOf(other, _ExitedColliders);
+            if (index >= 0)
+            {
+                cInfo = _ExitedColliders[index];
+                _ExitedColliders.RemoveAt(index);
+            }
+            if (cInfo != null)
+            {
+                _EnteredColliders.Add(cInfo);
+            }
+            else
+            {
+                if (GetIndexOf(other, _EnteredColliders) < 0)
+                    _EnteredColliders.Add(new ColliderInfo() { Collider = other });
+            }
             return true;
         }
         /// <summary>
@@ -58,23 +74,30 @@ namespace Skill.Framework.Triggers
         /// <param name="other">other Collider</param>
         protected override void OnExit(Collider other)
         {
-            RemoveFromList(other);
+            ColliderInfo cInfo = null;
+            int index = GetIndexOf(other, _EnteredColliders);
+            if (index >= 0)
+            {
+                cInfo = _EnteredColliders[index];
+                _EnteredColliders.RemoveAt(index);
+            }
+            if (cInfo != null)
+            {
+                _ExitedColliders.Add(cInfo);
+            }
         }
         /// <summary>
         /// called almost all the frames for every Collider other that is touching the trigger.
         /// </summary>
         /// <param name="other">other Collider</param>
-        protected override void OnStay(Collider other)
-        {
-            ApplyDamage(other);
-        }
+        protected override void OnStay(Collider other) { }
 
-        private int GetIndexOf(Collider other)
+        private int GetIndexOf(Collider other, List<ColliderInfo> list)
         {
             int index = -1;
-            for (int i = 0; i < _Colliders.Count; i++)
+            for (int i = 0; i < list.Count; i++)
             {
-                if (_Colliders[i].Collider == other)
+                if (list[i].Collider == other)
                 {
                     index = i;
                     break;
@@ -83,59 +106,40 @@ namespace Skill.Framework.Triggers
             return index;
         }
 
-        private void RemoveFromList(Collider other)
-        {
-            int index = GetIndexOf(other);
-            if (index >= 0)
-                _Colliders.RemoveAt(index);
-        }
-
-        private void ApplyDamage(Collider other)
-        {
-            ColliderInfo cInfo = null;
-            int index = GetIndexOf(other);
-            if (index >= 0)
-            {
-                cInfo = _Colliders[index];
-            }
-            else
-            {
-                cInfo = new ColliderInfo() { Collider = other };
-                _Colliders.Add(cInfo);
-            }
-            ApplyDamage(cInfo);
-        }
-
         private void ApplyDamage(ColliderInfo cInfo)
         {
-            if (cInfo != null)
+            if (cInfo.DamageTW.IsOver)
             {
-                if (!cInfo.DamageTW.IsEnabledAndOver)
-                    cInfo.DamageTW.End();
-
-                if (!cInfo.DamageTW.IsEnabled)
+                EventManager em = cInfo.Collider.GetComponent<EventManager>();
+                if (em != null)
                 {
-                    EventManager em = cInfo.Collider.GetComponent<EventManager>();
-                    if (em != null)
+                    float d = Damage;
+                    if (DecreaseByDistance)
                     {
-                        float d = Damage;
-                        if (DecreaseByDistance)
-                        {
-                            _IntersectRay.origin = _Transform.position;
-                            _IntersectRay.direction = (cInfo.Collider.transform.position - _IntersectRay.origin).normalized;
-
-                            float dis;
-                            if (!cInfo.Collider.bounds.IntersectRay(_IntersectRay, out dis))
-                                dis = 0; // colliders are very close
-
-                            d = Damage * (1.0f - Mathf.Min(Range, dis) / Range);
-                        }
-
-                        em.OnDamage(this, new DamageEventArgs(d, tag) { UserData = this.UserData });
-                        cInfo.DamageTW.Begin(Interval);
+                        Vector3 closestPoint = cInfo.Collider.ClosestPointOnBounds(_Transform.position);
+                        float distance = Vector3.Distance(closestPoint, _Transform.position);
+                        d *= (1.0f - Mathf.Min(Range, distance) / Range);
                     }
+
+                    em.RaiseDamage(this, new DamageEventArgs(d) { UserData = this.UserData, DamageType = DamageType, Tag = tag });
+                    cInfo.DamageTW.Begin(Interval);
                 }
             }
+        }
+
+        protected virtual void Update()
+        {
+            if (Global.IsGamePaused) return;
+            int index = 0;
+            while (index < _ExitedColliders.Count)
+            {
+                if (_ExitedColliders[index].DamageTW.IsOver)
+                    _ExitedColliders.RemoveAt(index);
+                else
+                    index++;
+            }
+            for (int i = 0; i < _EnteredColliders.Count; i++)
+                ApplyDamage(_EnteredColliders[i]);
         }
 
         protected override string GizmoFilename { get { return "Damage.png"; } }

@@ -39,7 +39,15 @@ namespace Skill.Studio.AI.Editor
         /// <summary>
         /// Current state of behavior tree.
         /// </summary>
-        public Behavior CurrentState { get { return _BehaviorTree.Root.Debug.Behavior; } }
+        public BehaviorTreeState CurrentState
+        {
+            get
+            {
+                if (_BehaviorTree.Root.Debug != null)
+                    return _BehaviorTree.Root.Debug.Behavior as BehaviorTreeState;
+                return null;
+            }
+        }
 
         /// <summary>
         /// Status of BehaviorTree
@@ -52,38 +60,26 @@ namespace Skill.Studio.AI.Editor
         public string DefaultState { get { return _BehaviorTree.DefaultState; } }
 
         /// <summary>
-        /// Occurs when leave current state
+        /// Occurs when state of behaviortree changed
         /// </summary>
-        public event StateTransitionHandler LeaveState;
+        public event ChangeStateEventHandler StateChanged;
         /// <summary>
-        /// Called when leave current state
+        /// Occurs when state of behaviortree changed
         /// </summary>
-        protected virtual void OnLeaveState()
+        protected virtual void OnStateChanged(string preState, string newState)
         {
-            if (_BehaviorTree.Root != null && LeaveState != null)
-                LeaveState(this, _BehaviorTree.Root.Name);
+            if (StateChanged != null)
+            {
+                StateChanged(this, new ChangeStateEventArgs(preState, newState));
+            }
         }
-
-        /// <summary>
-        /// Occurs when enter new state
-        /// </summary>
-        public event StateTransitionHandler EnterState;
-        /// <summary>
-        /// Called when enter new state
-        /// </summary>
-        protected virtual void OnEnterState()
-        {
-            if (_BehaviorTree.Root != null && EnterState != null)
-                EnterState(this, _BehaviorTree.Root.Name);
-        }
-
         /// <summary>
         /// Create an instance of BehaviorTree
         /// </summary>
         public DebugBehaviorTree(BehaviorTreeViewModel behaviorTree)
         {
             this._Reset = false;
-            this._BehaviorTree = behaviorTree;            
+            this._BehaviorTree = behaviorTree;
             this.Status = new BehaviorTreeStatus(this);
         }
 
@@ -102,18 +98,19 @@ namespace Skill.Studio.AI.Editor
         /// <remarks>
         /// By providing Controller as parameter, it is possible to reuse BehaviorTree by another Controller when current(previous) Controller is dead.
         /// </remarks>
-        public void Update(Skill.Framework.Controller controller)
+        public void Update()
         {
             this._Reset = false;
             if (_NextState != null && _NextState != _BehaviorTree.Root)
             {
+                string preState = string.Empty;
                 if (_BehaviorTree.Root != null)
                 {
                     _BehaviorTree.Root.Debug.Behavior.ResetBehavior(this.Status);
-                    OnLeaveState();
+                    preState = _BehaviorTree.Root.Name;
                 }
                 _BehaviorTree.ChangeState(_NextState.Name);
-                OnEnterState();
+                OnStateChanged(preState, _NextState.Name);
                 _NextState = null;
                 return; // let ui updated
             }

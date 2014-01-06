@@ -68,7 +68,7 @@ namespace Skill.Studio.AI
     public class CounterLimitAccessKeyViewModel : AccessKeyViewModel
     {
         [DefaultValue(1)]
-        [Description("Maximum number of Behaviors allow access this key")]
+        [Description("Maximum number of Behaviors that allowed  to access this key")]
         public int MaxAccessCount
         {
             get { return ((CounterLimitAccessKey)Model).MaxAccessCount; }

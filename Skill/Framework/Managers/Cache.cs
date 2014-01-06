@@ -84,33 +84,37 @@ namespace Skill.Framework.Managers
                 return null;
             }
 
+            GameObject obj = null;
             CacheObject cache = GetCacheObject(prefab);
             // If there's no cache for this prefab type, just instantiate normally
             if (cache == null)
             {
-                return GameObject.Instantiate(prefab, position, rotation) as GameObject;
+                obj = GameObject.Instantiate(prefab, position, rotation) as GameObject;
             }
-
-            // Find the next object in the cache
-            GameObject obj = cache.Next();
-            CacheBehavior cacheBehavior = obj.GetComponent<CacheBehavior>();
-            cacheBehavior.IsCollected = false;
-
-            try
+            else
             {
-                // Set the position and rotation of the object
-                obj.transform.position = position;
-                obj.transform.rotation = rotation;
-            }
-            catch (MissingReferenceException)
-            {
-                Debug.LogWarning(string.Format("MissingReferenceException when spawn prefab.name : {0}, catchId : {1}.", prefab.name, cache.CacheId));
-                throw;
-            }
+                // Find the next object in the cache
+                obj = cache.Next();
+                CacheBehavior cacheBehavior = obj.GetComponent<CacheBehavior>();
+                cacheBehavior.IsCached = false;
 
-            if (obj != null)
-                // Set the object to be active
-                obj.SetActive(active);
+                try
+                {
+                    // Set the position and rotation of the object
+                    obj.transform.position = position;
+                    obj.transform.rotation = rotation;
+                }
+                catch (MissingReferenceException)
+                {
+                    Debug.LogWarning(string.Format("MissingReferenceException when spawn prefab.name : {0}, catchId : {1}.", prefab.name, cache.CacheId));
+                    throw;
+                }
+            }            
+
+            if (obj != null && active)
+            {// Set the object to be active
+                obj.SetActive(active);                
+            }
             return obj;
         }
 
@@ -128,14 +132,14 @@ namespace Skill.Framework.Managers
             if (cache != null)
             {
                 CacheBehavior cacheBehavior = objectToDestroy.GetComponent<CacheBehavior>();
-                if (!cacheBehavior.IsCollected)
+                if (!cacheBehavior.IsCached)
                 {
-                    cacheBehavior.IsCollected = true;
+                    cacheBehavior.IsCached = true;
                     cache.Free(objectToDestroy);
 
                     EventManager eventManager = objectToDestroy.GetComponent<EventManager>();
                     if (eventManager != null)
-                        eventManager.OnCached(null, new CacheEventArgs(cache.CacheId));
+                        eventManager.RaiseCached(null, new CacheEventArgs(cache.CacheId));
                 }
             }
             else

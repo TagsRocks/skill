@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:view="clr-namespace:Skill.Studio.Tools.HToMesh.View"
              xmlns:viewModel="clr-namespace:Skill.Studio.Tools.HToMesh.ViewModel"
-             mc:Ignorable="d" >
+             mc:Ignorable="d" d:DesignHeight="200" d:DesignWidth="400" >
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -27,27 +27,8 @@
         </ResourceDictionary>
         
     </UserControl.Resources>
-    <Grid Background="#11000000" Margin="1">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="30" />
-        </Grid.RowDefinitions>
-
-        <!-- WIZARD STEP LISTING -->
-        <HeaderedContentControl Header="Steps">
-            <ItemsControl  ItemsSource="{Binding Path=Pages}" ItemTemplate="{StaticResource WizardStepTemplate}"  />
-        </HeaderedContentControl>
-
-        <!-- CURRENT PAGE AREA -->
-        <ScrollViewer Background="White" Grid.Row="0" Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" >
-            <HeaderedContentControl  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="{Binding Path=CurrentPage}"  Header="{Binding Path=CurrentPage.DisplayName}" />
-        </ScrollViewer>
-
-        <Border Grid.Column="0" Grid.Row="1" Background="{StaticResource ButtonPanelBg}" Grid.ColumnSpan="2" >
+    <DockPanel Background="#11000000" Margin="1" LastChildFill="True" >
+        <Border DockPanel.Dock="Bottom" Background="{StaticResource ButtonPanelBg}" Height="30" >
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -63,5 +44,13 @@
                 </StackPanel>
             </Grid>
         </Border>
-    </Grid>
+        
+        <HeaderedContentControl Header="Steps" DockPanel.Dock="Left" Width="200" >
+            <ItemsControl  ItemsSource="{Binding Path=Pages}" ItemTemplate="{StaticResource WizardStepTemplate}"  />
+        </HeaderedContentControl>               
+
+        <ScrollViewer Background="White" >
+            <HeaderedContentControl Content="{Binding Path=CurrentPage}"  Header="{Binding Path=CurrentPage.DisplayName}" />
+        </ScrollViewer>
+    </DockPanel>    
 </UserControl>

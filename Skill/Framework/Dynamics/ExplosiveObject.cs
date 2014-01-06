@@ -8,8 +8,7 @@ namespace Skill.Framework.Dynamics
     /// <summary>
     /// Defines base class for ExplosiveObjects. usually this object has a Health and an exploded mesh. When Health dies, explodedMesh will be visible and an explosion effect spawned
     /// </summary>
-    [RequireComponent(typeof(Health))]
-    [AddComponentMenu("Skill/Dynamics/ExplosiveObject")]
+    [RequireComponent(typeof(Health))]    
     public class ExplosiveObject : Explosive
     {
         /// <summary> Active after explosion </summary>
@@ -26,8 +25,8 @@ namespace Skill.Framework.Dynamics
         public float ExplosionForce = 20.0f;
         /// <summary> upwardsModifier to use in Rigidbody.AddExplosionForce method </summary>
         public float UpwardsModifier = 3.0f;
-        /// <summary> to spread around after explosion </summary>
-        public Transform FirePosition;
+        /// <summary> instantiate when health reach FireHealthThreshold </summary>
+        public Transform[] FirePositions;
         /// <summary> instantiate when health reach FireHealthThreshold </summary>
         public GameObject FirePrefab;
         /// <summary> when health reach lower than this negative RegenerateSpeed begins </summary>
@@ -38,18 +37,18 @@ namespace Skill.Framework.Dynamics
         /// <summary> Health </summary>
         public Health Health { get; private set; }
 
-        private GameObject _DamageFireInstance;        
+        private GameObject[] _DamageFireInstances;
 
         /// <summary>
         /// Get required references
         /// </summary>
         protected override void GetReferences()
         {
-            base.GetReferences();            
+            base.GetReferences();
             Health = GetComponent<Health>();
             if (Health == null)
                 Debug.LogWarning("ExplosiveObject should have Health component in same GameObject to work correctlly");
-        }        
+        }
 
         /// <summary>
         /// Awake
@@ -63,8 +62,8 @@ namespace Skill.Framework.Dynamics
                 Health.HealthChange += Health_HealthChange;
             }
 
-            if (FirePosition == null)
-                FirePosition = transform;
+            if (FirePositions == null)
+                FirePositions = new Transform[] { _Transform };
 
             if (ExplodedObjects != null)
             {
@@ -76,7 +75,7 @@ namespace Skill.Framework.Dynamics
             }
         }
 
-        
+
         void Health_HealthChange(Object sender, HealthChangeEventArgs args)
         {
             // check if health of object is lower than FireHealthThreshold then start fire and enable selfdamage
@@ -87,7 +86,15 @@ namespace Skill.Framework.Dynamics
                 else
                     Health.RegenerateSpeed = FireDamageSpeed;
                 Health.enabled = true;
-                _DamageFireInstance = Cache.Spawn(FirePrefab, FirePosition.position, FirePrefab.transform.rotation);
+                if (FirePrefab != null)
+                {
+                    _DamageFireInstances = new GameObject[FirePositions.Length];
+                    for (int i = 0; i < FirePositions.Length; i++)
+                    {
+                        _DamageFireInstances[i] = Cache.Spawn(FirePrefab, FirePositions[i].position, FirePositions[i].rotation);
+                    }
+
+                }
             }
         }
 
@@ -99,7 +106,7 @@ namespace Skill.Framework.Dynamics
         protected override void Events_Die(object sender, System.EventArgs e)
         {
             base.Events_Die(sender, e);
-            
+
             // if there are spread objects then spread some objects
             if (SpreadObjects != null && SpreadObjects.Length > 0)
             {
@@ -111,9 +118,22 @@ namespace Skill.Framework.Dynamics
             }
 
             // the object is exploded so destroy spawned fire
-            if (_DamageFireInstance != null)
+            if (_DamageFireInstances != null)
             {
-                Cache.DestroyCache(_DamageFireInstance);
+                for (int i = 0; i < _DamageFireInstances.Length; i++)
+                {
+                    if (_DamageFireInstances[i] != null)
+                        Cache.DestroyCache(_DamageFireInstances[i]);
+                }
+            }
+
+            if (ExplodedObjects != null)
+            {
+                foreach (var item in ExplodedObjects)
+                {
+                    if (item != null && !item.activeSelf)
+                        item.SetActive(true);
+                }
             }
         }
 
@@ -127,7 +147,7 @@ namespace Skill.Framework.Dynamics
             {
                 foreach (var item in ExplodedObjects)
                 {
-                    if (item != null)
+                    if (item != null && !item.activeSelf)
                         item.SetActive(true);
                 }
             }
@@ -137,11 +157,11 @@ namespace Skill.Framework.Dynamics
         /// <summary>
         /// Subclass can override this method to spawn SpreadObjects another way
         /// </summary>        
-        /// <param name="so"> SpreadObject to spawn from </param>        
-        protected virtual void SpawnSpreadObject(GameObject so)
+        /// <param name="prefab"> SpreadObject to spawn from </param>        
+        protected virtual void SpawnSpreadObject(GameObject prefab)
         {
             Vector3 pos = _Transform.position + SpreadOffset * Random.onUnitSphere;
-            Cache.Spawn(so, pos, so.transform.rotation);
+            GameObject so = Cache.Spawn(prefab, pos, prefab.transform.rotation);
             if (so.rigidbody != null)
                 so.rigidbody.AddExplosionForce(ExplosionForce, _Transform.position, ExplosionRadius, UpwardsModifier);
         }

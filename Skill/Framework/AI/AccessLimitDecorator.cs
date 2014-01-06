@@ -185,7 +185,7 @@ namespace Skill.Framework.AI
         /// <param name="name">Name of behavior node</param>
         /// <param name="handler">user provided function to handle execution of Decorator</param>
         /// <param name="accessKey">Shared AccessKey</param>
-        public AccessLimitDecorator(string name, DecoratorHandler handler, AccessKey accessKey)
+        public AccessLimitDecorator(string name, ConditionHandler handler, AccessKey accessKey)
             : base(name, handler)
         {
             if (accessKey == null)

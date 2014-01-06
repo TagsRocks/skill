@@ -41,7 +41,7 @@ namespace Skill
 			_Scene = NULL;
 		}		
 
-		TerrainScene::TerrainScene(String^ name , array<double>^ heights , Dimension terrainSize, Dimension patchSize )
+		TerrainScene::TerrainScene(String^ name , array<double>^ heights , Dimension terrainSize, Dimension patchSize , int lod )
 		{
 			this->_Indices = NULL;
 			this->_Vertices = NULL;
@@ -69,7 +69,9 @@ namespace Skill
 			// patchsize is like 16, 32, 64, ...
 			// terrainsize is like 17,33,65,...,257,...
 
-			_IndexCount = this->_PatchSize.Width * this->_PatchSize.Height * 6; 
+			_LodFactor = Math::Pow(2,lod);
+
+			_IndexCount = (this->_PatchSize.Width / _LodFactor) * (this->_PatchSize.Height / _LodFactor) * 6; 
 			_VertexCount = this->_TerrainSize.Width * this->_TerrainSize.Height; 
 			if(_VertexCount != this->_Heights->Length)
 			{
@@ -192,7 +194,7 @@ namespace Skill
 			this->CalcVertices();
 			this->CalcUVs();
 			this->CalcNormals();			
-			
+
 			_Progress = 0;
 			_ProgressChange = 100.0 / (this->_Patches->Count * PatchSize.Width * PatchSize.Height);
 			for(int i=0; i < this->_Patches->Count ; i++)
@@ -208,11 +210,11 @@ namespace Skill
 
 		void TerrainScene::CreatePatch(CreatePatchParams patchParams)
 		{
-				IntPtr ptrName = System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(patchParams.PatchName);
-				const char* patchNameChars = static_cast<const char*>(ptrName.ToPointer());
-				
-				_Status = String::Format(L"Create Patche {0} ..." , patchParams.PatchName );
-				CreatePatch(patchNameChars, patchParams);				
+			IntPtr ptrName = System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(patchParams.PatchName);
+			const char* patchNameChars = static_cast<const char*>(ptrName.ToPointer());
+
+			_Status = String::Format(L"Create Patche {0} ..." , patchParams.PatchName );
+			CreatePatch(patchNameChars, patchParams);				
 		}
 
 		void TerrainScene::CreatePatch(const char* patchName, CreatePatchParams patchParams)
@@ -232,112 +234,24 @@ namespace Skill
 			_Scene->GetRootNode()->AddChild(patch);
 		}
 
-		//FbxNode* TerrainScene::CreatePatchMesh(const char* patchName,  CreatePatchParams patchParams)
-		//{			
-		//	FbxMesh* lMesh = FbxMesh::Create(_Scene,patchName);
-
-		//	// Create control points.
-		//	int vertexCount = (_PatchSize.Width + 1)  * (_PatchSize.Height + 1);
-		//	lMesh->InitControlPoints(vertexCount);
-		//	FbxVector4* lControlPoints = lMesh->GetControlPoints();
-
-		//	
-		//	// We want to have one normal for each vertex (or control point),
-		//	// so we set the mapping mode to eByControlPoint.
-		//	FbxGeometryElementNormal* lGeometryElementNormal =  lMesh->CreateElementNormal();
-		//	lGeometryElementNormal->SetMappingMode(FbxGeometryElement::eByControlPoint);
-		//	//// Set the normal values for every control point.
-		//	lGeometryElementNormal->SetReferenceMode(FbxGeometryElement::eDirect);
-		//	lGeometryElementNormal->GetDirectArray().SetCount(vertexCount);
-		//	
-
-
-		//	// Create UV for Global channel.
-		//	FbxGeometryElementUV* lUVGlobalElement = lMesh->CreateElementUV( "GlobalUV");
-		//	FBX_ASSERT( lUVGlobalElement != NULL);
-		//	lUVGlobalElement->SetMappingMode(FbxGeometryElement::eByControlPoint);
-		//	lUVGlobalElement->SetReferenceMode(FbxGeometryElement::eDirect);			
-		//	lUVGlobalElement->GetDirectArray().SetCount(vertexCount);
-
-		//	// Create UV for Local channel.
-		//	FbxGeometryElementUV* lUVLocalElement = lMesh->CreateElementUV( "LocalUV");
-		//	FBX_ASSERT( lUVLocalElement != NULL);
-		//	lUVLocalElement->SetMappingMode(FbxGeometryElement::eByControlPoint);
-		//	lUVLocalElement->SetReferenceMode(FbxGeometryElement::eDirect);			
-		//	lUVLocalElement->GetDirectArray().SetCount(vertexCount);	
-
-		//	int i,j;
-		//	int startIndexI = patchParams.IndexI * _PatchSize.Height * _TerrainSize.Width;			
-		//	int index = 0;
-		//	for (i = 0; i <= PatchSize.Width; i++)
-		//	{
-		//		int startIndexJ = patchParams.IndexJ * _PatchSize.Width;
-		//		for (j = 0; j <= PatchSize.Height; j++)
-		//		{					
-		//			int jj = startIndexI + startIndexJ + j;
-		//			if(jj >= _VertexCount || startIndexJ + j >= _TerrainSize.Width)
-		//			{
-		//				index++;
-		//				continue;
-		//			}
-		//			lControlPoints[index] = _Vertices[jj];					
-		//			lGeometryElementNormal->GetDirectArray().SetAt(index, _Normals[jj]);
-		//			lUVGlobalElement->GetDirectArray().SetAt(index , _GlobalUVs[jj]);	
-		//			lUVLocalElement->GetDirectArray().SetAt(index , _LocalUVs[index]);
-		//			index++;
-		//			_Progress += _ProgressChange;
-		//		}				
-		//		startIndexI += _TerrainSize.Width;
-		//	}
-		//																										
-
-		//	//Create polygons. Assign texture and texture UV indices.
-		//	for (i = 0; i < _IndexCount; i += 3)
-		//	{
-		//		// all faces of the cube have the same texture
-		//		lMesh->BeginPolygon(-1, -1, -1, false);
-
-		//		// Control point index
-		//		lMesh->AddPolygon(_Indices[i]);
-		//		lMesh->AddPolygon(_Indices[i + 1]);
-		//		lMesh->AddPolygon(_Indices[i + 2]);
-
-		//		lMesh->EndPolygon ();
-		//	}			
-
-		//	// create a FbxNode
-		//	FbxNode* lNode = FbxNode::Create(_Scene,patchName);
-
-		//	// set the node attribute
-		//	lNode->SetNodeAttribute(lMesh);
-
-		//	// set the shading mode to view texture
-		//	lNode->SetShadingMode(FbxNode::eTextureShading);	
-
-		//	//lMesh->GenerateTangentsDataForAllUVSets();
-
-		//	// return the FbxNode
-		//	return lNode;
-		//}
-
 		FbxNode* TerrainScene::CreatePatchMesh(const char* patchName,  CreatePatchParams patchParams)
 		{			
 			MeshData data = MeshData();
 
 			// Create control points.			
-			int vertexCount = (_PatchSize.Width + 1)  * (_PatchSize.Height + 1);
+			int vertexCount = (_PatchSize.Width / _LodFactor + 1)  * (_PatchSize.Height/ _LodFactor + 1);
 			data.Vertices.Reserve(vertexCount);
 			data.HasUV2 = true;			
 
 			int i,j;
-			int startIndexI = patchParams.IndexI * _PatchSize.Height * _TerrainSize.Width;			
+			int startIndexI = patchParams.IndexI * _PatchSize.Height * _TerrainSize.Width;						
 			int index = 0;
-			for (i = 0; i <= PatchSize.Width; i++)
+			for (i = 0; i <= PatchSize.Width / _LodFactor; i++)
 			{
 				int startIndexJ = patchParams.IndexJ * _PatchSize.Width;
-				for (j = 0; j <= PatchSize.Height; j++)
+				for (j = 0; j <= PatchSize.Height / _LodFactor; j++)
 				{					
-					int jj = startIndexI + startIndexJ + j;
+					int jj = startIndexI + startIndexJ + (j * _LodFactor);
 					if(jj >= _VertexCount || startIndexJ + j >= _TerrainSize.Width)
 					{
 						index++;
@@ -350,14 +264,19 @@ namespace Skill
 					vertex.UV = _GlobalUVs[jj];	
 					vertex.UV2 = _LocalUVs[index];
 
+					double x = vertex.Position[0];
+					double y = vertex.Position[1];
+					double z = vertex.Position[2];
+
+
 					data.Vertices.SetAt(index,vertex);
 
 					index++;
 					_Progress += _ProgressChange;
 				}				
-				startIndexI += _TerrainSize.Width;
+				startIndexI += _TerrainSize.Width * _LodFactor;
 			}
-			
+
 			int faceCount = _IndexCount / 3;
 			data.Faces.Reserve(faceCount);			
 			index = 0;
@@ -374,11 +293,11 @@ namespace Skill
 				index++;
 			}			
 
-			
+
 			MeshCreator creator = MeshCreator();
 
 			FbxNode* mesh = creator.Create(_Scene,patchName,data);
-			
+
 			// return the FbxNode
 			return mesh;
 		}
@@ -391,26 +310,26 @@ namespace Skill
 
 			int i, j;
 			int p = 0;
-			int** seqIndex = new int*[PatchSize.Width + 1];
-			for(int i = 0; i < PatchSize.Width + 1; ++i)
-				seqIndex[i] = new int[PatchSize.Height + 1];
+			int** seqIndex = new int*[PatchSize.Width / _LodFactor + 1];
+			for(int i = 0; i < PatchSize.Width/ _LodFactor + 1; ++i)
+				seqIndex[i] = new int[PatchSize.Height/ _LodFactor + 1];
 
-			for (i = 0; i <= PatchSize.Width; i++)
+			for (i = 0; i <= PatchSize.Width/ _LodFactor; i++)
 			{
-				for (j = 0; j <= PatchSize.Height; j++)
+				for (j = 0; j <= PatchSize.Height/ _LodFactor; j++)
 				{
 					seqIndex[i][j] = p++;
 				}
 			}
-			
+
 			if(!_Indices)
 				_Indices = new int[_IndexCount];
 
 			_ProgressChange = 100.0 / _IndexCount;
 			int index = 0;			
-			for (i = 0; i < PatchSize.Width; i++)
+			for (i = 0; i < PatchSize.Width/ _LodFactor; i++)
 			{
-				for (j = 0; j < PatchSize.Height; j++)
+				for (j = 0; j < PatchSize.Height/ _LodFactor; j++)
 				{
 
 					_Indices[index++] = seqIndex[i][j];                    
@@ -425,7 +344,7 @@ namespace Skill
 				}
 			}
 
-			for( i = 0; i < PatchSize.Width+ 1; ++i)
+			for( i = 0; i < PatchSize.Width / _LodFactor + 1; ++i)
 				delete[] seqIndex[i];
 			delete[] seqIndex;
 		}
@@ -481,7 +400,7 @@ namespace Skill
 
 			_GlobalUVCount = _TerrainSize.Width * _TerrainSize.Height;			
 			if(!_GlobalUVs) _GlobalUVs = new FbxVector2[_GlobalUVCount];
-			
+
 			_ProgressChange = 100.0 / _GlobalUVCount;
 
 			int i,j;
@@ -534,7 +453,7 @@ namespace Skill
 
 			for (i = 0; i < _VertexCount; i++)
 				_Normals[i]  = FbxVector4(0,0,0);
-			
+
 			int** seqIndex = new int*[_TerrainSize.Width];
 			for(i = 0; i < _TerrainSize.Width; ++i)
 				seqIndex[i] = new int[_TerrainSize.Height];
@@ -546,7 +465,7 @@ namespace Skill
 					seqIndex[i][j] = p++;
 				}
 			}						
-				
+
 
 			_ProgressChange = 100.0 / ((_TerrainSize.Width - 1) * (_TerrainSize.Height - 1));
 
@@ -588,12 +507,12 @@ namespace Skill
 			}			
 
 			for (int i = 0; i < _VertexCount; i++)
-            {
-                _Normals[i] = FbxHelper::SafeNormalize(_Normals[i]);
-            }
+			{
+				_Normals[i] = FbxHelper::SafeNormalize(_Normals[i]);
+			}
 		}		
 
 
-				
+
 	}
 }

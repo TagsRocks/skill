@@ -3,8 +3,7 @@ using System.Collections;
 
 namespace Skill.Framework.Triggers
 {
-
-    //[AddComponentMenu("Game/Triggers/Weapon")]
+    
     //public class G_WeaponTrigger : MonoBehaviour
     //{
     //    public G_WeaponBase Weapon { get; set; }

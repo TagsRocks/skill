@@ -21,19 +21,19 @@ namespace Skill.Editor.UI
             this.Position = new UnityEngine.Rect(0, 0, 300, 16);
         }
 
-        /// <summary> Make control enabled or disabled</summary>
-        /// <param name="enable">Enabled value</param>        
-        protected override void ApplyGUIEnable(bool enable)
-        {
-            EditorGUI.BeginDisabledGroup(enable);
-        }
+        ///// <summary> Make control enabled or disabled</summary>
+        ///// <param name="enable">Enabled value</param>        
+        //protected override void ApplyGUIEnable(bool enable)
+        //{
+        //    EditorGUI.BeginDisabledGroup(enable);
+        //}
 
-        /// <summary>
-        /// Restore previous value of GUI enable
-        /// </summary>        
-        protected override void RestoreGUIEnable()
-        {
-            EditorGUI.EndDisabledGroup();
-        }
+        ///// <summary>
+        ///// Restore previous value of GUI enable
+        ///// </summary>        
+        //protected override void RestoreGUIEnable()
+        //{
+        //    EditorGUI.EndDisabledGroup();
+        //}
     }
 }

@@ -13,7 +13,8 @@ namespace Skill.CodeGeneration.CSharp
     {
         None,
         Override,
-        Virtual
+        Virtual,
+        Abstract
     }
 
     /// <summary>
@@ -26,7 +27,7 @@ namespace Skill.CodeGeneration.CSharp
         /// <summary> whether this method is override,virtual or usual </summary>
         public SubMethod SubMethod { get; set; }
         /// <summary> Modifier of method (public, internal, private, protected) </summary>
-        public Modifiers Modifiers { get; set; }
+        public Modifiers Modifier { get; set; }
         /// <summary> string that represent return type (string, int, float, ...)</summary>
         public string ReturnType { get; private set; }
         /// <summary> Name of methods </summary>
@@ -49,7 +50,7 @@ namespace Skill.CodeGeneration.CSharp
         /// <param name="parameters">parameters</param>
         public Method(string returnType, string name, string body, params string[] parameters)
         {
-            this.Modifiers = Modifiers.Private;
+            this.Modifier = Modifiers.Private;
             this.ReturnType = returnType;
             this.Name = name;
             this.Body = body;
@@ -63,7 +64,7 @@ namespace Skill.CodeGeneration.CSharp
         /// <param name="writer">Stream</param>
         public void Write(System.IO.StreamWriter writer)
         {
-            writer.Write(string.Format("{0} {1} {2} {3} {4}(", (Modifiers != Modifiers.None) ? Modifiers.ToString().ToLower() : string.Empty,
+            writer.Write(string.Format("{0} {1} {2} {3} {4}(", (Modifier != Modifiers.None) ? Modifier.ToString().ToLower() : string.Empty,
                 IsStatic ? "static" : string.Empty,
                 (this.SubMethod != SubMethod.None) ? this.SubMethod.ToString().ToLower() : string.Empty,
                 ReturnType,
@@ -79,13 +80,20 @@ namespace Skill.CodeGeneration.CSharp
                 }
             }
 
-            writer.WriteLine(")");
-            if (!string.IsNullOrEmpty(BaseMethod))
-                writer.WriteLine(BaseMethod);
-            writer.WriteLine("{");
-            if (!string.IsNullOrEmpty(Body))
-                writer.WriteLine(Body);
-            writer.WriteLine("}");
+            if (SubMethod == CSharp.SubMethod.Abstract)
+                writer.WriteLine(");");
+            else
+            {
+                writer.WriteLine(")");
+
+
+                if (!string.IsNullOrEmpty(BaseMethod))
+                    writer.WriteLine(BaseMethod);
+                writer.WriteLine("{");
+                if (!string.IsNullOrEmpty(Body))
+                    writer.WriteLine(Body);
+                writer.WriteLine("}");
+            }
         }
 
         /// <summary>
@@ -95,7 +103,7 @@ namespace Skill.CodeGeneration.CSharp
         /// <returns>true if exist, otherwise false</returns>
         public bool IsExist(string code)
         {
-            string reg = Modifiers.ToString().ToLower() + "\\s+" +
+            string reg = Modifier.ToString().ToLower() + "\\s+" +
                 ((this.SubMethod != SubMethod.None) ? this.SubMethod.ToString().ToLower() + "\\s+" : "") + ReturnType.ToString() + "\\s+" + Name;
             Regex regex = new Regex(reg);
             return regex.Match(code).Success;

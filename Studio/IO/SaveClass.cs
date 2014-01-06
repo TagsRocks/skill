@@ -44,6 +44,25 @@ namespace Skill.Studio.IO
             }
         }
 
+        [Description("is struct?")]
+        public bool IsStruct
+        {
+            get
+            {
+                return Model.IsStruct;
+            }
+            set
+            {
+                if (Model.IsStruct != value)
+                {
+                    SaveData.Editor.History.Insert(new ChangePropertyUnDoRedo(this, "IsStruct", value, Model.IsStruct));
+                    Model.IsStruct = value;
+                    OnPropertyChanged("IsStruct", !value, value);
+                    OnPropertyChanged("CodeString");
+                }
+            }
+        }
+
         [DefaultValue("")]
         [Description("Comment of class")]
         public string Comment
@@ -142,7 +161,7 @@ namespace Skill.Studio.IO
         }
 
         [Browsable(false)]
-        public string CodeString { get { return string.Format("class {0}", Name); } }
+        public string CodeString { get { return string.Format("{0} {1}", IsStruct ? "struct" : "class", Name); } }
 
 
         public void NotifyChangeClassName(string oldName, string newName)

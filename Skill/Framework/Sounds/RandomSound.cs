@@ -8,14 +8,11 @@ namespace Skill.Framework.Sounds
     /// <summary>
     /// Play random sound on enable
     /// </summary>
-    [RequireComponent(typeof(AudioSource))]
-    [AddComponentMenu("Skill/Sounds/RandomSound")]
+    [RequireComponent(typeof(AudioSource))]    
     public class RandomSound : StaticBehaviour
     {
         /// <summary> Array of sounds to play in random </summary>
         public AudioClip[] Sounds;
-        /// <summary> Category of soudns </summary>
-        public SoundCategory Category;        
 
         private AudioSource _Audio;
 
@@ -42,10 +39,7 @@ namespace Skill.Framework.Sounds
 
                 if (randomSound != null)
                 {
-                    if (Global.Instance != null)
-                        Global.Instance.PlaySoundOneShot(_Audio, randomSound, Category);
-                    else
-                        _Audio.PlayOneShot(randomSound);
+                    _Audio.PlayOneShot(randomSound);
                 }
                 else
                     Debug.LogWarning(string.Format("Invalid AudioClip with index : {0}, in GameObject : {1}", index, gameObject.name));

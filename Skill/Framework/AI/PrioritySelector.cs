@@ -60,6 +60,7 @@ namespace Skill.Framework.AI
             BehaviorResult result = BehaviorResult.Failure;
             for (int i = RunningChildIndex; i < ChildCount; i++)
             {
+                if (status.IsInterrupted) break;
                 BehaviorContainer node = this[i];
                 status.Parameters = node.Parameters;
                 result = node.Behavior.Execute(status);
@@ -78,5 +79,5 @@ namespace Skill.Framework.AI
             return result;
         }        
     }
-    #endregion
+    #endregion    
 }

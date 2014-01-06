@@ -1,3 +1,0 @@
-﻿1- Add EventNode in BehaviorTree
-2- Copy And Paste in AnimationTree has problem
-3- specyfy default value for each properties

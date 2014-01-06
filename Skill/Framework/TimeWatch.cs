@@ -5,7 +5,7 @@ using System.Text;
 namespace Skill.Framework
 {
     /// <summary>
-    /// Helper class for track limitation of a job
+    /// Helper class for track time
     /// </summary>
     public struct TimeWatch
     {

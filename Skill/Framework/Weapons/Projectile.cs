@@ -83,7 +83,8 @@ namespace Skill.Framework.Weapons
         /// <summary> Number of ammo in current clip </summary>
         public int ClipAmmo { get; set; }
         /// <summary> Total number of ammo without clip ammo </summary>
-        public int TotalAmmo { get; set; }
-
+        public int Ammo { get; set; }
+        /// <summary> Total number of ammo </summary>
+        public int TotalAmmo { get { return ClipAmmo + Ammo; } }
     }
 }

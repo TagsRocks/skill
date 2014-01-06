@@ -802,6 +802,7 @@ namespace Skill.Framework
             private bool _ToggleCrouch;
             private bool _ToggleRun;
             private bool _ToggleAim;
+            private bool _Vibration;
             private KeyMap[] _Keys = null;
             private Dictionary<string, KeyMap> _KeyDictionary;
 
@@ -812,6 +813,7 @@ namespace Skill.Framework
             public bool ToggleCrouch { get { return _ToggleCrouch; } set { _ToggleCrouch = value; } }
             public bool ToggleRun { get { return _ToggleRun; } set { _ToggleRun = value; } }
             public bool ToggleAim { get { return _ToggleAim; } set { _ToggleAim = value; } }
+            public bool Vibration { get { return _Vibration; } set { _Vibration = value; } }
 
             /// <summary>
             /// Get key by name
@@ -896,6 +898,8 @@ namespace Skill.Framework
                 e.AppendChild(_ToggleRunElement);
                 IO.XmlElement _ToggleAimElement = stream.Create("ToggleAim", _ToggleAim);
                 e.AppendChild(_ToggleAimElement);
+                IO.XmlElement _VibrationElement = stream.Create("Vibration", _Vibration);
+                e.AppendChild(_VibrationElement);
                 IO.XmlElement _KeysElement = stream.Create<KeyMap>("Keys", _Keys);
                 e.AppendChild(_KeysElement);
 
@@ -908,6 +912,7 @@ namespace Skill.Framework
                 stream.Write(_ToggleCrouch);
                 stream.Write(_ToggleRun);
                 stream.Write(_ToggleAim);
+                stream.Write(_Vibration);
                 stream.Write<KeyMap>(_Keys);
 
             }
@@ -936,6 +941,9 @@ namespace Skill.Framework
                         case "ToggleAim":
                             this.ToggleAim = stream.ReadBoolean(element);
                             break;
+                        case "Vibration":
+                            this.Vibration = stream.ReadBoolean(element);
+                            break;
                         case "Keys":
                             this._Keys = stream.ReadSavableArray<KeyMap>(element, KeyMap.CreateKeyMap);
                             break;
@@ -952,6 +960,7 @@ namespace Skill.Framework
                 this.ToggleCrouch = stream.ReadBoolean();
                 this.ToggleRun = stream.ReadBoolean();
                 this.ToggleAim = stream.ReadBoolean();
+                this.Vibration = stream.ReadBoolean();
                 this._Keys = stream.ReadSavableArray<KeyMap>(KeyMap.CreateKeyMap);
 
             }
@@ -1036,6 +1045,81 @@ namespace Skill.Framework
                 }
                 return false;
             }
+
+            #region GetKey
+            /// <summary>
+            /// Returns true while the user holds down the key identified by name. Think auto fire. 
+            /// </summary>
+            /// <param name="keyName">Name of key</param>
+            /// <returns>Ttrue while the user holds down the key, otherwise false</returns>
+            public bool GetKey(string keyName)
+            {
+                return GetKey(_KeyDictionary[keyName]);
+            }
+            /// <summary>
+            /// Returns true while the user holds down the key identified by name. Think auto fire. 
+            /// </summary>
+            /// <param name="keyIndex">Index of key</param>
+            /// <returns>Ttrue while the user holds down the key, otherwise false</returns>
+            public bool GetKey(int keyIndex)
+            {
+                return GetKey(_Keys[keyIndex]);
+            }
+            private bool GetKey(KeyMap map)
+            {
+                return UnityEngine.Input.GetKey(map.PrimaryKey) || UnityEngine.Input.GetKey(map.SecondaryKey) || UnityEngine.Input.GetKey(map.GamepadKey);
+            } 
+            #endregion
+
+            #region GetKeyDown
+            /// <summary>
+            /// Returns true during the frame the user starts pressing down the key identified by name. 
+            /// </summary>
+            /// <param name="keyName">Name of key</param>
+            /// <returns>True if the user starts pressing down the key, otherwise false</returns>
+            public bool GetKeyDown(string keyName)
+            {
+                return GetKeyDown(_KeyDictionary[keyName]);
+            }
+            /// <summary>
+            /// Returns true during the frame the user starts pressing down the key identified by name. 
+            /// </summary>
+            /// <param name="keyIndex">Index of key</param>
+            /// <returns>True if the user starts pressing down the key, otherwise false</returns>
+            public bool GetKeyDown(int keyIndex)
+            {
+                return GetKeyDown(_Keys[keyIndex]);
+            }
+            private bool GetKeyDown(KeyMap map)
+            {
+                return UnityEngine.Input.GetKeyDown(map.PrimaryKey) || UnityEngine.Input.GetKeyDown(map.SecondaryKey) || UnityEngine.Input.GetKeyDown(map.GamepadKey);
+            } 
+            #endregion
+
+            #region GetKeyUp
+            /// <summary>
+            /// Returns true during the frame the user releases the key identified by name.
+            /// </summary>
+            /// <param name="keyName">Name of key</param>
+            /// <returns>True if the user releases the key, otherwise false</returns>
+            public bool GetKeyUp(string keyName)
+            {
+                return GetKeyUp(_KeyDictionary[keyName]);
+            }
+            /// <summary>
+            /// Returns true during the frame the user releases the key identified by name.
+            /// </summary>
+            /// <param name="keyIndex">Index of key</param>
+            /// <returns>True if the user releases the key, otherwise false</returns>
+            public bool GetKeyUp(int keyIndex)
+            {
+                return GetKeyUp(_Keys[keyIndex]);
+            }
+            private bool GetKeyUp(KeyMap map)
+            {
+                return UnityEngine.Input.GetKeyUp(map.PrimaryKey) || UnityEngine.Input.GetKeyUp(map.SecondaryKey) || UnityEngine.Input.GetKeyUp(map.GamepadKey);
+            } 
+            #endregion
         }
 
         // Variables
@@ -1172,7 +1256,7 @@ namespace Skill.Framework
                     new KeyMap(){ Name = "Fire1" , PrimaryKey = KeyCode.Mouse0 , SecondaryKey = KeyCode.LeftControl  },
                     new KeyMap(){ Name = "Fire2" , PrimaryKey = KeyCode.Mouse1 , SecondaryKey = KeyCode.LeftAlt},
                     new KeyMap(){ Name = "Fire3" , PrimaryKey = KeyCode.Mouse2 , SecondaryKey = KeyCode.LeftCommand},
-                    new KeyMap(){ Name = "Junp" , PrimaryKey = KeyCode.Space},
+                    new KeyMap(){ Name = "Jump" , PrimaryKey = KeyCode.Space},
                     new KeyMap(){ Name = "Action" , PrimaryKey = KeyCode.E },
                     new KeyMap(){ Name = "Crouch" , PrimaryKey = KeyCode.C},                    
                 };

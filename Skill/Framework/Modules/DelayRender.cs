@@ -5,8 +5,7 @@ namespace Skill.Framework.Modules
 {
     /// <summary>
     /// Object vill be visible at specific time after instantiate
-    /// </summary>
-    [AddComponentMenu("Skill/Modules/DelayRender")]
+    /// </summary>    
     public class DelayRender : DynamicBehaviour
     {
         /// <summary> Delay time </summary>

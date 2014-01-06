@@ -127,15 +127,16 @@ namespace Skill.Framework.AI
         {
             _FailureCount = 0;
             CreateChildrenExecution(); // make sure the  _ChildrenResults array is valid
-            BehaviorResult result = BehaviorResult.Success; // by default success
-            //if (FirstConditions) // first check conditions
-            //result = CheckConditions(status);
-            //if (result == BehaviorResult.Failure)// if fails no need to execute other nodes
-            //return result;
-
-            // itrate throw children an execute them
+            BehaviorResult result = BehaviorResult.Running; // by default running
+            
+            // iterate throw children an execute them
             for (int i = 0; i < ChildCount; i++)
             {
+                if (status.IsInterrupted)
+                {
+                    ResetChildrenExecution();
+                    break;
+                }
                 BehaviorContainer node = this[i];
                 status.Parameters = node.Parameters;
 
@@ -180,9 +181,9 @@ namespace Skill.Framework.AI
                     break;
                 }
 
-                // if result of this node is running or result of any previous node is running, set result to running
-                if (childResult == BehaviorResult.Running || result != BehaviorResult.Running)
-                    result = childResult;
+                //// if result of this node is running or result of any previous node is running, set result to running
+                //if (childResult == BehaviorResult.Running || result != BehaviorResult.Running)
+                //    result = childResult;
 
                 _ChildrenFirstExecution[i] = true;
             }

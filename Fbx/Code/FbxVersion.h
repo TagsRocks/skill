@@ -6,6 +6,7 @@ namespace Skill
 	{
 		public enum class FbxVersion
 		{
+			V2014,
 			V2013,			
 			V2012,
 			V2011,

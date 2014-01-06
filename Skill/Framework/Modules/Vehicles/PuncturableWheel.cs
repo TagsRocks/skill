@@ -7,8 +7,7 @@ namespace Skill.Framework.Modules.Vehicles
     /// <summary>
     /// This behaviour is useful for situations like when a static car placed besides of street and you want it's wheel be puncturable but without using RigidBodies.
     /// assign this components to each wheel and set valid reference to Chassis.
-    /// </summary>
-    [AddComponentMenu("Skill/Modules/Vehicles/PuncturableWheel")]
+    /// </summary>    
     public class PuncturableWheel : Health
     {
         /// <summary> Puncturable Chassis </summary>

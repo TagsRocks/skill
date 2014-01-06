@@ -133,13 +133,12 @@ namespace Skill.Framework.AI
         private int GetRandomIndex()
         {
             float rnd = RandomService.Range(0.0f, _TotalWeight);
-            float sum = 0;
             for (int i = 0; i < ChildCount; i++)
             {
-                sum += this[i].Behavior.Weight;
-                if (sum >= rnd) return i;
+                if (rnd < this[i].Behavior.Weight) return i;
+                rnd -= this[i].Behavior.Weight;
             }
             return 0;
-        }        
+        }
     }
 }

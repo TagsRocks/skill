@@ -6,7 +6,7 @@ namespace Skill.Framework.Sounds
     /// <summary>
     /// Listen to PitchController.Instance.Pitch
     /// </summary>
-    [AddComponentMenu("Skill/Sounds/PitchListener")]
+   
     public class PitchListener : DynamicBehaviour
     {
         private AudioSource[] _AudioSources;

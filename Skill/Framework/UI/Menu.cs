@@ -17,6 +17,8 @@ namespace Skill.Framework.UI
         private Frame _DialogToShowNext;    // to don't modify stack of dialogs when rendering dialogs
         private bool _BackRequest;          // request to show previous frame in view stack
         private bool _ClearRequest;         // request to show clear view stack        
+        private Frame _ShowingFrame;
+        private Frame _EnteringFrame;
 
         // Find a frame by name
         private Frame FindFrame(string name)
@@ -258,63 +260,86 @@ namespace Skill.Framework.UI
         /// </summary>
         public virtual void Update()
         {
-
-            if (_ClearRequest)
+            bool isValidToProcessNextRequest = true;
+            if (_EnteringFrame != null)
             {
-                _ViewStack.Clear();
-                _DialogStack.Clear();
-                _ClearRequest = false;
-            }
-            // there was a request to show previous frame
-            else if (_BackRequest)
-            {
-                if (_ViewStack.Count > 0)
-                {
-                    bool cancel = false;
-                    if (_ViewStack.Peek().LeaveFrame(ref cancel)) // let current frame leave
-                    {
-                        if (!cancel) // if current frame do not cancel operation
-                        {
-                            _ViewStack.Pop(); // remove top frame
-                            if (_ViewStack.Count > 0)
-                            {
-                                _ViewStack.Peek().ShowFrame();// show lower frame in stack
-                            }
-                            else
-                            {
-                                // stack is empty
-                                OnExit();
-                            }
-                        }
-                        _BackRequest = false;
-                    }
-                    // else wait until current visible frame leave successfully
-                }
-            }
-            // there was a request to show a frame
-            else if (_FrameToShowNext != null)
-            {
-                bool enter = false; // can we show next frame or should wait?
-                if (_ViewStack.Count > 0)
-                    enter = _ViewStack.Peek().HideFrame();
+                if (_EnteringFrame.EnterFrame())
+                    _EnteringFrame = null;
                 else
-                    enter = true;
-                if (enter) // previous frame hide successfully, so we can show next frame
-                {
-                    _FrameToShowNext.EnterFrame();
-                    _ViewStack.Push(_FrameToShowNext);
-                    _FrameToShowNext = null;
-                }
-                // else wait until current visible frame hide successfully
+                    isValidToProcessNextRequest = false;
             }
-            // there was a request to show a dialog
-            else if (_DialogToShowNext != null)
+            else if (_ShowingFrame != null)
             {
-                _DialogToShowNext.EnterFrame();
-                _DialogStack.Push(_DialogToShowNext);
-                _DialogToShowNext = null;
+                if (_ShowingFrame.ShowFrame())
+                    _ShowingFrame = null;
+                else
+                    isValidToProcessNextRequest = false;
             }
 
+            if (isValidToProcessNextRequest)
+            {
+                if (_ClearRequest)
+                {
+                    _ViewStack.Clear();
+                    _DialogStack.Clear();
+                    _ClearRequest = false;
+                }
+                // there was a request to show previous frame
+                else if (_BackRequest)
+                {
+                    if (_ViewStack.Count > 0)
+                    {
+                        bool cancel = false;
+                        if (_ViewStack.Peek().LeaveFrame(ref cancel)) // let current frame leave
+                        {
+                            if (!cancel) // if current frame do not cancel operation
+                            {
+                                _ViewStack.Pop(); // remove top frame
+                                if (_ViewStack.Count > 0)
+                                {
+                                    _ShowingFrame = _ViewStack.Peek();
+                                    if (_ShowingFrame.ShowFrame())
+                                        _ShowingFrame = null;
+                                }
+                                else
+                                {
+                                    // stack is empty
+                                    OnExit();
+                                }
+                            }
+                            _BackRequest = false;
+                        }
+                        // else wait until current visible frame leave successfully
+                    }
+                }
+                // there was a request to show a frame
+                else if (_FrameToShowNext != null)
+                {
+                    bool enter = false; // can we show next frame or should wait?
+                    if (_ViewStack.Count > 0)
+                        enter = _ViewStack.Peek().HideFrame();
+                    else
+                        enter = true;
+                    if (enter) // previous frame hide successfully, so we can show next frame
+                    {
+                        _ViewStack.Push(_FrameToShowNext);
+                        _EnteringFrame = _FrameToShowNext;
+                        if (_EnteringFrame.EnterFrame())
+                            _EnteringFrame = null;
+                        _FrameToShowNext = null;
+                    }
+                    // else wait until current visible frame hide successfully
+                }
+                // there was a request to show a dialog
+                else if (_DialogToShowNext != null)
+                {
+                    _DialogStack.Push(_DialogToShowNext);
+                    _EnteringFrame = _DialogToShowNext;
+                    if (_EnteringFrame.EnterFrame())
+                        _EnteringFrame = null;
+                    _DialogToShowNext = null;
+                }
+            }
 
             if (TopFrame != null)
                 TopFrame.Update();

@@ -86,7 +86,9 @@ namespace Skill.Framework.IO
         /// <returns>string</returns>
         public override string ReadString()
         {
-            return _BinaryReader.ReadString();
+            if (ReadBoolean())
+                return _BinaryReader.ReadString();
+            return null;
         }
     }
 }

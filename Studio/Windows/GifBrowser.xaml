@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ctrl="clr-namespace:Skill.Studio.Controls"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-        Title="Browse Animations" Height="400" Width="600" Background="{StaticResource WindowBg}" x:Name="This" WindowStartupLocation="CenterOwner" >
+        Title="Browse Animations" Height="400" Width="800" Background="{StaticResource WindowBg}" x:Name="This" WindowStartupLocation="CenterOwner" >
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -15,10 +15,10 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="2*" />
                 <ColumnDefinition Width="2" />
+                <ColumnDefinition Width="2*" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBlock Text="Sets" Grid.Column="0" Grid.Row="0"  VerticalAlignment="Bottom" Margin="6,4" FontStyle="Italic" />
             <TextBlock Text="Animations" Grid.Column="2" Grid.Row="0"  VerticalAlignment="Bottom" Margin="6,4" FontStyle="Italic" />
@@ -63,15 +63,30 @@
                     </Button>
                 </StackPanel>
             </Grid>
-            <StackPanel Grid.Row="1" Grid.Column="3" HorizontalAlignment="Center" Margin="4,8,4,0" >
-                <Border BorderThickness="2" BorderBrush="LightGray" >
-                    <ctrl:GifImage x:Name="_Preview" Width="64" Height="64" />
-                </Border>
-                <xctk:IntegerUpDown Minimum="10" Maximum="30" Value="{Binding FrameRate,ElementName=This}" />
-            </StackPanel>
+            <Border Grid.Row="1" Grid.Column="3" BorderThickness="1" BorderBrush="Gray" >
+                <Grid Margin="4,8,4,0" IsEnabled="{Binding HasSelectedAnimation, ElementName=This}" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="70"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Border Grid.Row="0" Grid.ColumnSpan="2"  BorderThickness="2" BorderBrush="LightGray" Width="66" Height="66" HorizontalAlignment="Center" Margin="2" >
+                        <ctrl:GifImage x:Name="_Preview"  />
+                    </Border>
+                    <TextBlock Grid.Row="1" Text="Frame rate : " VerticalAlignment="Center" />
+                    <xctk:IntegerUpDown Grid.Row="1" Grid.Column="1" Minimum="10" Maximum="30" Value="{Binding FrameRate,ElementName=This}" HorizontalAlignment="Center"  VerticalAlignment="Center" MinHeight="24" />
+                    <TextBlock Grid.Row="2" Text="Posture : "  VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Posture,ElementName=This}" VerticalAlignment="Center" Foreground="Red" />
+                </Grid>
+            </Border>
         </Grid>
         <Grid Grid.Row="1" Background="{StaticResource ButtonPanelBg}" >
-            <Grid.ColumnDefinitions>                
+            <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="100" />

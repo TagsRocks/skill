@@ -10,11 +10,33 @@ namespace Skill.Editor.Tools
 {
     class SpawnObjectField : EditorControl
     {
-        private StackPanel _Panel;
+        private Grid _Panel;
         private ObjectField<GameObject> _PrefabField;
-        private Skill.Editor.UI.Slider _ChanceField;
+        private Skill.Editor.UI.Slider _WeightField;        
+        private Skill.Framework.UI.Box _Background;
 
-        public Skill.Framework.SpawnObject Object { get; private set; }
+        private Skill.Framework.SpawnObject _Object;
+        public Skill.Framework.SpawnObject Object
+        {
+            get { return _Object; }
+            set
+            {
+                _Object = value;
+                if (_Object != null)
+                {
+                    this._PrefabField.Object = _Object.Prefab;
+                    this._WeightField.Value = _Object.Weight;
+                    IsEnabled = true;
+                }
+                else
+                {
+                    this._PrefabField.Object = null;
+                    this._WeightField.Value = 0;
+                    IsEnabled = false;
+                }
+            }
+        }
+        public SpawnAssetEditor Editor { get; private set; }        
 
         public override float LayoutHeight
         {
@@ -22,47 +44,49 @@ namespace Skill.Editor.Tools
             {
                 if (Visibility != Skill.Framework.UI.Visibility.Collapsed)
                     return _PrefabField.LayoutHeight + _PrefabField.Margin.Vertical +
-                           _ChanceField.LayoutHeight + _ChanceField.Margin.Vertical;
+                           _WeightField.LayoutHeight + _WeightField.Margin.Vertical + 2;
                 return base.LayoutHeight;
             }
         }
 
-        public SpawnObjectField()
-            : this(new Skill.Framework.SpawnObject() { Chance = 1.0f, Prefab = null })
+        public SpawnObjectField(SpawnAssetEditor editor)
         {
-        }
-        public SpawnObjectField(Skill.Framework.SpawnObject obj)
-        {
-            this.Object = obj;
-            if (this.Object == null)
-                throw new ArgumentNullException("Invalid SpawnData");
+            this.Editor = editor;
 
-            this.Margin = new Thickness(0, 0, 0, 8);
-            this.Width = 300;
-            this._PrefabField = new ObjectField<GameObject>() { AllowSceneObjects = true, Margin = new Thickness(2, 2, 2, 0), Object = Object.Prefab };
-            this._PrefabField.Label.text = "Prefab";            
+            this._PrefabField = new ObjectField<GameObject>() { Row = 0, Column = 0, AllowSceneObjects = true, Margin = new Thickness(4, 4, 4, 0) };
+            this._PrefabField.Label.text = "Prefab";
 
-            this._ChanceField = new Skill.Editor.UI.Slider() { MinValue = 0.1f, MaxValue = 1.0f, Value = Object.Chance, Margin = new Thickness(2, 2, 2, 2) };
-            this._ChanceField.Label.text = "Chance";            
+            this._WeightField = new Skill.Editor.UI.Slider() { Row = 1, Column = 0, MinValue = 0.1f, MaxValue = 1.0f, Margin = new Thickness(4, 2, 4, 4) };
+            this._WeightField.Label.text = "Weight";
 
-            this._Panel = new StackPanel() { Orientation = Orientation.Vertical, Parent = this };
-            this._Panel.Controls.Add(_PrefabField);            
-            this._Panel.Controls.Add(_ChanceField);            
-            
-            this._ChanceField.ValueChanged += new EventHandler(_ChanceField_ValueChanged);
-            this._PrefabField.ObjectChanged += new EventHandler(_PrefabField_ObjectChanged);            
+            this._Background = new Framework.UI.Box() { Row = 0, Column = 0, RowSpan = 3, ColumnSpan = 2 };
+
+            this._Panel = new Grid() { Parent = this , Padding = new Thickness(2) };
+            this._Panel.RowDefinitions.Add(1, GridUnitType.Star);
+            this._Panel.RowDefinitions.Add(1, GridUnitType.Star);
+            this._Panel.ColumnDefinitions.Add(1, GridUnitType.Star);            
+
+            this._Panel.Controls.Add(_Background);
+            this._Panel.Controls.Add(_PrefabField);
+            this._Panel.Controls.Add(_WeightField);            
+
+            this._WeightField.ValueChanged += new EventHandler(_WeightField_ValueChanged);
+            this._PrefabField.ObjectChanged += new EventHandler(_PrefabField_ObjectChanged);
             this._Panel.LayoutChanged += Panel_LayoutChanged;
-        }               
+
+            this.Object = null;
+        }       
 
         void _PrefabField_ObjectChanged(object sender, EventArgs e)
         {
-            Object.Prefab = _PrefabField.Object;
+            if (_Object != null) _Object.Prefab = _PrefabField.Object;
+            Editor.UpdateNames();
         }
 
-        void _ChanceField_ValueChanged(object sender, EventArgs e)
+        void _WeightField_ValueChanged(object sender, EventArgs e)
         {
-            Object.Chance = _ChanceField.Value;
-        }        
+            if (_Object != null) _Object.Weight = _WeightField.Value;
+        }
 
         protected override void OnRenderAreaChanged()
         {

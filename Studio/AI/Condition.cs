@@ -30,6 +30,10 @@ namespace Skill.Studio.AI
         {
 
         }
+        public ConditionViewModel(BehaviorTreeViewModel tree, DataModels.AI.Condition condition)
+            : base(tree, condition)
+        {            
+        }
 
         [Category("Debug")]
         [Description("Is condition valid in simulation runtime")]

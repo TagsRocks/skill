@@ -7,6 +7,9 @@ namespace Skill.Framework.UI
     /// <summary>
     /// Make a popup window.
     /// </summary>
+    /// <remarks>
+    /// you have to set useGuiLayout = true to make window render correctly
+    /// </remarks>     
     public class Window : Frame
     {
         private static int _IdGenerator = 0;

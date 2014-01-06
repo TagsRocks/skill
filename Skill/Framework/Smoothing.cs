@@ -45,7 +45,7 @@ namespace Skill.Framework
         public float Current { get { return _Current; } set { _Current = value; _CurrentVelocity = 0; } }
 
         /// <summary> The position we are trying to reach. </summary>
-        public float Target;
+        public float Target { get; set; }
 
         /// <summary>
         /// Update one step and return result
@@ -97,7 +97,7 @@ namespace Skill.Framework
         public float CurrentAngle { get { return _CurrentAngle; } set { _CurrentAngle = value; _CurrentAngleVelocity = 0; } }
 
         /// <summary> The position we are trying to reach. </summary>
-        public float TargetAngle;
+        public float TargetAngle { get; set; }
 
         /// <summary>
         /// Update one step and return result
@@ -139,7 +139,7 @@ namespace Skill.Framework
     /// <summary>
     /// Simplify using Mathf.SmoothDamp for two value
     /// </summary>
-    public struct Smoothing2
+    public struct Smoothing2D
     {
 
         private Vector2 _CurrentVelocity;
@@ -194,7 +194,7 @@ namespace Skill.Framework
     /// <summary>
     /// Simplify using Mathf.SmoothDamp for two value
     /// </summary>
-    public struct Smoothing3
+    public struct Smoothing3D
     {
         private Vector3 _CurrentVelocity;
         private Vector3 _Current;

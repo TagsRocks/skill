@@ -6,14 +6,13 @@ namespace Skill.Framework.Modules.Vehicles
     /// <summary>
     /// This behaviour is useful for situations like when a static car placed besides of street and you want it's wheel be puncturable but without using RigidBodies.
     /// assign this components to chassis and set reference of chassis to each child wheel.
-    /// </summary>
-    [AddComponentMenu("Skill/Modules/Vehicles/PuncturableChassis")]
+    /// </summary>    
     public class PuncturableChassis : DynamicBehaviour
     {
         /// <summary> Parameters of how smooth rotation of chassis when a wheel is punctured </summary>
         public SmoothingParameters PunctureSmoothing;
 
-        private Smoothing3 _Euler;
+        private Smoothing3D _Euler;
         private TimeWatch _UpdateTW;
 
         /// <summary>
@@ -31,7 +30,7 @@ namespace Skill.Framework.Modules.Vehicles
         /// </summary>
         protected override void Update()
         {
-            if (Time.timeScale == 0) return;
+            if (Global.IsGamePaused) return;
             _Euler.Update(PunctureSmoothing);
             transform.rotation = Quaternion.Euler(_Euler.Current);
 

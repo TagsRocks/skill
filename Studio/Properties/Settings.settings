@@ -27,7 +27,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="UnityServerPort" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">8000</Value>
+      <Value Profile="(Default)">4200</Value>
     </Setting>
     <Setting Name="UnityServerBufferSize" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">20</Value>

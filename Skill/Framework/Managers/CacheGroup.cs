@@ -5,14 +5,18 @@ namespace Skill.Framework.Managers
 {
     /// <summary>
     /// Group of CacheObjects for better management
-    /// </summary>
-    [AddComponentMenu("Skill/Managers/CacheGroup")]
+    /// </summary>    
     public class CacheGroup : DynamicBehaviour
-    {        
+    {
+        /// <summary> create all cached objects on awake </summary>
+        public bool InitializeOnAwake = true;
+        /// <summary> create all cached objects as childs of group </summary>
+        public bool MakeAsChild = true;
+        /// <summary> Clean Interval of this group</summary>
+        public float CleanInterval = 60;
         /// <summary> CacheObjects </summary>
         public CacheObject[] Caches;
-        /// <summary> Clean Interval of this group</summary>
-        public float CleanInterval = 20;
+        
 
         private TimeWatch _CleanTW;
 
@@ -22,13 +26,15 @@ namespace Skill.Framework.Managers
         protected override void Awake()
         {
             base.Awake();
-            // Loop through the caches
-            for (var i = 0; i < Caches.Length; i++)
+            if (InitializeOnAwake)
             {
-                // Initialize each cache
-                Caches[i].Initialize(this);
+                // Loop through the caches
+                for (var i = 0; i < Caches.Length; i++)
+                {
+                    // Initialize each cache
+                    Caches[i].Initialize(this);
+                }
             }
-
             enabled = CleanInterval > 0;
         }
 

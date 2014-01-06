@@ -27,8 +27,8 @@ namespace Skill.Studio.AI.Editor
             get
             {
                 return _BTTree.SelectedItem as BehaviorViewModel;
-            }
-        }
+            }           
+        }        
 
         public BehaviorTreeTreeView()
         {

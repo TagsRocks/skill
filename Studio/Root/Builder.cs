@@ -85,6 +85,10 @@ namespace Skill.Studio
                 writer = new StreamWriter(file);
                 generator.WritePartial(writer, oldCode);
             }
+            else if (File.Exists(userFilename))
+            {
+                File.Delete(userFilename);
+            }
             writer.Close();
             file.Close();
         }

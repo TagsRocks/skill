@@ -197,9 +197,13 @@ namespace Skill.Editor
                         };
 
 
-                        var xCurve = AnimationUtility.GetEditorCurve(state.clip, _RootBone.Object.name, typeof(Transform), "m_LocalPosition.x");
-                        var yCurve = AnimationUtility.GetEditorCurve(state.clip, _RootBone.Object.name, typeof(Transform), "m_LocalPosition.y");
-                        var zCurve = AnimationUtility.GetEditorCurve(state.clip, _RootBone.Object.name, typeof(Transform), "m_LocalPosition.z");
+                        EditorCurveBinding binding = new EditorCurveBinding() { path = _RootBone.Object.name, type = typeof(Transform) };
+                        binding.propertyName = "m_LocalPosition.x";
+                        var xCurve = AnimationUtility.GetEditorCurve(state.clip, binding);
+                        binding.propertyName = "m_LocalPosition.y";
+                        var yCurve = AnimationUtility.GetEditorCurve(state.clip, binding);
+                        binding.propertyName = "m_LocalPosition.z";
+                        var zCurve = AnimationUtility.GetEditorCurve(state.clip, binding);
 
                         AddKeys(xCurve, clip.RootMotion.XKeys);
                         AddKeys(yCurve, clip.RootMotion.YKeys);

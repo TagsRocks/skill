@@ -39,9 +39,9 @@ namespace Skill.DataModels
         /// </summary>
         /// <param name="e"></param>
         /// <param name="attName">Name of Attribute</param>
-        /// <param name="defaltValue">Default value to return if process of conversion failed</param>
+        /// <param name="defaultValue">Default value to return if process of conversion failed</param>
         /// <returns>Value</returns>
-        public static float GetAttributeValueAsFloat(this XElement e, string attName, float defaltValue)
+        public static float GetAttributeValueAsFloat(this XElement e, string attName, float defaultValue)
         {
             var p = e.Attribute(attName);
             if (p != null)
@@ -50,7 +50,26 @@ namespace Skill.DataModels
                 if (float.TryParse(p.Value, out f))
                     return f;
             }
-            return defaltValue;
+            return defaultValue;
+        }
+
+
+        public static E GetAttributeValueAsEnum<E>(this XElement e, string attName, E defaultValue)
+        {
+            try
+            {
+                var p = e.Attribute(attName);
+                if (p != null)
+                {
+                    return (E)Enum.Parse(typeof(E), p.Value, true);
+                }
+                else
+                    return defaultValue;
+            }
+            catch (Exception)
+            {
+                return defaultValue;
+            }
         }
 
         /// <summary>
@@ -58,9 +77,9 @@ namespace Skill.DataModels
         /// </summary>
         /// <param name="e"></param>
         /// <param name="attName">Name of Attribute</param>
-        /// <param name="defaltValue">Default value to return if process of conversion failed</param>
+        /// <param name="defaultValue">Default value to return if process of conversion failed</param>
         /// <returns>Value</returns>
-        public static double GetAttributeValueAsDouble(this XElement e, string attName, double defaltValue)
+        public static double GetAttributeValueAsDouble(this XElement e, string attName, double defaultValue)
         {
             var p = e.Attribute(attName);
             if (p != null)
@@ -69,7 +88,7 @@ namespace Skill.DataModels
                 if (double.TryParse(p.Value, out d))
                     return d;
             }
-            return defaltValue;
+            return defaultValue;
         }
 
         /// <summary>
@@ -77,9 +96,9 @@ namespace Skill.DataModels
         /// </summary>
         /// <param name="e"></param>
         /// <param name="attName">Name of Attribute</param>
-        /// <param name="defaltValue">Default value to return if process of conversion failed</param>
+        /// <param name="defaultValue">Default value to return if process of conversion failed</param>
         /// <returns>Value</returns>
-        public static int GetAttributeValueAsInt(this XElement e, string attName, int defaltValue)
+        public static int GetAttributeValueAsInt(this XElement e, string attName, int defaultValue)
         {
             var p = e.Attribute(attName);
             if (p != null)
@@ -88,7 +107,7 @@ namespace Skill.DataModels
                 if (int.TryParse(p.Value, out i))
                     return i;
             }
-            return defaltValue;
+            return defaultValue;
         }
 
         /// <summary>
@@ -96,9 +115,9 @@ namespace Skill.DataModels
         /// </summary>
         /// <param name="e"></param>
         /// <param name="attName">Name of Attribute</param>
-        /// <param name="defaltValue">Default value to return if process of conversion failed</param>
+        /// <param name="defaultValue">Default value to return if process of conversion failed</param>
         /// <returns>Value</returns>
-        public static bool GetAttributeValueAsBoolean(this XElement e, string attName, bool defaltValue)
+        public static bool GetAttributeValueAsBoolean(this XElement e, string attName, bool defaultValue)
         {
             var p = e.Attribute(attName);
             if (p != null)
@@ -107,7 +126,7 @@ namespace Skill.DataModels
                 if (Boolean.TryParse(p.Value, out b))
                     return b;
             }
-            return defaltValue;
+            return defaultValue;
         }
 
         /// <summary>
@@ -115,16 +134,16 @@ namespace Skill.DataModels
         /// </summary>
         /// <param name="e"></param>
         /// <param name="attName">Name of Attribute</param>
-        /// <param name="defaltValue">Default value to return if process of conversion failed</param>
+        /// <param name="defaultValue">Default value to return if process of conversion failed</param>
         /// <returns>Value</returns>
-        public static string GetAttributeValueAsString(this XElement e, string attName, string defaltValue)
+        public static string GetAttributeValueAsString(this XElement e, string attName, string defaultValue)
         {
             var p = e.Attribute(attName);
             if (p != null)
             {
                 return p.Value;
             }
-            return defaltValue;
+            return defaultValue;
         }
-    }    
+    }
 }

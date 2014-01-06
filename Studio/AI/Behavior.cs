@@ -120,9 +120,6 @@ namespace Skill.Studio.AI
         #region Properties
 
         [Browsable(false)]
-        public virtual double CornerRadius { get { return 8; } }
-
-        [Browsable(false)]
         public virtual double MinHeight { get { return 10; } }
 
         [Browsable(false)]
@@ -140,7 +137,7 @@ namespace Skill.Studio.AI
         }
 
         /// <summary>
-        /// Actual behavior data
+        /// behavior data
         /// </summary>
         [Browsable(false)]
         public Behavior Model { get; private set; }
@@ -150,15 +147,6 @@ namespace Skill.Studio.AI
         /// </summary>
         [Browsable(false)]
         public BehaviorTreeViewModel Tree { get; private set; }
-
-
-        /// <summary> Is this behavior root of state? </summary>
-        [Browsable(false)]
-        public bool IsState
-        {
-            get { return Model.IsState; }
-            set { Model.IsState = value; }
-        }
 
         private bool _IsDefaultState;
         [Browsable(false)]
@@ -208,90 +196,6 @@ namespace Skill.Studio.AI
 
         internal PathFigure _PathFigure;
         internal BezierSegment _BezierSegment;
-        //private void UpdateConnectionToParent()
-        //{
-
-        //    if (_ConnectionToParent == null)
-        //    {
-        //        _PathFigure = new PathFigure();
-        //        _BezierSegment = new BezierSegment();
-        //        _BezierSegment.IsStroked = true;
-        //        _PathFigure.Segments.Add(_BezierSegment);
-        //    }
-        //    BehaviorViewModel parent = Parent as BehaviorViewModel;
-        //    if (parent != null)
-        //    {
-        //        double deltaX = parent.X - this.X + parent.Width;
-        //        double deltaY = (parent.Y + parent.Height * 0.5) - (this.Y + this.Height * 0.5);
-
-        //        Point targetPosition = new Point(OFFSET, Height * 0.5);
-        //        Point sourcePosition = new Point(deltaX - OFFSET, deltaY + this.Height * 0.5);
-
-        //        deltaX = System.Math.Abs(targetPosition.X - sourcePosition.X) * 0.5;
-        //        deltaY = System.Math.Abs(targetPosition.Y - sourcePosition.Y) * 0.5;
-
-        //        Point startBezierPoint = Skill.Studio.Diagram.BezierCurve.GetBezierPoint(deltaX, deltaY, Diagram.ConnectorOrientation.Right, sourcePosition);
-        //        Point endBezierPoint = Skill.Studio.Diagram.BezierCurve.GetBezierPoint(deltaX, deltaY, Diagram.ConnectorOrientation.Left, targetPosition);
-
-        //        _PathFigure.StartPoint = sourcePosition;
-        //        _BezierSegment.Point1 = startBezierPoint;
-        //        _BezierSegment.Point2 = endBezierPoint;
-        //        _BezierSegment.Point3 = targetPosition;
-
-        //        if (_ConnectionToParent == null)
-        //        {
-        //            PathGeometry pathGeometry = new System.Windows.Media.PathGeometry();
-        //            pathGeometry.Figures.Add(_PathFigure);
-        //            this.ConnectionToParent = pathGeometry;
-        //        }
-        //    }
-
-        //}
-
-        //private static double MINWIDTH = 80;
-        //private static double MINHEIGHT = 30;
-        //private static double MARGINLEFT = 50;
-        //private static double MARGINBOTTOM = 10;
-        //private static double OFFSET = 2;
-
-        //public void UpdatePosition()
-        //{
-        //    UpdatePosition(MARGINLEFT, 10);
-        //    UpdateConnection();
-        //}
-
-        //private void UpdateConnection()
-        //{
-        //    this.UpdateConnectionToParent();
-        //    foreach (BehaviorViewModel child in this) if (child != null) child.UpdateConnection();
-        //}
-
-        //private double UpdatePosition(double x, double y)
-        //{
-
-        //    X = x;
-
-        //    double delta;
-        //    if (Count == 0) // this is a leaf node
-        //    {
-        //        delta = Height;
-        //    }
-        //    else
-        //    {
-        //        delta = 0;
-        //        int i = 0;
-        //        foreach (BehaviorViewModel child in this)
-        //        {
-        //            if (child != null)
-        //                delta += child.UpdatePosition(x + Width + MARGINLEFT, y + delta) + MARGINBOTTOM;
-        //            i++;
-        //        }
-
-        //        if (Count > 1) delta -= MARGINBOTTOM;
-        //    }
-        //    Y = y + (delta - Height) * 0.5;
-        //    return delta;
-        //}
 
         [Browsable(false)]
         public string DisplayName
@@ -354,6 +258,12 @@ namespace Skill.Studio.AI
         /// <summary> Canvas.Top </summary>        
         [Browsable(false)]
         public double Y { get { return _Y; } set { if (_Y != value) { _Y = value; OnPropertyChanged(new PropertyChangedEventArgs("Y")); } } }
+
+
+        private bool _IsUnused;
+        /// <summary> Is not used in tree </summary>        
+        [Browsable(false)]
+        public bool IsUnused { get { return _IsUnused; } set { if (_IsUnused != value) { _IsUnused = value; OnPropertyChanged(new PropertyChangedEventArgs("IsUnused")); } } }
         #endregion
 
         #region Constructors
@@ -409,18 +319,47 @@ namespace Skill.Studio.AI
         /// <returns>Create view model</returns>
         public BehaviorViewModel CreateViewModel(Behavior behavior)
         {
+            return CreateViewModel(this, behavior);
+        }
+
+        /// <summary>
+        /// Create view model based on BehaviorType
+        /// </summary>
+        /// <param name="behavior">behavior data</param>
+        /// <returns>Create view model</returns>
+        public static BehaviorViewModel CreateViewModel(BehaviorViewModel parent, Behavior behavior)
+        {
             switch (behavior.BehaviorType)
             {
                 case BehaviorType.Action:
-                    return new ActionViewModel(this, (Skill.DataModels.AI.Action)behavior);
+                    return new ActionViewModel(parent, (Skill.DataModels.AI.Action)behavior);
                 case BehaviorType.Condition:
-                    return new ConditionViewModel(this, (Skill.DataModels.AI.Condition)behavior);
+                    return new ConditionViewModel(parent, (Skill.DataModels.AI.Condition)behavior);
                 case BehaviorType.ChangeState:
-                    return new ChangeStateViewModel(this, (Skill.DataModels.AI.ChangeState)behavior);
+                    return new ChangeStateViewModel(parent, (Skill.DataModels.AI.ChangeState)behavior);
                 case BehaviorType.Decorator:
-                    return CreateDecoratorViewModel((Skill.DataModels.AI.Decorator)behavior);
+                    return CreateDecoratorViewModel(parent, (Skill.DataModels.AI.Decorator)behavior);
                 case BehaviorType.Composite:
-                    return CreateCompositeViewModel((Composite)behavior);
+                    return CreateCompositeViewModel(parent, (Composite)behavior);
+
+            }
+            return null;
+        }
+
+        public static BehaviorViewModel CreateViewModel(BehaviorTreeViewModel tree, Behavior behavior)
+        {
+            switch (behavior.BehaviorType)
+            {
+                case BehaviorType.Action:
+                    return new ActionViewModel(tree, (Skill.DataModels.AI.Action)behavior);
+                case BehaviorType.Condition:
+                    return new ConditionViewModel(tree, (Skill.DataModels.AI.Condition)behavior);
+                case BehaviorType.ChangeState:
+                    return new ChangeStateViewModel(tree, (Skill.DataModels.AI.ChangeState)behavior);
+                case BehaviorType.Decorator:
+                    return CreateDecoratorViewModel(tree, (Skill.DataModels.AI.Decorator)behavior);
+                case BehaviorType.Composite:
+                    return CreateCompositeViewModel(tree, (Composite)behavior);
 
             }
             return null;
@@ -431,14 +370,27 @@ namespace Skill.Studio.AI
         /// </summary>
         /// <param name="behavior">selector data</param>
         /// <returns>Create view model</returns>
-        DecoratorViewModel CreateDecoratorViewModel(Skill.DataModels.AI.Decorator decorator)
+        static DecoratorViewModel CreateDecoratorViewModel(BehaviorViewModel parent, Skill.DataModels.AI.Decorator decorator)
         {
             switch (decorator.Type)
             {
                 case DecoratorType.Default:
-                    return new DecoratorViewModel(this, decorator);
+                    return new DecoratorViewModel(parent, decorator);
                 case DecoratorType.AccessLimit:
-                    return new AccessLimitDecoratorViewModel(this, (AccessLimitDecorator)decorator);
+                    return new AccessLimitDecoratorViewModel(parent, (AccessLimitDecorator)decorator);
+                default:
+                    throw new InvalidCastException("Invalid DecoratorType");
+            }
+        }
+
+        static DecoratorViewModel CreateDecoratorViewModel(BehaviorTreeViewModel tree, Skill.DataModels.AI.Decorator decorator)
+        {
+            switch (decorator.Type)
+            {
+                case DecoratorType.Default:
+                    return new DecoratorViewModel(tree, decorator);
+                case DecoratorType.AccessLimit:
+                    return new AccessLimitDecoratorViewModel(tree, (AccessLimitDecorator)decorator);
                 default:
                     throw new InvalidCastException("Invalid DecoratorType");
             }
@@ -450,20 +402,39 @@ namespace Skill.Studio.AI
         /// </summary>
         /// <param name="behavior">selector data</param>
         /// <returns>Create view model</returns>
-        CompositeViewModel CreateCompositeViewModel(Composite composite)
+        static CompositeViewModel CreateCompositeViewModel(BehaviorViewModel parent, Composite composite)
         {
             switch (composite.CompositeType)
             {
                 case CompositeType.Sequence:
-                    return new SequenceSelectorViewModel(this, (SequenceSelector)composite);
+                    return new SequenceSelectorViewModel(parent, (SequenceSelector)composite);
                 case CompositeType.Concurrent:
-                    return new ConcurrentSelectorViewModel(this, (ConcurrentSelector)composite);
+                    return new ConcurrentSelectorViewModel(parent, (ConcurrentSelector)composite);
                 case CompositeType.Random:
-                    return new RandomSelectorViewModel(this, (RandomSelector)composite);
+                    return new RandomSelectorViewModel(parent, (RandomSelector)composite);
                 case CompositeType.Priority:
-                    return new PrioritySelectorViewModel(this, (PrioritySelector)composite);
+                    return new PrioritySelectorViewModel(parent, (PrioritySelector)composite);
                 case CompositeType.Loop:
-                    return new LoopSelectorViewModel(this, (LoopSelector)composite);
+                    return new LoopSelectorViewModel(parent, (LoopSelector)composite);
+                default:
+                    throw new InvalidCastException("Invalid CompositeType");
+            }
+        }
+
+        static CompositeViewModel CreateCompositeViewModel(BehaviorTreeViewModel tree, Composite composite)
+        {
+            switch (composite.CompositeType)
+            {
+                case CompositeType.Sequence:
+                    return new SequenceSelectorViewModel(tree, (SequenceSelector)composite);
+                case CompositeType.Concurrent:
+                    return new ConcurrentSelectorViewModel(tree, (ConcurrentSelector)composite);
+                case CompositeType.Random:
+                    return new RandomSelectorViewModel(tree, (RandomSelector)composite);
+                case CompositeType.Priority:
+                    return new PrioritySelectorViewModel(tree, (PrioritySelector)composite);
+                case CompositeType.Loop:
+                    return new LoopSelectorViewModel(tree, (LoopSelector)composite);
                 default:
                     throw new InvalidCastException("Invalid CompositeType");
             }
@@ -580,7 +551,7 @@ namespace Skill.Studio.AI
 
         [DefaultValue(false)]
         [DisplayName("Concurrency")]
-        [Description("If true : when a condition child fails, return failure")]
+        [Description("execution time of behavior when behavior is child of a concurent selector")]
         public ConcurrencyMode Concurrency
         {
             get { return Model.Concurrency; }
@@ -740,9 +711,10 @@ namespace Skill.Studio.AI
                 }
             }
 
+            Tree.Use(toAdd);
             Tree.History.Insert(new AddBehaviorUnDoRedo(toAdd, parameters, this, -1));
             return toAdd;
-        }
+        }        
 
         /// <summary>
         /// Create new child (action)
@@ -842,7 +814,7 @@ namespace Skill.Studio.AI
 
             if (composite != null)
             {
-                BehaviorViewModel selectorVM = CreateCompositeViewModel(composite);
+                BehaviorViewModel selectorVM = CreateCompositeViewModel(this, composite);
                 Tree.CreateNewName(selectorVM);
                 return AddBehavior(selectorVM, null, false, -1);
             }
@@ -928,7 +900,7 @@ namespace Skill.Studio.AI
                         }
                     }
                 }
-                Tree.UnRegisterViewModel(child);
+                //Tree.UnRegisterViewModel(child);
                 Tree.History.Insert(new AddBehaviorUnDoRedo(child, parameters, this, index, true));
                 return true;
             }

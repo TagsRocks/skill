@@ -18,12 +18,48 @@ namespace Skill.Editor.Tools
 
         private Skill.Editor.UI.DropShadowLabel _RotationLabel;
 
-        private Skill.Editor.UI.SelectionField _RotationSF;
-        private Skill.Editor.UI.XYZComponent _RandomRotation;
+        private Skill.Editor.UI.Extended.SelectionField _RotationSF;
+        private Skill.Editor.UI.Extended.XYZComponent _RandomRotation;
         private Skill.Editor.UI.Vector3Field _CustomRotation;
         private Skill.Framework.UI.ToggleButton _RandomYaw;
 
-        public ImplantObject Object { get; private set; }
+        private ImplantObject _Object;
+        public ImplantObject Object
+        {
+            get { return _Object; }
+            set
+            {
+                _Object = value;
+                if (_Object != null)
+                {
+                    this._PrefabField.Object = _Object.Prefab;
+                    this._MinScaleField.Value = _Object.MinScalePercent;
+                    this._MaxScaleField.Value = _Object.MaxScalePercent;
+                    this._ChanceField.Value = _Object.Weight;
+
+                    _RandomRotation.XComponent.IsChecked = _Object.RandomX;
+                    _RandomRotation.YComponent.IsChecked = _Object.RandomY;
+                    _RandomRotation.ZComponent.IsChecked = _Object.RandomZ;
+
+                    if (_Object.Rotation == ImplantObjectRotation.SurfaceNormal)
+                        _RotationSF.SelectField(_RandomYaw);
+                    else if (_Object.Rotation == ImplantObjectRotation.Custom)
+                        _RotationSF.SelectField(_CustomRotation);
+                    else
+                        _RotationSF.SelectField(_RandomRotation);
+
+                    this._CustomRotation.Value = _Object.CustomRotation;
+                    this._RandomYaw.IsChecked = _Object.RandomYaw;
+                    IsEnabled = true;
+                }
+                else
+                {
+                    this._PrefabField.Object = null;
+                    IsEnabled = false;
+                }
+            }
+        }
+        public ImplantAssetEditor Editor { get; private set; }
 
         public override float LayoutHeight
         {
@@ -40,54 +76,36 @@ namespace Skill.Editor.Tools
             }
         }
 
-        public ImplantObjectField()
-            : this(new ImplantObject() { Chance = 1.0f, Prefab = null, MinScalePercent = 0.8f, MaxScalePercent = 1.0f })
+        public ImplantObjectField(ImplantAssetEditor editor)
         {
-        }
-        public ImplantObjectField(ImplantObject obj)
-        {
-            this.Object = obj;
-            if (this.Object == null)
-                throw new ArgumentNullException("Invalid ImplantObject");
-
+            this.Editor = editor;
             this.Margin = new Thickness(0, 0, 0, 8);
             this.Width = 300;
-            this._PrefabField = new ObjectField<GameObject>() { AllowSceneObjects = true, Margin = new Thickness(2, 2, 2, 0), Object = Object.Prefab };
+            this._PrefabField = new ObjectField<GameObject>() { AllowSceneObjects = true, Margin = new Thickness(2, 2, 2, 0) };
             this._PrefabField.Label.text = "Prefab";
 
-            this._MinScaleField = new FloatField() { Margin = new Thickness(2, 2, 2, 0), Value = Object.MinScalePercent };
+            this._MinScaleField = new FloatField() { Margin = new Thickness(2, 2, 2, 0) };
             this._MinScaleField.Label.text = "Min Scale Percent";
 
-            this._MaxScaleField = new FloatField() { Margin = new Thickness(2, 2, 2, 0), Value = Object.MaxScalePercent };
+            this._MaxScaleField = new FloatField() { Margin = new Thickness(2, 2, 2, 0) };
             this._MaxScaleField.Label.text = "Max Scale Percent";
 
-            this._ChanceField = new Skill.Editor.UI.Slider() { MinValue = 0.1f, MaxValue = 1.0f, Value = Object.Chance, Margin = new Thickness(2, 2, 2, 2) };
+            this._ChanceField = new Skill.Editor.UI.Slider() { MinValue = 0.1f, MaxValue = 1.0f, Margin = new Thickness(2, 2, 2, 2) };
             this._ChanceField.Label.text = "Chance";
 
-            _RandomRotation = new Skill.Editor.UI.XYZComponent();
-            _RandomRotation.XComponent.IsChecked = Object.RandomX;
-            _RandomRotation.YComponent.IsChecked = Object.RandomY;
-            _RandomRotation.ZComponent.IsChecked = Object.RandomZ;
+            _RandomRotation = new Skill.Editor.UI.Extended.XYZComponent();
+            _CustomRotation = new Skill.Editor.UI.Vector3Field();
 
-            _CustomRotation = new Skill.Editor.UI.Vector3Field() { Value = Object.CustomRotation };
-
-            _RandomYaw = new Skill.Framework.UI.ToggleButton() { IsChecked = Object.RandomYaw, HorizontalAlignment = Skill.Framework.UI.HorizontalAlignment.Left, Margin = new Thickness(20, 0, 0, 0) };
+            _RandomYaw = new Skill.Framework.UI.ToggleButton() { HorizontalAlignment = Skill.Framework.UI.HorizontalAlignment.Left, Margin = new Thickness(20, 0, 0, 0) };
             _RandomYaw.Content.text = "Random Yaw";
 
-            _RotationSF = new Skill.Editor.UI.SelectionField() { Margin = new Thickness(2) };
+            _RotationSF = new Skill.Editor.UI.Extended.SelectionField() { Margin = new Thickness(2) };
             _RotationSF.Label.Width = 110;
             _RotationSF.Background.Visibility = Skill.Framework.UI.Visibility.Hidden;
 
             _RotationSF.AddField(_RandomYaw, "Surface Normal ");
             _RotationSF.AddField(_CustomRotation, "Custom ");
             _RotationSF.AddField(_RandomRotation, "Random ");
-
-            if (Object.Rotation == ImplantObjectRotation.SurfaceNormal)
-                _RotationSF.SelectField(_RandomYaw);
-            else if (Object.Rotation == ImplantObjectRotation.Custom)
-                _RotationSF.SelectField(_CustomRotation);
-            else
-                _RotationSF.SelectField(_RandomRotation);
 
             _RotationLabel = new DropShadowLabel() { Text = "Rotation", Margin = new Thickness(4, 0, 0, 0) };
 
@@ -114,60 +132,79 @@ namespace Skill.Editor.Tools
 
             this._CustomRotation.ValueChanged += new EventHandler(_CustomRotation_ValueChanged);
             this._RandomYaw.Changed += new EventHandler(_RandomYaw_Changed);
-            
+
 
             this._Panel.LayoutChanged += Panel_LayoutChanged;
+
+            this.Object = null;
         }
 
         void _RandomYaw_Changed(object sender, EventArgs e)
         {
-            Object.RandomYaw = _RandomYaw.IsChecked;
+            if (_Object != null)
+                _Object.RandomYaw = _RandomYaw.IsChecked;
         }
 
         void _CustomRotation_ValueChanged(object sender, EventArgs e)
         {
-            Object.CustomRotation = _CustomRotation.Value;
+            if (_Object != null)
+                _Object.CustomRotation = _CustomRotation.Value;
         }
 
         void RandomXYZComponent_Checked(object sender, EventArgs e)
         {
-            Object.RandomX = _RandomRotation.XComponent.IsChecked;
-            Object.RandomY = _RandomRotation.YComponent.IsChecked;
-            Object.RandomZ = _RandomRotation.ZComponent.IsChecked;
+            if (_Object != null)
+            {
+                _Object.RandomX = _RandomRotation.XComponent.IsChecked;
+                _Object.RandomY = _RandomRotation.YComponent.IsChecked;
+                _Object.RandomZ = _RandomRotation.ZComponent.IsChecked;
+            }
         }
 
         void _RotationSF_SelectedFieldChanged(object sender, EventArgs e)
         {
-            if (_RotationSF.SelectedField == _RandomYaw)
-                Object.Rotation = ImplantObjectRotation.SurfaceNormal;
-            else if (_RotationSF.SelectedField == _CustomRotation)
-                Object.Rotation = ImplantObjectRotation.Custom;
-            else
-                Object.Rotation = ImplantObjectRotation.Random;
+            if (_Object != null)
+            {
+                if (_RotationSF.SelectedField == _RandomYaw)
+                    _Object.Rotation = ImplantObjectRotation.SurfaceNormal;
+                else if (_RotationSF.SelectedField == _CustomRotation)
+                    _Object.Rotation = ImplantObjectRotation.Custom;
+                else
+                    _Object.Rotation = ImplantObjectRotation.Random;
+            }
         }
 
         void _PrefabField_ObjectChanged(object sender, EventArgs e)
         {
-            Object.Prefab = _PrefabField.Object;
+            if (_Object != null)
+                _Object.Prefab = _PrefabField.Object;
+            Editor.UpdateNames();
         }
 
         void _ChanceField_ValueChanged(object sender, EventArgs e)
         {
-            Object.Chance = _ChanceField.Value;
+            if (_Object != null)
+                _Object.Weight = _ChanceField.Value;
         }
 
         void _MaxScaleField_ValueChanged(object sender, EventArgs e)
         {
-            if (_MaxScaleField.Value < _MinScaleField.Value)
-                _MaxScaleField.Value = _MinScaleField.Value;
-            Object.MaxScalePercent = _MaxScaleField.Value;
+            if (_Object != null)
+            {
+                if (_MaxScaleField.Value < _MinScaleField.Value)
+                    _MaxScaleField.Value = _MinScaleField.Value;
+                _Object.MaxScalePercent = _MaxScaleField.Value;
+            }
         }
 
         void _MinScaleField_ValueChanged(object sender, EventArgs e)
         {
-            if (_MinScaleField.Value > _MaxScaleField.Value)
-                _MinScaleField.Value = _MaxScaleField.Value;
-            Object.MinScalePercent = _MinScaleField.Value;
+            if (_Object != null)
+            {
+                if (_MinScaleField.Value > _MaxScaleField.Value)
+                    _MinScaleField.Value = _MaxScaleField.Value;
+                _Object.MinScalePercent = _MinScaleField.Value;
+            }
         }
 
         protected override void OnRenderAreaChanged()

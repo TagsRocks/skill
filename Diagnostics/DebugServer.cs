@@ -7,6 +7,12 @@ using UnityEngine;
 namespace Skill.Diagnostics
 {
 
+    /// <summary>
+    /// Debug server
+    /// </summary>
+    /// <remarks>
+    /// Name this gameobject to something like AAAAADebugServer to make sure this is the first object in scene
+    /// </remarks>
     [AddComponentMenu("Skill/Diagnostics/Debug Server")]
     public class DebugServer : MonoBehaviour, Skill.Framework.IControllerManager
     {
@@ -24,7 +30,7 @@ namespace Skill.Diagnostics
         /// <summary> Port of server </summary>
         public int Port = DefaultPort;
         /// <summary> Size of buffer in kilobytes to use in messaging</summary>
-        public int BufferSize = 20;// 20kb
+        public int BufferSize = 100;// 100 kb
 
         private Skill.Net.Server _Server;
         private List<Client> _Clients;
@@ -287,7 +293,7 @@ namespace Skill.Diagnostics
                     case MessageType.RequestControllersList:
                         msgToSend = _Server.GetList();
                         if (_Server.Log)
-                            Skill.Net.Logger.LogMessage("RequestBehaviorTreeList Message revieved");
+                            Skill.Net.Logger.LogMessage("RequestBehaviorTreeList Message recieved");
                         break;
                     case MessageType.RegisterControllerBT:
                         RegisterControllerBTMessage registerMsg = msg as RegisterControllerBTMessage;
@@ -436,7 +442,6 @@ namespace Skill.Diagnostics
                     var bData = CreateList(_BehaviorList, s);
                     if (bData != null)
                     {
-                        bData.Data.IsState = true;
                         _States.Add(bData);
                     }
                 }
@@ -444,7 +449,7 @@ namespace Skill.Diagnostics
                 Skill.DataModels.AI.BehaviorTree data = new Skill.DataModels.AI.BehaviorTree();
                 data.DefaultState = Tree.DefaultState;
                 data.Name = name;
-                data.States = new Skill.DataModels.AI.Behavior[_States.Count];
+                data.States = new Skill.DataModels.AI.BehaviorTreeState[_States.Count];
                 for (int i = 0; i < _States.Count; i++)
                     data.States[i] = _States[i].Data;
 
@@ -485,7 +490,10 @@ namespace Skill.Diagnostics
                     {
                         var child = CreateList(behaviorList, b.Behavior);
                         if (child != null)
-                            bData.Data.Add(child.Data);
+                        {
+                            if (!bData.Data.Contains(child.Data))
+                                bData.Data.Add(child.Data);
+                        }
                     }
                 }
                 else if (behavior.Type == Skill.Framework.AI.BehaviorType.Decorator)
@@ -494,7 +502,10 @@ namespace Skill.Diagnostics
                     {
                         var child = CreateList(behaviorList, ((Skill.Framework.AI.Decorator)behavior).Child.Behavior);
                         if (child != null)
-                            bData.Data.Add(child.Data);
+                        {
+                            if (!bData.Data.Contains(child.Data))
+                                bData.Data.Add(child.Data);
+                        }
                     }
                 }
 
@@ -596,6 +607,10 @@ namespace Skill.Diagnostics
                         break;
                     case Skill.Framework.AI.CompositeType.Priority:
                         composite = new Skill.DataModels.AI.PrioritySelector();
+                        ((Skill.DataModels.AI.PrioritySelector)composite).Priority = (Skill.DataModels.AI.PriorityType)((Skill.Framework.AI.PrioritySelector)behavior).Priority;
+                        break;
+                    case Skill.Framework.AI.CompositeType.State:
+                        composite = new Skill.DataModels.AI.BehaviorTreeState();
                         ((Skill.DataModels.AI.PrioritySelector)composite).Priority = (Skill.DataModels.AI.PriorityType)((Skill.Framework.AI.PrioritySelector)behavior).Priority;
                         break;
                     case Skill.Framework.AI.CompositeType.Loop:

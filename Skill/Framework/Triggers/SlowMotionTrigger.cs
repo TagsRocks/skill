@@ -5,8 +5,7 @@ namespace Skill.Framework.Triggers
 {
     /// <summary>
     /// Slow motion OnTriggerEnter 
-    /// </summary>
-    [AddComponentMenu("Game/Triggers/SlowMotion")]
+    /// </summary>    
     public class SlowMotionTrigger : Trigger
     {
         /// <summary>
@@ -22,7 +21,7 @@ namespace Skill.Framework.Triggers
         protected override bool OnEnter(Collider other)
         {
             if (Motion.SlowMotion > 0)
-                Skill.Framework.Global.OnSlowMotion(this, Motion);
+                Skill.Framework.Global.RaiseSlowMotion(this, Motion);
             return true;
         }
 

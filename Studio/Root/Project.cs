@@ -22,7 +22,7 @@ namespace Skill.Studio
         public static int EditorVersion = 2; // current version of editor
         public static string Extension = ".skproj"; // extension of priject file
         public static string FilterExtension = "Skill project|*" + Extension; // filer used in OpenFileDialog 
-        public static string GetFilename(string unityProjectDir, string name) { return System.IO.Path.Combine(unityProjectDir, "Assets\\Editor\\Skill", name + Extension); }
+        public static string GetFilename(string unityProjectDir, string name) { return System.IO.Path.Combine(unityProjectDir, PluginManager.Plugin.AssetsPath, PluginManager.Plugin.EditorPath, name + Extension); }
         #endregion
 
         #region Properties
@@ -326,15 +326,17 @@ namespace Skill.Studio
         {
             get
             {
-                int index = this.Path.IndexOf("assets", StringComparison.OrdinalIgnoreCase);
+                int index = this.Path.IndexOf(PluginManager.Plugin.AssetsPath, StringComparison.OrdinalIgnoreCase);
                 if (index >= 0)
-                    return this.Path.Substring(0, index + 6); // 6 : lenght of assets
-                return "assets";
+                    return this.Path.Substring(0, index + PluginManager.Plugin.AssetsPath.Length);
+                return PluginManager.Plugin.AssetsPath;
             }
         }
 
-        public string EditorPath { get { return System.IO.Path.Combine(AssetsPath, "Editor\\Skill"); } }
-        public string ScriptsPath { get { return System.IO.Path.Combine(AssetsPath, "Scripts"); } }
+        public string EditorPath { get { return System.IO.Path.Combine(AssetsPath, PluginManager.Plugin.EditorPath); } }
+        public string ScriptsPath { get { return System.IO.Path.Combine(AssetsPath, PluginManager.Plugin.ScriptsPath); } }
+        public string PluginsPath { get { return System.IO.Path.Combine(AssetsPath, PluginManager.Plugin.PluginsPath); } }
+        public string DesignerPath { get { return System.IO.Path.Combine(AssetsPath, PluginManager.Plugin.DesignerPath); } }
 
         /// <summary>
         /// Get full path of file in projetc directory
@@ -363,7 +365,7 @@ namespace Skill.Studio
         /// <returns>path</returns>
         public string GetDesignerOutputPath(string localPath)
         {
-            return System.IO.Path.Combine(this.ScriptsPath, DesignerName, localPath);
+            return System.IO.Path.Combine(DesignerPath, localPath);
         }
 
         /// <summary>
@@ -393,7 +395,7 @@ namespace Skill.Studio
             if (rf.IsEditor)
                 return System.IO.Path.Combine(EditorPath, rf.DestinationDirectory, System.IO.Path.GetFileName(rf.SourceFile));
             else
-                return System.IO.Path.Combine(ScriptsPath, DesignerName, rf.DestinationDirectory, System.IO.Path.GetFileName(rf.SourceFile));
+                return System.IO.Path.Combine(PluginsPath, rf.DestinationDirectory, System.IO.Path.GetFileName(rf.SourceFile));
         }
 
         /// <summary>
@@ -401,7 +403,7 @@ namespace Skill.Studio
         /// </summary>
         /// <param name="localPath">local path of gif file</param>
         /// <returns>path</returns>
-        public string GetAnimationPath(string localPath)
+        public string GetGifAnimationPath(string localPath)
         {
             return System.IO.Path.Combine(this.GifAnimationDirectory, localPath);
         }

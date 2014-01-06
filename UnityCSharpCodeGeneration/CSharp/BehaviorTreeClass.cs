@@ -6,14 +6,31 @@ using Skill.DataModels.AI;
 
 namespace Skill.CodeGeneration.CSharp
 {
+
+
+
     /// <summary>
     /// generate C# code for a BehaviorTree class
     /// </summary>
     class BehaviorTreeClass : Class
     {
+        #region BehaviorTreeStateNamesClass
+        class BehaviorTreeStateNamesClass : Class
+        {
+            public BehaviorTreeStateNamesClass(BehaviorTree tree)
+                : base("StateNames")
+            {
+                base.ClassModifier = ClassModifiers.Static;
+                base.IsPartial = false;
+                foreach (var s in tree.States)
+                    Add(new Variable("string", s.Name, string.Format("\"{0}\"", s.Name)) { IsStatic = true, Modifier = Modifiers.Public });
+            }
+        }
+        #endregion
+
         #region Variables
         private static string[] ActionResetEventHandlerParams = new string[] { "Skill.Framework.AI.Action action" };
-        private static string[] ConditionHandlerParams = new string[] { "Skill.Framework.AI.BehaviorParameterCollection parameters" };
+        private static string[] ConditionHandlerParams = new string[] { "object sender", "Skill.Framework.AI.BehaviorParameterCollection parameters" };
         private static string[] DecoratorHandlerParams = ConditionHandlerParams;
         private static string[] ActionHandlerParams = ConditionHandlerParams;
 
@@ -42,19 +59,67 @@ namespace Skill.CodeGeneration.CSharp
                 this.Add(new SharedAccessKeysClass(this._Tree.AccessKeys));
             }
 
+            // states class
+            BehaviorTreeStateNamesClass states = new BehaviorTreeStateNamesClass(tree);
+            Add(states);
+
+            if (!_Tree.ExpandMethods)
+            {
+                ClassModifier = ClassModifiers.Abstract;
+
+                EnumClass actions = new EnumClass("Actions") { Modifier = Modifiers.Protected };
+                EnumClass conditions = new EnumClass("Conditions") { Modifier = Modifiers.Protected };
+                EnumClass decorators = new EnumClass("Decorators") { Modifier = Modifiers.Protected };
+
+                foreach (var b in _Behaviors)
+                {
+                    switch (b.BehaviorType)
+                    {
+                        case BehaviorType.Action:
+                            actions.Add(b.Name);
+                            break;
+                        case BehaviorType.Condition:
+                            conditions.Add(b.Name);
+                            break;
+                        case BehaviorType.Decorator:
+                            decorators.Add(b.Name);
+                            break;
+                    }
+                }
+
+                if (actions.Count > 0)
+                {
+                    Add(actions);
+                    Add(new Method("Skill.Framework.AI.BehaviorResult", "OnAction", "", "Actions action", "object sender", "Skill.Framework.AI.BehaviorParameterCollection parameters") { SubMethod = SubMethod.Abstract, Modifier = Modifiers.Protected });
+                    Add(new Method("void", "OnActionReset", "", "Actions action") { SubMethod = SubMethod.Abstract, Modifier = Modifiers.Protected });
+                }
+                if (conditions.Count > 0)
+                {
+                    Add(conditions);
+                    Add(new Method("bool", "OnCondition", "", "Conditions condition", "object sender", "Skill.Framework.AI.BehaviorParameterCollection parameters") { SubMethod = SubMethod.Abstract, Modifier = Modifiers.Protected });
+                }
+                if (decorators.Count > 0)
+                {
+                    Add(decorators);
+                    Add(new Method("bool", "OnDecorator", "", "Decorators decorator", "object sender", "Skill.Framework.AI.BehaviorParameterCollection parameters") { SubMethod = SubMethod.Abstract, Modifier = Modifiers.Protected });
+                }
+
+                IsPartial = false;
+            }
+
             // add DefaultState property
 
-            Property defaultState = new Property("string", "DefaultState", string.Format("\"{0}\"", _Tree.DefaultState), false) { Modifiers = Modifiers.Public, SubMethod = CSharp.SubMethod.Override };
+            Property defaultState = new Property("string", "DefaultState", string.Format("\"{0}\"", _Tree.DefaultState), false) { Modifier = Modifiers.Public, SubMethod = CSharp.SubMethod.Override };
             Add(defaultState);
 
-            Method constructor = new Method("", Name, "", "");
-            constructor.Modifiers = Modifiers.Public;
-            Add(constructor);
+            //Method constructor = new Method("", Name, "", "");
+            //constructor.Modifier = Modifiers.Public;
+            //Add(constructor);
 
-            Method createTree = new Method("Skill.Framework.AI.Behavior[]", "CreateTree", this._CreateTreeMethodBody.ToString());
+            Method createTree = new Method("Skill.Framework.AI.BehaviorTreeState[]", "CreateTree", this._CreateTreeMethodBody.ToString());
             createTree.IsPartial = false;
             createTree.SubMethod = SubMethod.Override;
-            createTree.Modifiers = Modifiers.Protected;
+            createTree.Modifier = Modifiers.Protected;
             Add(createTree);
         }
 
@@ -236,7 +301,7 @@ namespace Skill.CodeGeneration.CSharp
             // then return root of tree
             if (_Tree.States != null)
             {
-                _CreateTreeMethodBody.AppendLine(string.Format("Skill.Framework.AI.Behavior[] states = new Skill.Framework.AI.Behavior[{0}];", _Tree.States.Length));
+                _CreateTreeMethodBody.AppendLine(string.Format("Skill.Framework.AI.BehaviorTreeState[] states = new Skill.Framework.AI.BehaviorTreeState[{0}];", _Tree.States.Length));
                 for (int i = 0; i < _Tree.States.Length; i++)
                 {
                     _CreateTreeMethodBody.AppendLine(string.Format("states[{0}] = {1};", i, Variable.GetName(_Tree.States[i].Name)));
@@ -265,20 +330,26 @@ namespace Skill.CodeGeneration.CSharp
             // create action variable
             Add(new Variable("Skill.Framework.AI.Action", action.Name, "null"));
             // new action inside CreateTree method
-            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Framework.AI.Action(\"{1}\",{2});", Variable.GetName(action.Name), action.Name, GetActionHandlerName(action.Name)));
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Framework.AI.Action(\"{1}\", {2}, Skill.Framework.Posture.{3});", Variable.GetName(action.Name), action.Name, GetActionHandlerName(action.Name), action.ChangePosture));
             // set weight
             SetWeight(action);
-            // create action handler method
-            Method m = new Method("Skill.Framework.AI.BehaviorResult", GetActionHandlerName(action.Name), "return Skill.Framework.AI.BehaviorResult.Failure;", ActionHandlerParams);
-            m.IsPartial = true;
+
+
+            Method m = new Method("Skill.Framework.AI.BehaviorResult", GetActionHandlerName(action.Name),
+                _Tree.ExpandMethods ? "return Skill.Framework.AI.BehaviorResult.Failure;" : string.Format("return OnAction( Actions.{0} , sender ,  parameters);", action.Name),
+                ActionHandlerParams) { IsPartial = _Tree.ExpandMethods };
             Add(m);
 
             // create reset event handler and assign it to Reset event
             if (action.ResetEvent)
             {
                 string resetName = action.Name + "_Reset";
-                Add(new Method("void", resetName, "", ActionResetEventHandlerParams) { IsPartial = true });
-                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.Reset += new ActionResetEventHandler({1});", Variable.GetName(action.Name), resetName));
+                Method resetMethod = new Method("void", resetName,
+                    _Tree.ExpandMethods ? "" : string.Format("return OnActionReset( Actions.{0} );", action.Name),
+                    ActionResetEventHandlerParams) { IsPartial = _Tree.ExpandMethods };
+                Add(resetMethod);
+                _CreateTreeMethodBody.AppendLine(string.Format("this.{0}.Reset += new ActionResetEventHandler({1});", Variable.GetName(action.Name)
+                    , resetName));
             }
         }
 
@@ -291,8 +362,8 @@ namespace Skill.CodeGeneration.CSharp
             // set weight
             SetWeight(condition);
             // create condition handler method
-            Method m = new Method("bool", GetConditionHandlerName(condition.Name), "return false;", ConditionHandlerParams);
-            m.IsPartial = true;
+            Method m = new Method("bool", GetConditionHandlerName(condition.Name),
+              _Tree.ExpandMethods ? "return false;" : string.Format("return OnCondition( Conditions.{0}, sender ,  parameters);", condition.Name), ConditionHandlerParams) { IsPartial = _Tree.ExpandMethods };
             Add(m);
         }
 
@@ -331,8 +402,9 @@ namespace Skill.CodeGeneration.CSharp
             // set weight
             SetWeight(decorator);
             // create decorator handler method
-            Method m = new Method("bool", GetDecoratorHandlerName(decorator.Name), "return false;", DecoratorHandlerParams);
-            m.IsPartial = true;
+            Method m = new Method("bool", GetDecoratorHandlerName(decorator.Name),
+             _Tree.ExpandMethods ? "return false;" : string.Format("return OnDecorator( Decorators.{0}, sender ,  parameters);", decorator.Name),
+             DecoratorHandlerParams) { IsPartial = _Tree.ExpandMethods };
             Add(m);
         }
 
@@ -358,8 +430,9 @@ namespace Skill.CodeGeneration.CSharp
             // set weight
             SetWeight(decorator);
             // create decorator handler method
-            Method m = new Method("bool", GetDecoratorHandlerName(decorator.Name), "return true;", DecoratorHandlerParams);
-            m.IsPartial = true;
+            Method m = new Method("bool", GetDecoratorHandlerName(decorator.Name),
+                _Tree.ExpandMethods ? "return true;" : string.Format("return OnDecorator( Decorators.{0}, sender ,  parameters);", decorator.Name),
+                DecoratorHandlerParams) { IsPartial = _Tree.ExpandMethods };
             Add(m);
         }
 
@@ -378,6 +451,9 @@ namespace Skill.CodeGeneration.CSharp
                     break;
                 case CompositeType.Priority:
                     CreatePrioritySelector((PrioritySelector)composite);
+                    break;
+                case CompositeType.State:
+                    CreateBehaviorTreeState((BehaviorTreeState)composite);
                     break;
                 case CompositeType.Loop:
                     CreateLoopSelector((LoopSelector)composite);
@@ -402,7 +478,7 @@ namespace Skill.CodeGeneration.CSharp
             // create ConcurrentSelector variable
             Add(new Variable("Skill.Framework.AI.ConcurrentSelector", concurrentSelector.Name, "null"));
             // new ConcurrentSelector variable inside CreateTree method
-            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Framework.AI.ConcurrentSelector(\"{1}\");", Variable.GetName(concurrentSelector.Name), concurrentSelector.Name));            
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Framework.AI.ConcurrentSelector(\"{1}\");", Variable.GetName(concurrentSelector.Name), concurrentSelector.Name));
 
             // set BreakOnConditionFailure Property
             if (concurrentSelector.BreakOnConditionFailure != false) // default is false                
@@ -435,6 +511,18 @@ namespace Skill.CodeGeneration.CSharp
             // set Priority property
             if (prioritySelector.Priority != PriorityType.HighestPriority) // default is HighestPriority                
                 _CreateTreeMethodBody.AppendLine(SetProperty(prioritySelector.Name, "Priority", string.Format("Skill.Framework.AI.PriorityType.{0}", prioritySelector.Priority)));
+        }
+
+        private void CreateBehaviorTreeState(BehaviorTreeState state)
+        {
+            // create PrioritySelector variable
+            Add(new Variable("Skill.Framework.AI.BehaviorTreeState", state.Name, "null"));
+            // new PrioritySelector variable inside CreateTree method
+            _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Framework.AI.BehaviorTreeState(\"{1}\");", Variable.GetName(state.Name), state.Name));
+
+            // set Priority property
+            if (state.Priority != PriorityType.HighestPriority) // default is HighestPriority                
+                _CreateTreeMethodBody.AppendLine(SetProperty(state.Name, "Priority", string.Format("Skill.Framework.AI.PriorityType.{0}", state.Priority)));
         }
 
         private void CreateLoopSelector(LoopSelector loopSelector)

@@ -15,6 +15,6 @@ namespace Skill.Framework
         public GameObject Prefab;
 
         /// <summary> Chance to spawn </summary>
-        public float Chance = 1.0f;
+        public float Weight = 1.0f;
     }
 }

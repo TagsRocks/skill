@@ -9,7 +9,7 @@ namespace Skill.Framework.AI
     /// </summary>    
     /// <param name="parameters">Parameters for condition</param>
     /// <returns>true for success, false for failure</returns>
-    public delegate bool ConditionHandler(BehaviorParameterCollection parameters);
+    public delegate bool ConditionHandler(object sender, BehaviorParameterCollection parameters);
 
     /// <summary>
     /// Check that certain actor or game world statuss hold true.(leaf node)
@@ -50,7 +50,7 @@ namespace Skill.Framework.AI
             BehaviorResult result = BehaviorResult.Failure;
             if (_Handler != null)
             {
-                bool b = _Handler(status.Parameters);
+                bool b = _Handler(this,status.Parameters);
                 if (Reverse)
                     result = b ? BehaviorResult.Failure : BehaviorResult.Success;
                 else

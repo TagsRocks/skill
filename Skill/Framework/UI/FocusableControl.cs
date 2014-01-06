@@ -16,6 +16,11 @@ namespace Skill.Framework.UI
         bool IsEnabled { get; set; }
 
         /// <summary>
+        /// Indicates whether the element can receive focus.(You must set valid name to enable this behavior)
+        /// </summary>
+        bool IsFocusable { get; }
+
+        /// <summary>
         /// Occurs when this element gets logical focus.(You must set valid name to enable this behavior)
         /// </summary>
         event EventHandler GotFocus;
@@ -48,6 +53,11 @@ namespace Skill.Framework.UI
 
         /// <summary> Try focuse control </summary>
         void Focus();
+
+        /// <summary> Disable focusable - sometimes in editor it is better to disable focusable </summary>
+        void DisableFocusable();
+        /// <summary> Enable focusable </summary>
+        void EnableFocusable();
     }
 
     /// <summary>
@@ -58,10 +68,17 @@ namespace Skill.Framework.UI
         /// <summary> Tab index of control. </summary>
         public int TabIndex { get; set; }
 
+
+        /// <summary> Disable focusable - sometimes in editor it is better to disable focusable </summary>
+        public void DisableFocusable() { _IsFocusable = false; }
+        /// <summary> Enable focusable </summary>
+        public void EnableFocusable() { _IsFocusable = true; }
+
+        private bool _IsFocusable = true;
         /// <summary>
         /// Indicates whether the element can receive focus.(You must set valid name to enable this behavior)
         /// </summary>
-        public override bool IsFocusable { get { return true; } }
+        public override bool IsFocusable { get { return _IsFocusable; } }
 
         /// <summary> it is not extended focusable </summary>
         public bool IsExtendedFocusable { get { return false; } }

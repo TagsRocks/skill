@@ -145,7 +145,6 @@ namespace Skill.Studio.AI.Editor
             else
             {
                 bvm.Y = y;
-
                 double delta;
                 if (bvm.Count == 0) // this is a leaf node
                 {
@@ -242,6 +241,21 @@ namespace Skill.Studio.AI.Editor
             BehaviorBorder border = sender as BehaviorBorder;
             if (border != null)
                 border.ViewModel.IsSelected = true;
+        }
+
+        private void ImgRefresh_MouseDown(object sender, MouseButtonEventArgs e)
+        {            
+            RefreshGraph();            
+        }
+
+        private void InvalidateBehavior(BehaviorViewModel bvm)
+        {
+            foreach (BehaviorViewModel child in bvm)
+            {
+                if (child != null)
+                    InvalidateBehavior(child);
+            }
+            bvm.Border.InvalidateMeasure();
         }
     }
 

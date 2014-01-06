@@ -17,7 +17,7 @@ namespace Skill.Framework.UI
         /// <summary> Gets or sets Name of group (optional) </summary>
         public string Name { get; set; }
 
-        private List<ToggleButton> _Buttons;
+        private List<IToggleButton> _Buttons;
         private bool _IsInChange;
 
         /// <summary>
@@ -26,14 +26,14 @@ namespace Skill.Framework.UI
         public ToggleButtonGroup()
         {
             this.ForceChecked = true;
-            _Buttons = new List<ToggleButton>();
+            _Buttons = new List<IToggleButton>();
         }
 
         /// <summary>
         /// Add a ToggleButton to group
         /// </summary>
         /// <param name="button">Button to add</param>
-        internal void Add(ToggleButton button)
+        public void Add(IToggleButton button)
         {
             if (_Buttons.Contains(button)) return;
             _Buttons.Add(button);
@@ -46,7 +46,7 @@ namespace Skill.Framework.UI
         /// </summary>
         /// <param name="button">Button to remove</param>
         /// <returns>True if success otherwise false</returns>
-        internal bool Remove(ToggleButton button)
+        public bool Remove(IToggleButton button)
         {
             bool result = _Buttons.Remove(button);
             if (result)

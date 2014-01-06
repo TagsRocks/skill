@@ -12,7 +12,8 @@ namespace Skill
 	{
 		void FbxHelper::GetVersion(FbxVersion version , int* lMajor, int* lMinor, int* lRevision)
 		{
-			if(version == FbxVersion::V2013)		{ *lMajor = 2013; *lMinor = 0; *lRevision = 0; }
+			if(version == FbxVersion::V2014)		{ *lMajor = 2014; *lMinor = 0; *lRevision = 0; }
+			else if(version == FbxVersion::V2013)	{ *lMajor = 2013; *lMinor = 0; *lRevision = 0; }
 			else if(version == FbxVersion::V2012)   { *lMajor = 2012; *lMinor = 0; *lRevision = 0; }			
 			else if(version == FbxVersion::V2011)   { *lMajor = 2011; *lMinor = 0; *lRevision = 0; }			
 			else if(version == FbxVersion::V2010)   { *lMajor = 2010; *lMinor = 0; *lRevision = 0; }			

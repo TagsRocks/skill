@@ -9,7 +9,7 @@
         <Grid.Resources>
             <Style TargetType="GroupBox">
                 <Setter Property="Margin" Value="4" />
-                <Setter Property="Padding" Value="20,0,0,0" />
+                <Setter Property="Padding" Value="10,0,0,0" />
             </Style>
             <Style TargetType="TextBlock">
                 <Setter Property="VerticalAlignment" Value="Center" />
@@ -61,6 +61,8 @@
                 <Button Grid.Column="5" Content="Create" Command="{Binding CreateCommand}" Style="{StaticResource ButtonStyle}" />
             </Grid>
         </GroupBox>
-        <Image Grid.Row="2"  Margin="4" Source="{Binding Data.Image}" Stretch="Fill" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />        
+        <Grid Grid.Row="2" Grid.Column="0" Margin="2" >
+            <Image  Margin="4" Stretch="Fill" Source="{Binding Data.Image}" />
+        </Grid>
     </Grid>
 </UserControl>

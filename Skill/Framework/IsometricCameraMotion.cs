@@ -6,8 +6,7 @@ namespace Skill.Framework
 {
     /// <summary>
     /// Motion Isometric camera smoothly. Add this component to 'UnityEngine.Camera' with 'Skill.Framework.IsometricCamera' component attached.
-    /// </summary>
-    [AddComponentMenu("Skill/Camera/IsometricMotion")]
+    /// </summary>    
     [RequireComponent(typeof(IsometricCamera))]
     public class IsometricCameraMotion : DynamicBehaviour
     {

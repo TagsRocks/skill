@@ -5,8 +5,7 @@ namespace Skill.Framework.Weapons
 {
     /// <summary>
     /// A muzzle flash in front of weapon at fire time.
-    /// </summary>
-    [AddComponentMenu("Skill/Weapons/MuzzleFlash")]
+    /// </summary>    
     public class MuzzleFlash : DynamicBehaviour
     {
         /// <summary> Weapon that own's this muzzle flash </summary>

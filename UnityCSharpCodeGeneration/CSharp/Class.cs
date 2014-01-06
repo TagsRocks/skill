@@ -5,6 +5,14 @@ using System.Text;
 
 namespace Skill.CodeGeneration.CSharp
 {
+    public enum ClassModifiers
+    {
+        None,
+        Static,
+        Abstract,
+        Sealed
+    }
+
     /// <summary>
     /// Defines a class
     /// </summary>
@@ -13,17 +21,21 @@ namespace Skill.CodeGeneration.CSharp
         List<Method> _Methods; // method list
         List<Property> _Properties;// property list
         List<Variable> _Variables;// variable list
+        List<EnumClass> _Enums;// variable list
         List<Class> _Classes;// class list
         List<string> _InheritClasses;// inherit classes
+        List<string> _Attributes;// inherit classes
 
         /// <summary> Name of class </summary>
         public string Name { get; private set; }
         /// <summary> Whether class is public </summary>
-        public bool IsPublic { get; set; }
-        /// <summary> Whether class is Static </summary>
-        public bool IsStatic { get; set; }
+        public Modifiers Modifier { get; set; }
+        /// <summary> Whether class is public </summary>
+        public ClassModifiers ClassModifier { get; set; }
         /// <summary> Whether class is partial </summary>
         public bool IsPartial { get; set; }
+        /// <summary> Whether class is partial </summary>
+        public bool IsStruct { get; set; }
 
         /// <summary> Comment of class </summary>
         public string Comment { get; private set; }
@@ -35,12 +47,15 @@ namespace Skill.CodeGeneration.CSharp
         public Class(string name)
         {
             this.Name = name;
-            this._Classes = new List<Class>(); 
+            this._Classes = new List<Class>();
             this._Methods = new List<Method>();
             this._Properties = new List<Property>();
             this._Variables = new List<Variable>();
+            this._Attributes = new List<string>();
+            _Enums = new List<EnumClass>();
             this._InheritClasses = new List<string>();
-            this.IsPublic = true;
+            this.Modifier = Modifiers.Public;
+            this.ClassModifier = ClassModifiers.None;
             this.IsPartial = true;
         }
 
@@ -80,6 +95,44 @@ namespace Skill.CodeGeneration.CSharp
         public bool Remove(Class cl)
         {
             return _Classes.Remove(cl);
+        }
+
+        /// <summary>
+        /// Add an attribute
+        /// </summary>
+        /// <param name="att">Attribute to add</param>
+        public void AddAttribute(string att)
+        {
+            if (!_Attributes.Contains(att))
+                _Attributes.Add(att);
+        }
+        /// <summary>
+        /// Remove specyfied attribute
+        /// </summary>
+        /// <param name="cl">Attribute to remove</param>
+        /// <returns>True if success, othrwise false</returns>
+        public bool RemoveAttribute(string att)
+        {
+            return _Attributes.Remove(att);
+        }
+
+        /// <summary>
+        /// Add a Enum
+        /// </summary>
+        /// <param name="e">enum to add</param>
+        public void Add(EnumClass e)
+        {
+            if (!_Enums.Contains(e))
+                _Enums.Add(e);
+        }
+        /// <summary>
+        /// Remove specyfied Enum
+        /// </summary>
+        /// <param name="e">Enum to remove</param>
+        /// <returns>True if success, othrwise false</returns>
+        public bool Remove(EnumClass e)
+        {
+            return _Enums.Remove(e);
         }
 
         /// <summary>
@@ -146,10 +199,18 @@ namespace Skill.CodeGeneration.CSharp
         public void Write(System.IO.StreamWriter writer)
         {
             CommentWriter.Write(writer, Comment);
-            if (IsPublic) writer.Write("public ");
-            if (IsStatic) writer.Write("static ");
+            for (int i = 0; i < _Attributes.Count; i++) // write attributes            
+                writer.WriteLine(string.Format("[{0}]", _Attributes[i]));
+            
+            writer.Write(Modifier.ToString().ToLower());
+            writer.Write(" ");
+            if (ClassModifier != ClassModifiers.None)
+            {
+                writer.Write(ClassModifier.ToString().ToLower());
+                writer.Write(" ");
+            }
             if (IsPartial) writer.Write("partial ");
-            writer.Write(string.Format("class {0}", Name));
+            writer.Write(string.Format("{0} {1}", IsStruct ? "struct" : "class", Name));
             if (_InheritClasses.Count > 0)
             {
                 writer.Write(" : ");
@@ -162,6 +223,14 @@ namespace Skill.CodeGeneration.CSharp
             }
             writer.WriteLine();
             writer.WriteLine("{");
+
+            if (_Enums.Count > 0)
+            {
+                writer.WriteLine();
+                writer.WriteLine("// Internal Enumurators");
+                foreach (var e in _Enums)
+                    e.Write(writer);
+            }
 
             if (_Classes.Count > 0)
             {
@@ -202,9 +271,10 @@ namespace Skill.CodeGeneration.CSharp
         {
             if (string.IsNullOrEmpty(oldCode))
             {
-                if (IsPublic) writer.Write("public ");
+                writer.Write(Modifier.ToString().ToLower());
+                writer.Write(" ");
                 if (IsPartial) writer.Write("partial ");
-                writer.Write(string.Format("class {0}", Name));
+                writer.Write(string.Format("{0} {1}", IsStruct ? "struct" : "class", Name));
                 if (_InheritClasses.Count > 0)
                 {
                     writer.Write(" : ");

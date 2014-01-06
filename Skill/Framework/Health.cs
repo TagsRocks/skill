@@ -31,8 +31,7 @@ namespace Skill.Framework
 
     /// <summary>
     /// Defines Health behaviour for gameobject
-    /// </summary>
-    [AddComponentMenu("Skill/Base/Health")]
+    /// </summary>    
     [RequireComponent(typeof(EventManager))]
     public class Health : DynamicBehaviour
     {
@@ -43,7 +42,7 @@ namespace Skill.Framework
         /// <summary> Offset of decale to hit surface </summary>
         public float DecalOffset = 0.1f;
         /// <summary> If true, it takes additional raycast to find position of decale with more precision  </summary>
-        public bool UseRaycastForDecal = false;
+        //public bool UseRaycastForDecal = false;
         /// <summary> True if you want HitParticle spawn at inverse direction of hit normal </summary>
         public bool InverseHit;
         /// <summary> Maximum amount of health (if RegenerateSpeed > 0) </summary>
@@ -61,8 +60,8 @@ namespace Skill.Framework
 
         private TimeWatch _RegenerateDelayTW;
         private TimeWatch _DieDelayTW;
-        Ray _DecaleRay;
-        RaycastHit _DecalHit;
+        //private Ray _DecaleRay;
+        //private RaycastHit _DecalHit;
 
         private float _CurrentHealth;
         /// <summary>
@@ -86,8 +85,18 @@ namespace Skill.Framework
                     {
                         if (DieDelay < 0)
                             DieDelay = 0;
-                        enabled = true;
-                        _DieDelayTW.Begin(DieDelay);
+                        if (!IsDead)
+                        {
+                            if (DieDelay > 0)
+                            {
+                                enabled = true;
+                                _DieDelayTW.Begin(DieDelay);
+                            }
+                            else
+                            {
+                                OnDie();
+                            }
+                        }
                     }
                     else
                     {
@@ -102,8 +111,11 @@ namespace Skill.Framework
             }
         }
 
+        /// <summary> Retrieve last object that caused damage to this health </summary>
+        public object LastCausedDamage { get; private set; }
+
         /// <summary> Retrieve tag of last object that caused damage to this health </summary>
-        public string LastCausedDamage { get; private set; }
+        public string LastCausedDamageTag { get; private set; }
 
         /// <summary> Amount of last damage </summary>
         public float LastDamage { get; private set; }
@@ -113,6 +125,9 @@ namespace Skill.Framework
 
         /// <summary> Normal of last hit </summary>
         public Vector3 LastHitNormal { get; private set; }
+
+        /// <summary> type of last damage </summary>
+        public int LastDamageType { get; private set; }
 
         /// <summary>
         /// Whether agent is dead or not.
@@ -170,7 +185,9 @@ namespace Skill.Framework
         /// <param name="sender">sender</param>
         /// <param name="e">EventArgs</param>
         protected virtual void Events_Die(object sender, System.EventArgs e)
-        {            
+        {
+            IsDead = true;
+            CurrentHealth = 0;
         }
 
 
@@ -182,6 +199,7 @@ namespace Skill.Framework
             IsDead = false;
             LastCausedDamage = string.Empty;
             CurrentHealth = InitialHealth;
+            LastDamageType = -1;
         }
 
         /// <summary>
@@ -204,7 +222,7 @@ namespace Skill.Framework
             else if (InitialHealth > MaxHealth) InitialHealth = MaxHealth;
             _CurrentHealth = InitialHealth;
 
-            enabled = RegenerateSpeed != 0.0f;
+            enabled = RegenerateSpeed != 0.0f && _CurrentHealth < MaxHealth;
         }
 
         /// <summary>
@@ -219,7 +237,7 @@ namespace Skill.Framework
             LastHitNormal = args.Normal;
 
             if (Events != null)
-                Events.OnDamage(sender, new DamageEventArgs(args.Damage, args.Tag) { UserData = args.UserData });
+                Events.RaiseDamage(sender, new DamageEventArgs(args.Damage) { UserData = args.UserData, DamageType = args.DamageType, Tag = args.Tag });
 
             if (args.CauseParticle)
             {
@@ -244,20 +262,20 @@ namespace Skill.Framework
                         GameObject decal = Decals[selectedDecale];
                         if (decal != null)
                         {
-                            if (UseRaycastForDecal)
-                            {
-                                _DecaleRay.origin = args.Point + 10 * args.Normal;
-                                _DecaleRay.direction = -args.Normal;
+                            //if (UseRaycastForDecal)
+                            //{
+                            //    _DecaleRay.origin = args.Point + 10 * args.Normal;
+                            //    _DecaleRay.direction = -args.Normal;
 
-                                if (args.Collider.Raycast(_DecaleRay, out _DecalHit, 12))
-                                {
-                                    Cache.Spawn(decal, _DecalHit.point + (DecalOffset * _DecalHit.normal), Quaternion.LookRotation(_DecalHit.normal));
-                                }
-                            }
-                            else
-                            {
-                                Cache.Spawn(decal, args.Point + (DecalOffset * args.Normal), Quaternion.LookRotation(args.Normal));
-                            }
+                            //    if (args.Collider.Raycast(_DecaleRay, out _DecalHit, 12))
+                            //    {
+                            //        Cache.Spawn(decal, _DecalHit.point + (DecalOffset * _DecalHit.normal), Quaternion.LookRotation(_DecalHit.normal));
+                            //    }
+                            //}
+                            //else
+                            //{
+                                Cache.Spawn(decal, args.Collider.ClosestPointOnBounds(args.Point) + (DecalOffset * args.Normal), Quaternion.LookRotation(args.Normal));
+                            //}
                         }
                     }
                 }
@@ -313,8 +331,10 @@ namespace Skill.Framework
         protected virtual void Events_Damage(object sender, DamageEventArgs args)
         {
             if (IsDead || _CurrentHealth <= 0) return;
-            LastCausedDamage = args.Tag;
+            LastCausedDamage = sender;
+            LastCausedDamageTag = args.Tag;
             LastDamage = args.Damage;
+            LastDamageType = args.DamageType;
             // Take no damage if invincible, dead, or if the damage is zero
             if (Invincible)
                 return;
@@ -331,16 +351,13 @@ namespace Skill.Framework
         /// </summary>
         protected override void Update()
         {
-            if (Time.timeScale == 0) return;
+            if (Global.IsGamePaused) return;
             if (_DieDelayTW.IsEnabled)
             {
                 if (_DieDelayTW.IsOver)
                 {
                     _DieDelayTW.End();
-                    IsDead = true;
-                    enabled = false;
-                    if (Events != null)
-                        Events.OnDie(this, System.EventArgs.Empty);
+                    OnDie();
                 }
             }
             else
@@ -348,6 +365,14 @@ namespace Skill.Framework
                 Regenerate();
             }
             base.Update();
+        }
+
+        private void OnDie()
+        {
+            IsDead = true;
+            enabled = false;
+            if (Events != null)
+                Events.RaiseDie(this, System.EventArgs.Empty);
         }
 
 

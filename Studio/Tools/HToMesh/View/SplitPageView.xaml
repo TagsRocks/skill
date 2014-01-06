@@ -4,12 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="400">
+             d:DesignHeight="300" d:DesignWidth="500">
     <Grid>
         <Grid.Resources>
             <Style TargetType="GroupBox">
                 <Setter Property="Margin" Value="4" />
-                <Setter Property="Padding" Value="20,0,0,0" />
+                <Setter Property="Padding" Value="10,0,0,0" />
             </Style>
             <Style TargetType="TextBlock">
                 <Setter Property="VerticalAlignment" Value="Center" />
@@ -24,56 +24,51 @@
                 <Setter Property="MinHeight" Value="24" />
                 <Setter Property="Margin" Value="4,0" />
             </Style>
-        </Grid.Resources>
+        </Grid.Resources>        
         <Grid.RowDefinitions>
             <RowDefinition Height="70" />
             <RowDefinition Height="70" />
-            <RowDefinition Height="30" />
             <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <GroupBox Grid.Row="0" Header="Suggestion" >
-            <Grid>
-                <ComboBox x:Name="_CmbPatchSizes" SelectedIndex="{Binding SelectedSplitSize}" ItemsSource="{Binding SplitSizes}" Style="{StaticResource ButtonStyle}" HorizontalContentAlignment="Center" />
-            </Grid>
-        </GroupBox>
-        <GroupBox Grid.Row="1" Header="Patch Size" >
+        </Grid.RowDefinitions>        
+        <GroupBox Grid.Row="0" Header="Patch Size" Grid.Column="1" >
             <Grid>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="90" />                    
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="40" />
                     <ColumnDefinition Width="10" />
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="40" />                    
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="Width : "  />
-                <TextBox Grid.Column="1" Text="{Binding Width}" />
-                <TextBlock Grid.Column="3" Text="Height : "  />
-                <TextBox Grid.Column="4" Text="{Binding Height}"  />
-                <Button Grid.Column="5" Content="Split" Style="{StaticResource ButtonStyle}" Command="{Binding SplitCommand}" />
+                <ComboBox Grid.Column="0" x:Name="_CmbPatchSizes" SelectedIndex="{Binding SelectedSplitSize}" ItemsSource="{Binding SplitSizes}" Style="{StaticResource ButtonStyle}" HorizontalContentAlignment="Center" />
+                <TextBlock Grid.Column="1" Text="Width : "  />
+                <TextBox Grid.Column="2" Text="{Binding Width}" />
+                <TextBlock Grid.Column="4" Text="Height : "  />
+                <TextBox Grid.Column="5" Text="{Binding Height}"  />
+                <Button Grid.Column="6" Content="Split" Style="{StaticResource ButtonStyle}" Command="{Binding SplitCommand}" />
             </Grid>
         </GroupBox>
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="1" >
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="30" />
+                <ColumnDefinition Width="25" />
+                <ColumnDefinition Width="90" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="90" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="30" />
             </Grid.ColumnDefinitions>
-            <Button Content="All" Grid.Column="1" Command="{Binding SelectAllCommand}" />
-            <Button Content="None" Grid.Column="2" Command="{Binding SelectNoneCommand}" />
+            <Button Content="All" Grid.Column="1" Command="{Binding SelectAllCommand}" VerticalAlignment="Bottom" Margin="0,6" />
+            <Button Content="None" Grid.Column="3" Command="{Binding SelectNoneCommand}" VerticalAlignment="Bottom" Margin="0,6" />
         </Grid>
-        <Grid Grid.Row="3" Margin="8" >
+        <Grid Grid.Row="2" Margin="5" Grid.ColumnSpan="2" >
             <Image Margin="1" Source="{Binding Data.Image}" Stretch="Fill" />
-            <Border BorderThickness="1" BorderBrush="Gray" >
-                <ItemsControl ItemsSource="{Binding Data.Patches}" >
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <UniformGrid Rows="{Binding RowCount}" Columns="{Binding ColumnCount}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                </ItemsControl>
-            </Border>            
+            <ItemsControl ItemsSource="{Binding Data.Patches}" >
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Rows="{Binding RowCount}" Columns="{Binding ColumnCount}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
         </Grid>
     </Grid>
 </UserControl>

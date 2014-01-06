@@ -28,10 +28,25 @@ namespace Skill.Studio.AI
             }
         }
 
+        [Description("Whether this action change posture of actor?")]
+        public Skill.DataModels.Posture ChangePosture
+        {
+            get { return ((Skill.DataModels.AI.Action)Model).ChangePosture; }
+            set
+            {
+                if (((Skill.DataModels.AI.Action)Model).ChangePosture != value)
+                {
+                    Tree.History.Insert(new ChangePropertyUnDoRedo(this, "ChangePosture", value, ((Skill.DataModels.AI.Action)Model).ChangePosture));
+                    ((Skill.DataModels.AI.Action)Model).ChangePosture = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("ChangePosture"));
+                }
+            }
+        }
+
         [DefaultValue(false)]
         [Category("Events")]
         [DisplayName("Reset")]
-        [Description("If true code generator create an method and hook it to reset event")]
+        [Description("If true code generator create a method and hook it to reset event of BehaviorTree")]
         public bool ResetEvent
         {
             get { return ((Skill.DataModels.AI.Action)Model).ResetEvent; }
@@ -134,7 +149,9 @@ namespace Skill.Studio.AI
             {
                 string result = ((Skill.DataModels.AI.Action)Model).AnimationSource;
                 if (!string.IsNullOrEmpty(result))
-                    _GifAnimation.GifSource = MainWindow.Instance.Project.GetAnimationPath(result);
+                {
+                    _GifAnimation.GifSource = GifAnimationManager.GetGifPath(result, ChangePosture);
+                }
                 return result;
             }
             set
@@ -166,13 +183,24 @@ namespace Skill.Studio.AI
         public ActionViewModel(BehaviorViewModel parent, Skill.DataModels.AI.Action action)
             : base(parent, action)
         {
+            Init();
+        }
+
+        public ActionViewModel(BehaviorTreeViewModel tree, DataModels.AI.Action action)
+            : base(tree, action)
+        {
+            Init();
+        }
+
+        private void Init()
+        {
             GifAnimation = new GifImage();
             GifAnimation.FrameRate = FrameRate;
             GifAnimation.WrapMode = WrapMode;
 
-            string anim = action.AnimationSource;
+            string anim = ((DataModels.AI.Action)Model).AnimationSource;
             if (!string.IsNullOrEmpty(anim))
-                _GifAnimation.GifSource = MainWindow.Instance.Project.GetAnimationPath(anim);
+                _GifAnimation.GifSource = MainWindow.Instance.Project.GetGifAnimationPath(anim);
         }
     }
     #endregion

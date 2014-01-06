@@ -17,12 +17,14 @@ namespace Skill.DataModels.IO
         public string Comment { get; set; }
         /// <summary> properties of Class </summary>
         public SaveProperty[] Properties { get; set; }
+        /// <summary> Is struct? </summary>
+        public bool IsStruct { get; set; }
 
         /// <summary>
         /// Create an instance of SaveClass
         /// </summary>
         public SaveClass()
-            :this("NewClass")
+            : this("NewClass")
         {
 
         }
@@ -44,6 +46,7 @@ namespace Skill.DataModels.IO
         {
             XElement saveclass = new XElement("SaveClass");
             saveclass.SetAttributeValue("Name", Name != null ? Name : "");
+            saveclass.SetAttributeValue("IsStruct", IsStruct);
             if (this.Properties != null)
             {
                 XElement properties = new XElement("Properties");
@@ -76,6 +79,7 @@ namespace Skill.DataModels.IO
         public void Load(XElement e)
         {
             this.Name = e.GetAttributeValueAsString("Name", this.Name);
+            this.IsStruct = e.GetAttributeValueAsBoolean("IsStruct", false);
             XElement properties = e.FindChildByName("Properties");
             if (properties != null)
             {
@@ -142,6 +146,6 @@ namespace Skill.DataModels.IO
                 default:
                     return null;
             }
-        }        
+        }
     }
 }

@@ -6,31 +6,15 @@ namespace Skill.Framework.Managers
 
     /// <summary>
     /// After specific time CacheObject automatically cached
-    /// </summary>
-    [RequireComponent(typeof(CacheBehavior))]
-    [AddComponentMenu("Skill/Managers/CacheLifeTime")]
+    /// </summary>        
     public class CacheLifeTime : DynamicBehaviour
     {
         /// <summary>
         /// Life Time
         /// </summary>
-        public float LifeTime = 5;
+        public float LifeTime = 5;        
 
-        /// <summary>
-        /// Whether life time timer begins on awake
-        /// </summary>
-        public bool EnableOnAwake = true;
-
-        private TimeWatch _LifeTimeTW;
-
-        /// <summary>
-        /// Awake
-        /// </summary>
-        protected override void Awake()
-        {
-            base.Awake();
-            enabled = EnableOnAwake;
-        }
+        private TimeWatch _LifeTimeTW;        
 
         /// <summary>
         /// On Enable
@@ -45,10 +29,8 @@ namespace Skill.Framework.Managers
         /// </summary>
         protected override void Update()
         {
-            if (_LifeTimeTW.IsEnabledAndOver)
-            {
-                Cache.DestroyCache(this.gameObject);
-            }
+            if (_LifeTimeTW.IsEnabledAndOver)            
+                Cache.DestroyCache(this.gameObject);            
             base.Update();
         }
     }

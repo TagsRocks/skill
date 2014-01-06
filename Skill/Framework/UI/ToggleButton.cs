@@ -4,10 +4,22 @@ using System;
 
 namespace Skill.Framework.UI
 {
+
+    /// <summary> ToggleButton interface </summary>
+    public interface IToggleButton
+    {
+        /// <summary> Occurs when a ToggleButton is checked. </summary>
+        event EventHandler Checked;
+        /// <summary> Occurs when a ToggleButton is unchecked. </summary>
+        event EventHandler Unchecked;
+        /// <summary> Gets or sets whether the ToggleButton is checked. </summary>
+        bool IsChecked { get; set; }
+    }
+
     /// <summary>
     /// Make an on/off toggle button.
     /// </summary>
-    public class ToggleButton : FocusableControl
+    public class ToggleButton : FocusableControl, IToggleButton
     {
         /// <summary>
         /// Text, image and tooltip for this button.

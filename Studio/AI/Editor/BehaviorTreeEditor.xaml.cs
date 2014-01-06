@@ -30,12 +30,13 @@ namespace Skill.Studio.AI.Editor
 
         #region Menu Availability
 
+
         void CheckContextMnuAvailability()
         {
             BehaviorViewModel selected = _TreeView.SelectedItem;
             if (selected != null && !BehaviorTree.IsDebuging)
             {
-                _TreeView.IsDeleteAv = _GraphView.IsCopyAv = selected != BehaviorTree.Root;
+                _TreeView.IsDeleteAv = _TreeView.IsCopyAv = _GraphView.IsDeleteAv = _GraphView.IsCopyAv = selected != BehaviorTree.Root;
                 if (selected.Model.BehaviorType == BehaviorType.Composite)
                 {
                     _TreeView.IsNewAv = _GraphView.IsNewAv = true;
@@ -113,7 +114,7 @@ namespace Skill.Studio.AI.Editor
                 if (_AllowEdit != value)
                 {
                     _AllowEdit = value;
-                    RaisePropertyChanged("AllowEdit");                    
+                    RaisePropertyChanged("AllowEdit");
                 }
             }
         }
@@ -140,13 +141,14 @@ namespace Skill.Studio.AI.Editor
                 Skill.DataModels.AI.BehaviorTree bt = viewModel.LoadData() as Skill.DataModels.AI.BehaviorTree;
                 if (bt != null)
                 {
-                    Data = BehaviorTree = _GraphView.BehaviorTree = _TreeView.BehaviorTree = new BehaviorTreeViewModel(bt);
+                    Data = BehaviorTree = _GraphView.BehaviorTree = _TreeView.BehaviorTree = _ListView.BehaviorTree = new BehaviorTreeViewModel(bt);
                     RaisePropertyChanged("BehaviorTree");
                 }
             }
 
             this._GraphView.Editor = this;
             this._TreeView.Editor = this;
+            this._ListView.Editor = this;
             this.ParentDocument.Closed += ParentDocument_Closed;
 
             InitialDebug();
@@ -168,6 +170,7 @@ namespace Skill.Studio.AI.Editor
         private void SetState(int index)
         {
             _CmbStatesDesign.SelectedIndex = index;
+            ApplicationCommands.Properties.Execute(null, null);
         }
 
         #endregion
@@ -215,28 +218,22 @@ namespace Skill.Studio.AI.Editor
             CheckContextMnuAvailability();
             BehaviorViewModel vm = _TreeView.SelectedItem;
             ApplicationCommands.Properties.Execute(vm, null);
-            if (!BehaviorTree.IsDebuging)
-            {
 
-                if (vm != null)
+            if (vm != null && vm.Model.BehaviorType == BehaviorType.Action &&
+                vm.Model.BehaviorType == BehaviorType.Action &&
+                !string.IsNullOrEmpty(((ActionViewModel)vm).Animation))
+            {
+                ActionViewModel ac = (ActionViewModel)vm;
+                if (!Animations.Contains(ac.GifAnimation))
                 {
-                    if (vm.Model.BehaviorType == BehaviorType.Action)
-                    {
-                        ActionViewModel ac = (ActionViewModel)vm;
-                        if (!Animations.Contains(ac.GifAnimation))
-                        {
-                            foreach (var anim in Animations) anim.Stop();
-                            Animations.Clear();
-                            Animations.Add(ac.GifAnimation);
-                            ac.GifAnimation.Play();
-                        }
-                    }
-                    else
-                    {
-                        Animations.Clear();
-                    }
+                    foreach (var anim in Animations) anim.Stop();
+                    Animations.Clear();
+                    Animations.Add(ac.GifAnimation);
+                    ac.GifAnimation.Play();
                 }
             }
+            else if (!BehaviorTree.IsDebuging)
+                Animations.Clear();
         }
 
         #endregion
@@ -260,7 +257,7 @@ namespace Skill.Studio.AI.Editor
                                 newVM.IsSelected = true;
                                 foreach (BehaviorViewModel vm in BehaviorTree.GetSharedModel(newVM.Model))
                                 {
-                                    if (vm != newVM)
+                                    if (vm != newVM && ((BehaviorViewModel)vm.Parent).Model != ((BehaviorViewModel)newVM.Parent).Model)
                                     {
                                         ParameterCollectionViewModel parameters = null;
                                         if (vm.Model.BehaviorType == DataModels.AI.BehaviorType.Action)
@@ -361,6 +358,7 @@ namespace Skill.Studio.AI.Editor
                 {
                     newVM.IsSelected = true;
                 }
+                _GraphView.RefreshGraph();
             }
         }
 
@@ -436,6 +434,7 @@ namespace Skill.Studio.AI.Editor
                     {
                         ((BehaviorViewModel)selected.Parent).RemoveBehavior(selected);
                         _GraphView.RefreshGraph();
+                        ApplicationCommands.Properties.Execute(null, null);
                     }
                 }
                 CheckContextMnuAvailability();
@@ -648,6 +647,8 @@ namespace Skill.Studio.AI.Editor
         private void BtnAddNewState_Click(object sender, RoutedEventArgs e)
         {
             BehaviorTree.AddNewState();
+            SetState(_CmbStatesDesign.Items.IndexOf(BehaviorTree.Root));
+            ApplicationCommands.Properties.Execute(BehaviorTree.Root, null);
         }
 
         private void BtnDeleteState_Click(object sender, RoutedEventArgs e)
@@ -736,6 +737,7 @@ namespace Skill.Studio.AI.Editor
         private void StartDebug()
         {
             AllowEdit = false;
+            BehaviorTree.DebugTree = _DebugBehaviorTree;
             _PreState = BehaviorTree.Root.Name;
             Skill.Framework.AI.RandomSelector.RandomService = _DebugRandomService;
             foreach (var s in BehaviorTree.States)
@@ -783,7 +785,7 @@ namespace Skill.Studio.AI.Editor
 
             if (!BehaviorTree.IsDebuging) return;
             BehaviorTree.DebugTimer += _DebugTimeInterval;
-            _DebugBehaviorTree.Update(null);
+            _DebugBehaviorTree.Update();
 
             // notify debug behaviors that all ExecutionSequence is visited
             for (int i = 0; i < _DebugBehaviorTree.Status.SequenceCount; i++)

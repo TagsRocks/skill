@@ -7,33 +7,35 @@ namespace Skill.Framework.Modules
     /// <summary>
     /// Call Global.OnCameraShake event OnEnable. this is usefull for explisions to shake camera
     /// </summary>
-    [AddComponentMenu("Skill/Modules/ShakeOnEnable")]
+    ///<remarks>
+    ///// When a GameObject instantiated OnEnable method will called.
+    ///// if use this behavior with a cachable object, and cache objects instantiated before use,
+    ///// so it is better to ignore first enable
+    ///// so make sure that if you use this behavior and CacheBehavior together, this gameobject must be inside a CacheGroup to work correctly
+    ///// </remarks>    
+    [RequireComponent(typeof(EventManager))]
     public class ShakeOnEnable : StaticBehaviour
     {
         /// <summary> Shake parameter </summary>
-        public CameraShakeInfo Shake;
+        public CameraShakeParams Shake;
 
-        /// <summary> Ignore first OnEnable </summary>
-        /// <remarks>
-        /// When a GameObject instantiated OnEnable method will called.
-        /// if use this behavior with a cachable object, and cache objects instantiated before use,
-        /// so it is better to ignore first enable
-        /// </remarks>
-        public bool IgnoreFirst = true;
+        //private bool _IgnoreFirst;
 
-        private int _EnableCount = 0;
+        //protected override void Awake()
+        //{
+        //    base.Awake();
+        //    _IgnoreFirst = GetComponent<Managers.CacheBehavior>() != null;
+        //}
 
         /// <summary>
         /// This function is called when the object becomes enabled and active.
         /// </summary>
         protected virtual void OnEnable()
         {
-            if (IgnoreFirst && _EnableCount < 1)
-            {
-                _EnableCount++;
-            }
-            else
-                Global.OnCameraShake(this, Shake, _Transform.position);
+            //if (_IgnoreFirst)
+            //    _IgnoreFirst = false;
+            //else
+                Global.RaiseCameraShake(this, Shake, _Transform.position);
         }
     }
 }

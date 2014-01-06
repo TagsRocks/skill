@@ -13,7 +13,7 @@ namespace Skill.CodeGeneration.CSharp
         /// <summary> whether this method is override,virtual or usual </summary>
         public SubMethod SubMethod { get; set; }
         /// <summary> Modifier of property (public, internal, private, protected) </summary>
-        public Modifiers Modifiers { get; set; }
+        public Modifiers Modifier { get; set; }
         /// <summary> whether this variable settable</summary>
         public bool HasSet { get; private set; }
         /// <summary> string that represent type of property (int, float, string, ....)</summary>
@@ -41,7 +41,7 @@ namespace Skill.CodeGeneration.CSharp
         /// <param name="hasSet">whether this variable settable</param>
         public Property(string type, string name, string value, bool hasSet = true)
         {
-            this.Modifiers = Modifiers.Public;
+            this.Modifier = Modifiers.Public;
             this.Type = type;
             this.Name = name;
             this.Value = value;
@@ -61,7 +61,7 @@ namespace Skill.CodeGeneration.CSharp
             CommentWriter.Write(writer, Comment);
             if (Multiline)
             {
-                writer.WriteLine(string.Format("{0} {1} {2} {3} {4}", Modifiers.ToString().ToLower(),
+                writer.WriteLine(string.Format("{0} {1} {2} {3} {4}", Modifier.ToString().ToLower(),
                     IsStatic ? "static" : string.Empty,
                     (SubMethod != CSharp.SubMethod.None) ? SubMethod.ToString().ToLower() : string.Empty,
                     Type, GetName(Name)));
@@ -86,14 +86,14 @@ namespace Skill.CodeGeneration.CSharp
             {
                 if (HasSet)
                 {
-                    writer.WriteLine(string.Format("{0} {1} {2} {3} {4} {{ get {{ {5} }} set {{ {6} }} }}", Modifiers.ToString().ToLower(),
+                    writer.WriteLine(string.Format("{0} {1} {2} {3} {4} {{ get {{ {5} }} set {{ {6} }} }}", Modifier.ToString().ToLower(),
                         IsStatic ? "static" : string.Empty,
                         (SubMethod != CSharp.SubMethod.None) ? SubMethod.ToString().ToLower() : string.Empty,
                         Type, GetName(Name), _Get, _Set));
                 }
                 else
                 {
-                    writer.WriteLine(string.Format("{0} {1} {2} {3} {4} {{ get {{ {5} }} }}", Modifiers.ToString().ToLower(),
+                    writer.WriteLine(string.Format("{0} {1} {2} {3} {4} {{ get {{ {5} }} }}", Modifier.ToString().ToLower(),
                         IsStatic ? "static" : string.Empty,
                         (SubMethod != CSharp.SubMethod.None) ? SubMethod.ToString().ToLower() : string.Empty,
                         Type, GetName(Name), _Get));

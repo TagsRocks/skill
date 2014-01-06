@@ -10,8 +10,6 @@ namespace Skill.Framework.Managers
     [Serializable]
     public class CacheObject
     {
-        /// <summary> Name of CacheObject </summary>
-        public string Name;
         /// <summary> Cacheable GameObject</summary>
         public GameObject Prefab;
         /// <summary> Number of instances to create at initialize time</summary>
@@ -48,10 +46,16 @@ namespace Skill.Framework.Managers
             for (_NextIndex = 0; _NextIndex < CacheSize; _NextIndex++)
             {
                 GameObject obj = MonoBehaviour.Instantiate(Prefab) as GameObject;
-                obj.transform.parent = group.transform;                
+                if (group.MakeAsChild)
+                    obj.transform.parent = group.transform;
 
                 SetCacheIdAndGroup(obj);
-                obj.SetActive(false);                
+                obj.SetActive(false);
+
+                EventManager eventManager = obj.GetComponent<EventManager>();
+                if (eventManager != null)
+                    eventManager.RaiseCached(null, new CacheEventArgs(this.CacheId));
+
                 _DeactiveObjects.Enqueue(obj);
                 _Objects.Add(obj);
             }
@@ -99,8 +103,13 @@ namespace Skill.Framework.Managers
             if (Growable)
             {
                 GameObject obj = MonoBehaviour.Instantiate(Prefab) as GameObject;
-                obj.transform.parent = Group.transform;                
+                if (Group.MakeAsChild)
+                    obj.transform.parent = Group.transform;
                 SetCacheIdAndGroup(obj);
+                obj.SetActive(false);
+                EventManager eventManager = obj.GetComponent<EventManager>();
+                if (eventManager != null)
+                    eventManager.RaiseCached(null, new CacheEventArgs(this.CacheId));
                 _Objects.Add(obj);
                 return obj;
             }

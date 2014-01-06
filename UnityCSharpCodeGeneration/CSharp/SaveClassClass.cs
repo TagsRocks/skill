@@ -20,15 +20,20 @@ namespace Skill.CodeGeneration.CSharp
         /// <param name="saveClass">SaveClass model</param>
         public SaveClassClass(SaveClass saveClass)
             : base(saveClass.Name)
-        {
+        {            
             this._SaveClass = saveClass;
             this.IsPartial = false;
+            this.IsStruct = saveClass.IsStruct;
 
             AddInherit("Skill.Framework.IO.ISavable");
 
-            Method constructor = new Method("", Name, "");
-            constructor.Modifiers = Modifiers.Public;
-            Add(constructor);
+            if (!this.IsStruct)
+            {
+                base.AddAttribute("System.Serializable");
+                Method constructor = new Method("", Name, "");
+                constructor.Modifier = Modifiers.Public;
+                Add(constructor);
+            }
 
             // create static creator method
             CreateCreatorMethod();
@@ -48,7 +53,7 @@ namespace Skill.CodeGeneration.CSharp
 
         private void CreateCreatorMethod()
         {
-            Method m = new Method(this.Name, GetStaticCreatorMethodName(this.Name), string.Format("return new {0}();", this.Name)) { IsStatic = true, Modifiers = Modifiers.Public };
+            Method m = new Method(this.Name, GetStaticCreatorMethodName(this.Name), string.Format("return new {0}();", this.Name)) { IsStatic = true, Modifier = Modifiers.Public };
             Add(m);
         } 
         #endregion
@@ -131,7 +136,7 @@ namespace Skill.CodeGeneration.CSharp
             }
 
             Method toXmlElement = new Method("void", "Save", toXmlElementBody.ToString(), "Skill.Framework.IO.XmlElement e", "Skill.Framework.IO.XmlSaveStream stream");
-            toXmlElement.Modifiers = Modifiers.Public;
+            toXmlElement.Modifier = Modifiers.Public;
             Add(toXmlElement);
         }
 
@@ -148,7 +153,7 @@ namespace Skill.CodeGeneration.CSharp
             }
 
             Method saveMethod = new Method("void", "Save", saveBinaryBody.ToString(), "Skill.Framework.IO.BinarySaveStream stream");
-            saveMethod.Modifiers = Modifiers.Public;
+            saveMethod.Modifier = Modifiers.Public;
             Add(saveMethod);
         }
 
@@ -252,7 +257,7 @@ namespace Skill.CodeGeneration.CSharp
             loadXmlBody.AppendLine("}");
 
             Method loadMethod = new Method("void", "Load", loadXmlBody.ToString(), "Skill.Framework.IO.XmlElement e", "Skill.Framework.IO.XmlLoadStream stream");
-            loadMethod.Modifiers = Modifiers.Public;
+            loadMethod.Modifier = Modifiers.Public;
             Add(loadMethod);
         }
 
@@ -277,7 +282,7 @@ namespace Skill.CodeGeneration.CSharp
             }
 
             Method loadBinaryMethod = new Method("void", "Load", loadMethodBody.ToString(), "Skill.Framework.IO.BinaryLoadStream stream");
-            loadBinaryMethod.Modifiers = Modifiers.Public;
+            loadBinaryMethod.Modifier = Modifiers.Public;
             Add(loadBinaryMethod);
         }
     }

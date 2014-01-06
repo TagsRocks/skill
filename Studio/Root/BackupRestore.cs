@@ -91,7 +91,7 @@ namespace Skill.Studio
 
     public class BackupRestore
     {
-        private string _UnityDirectory;
+        private string _ScriptsPath;
         private string _ProjectName;
 
         public string CodeFileExtension { get; set; }
@@ -111,7 +111,7 @@ namespace Skill.Studio
                 throw new InvalidOperationException("Can not create instance of backup file when no project loaded");
 
             this._ProjectName = MainWindow.Instance.Project.Model.Name;
-            this._UnityDirectory = MainWindow.Instance.Project.Directory;
+            this._ScriptsPath = MainWindow.Instance.Project.ScriptsPath;
             this.BackupDirectory = Path.Combine(BackupRoot, _ProjectName);
         }
 
@@ -164,7 +164,7 @@ namespace Skill.Studio
 
         public void Create(string backupName)
         {
-            if (!Directory.Exists(_UnityDirectory)) return;
+            if (!Directory.Exists(_ScriptsPath)) return;
             if (!MainWindow.Instance.IsProjectLoaded) return;
             string destination = Path.Combine(BackupDirectory, backupName);
 
@@ -175,7 +175,7 @@ namespace Skill.Studio
         {
             if (node.EntityType != EntityType.Root && node.EntityType != EntityType.Folder)
             {
-                string file = System.IO.Path.Combine(_UnityDirectory, node.LocalPathWithoutExtension + CodeFileExtension);
+                string file = System.IO.Path.Combine(_ScriptsPath, node.LocalPathWithoutExtension + CodeFileExtension);
                 if (System.IO.File.Exists(file))
                 {
                     string backupFile = Path.Combine(destDir, node.LocalPathWithoutExtension + CodeFileExtension);
@@ -260,27 +260,27 @@ namespace Skill.Studio
             return null;
         }
 
-        private void RestoreCode(UserCodeFile code)
+        private void RestoreCode(UserCodeFile code, string backupName)
         {
-            if (!Directory.Exists(_UnityDirectory)) return;
+            if (!Directory.Exists(_ScriptsPath)) return;
 
             string path = Path.GetFullPath(code.Path);
-            string localPath = path.Replace(BackupDirectory, string.Empty).Trim(_TrimStartChars);
-            string destFile = Path.Combine(_UnityDirectory, localPath);
+            string localPath = path.Replace(Path.Combine(BackupDirectory, backupName), string.Empty).Trim(_TrimStartChars);
+            string destFile = Path.Combine(_ScriptsPath, localPath);
             Copy(code.Path, destFile);
         }
 
-        public void Restore(BackupItem item)
+        public void Restore(BackupItem item, string backupName)
         {
             if (item == null) return;
             else if (item is BackupFolder)
             {
                 foreach (var child in item)
                 {
-                    Restore(child as BackupItem);
+                    Restore(child as BackupItem, backupName);
                 }
             }
-            else if (item is UserCodeFile) RestoreCode(item as UserCodeFile);
+            else if (item is UserCodeFile) RestoreCode(item as UserCodeFile, backupName);
         }
 
         public void Delete(BackupItem item)

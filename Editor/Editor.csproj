@@ -49,6 +49,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Tools\BrushProjector.cs" />
+    <Compile Include="Tools\CacheObjectField.cs" />
+    <Compile Include="Tools\CacheGroupEditor.cs" />
+    <Compile Include="Tools\CRSpline3DEditor.cs" />
+    <Compile Include="Tools\Curve3DEditor.cs" />
+    <Compile Include="Tools\EditorListItem.cs" />
+    <Compile Include="Tools\ExplosionEditor.cs" />
+    <Compile Include="Tools\IEditor.cs" />
+    <Compile Include="Tools\LaserBeamEditor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -61,13 +70,19 @@
     <Compile Include="Tools\ImplantAsset.cs" />
     <Compile Include="Tools\ImplantAssetEditor.cs" />
     <Compile Include="Tools\ImplantObject.cs" />
+    <Compile Include="Tools\MeterEditor.cs" />
+    <Compile Include="Tools\PaintColorEditor.cs" />
     <Compile Include="Tools\SpawnAssetEditor.cs" />
     <Compile Include="Tools\SpawnObjectField.cs" />
+    <Compile Include="Tools\TextureBrush.cs" />
     <Compile Include="UI\BoundsField.cs" />
     <Compile Include="UI\Button.cs" />
     <Compile Include="UI\ChangeCheck.cs" />
     <Compile Include="UI\ColorField.cs" />
     <Compile Include="UI\EditorFrame.cs" />
+    <Compile Include="UI\Extended\TabHeader.cs" />
+    <Compile Include="UI\Extended\TextureBrushGrid.cs" />
+    <Compile Include="UI\InspectorHelper.cs" />
     <Compile Include="UI\IntPopup.cs" />
     <Compile Include="UI\CurveField.cs" />
     <Compile Include="UI\DropShadowLabel.cs" />
@@ -94,7 +109,7 @@
     <Compile Include="UI\PropertyField.cs" />
     <Compile Include="UI\RectField.cs" />
     <Compile Include="UI\SelectableLabel.cs" />
-    <Compile Include="UI\SelectionField.cs" />
+    <Compile Include="UI\Extended\SelectionField.cs" />
     <Compile Include="UI\SerializedPropertySlider.cs" />
     <Compile Include="UI\Slider.cs" />
     <Compile Include="UI\TagField.cs" />
@@ -106,14 +121,15 @@
     <Compile Include="UI\Vector3Field.cs" />
     <Compile Include="UI\Vector4Field.cs" />
     <Compile Include="UI\VerticalExpander.cs" />
-    <Compile Include="UI\XYZComponent.cs" />
+    <Compile Include="UI\Extended\XYZComponent.cs" />
     <Compile Include="Windows\AboutSkill.cs" />
-    <Compile Include="Tools\AnimationAssigner.cs" />
+    <Compile Include="Tools\AnimationCopy.cs" />
     <Compile Include="Diagnostics\BehaviorTreeStateDebugger.cs" />
     <Compile Include="Windows\Exporter.cs" />
-    <Compile Include="Tools\Implant.cs" />
+    <Compile Include="Tools\ImplantEditor.cs" />
     <Compile Include="Tools\ImplantObjectField.cs" />
     <Compile Include="Windows\LineDrawer.cs" />
+    <Compile Include="Windows\ScriptableObjectUtility.cs" />
     <Compile Include="Windows\SkillMenu.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -136,13 +152,49 @@
     <Content Include="Resources\UI\Action.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\UI\Colors\Black.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Colors\Blue.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Colors\Green.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Colors\Red.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Colors\Transparent.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Colors\White.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Colors\Yellow.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\UI\Condition.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\UI\Decorator.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\UI\EvenItem.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\UI\Failure.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Minus.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\OddItem.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Plus.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\PlusNext.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\UI\Running.png">

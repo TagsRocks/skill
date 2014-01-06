@@ -30,7 +30,7 @@ namespace Skill.Editor.Tools
         /// <summary> Maximum scale percent of original scale </summary>
         public float MaxScalePercent;
         /// <summary> Chance of this object to implant </summary>
-        public float Chance;
+        public float Weight;
 
         // ******** Rotation *********
 

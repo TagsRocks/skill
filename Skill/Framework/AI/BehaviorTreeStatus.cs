@@ -55,6 +55,30 @@ namespace Skill.Framework.AI
         public IBehaviorTree Tree { get; private set; }
 
         /// <summary>
+        /// Posture based on actions
+        /// </summary>
+        public Posture Posture { get; private set; }
+
+        /// <summary>
+        /// Is execution of tree interrupted for any reason?
+        /// </summary>
+        public bool IsInterrupted { get; private set; }
+
+        /// <summary>
+        /// Interrupt execution of tree
+        /// </summary>
+        public void Interrupt()
+        {
+            IsInterrupted = true;
+        }
+
+        internal void ChangePosture(Posture newPosture)
+        {
+            if (newPosture != Framework.Posture.Unknown)
+                Posture = newPosture;
+        }
+
+        /// <summary>
         /// Create a BehaviorStatus
         /// </summary>
         /// <param name="tree">BehaviorTree</param>
@@ -63,7 +87,7 @@ namespace Skill.Framework.AI
             this.Tree = tree;
             this.Exception = null;
             this.RunningActions = new RunningActionCollection();
-        }        
+        }
         private Behavior[] _ExecutionSequence = new Behavior[MaxSequenceLength];// 200 is maximum node trace in tree (i hope).
         private int _CurrnetExecutionIndex = -1;
 
@@ -73,6 +97,7 @@ namespace Skill.Framework.AI
         /// </summary>
         public void Begin()
         {
+            this.IsInterrupted = false;
             this.Exception = null;
             this._CurrnetExecutionIndex = -1;
             this.UpdateId++;

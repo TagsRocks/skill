@@ -55,6 +55,7 @@ namespace Skill.Editor.UI
             if (owner == null)
                 throw new ArgumentNullException("Invalid EditorWindow");
             this.Owner = owner;
+            this.Location = EditorFrameLocation.Fill;
         }
 
         /// <summary>

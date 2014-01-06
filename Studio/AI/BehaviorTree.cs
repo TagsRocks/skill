@@ -158,6 +158,7 @@ namespace Skill.Studio.AI
         /// <summary> Editor owner </summary>
         public Editor.IBehaviorTreeGraphView GraphView { get; set; }
 
+        public Skill.Studio.AI.Editor.DebugBehaviorTree DebugTree { get; internal set; }
         private bool _IsDebuging;
         [Browsable(false)]
         public bool IsDebuging
@@ -236,8 +237,36 @@ namespace Skill.Studio.AI
 
             foreach (var s in tree.States)
             {
-                BehaviorViewModel svm = new PrioritySelectorViewModel(this, (PrioritySelector)s);
+                BehaviorTreeStateViewModel svm = new BehaviorTreeStateViewModel(this, (BehaviorTreeState)s);
                 // each state register itself
+            }
+            //create extra behaviors
+            if (tree.ExtraBehaviors != null)
+            {
+                foreach (Behavior b in tree.ExtraBehaviors)
+                {
+                    BehaviorViewModel viewmodel = null;
+                    switch (b.BehaviorType)
+                    {
+                        case BehaviorType.Action:
+                            viewmodel = FindViewModelByModel(this.Actions, b);
+                            break;
+                        case BehaviorType.Condition:
+                            viewmodel = FindViewModelByModel(this.Conditions, b);
+                            break;
+                        case BehaviorType.Decorator:
+                            viewmodel = FindViewModelByModel(this.Decorators, b);
+                            break;
+                        case BehaviorType.Composite:
+                            viewmodel = FindViewModelByModel(this.Composites, b);
+                            break;
+                        case BehaviorType.ChangeState:
+                            viewmodel = FindViewModelByModel(this.ChangeStates, b);
+                            break;
+                    }
+                    if (viewmodel == null)
+                        viewmodel = BehaviorViewModel.CreateViewModel(this, b);
+                }
             }
             this.SelectDefaultState();
             this.AccessKeys = new SharedAccessKeysViewModel(Model.AccessKeys);
@@ -279,49 +308,76 @@ namespace Skill.Studio.AI
         {
             if (_IgnoreRegister || viewModel.Tree != this) return;
 
-            if (viewModel.IsState)
+            //check if we donot register it before add it to list            
+            switch (viewModel.Model.BehaviorType)
             {
-                if (FindViewModelByModel(this.States, viewModel.Model) == null)
-                    this.States.Add(viewModel);
-            }
-            else
-            {
-                //check if we donot register it before add it to list            
-                switch (viewModel.Model.BehaviorType)
-                {
-                    case BehaviorType.Action:
-                        if (FindViewModelByModel(this.Actions, viewModel.Model) == null)
-                            this.Actions.Add(viewModel);
-                        break;
-                    case BehaviorType.Condition:
-                        if (FindViewModelByModel(this.Conditions, viewModel.Model) == null)
-                            this.Conditions.Add(viewModel);
-                        break;
-                    case BehaviorType.Decorator:
-                        if (FindViewModelByModel(this.Decorators, viewModel.Model) == null)
-                            this.Decorators.Add(viewModel);
-                        break;
-                    case BehaviorType.Composite:
+                case BehaviorType.Action:
+                    if (FindViewModelByModel(this.Actions, viewModel.Model) == null)
+                        this.Actions.Add(viewModel);
+                    break;
+                case BehaviorType.Condition:
+                    if (FindViewModelByModel(this.Conditions, viewModel.Model) == null)
+                        this.Conditions.Add(viewModel);
+                    break;
+                case BehaviorType.Decorator:
+                    if (FindViewModelByModel(this.Decorators, viewModel.Model) == null)
+                        this.Decorators.Add(viewModel);
+                    break;
+                case BehaviorType.Composite:
+                    if (((CompositeViewModel)viewModel).CompositeType == CompositeType.State)
+                    {
+                        if (FindViewModelByModel(this.States, viewModel.Model) == null)
+                            this.States.Add(viewModel);
+                    }
+                    else
+                    {
                         if (FindViewModelByModel(this.Composites, viewModel.Model) == null)
                             this.Composites.Add(viewModel);
-                        break;
-                    case BehaviorType.ChangeState:
-                        if (FindViewModelByModel(this.ChangeStates, viewModel.Model) == null)
-                            this.ChangeStates.Add(viewModel);
-                        break;
-                }
+                    }
+                    break;
+                case BehaviorType.ChangeState:
+                    if (FindViewModelByModel(this.ChangeStates, viewModel.Model) == null)
+                        this.ChangeStates.Add(viewModel);
+                    break;
             }
-
             if (FindViewModelByModel(this.Behaviors, viewModel.Model) == null)
+            {
                 this.Behaviors.Add(viewModel);
+            }
         }
 
         public void UnRegisterViewModel(BehaviorViewModel viewModel)
         {
-            UnRegisterRecursive(viewModel);
+            if (viewModel.Model.BehaviorType == BehaviorType.Composite && ((CompositeViewModel)viewModel).CompositeType == CompositeType.State)
+            {
+                this.States.Remove(viewModel);
+                this.Behaviors.Remove(viewModel);
+            }
+            else if (!IsInHierarchy(viewModel))
+            {
+                this.Behaviors.Remove(viewModel);
+                switch (viewModel.Model.BehaviorType)
+                {
+                    case BehaviorType.Action:
+                        Actions.Remove(viewModel);
+                        break;
+                    case BehaviorType.Condition:
+                        Conditions.Remove(viewModel);
+                        break;
+                    case BehaviorType.Decorator:
+                        Decorators.Remove(viewModel);
+                        break;
+                    case BehaviorType.Composite:
+                        Composites.Remove(viewModel);
+                        break;
+                    case BehaviorType.ChangeState:
+                        ChangeStates.Remove(viewModel);
+                        break;
+                }
+            }
         }
 
-        private bool IsInHierarchy(BehaviorViewModel viewModel)
+        public bool IsInHierarchy(BehaviorViewModel viewModel)
         {
             foreach (var s in States)
             {
@@ -333,43 +389,13 @@ namespace Skill.Studio.AI
 
         private bool IsInHierarchy(BehaviorViewModel node, BehaviorViewModel viewModel)
         {
-            if (node == viewModel) return true;
+            if (node.Model == viewModel.Model) return true;
             foreach (BehaviorViewModel child in node)
             {
                 if (IsInHierarchy(child, viewModel))
                     return true;
             }
             return false;
-        }
-
-        //private void RegisterRecursive(BehaviorViewModel viewModel)
-        //{
-        //    if (!this.Behaviors.Contains(viewModel))
-        //    {
-        //        this.Behaviors.Add(viewModel);
-        //        foreach (BehaviorViewModel child in viewModel)
-        //        {
-        //            if (child != null)
-        //                RegisterRecursive(child);
-        //        }
-        //    }
-        //}
-
-        private void UnRegisterRecursive(BehaviorViewModel viewModel)
-        {
-            if (viewModel.IsState)
-            {
-                this.States.Remove(viewModel);
-            }
-            else if (!IsInHierarchy(viewModel))
-            {
-                Behaviors.Remove(viewModel);
-                foreach (BehaviorViewModel child in viewModel)
-                {
-                    if (child != null)
-                        UnRegisterRecursive(child);
-                }
-            }
         }
         #endregion
 
@@ -381,16 +407,16 @@ namespace Skill.Studio.AI
         public void CreateNewName(BehaviorViewModel behaviorVM)
         {
             CreateNewName(behaviorVM, Behaviors);
+            foreach (BehaviorViewModel child in behaviorVM)
+                CreateNewName(child);// make sure all new behaviors have a valid name            
         }
         void CreateNewName(BehaviorViewModel behaviorVM, ObservableCollection<BehaviorViewModel> list)
         {
             int i = 1;
             string name = behaviorVM.Name;
-            while (list.Where(b => b != behaviorVM && b.Name == name).Count() > 0)
-            {
+            while (list.Where(b => b.Model != behaviorVM.Model && b.Name == name).Count() > 0)
                 name = behaviorVM.Name + i++;
-            }
-            behaviorVM.Model.Name = name;
+            behaviorVM.Name = name;
         }
         #endregion
 
@@ -438,6 +464,14 @@ namespace Skill.Studio.AI
             foreach (var s in States)
                 states.Add(s.Model);
             this.Model.States = states.ToArray();
+
+            List<Behavior> extra = new List<Behavior>();
+            foreach (var b in Behaviors)
+            {
+                if (!IsInHierarchy(b))
+                    extra.Add(b.Model);
+            }
+            this.Model.ExtraBehaviors = extra.ToArray();
         }
 
         private void OptimizeChangeStates(BehaviorViewModel behavior, List<DataModels.AI.ChangeState> changestateList)
@@ -489,13 +523,13 @@ namespace Skill.Studio.AI
         /// </summary>                
         public BehaviorViewModel AddNewState()
         {
-            PrioritySelector state = new PrioritySelector();
+            BehaviorTreeState state = new BehaviorTreeState();
 
             _IgnoreRegister = true;
-            PrioritySelectorViewModel stateVM = new PrioritySelectorViewModel(this, state) { IsState = true, Name = "NewState" };
+            BehaviorTreeStateViewModel stateVM = new BehaviorTreeStateViewModel(this, state) { Name = "NewState" };
             _IgnoreRegister = false;
             CreateNewName(stateVM);
-            AddState(stateVM);
+            AddState(stateVM);            
             return stateVM;
         }
 
@@ -553,6 +587,41 @@ namespace Skill.Studio.AI
         }
 
         #endregion
+
+        public void Use(BehaviorViewModel behavior)
+        {
+            switch (behavior.Model.BehaviorType)
+            {
+                case BehaviorType.Action:
+                    this.Actions.Where(b => b.Model == behavior.Model).All(b => b.IsUnused = false);
+                    break;
+                case BehaviorType.Condition:
+                    this.Conditions.Where(b => b.Model == behavior.Model).All(b => b.IsUnused = false);
+                    break;
+                case BehaviorType.Decorator:
+                    this.Decorators.Where(b => b.Model == behavior.Model).All(b => b.IsUnused = false);
+                    break;
+                case BehaviorType.Composite:
+                    this.Composites.Where(b => b.Model == behavior.Model).All(b => b.IsUnused = false);
+                    break;
+                case BehaviorType.ChangeState:
+                    this.ChangeStates.Where(b => b.Model == behavior.Model).All(b => b.IsUnused = false);
+                    break;
+                default:
+                    break;
+            }
+
+            foreach (BehaviorViewModel b in Behaviors)
+            {
+                if (b.Model == behavior.Model)
+                {
+                    behavior.IsUnused = false;
+                    break;
+                }
+            }
+            foreach (BehaviorViewModel child in behavior)
+                Use(child);
+        }
     }
     #endregion
 }

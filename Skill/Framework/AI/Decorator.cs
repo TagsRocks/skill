@@ -3,16 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Skill.Framework.AI
-{
-    #region DecoratorHandler
-    /// <summary>
-    /// Represents the method to handle execution of Decorator by user
-    /// </summary>    
-    /// <param name="parameters">Parameters for handler</param>
-    /// <returns>true for success, false for failure</returns>
-    public delegate bool DecoratorHandler(BehaviorParameterCollection parameters);
-    #endregion
-
+{    
     #region DecoratorType
     /// <summary>
     /// Defines type of  Decorator
@@ -38,7 +29,7 @@ namespace Skill.Framework.AI
     /// </summary>
     public class Decorator : Behavior
     {        
-        private DecoratorHandler _Handler = null;// handler
+        private ConditionHandler _Handler = null;// handler
 
         /// <summary>
         /// Single child node
@@ -73,7 +64,7 @@ namespace Skill.Framework.AI
         /// </summary>
         /// <param name="name">Name of behavior</param>
         /// <param name="handler">user provided function to handle execution of Decorator</param>
-        public Decorator(string name, DecoratorHandler handler)
+        public Decorator(string name, ConditionHandler handler)
             : base(name, BehaviorType.Decorator)
         {
             this._Handler = handler;
@@ -96,7 +87,7 @@ namespace Skill.Framework.AI
                     {
                         result = TraceChild(status);
                     }
-                    else if (_Handler(status.Parameters))
+                    else if (_Handler(this,status.Parameters))
                     {
                         result = TraceChild(status);
                     }

@@ -35,7 +35,7 @@ namespace Skill.Studio.Tools
 
         public SaveOptionControl()
         {
-            Versions = new string[] { "2013", "2012", "2011", "2010", "2009", "2006" };
+            Versions = new string[] { "2014", "2013", "2012", "2011", "2010", "2009", "2006" };
             Formats = new string[] { "Binary", "Ascii" };
             Axises = new string[] { "YUp", "ZUp" };
             Units = new string[] { "Inches", "Feet", " Yards", "Miles", "Millimeters", "Centimeters", "Meters", "Kilometers" };
@@ -47,16 +47,16 @@ namespace Skill.Studio.Tools
             _SaveOptions.SmoothMesh = false;
             _SaveOptions.TangentsAndBinormals = false;
             //_Units = FbxSystemUnits.Meters;
-            _SaveOptions.Version = FbxVersion.V2012;
+            _SaveOptions.Version = FbxVersion.V2014;
             _SaveOptions.Axis = FbxAxis.YUp;
-            _SaveOptions.Units = FbxSystemUnits.Meters;
+            _SaveOptions.Units = FbxSystemUnits.Centimeters;
 
             InitializeComponent();
 
             SelectedVersion = 1;
             SelectedFormat = 0;
             SelectedAxis = 0;
-            SelectedUnit = 6;
+            SelectedUnit = 5;
         }
 
         public string[] Versions { get; private set; }

@@ -7,20 +7,19 @@ namespace Skill.Framework
 {
     /// <summary>
     /// Shakes camera. arrange components in a way that CameraShake component update after camera controller
-    /// </summary>
-    [AddComponentMenu("Skill/Camera/Shake")]
+    /// </summary>    
     public class CameraShake : DynamicBehaviour
     {
 
-        private CameraShakeInfo _Shake;
-        private TimeWatch _ShakeTime;
+        private CameraShakeParams _Shake;
+        private TimeWatch _ShakeTimeTW;
+        private TimeWatch _TickTimeTW;
+        private Vector3 _DeltaPosition;
+        private float _DeltaRoll;
 
-        /// <summary>
-        /// Hook required events
-        /// </summary>
-        protected override void HookEvents()
+        protected override void Start()
         {
-            base.HookEvents();
+            base.Start();
             Global.CameraShake += OnCameraShake;
         }
 
@@ -44,19 +43,49 @@ namespace Skill.Framework
         /// </summary>
         /// <param name="shakeInfo">Parameters of shake</param>
         /// <param name="sourceOfShake"> source of shake </param>
-        public virtual void Shake(CameraShakeInfo shakeInfo, Vector3 sourceOfShake)
+        public virtual void Shake(CameraShakeParams shakeInfo, Vector3 sourceOfShake)
         {
-
-            float distanceToSource = Vector3.Distance(_Transform.position, sourceOfShake);
-            if (distanceToSource <= shakeInfo.Range)
+            if (shakeInfo.Enable)
             {
-                this._Shake = new CameraShakeInfo(shakeInfo);
-                float modifier = (this._Shake.ByDistance) ? (1 - (distanceToSource / this._Shake.Range)) : 1.0f;
-                this._Shake.Roll *= modifier;
-                this._Shake.Intensity *= modifier;
-                this._ShakeTime.Begin(this._Shake.Duration);
-                base.enabled = true;
+                if (this._Shake == null)
+                    this._Shake = new CameraShakeParams();
+
+                float distanceToSource = Vector3.Distance(_Transform.position, sourceOfShake);
+                if (distanceToSource <= shakeInfo.Range)
+                {
+                    this._Shake.CopyFrom(shakeInfo);
+                    if (this._Shake.Range <= Mathf.Epsilon) this._Shake.Range = Mathf.Epsilon;
+                    float modifier = (this._Shake.ByDistance) ? (1 - Mathf.Clamp01(distanceToSource / this._Shake.Range)) : 1.0f;
+                    this._Shake.Roll *= modifier;
+                    this._Shake.Intensity *= modifier;
+                    if (this._Shake.TickTime < 0) this._Shake.TickTime = 0;
+                    this._ShakeTimeTW.Begin(this._Shake.Duration);
+                    this.Tick();
+                    base.enabled = true;
+                }
             }
+        }
+
+        private void Tick()
+        {
+            Vector3 right = _Transform.right;
+            Vector3 up = _Transform.up;
+            Vector3 forward = _Transform.forward;
+            Vector3 position = _Transform.position;
+            Quaternion rotation = _Transform.rotation;
+
+            _DeltaPosition = Vector3.zero;
+            if (_Shake.Intensity.x > 0)
+                _DeltaPosition += right * UnityEngine.Random.Range(-this._Shake.Intensity.x, this._Shake.Intensity.x);
+            if (_Shake.Intensity.y > 0)
+                _DeltaPosition += up * UnityEngine.Random.Range(-this._Shake.Intensity.y, this._Shake.Intensity.y);
+            if (_Shake.Intensity.z > 0)
+                _DeltaPosition += forward * UnityEngine.Random.Range(-this._Shake.Intensity.z, this._Shake.Intensity.z);
+
+            if (_Shake.Roll > 0)
+                _DeltaRoll = UnityEngine.Random.Range(-_Shake.Roll, _Shake.Roll);
+
+            _TickTimeTW.Begin(UnityEngine.Random.Range(this._Shake.TickTime * 0.5f, this._Shake.TickTime));
         }
 
         /// <summary>
@@ -65,33 +94,23 @@ namespace Skill.Framework
         protected virtual void LateUpdate()
         {
             if (Global.IsGamePaused) return;
-            if (_ShakeTime.IsEnabled)
+            if (_ShakeTimeTW.IsEnabled)
             {
-                if (_ShakeTime.IsOver)
+                if (_ShakeTimeTW.IsOver)
                 {
-                    _ShakeTime.End();
+                    _ShakeTimeTW.End();
+                    _TickTimeTW.End();
                     enabled = false;
                 }
                 else
                 {
-                    Vector3 right = _Transform.right;
-                    Vector3 up = _Transform.up;
-                    Vector3 forward = _Transform.forward;
-                    Vector3 position = _Transform.position;
-                    Quaternion rotation = _Transform.rotation;
-
-                    if (_Shake.Intensity.x > 0)
-                        position += right * UnityEngine.Random.Range(-this._Shake.Intensity.x, this._Shake.Intensity.x);
-                    if (_Shake.Intensity.y > 0)
-                        position += up * UnityEngine.Random.Range(-this._Shake.Intensity.y, this._Shake.Intensity.y);
-                    if (_Shake.Intensity.z > 0)
-                        position += forward * UnityEngine.Random.Range(-this._Shake.Intensity.z, this._Shake.Intensity.z);
+                    if (_TickTimeTW.IsOver)
+                        Tick();
+                    
+                    _Transform.position += _DeltaPosition;
 
                     if (_Shake.Roll > 0)
-                        rotation = Quaternion.AngleAxis(UnityEngine.Random.Range(-_Shake.Roll, _Shake.Roll), forward) * rotation;
-
-                    _Transform.position = position;
-                    _Transform.rotation = rotation;
+                        _Transform.rotation = Quaternion.AngleAxis(_DeltaRoll, _Transform.forward) * _Transform.rotation;
                 }
 
             }

@@ -429,8 +429,7 @@ namespace Skill.Studio
 
             if (base.Remove(entity))
             {
-                this.Model.Remove(entity.Model);
-                entity.Delete();
+                this.Model.Remove(entity.Model);                
             }
         }
         #endregion

@@ -56,12 +56,7 @@ namespace Skill.Studio
         }
 
         ProjectWizardViewModel _ViewModel;
-        public NewProjectInfo ProjectInfo { get { return _ViewModel.Info; } }
-
-        //string GetDefaultDir()
-        //{
-        //      System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skill\\Projects\\");
-        //}
+        public NewProjectInfo ProjectInfo { get { return _ViewModel.Info; } }        
 
         public ProjectWizard()
         {
@@ -78,7 +73,7 @@ namespace Skill.Studio
                 System.Windows.MessageBox.Show("Invalid directory");
                 return;
             }
-            if (!Validation.LocationValidator.IsValid(System.IO.Path.Combine(_ViewModel.UnityProjectDirectory, "Assets")))
+            if (!Validation.LocationValidator.IsValid(System.IO.Path.Combine(_ViewModel.UnityProjectDirectory, PluginManager.Plugin.AssetsPath)))
             {
                 var result = System.Windows.MessageBox.Show(this, "Seems not to be a unity project directory - Continue?\n'Assets' directory does not exist.", "Invalid project directory", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
                 if (result == MessageBoxResult.No)

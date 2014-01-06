@@ -28,6 +28,15 @@ namespace Skill.Framework
         /// <param name="other">Oter SlowMotionInfo to copy</param>
         public SlowMotionInfo(SlowMotionInfo other)
         {
+            CopyFrom(other);
+        }
+
+        /// <summary>
+        /// Create a copy of SlowMotionInfo
+        /// </summary>
+        /// <param name="other">Oter SlowMotionInfo to copy</param>
+        public void CopyFrom(SlowMotionInfo other)
+        {
             this.Freez = other.Freez;
             this.SlowMotion = other.SlowMotion;
             this.TimeScale = other.TimeScale;
@@ -62,8 +71,7 @@ namespace Skill.Framework
 
     /// <summary>
     /// Modify TimeScale to simulate slowmotion
-    /// </summary>
-    [AddComponentMenu("Skill/Base/SlowMotionController")]
+    /// </summary>    
     public class SlowMotionController : DynamicBehaviour
     {
 
@@ -94,7 +102,8 @@ namespace Skill.Framework
         private bool _Paused;
         private float _TimeLeftWhenPaused;
         private float _FreezTimeLeftWhenPaused;
-
+        private float _PreFixedDeltaTime;
+        private float _PreTimeScale;
         /// <summary>
         /// Hook required events if needed
         /// </summary>
@@ -118,13 +127,16 @@ namespace Skill.Framework
             if (_MotionTW.IsEnabled) return;
             if (args == null || args.Motion == null) return;
 
-            _Info = args.Motion;
+            if (_Info == null) _Info = new SlowMotionInfo();
+            _Info.CopyFrom(args.Motion);
             _MotionTW.Begin(_Info.SlowMotion, true);
             if (_Info.Freez > 0)
                 _FreezeTW.Begin(_Info.Freez, true);
             else
                 _FreezeTW.End();
             enabled = true;
+            _PreFixedDeltaTime = Time.fixedDeltaTime;
+            _PreTimeScale = Time.timeScale;
             OnStartSlowMotion();
         }
 
@@ -163,7 +175,7 @@ namespace Skill.Framework
         {
             // it is possible to player pasue game when slowmotion
             // as we control slowmotion by realtime of game, we need to save how many times left from start of slowmotion to continue after resume game
-            if (Time.timeScale == 0 && Global.IsGamePaused)
+            if (Global.IsGamePaused)
             {
                 if (!_Paused)
                 {
@@ -171,53 +183,54 @@ namespace Skill.Framework
                     _FreezTimeLeftWhenPaused = _FreezeTW.OverTime - Time.realtimeSinceStartup;
                 }
                 _Paused = true;
-                return;
             }
-
-            if (_Paused)
+            else
             {
-                if (_TimeLeftWhenPaused > 0)
-                    _MotionTW.Begin(_TimeLeftWhenPaused, true);
-                if (_FreezTimeLeftWhenPaused > 0 && _Info.Freez > 0)
-                    _FreezeTW.Begin(_FreezTimeLeftWhenPaused, true);
-                _Paused = false;
-                _TimeLeftWhenPaused = 0;
-                _FreezTimeLeftWhenPaused = 0;
-            }
-
-            if (_MotionTW.IsEnabled)
-            {
-                if (_MotionTW.IsOver)
+                if (_Paused)
                 {
-                    if (Skill.Framework.Sounds.PitchController.Instance != null)
-                        Skill.Framework.Sounds.PitchController.Instance.Pitch = 1.0f;
-                    Time.timeScale = 1;
-                    enabled = false;
-                    _MotionTW.End();
-                    _Info = null;
+                    if (_TimeLeftWhenPaused > 0)
+                        _MotionTW.Begin(_TimeLeftWhenPaused, true);
+                    if (_FreezTimeLeftWhenPaused > 0 && _Info.Freez > 0)
+                        _FreezeTW.Begin(_FreezTimeLeftWhenPaused, true);
+                    _Paused = false;
                     _TimeLeftWhenPaused = 0;
                     _FreezTimeLeftWhenPaused = 0;
-                    OnEndSlowMotion();
                 }
-                else
-                {
-                    if (_FreezeTW.IsEnabledAndOver)
-                        _FreezeTW.End();
 
-                    if (Skill.Framework.Sounds.PitchController.Instance != null)
-                        Skill.Framework.Sounds.PitchController.Instance.Pitch = _Info.Pitch;
-                    if (!_FreezeTW.IsEnabled)
+                if (_MotionTW.IsEnabled)
+                {
+                    if (_MotionTW.IsOver)
                     {
-                        Time.timeScale = _Info.TimeScale;
+                        if (Skill.Framework.Sounds.PitchController.Instance != null)
+                            Skill.Framework.Sounds.PitchController.Instance.Pitch = 1.0f;
+                        Time.timeScale = _PreTimeScale;
+                        Time.fixedDeltaTime = _PreFixedDeltaTime;
+                        enabled = false;
+                        _MotionTW.End();
+                        _Info = null;
+                        _TimeLeftWhenPaused = 0;
+                        _FreezTimeLeftWhenPaused = 0;
+                        OnEndSlowMotion();
                     }
                     else
                     {
-                        Time.timeScale = 0;
-                    }
-                }
-                Time.fixedDeltaTime = 0.02f * Time.timeScale;
-            }
+                        if (_FreezeTW.IsEnabledAndOver)
+                            _FreezeTW.End();
 
+                        if (Skill.Framework.Sounds.PitchController.Instance != null)
+                            Skill.Framework.Sounds.PitchController.Instance.Pitch = _Info.Pitch;
+                        if (!_FreezeTW.IsEnabled)
+                        {
+                            Time.timeScale = _Info.TimeScale;
+                        }
+                        else
+                        {
+                            Time.timeScale = 0;
+                        }
+                    }
+                    Time.fixedDeltaTime = 0.02f * Time.timeScale;
+                }
+            }
             base.Update();
         }
     }

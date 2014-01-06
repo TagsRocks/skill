@@ -120,45 +120,8 @@
                             </xcad:LayoutAnchorable>
                         </xcad:LayoutAnchorablePane>
                         <xcad:LayoutAnchorablePane DockWidth="*"  >
-                            <xcad:LayoutAnchorable Title="Validation" >
-                                <TabControl x:Name="_TbChecks" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0" BorderThickness="1,1,0,0" >
-                                    <TabControl.Resources>
-                                        <Style TargetType="ListView" >
-                                            <Style.Resources>
-                                                <DataTemplate DataType="{x:Type vm:BehaviorViewModel}">
-                                                    <Grid>
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="Auto"/>
-                                                            <ColumnDefinition Width="*"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <CheckBox IsChecked="{Binding IsValid}" Margin="2,0" VerticalAlignment="Center" />
-                                                        <TextBlock Text="{Binding Name}" Grid.Column="1" />
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </Style.Resources>
-                                            <Setter Property="BorderThickness" Value="0"/>
-                                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                                        </Style>
-                                    </TabControl.Resources>
-                                    <TabItem >
-                                        <TabItem.Header>
-                                            <Image Source="{StaticResource ImgCondition}" Width="16" Height="16" ToolTip="Conditions" />
-                                        </TabItem.Header>
-                                        <ListView ItemsSource="{Binding BehaviorTree.Conditions}" />
-                                    </TabItem>
-                                    <TabItem >
-                                        <TabItem.Header>
-                                            <Image Source="{StaticResource ImgDecorator}" Width="16" Height="16" ToolTip="Decorators"  />
-                                        </TabItem.Header>
-                                        <ListView ItemsSource="{Binding BehaviorTree.Decorators}" />
-                                    </TabItem>
-                                    <TabItem >
-                                        <TabItem.Header>
-                                            <Image Source="{StaticResource ImgAction}" Width="16" Height="16" ToolTip="Actions"  />
-                                        </TabItem.Header>
-                                        <ListView ItemsSource="{Binding BehaviorTree.Actions}"/>
-                                    </TabItem>
-                                </TabControl>
+                            <xcad:LayoutAnchorable Title="List View" >
+                                <bedit:BehaviorTreeListView x:Name="_ListView"  />
                             </xcad:LayoutAnchorable>
                         </xcad:LayoutAnchorablePane>
                     </xcad:LayoutAnchorablePaneGroup>

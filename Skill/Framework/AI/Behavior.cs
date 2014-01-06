@@ -67,7 +67,7 @@ namespace Skill.Framework.AI
         /// <param name="status">Status of BehaviorTree</param>
         /// <returns>Result of execution</returns>
         public BehaviorResult Execute(BehaviorTreeStatus status)
-        {
+        {            
             LastUpdateId = status.UpdateId;
             status.RegisterForExecution(this); // register in execution sequence
             try

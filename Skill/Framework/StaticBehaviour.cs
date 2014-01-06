@@ -25,9 +25,9 @@ namespace Skill.Framework
         /// </summary>
         protected virtual void Awake()
         {
-            GetReferences();
-            HookEvents();
+            GetReferences();            
             IsDestroyed = false;
+            HookEvents();
         }
 
         /// <summary>
@@ -70,6 +70,14 @@ namespace Skill.Framework
             if (IsDestroyed) return;            
             UnhookEvents();
             IsDestroyed = true;
+        }
+
+        /// <summary>
+        /// Destroy game object
+        /// </summary>
+        public virtual void DestroySelf()
+        {            
+            Managers.Cache.DestroyCache(this.gameObject);
         }
     }
 }
