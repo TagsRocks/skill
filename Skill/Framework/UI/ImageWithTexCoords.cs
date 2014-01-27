@@ -19,15 +19,23 @@ namespace Skill.Framework.UI
         /// </summary>
         public bool AlphaBlend { get; set; }
 
+        private Rect _TextureCoordinate;
         /// <summary>
         /// Draw a texture within a rectangle with the given texture coordinates.
         /// </summary>
-        public Rect TextureCoordinate { get; set; }
+        public Rect TextureCoordinate { get { return _TextureCoordinate; } set { _TextureCoordinate = value; } }
 
         /// <summary>
         /// Getsor sets tinting color
         /// </summary>
         public Color TintColor { get; set; }
+
+        /// <summary>
+        /// If not null Image use alpha value of referenced Fading
+        /// </summary>
+        public Fading AlphaFading { get; set; }
+
+
 
         /// <summary>
         /// Create an instance of Image
@@ -48,8 +56,11 @@ namespace Skill.Framework.UI
             {
                 Color preCoor = GUI.color;
 
-                GUI.color = TintColor;
-                GUI.DrawTextureWithTexCoords(RenderArea, Texture, TextureCoordinate, AlphaBlend);
+                if (AlphaFading != null)
+                    GUI.color = AlphaFading.ApplyAlpha(TintColor);
+                else
+                    GUI.color = TintColor;
+                GUI.DrawTextureWithTexCoords(RenderArea, Texture, _TextureCoordinate, AlphaBlend);
 
                 GUI.color = preCoor;
             }

@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Skill.Editor
 {
     class SkillMenu : ScriptableObject
-    {        
+    {
         [MenuItem("Skill/Tools/Distance", false, 0)]
         static void ShowDistance()
         {
@@ -46,13 +46,23 @@ namespace Skill.Editor
         }
 
 
-        
+
 
         // Create Menu
         [MenuItem("Assets/Create/Skill/Implant Asset")]
         static void CreateImplantAsset()
         {
-           ScriptableObjectUtility.CreateAsset<Skill.Editor.Tools.ImplantAsset>("ImplantAsset");
+            ScriptableObjectUtility.CreateAsset<Skill.Editor.Tools.ImplantAsset>("ImplantAsset", delegate(Skill.Editor.Tools.ImplantAsset asset)
+            {
+                if (asset.DefaultObject == null)
+                    asset.DefaultObject = new Skill.Editor.Tools.ImplantObject();
+                asset.DefaultObject.Prefab = null;
+                asset.DefaultObject.MinScalePercent = 0.8f;
+                asset.DefaultObject.MaxScalePercent = 1.0f;
+                asset.DefaultObject.Weight = 1.0f;
+                asset.DefaultObject.Rotation = Skill.Editor.Tools.ImplantObjectRotation.SurfaceNormal;
+            });
+
         }
 
         [MenuItem("Assets/Create/Skill/Spawn Asset")]

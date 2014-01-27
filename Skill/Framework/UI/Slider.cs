@@ -17,6 +17,12 @@ namespace Skill.Framework.UI
         /// </summary>
         public Orientation Orientation { get; set; }
 
+
+        /// <summary>
+        /// Unity draw slider at top of RenderArea, to bring it to center set DrawCenter to witdh of slider.
+        /// </summary>
+        public float DrawCenter { get; set; }
+
         /// <summary>
         /// Amount of change when user press direction button (only used in HandleCommand method)
         /// </summary>
@@ -101,23 +107,37 @@ namespace Skill.Framework.UI
         protected override void Render()
         {
             if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
+            Rect ra = RenderArea;
+            if (DrawCenter > 0)
+            {
+                if (Orientation == Orientation.Horizontal)
+                {
+                    ra.y += (ra.height - DrawCenter) * 0.5f;
+                    ra.height = DrawCenter;
+                }
+                else
+                {
+                    ra.x += (ra.width - DrawCenter) * 0.5f;
+                    ra.width = DrawCenter;
+                }
+            }
             if (Style != null && ThumbStyle != null)
             {
                 if (Orientation == Orientation.Horizontal)
-                    Value = GUI.HorizontalSlider(RenderArea, _Value, _MinValue, _MaxValue, Style, ThumbStyle);
+                    Value = GUI.HorizontalSlider(ra, _Value, _MinValue, _MaxValue, Style, ThumbStyle);
                 else
-                    Value = GUI.VerticalSlider(RenderArea, _Value, _MinValue, _MaxValue, Style, ThumbStyle);
+                    Value = GUI.VerticalSlider(ra, _Value, _MinValue, _MaxValue, Style, ThumbStyle);
             }
             else
             {
                 if (Orientation == Orientation.Horizontal)
-                    Value = GUI.HorizontalSlider(RenderArea, _Value, _MinValue, _MaxValue);
+                    Value = GUI.HorizontalSlider(ra, _Value, _MinValue, _MaxValue);
                 else
-                    Value = GUI.VerticalSlider(RenderArea, _Value, _MinValue, _MaxValue);
+                    Value = GUI.VerticalSlider(ra, _Value, _MinValue, _MaxValue);
             }
         }
 
-        
+
 
         /// <summary>
         /// Handle specified command. slider respond to direction commands

@@ -15,13 +15,15 @@ namespace Skill.Editor.Tools
 
         #region UI
 
-        private float _FrameSize = 250;
+        private float _FrameSize = 300;
         private StackPanel _Panel;
         private Skill.Framework.UI.Frame _Frame;
+        private Skill.Editor.UI.ToggleButton _TbEnable;
         private Skill.Editor.UI.ObjectField<ImplantAsset> _AssetField;
+        private Skill.Editor.UI.ObjectField<Transform> _RootField;
         private Skill.Editor.UI.LayerMaskField _Layers;
         private Skill.Editor.UI.Slider _SliMinRadius;
-        private Skill.Editor.UI.Slider _SliMaxRadius;        
+        private Skill.Editor.UI.Slider _SliMaxRadius;
         private Skill.Editor.UI.IntSlider _SliDensity;
         private Skill.Editor.UI.Slider _SliRotation;
         private Skill.Editor.UI.Slider _SliOffsetY;
@@ -37,6 +39,8 @@ namespace Skill.Editor.Tools
             _Frame = new Skill.Framework.UI.Frame("Frame");
             _Panel = new StackPanel();
 
+            _TbEnable = new UI.ToggleButton() { IsChecked = _Implant.IsEnable, Margin = margin }; _TbEnable.Label.text = "Enable";
+
             _AssetField = new Skill.Editor.UI.ObjectField<ImplantAsset>() { VerticalAlignment = VerticalAlignment.Center, Margin = margin, AllowSceneObjects = false };
             _AssetField.Label.text = "ImplantAsset";
             if (_Implant.ImplantAsset != null)
@@ -45,17 +49,19 @@ namespace Skill.Editor.Tools
                 _Implant.ImplantAsset = _AssetField.Object = _Asset;
             }
 
+            _RootField = new ObjectField<Transform>() { Margin = margin, AllowSceneObjects = true, Object = _Implant.Root }; _RootField.Label.text = "Root";
+
             _Layers = new Skill.Editor.UI.LayerMaskField() { Layers = _Implant.LayerMask, VerticalAlignment = VerticalAlignment.Center, Margin = margin };
             _Layers.Label.text = "Raycast layers";
 
-            _SliDensity = new Skill.Editor.UI.IntSlider() { Value = _Implant.Density, MinValue = 1, MaxValue = 200, Margin = margin, Height = 16 }; _SliDensity.Label.text = "Density"; _SliDensity.Label.tooltip = "Shift + (W/S)";
+            _SliDensity = new Skill.Editor.UI.IntSlider() { Value = _Implant.Density, MinValue = 1, MaxValue = 1000, Margin = margin, Height = 16 }; _SliDensity.Label.text = "Density"; _SliDensity.Label.tooltip = "Shift + (W/S)";
             _SliRotation = new Skill.Editor.UI.Slider() { Value = _Implant.Rotation, MinValue = 0.0f, MaxValue = 360, Margin = margin, Height = 16 }; _SliRotation.Label.text = "Rotation"; _SliRotation.Label.tooltip = "Shift + (A/D)";
-            _SliOffsetY = new Skill.Editor.UI.Slider() { Value = _Implant.OffsetY, MinValue = 0.0f, MaxValue = 20, Margin = margin, Height = 16 }; _SliOffsetY.Label.text = "Offset Y"; _SliOffsetY.Label.tooltip = "Offset in Y axis)";
-            _SliMinRadius = new Skill.Editor.UI.Slider() { Value = _Implant.MinRadius, MinValue = 0.0f, MaxValue = 50, Margin = margin, Height = 16 }; _SliMinRadius.Label.text = "Min Radius";
-            _SliMaxRadius = new Skill.Editor.UI.Slider() { Value = _Implant.MaxRadius, MinValue = 0.0f, MaxValue = 50, Margin = margin, Height = 16 }; _SliMaxRadius.Label.text = "Max Radius";
-            _SliRectWidth = new Skill.Editor.UI.Slider() { Value = _Implant.RectWidth, MinValue = 0.0f, MaxValue = 100, Margin = margin, Height = 16 }; _SliRectWidth.Label.text = "Width";
-            _SliRectHeight = new Skill.Editor.UI.Slider() { Value = _Implant.RectHeight, MinValue = 0.0f, MaxValue = 100, Margin = margin, Height = 16 }; _SliRectHeight.Label.text = "Height";
-            _Help = new Skill.Editor.UI.HelpBox() { Message = "Hold Ctrl and Right Click to implant obejcts.\n\nMouse3 to shuffle", Height = 50, Margin = new Thickness(0, 10, 0, 0) };
+            _SliOffsetY = new Skill.Editor.UI.Slider() { Value = _Implant.OffsetY, MinValue = -10.0f, MaxValue = 20, Margin = margin, Height = 16 }; _SliOffsetY.Label.text = "Offset Y"; _SliOffsetY.Label.tooltip = "Offset in Y axis)";
+            _SliMinRadius = new Skill.Editor.UI.Slider() { Value = _Implant.MinRadius, MinValue = 0.0f, MaxValue = 200, Margin = margin, Height = 16 }; _SliMinRadius.Label.text = "Min Radius";
+            _SliMaxRadius = new Skill.Editor.UI.Slider() { Value = _Implant.MaxRadius, MinValue = 0.0f, MaxValue = 200, Margin = margin, Height = 16 }; _SliMaxRadius.Label.text = "Max Radius";
+            _SliRectWidth = new Skill.Editor.UI.Slider() { Value = _Implant.RectWidth, MinValue = 0.0f, MaxValue = 1000, Margin = margin, Height = 16 }; _SliRectWidth.Label.text = "Width";
+            _SliRectHeight = new Skill.Editor.UI.Slider() { Value = _Implant.RectHeight, MinValue = 0.0f, MaxValue = 1000, Margin = margin, Height = 16 }; _SliRectHeight.Label.text = "Height";
+            _Help = new Skill.Editor.UI.HelpBox() { Message = "Hold Ctrl and Right Click to implant obejcts.\nMouse3 to shuffle.\nShift + R : Make reference point.\nSpace : R reference point", Height = 60, Margin = new Thickness(0, 10, 0, 0) };
 
             _TbModes = new TabHeader { Margin = new Thickness(0, 2, 0, 10), HorizontalAlignment = HorizontalAlignment.Center, Width = 200, Height = 20 };
             _TbModes[0].text = "Circle";
@@ -63,7 +69,9 @@ namespace Skill.Editor.Tools
             _TbModes.SelectedTab = _Implant.BrushMode;
 
 
+            _Panel.Controls.Add(_TbEnable);
             _Panel.Controls.Add(_AssetField);
+            _Panel.Controls.Add(_RootField);
             _Panel.Controls.Add(_Layers);
             _Panel.Controls.Add(_SliDensity);
             _Panel.Controls.Add(_SliRotation);
@@ -80,6 +88,7 @@ namespace Skill.Editor.Tools
             UpdateRotation();
 
             _AssetField.ObjectChanged += _AssetField_ObjectChanged;
+            _RootField.ObjectChanged += _RootField_ObjectChanged;
             _Layers.LayersChanged += _Layers_LayersChanged;
             _SliDensity.ValueChanged += _SliDensity_ValueChanged;
             _SliRotation.ValueChanged += _SliRotation_ValueChanged;
@@ -89,12 +98,25 @@ namespace Skill.Editor.Tools
             _SliRectWidth.ValueChanged += _SliRectWidth_ValueChanged;
             _SliRectHeight.ValueChanged += _SliRectHeight_ValueChanged;
             _SliOffsetY.ValueChanged += _SliOffsetY_ValueChanged;
+            _TbEnable.Changed += _TbEnable_Changed;
+        }
+
+        void _TbEnable_Changed(object sender, EventArgs e)
+        {
+            _Implant.IsEnable = _TbEnable.IsChecked;
+            EditorUtility.SetDirty(_Implant);
+        }
+
+        void _RootField_ObjectChanged(object sender, EventArgs e)
+        {
+            _Implant.Root = _RootField.Object;
+            EditorUtility.SetDirty(_Implant);
         }
 
         void _SliOffsetY_ValueChanged(object sender, EventArgs e)
         {
             _Implant.OffsetY = _SliOffsetY.Value;
-            EditorUtility.SetDirty(_Implant);            
+            EditorUtility.SetDirty(_Implant);
         }
 
         void _TbModes_SelectedTabChanged(object sender, EventArgs e)
@@ -146,13 +168,13 @@ namespace Skill.Editor.Tools
 
         private void ChangeMode()
         {
-            if (_Implant.BrushMode == 0)
-            {                
+            if (_Implant.BrushMode == 0) // circle
+            {
                 _SliMaxRadius.Visibility = _SliMinRadius.Visibility = Visibility.Visible;
                 _SliRectHeight.Visibility = _SliRectWidth.Visibility = Visibility.Collapsed;
             }
-            if (_Implant.BrushMode == 1)
-            {                
+            if (_Implant.BrushMode == 1) // rectangle
+            {
                 _SliMaxRadius.Visibility = _SliMinRadius.Visibility = Visibility.Collapsed;
                 _SliRectHeight.Visibility = _SliRectWidth.Visibility = Visibility.Visible;
             }
@@ -190,6 +212,9 @@ namespace Skill.Editor.Tools
         private ImplantAsset _Asset;
         private bool _ShuffleNeeded;
         private Quaternion _Rotation;
+        private RaycastHit _ReferenceHit;
+        private bool _ReferenceEnable;
+
         void OnEnable()
         {
             _Implant = target as Implant;
@@ -214,7 +239,7 @@ namespace Skill.Editor.Tools
             Vector3 point;
             if (_Implant.BrushMode == 1)// rectangle brush        
             {
-                point = new Vector3(UnityEngine.Random.Range(-1.0f, 1.0f) * _Implant.RectWidth, 0, UnityEngine.Random.Range(-1.0f, 1.0f) * _Implant.RectHeight);
+                point = new Vector3(UnityEngine.Random.Range(-0.5f, 0.5f) * _Implant.RectWidth, 0, UnityEngine.Random.Range(-0.5f, 0.5f) * _Implant.RectHeight);
             }
             else // circle brush        
             {
@@ -233,7 +258,7 @@ namespace Skill.Editor.Tools
                 Shuffle();
                 _ShuffleNeeded = false;
             }
-            if (_Implant != null)
+            if (_Implant != null && _Implant.IsEnable)
             {
                 Event e = Event.current;
                 switch (e.type)
@@ -262,12 +287,21 @@ namespace Skill.Editor.Tools
                                 e.Use();
                                 HandleUtility.Repaint();
                             }
+                            else if (e.keyCode == KeyCode.R)
+                            {
+                                MakeReference();
+                                e.Use();
+                            }
+                        }
+                        else if (e.keyCode == KeyCode.R)
+                        {
+                            _ReferenceEnable = false;
                         }
                         break;
                     case EventType.mouseDown:
                         if (!e.shift)
                         {
-                            if (e.button == 2) // middle mouse
+                            if (!e.alt && e.button == 2) // middle mouse
                             {
                                 Shuffle();
                                 e.Use();
@@ -287,6 +321,16 @@ namespace Skill.Editor.Tools
             }
         }
 
+        private void MakeReference()
+        {
+            Event e = Event.current;
+            Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
+            if (Physics.Raycast(ray, out _ReferenceHit, 1000, _Layers.Layers))
+                _ReferenceEnable = true;
+            else
+                _ReferenceEnable = false;
+        }
+
 
         private ImplantObject GetRandomImplantObject()
         {
@@ -295,13 +339,22 @@ namespace Skill.Editor.Tools
 
             float totalWeight = 0;
             foreach (ImplantObject item in _AssetField.Object.Objects)
-                totalWeight += item.Weight;
+            {
+                if (item.OverrideProperties)
+                    totalWeight += item.Weight;
+                else
+                    totalWeight += _Asset.DefaultObject.Weight;
+            }
 
             float rnd = UnityEngine.Random.Range(0.0f, totalWeight);
             foreach (ImplantObject item in _AssetField.Object.Objects)
             {
-                if (rnd < item.Weight) return item;
-                rnd -= item.Weight;
+                float w = _Asset.DefaultObject.Weight;
+                if (item.OverrideProperties)
+                    w = item.Weight;
+
+                if (rnd < w) return item;
+                rnd -= w;
             }
             return null;
 
@@ -309,55 +362,69 @@ namespace Skill.Editor.Tools
         private void ImplantObject(ImplantObject io, ref RaycastHit hit)
         {
             GameObject obj = PrefabUtility.InstantiatePrefab(io.Prefab) as GameObject;
+            ImplantObject pr = _Asset.DefaultObject;
+            if (io.OverrideProperties) pr = io;
             if (obj != null)
             {
                 // scale                               
-                float scale = UnityEngine.Random.Range(io.MinScalePercent, io.MaxScalePercent);
+                float scale = UnityEngine.Random.Range(pr.MinScalePercent, pr.MaxScalePercent);
                 obj.transform.localScale *= scale;
                 // position
                 obj.transform.position = hit.point + (hit.normal * (_Implant.OffsetY * scale));
 
                 // rotation
                 Quaternion rotation = obj.transform.rotation;
-                if (io.Rotation == ImplantObjectRotation.Random)
+                if (pr.Rotation == ImplantObjectRotation.Random)
                 {
                     Vector3 euler = obj.transform.eulerAngles;
-                    if (io.RandomX) euler.x = UnityEngine.Random.Range(0.0f, 360.0f);
-                    if (io.RandomY) euler.y = UnityEngine.Random.Range(0.0f, 360.0f);
-                    if (io.RandomZ) euler.z = UnityEngine.Random.Range(0.0f, 360.0f);
+                    if (pr.RandomX) euler.x = UnityEngine.Random.Range(0.0f, 360.0f);
+                    if (pr.RandomY) euler.y = UnityEngine.Random.Range(0.0f, 360.0f);
+                    if (pr.RandomZ) euler.z = UnityEngine.Random.Range(0.0f, 360.0f);
                     rotation = Quaternion.Euler(euler);
                 }
-                else if (io.Rotation == ImplantObjectRotation.Custom)
+                else if (pr.Rotation == ImplantObjectRotation.Custom)
                 {
-                    rotation = Quaternion.Euler(io.CustomRotation);
+                    rotation = Quaternion.Euler(pr.CustomRotation);
                 }
                 else
                 {
                     rotation *= Quaternion.FromToRotation(obj.transform.up, hit.normal);
 
-                    if (io.RandomYaw)
+                    if (pr.RandomYaw)
                     {
                         rotation *= Quaternion.Euler(0, UnityEngine.Random.Range(0.0f, 360.0f), 0);
                     }
 
                 }
                 obj.transform.rotation = rotation;
-                obj.transform.parent = _Implant.transform;
+                obj.transform.parent = _Implant.Root != null ? _Implant.Root : _Implant.transform;
                 Undo.RegisterCreatedObjectUndo(obj, "Create Object");
             }
         }
 
         private void ImplantObjects()
         {
-
+            bool valid = false;
+            Ray ray = new Ray();
             Event e = Event.current;
-            RaycastHit hit;
-            Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
-            if (Physics.Raycast(ray, out hit, 1000, _Layers.Layers))
+            if (_ReferenceEnable)
             {
-                Vector3 center = hit.point + (hit.normal * 100);
-                ray.direction = -hit.normal;
+                valid = true;
+            }
+            else
+            {
+                ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
+                if (Physics.Raycast(ray, out _ReferenceHit, 1000, _Layers.Layers))
+                {
+                    valid = true;
+                }
+            }
 
+            if (valid)
+            {
+                Vector3 center = _ReferenceHit.point + (_ReferenceHit.normal * 100);
+                ray.direction = -_ReferenceHit.normal;
+                RaycastHit hit;
                 for (int i = 0; i < _Implant.Points.Length; i++)
                 {
                     ray.origin = center + _Rotation * _Implant.Points[i];
@@ -373,29 +440,61 @@ namespace Skill.Editor.Tools
                             Debug.LogWarning("Please set valid prefab to implant");
                             return;
                         }
-                        e.Use();
                     }
                 }
+                e.Use();
             }
         }
 
         private void UpdatePreviewHandle()
         {
             Event e = Event.current;
-            RaycastHit hit;
-            Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
-            if (Physics.Raycast(ray, out hit, 1000, _Layers.Layers))
+            Ray ray = new Ray();
+            bool valid = false;
+            if (_ReferenceEnable)
             {
-                float handleSize = HandleUtility.GetHandleSize(hit.point);
-                Handles.color = Color.red;
-                Vector3 center = hit.point + (hit.normal * 100);
-                ray.direction = -hit.normal;
+                valid = true;
+            }
+            else
+            {
+                ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
+                if (Physics.Raycast(ray, out _ReferenceHit, 1000, _Layers.Layers))
+                    valid = true;
+            }
 
+            if (valid)
+            {
+
+                float handleSize = HandleUtility.GetHandleSize(_ReferenceHit.point);
+
+                if (_ReferenceEnable)
+                {
+                    Handles.color = Color.blue;
+                    Handles.ArrowCap(0, _ReferenceHit.point, Quaternion.LookRotation(_ReferenceHit.normal), handleSize * 0.8f);
+                }
+
+                Handles.color = Color.red;
+                Vector3 center = _ReferenceHit.point + (_ReferenceHit.normal * 100);
+                ray.direction = -_ReferenceHit.normal;
+
+                RaycastHit hit;
                 for (int i = 0; i < _Implant.Points.Length; i++)
                 {
-                    ray.origin = center + _Rotation * _Implant.Points[i];
+                    ray.origin = center + (_Rotation * _Implant.Points[i]);
                     if (Physics.Raycast(ray, out hit, 1000, _Layers.Layers))
-                        Handles.ArrowCap(0, hit.point, Quaternion.LookRotation(hit.normal), handleSize * 0.5f);
+                        Handles.ArrowCap(0, hit.point + (hit.normal * _Implant.OffsetY), Quaternion.LookRotation(hit.normal), handleSize * 0.5f);
+                }
+
+                Vector3 offset = (_ReferenceHit.normal * _Implant.OffsetY);
+                if (_Implant.BrushMode == 0) // circle
+                {
+                    if (_Implant.MinRadius > 0.01f)
+                        Handles.DrawWireDisc(_ReferenceHit.point + offset, _ReferenceHit.normal, _Implant.MinRadius);
+                    Handles.DrawWireDisc(_ReferenceHit.point + offset, _ReferenceHit.normal, _Implant.MaxRadius);
+                }
+                else
+                {
+                    HandleHelper.DrawWireRect(_ReferenceHit.point + offset, new Vector2(_Implant.RectWidth, _Implant.RectHeight), _Rotation);
                 }
             }
         }

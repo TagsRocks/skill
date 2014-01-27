@@ -189,7 +189,7 @@ namespace Skill.Net
         {
             CheckForWrite();            
             this._Writer.Write(value);            
-            this.ByteCounter += System.Text.Encoding.Unicode.GetByteCount(value);
+            this.ByteCounter += System.Text.Encoding.UTF8.GetByteCount(value);
         }
         public void Write(ushort value)
         {

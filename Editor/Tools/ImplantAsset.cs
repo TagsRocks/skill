@@ -14,5 +14,10 @@ namespace Skill.Editor.Tools
         /// Array of Implant Objects
         /// </summary>
         public ImplantObject[] Objects;
+
+        /// <summary>
+        /// Default properties
+        /// </summary>
+        public ImplantObject DefaultObject;
     }
 }

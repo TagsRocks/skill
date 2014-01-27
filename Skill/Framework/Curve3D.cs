@@ -38,7 +38,7 @@ namespace Skill.Framework
         /// <param name="time">time (0 - TimeLength)</param>
         /// <returns>Evaluated point</returns>
         public override Vector3 Evaluate(float time)
-        {
+        {            
             if (_Curve != null)
             {
                 if (UseWorldSpace)
@@ -97,6 +97,6 @@ namespace Skill.Framework
                         Gizmos.DrawLine(transform.TransformPoint(Keys[i].Value), transform.TransformPoint(Keys[i + 1].Value));
                 }
             }
-        }
+        }        
     }
 }

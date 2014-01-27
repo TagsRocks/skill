@@ -38,6 +38,9 @@ namespace Skill.Framework.Dynamics
             }
         }
 
+        /// <summary>
+        /// Hook required events
+        /// </summary>
         protected override void UnhookEvents()
         {
             base.UnhookEvents();

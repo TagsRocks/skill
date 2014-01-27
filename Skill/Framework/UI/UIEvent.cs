@@ -19,20 +19,22 @@ namespace Skill.Framework.UI
     /// </summary>
     public enum MouseButton
     {
+        /// <summary> None </summary>
+        None = 0,
         /// <summary> Mouse0 </summary>
-        Mouse0 = 0,
+        Mouse0 = 1,
         /// <summary> Mouse1 </summary>
-        Mouse1 = 1,
+        Mouse1 = 2,
         /// <summary> Mouse2 </summary>
-        Mouse2 = 2,
+        Mouse2 = 3,
         /// <summary> Mouse3 </summary>
-        Mouse3 = 3,
+        Mouse3 = 4,
         /// <summary> Mouse4 </summary>
-        Mouse4 = 4,
+        Mouse4 = 5,
         /// <summary> Mouse5 </summary>
-        Mouse5 = 5,
+        Mouse5 = 6,
         /// <summary> Mouse6 </summary>
-        Mouse6 = 6,
+        Mouse6 = 7,
         /// <summary> Left mouse button </summary>
         Left = Mouse0,
         /// <summary> Right mouse button </summary>
@@ -40,13 +42,13 @@ namespace Skill.Framework.UI
         /// <summary> Middle mouse button </summary>
         Middle = Mouse2,
         /// <summary> Another button in the mouse </summary>
-        Other = 7,
+        Other = 8,
     }
 
     /// <summary>
     /// Mouse event args
     /// </summary>
-    public abstract class MouseEventArgs : UIEventArgs
+    public class MouseEventArgs : UIEventArgs
     {
         /// <summary> The mouse position. </summary>
         public Vector2 MousePosition { get; private set; }
@@ -120,6 +122,13 @@ namespace Skill.Framework.UI
             this.Delta = delta;
         }
     }
+
+    /// <summary>
+    /// MouseEventHandler
+    /// </summary>
+    /// <param name="sender"> Owner of event  </param>
+    /// <param name="args"> MouseEventArgs </param>
+    public delegate void MouseEventHandler(object sender, MouseEventArgs args);
 
     /// <summary>
     /// MouseClickEventHandler

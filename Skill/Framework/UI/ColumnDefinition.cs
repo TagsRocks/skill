@@ -84,6 +84,8 @@ namespace Skill.Framework.UI
             }
         }
 
+        /// <summary> Width of column after update layout </summary>
+        public float RenderWidth { get; internal set; }
     }
     #endregion
 

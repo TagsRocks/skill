@@ -107,7 +107,7 @@ namespace Skill.Framework
         {
             if (!Global.IsGamePaused)
             {
-                if (Events != null && TimeEvents.Length > 0)
+                if (TimeEvents != null && TimeEvents.Length > 0)
                 {
                     if (Loop) Finished = false;
                     if (!Finished)

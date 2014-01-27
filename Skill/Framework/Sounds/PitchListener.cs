@@ -9,6 +9,7 @@ namespace Skill.Framework.Sounds
    
     public class PitchListener : DynamicBehaviour
     {
+        
         private AudioSource[] _AudioSources;
         private float _Pitch;
 
@@ -18,7 +19,7 @@ namespace Skill.Framework.Sounds
         protected override void Awake()
         {
             base.Awake();
-            _AudioSources = GetComponents<AudioSource>();
+            RelinkAudios();
         }
 
         /// <summary>
@@ -62,6 +63,14 @@ namespace Skill.Framework.Sounds
                 }
             }            
             base.Update();
+        }
+
+        /// <summary>
+        /// if number of AudioSources attached to this gameobject is dynamic. call this before change pitch to find all audios again
+        /// </summary>
+        public void RelinkAudios()
+        {
+            _AudioSources = GetComponentsInChildren<AudioSource>();
         }
     }
 

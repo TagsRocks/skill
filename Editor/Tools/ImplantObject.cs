@@ -8,7 +8,7 @@ namespace Skill.Editor.Tools
     /// Defines type of rotation algorithm for implant objects
     /// </summary>
     public enum ImplantObjectRotation
-    {
+    {        
         /// <summary> Objects align with surface normal </summary>
         SurfaceNormal = 0,
         /// <summary> Custom rotation </summary>
@@ -33,7 +33,6 @@ namespace Skill.Editor.Tools
         public float Weight;
 
         // ******** Rotation *********
-
         /// <summary> Rotation of implanted object </summary>
         public ImplantObjectRotation Rotation;
         /// <summary> if Rotation is Random, whether x value of rotation is random between 0-360 or same as Prefab  </summary>
@@ -48,6 +47,9 @@ namespace Skill.Editor.Tools
 
         /// <summary> if Rotation is SurfaceNormal whether yaw value of rotation is random between 0-360 or same as Prefab </summary>
         public bool RandomYaw;
+
+        /// <summary> if Rotation is SurfaceNormal whether yaw value of rotation is random between 0-360 or same as Prefab </summary>
+        public bool OverrideProperties;
     }
 
 

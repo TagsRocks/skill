@@ -469,6 +469,11 @@ namespace Skill.Framework.UI
             }
         }
 
+        /// <summary>
+        /// Is mouse over the control
+        /// </summary>
+        public bool IsMouseOver { get; private set; }
+
         #endregion
 
         #region Events
@@ -515,11 +520,34 @@ namespace Skill.Framework.UI
             OnLayoutChanged();
         }
 
+        /// <summary> Occurs when mouse enters control.(if WantsMouseEvents = true)</summary>
+        public event MouseEventHandler MouseEnter;
+        /// <summary>
+        /// Occurs when mouse enters control (if WantsMouseEvents = true)
+        /// </summary>
+        /// <param name="args"> MouseEventArgs </param>
+        protected virtual void OnMouseEnter(MouseEventArgs args)
+        {
+            if (MouseEnter != null)
+                MouseEnter(this, args);
+        }
 
-        /// <summary> Occurs when mouse button was pressed.</summary>
+        /// <summary> Occurs when mouse leaves control.(if WantsMouseEvents = true)</summary>
+        public event MouseEventHandler MouseLeave;
+        /// <summary>
+        /// Occurs when mouse leaves control (if WantsMouseEvents = true)
+        /// </summary>
+        /// <param name="args"> MouseEventArgs </param>
+        protected virtual void OnMouseLeave(MouseEventArgs args)
+        {
+            if (MouseLeave != null)
+                MouseLeave(this, args);
+        }
+
+        /// <summary> Occurs when mouse button was pressed.(if WantsMouseEvents = true)</summary>
         public event MouseClickEventHandler MouseDown;
         /// <summary>
-        /// Occurs when mouse button was pressed.(if MouseDown hooked )
+        /// Occurs when mouse button was pressed.(if WantsMouseEvents = true)
         /// </summary>
         /// <param name="args"> MouseClickEventArgs </param>
         protected virtual void OnMouseDown(MouseClickEventArgs args)
@@ -528,63 +556,57 @@ namespace Skill.Framework.UI
                 MouseDown(this, args);
         }
 
-        /// <summary> Occurs when mouse button was released. </summary>
+        /// <summary> Occurs when mouse button was released.(if WantsMouseEvents = true) </summary>
         public event MouseClickEventHandler MouseUp;
         /// <summary>
-        /// Occurs when mouse button was released.(if MouseUp hooked )
+        /// Occurs when mouse button was released.(if WantsMouseEvents = true)
         /// </summary>
         /// <param name="args"> MouseClickEventArgs </param>
-        private void OnMouseUp(MouseClickEventArgs args)
+        protected virtual void OnMouseUp(MouseClickEventArgs args)
         {
             if (MouseUp != null)
                 MouseUp(this, args);
         }
 
-        /// <summary> Occurs when mouse was dragged. </summary>
+        /// <summary> Occurs when mouse was dragged.(if WantsMouseEvents = true) </summary>
         public event MouseMoveEventHandler MouseDrag;
         /// <summary>
-        /// Occurs when mouse was dragged.(if MouseDrag hooked )
+        /// Occurs when mouse was dragged.(if WantsMouseEvents = true)
         /// </summary>
         /// <param name="args"> MouseMoveEventArgs </param>
-        private void OnMouseDrag(MouseMoveEventArgs args)
+        protected virtual void OnMouseDrag(MouseMoveEventArgs args)
         {
             if (MouseDrag != null)
                 MouseDrag(this, args);
         }
 
 
-        /// <summary> Occurs when mouse was dragged. </summary>
+        /// <summary> Occurs when mouse was dragged.(if WantsMouseEvents = true)(works only in EditorWindow with set wantsMouseMove true) </summary>
         public event MouseMoveEventHandler MouseMove;
         /// <summary>
-        /// Occurs when mouse was dragged.(if MouseMove hooked )
+        /// Occurs when mouse was dragged.(if WantsMouseEvents = true)(works only in EditorWindow with set wantsMouseMove true)
         /// </summary>
         /// <param name="args"> MouseMoveEventArgs </param>
-        private void OnMouseMove(MouseMoveEventArgs args)
+        protected virtual void OnMouseMove(MouseMoveEventArgs args)
         {
             if (MouseMove != null)
                 MouseMove(this, args);
         }
 
-        /// <summary> Occurs when The scroll wheel was moved. </summary>
+        /// <summary> Occurs when The scroll wheel was moved.(if WantsMouseEvents = true) </summary>
         public event MouseMoveEventHandler ScrollWheel;
         /// <summary>
-        /// Occurs when The scroll wheel was moved.(if ScrollWheel hooked )
+        /// Occurs when The scroll wheel was moved.(if WantsMouseEvents = true)
         /// </summary>
         /// <param name="args"> MouseMoveEventArgs </param>
-        private void OnScrollWheel(MouseMoveEventArgs args)
+        protected virtual void OnScrollWheel(MouseMoveEventArgs args)
         {
             if (ScrollWheel != null)
                 ScrollWheel(this, args);
         }
 
-        /// <summary>
-        /// Is any mouse events hooked?
-        /// </summary>
-        /// <returns>True if hooked, otherwise false</returns>
-        private bool IsAnyMouseEventHooked()
-        {
-            return MouseDown != null || MouseUp != null || MouseDrag != null || MouseMove != null || ScrollWheel != null;
-        }
+        /// <summary> check mouse events? (MouseDown, MouseUp, MouseDrag, MouseMove, ScrollWheel) </summary>        
+        public bool WantsMouseEvents { get; set; }
 
         /// <summary>
         /// Convert mouse to local position
@@ -595,24 +617,41 @@ namespace Skill.Framework.UI
             return mousePosition;
         }
 
+        protected virtual MouseButton ConvertButton(int ebutton)
+        {
+            MouseButton mb = MouseButton.None;
+            if (ebutton >= 0)
+            {
+                ebutton++;
+                if (ebutton <= (int)MouseButton.Other) mb = (MouseButton)ebutton;
+                else mb = MouseButton.Other;
+            }
+            return mb;
+        }        
+
         /// <summary>
         /// Check for events
         /// </summary>
         protected virtual void CheckEvents()
         {
-            if (IsAnyMouseEventHooked())
+            if (WantsMouseEvents)
             {
                 Event e = Event.current;
                 if (e != null && e.isMouse)
                 {
+                    EventType type = e.type;
                     Vector2 localMouse = ConvertToLocal(e.mousePosition);
                     if (_RenderArea.Contains(localMouse))
                     {
-                        EventType type = e.type;
-                        if ((type == EventType.MouseDown || type == EventType.MouseUp) && (MouseDown != null || MouseUp != null))
+                        if (!IsMouseOver)
                         {
-                            MouseButton mb = MouseButton.Other;
-                            if (e.button <= (int)MouseButton.Other) mb = (MouseButton)e.button;
+                            IsMouseOver = true;
+                            OnMouseEnter(new MouseEventArgs(e.mousePosition, e.modifiers));
+                        }
+
+                        if (type == EventType.MouseDown || type == EventType.MouseUp)
+                        {
+                            MouseButton mb = ConvertButton(e.button);
                             MouseClickEventArgs args = new MouseClickEventArgs(e.mousePosition, e.modifiers, mb, e.clickCount);
                             if (type == EventType.MouseDown)
                                 OnMouseDown(args);
@@ -621,20 +660,28 @@ namespace Skill.Framework.UI
                             if (args.Handled)
                                 e.Use();
                         }
-                        else if ((type == EventType.ScrollWheel || type == EventType.mouseMove || type == EventType.mouseDrag) && (MouseDrag != null || MouseMove != null || ScrollWheel != null))
+                        else if (type == EventType.ScrollWheel || type == EventType.MouseMove || type == EventType.MouseDrag)
                         {
-                            MouseButton mb = MouseButton.Other;
-                            if (e.button < (int)MouseButton.Other) mb = (MouseButton)e.button;
+                            MouseButton mb = ConvertButton(e.button);
                             MouseMoveEventArgs args = new MouseMoveEventArgs(e.mousePosition, e.modifiers, mb, e.delta);
                             if (type == EventType.ScrollWheel)
                                 OnScrollWheel(args);
-                            else if (type == EventType.mouseMove)
+                            else if (type == EventType.MouseMove)
                                 OnMouseMove(args);
                             else
                                 OnMouseDrag(args);
                             if (args.Handled)
                                 e.Use();
                         }
+                    }
+                    else
+                    {
+                        if (IsMouseOver)
+                        {
+                            IsMouseOver = false;
+                            OnMouseLeave(new MouseEventArgs(e.mousePosition, e.modifiers));
+                        }
+
                     }
                 }
             }

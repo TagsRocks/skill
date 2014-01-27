@@ -146,22 +146,19 @@ namespace Skill.Framework.UI
         }
 
         /// <summary>
-        /// Is any key events hooked?
+        /// WantsKeyEvents?
         /// </summary>
         /// <returns>True if hooked, otherwise false</returns>
-        private bool IsAnyKeyEventHooked()
-        {
-            return KeyDown != null || KeyUp != null;
-        }
+        public bool WantsKeyEvents { get; set; }
 
         /// <summary>
-        /// Check for events
+        /// Check for events (KeyUp, KeyDown)
         /// </summary>
         protected override void CheckEvents()
         {
             base.CheckEvents();
 
-            if (_IsFocused && IsAnyKeyEventHooked())
+            if (_IsFocused && WantsKeyEvents)
             {
                 Event e = Event.current;
                 if (e != null && e.isKey && e.keyCode != KeyCode.None)
@@ -181,10 +178,10 @@ namespace Skill.Framework.UI
             }
         }
 
-        /// <summary> Occurs when a keyboard key was pressed.() </summary>
+        /// <summary> Occurs when a keyboard key was pressed.(if WantsKeyEvents = true ) </summary>
         public event KeyEventHandler KeyDown;
         /// <summary>
-        /// Occurs when a keyboard key was pressed.(if KeyDown hooked )
+        /// Occurs when a keyboard key was pressed.(if WantsKeyEvents = true )
         /// </summary>
         /// <param name="args"> KeyEventArgs </param>
         private void OnKeyDown(KeyEventArgs args)
@@ -193,10 +190,10 @@ namespace Skill.Framework.UI
                 KeyDown(this, args);
         }
 
-        /// <summary> Occurs when a keyboard key was released. </summary>
+        /// <summary> Occurs when a keyboard key was released.(if WantsKeyEvents = true ) </summary>
         public event KeyEventHandler KeyUp;
         /// <summary>
-        /// Occurs when a keyboard key was released.(if KeyUp hooked )
+        /// Occurs when a keyboard key was released.(if WantsKeyEvents = true )
         /// </summary>
         /// <param name="args"> KeyEventArgs </param>
         private void OnKeyUp(KeyEventArgs args)

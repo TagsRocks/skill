@@ -172,6 +172,9 @@ namespace Skill.Framework.UI
             }
             else
                 rowRects[0] = renderArea;
+
+            for (int i = 0; i < RowDefinitions.Count; i++)
+                RowDefinitions[i].RenderHeight = rowRects[i].height;
             return rowRects;
         }
 
@@ -264,6 +267,9 @@ namespace Skill.Framework.UI
             }
             else
                 columnRects[0] = renderArea;
+
+            for (int i = 0; i < ColumnDefinitions.Count; i++)
+                ColumnDefinitions[i].RenderWidth = columnRects[i].width;
             return columnRects;
         }
     }

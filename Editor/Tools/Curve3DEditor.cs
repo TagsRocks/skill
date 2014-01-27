@@ -26,6 +26,10 @@ namespace Skill.Editor.Tools
         private Slider _SliSmoothValue;
         private Skill.Framework.UI.Grid _PnlTools;
 
+        private LayerMaskField _LmGroundLayer;
+        private Button _BtnGroundAll;
+        private Button _BtnGroundSelected;
+
         private Skill.Framework.UI.Box _SelectedPointPropertiesBackground;
         private Skill.Framework.UI.StackPanel _PnlPoperties;
         private FloatField _FFTime;
@@ -97,10 +101,10 @@ namespace Skill.Editor.Tools
             _ChangeCheck.ColumnDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star);
             _ChangeCheck.ColumnDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star);
 
-            _ChangeCheck.RowDefinitions.Add(24, Skill.Framework.UI.GridUnitType.Pixel);
-            _ChangeCheck.RowDefinitions.Add(164, Skill.Framework.UI.GridUnitType.Pixel);
-            _ChangeCheck.RowDefinitions.Add(86, Skill.Framework.UI.GridUnitType.Pixel);
-            _ChangeCheck.RowDefinitions.Add(80, Skill.Framework.UI.GridUnitType.Pixel);
+            _ChangeCheck.RowDefinitions.Add(24, Skill.Framework.UI.GridUnitType.Pixel); // _BtnAdd , _BtnRemove
+            _ChangeCheck.RowDefinitions.Add(164, Skill.Framework.UI.GridUnitType.Pixel); // _PointsScrollView
+            _ChangeCheck.RowDefinitions.Add(86, Skill.Framework.UI.GridUnitType.Pixel); // _PnlPoperties
+            _ChangeCheck.RowDefinitions.Add(130, Skill.Framework.UI.GridUnitType.Pixel);//_PnlTools
 
             _BtnAdd = new Button() { Row = 0, Column = 0 }; _BtnAdd.Content.text = "Add"; _BtnAdd.Content.tooltip = "Add new point the end of the path."; _BtnAdd.Content.image = Resources.Textures.Plus;
             _BtnRemove = new Button() { Row = 0, Column = 1 }; _BtnRemove.Content.text = "Remove"; _BtnRemove.Content.tooltip = "Remove selected point."; _BtnRemove.Content.image = Resources.Textures.Minus;
@@ -126,18 +130,28 @@ namespace Skill.Editor.Tools
             _PnlTools.ColumnDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star);
             _PnlTools.ColumnDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star);
             _PnlTools.ColumnDefinitions.Add(2, Skill.Framework.UI.GridUnitType.Star);
-            _PnlTools.RowDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star);
+
+            _PnlTools.RowDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star); // _LmGroundLayer
+            _PnlTools.RowDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star); // _BtnGroundAll , _BtnGroundSelected
+            _PnlTools.RowDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star); // _LblFLinearTime
             _PnlTools.RowDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star);
             _PnlTools.RowDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star);
 
-            _LblFLinearTime = new LabelField() { Row = 0, Column = 0, Margin = new Skill.Framework.UI.Thickness(0, 2) }; _LblFLinearTime.Label.text = "Time";
-            _FFLinearTime = new FloatField() { Row = 0, Column = 1, Margin = new Skill.Framework.UI.Thickness(0, 2), Value = _Path.PathTime };
-            _BtnSetLinearTime = new Button() { Row = 0, Column = 2, Margin = new Skill.Framework.UI.Thickness(2, 2) }; _BtnSetLinearTime.Content.text = "Set Time by Distance"; _BtnSetLinearTime.Content.tooltip = "Set time of nodes by relative distance";
+            _LmGroundLayer = new LayerMaskField() { Row = 0, Column = 0, ColumnSpan = 3, Layers = _Path.GroundLayer, Margin = new Framework.UI.Thickness(2) }; _LmGroundLayer.Label.text = "Ground Layer";
+            _BtnGroundSelected = new Button() { Row = 1, Column = 0, ColumnSpan = 2, Margin = new Skill.Framework.UI.Thickness(2, 2) }; _BtnGroundSelected.Content.text = "Ground Selected"; _BtnGroundSelected.Content.tooltip = "put selected on ground";
+            _BtnGroundAll = new Button() { Row = 1, Column = 2, Margin = new Skill.Framework.UI.Thickness(2, 2) }; _BtnGroundAll.Content.text = "Ground All"; _BtnGroundAll.Content.tooltip = "put all points on ground";
 
-            _SliSmoothValue = new Slider() { Row = 1, Column = 0, ColumnSpan = 3, MinValue = 0.0f, MaxValue = 1.0f, Value = _Path.SmoothValue }; _SliSmoothValue.Label.text = "Smooth Value";
-            _BtnSmoothCurve = new Button() { Row = 2, Column = 0, ColumnSpan = 2, Margin = new Skill.Framework.UI.Thickness(2, 2) }; _BtnSmoothCurve.Content.text = "Smooth Curve"; _BtnSmoothCurve.Content.tooltip = "Smooth the in and out tangents of the keys.";
-            _BtnSmoothPoint = new Button() { Row = 2, Column = 2, Margin = new Skill.Framework.UI.Thickness(2, 2) }; _BtnSmoothPoint.Content.text = "Smooth Point"; _BtnSmoothPoint.Content.tooltip = "Smooth the in and out tangents of the selected key.";
+            _LblFLinearTime = new LabelField() { Row = 2, Column = 0, Margin = new Skill.Framework.UI.Thickness(0, 2) }; _LblFLinearTime.Label.text = "Time";
+            _FFLinearTime = new FloatField() { Row = 2, Column = 1, Margin = new Skill.Framework.UI.Thickness(0, 2), Value = _Path.PathTime };
+            _BtnSetLinearTime = new Button() { Row = 2, Column = 2, Margin = new Skill.Framework.UI.Thickness(2, 2) }; _BtnSetLinearTime.Content.text = "Set Time by Distance"; _BtnSetLinearTime.Content.tooltip = "Set time of nodes by relative distance";
 
+            _SliSmoothValue = new Slider() { Row = 3, Column = 0, ColumnSpan = 3, MinValue = 0.0f, MaxValue = 1.0f, Value = _Path.SmoothValue }; _SliSmoothValue.Label.text = "Smooth Value";
+            _BtnSmoothCurve = new Button() { Row = 4, Column = 0, ColumnSpan = 2, Margin = new Skill.Framework.UI.Thickness(2, 2) }; _BtnSmoothCurve.Content.text = "Smooth Curve"; _BtnSmoothCurve.Content.tooltip = "Smooth the in and out tangents of the keys.";
+            _BtnSmoothPoint = new Button() { Row = 4, Column = 2, Margin = new Skill.Framework.UI.Thickness(2, 2) }; _BtnSmoothPoint.Content.text = "Smooth Point"; _BtnSmoothPoint.Content.tooltip = "Smooth the in and out tangents of the selected key.";            
+
+            _PnlTools.Controls.Add(_LmGroundLayer);
+            _PnlTools.Controls.Add(_BtnGroundSelected);
+            _PnlTools.Controls.Add(_BtnGroundAll);
             _PnlTools.Controls.Add(_LblFLinearTime);
             _PnlTools.Controls.Add(_FFLinearTime);
             _PnlTools.Controls.Add(_BtnSetLinearTime);
@@ -172,6 +186,45 @@ namespace Skill.Editor.Tools
             _BtnSetLinearTime.Click += _BtnSetLinearTime_Click;
 
             _SliSmoothValue.ValueChanged += _SliSmoothValue_ValueChanged;
+
+            _LmGroundLayer.LayersChanged += _LmGroundLayer_LayersChanged;
+            _BtnGroundSelected.Click += _BtnGroundSelected_Click;
+            _BtnGroundAll.Click += _BtnGroundAll_Click;
+        }
+
+        void _BtnGroundAll_Click(object sender, System.EventArgs e)
+        {
+            if (_Path.Keys != null)
+            {
+                for (int i = 0; i < _Path.Keys.Length; i++)
+                    Ground(i);
+                RebuildPath();
+                EditorUtility.SetDirty(_Path);
+            }
+        }
+
+        void _BtnGroundSelected_Click(object sender, System.EventArgs e)
+        {
+            if (_Path.SelectedIndex >= 0)
+            {
+                Ground(_Path.SelectedIndex);
+                RebuildPath();
+                EditorUtility.SetDirty(_Path);
+            }
+        }
+
+        private void Ground(int pointIndex)
+        {
+            Ray ray = new Ray() { origin = _Path.Keys[pointIndex].Value + new Vector3(0, 99999, 0), direction = Vector3.down };
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit, 999999, _Path.GroundLayer))
+                _Path.Keys[pointIndex].Value = hit.point;
+        }
+
+        void _LmGroundLayer_LayersChanged(object sender, System.EventArgs e)
+        {
+            _Path.GroundLayer = _LmGroundLayer.Layers;
+            EditorUtility.SetDirty(_Path);
         }
 
         private void ReloadProperties()
@@ -511,7 +564,7 @@ namespace Skill.Editor.Tools
         {
             base.OnInspectorGUI();
             _Frame.Update();
-            _Frame.OnInspectorGUI(354);
+            _Frame.OnInspectorGUI(404);
 
             if (_PreSmoothAmount != _Path.SmoothAmount || _PreUseWorldSpace != _Path.UseWorldSpace)
             {

@@ -12,12 +12,109 @@ namespace Skill.Editor.Tools
     {
         private StackPanel _Panel;
         private ObjectField<GameObject> _PrefabField;
+        private Editor.UI.ToggleButton _TbOverride;
+        private ImplantObjectPropertiesField _PropertiesField;
+
+        private ImplantObject _Object;
+        public ImplantObject Object
+        {
+            get { return _Object; }
+            set
+            {
+                _Object = value;
+                if (_Object != null)
+                {
+                    this._PrefabField.Object = _Object.Prefab;
+                    this._PropertiesField.Object = _Object;
+                    this._TbOverride.IsChecked = _Object.OverrideProperties;
+                    IsEnabled = true;
+                }
+                else
+                {
+                    this._PrefabField.Object = null;
+                    this._PropertiesField.Object = null;
+                    this._TbOverride.IsChecked = false;
+                    IsEnabled = false;
+                }
+            }
+        }
+        public ImplantAssetEditor Editor { get; private set; }
+
+        public override float LayoutHeight
+        {
+            get
+            {
+                if (Visibility != Skill.Framework.UI.Visibility.Collapsed)
+                    return _PrefabField.LayoutHeight + _PrefabField.Margin.Vertical +
+                           _TbOverride.LayoutHeight + _TbOverride.Margin.Vertical +
+                           _PropertiesField.LayoutHeight + _PropertiesField.Margin.Vertical;
+                return base.LayoutHeight;
+            }
+        }
+
+        public ImplantObjectField(ImplantAssetEditor editor)
+        {
+            this.Editor = editor;
+            this.Margin = new Thickness(0, 0, 0, 8);
+            this.Width = 300;
+            this._PrefabField = new ObjectField<GameObject>() { AllowSceneObjects = true, Margin = new Thickness(2, 2, 2, 0) };
+            this._PrefabField.Label.text = "Prefab";
+
+            _TbOverride = new UI.ToggleButton() { IsChecked = false }; _TbOverride.Label.text = "Override properties";
+            _PropertiesField = new ImplantObjectPropertiesField();
+
+            this._Panel = new StackPanel() { Orientation = Orientation.Vertical, Parent = this };
+            this._Panel.Controls.Add(_PrefabField);
+            this._Panel.Controls.Add(_TbOverride);
+            this._Panel.Controls.Add(_PropertiesField);
+
+
+
+            this._PrefabField.ObjectChanged += _PrefabField_ObjectChanged;
+            this._Panel.LayoutChanged += Panel_LayoutChanged;
+            this._TbOverride.Changed += _TbOverride_Changed;
+
+            this.Object = null;
+        }
+
+        void _TbOverride_Changed(object sender, EventArgs e)
+        {
+            _PropertiesField.IsEnabled = _TbOverride.IsChecked;
+            if (this._Object != null)
+                this._Object.OverrideProperties = _TbOverride.IsChecked;
+        }
+
+        void _PrefabField_ObjectChanged(object sender, EventArgs e)
+        {
+            if (_Object != null)
+                _Object.Prefab = _PrefabField.Object;
+            Editor.UpdateNames();
+        }
+        protected override void OnRenderAreaChanged()
+        {
+            this._Panel.RenderArea = RenderArea;
+        }
+
+        private void Panel_LayoutChanged(object sender, EventArgs e)
+        {
+            OnLayoutChanged();
+        }
+
+        protected override void Render()
+        {
+            this._Panel.OnGUI();
+        }
+    }
+
+
+
+    class ImplantObjectPropertiesField : EditorControl
+    {
+        private StackPanel _Panel;
         private FloatField _MinScaleField;
         private FloatField _MaxScaleField;
         private Skill.Editor.UI.Slider _ChanceField;
-
         private Skill.Editor.UI.DropShadowLabel _RotationLabel;
-
         private Skill.Editor.UI.Extended.SelectionField _RotationSF;
         private Skill.Editor.UI.Extended.XYZComponent _RandomRotation;
         private Skill.Editor.UI.Vector3Field _CustomRotation;
@@ -32,7 +129,6 @@ namespace Skill.Editor.Tools
                 _Object = value;
                 if (_Object != null)
                 {
-                    this._PrefabField.Object = _Object.Prefab;
                     this._MinScaleField.Value = _Object.MinScalePercent;
                     this._MaxScaleField.Value = _Object.MaxScalePercent;
                     this._ChanceField.Value = _Object.Weight;
@@ -50,24 +146,21 @@ namespace Skill.Editor.Tools
 
                     this._CustomRotation.Value = _Object.CustomRotation;
                     this._RandomYaw.IsChecked = _Object.RandomYaw;
-                    IsEnabled = true;
+                    IsEnabled = _Object.OverrideProperties;
                 }
                 else
                 {
-                    this._PrefabField.Object = null;
                     IsEnabled = false;
                 }
             }
         }
-        public ImplantAssetEditor Editor { get; private set; }
 
         public override float LayoutHeight
         {
             get
             {
                 if (Visibility != Skill.Framework.UI.Visibility.Collapsed)
-                    return _PrefabField.LayoutHeight + _PrefabField.Margin.Vertical +
-                           _MinScaleField.LayoutHeight + _MinScaleField.Margin.Vertical +
+                    return _MinScaleField.LayoutHeight + _MinScaleField.Margin.Vertical +
                            _MaxScaleField.LayoutHeight + _MaxScaleField.Margin.Vertical +
                            _ChanceField.LayoutHeight + _ChanceField.Margin.Vertical +
                            _RotationLabel.LayoutHeight + _RotationLabel.Margin.Vertical +
@@ -76,13 +169,10 @@ namespace Skill.Editor.Tools
             }
         }
 
-        public ImplantObjectField(ImplantAssetEditor editor)
+        public ImplantObjectPropertiesField()
         {
-            this.Editor = editor;
             this.Margin = new Thickness(0, 0, 0, 8);
             this.Width = 300;
-            this._PrefabField = new ObjectField<GameObject>() { AllowSceneObjects = true, Margin = new Thickness(2, 2, 2, 0) };
-            this._PrefabField.Label.text = "Prefab";
 
             this._MinScaleField = new FloatField() { Margin = new Thickness(2, 2, 2, 0) };
             this._MinScaleField.Label.text = "Min Scale Percent";
@@ -110,7 +200,6 @@ namespace Skill.Editor.Tools
             _RotationLabel = new DropShadowLabel() { Text = "Rotation", Margin = new Thickness(4, 0, 0, 0) };
 
             this._Panel = new StackPanel() { Orientation = Orientation.Vertical, Parent = this };
-            this._Panel.Controls.Add(_PrefabField);
             this._Panel.Controls.Add(_MinScaleField);
             this._Panel.Controls.Add(_MaxScaleField);
             this._Panel.Controls.Add(_ChanceField);
@@ -120,7 +209,6 @@ namespace Skill.Editor.Tools
             this._MinScaleField.ValueChanged += new EventHandler(_MinScaleField_ValueChanged);
             this._MaxScaleField.ValueChanged += new EventHandler(_MaxScaleField_ValueChanged);
             this._ChanceField.ValueChanged += new EventHandler(_ChanceField_ValueChanged);
-            this._PrefabField.ObjectChanged += new EventHandler(_PrefabField_ObjectChanged);
             this._RotationSF.SelectedFieldChanged += new EventHandler(_RotationSF_SelectedFieldChanged);
 
             this._RandomRotation.XComponent.Checked += new EventHandler(RandomXYZComponent_Checked);
@@ -174,13 +262,6 @@ namespace Skill.Editor.Tools
             }
         }
 
-        void _PrefabField_ObjectChanged(object sender, EventArgs e)
-        {
-            if (_Object != null)
-                _Object.Prefab = _PrefabField.Object;
-            Editor.UpdateNames();
-        }
-
         void _ChanceField_ValueChanged(object sender, EventArgs e)
         {
             if (_Object != null)
@@ -191,9 +272,12 @@ namespace Skill.Editor.Tools
         {
             if (_Object != null)
             {
-                if (_MaxScaleField.Value < _MinScaleField.Value)
-                    _MaxScaleField.Value = _MinScaleField.Value;
                 _Object.MaxScalePercent = _MaxScaleField.Value;
+                if (_Object.MaxScalePercent < _Object.MinScalePercent)
+                {
+                    _Object.MaxScalePercent = _Object.MinScalePercent;
+                    _MaxScaleField.Value = _Object.MaxScalePercent;
+                }
             }
         }
 
@@ -201,9 +285,12 @@ namespace Skill.Editor.Tools
         {
             if (_Object != null)
             {
-                if (_MinScaleField.Value > _MaxScaleField.Value)
-                    _MinScaleField.Value = _MaxScaleField.Value;
                 _Object.MinScalePercent = _MinScaleField.Value;
+                if (_Object.MinScalePercent > _Object.MaxScalePercent)
+                {
+                    _Object.MinScalePercent = _Object.MaxScalePercent;
+                    _MinScaleField.Value = _Object.MinScalePercent;
+                }
             }
         }
 

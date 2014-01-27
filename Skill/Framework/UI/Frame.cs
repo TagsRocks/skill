@@ -219,7 +219,7 @@ namespace Skill.Framework.UI
             if (fc == null)
                 fc = Grid.FindControlByMinTabIndex();
             if (fc != null)
-                FocusControl(fc);            
+                FocusControl(fc);
         }
 
         /// <summary>
@@ -565,6 +565,15 @@ namespace Skill.Framework.UI
             }
             return handled;
         }
+        #endregion
+
+        #region Helper
+
+        /// <summary>
+        /// Grid.Controls.
+        /// </summary>
+        public BaseControlCollection Controls { get { return Grid.Controls; } }
+
         #endregion
     }
 }

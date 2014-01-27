@@ -9,15 +9,17 @@ namespace Skill.Editor
     /// </summary>
     public static class ScriptableObjectUtility
     {
-        
+
         /// <summary>
         /// This makes it easy to create, name and place unique new ScriptableObject asset files.
         /// </summary>
         /// <typeparam name="T"> Type of asset </typeparam>
         /// <param name="assetName"> name of asset</param>
-        public static void CreateAsset<T>(string assetName) where T : ScriptableObject
+        public static void CreateAsset<T>(string assetName, Action<T> setDefault = null) where T : ScriptableObject
         {
             T asset = ScriptableObject.CreateInstance<T>();
+            if (setDefault != null)
+                setDefault(asset);
             string path = AssetDatabase.GetAssetPath(Selection.activeObject);
             if (path == "")
             {

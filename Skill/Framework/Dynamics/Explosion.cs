@@ -40,7 +40,7 @@ namespace Skill.Framework.Dynamics
         /// </remarks>
         public string[] IgnoreRaycast = new string[] { "Glass" };
         /// <summary> tags that filtered to apply force</summary>
-        public string[] IgnoreForceTags;
+        public string[] IgnoreForce;
         /// <summary> Use raycast to know if any object is between explosion and collider to block explosion </summary>
         public bool UseRaycast = false;
         [HideInInspector]
@@ -140,7 +140,7 @@ namespace Skill.Framework.Dynamics
 
         private bool IsUsedForForce(string tag)
         {
-            return !IsTagExist(tag, IgnoreForceTags);
+            return !IsTagExist(tag, IgnoreForce);
         }
 
         private bool IsUsedForRaycast(string tag)

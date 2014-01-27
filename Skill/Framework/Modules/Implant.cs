@@ -11,6 +11,7 @@ namespace Skill.Framework.Modules
     public class Implant : MonoBehaviour
     {
         public ScriptableObject ImplantAsset = null;
+        public Transform Root;
         public int LayerMask = 1; // default layer    
         public float MinRadius = 0.0f;
         public float MaxRadius = 1.0f;
@@ -21,5 +22,6 @@ namespace Skill.Framework.Modules
         public int BrushMode = 0;
         public float OffsetY = 0;
         public Vector3[] Points;
+        public bool IsEnable = true;
     }
 }

@@ -80,6 +80,10 @@ namespace Skill.Framework.UI
             }
         }
 
+
+        /// <summary> Height of row after update layout </summary>
+        public float RenderHeight { get; internal set; }
+
     }
     #endregion
 

@@ -28,6 +28,8 @@ namespace Skill.Framework
         /// <summary> use in Editor </summary>
         [HideInInspector]
         public int SelectedIndex = 0;
+        [HideInInspector]
+        public int GroundLayer = 1;
 
         /// <summary> Show lowpoly path in editor(for internal use).</summary>
         public bool ShowPath { get; set; }
@@ -197,6 +199,73 @@ namespace Skill.Framework
             }
 
             return distance;
+        }
+
+        /// <summary>
+        /// Caculate points of path in specified resolution
+        /// </summary>
+        /// <param name="path">Path</param>
+        /// <param name="count">number of points</param>
+        /// <returns>calculated points</returns>
+        public static Vector3[] CalcPoints(Path3D path, int count)
+        {
+            if (count < 2)
+                throw new ArgumentException("Invalid resolution");
+            Vector3[] points = new Vector3[count];
+
+            if (Application.isEditor && !Application.isPlaying)
+            {
+                if (path is CRSpline3D)
+                {
+                    CRSpline3D cRSpline3D = (CRSpline3D)path;
+                    Vector3[] curvePoints = CRSpline3D.GeneratorPathControlPoints(cRSpline3D.Keys);
+                    if (!cRSpline3D.UseWorldSpace)
+                    {
+                        for (int i = 0; i < curvePoints.Length; i++)
+                            curvePoints[i] = cRSpline3D.transform.TransformPoint(curvePoints[i]);
+                    }
+                    points[0] = CRSpline3D.Interpolate(curvePoints, 0);
+                    count--;
+                    for (int i = 1; i <= count; i++)
+                    {
+                        float time = ((float)i / count) * cRSpline3D.TimeLength;
+                        points[i] = CRSpline3D.Interpolate(curvePoints, cRSpline3D.ConvertToInterpolationTime(time));
+                    }
+                }
+                else if (path is Curve3D)
+                {
+                    Curve3D curve3D = (Curve3D)path;
+                    AnimationCurve3D animCurve3D = new AnimationCurve3D(curve3D.Keys);
+
+                    float timeStep = curve3D.TimeLength / (count - 1);
+                    float timer = 0;
+                    for (int i = 0; i < count; i++)
+                    {
+                        points[i] = animCurve3D.Evaluate(timer);
+                        timer += timeStep;
+                    }
+                    if (!path.UseWorldSpace)
+                    {
+                        for (int i = 0; i < points.Length; i++)
+                            points[i] = path.transform.TransformPoint(points[i]);
+                    }
+                }
+                else
+                    throw new NotSupportedException("Unknow path");
+            }
+            else
+            {
+                float timeStep = path.TimeLength / (count - 1);
+                float time = 0;
+                points[0] = path.Evaluate(time);
+
+                for (int i = 1; i < count; i++)
+                {
+                    time += timeStep;
+                    points[i] = path.Evaluate(time);
+                }
+            }
+            return points;
         }
     }
 

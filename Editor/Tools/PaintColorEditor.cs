@@ -310,7 +310,7 @@ namespace Skill.Editor.Tools
                         }
                         break;
                     case EventType.MouseDrag:
-                        if (e.control || e.shift || e.command)
+                        if (e.control || e.command)
                         {
                             if (_PaintColor.ChannelR || _PaintColor.ChannelB || _PaintColor.ChannelG || _PaintColor.ChannelA)
                             {

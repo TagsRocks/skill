@@ -119,6 +119,27 @@ namespace Skill.Framework
         }
 
         /// <summary>
+        /// Retrieves time left to end
+        /// </summary>
+        public float TimeLeft
+        {
+            get
+            {
+                if (_IsEnabled)
+                {
+                    if (_UseRealTime)
+                        return Math.Max(0, _OverTime - UnityEngine.Time.realtimeSinceStartup);
+                    else
+                        return Math.Max(0, _OverTime - UnityEngine.Time.time);
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        }
+
+        /// <summary>
         /// if true TimeWatch use Time.realtimeSinceStartup instead of Time.time
         /// </summary>
         public bool UseRealTime { get { return _UseRealTime; } }

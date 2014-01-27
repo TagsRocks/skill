@@ -11,7 +11,7 @@ using Skill.Editor;
 namespace Skill.Editor.Tools
 {
 
-       
+
     class ImplantObjectListItem : EditorListItem
     {
         public ImplantObject Object { get; private set; }
@@ -34,8 +34,10 @@ namespace Skill.Editor.Tools
         #region CreateUI
 
         const float ButtonRowHeight = 26;
-        private const float FrameHeight = 290;
+        private const float FrameHeight = 400;
 
+        private Skill.Editor.UI.DropShadowLabel _LblDefaultProperties;
+        private ImplantObjectPropertiesField _PropertiesField;
         private Skill.Framework.UI.Extended.ListBox _ItemsList;
         private Skill.Editor.UI.Button _BtnAdd;
         private Skill.Editor.UI.ChangeCheck _MainPanel;
@@ -45,28 +47,44 @@ namespace Skill.Editor.Tools
 
         private void CreateUI()
         {
-            _ObjectField = new ImplantObjectField(this) { Row = 2, Column = 1 };
+            _ObjectField = new ImplantObjectField(this) { Row = 4, Column = 1 };
 
             _MainPanel = new ChangeCheck();
-            _MainPanel.RowDefinitions.Add(ButtonRowHeight, GridUnitType.Pixel);
-            _MainPanel.RowDefinitions.Add(1, GridUnitType.Star);
-            _MainPanel.RowDefinitions.Add(_ObjectField.LayoutHeight, GridUnitType.Pixel);
 
-            _ItemsList = new ListBox() { Row = 1, Column = 0, Margin = new Thickness(2) };
+            _MainPanel.RowDefinitions.Add(26, GridUnitType.Pixel); // property lable
+            _MainPanel.RowDefinitions.Add(104, GridUnitType.Pixel); // properties
+            _MainPanel.RowDefinitions.Add(ButtonRowHeight, GridUnitType.Pixel); // button add
+            _MainPanel.RowDefinitions.Add(1, GridUnitType.Star);// object list
+            _MainPanel.RowDefinitions.Add(_ObjectField.LayoutHeight, GridUnitType.Pixel);// object filed
+
+
+            _LblDefaultProperties = new DropShadowLabel() { Row = 0, Column = 0, Margin = new Thickness(0, 0, 0, 6) }; _LblDefaultProperties.Text = "Default properties";
+
+            ImplantAsset asset = target as ImplantAsset;
+            if (asset.DefaultObject == null) asset.DefaultObject = CreateNew();
+            asset.DefaultObject.OverrideProperties = true;
+            _PropertiesField = new ImplantObjectPropertiesField() { Row = 1, Column = 0, Object = asset.DefaultObject };
+
+            _ItemsList = new ListBox() { Row = 3, Column = 0, Margin = new Thickness(2) };
             _ItemsList.BackgroundVisible = true;
             _ItemsList.SelectedStyle = new GUIStyle();
             _ItemsList.SelectedStyle.normal.background = Resources.Textures.SelectedItemBackground;
             _ItemsList.DisableFocusable();
 
-            _BtnAdd = new Skill.Editor.UI.Button() { Row = 0, Column = 0, Margin = new Thickness(2) };
+            _BtnAdd = new Skill.Editor.UI.Button() { Row = 2, Column = 0, Margin = new Thickness(2) };
             _BtnAdd.Content.text = "Add";
             _BtnAdd.Click += new System.EventHandler(_BtnAdd_Click);
 
-            _MainPanel.Controls.Add(new Box() { Row = 2, Column = 1 });
+            _MainPanel.Controls.Add(new Box() { Row = 4, Column = 0 });
+            _MainPanel.Controls.Add(new Box() { Row = 0, Column = 0, RowSpan = 2 });
+
+            _MainPanel.Controls.Add(_LblDefaultProperties);
+            _MainPanel.Controls.Add(_PropertiesField);
             _MainPanel.Controls.Add(_BtnAdd);
             _MainPanel.Controls.Add(_ItemsList);
             _MainPanel.Controls.Add(_ObjectField);
-            
+
+
 
             _Frame = new Frame("MainFrame");
             _Frame.Grid.Controls.Add(_MainPanel);

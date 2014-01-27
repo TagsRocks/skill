@@ -10,6 +10,7 @@ namespace Skill.Framework
     /// </summary>    
     public class CameraShake : DynamicBehaviour
     {
+        public Transform RelativeTo;
 
         private CameraShakeParams _Shake;
         private TimeWatch _ShakeTimeTW;
@@ -50,7 +51,9 @@ namespace Skill.Framework
                 if (this._Shake == null)
                     this._Shake = new CameraShakeParams();
 
-                float distanceToSource = Vector3.Distance(_Transform.position, sourceOfShake);
+                if (RelativeTo == null) RelativeTo = _Transform;
+
+                float distanceToSource = Vector3.Distance(RelativeTo.position, sourceOfShake);
                 if (distanceToSource <= shakeInfo.Range)
                 {
                     this._Shake.CopyFrom(shakeInfo);

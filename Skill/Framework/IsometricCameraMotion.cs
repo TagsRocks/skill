@@ -27,9 +27,19 @@ namespace Skill.Framework
         protected override void Awake()
         {
             base.Awake();
+            
             _AroundAngleSmoothing = new SmoothingParameters() { SmoothType = SmoothType.Damp };
             _LookAngleSmoothing = new SmoothingParameters() { SmoothType = SmoothType.Damp };
             _FovSmoothing = new SmoothingParameters() { SmoothType = SmoothType.Damp };
+
+            if (Camera != null)
+            {
+                _AroundAngle.Reset(Camera.AroundAngle);
+                _LookAngle.Reset(Camera.LookAngle);
+                _Fov.Reset(Camera.Fov);
+            }
+
+            enabled = false;
         }
 
         protected override void GetReferences()

@@ -74,7 +74,7 @@ namespace Skill.Framework.UI
         }
 
         /// <summary>
-        /// When RenderArea hanged
+        /// When RenderArea changed
         /// </summary>
         protected override void OnRenderAreaChanged()
         {

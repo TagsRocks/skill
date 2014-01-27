@@ -49,6 +49,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HandleHelper.cs" />
     <Compile Include="Tools\BrushProjector.cs" />
     <Compile Include="Tools\CacheObjectField.cs" />
     <Compile Include="Tools\CacheGroupEditor.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="UI\EditorFrame.cs" />
     <Compile Include="UI\Extended\TabHeader.cs" />
     <Compile Include="UI\Extended\TextureBrushGrid.cs" />
+    <Compile Include="UI\GridSplitter.cs" />
     <Compile Include="UI\InspectorHelper.cs" />
     <Compile Include="UI\IntPopup.cs" />
     <Compile Include="UI\CurveField.cs" />

@@ -11,10 +11,15 @@ namespace Skill.Framework
         /// <summary> Keys of path </summary>
         [HideInInspector]
         public Vector3[] Keys;
+
+        /// <summary> Times of keys </summary>
+        [HideInInspector]
+        public float[] Times;
+
         /// <summary> Number of keys in path </summary>
         public override int Length { get { return Keys != null ? Keys.Length : 0; } }
         /// <summary> lenght of path in time</summary>
-        public override float TimeLength { get { return 1.0f; } }
+        public override float TimeLength { get { return (Times != null && Times.Length > 0) ? Times[Times.Length - 1] : 0; } }
 
         private Vector3[] _PathControlPoints;
         /// <summary> Rebuild path after modify keys </summary>
@@ -22,15 +27,28 @@ namespace Skill.Framework
         {
             if (Keys == null) Keys = new Vector3[] { _Transform.position, _Transform.position + Vector3.forward };
             else if (Keys.Length == 1) Keys = new Vector3[] { Keys[0], Keys[0] + Vector3.forward };
+
+            if (Times == null) Times = new float[] { 0, 1 };
+            else if (Times.Length == 1) Times = new float[] { Times[0], Times[0] + 1 };
+
             _PathControlPoints = GeneratorPathControlPoints(Keys);
         }
 
         /// <summary>
         /// Evaluate 
         /// </summary>
-        /// <param name="time"> 0.0f - 1.0f</param>
+        /// <param name="time"> Time</param>
         /// <returns>Evaluate position</returns>
         public override Vector3 Evaluate(float time)
+        {
+            time = ConvertToInterpolationTime(time);
+            Vector3 result = Interpolate(_PathControlPoints, time);
+            if (!UseWorldSpace)
+                result = _Transform.TransformPoint(result);
+            return result;
+        }
+
+        private float ValidateTime(float time)
         {
             if (time < 0)
             {
@@ -42,40 +60,69 @@ namespace Skill.Framework
                         time = 0.0f;
                         break;
                     case WrapMode.Loop:
-                        time = 1.0f - (Mathf.Abs(time) - Mathf.FloorToInt(Mathf.Abs(time)));
+                        time = Mathf.Abs(time);
+                        time = TimeLength - (time - Mathf.FloorToInt(time / TimeLength) * TimeLength);
                         break;
                     case WrapMode.PingPong:
-                        time = Mathf.Abs(time) - Mathf.FloorToInt(Mathf.Abs(time));
+                        time = Mathf.Abs(time);
+                        time = time - (Mathf.FloorToInt(time / TimeLength) * TimeLength);
                         break;
                 }
             }
-            else if (time > 1.0f)
+            else if (time > TimeLength)
             {
                 switch (PostWrapMode)
                 {
                     case WrapMode.Clamp:
                     case WrapMode.ClampForever:
                     case WrapMode.Default:
-                        time = 1.0f;
+                        time = TimeLength;
                         break;
                     case WrapMode.Loop:
-                        time = time - Mathf.FloorToInt(time);
+                        time = time - (Mathf.FloorToInt(time / TimeLength) * TimeLength);
                         break;
                     case WrapMode.PingPong:
-                        time = 1.0f - (time - Mathf.FloorToInt(time));
+                        time = TimeLength - (time - (Mathf.FloorToInt(time / TimeLength) * TimeLength));
                         break;
                 }
             }
-            if (UseWorldSpace)
-            {
-                return Interpolate(_PathControlPoints, time);
-            }
-            else
-            {
-                Vector3 localPosition = Interpolate(_PathControlPoints, time);               
-                return _Transform.TransformPoint(localPosition);
-            }
+            return time;
         }
+
+        /// <summary>
+        /// Convert time to range (0.0f - 1.0f)
+        /// </summary>
+        /// <param name="time">Time</param>
+        /// <returns>time between (0.0f - 1.0f)</returns>
+        public float ConvertToInterpolationTime(float time)
+        {
+            time = ValidateTime(time);
+            int index = FindTimeIndex(time);
+            float timeStep = 1.0f / (Length - 1);
+            return (index + (time - Times[index]) / (Times[index + 1] - Times[index])) * timeStep;
+        }
+
+        int FindTimeIndex(float time)
+        {
+            int minTimeIndex = 0;
+            int maxTimeIndex = Length - 1;
+
+            while (maxTimeIndex - minTimeIndex > 1)
+            {
+                // calculate the midpoint for roughly equal partition
+                int middleIndex = (minTimeIndex + maxTimeIndex) / 2;                
+                // determine which subarray to search
+                if (Times[middleIndex] < time)
+                    // change min index to search upper subarray
+                    minTimeIndex = middleIndex;
+                else
+                    // change max index to search lower subarray
+                    maxTimeIndex = middleIndex;
+            }
+
+            return minTimeIndex;
+        }
+
 
         /// <summary>
         /// Retrieves time of path at specified point
@@ -85,8 +132,7 @@ namespace Skill.Framework
         public override float GetTime(int pointIndex)
         {
             pointIndex = GetValidIndex(pointIndex);
-            float maxIndex = Length - 1;
-            return Mathf.Repeat(pointIndex, maxIndex) / maxIndex;
+            return Times[pointIndex];
         }
 
 

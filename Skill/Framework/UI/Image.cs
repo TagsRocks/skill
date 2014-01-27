@@ -27,17 +27,22 @@ namespace Skill.Framework.UI
         /// This allows the aspect ratio of the source image to be adjusted without changing the pixel width and height.
         /// </summary>
         public float ImageAspect { get; set; }
-        
+
         /// <summary>
         /// Getsor sets tinting color
         /// </summary>
         public Color TintColor { get; set; }
 
         /// <summary>
+        /// If not null Image use alpha value of referenced Fading
+        /// </summary>
+        public Fading AlphaFading { get; set; }
+
+        /// <summary>
         /// Create an instance of Image
         /// </summary>
         public Image()
-        {            
+        {
             this.AlphaBlend = true;
             this.Scale = ScaleMode.ScaleToFit;
             this.ImageAspect = 0;
@@ -52,8 +57,10 @@ namespace Skill.Framework.UI
             if (Texture != null)
             {
                 Color preCoor = GUI.color;
-
-                GUI.color = TintColor;
+                if (AlphaFading != null)
+                    GUI.color = AlphaFading.ApplyAlpha(TintColor);
+                else
+                    GUI.color = TintColor;
                 GUI.DrawTexture(RenderArea, Texture, Scale, AlphaBlend, ImageAspect);
 
                 GUI.color = preCoor;

@@ -41,7 +41,7 @@ namespace Skill.Framework.Sounds
             if (Instance != null)
                 Debug.LogWarning("More than one instance of PitchController found.");
             Instance = this;
-            _PitchSmoothing.Target = _PitchSmoothing.Current = 1.0f;
+            _PitchSmoothing.Reset(1.0f);
         }
 
         /// <summary>
@@ -50,8 +50,30 @@ namespace Skill.Framework.Sounds
         protected override void Update()
         {
             if (Global.IsGamePaused) return;
+            if (_PitchTimeTW.IsEnabledAndOver)
+            {
+                Pitch = _PrePitch;
+                _PitchTimeTW.End();
+            }
             _PitchSmoothing.Update(PitchSmoothing);
             base.Update();
+        }
+
+
+        private TimeWatch _PitchTimeTW;
+        private float _PrePitch;
+
+        /// <summary>
+        /// Change pitch for specific time than fallback
+        /// </summary>
+        /// <param name="targetPitch">Target pitch</param>
+        /// <param name="length">lenght of change</param>
+        /// <param name="realtime"> use realtime or gametime?</param>
+        public void Change(float targetPitch, float length, bool realtime = true)
+        {
+            _PrePitch = Pitch;
+            Pitch = targetPitch;
+            _PitchTimeTW.Begin(length, realtime);
         }
     }
 }

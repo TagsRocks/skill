@@ -12,8 +12,8 @@ namespace Skill.Framework
     {
         /// <summary> Target to follow </summary>
         public Transform Target;
-        /// <summary> How to smooth movement of camera when following target</summary>
-        public float Smoothing = 0.3f;        
+        /// <summary> How to damp movement of camera when following target</summary>
+        public float Damping = 2.0f;
         /// <summary> Camera moves by mouse when mouse position gets far from center of screen. </summary>
         public float CameraPreview = 2.0f;
         /// <summary> Rotation angle around target ( 0 - 360) </summary>
@@ -31,7 +31,7 @@ namespace Skill.Framework
         /// <summary> height of cursor plane above target </summary>
         public float CursorPlaneHeight = 0;
         /// <summary> If target can move very fast do not allow camera to loose it</summary>
-        public bool FastMove;
+        public bool FastTarget;
 
         /// <summary>
         /// Apply relative custom offset to position of camera
@@ -58,7 +58,6 @@ namespace Skill.Framework
 
         // Private memeber data                
         private Transform _CameraTransform;
-        private Vector3 _CameraVelocity;
 
         private Quaternion _ScreenMovementSpace;
         private Plane _MovementPlane;
@@ -68,7 +67,7 @@ namespace Skill.Framework
         private float _LengthOffset;
 
         private float _PreAroundAngle, _PreZoom, _PreLookAngle;
-        private float _ZDistace, _YDistace;        
+        private float _ZDistace, _YDistace;
 
         /// <summary>
         /// Awake
@@ -77,10 +76,9 @@ namespace Skill.Framework
         {
             base.Awake();
             _PreZoom = -1;
-            _CameraVelocity = Vector3.zero;
             _CameraTransform = Camera.transform;
             // Set the initial cursor position to the center of the screen
-            CursorScreenPosition = new Vector3(0.5f * Screen.width, 0.5f * Screen.height, 0);            
+            CursorScreenPosition = new Vector3(0.5f * Screen.width, 0.5f * Screen.height, 0);
         }
 
         protected override void GetReferences()
@@ -114,9 +112,9 @@ namespace Skill.Framework
         }
 
         /// <summary>
-        /// Update
+        /// LateUpdate
         /// </summary>
-        protected override void Update()
+        protected virtual void LateUpdate()
         {
             if (!Global.IsGamePaused && !Global.CutSceneEnable) // do not modify camera if game is in cutscene mode
             {
@@ -146,20 +144,18 @@ namespace Skill.Framework
                 {
                     _LengthOffset = 0;
                     _Offset = Vector3.zero;
-                }                
+                }
 
                 // make sure zoom factors are in correct range
                 if (ZoomIn < 0) ZoomIn = 0;
                 if (ZoomOut < ZoomIn) ZoomOut = ZoomIn;
 
                 float zoomFactor = _LengthOffset / Mathf.Max(0.01f, MaxOffset);
-                _Zoom = Mathf.Lerp(ZoomIn, ZoomOut, zoomFactor);                
+                _Zoom = Mathf.Lerp(ZoomIn, ZoomOut, zoomFactor);
 
                 // update position of camera
                 UpdateCamera();
             }
-
-            base.Update();
         }
 
         /// <summary>
@@ -194,46 +190,49 @@ namespace Skill.Framework
 
         private void UpdateCamera(bool force = false)
         {
-            UpdateScreenSpace();
-
-            _MovementPlane.distance = -Target.position.y + CursorPlaneHeight;
-
-            CursorScreenPosition = HandleMousePosition();
-
-            // Find out where the mouse ray intersects with the movement plane of the player
-            CursorWorldPosition = ScreenPointToWorldPointOnPlane(CursorScreenPosition, _MovementPlane, Camera);
-
-            Vector3 cameraAdjustmentVector = Vector3.zero;
-
-            if (_LengthOffset < CameraPreview)
+            if (Target != null)
             {
-                float halfWidth = Screen.width / 2.0f;
-                float halfHeight = Screen.height / 2.0f;
-                float maxHalf = Mathf.Max(halfWidth, halfHeight);
+                UpdateScreenSpace();
 
-                // Acquire the relative screen position			
-                Vector3 posRel = CursorScreenPosition - new Vector3(halfWidth, halfHeight, CursorScreenPosition.z);
-                posRel.x /= maxHalf;
-                posRel.y /= maxHalf;
+                _MovementPlane.distance = -Target.position.y + CursorPlaneHeight;
 
-                // used to adjust the camera based on cursor or joystick position
-                cameraAdjustmentVector = posRel.x * ScreenRight + posRel.y * ScreenForward;
-                cameraAdjustmentVector.y = 0.0f;
-            }
+                CursorScreenPosition = HandleMousePosition();
 
-            Camera.fieldOfView = Fov;
+                // Find out where the mouse ray intersects with the movement plane of the player
+                CursorWorldPosition = ScreenPointToWorldPointOnPlane(CursorScreenPosition, _MovementPlane, Camera);
 
-            // HANDLE CAMERA POSITION
-            Vector3 offsetToCenter = -_ZDistace * ScreenForward;
-            offsetToCenter.y = _YDistace;
-            // Set the target position of the camera to point at the focus point
+                Vector3 cameraAdjustmentVector = Vector3.zero;
 
-            Vector3 finalOffset = _Offset + offsetToCenter + (cameraAdjustmentVector * CameraPreview) + (_ScreenMovementSpace * CustomOffset);
-            Vector3 finalPosition = Target.position + finalOffset;
+                if (_LengthOffset < CameraPreview)
+                {
+                    float halfWidth = Screen.width / 2.0f;
+                    float halfHeight = Screen.height / 2.0f;
+                    float maxHalf = Mathf.Max(halfWidth, halfHeight);
 
-            if (!force)
-            {
-                if (FastMove)
+                    // Acquire the relative screen position			
+                    Vector3 posRel = CursorScreenPosition - new Vector3(halfWidth, halfHeight, CursorScreenPosition.z);
+                    posRel.x /= maxHalf;
+                    posRel.y /= maxHalf;
+
+                    // used to adjust the camera based on cursor or joystick position
+                    cameraAdjustmentVector = posRel.x * ScreenRight + posRel.y * ScreenForward;
+                    cameraAdjustmentVector.y = 0.0f;
+                }
+
+                Camera.fieldOfView = Fov;
+
+                // HANDLE CAMERA POSITION
+                Vector3 offsetToCenter = -_ZDistace * ScreenForward;
+                offsetToCenter.y = _YDistace;
+                // Set the target position of the camera to point at the focus point
+
+                Vector3 finalOffset = _Offset + offsetToCenter + (cameraAdjustmentVector * CameraPreview) + (_ScreenMovementSpace * CustomOffset);
+                Vector3 finalPosition = Target.position + finalOffset;
+
+                if (!force)
+                    finalPosition = Vector3.Lerp(_CameraTransform.position, finalPosition, Damping * Time.deltaTime);
+
+                if (FastTarget)
                 {
                     // speed up smoothing if target moves fast
                     Vector3 dir = _CameraTransform.position - finalPosition;
@@ -245,16 +244,13 @@ namespace Skill.Framework
                     }
                 }
 
-                finalPosition = Vector3.SmoothDamp(_CameraTransform.position, finalPosition, ref _CameraVelocity, Smoothing);
+                Vector3 look = -offsetToCenter.normalized;
+                Quaternion finalRotation = Quaternion.LookRotation(look); // look at target
+
+                // Apply some smoothing to the camera movement
+                _CameraTransform.position = finalPosition;
+                _CameraTransform.rotation = finalRotation;
             }
-
-
-            Vector3 look = -offsetToCenter.normalized;
-            Quaternion finalRotation = Quaternion.LookRotation(look); // look at target
-
-            // Apply some smoothing to the camera movement
-            _CameraTransform.position = finalPosition;
-            _CameraTransform.rotation = finalRotation;
         }
 
 
