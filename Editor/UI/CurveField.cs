@@ -70,7 +70,7 @@ namespace Skill.Editor.UI
             if (UseColor)
                 _Curve = EditorGUI.CurveField(RenderArea, Label, _Curve, Color, Ranges);
             else
-                _Curve = EditorGUI.CurveField(RenderArea, Label, _Curve);
+                _Curve = EditorGUI.CurveField(RenderArea, Label, _Curve);            
         }
     }
 }

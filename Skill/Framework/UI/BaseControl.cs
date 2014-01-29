@@ -627,61 +627,78 @@ namespace Skill.Framework.UI
                 else mb = MouseButton.Other;
             }
             return mb;
-        }        
+        }
+
+        /// <summary> ContextMenu </summary>
+        public IContextMenu ContextMenu { get; set; }
+
 
         /// <summary>
         /// Check for events
         /// </summary>
         protected virtual void CheckEvents()
         {
-            if (WantsMouseEvents)
+            Event e = Event.current;
+            if (e != null)
             {
-                Event e = Event.current;
-                if (e != null && e.isMouse)
+                if (WantsMouseEvents)
                 {
-                    EventType type = e.type;
+                    if (e.isMouse)
+                    {
+                        EventType type = e.type;
+                        Vector2 localMouse = ConvertToLocal(e.mousePosition);
+                        if (_RenderArea.Contains(localMouse))
+                        {
+                            if (!IsMouseOver)
+                            {
+                                IsMouseOver = true;
+                                OnMouseEnter(new MouseEventArgs(e.mousePosition, e.modifiers));
+                            }
+
+                            if (type == EventType.MouseDown || type == EventType.MouseUp)
+                            {
+                                MouseButton mb = ConvertButton(e.button);
+                                MouseClickEventArgs args = new MouseClickEventArgs(e.mousePosition, e.modifiers, mb, e.clickCount);
+                                if (type == EventType.MouseDown)
+                                    OnMouseDown(args);
+                                else
+                                    OnMouseUp(args);
+                                if (args.Handled)
+                                    e.Use();
+                            }
+                            else if (type == EventType.ScrollWheel || type == EventType.MouseMove || type == EventType.MouseDrag)
+                            {
+                                MouseButton mb = ConvertButton(e.button);
+                                MouseMoveEventArgs args = new MouseMoveEventArgs(e.mousePosition, e.modifiers, mb, e.delta);
+                                if (type == EventType.ScrollWheel)
+                                    OnScrollWheel(args);
+                                else if (type == EventType.MouseMove)
+                                    OnMouseMove(args);
+                                else
+                                    OnMouseDrag(args);
+                                if (args.Handled)
+                                    e.Use();
+                            }
+
+                        }
+                        else
+                        {
+                            if (IsMouseOver)
+                            {
+                                IsMouseOver = false;
+                                OnMouseLeave(new MouseEventArgs(e.mousePosition, e.modifiers));
+                            }
+
+                        }
+                    }
+                }
+                else if (ContextMenu != null && e.type == EventType.ContextClick)
+                {
                     Vector2 localMouse = ConvertToLocal(e.mousePosition);
                     if (_RenderArea.Contains(localMouse))
                     {
-                        if (!IsMouseOver)
-                        {
-                            IsMouseOver = true;
-                            OnMouseEnter(new MouseEventArgs(e.mousePosition, e.modifiers));
-                        }
-
-                        if (type == EventType.MouseDown || type == EventType.MouseUp)
-                        {
-                            MouseButton mb = ConvertButton(e.button);
-                            MouseClickEventArgs args = new MouseClickEventArgs(e.mousePosition, e.modifiers, mb, e.clickCount);
-                            if (type == EventType.MouseDown)
-                                OnMouseDown(args);
-                            else
-                                OnMouseUp(args);
-                            if (args.Handled)
-                                e.Use();
-                        }
-                        else if (type == EventType.ScrollWheel || type == EventType.MouseMove || type == EventType.MouseDrag)
-                        {
-                            MouseButton mb = ConvertButton(e.button);
-                            MouseMoveEventArgs args = new MouseMoveEventArgs(e.mousePosition, e.modifiers, mb, e.delta);
-                            if (type == EventType.ScrollWheel)
-                                OnScrollWheel(args);
-                            else if (type == EventType.MouseMove)
-                                OnMouseMove(args);
-                            else
-                                OnMouseDrag(args);
-                            if (args.Handled)
-                                e.Use();
-                        }
-                    }
-                    else
-                    {
-                        if (IsMouseOver)
-                        {
-                            IsMouseOver = false;
-                            OnMouseLeave(new MouseEventArgs(e.mousePosition, e.modifiers));
-                        }
-
+                        ContextMenu.Show();
+                        e.Use();
                     }
                 }
             }
