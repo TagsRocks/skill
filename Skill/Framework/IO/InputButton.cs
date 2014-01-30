@@ -27,7 +27,7 @@ namespace Skill.Framework.IO
         /// Create Button
         /// </summary>
         /// <param name="name"> Name of Button </param>
-        /// <param name="key"> keys that atleast one press required to activate this button. </param>
+        /// <param name="keys"> keys that atleast one press required to activate this button. </param>
         internal InputButton(string name, params KeyCode[] keys)
         {
             if (_ValueGenerator > 31)

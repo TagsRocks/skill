@@ -6,7 +6,8 @@ namespace Skill.Framework.AI
 {
     /// <summary>
     /// Represents the method to handle execution of condition by user
-    /// </summary>    
+    /// </summary>        
+    /// <param name="sender"> Sender </param>
     /// <param name="parameters">Parameters for condition</param>
     /// <returns>true for success, false for failure</returns>
     public delegate bool ConditionHandler(object sender, BehaviorParameterCollection parameters);

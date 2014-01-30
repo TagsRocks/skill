@@ -84,8 +84,7 @@ namespace Skill.Framework.IO
 
         /// <summary>
         /// Create a GestureDetector
-        /// </summary>
-        /// <param name="priority"> Priority of detector </param>
+        /// </summary>        
         protected GestureDetector()
         {
             _TrackingTouches = new List<TouchState>();

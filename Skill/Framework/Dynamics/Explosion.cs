@@ -43,8 +43,9 @@ namespace Skill.Framework.Dynamics
         public string[] IgnoreForce;
         /// <summary> Use raycast to know if any object is between explosion and collider to block explosion </summary>
         public bool UseRaycast = false;
-        [HideInInspector]
+
         /// <summary> use raycast to sure there is something between collider and explosion that block explosion</summary>
+        [HideInInspector]        
         public int LayerMask = 0;
 
         //private bool _IgnoreFirst;

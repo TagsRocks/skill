@@ -9,6 +9,14 @@ namespace Skill.Framework
     /// </summary>
     public abstract class DynamicBehaviour : StaticBehaviour
     {
+
+        /// <summary>
+        /// Use this for initialization
+        /// </summary>
+        protected virtual void Start()
+        {
+        }
+
         /// <summary>
         /// Update
         /// </summary>

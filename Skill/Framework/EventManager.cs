@@ -54,8 +54,9 @@ namespace Skill.Framework
     /// 
     /// other behaviors could call OnHit method to notify interested behaviors
     /// </example>              
-    public class EventManager : UnityEngine.MonoBehaviour
+    public class EventManager : StaticBehaviour
     {
+        
         /// <summary>
         /// Occurs when a ray or somthing Hit this GameObject
         /// </summary>

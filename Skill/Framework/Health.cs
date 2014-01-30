@@ -42,7 +42,7 @@ namespace Skill.Framework
         /// <summary> Offset of decale to hit surface </summary>
         public float DecalOffset = 0.1f;
         /// <summary> If true, it takes additional raycast to find position of decale with more precision  </summary>
-        //public bool UseRaycastForDecal = false;
+        /// public bool UseRaycastForDecal = false;
         /// <summary> True if you want HitParticle spawn at inverse direction of hit normal </summary>
         public bool InverseHit;
         /// <summary> Maximum amount of health (if RegenerateSpeed > 0) </summary>

@@ -27,8 +27,9 @@ namespace Skill.Framework.Rendering
         /// <summary>
         /// Awake
         /// </summary>
-        void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             _Material = renderer.material;
         }
 

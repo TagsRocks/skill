@@ -56,7 +56,7 @@ namespace Skill.Framework.Weapons
             }
         }
 
-        /// <summary> Retrieves precalculated Mathf.Sin(ThrowAngle) </summary>
+        //// <summary> Retrieves precalculated Mathf.Sin(ThrowAngle) </summary>
         //public float SinThrowAngle
         //{
         //    get
@@ -66,7 +66,7 @@ namespace Skill.Framework.Weapons
         //    }
         //}
 
-        /// <summary> Retrieves precalculated Mathf.Cos(ThrowAngle) </summary>
+        //// <summary> Retrieves precalculated Mathf.Cos(ThrowAngle) </summary>
         //public float CosThrowAngle
         //{
         //    get
@@ -85,7 +85,7 @@ namespace Skill.Framework.Weapons
             }
         }
 
-        /// <summary> Retrieves precalculated Mathf.Cos(ThrowAngle) </summary>
+        //// <summary> Retrieves precalculated Mathf.Cos(ThrowAngle) </summary>
         //public float Cos2ThrowAngle
         //{
         //    get

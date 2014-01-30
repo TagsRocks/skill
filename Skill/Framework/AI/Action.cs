@@ -17,7 +17,8 @@ namespace Skill.Framework.AI
 
     /// <summary>
     /// Represents the method that will handle execution of action by user
-    /// </summary>    
+    /// </summary>        
+    /// <param name="sender"> Sender</param>
     /// <param name="parameters">Parameters for action</param>
     /// <returns>Status of action</returns>
     public delegate BehaviorResult ActionHandler(object sender, BehaviorParameterCollection parameters);

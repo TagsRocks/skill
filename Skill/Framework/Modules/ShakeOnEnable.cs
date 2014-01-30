@@ -8,11 +8,11 @@ namespace Skill.Framework.Modules
     /// Call Global.OnCameraShake event OnEnable. this is usefull for explisions to shake camera
     /// </summary>
     ///<remarks>
-    ///// When a GameObject instantiated OnEnable method will called.
-    ///// if use this behavior with a cachable object, and cache objects instantiated before use,
-    ///// so it is better to ignore first enable
-    ///// so make sure that if you use this behavior and CacheBehavior together, this gameobject must be inside a CacheGroup to work correctly
-    ///// </remarks>    
+    /// When a GameObject instantiated OnEnable method will called.
+    /// if use this behavior with a cachable object, and cache objects instantiated before use,
+    /// so it is better to ignore first enable
+    /// so make sure that if you use this behavior and CacheBehavior together, this gameobject must be inside a CacheGroup to work correctly
+    /// </remarks>    
     [RequireComponent(typeof(EventManager))]
     public class ShakeOnEnable : StaticBehaviour
     {

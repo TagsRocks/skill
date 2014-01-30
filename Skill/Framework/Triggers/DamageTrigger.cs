@@ -12,8 +12,18 @@ namespace Skill.Framework.Triggers
     {
         private class ColliderInfo
         {
+            public EventManager Events;
             public Collider Collider;
             public TimeWatch DamageTW;
+
+            public bool IsDestroyed { get { return Events != null && Events.IsDestroyed; } }
+
+            public ColliderInfo(Collider collider)
+            {
+                this.Collider = collider;
+                this.Events = collider.GetComponent<EventManager>();
+                DamageTW.End();
+            }
         }
 
         /// <summary> Amount of damage </summary>
@@ -64,7 +74,7 @@ namespace Skill.Framework.Triggers
             else
             {
                 if (GetIndexOf(other, _EnteredColliders) < 0)
-                    _EnteredColliders.Add(new ColliderInfo() { Collider = other });
+                    _EnteredColliders.Add(new ColliderInfo(other));
             }
             return true;
         }
@@ -110,7 +120,7 @@ namespace Skill.Framework.Triggers
         {
             if (cInfo.DamageTW.IsOver)
             {
-                EventManager em = cInfo.Collider.GetComponent<EventManager>();
+                EventManager em = cInfo.Events;
                 if (em != null)
                 {
                     float d = Damage;
@@ -133,13 +143,22 @@ namespace Skill.Framework.Triggers
             int index = 0;
             while (index < _ExitedColliders.Count)
             {
-                if (_ExitedColliders[index].DamageTW.IsOver)
+                if (_ExitedColliders[index].IsDestroyed || _ExitedColliders[index].DamageTW.IsOver)
                     _ExitedColliders.RemoveAt(index);
                 else
                     index++;
-            }
-            for (int i = 0; i < _EnteredColliders.Count; i++)
-                ApplyDamage(_EnteredColliders[i]);
+            }            
+            while (index < _EnteredColliders.Count)
+            {
+                // check for destroyed
+                if (_EnteredColliders[index].IsDestroyed)
+                    _EnteredColliders.RemoveAt(index);
+                else // or apply damage
+                {
+                    ApplyDamage(_EnteredColliders[index]);
+                    index++;
+                }
+            }            
         }
 
         protected override string GizmoFilename { get { return "Damage.png"; } }

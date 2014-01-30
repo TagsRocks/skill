@@ -7,19 +7,41 @@ using UnityEditor;
 
 namespace Skill.Editor.UI
 {
-    /// <summary> ContextMenuBase </summary>
-    public abstract class ContextMenuBase
+    /// <summary> MenuItemBase </summary>
+    public abstract class MenuItemBase
     {
-        private List<ContextMenuItem> _Items;
-        internal ContextMenuBase Parent { get; set; }
+        private List<MenuItem> _Items;
+        internal MenuItemBase Parent { get; set; }
         internal int Count { get { return _Items.Count; } }
-        internal ContextMenuItem this[int index] { get { return _Items[index]; } }
+        internal MenuItem this[int index] { get { return _Items[index]; } }
 
+        /// <summary>
+        /// Height of ContextMenu to draw DropDown
+        /// </summary>
+        public float Height { get; private set; }
 
-        /// <summary> Create a ContextMenuBase </summary>
-        protected ContextMenuBase()
+        /// <summary> Create a MenuItemBase </summary>
+        protected MenuItemBase()
         {
-            _Items = new List<ContextMenuItem>();
+            _Items = new List<MenuItem>();
+            Height = 16;
+        }
+
+        internal void CalcHeight(float itemH, float sepratorH)
+        {
+            if (_Items.Count == 0)
+                Height = itemH;
+            else
+            {
+                Height = 0;
+                for (int i = 0; i < _Items.Count; i++)
+                {
+                    if (_Items[i] == null)
+                        Height += sepratorH;
+                    else
+                        Height += itemH;
+                }
+            }
         }
 
         /// <summary>
@@ -34,13 +56,13 @@ namespace Skill.Editor.UI
         }
 
         /// <summary>
-        /// Adds a ContextMenuItem element to a ContextMenu
+        /// Adds a MenuItem element to a ContextMenu
         /// </summary>
-        /// <param name="item">Identifies the ContextMenuItem to add to the collection.</param>
-        public void Add(ContextMenuItem item)
+        /// <param name="item">Identifies the MenuItem to add to the collection.</param>
+        public void Add(MenuItem item)
         {
             if (item == null)
-                throw new ArgumentNullException("ContextMenuItem is null");
+                throw new ArgumentNullException("MenuItem is null");
 
             item.Parent = this;
             item.EnableChanged += Item_EnableChanged;
@@ -48,7 +70,7 @@ namespace Skill.Editor.UI
         }
 
         /// <summary>
-        /// Adds a Separator to ContextMenuItem
+        /// Adds a Separator to MenuItem
         /// </summary>    
         public void AddSeparator()
         {
@@ -59,16 +81,29 @@ namespace Skill.Editor.UI
     /// <summary>
     /// ContextMenu 
     /// </summary>
-    public class ContextMenu : ContextMenuBase, Skill.Framework.UI.IContextMenu
+    public class ContextMenu : MenuItemBase, Skill.Framework.UI.IContextMenu
     {
         private GenericMenu _GenericMenu;
         private GenericMenu.MenuFunction2 _MenuFunction;
         private bool _Changed;
 
+
+        /// <summary> Height of an item </summary>
+        public float ItemHeight { get; set; }
+        /// <summary> Height of n separator </summary>
+        public float SeparatorHeight { get; set; }
+
+
+
+        /// <summary>
+        /// Create a ContextMenu
+        /// </summary>
         public ContextMenu()
         {
             _Changed = true;
             _MenuFunction = Item_Click;
+            ItemHeight = 16;
+            SeparatorHeight = 8;
         }
 
         private void ApplyChanges()
@@ -81,13 +116,13 @@ namespace Skill.Editor.UI
             }
         }
 
-        private void GenerateMenu(ContextMenuBase contextMenu, GenericMenu genericMenu, string path)
+        private void GenerateMenu(MenuItemBase contextMenu, GenericMenu genericMenu, string path)
         {
             if (contextMenu.Count > 0)
             {
                 for (int i = 0; i < contextMenu.Count; i++)
                 {
-                    ContextMenuItem item = contextMenu[i];
+                    MenuItem item = contextMenu[i];
                     if (item == null)
                     {
                         genericMenu.AddSeparator(path + "/");
@@ -116,6 +151,7 @@ namespace Skill.Editor.UI
                     }
                 }
             }
+            contextMenu.CalcHeight(ItemHeight, SeparatorHeight);
         }
 
         /// <summary> Show the menu at the given screen rect. </summary>
@@ -136,7 +172,7 @@ namespace Skill.Editor.UI
 
         private void Item_Click(object userData)
         {
-            ((ContextMenuItem)userData).RaiseClick();
+            ((MenuItem)userData).RaiseClick();
         }
 
         protected override void Item_EnableChanged(object sender, EventArgs e)
@@ -147,9 +183,9 @@ namespace Skill.Editor.UI
 
 
     /// <summary>
-    /// Context Menu Item
+    /// Menu Item
     /// </summary>
-    public class ContextMenuItem : ContextMenuBase
+    public class MenuItem : MenuItemBase
     {
         /// <summary>
         /// text,Image or tootip of item
@@ -213,10 +249,10 @@ namespace Skill.Editor.UI
         }
 
         /// <summary>
-        /// Create an instance of ContextMenuItem
+        /// Create an instance of MenuItem
         /// </summary>    
 
-        public ContextMenuItem(string name)
+        public MenuItem(string name)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentException("Invalid name");

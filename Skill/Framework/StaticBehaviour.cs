@@ -53,14 +53,7 @@ namespace Skill.Framework
         {
             _Transform = transform;
             Events = GetComponent<EventManager>();
-        }
-
-        /// <summary>
-        /// Use this for initialization
-        /// </summary>
-        protected virtual void Start()
-        {            
-        }
+        }      
 
         /// <summary>
         /// This function is called when the MonoBehaviour will be destroyed.
