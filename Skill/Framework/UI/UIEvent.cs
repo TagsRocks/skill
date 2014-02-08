@@ -106,7 +106,7 @@ namespace Skill.Framework.UI
         /// <summary> Which mouse button was pressed. Used in EventType.MouseDown, EventType.MouseUp events.  </summary>
         public MouseButton Button { get; private set; }
         /// <summary> The relative movement of the mouse compared to last event. </summary>
-        public Vector2 Delta { get; private set; }
+        public Vector2 Delta { get; set; }
 
         /// <summary>
         /// Create a MouseMoveEventArgs

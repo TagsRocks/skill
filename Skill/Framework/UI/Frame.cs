@@ -156,6 +156,7 @@ namespace Skill.Framework.UI
                 }
             }
         }
+        
 
         /// <summary>
         /// Retrieves parent menu of frame
@@ -239,6 +240,41 @@ namespace Skill.Framework.UI
             if (fc != null)
                 FocusControl(fc);
         }
+        
+        private BaseControl _PrecedenceEvent;
+
+        /// <summary>
+        /// request to have chance for handle events frst
+        /// </summary>
+        /// <param name="pe">IPrecedenceEvent to register</param>
+        /// <returns>True if succes, oterwise false
+        /// </returns>
+        public bool RegisterPrecedenceEvent(BaseControl pe)
+        {
+            if (_PrecedenceEvent == null)
+            {
+                _PrecedenceEvent = pe;
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// unregister from chance for handle events frst
+        /// </summary>
+        /// <param name="pe">IPrecedenceEvent to unregister</param>
+        /// <returns>True if succes, oterwise false</returns>
+        /// <remarks> pe must registered before </remarks>
+        public bool UnregisterPrecedenceEvent(BaseControl pe)
+        {
+            if (_PrecedenceEvent == pe)
+            {
+                _PrecedenceEvent = null;
+                return true;
+            }
+            return false;
+        }
+
         #endregion
 
         #region Events
@@ -259,18 +295,31 @@ namespace Skill.Framework.UI
         private void CheckEvents()
         {
             Event e = Event.current;
-            if (e != null && e.isKey && e.keyCode != KeyCode.None)
+            if (e != null)
             {
                 EventType type = e.type;
-                if (type == EventType.keyDown || type == EventType.KeyUp)
+
+                if (e.type != EventType.Used && _PrecedenceEvent != null)
+                    _PrecedenceEvent.HandleEvent(e);
+
+                if (e.type != EventType.Used && _FocusedControl != null)
+                    _FocusedControl.HandleEvent(e);
+
+                if (type != EventType.Used)
                 {
-                    KeyEventArgs args = new KeyEventArgs(e.keyCode, e.character);
-                    if (type == EventType.keyDown)
-                        OnKeyDown(args);
-                    else
-                        OnKeyUp(args);
-                    if (args.Handled)
-                        e.Use();
+                    if (e.isKey && e.keyCode != KeyCode.None)
+                    {
+                        if (type == EventType.keyDown || type == EventType.KeyUp)
+                        {
+                            KeyEventArgs args = new KeyEventArgs(e.keyCode, e.character);
+                            if (type == EventType.keyDown)
+                                OnKeyDown(args);
+                            else
+                                OnKeyUp(args);
+                            if (args.Handled)
+                                e.Use();
+                        }
+                    }
                 }
             }
         }

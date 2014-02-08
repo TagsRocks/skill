@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Skill.Framework.UI
-{
+{    
     /// <summary>
     /// Defines focusable behavior
     /// </summary>
@@ -58,6 +58,13 @@ namespace Skill.Framework.UI
         void DisableFocusable();
         /// <summary> Enable focusable </summary>
         void EnableFocusable();
+
+        /// <summary>
+        /// Handle event
+        /// </summary>
+        /// <param name="e">Event to handle</param>
+        void HandleEvent(Event e);
+        
     }
 
     /// <summary>
@@ -154,14 +161,13 @@ namespace Skill.Framework.UI
         /// <summary>
         /// Check for events (KeyUp, KeyDown)
         /// </summary>
-        protected override void CheckEvents()
+        public override void HandleEvent(Event e)
         {
-            base.CheckEvents();
+            base.HandleEvent(e);
 
-            if (_IsFocused && WantsKeyEvents)
+            if (e != null && e.type != EventType.Used && _IsFocused && WantsKeyEvents)
             {
-                Event e = Event.current;
-                if (e != null && e.isKey && e.keyCode != KeyCode.None)
+                if (e.isKey && e.keyCode != KeyCode.None)
                 {
                     EventType type = e.type;
                     if (type == EventType.keyDown || type == EventType.KeyUp)
@@ -216,7 +222,8 @@ namespace Skill.Framework.UI
             }
 
             _SetFocuse = false;
-        }
+        }      
+      
     }
 
 }

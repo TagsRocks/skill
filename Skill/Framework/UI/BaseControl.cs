@@ -636,9 +636,8 @@ namespace Skill.Framework.UI
         /// <summary>
         /// Check for events
         /// </summary>
-        protected virtual void CheckEvents()
+        public virtual void HandleEvent(Event e)
         {
-            Event e = Event.current;
             if (e != null)
             {
                 if (WantsMouseEvents)
@@ -720,7 +719,7 @@ namespace Skill.Framework.UI
             this._Column = 0;
             this._RowSpan = 1;
             this._ColumnSpan = 1;
-            this.Width = 100;
+            this.Width = 300;
             this.Height = 16;
             this.IsEnabled = true;
         }
@@ -787,7 +786,12 @@ namespace Skill.Framework.UI
             if (Visibility == UI.Visibility.Visible)
             {
                 BeginRender();
-                CheckEvents();
+
+                Event e = Event.current;
+                if (e != null && e.type != EventType.Used)
+                {
+                    HandleEvent(e);
+                }
                 Render();
                 EndRender();
             }

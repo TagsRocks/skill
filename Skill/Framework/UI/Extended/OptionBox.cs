@@ -174,7 +174,7 @@ namespace Skill.Framework.UI.Extended
             this.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30, GridUnitType.Star) });
 
             Background = new Box() { Row = 0, Column = 0, ColumnSpan = 3 };
-            FocusedBackground = new Box() { Row = 0, Column = 0, ColumnSpan = 3 , Visibility = UI.Visibility.Hidden };
+            FocusedBackground = new Box() { Row = 0, Column = 0, ColumnSpan = 3, Visibility = UI.Visibility.Hidden };
             LeftButton = new Button() { Row = 0, Column = 0 };
             OptionLabel = new Label() { Row = 0, Column = 1 };
             RightButton = new Button() { Row = 0, Column = 2 };
@@ -320,7 +320,7 @@ namespace Skill.Framework.UI.Extended
         {
             if (OwnerFrame != null)
                 OwnerFrame.FocusControl(this);
-        }
+        }        
         #endregion
     }
 }

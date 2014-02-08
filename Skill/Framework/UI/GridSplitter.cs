@@ -20,9 +20,9 @@ namespace Skill.Framework.UI
             }
             set
             {
-                if(value != null )
+                if (value != null)
                 {
-                    if(!(value is Grid))
+                    if (!(value is Grid))
                     {
                         throw new InvalidOperationException("you must add GridSplitter to a Grid");
                     }
@@ -87,11 +87,10 @@ namespace Skill.Framework.UI
             base.OnMouseDrag(args);
         }
 
-        protected override void CheckEvents()
+        public override void HandleEvent(Event e)
         {
-            if (_IsMouseDown)
+            if (e != null && e.type != EventType.Used && _IsMouseDown)
             {
-                Event e = Event.current;
                 EventType type = e.type;
                 if (type == EventType.MouseDrag)
                 {
@@ -110,11 +109,11 @@ namespace Skill.Framework.UI
                         e.Use();
                 }
                 else
-                    base.CheckEvents();
+                    base.HandleEvent(e);
             }
             else
             {
-                base.CheckEvents();
+                base.HandleEvent(e);
             }
 
         }
@@ -127,7 +126,7 @@ namespace Skill.Framework.UI
                 if (Orientation == Skill.Framework.UI.Orientation.Horizontal)
                 {
                     #region Horizontal
-                    
+
                     float[] renderHeights = new float[grid.RowDefinitions.Count];
                     for (int i = 0; i < grid.RowDefinitions.Count; i++)
                         renderHeights[i] = grid.RowDefinitions[i].RenderHeight;
@@ -141,7 +140,7 @@ namespace Skill.Framework.UI
                         if (grid.RowDefinitions[i].Height.GridUnitType != GridUnitType.Pixel)
                             sumOfStarPixels += renderHeights[i];
                     }
-                    
+
                     for (int i = 0; i < grid.RowDefinitions.Count; i++)
                     {
                         if (grid.RowDefinitions[i].Height.GridUnitType == GridUnitType.Pixel)
@@ -193,6 +192,6 @@ namespace Skill.Framework.UI
 
             if (sizes.Length > (index + span) + 1)
                 sizes[index + span + 1] -= delta;
-        }        
+        }
     }
 }
