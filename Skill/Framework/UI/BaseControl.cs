@@ -786,12 +786,6 @@ namespace Skill.Framework.UI
             if (Visibility == UI.Visibility.Visible)
             {
                 BeginRender();
-
-                Event e = Event.current;
-                if (e != null && e.type != EventType.Used)
-                {
-                    HandleEvent(e);
-                }
                 Render();
                 EndRender();
             }
@@ -1139,6 +1133,23 @@ namespace Skill.Framework.UI
         public int IndexOf(BaseControl control)
         {
             return _Items.IndexOf(control);
+        }
+
+        internal void HandleEvent(Event e)
+        {
+            if (e != null && e.type != EventType.Used)
+            {
+                foreach (var c in _Items)
+                {
+                    if (c != null)
+                    {
+                        c.HandleEvent(e);
+                        if (e.type == EventType.Used)
+                            break;
+                    }
+                }
+
+            }
         }
     }
     #endregion

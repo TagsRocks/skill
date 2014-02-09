@@ -86,6 +86,7 @@
     <Compile Include="UI\Extended\MenuBar.cs" />
     <Compile Include="UI\Extended\TabHeader.cs" />
     <Compile Include="UI\Extended\TextureBrushGrid.cs" />
+    <Compile Include="UI\Extended\ZoomPanel.cs" />
     <Compile Include="UI\GridSplitter.cs" />
     <Compile Include="UI\InspectorHelper.cs" />
     <Compile Include="UI\IntPopup.cs" />

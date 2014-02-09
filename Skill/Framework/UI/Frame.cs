@@ -156,7 +156,7 @@ namespace Skill.Framework.UI
                 }
             }
         }
-        
+
 
         /// <summary>
         /// Retrieves parent menu of frame
@@ -240,7 +240,7 @@ namespace Skill.Framework.UI
             if (fc != null)
                 FocusControl(fc);
         }
-        
+
         private BaseControl _PrecedenceEvent;
 
         /// <summary>
@@ -304,6 +304,9 @@ namespace Skill.Framework.UI
 
                 if (e.type != EventType.Used && _FocusedControl != null)
                     _FocusedControl.HandleEvent(e);
+
+                if (e.type != EventType.Used)
+                    Grid.HandleEvent(e);
 
                 if (type != EventType.Used)
                 {

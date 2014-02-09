@@ -89,33 +89,33 @@ namespace Skill.Framework.UI
 
         public override void HandleEvent(Event e)
         {
-            if (e != null && e.type != EventType.Used && _IsMouseDown)
+            if (e != null && e.type != EventType.Used)
             {
-                EventType type = e.type;
-                if (type == EventType.MouseDrag)
+                if (_IsMouseDown)
                 {
-                    MouseButton mb = ConvertButton(e.button);
-                    MouseMoveEventArgs args = new MouseMoveEventArgs(e.mousePosition, e.modifiers, mb, e.delta);
-                    OnMouseDrag(args);
-                    if (args.Handled)
-                        e.Use();
-                }
-                if (type == EventType.MouseUp)
-                {
-                    MouseButton mb = ConvertButton(e.button);
-                    MouseClickEventArgs args = new MouseClickEventArgs(e.mousePosition, e.modifiers, mb, e.clickCount);
-                    OnMouseUp(args);
-                    if (args.Handled)
-                        e.Use();
+                    EventType type = e.type;
+                    if (type == EventType.MouseDrag)
+                    {
+                        MouseButton mb = ConvertButton(e.button);
+                        MouseMoveEventArgs args = new MouseMoveEventArgs(e.mousePosition, e.modifiers, mb, e.delta);
+                        OnMouseDrag(args);
+                        if (args.Handled)
+                            e.Use();
+                    }
+                    if (type == EventType.MouseUp)
+                    {
+                        MouseButton mb = ConvertButton(e.button);
+                        MouseClickEventArgs args = new MouseClickEventArgs(e.mousePosition, e.modifiers, mb, e.clickCount);
+                        OnMouseUp(args);
+                        if (args.Handled)
+                            e.Use();
+                    }
+                    else
+                        base.HandleEvent(e);
                 }
                 else
                     base.HandleEvent(e);
             }
-            else
-            {
-                base.HandleEvent(e);
-            }
-
         }
 
         private void BalanceGrid(Vector2 mouseDelta)

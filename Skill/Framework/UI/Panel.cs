@@ -416,5 +416,16 @@ namespace Skill.Framework.UI
             }
             return base.HandleCommand(command);
         }
+
+        public override void HandleEvent(Event e)
+        {
+            if (e != null && e.type != EventType.Used)
+            {
+                Controls.HandleEvent(e);
+                if (e.type != EventType.Used)
+                    base.HandleEvent(e);
+            }
+
+        }
     }
 }

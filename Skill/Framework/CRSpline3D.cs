@@ -48,6 +48,19 @@ namespace Skill.Framework
             return result;
         }
 
+        /// <summary>
+        /// Evaluate 
+        /// </summary>
+        /// <param name="time"> Time</param>
+        /// <returns>Evaluate position</returns>
+        public Vector3 Evaluate01(float time)
+        {            
+            Vector3 result = Interpolate(_PathControlPoints, time);
+            if (!UseWorldSpace)
+                result = _Transform.TransformPoint(result);
+            return result;
+        }
+
         private float ValidateTime(float time)
         {
             if (time < 0)

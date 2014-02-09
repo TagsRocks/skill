@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Skill.Editor.UI.Extended
 {
     /// <summary>
-    /// Thumb to drag it's parent
+    /// Thumb to drag it's parent(panel)
     /// </summary>
     public class DragThumb : Box
     {
@@ -52,13 +52,13 @@ namespace Skill.Editor.UI.Extended
                 {
                     Vector2 delta = e.delta;
 
-                    //IControl parent = Parent;
-                    //while (parent != null)
-                    //{
-                    //    if (parent is ZoomBox)
-                    //        delta *= 1.0f / ((ZoomBox)parent).Zoom;
-                    //    parent = parent.Parent;
-                    //}
+                    IControl parent = Parent;
+                    while (parent != null)
+                    {
+                        if (parent is ZoomPanel)
+                            delta /= ((ZoomPanel)parent).ZoomFactor;
+                        parent = parent.Parent;
+                    }
 
                     Parent.X += delta.x;
                     Parent.Y += delta.y;
@@ -77,6 +77,6 @@ namespace Skill.Editor.UI.Extended
             }
             else
                 base.HandleEvent(e);
-        }        
+        }
     }
 }

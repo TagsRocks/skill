@@ -29,6 +29,7 @@ namespace Skill.Framework
         private float _Alpha = 1.0f;
         private float _OffsetTime;
         private float _Speed;
+        private float _DestAlpha;
 
         private const float EpsilonAlpha = 0.001f;
         private const float EpsilonTime = 0.01f;
@@ -53,6 +54,19 @@ namespace Skill.Framework
         public void FadeIn(bool resetAlpha = false)
         {
             if (resetAlpha) _Alpha = 1.0f;
+            FadeInTo(0.0f);
+        }
+        /// <summary>  FadeOut </summary>
+        /// <param name="resetAlpha"> Reset alpha or continue from last alpha value </param>
+        public void FadeOut(bool resetAlpha = false)
+        {
+            if (resetAlpha) _Alpha = 0.0f;
+            FadeOutTo(1.0f);
+        }
+
+        private void FadeInTo(float destAlpha)
+        {
+            _DestAlpha = destAlpha;
             if (FadeInTime < EpsilonTime) FadeInTime = EpsilonTime;
             _OffsetTime = FadeInTime * (1.0f - _Alpha);
             _Speed = 1.0f / FadeInTime;
@@ -61,11 +75,10 @@ namespace Skill.Framework
             IsFadeOut = false;
             enabled = true;
         }
-        /// <summary>  FadeOut </summary>
-        /// <param name="resetAlpha"> Reset alpha or continue from last alpha value </param>
-        public void FadeOut(bool resetAlpha = false)
+
+        private void FadeOutTo(float destAlpha)
         {
-            if (resetAlpha) _Alpha = 0.0f;
+            _DestAlpha = destAlpha;
             if (FadeOutTime < EpsilonTime) FadeOutTime = EpsilonTime;
             _OffsetTime = FadeOutTime * _Alpha;
             _Speed = 1.0f / FadeOutTime;
@@ -73,6 +86,18 @@ namespace Skill.Framework
             IsFadeIn = false;
             IsFadeOut = true;
             enabled = true;
+        }
+
+
+        /// <summary>
+        /// Fade to specified alpha
+        /// </summary>
+        /// <param name="alpha">Alpha value to fade to</param>
+        public void FadeTo(float alpha)
+        {
+            alpha = Mathf.Clamp01(alpha);
+            if (_Alpha < alpha) FadeOutTo(alpha);
+            else if (_Alpha > alpha) FadeInTo(alpha);
         }
 
         /// <summary> Apply alpha channel to color </summary>
@@ -102,10 +127,10 @@ namespace Skill.Framework
                 else
                     _Alpha += Time.deltaTime * _Speed;
 
-                if (_Alpha > 1 - EpsilonAlpha)
+                if (_Alpha > _DestAlpha - EpsilonAlpha)
                 {
                     IsFadeOut = false;
-                    _Alpha = 1.0f;
+                    _Alpha = _DestAlpha;
                     if (_FadeInAfterFadeOut)
                     {
                         FadeIn();
@@ -121,10 +146,10 @@ namespace Skill.Framework
                     _Alpha = Mathf.SmoothStep(1, 0, (Time.time + _OffsetTime - _FadeStartTime) / FadeInTime);
                 else
                     _Alpha -= Time.deltaTime * _Speed;
-                if (_Alpha < EpsilonAlpha)
+                if (_Alpha < _DestAlpha + EpsilonAlpha)
                 {
                     IsFadeIn = false;
-                    _Alpha = 0;
+                    _Alpha = _DestAlpha;
                     enabled = false;
                 }
             }
