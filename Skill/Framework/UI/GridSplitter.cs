@@ -129,7 +129,7 @@ namespace Skill.Framework.UI
 
                     float[] renderHeights = new float[grid.RowDefinitions.Count];
                     for (int i = 0; i < grid.RowDefinitions.Count; i++)
-                        renderHeights[i] = grid.RowDefinitions[i].RenderHeight;
+                        renderHeights[i] = grid.RowDefinitions[i].RenderHeight / this.ScaleFactor;
 
                     // balance in pixel space
                     Balance(renderHeights, Row, RowSpan, mouseDelta.y);
@@ -156,7 +156,7 @@ namespace Skill.Framework.UI
                     #region Vertical
                     float[] renderWidths = new float[grid.ColumnDefinitions.Count];
                     for (int i = 0; i < grid.ColumnDefinitions.Count; i++)
-                        renderWidths[i] = grid.ColumnDefinitions[i].RenderWidth;
+                        renderWidths[i] = grid.ColumnDefinitions[i].RenderWidth / this.ScaleFactor;
 
                     // balance in pixel space
                     Balance(renderWidths, Column, ColumnSpan, mouseDelta.x);
@@ -182,7 +182,7 @@ namespace Skill.Framework.UI
 
         private void Balance(float[] sizes, int index, int indexSpan, float delta)
         {
-
+            
             if (index > 0 && sizes.Length > index)
                 sizes[index - 1] += delta;
 

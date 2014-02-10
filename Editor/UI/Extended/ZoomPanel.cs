@@ -21,9 +21,10 @@ namespace Skill.Editor.UI.Extended
         private Matrix4x4 _Matrix;
         private Vector2 _MousePivot;
         private float _ZoomSpeed;
+        private bool _IsMouseDown;
+        private int _MouseButton;
 
-
-        /// <summary> ZoomFactor</summary>
+        /// <summary> Zoom Factor </summary>
         public float ZoomFactor { get { return _ZoomFactor; } }
 
         /// <summary> Pan position </summary>
@@ -31,6 +32,9 @@ namespace Skill.Editor.UI.Extended
 
         /// <summary> Speed of zoom when user hold alt and drag with right mouse button (default : 0.001) </summary>
         public float ZoomSpeed { get { return _ZoomSpeed; } set { _ZoomSpeed = value; } }
+
+        /// <summary> Transform matrix </summary>
+        public Matrix4x4 Matrix { get { return _Matrix; } }
 
         /// <summary>
         /// Create a ZoomPanel
@@ -42,6 +46,7 @@ namespace Skill.Editor.UI.Extended
             _PanPosition = Vector2.zero;
             UpdateMatrix();
             WantsMouseEvents = true;
+            _MouseButton = -1;
         }
 
         private void UpdateMatrix()
@@ -62,6 +67,8 @@ namespace Skill.Editor.UI.Extended
 
             foreach (var c in Controls)
             {
+                c.ScaleFactor = _ZoomFactor;
+
                 Rect cRect = new Rect();
 
                 cRect.x = rect.x + c.X + c.Margin.Left;
@@ -119,35 +126,56 @@ namespace Skill.Editor.UI.Extended
         /// <param name="args">args</param>
         protected override void OnMouseDown(MouseClickEventArgs args)
         {
-            if (args.Button == MouseButton.Right)
+            if (_MouseButton == -1 && Parent != null && (args.Button == MouseButton.Right || args.Button == MouseButton.Middle) && args.Alt)
             {
+                Frame of = OwnerFrame;
+                if (of != null)
+                {
+                    _IsMouseDown = OwnerFrame.RegisterPrecedenceEvent(this);
+                    args.Handled = true;
+                }
                 _MousePivot = ConvertToLocal(args.MousePosition);
+                _MouseButton = args.Button == MouseButton.Right ? 1 : 2;
             }
             base.OnMouseDown(args);
         }
 
-        /// <summary>
-        /// OnMouseDrag
-        /// </summary>
-        /// <param name="args">Args</param>
-        protected override void OnMouseDrag(MouseMoveEventArgs args)
+        public override void HandleEvent(Event e)
         {
-            if (args.Alt)
+            if (_IsMouseDown && Parent != null && e != null)
             {
-                if (args.Button == MouseButton.Middle)
+                if (e.type == EventType.MouseDrag)
                 {
-                    _PanPosition += args.Delta;
-                    UpdateMatrix();
-                    args.Handled = true;
+                    if (e.alt)
+                    {
+                        if (e.button == 2) // middle
+                        {
+                            _PanPosition += e.delta;
+                            UpdateMatrix();
+                            e.Use();
+                        }
+                        if (e.button == 1) // right
+                        {
+                            Zoom(e.delta.x * _ZoomSpeed, _MousePivot);
+                            UpdateMatrix();
+                            e.Use();
+                        }
+                    }
                 }
-                if (args.Button == MouseButton.Right)
+                else if (e.type == EventType.MouseUp && e.button == _MouseButton)
                 {
-                    Zoom(args.Delta.x * _ZoomSpeed, _MousePivot);
-                    UpdateMatrix();
-                    args.Handled = true;
+                    Frame of = OwnerFrame;
+                    if (of != null)
+                    {
+                        of.UnregisterPrecedenceEvent(this);
+                        _IsMouseDown = false;
+                        _MouseButton = -1;
+                        e.Use();
+                    }
                 }
             }
-            base.OnMouseDrag(args);
+            else
+                base.HandleEvent(e);
         }
 
 

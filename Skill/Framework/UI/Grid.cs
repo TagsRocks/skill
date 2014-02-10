@@ -63,6 +63,7 @@ namespace Skill.Framework.UI
 
             foreach (var c in Controls)
             {
+                c.ScaleFactor = this.ScaleFactor;
                 int row = Mathf.Max(0, Mathf.Min(c.Row, RowDefinitions.Count - 1));
                 int column = Mathf.Max(0, Mathf.Min(c.Column, ColumnDefinitions.Count - 1));
 
@@ -101,7 +102,7 @@ namespace Skill.Framework.UI
                     RowDefinition rd = RowDefinitions[i];
                     if (rd.Height.IsAbsolute) // no calculation needs
                     {
-                        rowRects[i].height = rd.Height.Value;
+                        rowRects[i].height = rd.Height.Value * this.ScaleFactor;
                     }
                     else if (rd.Height.IsAuto)
                     {
@@ -109,7 +110,7 @@ namespace Skill.Framework.UI
                         {
                             if (c.Row == i && c.RowSpan <= 1) // control is fully in row 
                             {
-                                rowRects[i].height = Mathf.Max(rowRects[i].height, c.LayoutHeight + c.Margin.Vertical);
+                                rowRects[i].height = Mathf.Max(rowRects[i].height, (c.LayoutHeight + c.Margin.Vertical) * this.ScaleFactor);
                             }
                             else if (c.RowSpan > 1 && c.Row + c.RowSpan - 1 == i) // control is partially in row (ends with this row)
                             {
@@ -117,7 +118,7 @@ namespace Skill.Framework.UI
                                 for (int r = c.Row; r < i; r++) // calc height of previous rows that affected by this control
                                     previousRowheights += rowRects[r].height;
 
-                                rowRects[i].height = Mathf.Max(rowRects[i].height, c.LayoutHeight + c.Margin.Vertical - previousRowheights);
+                                rowRects[i].height = Mathf.Max(rowRects[i].height, (c.LayoutHeight + c.Margin.Vertical) * this.ScaleFactor - previousRowheights);
                             }
                         }
                     }
@@ -196,7 +197,7 @@ namespace Skill.Framework.UI
                     ColumnDefinition cd = ColumnDefinitions[j];
                     if (cd.Width.IsAbsolute) // no calculation needs
                     {
-                        columnRects[j].width = cd.Width.Value;
+                        columnRects[j].width = cd.Width.Value * this.ScaleFactor;
                     }
                     else if (cd.Width.IsAuto)
                     {
@@ -204,7 +205,7 @@ namespace Skill.Framework.UI
                         {
                             if (c.Column == j && c.ColumnSpan <= 1) // control is fully in row 
                             {
-                                columnRects[j].width = Mathf.Max(columnRects[j].width, c.LayoutWidth + c.Margin.Horizontal);
+                                columnRects[j].width = Mathf.Max(columnRects[j].width, (c.LayoutWidth + c.Margin.Horizontal) * this.ScaleFactor);
                             }
                             else if (c.ColumnSpan > 1 && c.Column + c.ColumnSpan - 1 == j) // control is partially in column (ends with this column)
                             {
@@ -212,7 +213,7 @@ namespace Skill.Framework.UI
                                 for (int cl = c.Column; cl < j; cl++) // calc width of previous columns that affected by this control
                                     previousColumnsWidths += columnRects[cl].width;
 
-                                columnRects[j].width = Mathf.Max(columnRects[j].width, c.LayoutWidth + c.Margin.Horizontal - previousColumnsWidths);
+                                columnRects[j].width = Mathf.Max(columnRects[j].width, (c.LayoutWidth + c.Margin.Horizontal) * this.ScaleFactor - previousColumnsWidths);
                             }
                         }
                     }

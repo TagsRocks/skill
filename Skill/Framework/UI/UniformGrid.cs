@@ -58,6 +58,7 @@ namespace Skill.Framework.UI
 
             foreach (var c in Controls)
             {
+                c.ScaleFactor = this.ScaleFactor;
                 int row = Mathf.Max(0, Mathf.Min(c.Row, rows - 1));
                 int column = Mathf.Max(0, Mathf.Min(c.Column, columns - 1));
 

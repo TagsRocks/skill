@@ -43,17 +43,18 @@ namespace Skill.Framework.UI
 
             foreach (var c in Controls)
             {
+                c.ScaleFactor = this.ScaleFactor;
                 Rect cRect = renderArea;
                 float xMax = renderArea.xMax;
-                cRect.x += c.Margin.Left;
-                cRect.width = c.LayoutWidth;
-                renderArea.xMin = cRect.xMax + c.Margin.Right;
+                cRect.x += c.Margin.Left * this.ScaleFactor;
+                cRect.width = c.LayoutWidth * this.ScaleFactor;
+                renderArea.xMin = cRect.xMax + c.Margin.Right * this.ScaleFactor;
                 renderArea.xMax = Mathf.Max(xMax, renderArea.xMin);
-                cRect.height = c.LayoutHeight;
+                cRect.height = c.LayoutHeight * this.ScaleFactor;
                 switch (c.VerticalAlignment)
                 {
                     case VerticalAlignment.Top:
-                        cRect.y += c.Margin.Top;
+                        cRect.y += c.Margin.Top * this.ScaleFactor;
                         break;
                     case VerticalAlignment.Center:
                         cRect.y = Mathf.Max(renderArea.y, renderArea.y + (renderArea.height - cRect.height) / 2);
@@ -85,13 +86,14 @@ namespace Skill.Framework.UI
 
             foreach (var c in Controls)
             {
+                c.ScaleFactor = this.ScaleFactor;
                 Rect cRect = renderArea;
                 float yMax = renderArea.yMax;
-                cRect.y += c.Margin.Top;
-                cRect.height = c.LayoutHeight;
-                renderArea.yMin = cRect.yMax + c.Margin.Bottom;
+                cRect.y += c.Margin.Top * this.ScaleFactor;
+                cRect.height = c.LayoutHeight * this.ScaleFactor;
+                renderArea.yMin = cRect.yMax + c.Margin.Bottom * this.ScaleFactor;
                 renderArea.yMax = Mathf.Max(yMax, renderArea.yMin);
-                cRect.width = c.LayoutWidth;
+                cRect.width = c.LayoutWidth * this.ScaleFactor;
 
                 switch (c.HorizontalAlignment)
                 {

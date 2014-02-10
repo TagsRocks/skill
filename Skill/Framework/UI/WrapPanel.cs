@@ -43,7 +43,8 @@ namespace Skill.Framework.UI
 
             foreach (var c in Controls)
             {
-                Rect cRect = new Rect(x, y, c.Margin.Horizontal + c.LayoutWidth, c.Margin.Vertical + c.LayoutHeight);
+                c.ScaleFactor = this.ScaleFactor;
+                Rect cRect = new Rect(x, y, (c.Margin.Horizontal + c.LayoutWidth) * this.ScaleFactor, (c.Margin.Vertical + c.LayoutHeight) * this.ScaleFactor);
 
                 if (cRect.xMax > rect.xMax)
                 {
@@ -67,7 +68,7 @@ namespace Skill.Framework.UI
 
             foreach (var c in Controls)
             {
-                Rect cRect = new Rect(x, y, c.Margin.Horizontal + c.LayoutWidth, c.Margin.Vertical + c.LayoutHeight);
+                Rect cRect = new Rect(x, y, (c.Margin.Horizontal + c.LayoutWidth) * this.ScaleFactor, (c.Margin.Vertical + c.LayoutHeight) * this.ScaleFactor);
 
                 if (cRect.yMax > rect.yMax)
                 {

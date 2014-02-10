@@ -82,6 +82,9 @@
     <Compile Include="UI\ColorField.cs" />
     <Compile Include="UI\ContextMenu.cs" />
     <Compile Include="UI\EditorFrame.cs" />
+    <Compile Include="UI\Extended\Connection.cs" />
+    <Compile Include="UI\Extended\ConnectionHost.cs" />
+    <Compile Include="UI\Extended\Connector.cs" />
     <Compile Include="UI\Extended\DragThumb.cs" />
     <Compile Include="UI\Extended\MenuBar.cs" />
     <Compile Include="UI\Extended\TabHeader.cs" />

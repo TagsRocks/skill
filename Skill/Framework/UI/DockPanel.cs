@@ -47,7 +47,7 @@ namespace Skill.Framework.UI
         {
             LastChildFill = true;
         }
-        
+
         /// <summary>
         /// Ensures that all visual child elements of this element are properly updated for layout.
         /// </summary>
@@ -61,6 +61,7 @@ namespace Skill.Framework.UI
                 BaseControl c = Controls[i];
                 if (c != null)
                 {
+                    c.ScaleFactor = this.ScaleFactor;
                     if (rect.width == 0 || rect.height == 0)
                         c.RenderArea = rect;
                     else
@@ -72,7 +73,7 @@ namespace Skill.Framework.UI
                             {
                                 case Dock.Left:
                                     float xMax = rect.xMax;
-                                    renderArea.width = c.LayoutWidth + c.Margin.Horizontal;
+                                    renderArea.width = (c.LayoutWidth + c.Margin.Horizontal) * this.ScaleFactor;
                                     if (renderArea.xMax > xMax)
                                         renderArea.xMax = xMax;
                                     rect.xMin = renderArea.xMax;
@@ -80,14 +81,14 @@ namespace Skill.Framework.UI
                                     break;
                                 case Dock.Top:
                                     float yMax = rect.yMax;
-                                    renderArea.height = c.LayoutHeight + c.Margin.Vertical;
+                                    renderArea.height = (c.LayoutHeight + c.Margin.Vertical) * this.ScaleFactor;
                                     if (renderArea.yMax > yMax)
                                         renderArea.yMax = yMax;
                                     rect.yMin = renderArea.yMax;
                                     rect.yMax = yMax;
                                     break;
                                 case Dock.Right:
-                                    float w = c.LayoutWidth + c.Margin.Horizontal;
+                                    float w = (c.LayoutWidth + c.Margin.Horizontal) * this.ScaleFactor;
                                     renderArea.xMin = rect.xMax - w;
                                     renderArea.width = w;
                                     if (renderArea.xMin < rect.xMin)
@@ -95,7 +96,7 @@ namespace Skill.Framework.UI
                                     rect.xMax = renderArea.xMin;
                                     break;
                                 case Dock.Bottom:
-                                    float h = c.LayoutHeight + c.Margin.Vertical;
+                                    float h = (c.LayoutHeight + c.Margin.Vertical) * this.ScaleFactor;
                                     renderArea.yMin = rect.yMax - h;
                                     renderArea.height = h;
                                     if (renderArea.yMin < rect.yMin)
@@ -114,6 +115,6 @@ namespace Skill.Framework.UI
                     }
                 }
             }
-        }        
+        }
     }
 }

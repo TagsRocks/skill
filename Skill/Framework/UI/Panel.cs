@@ -87,8 +87,8 @@ namespace Skill.Framework.UI
         /// When Layout changed
         /// </summary>
         protected override void OnLayoutChanged()
-        {
-            this.RequestUpdateLayout();
+        {            
+            this.RequestUpdateLayout();            
             base.OnLayoutChanged();
 
         }

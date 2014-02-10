@@ -12,7 +12,6 @@ namespace Skill.Editor.UI.Extended
     /// </summary>
     public class DragThumb : Box
     {
-
         private bool _IsMouseDown;
         /// <summary>
         /// Create a DragThumb
@@ -50,21 +49,13 @@ namespace Skill.Editor.UI.Extended
             {
                 if (e.type == EventType.MouseDrag)
                 {
-                    Vector2 delta = e.delta;
-
-                    IControl parent = Parent;
-                    while (parent != null)
-                    {
-                        if (parent is ZoomPanel)
-                            delta /= ((ZoomPanel)parent).ZoomFactor;
-                        parent = parent.Parent;
-                    }
+                    Vector2 delta = e.delta / this.ScaleFactor;
 
                     Parent.X += delta.x;
                     Parent.Y += delta.y;
                     e.Use();
                 }
-                else if (e.type == EventType.MouseUp)
+                else if (e.type == EventType.MouseUp && e.button == 0)
                 {
                     Frame of = OwnerFrame;
                     if (of != null)

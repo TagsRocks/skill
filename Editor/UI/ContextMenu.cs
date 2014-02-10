@@ -15,6 +15,9 @@ namespace Skill.Editor.UI
         internal int Count { get { return _Items.Count; } }
         internal MenuItem this[int index] { get { return _Items[index]; } }
 
+        /// <summary> IsChanged </summary>
+        protected bool IsChanged { get; set; }
+
         /// <summary>
         /// Height of ContextMenu to draw DropDown
         /// </summary>
@@ -25,6 +28,7 @@ namespace Skill.Editor.UI
         {
             _Items = new List<MenuItem>();
             Height = 16;
+            IsChanged = true;
         }
 
         internal void CalcHeight(float itemH, float sepratorH)
@@ -64,9 +68,37 @@ namespace Skill.Editor.UI
             if (item == null)
                 throw new ArgumentNullException("MenuItem is null");
 
+            ValidateNameForDuplicate(item);
+
             item.Parent = this;
             item.EnableChanged += Item_EnableChanged;
             _Items.Add(item);
+
+            IsChanged = true;
+        }
+
+        private void ValidateNameForDuplicate(MenuItem item)
+        {
+            int i = 1;
+            string name = item.Name;
+            do
+            {
+                MenuItem sameNameItem = null;
+                foreach (var myItem in _Items)
+                {
+                    if (myItem.Name == name)
+                    {
+                        sameNameItem = myItem;
+                        break;
+                    }
+                }
+                if (sameNameItem != null)
+                {
+                    name = item.Name + i++;
+                    continue;
+                }
+            } while (false);
+            item.Name = name;
         }
 
         /// <summary>
@@ -75,6 +107,24 @@ namespace Skill.Editor.UI
         public void AddSeparator()
         {
             _Items.Add(null);
+            IsChanged = true;
+        }
+
+        /// <summary>
+        /// Remove all MenuItem and seperators
+        /// </summary>        
+        public void Clear()
+        {
+            foreach (var item in _Items)
+            {
+                if (item != null)
+                {
+                    item.Parent = null;
+                    item.EnableChanged -= Item_EnableChanged;
+                }
+            }
+            _Items.Clear();
+            IsChanged = true;
         }
     }
 
@@ -85,7 +135,6 @@ namespace Skill.Editor.UI
     {
         private GenericMenu _GenericMenu;
         private GenericMenu.MenuFunction2 _MenuFunction;
-        private bool _Changed;
 
 
         /// <summary> Height of an item </summary>
@@ -100,19 +149,21 @@ namespace Skill.Editor.UI
         /// </summary>
         public ContextMenu()
         {
-            _Changed = true;
             _MenuFunction = Item_Click;
             ItemHeight = 16;
             SeparatorHeight = 8;
         }
 
-        private void ApplyChanges()
+        /// <summary>
+        /// Apply changes and generate GenericMenu
+        /// </summary>
+        protected virtual void ApplyChanges()
         {
-            if (_Changed)
+            if (IsChanged)
             {
                 _GenericMenu = new GenericMenu();
                 GenerateMenu(this, _GenericMenu, string.Empty);
-                _Changed = false;
+                IsChanged = false;
             }
         }
 
@@ -177,7 +228,7 @@ namespace Skill.Editor.UI
 
         protected override void Item_EnableChanged(object sender, EventArgs e)
         {
-            _Changed = true;
+            IsChanged = true;
         }
     }
 
@@ -193,13 +244,16 @@ namespace Skill.Editor.UI
         public GUIContent Content { get; private set; }
 
         /// <summary> Name </summary>
-        public string Name { get { return Content.text; } }
+        public string Name { get { return Content.text; } set { Content.text = value; } }
 
         /// <summary> Path of item </summary>
         public string Path { get; internal set; }
 
         /// <summary> Is checked </summary>
         public bool IsChecked { get; set; }
+
+        /// <summary> User data </summary>
+        public object UserData { get; set; }
 
         /// <summary>
         /// Occurs When item clicked

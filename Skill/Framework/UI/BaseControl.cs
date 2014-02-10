@@ -70,6 +70,10 @@ namespace Skill.Framework.UI
     {
         #region Properties
 
+        private float _ScaleFactor;
+        /// <summary> Gets or sets ScaleFactor </summary>
+        public float ScaleFactor { get { return _ScaleFactor; } set { _ScaleFactor = Mathf.Max(value, 0.01f); } }
+
         /// <summary>
         /// Indicates whether the element can receive focus.
         /// </summary>
@@ -691,7 +695,7 @@ namespace Skill.Framework.UI
                         }
                     }
                 }
-                else if (ContextMenu != null && e.type == EventType.ContextClick)
+                if (ContextMenu != null && e.type != EventType.Used && e.type == EventType.ContextClick)
                 {
                     Vector2 localMouse = ConvertToLocal(e.mousePosition);
                     if (_RenderArea.Contains(localMouse))
@@ -703,7 +707,6 @@ namespace Skill.Framework.UI
             }
         }
 
-
         #endregion
 
         #region Contstructor
@@ -712,6 +715,7 @@ namespace Skill.Framework.UI
         /// </summary>
         protected BaseControl()
         {
+            this.ScaleFactor = 1.0f;
             this._VerticalAlignment = UI.VerticalAlignment.Stretch;
             this._HorizontalAlignment = UI.HorizontalAlignment.Stretch;
             this.Dock = UI.Dock.Top;
@@ -1151,6 +1155,15 @@ namespace Skill.Framework.UI
 
             }
         }
+
+        //internal void SetScaleFactor(float scaleFactor)
+        //{
+        //    foreach (var c in _Items)
+        //    {
+        //        if (c != null)
+        //            c.ScaleFactor = scaleFactor;
+        //    }
+        //}
     }
     #endregion
 

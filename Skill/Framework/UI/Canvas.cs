@@ -13,23 +13,24 @@ namespace Skill.Framework.UI
         /// Ensures that all visual child elements of this element are properly updated for layout.
         /// </summary>
         public override void UpdateLayout()
-        {            
+        {
             Rect rect = RenderAreaShrinksByPadding;
             if (rect.xMax < rect.xMin) rect.xMax = rect.xMin;
-            if (rect.yMax < rect.yMin) rect.yMax = rect.yMin;            
+            if (rect.yMax < rect.yMin) rect.yMax = rect.yMin;
 
             foreach (var c in Controls)
             {
+                c.ScaleFactor = this.ScaleFactor;
                 Rect cRect = new Rect();
 
-                cRect.x = rect.x + c.X + c.Margin.Left;
-                cRect.y = rect.y + c.Y + c.Margin.Top;
-                cRect.width = c.LayoutWidth;
-                cRect.height = c.LayoutHeight;                
+                cRect.x = rect.x + (c.X + c.Margin.Left) * this.ScaleFactor;
+                cRect.y = rect.y + (c.Y + c.Margin.Top) * this.ScaleFactor;
+                cRect.width = c.LayoutWidth * this.ScaleFactor;
+                cRect.height = c.LayoutHeight * this.ScaleFactor;
 
                 c.RenderArea = cRect;
-            }            
-        }        
+            }
+        }
 
     }
 
