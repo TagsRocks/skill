@@ -67,8 +67,7 @@ namespace Skill.Editor.Tools
 
             _ItemsList = new ListBox() { Row = 3, Column = 0, Margin = new Thickness(2) };
             _ItemsList.BackgroundVisible = true;
-            _ItemsList.SelectedStyle = new GUIStyle();
-            _ItemsList.SelectedStyle.normal.background = Resources.Textures.SelectedItemBackground;
+            _ItemsList.SelectedStyle = Resources.Styles.SelectedItem;
             _ItemsList.DisableFocusable();
 
             _BtnAdd = new Skill.Editor.UI.Button() { Row = 2, Column = 0, Margin = new Thickness(2) };

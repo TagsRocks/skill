@@ -11,7 +11,88 @@ namespace Skill.Framework.UI
         /// <summary>
         /// Gets or sets a value that indicates the dimension by which child elements are stacked.
         /// </summary>       
-        public virtual Orientation Orientation { get; set; }        
+        public virtual Orientation Orientation { get; set; }
+
+
+        private float _LayoutHeight;
+        private bool _UpdateLayoutHeight;
+
+        /// <summary>
+        /// Retrieves Height used in layout. It is dependents on visibility and state of children
+        /// </summary>
+        public override float LayoutHeight
+        {
+            get
+            {
+                if (Visibility == UI.Visibility.Collapsed)
+                {
+                    return 0;
+                }
+                else
+                {
+                    if (_UpdateLayoutHeight)
+                    {
+                        if (Orientation == UI.Orientation.Vertical)
+                        {
+                            float height = 0;
+                            foreach (var c in Controls)
+                            {
+                                if (c != null)
+                                    height += c.LayoutHeight + c.Margin.Vertical;
+                            }
+
+                            _LayoutHeight = Mathf.Max(height, this.Height);
+                        }
+                        else
+                        {
+                            _LayoutHeight = this.Height;
+                        }
+                        _UpdateLayoutHeight = false;
+                    }
+                    return _LayoutHeight;
+                }
+            }
+        }
+
+
+        private float _LayoutWidth;
+        private bool _UpdateLayoutWidth;
+        /// <summary>
+        /// Retrieves Width used in layout. It is dependents on visibility and state of children
+        /// </summary>
+        public override float LayoutWidth
+        {
+            get
+            {
+                if (Visibility == UI.Visibility.Collapsed)
+                {
+                    return 0;
+                }
+                else
+                {
+                    if (_UpdateLayoutWidth)
+                    {
+                        if (Orientation == UI.Orientation.Horizontal)
+                        {
+                            float width = 0;
+                            foreach (var c in Controls)
+                            {
+                                if (c != null)
+                                    width += c.LayoutWidth + c.Margin.Horizontal;
+                            }
+
+                            _LayoutWidth = Mathf.Max(width, this.Width);
+                        }
+                        else
+                        {
+                            _LayoutWidth = this.Width;
+                        }
+                        _UpdateLayoutWidth = false;
+                    }
+                    return _LayoutWidth;
+                }
+            }
+        }
 
         /// <summary>
         /// Ensures that all visual child elements of this element are properly updated for layout.
@@ -25,8 +106,13 @@ namespace Skill.Framework.UI
                     break;
                 case Orientation.Vertical:
                     UpdateLayoutVertical();
+
                     break;
             }
+
+            _UpdateLayoutHeight = true;
+            _UpdateLayoutWidth = true;
+
         }
 
         /// <summary>
@@ -119,7 +205,20 @@ namespace Skill.Framework.UI
                 }
                 c.RenderArea = cRect;
             }
-        }       
+        }
+
+
+        /// <summary>
+        /// When Layout changed
+        /// </summary>
+        protected override void OnLayoutChanged() 
+        {
+            _UpdateLayoutHeight = true;
+            _UpdateLayoutWidth = true;
+            base.OnLayoutChanged();
+        }
+
+
     }
 
 }

@@ -330,9 +330,14 @@ namespace Skill.Framework.UI
         public string Name { get; set; }
 
         /// <summary>
-        /// The tag of this control. (optional)
+        /// The tag of this control.
         /// </summary>
         public string Tag { get; set; }
+
+        /// <summary>
+        /// User data.
+        /// </summary>
+        public object UserData { get; set; }
 
         private Dock _Dock;
         /// <summary>
@@ -610,16 +615,7 @@ namespace Skill.Framework.UI
         }
 
         /// <summary> check mouse events? (MouseDown, MouseUp, MouseDrag, MouseMove, ScrollWheel) </summary>        
-        public bool WantsMouseEvents { get; set; }
-
-        /// <summary>
-        /// Convert mouse to local position
-        /// </summary>
-        /// <param name="mousePosition">Position of mouse</param>
-        protected virtual Vector2 ConvertToLocal(Vector2 mousePosition)
-        {
-            return mousePosition;
-        }
+        public bool WantsMouseEvents { get; set; }        
 
         protected virtual MouseButton ConvertButton(int ebutton)
         {
@@ -649,7 +645,7 @@ namespace Skill.Framework.UI
                     if (e.isMouse)
                     {
                         EventType type = e.type;
-                        Vector2 localMouse = ConvertToLocal(e.mousePosition);
+                        Vector2 localMouse = e.mousePosition;
                         if (_RenderArea.Contains(localMouse))
                         {
                             if (!IsMouseOver)
@@ -697,7 +693,7 @@ namespace Skill.Framework.UI
                 }
                 if (ContextMenu != null && e.type != EventType.Used && e.type == EventType.ContextClick)
                 {
-                    Vector2 localMouse = ConvertToLocal(e.mousePosition);
+                    Vector2 localMouse = e.mousePosition;
                     if (_RenderArea.Contains(localMouse))
                     {
                         ContextMenu.Show();
@@ -841,6 +837,32 @@ namespace Skill.Framework.UI
         {
             return false;
         }
+        #endregion
+
+        #region Helper method
+
+        /// <summary>
+        /// Is control in hierarchy of this control
+        /// </summary>
+        /// <param name="control">control to check</param>
+        /// <returns>true if is in hierarchy, otherwise false</returns>
+        public virtual bool IsInHierarchy(BaseControl control)
+        {
+            return control == this;
+        }
+
+        
+        /// <summary>
+        /// Returns first control that given point is inside
+        /// </summary>
+        /// <param name="point">Point</param>
+        /// <returns>found BaseControl </returns>
+        public virtual BaseControl GetControlAtPoint(Vector2 point)
+        {
+            if (Containes(point)) return this;
+            return null;
+        }
+
         #endregion
     }
     #endregion

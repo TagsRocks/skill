@@ -152,18 +152,9 @@ namespace Skill.Framework.UI
         /// </summary>
         public ScrollView()
         {
-            this.ScrollbarThickness = 16;            
+            this.ScrollbarThickness = 16;
             this.Padding = new Thickness(0);
-        }
-
-        /// <summary>
-        /// Convert mouse to local position
-        /// </summary>
-        /// <param name="mousePosition">Position of mouse</param>
-        protected override Vector2 ConvertToLocal(Vector2 mousePosition)
-        {
-            return mousePosition - _ScrollPosition;
-        }
+        }       
 
         /// <summary> Begin Render control's content </summary>
         protected override void BeginRender()
@@ -171,11 +162,11 @@ namespace Skill.Framework.UI
             _IgnoreScrollbarThickness = true;
             base.BeginRender();
             _IgnoreScrollbarThickness = false;
-            Rect ra = RenderArea;
-            _ViewRect = ra;
-            Size ds = DesiredSize;
-            _ViewRect.width = Mathf.Max(ra.width, ds.Width) - ScrollbarThickness;
-            _ViewRect.height = Mathf.Max(ra.height, ds.Height);            
+            Rect ra = RenderAreaShrinksByPadding;            
+            Rect ds = DesiredSize;
+            _ViewRect = ds;
+            _ViewRect.width = Mathf.Max(ra.width - _ScrollbarThickness, ds.width);
+            _ViewRect.height = Mathf.Max(ra.height, ds.height);
 
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (HorizontalScrollbarStyle != null && VerticalScrollbarStyle != null)
@@ -192,7 +183,7 @@ namespace Skill.Framework.UI
         {
             GUI.EndScrollView(HandleScrollWheel);
             base.EndRender();
-        }
+        }        
     }
 
 }

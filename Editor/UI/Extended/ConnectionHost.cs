@@ -95,7 +95,7 @@ namespace Skill.Editor.UI.Extended
             {
                 if (e.type == EventType.MouseDrag)
                 {
-                    this._EndPreviewConnector = ConvertToLocal(e.mousePosition);
+                    this._EndPreviewConnector = e.mousePosition;
                     e.Use();
                 }
                 else if (e.type == EventType.MouseUp && e.button == 0)
@@ -107,7 +107,7 @@ namespace Skill.Editor.UI.Extended
                         _IsDetecting = false;
 
                         List<IConnector> connectorsList = FindAllConnectors();
-                        Vector2 mousePosition = ConvertToLocal(e.mousePosition);
+                        Vector2 mousePosition = e.mousePosition;
 
                         foreach (var c in connectorsList)
                         {

@@ -86,6 +86,7 @@ namespace Skill.Editor.UI
                 MenuItem sameNameItem = null;
                 foreach (var myItem in _Items)
                 {
+                    if (myItem == null) continue;
                     if (myItem.Name == name)
                     {
                         sameNameItem = myItem;

@@ -31,11 +31,11 @@ namespace Skill.Editor.Tools
             this._NameField = new Label() { Row = 0, Column = 0, Margin = new Thickness(2, 0) };
             this.ObjectName = "Null";
 
-            _BtnAdd = new UI.Button() { Row = 0, Column = 1, Margin = new Thickness(2, 4, 0, 3), Style = Resources.Styles.SmallButtonStyle };
+            _BtnAdd = new UI.Button() { Row = 0, Column = 1, Margin = new Thickness(2, 4, 0, 3), Style = Resources.Styles.SmallButton };
             _BtnAdd.Content.image = Resources.Textures.PlusNext;
             _BtnAdd.Content.tooltip = "Add next";
 
-            _BtnRemove = new UI.Button() { Row = 0, Column = 2, Margin = new Thickness(1, 4, 2, 3), Style = Resources.Styles.SmallButtonStyle };
+            _BtnRemove = new UI.Button() { Row = 0, Column = 2, Margin = new Thickness(1, 4, 2, 3), Style = Resources.Styles.SmallButton };
             _BtnRemove.Content.image = Resources.Textures.Minus;
             _BtnRemove.Content.tooltip = "Remove this";
 

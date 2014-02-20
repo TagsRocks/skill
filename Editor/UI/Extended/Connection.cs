@@ -105,6 +105,14 @@ namespace Skill.Editor.UI.Extended
         public static void DrawConnection(Vector2 point1, Vector2 point2, Color color, float thickness, int numSegments)
         {
             float offset = 5;
+
+            if (point1.x > point2.x)
+            {
+                Vector2 temp = point1;
+                point1 = point2;
+                point2 = temp;
+            }
+
             Skill.Editor.LineDrawer.DrawBezierLine(
                 point1, new Vector2(point1.x + offset + Mathf.Abs(point2.x - (point1.x + offset)) * 0.5f, point1.y + offset * 0.5f),
                 point2, new Vector2(point2.x - Mathf.Abs(point2.x - (point1.x + offset)) * 0.5f, point2.y + offset * 0.5f),

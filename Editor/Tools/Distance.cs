@@ -92,7 +92,7 @@ namespace Skill.Editor.Tools
         {
             _LableStyle = new GUIStyle()
             {
-                normal = new GUIStyleState() { textColor = Color.black, background = Resources.Textures.WhiteTexture },
+                normal = new GUIStyleState() { textColor = Color.black, background = Resources.Textures.White },
                 padding = new RectOffset(2, 2, 2, 2)
             };
 

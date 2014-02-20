@@ -86,10 +86,7 @@ namespace Skill.Editor
         /// <returns>Texture</returns>
         public static Texture2D CreateLineTexture()
         {
-            Texture2D lineTex = new Texture2D(1, 1, TextureFormat.ARGB32, true);
-            lineTex.SetPixel(0, 1, Color.white);
-            lineTex.Apply();
-            return lineTex;
+            return Resources.CreateColorTexture(Color.white, 1);
         }
 
         /// <summary>

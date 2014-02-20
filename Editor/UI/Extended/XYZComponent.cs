@@ -67,5 +67,19 @@ namespace Skill.Editor.UI.Extended
             this._Panel.OnGUI();
         }
 
+
+        /// <summary>
+        /// Is control in hierarchy of this control
+        /// </summary>
+        /// <param name="control">control to check</param>
+        /// <returns>true if is in hierarchy, otherwise false</returns>
+        public override bool IsInHierarchy(Skill.Framework.UI.BaseControl control)
+        {
+            if (base.IsInHierarchy(control)) return true;
+            if (control == this._TbX) return true;
+            if (control == this._TbY) return true;
+            if (control == this._TbZ) return true;
+            return false;
+        }
     }
 }

@@ -24,15 +24,16 @@ namespace Skill.Framework.UI
         /// The default is a thickness of 0 on all four sides.
         /// </returns>
         public virtual Thickness Padding { get; set; }
+        
 
         /// <summary>
         /// Gets a BaseControlCollection of child elements of this Panel.
         /// </summary>
         public BaseControlCollection Controls { get; private set; }
 
-        private Size _DesiredSize;
+        private Rect _DesiredSize;
         /// <summary> The Size needs for all controls </summary>
-        public Size DesiredSize { get { return _DesiredSize; } }
+        public Rect DesiredSize { get { return _DesiredSize; } }
 
         /// <summary>
         /// Gets RenderArea that shrinks by Padding.
@@ -65,7 +66,7 @@ namespace Skill.Framework.UI
         {
             this._NeedUpdateLayout = true;
             this.Controls = new BaseControlCollection(this);
-            this.Controls.LayoutChange += new System.EventHandler(Controls_LayoutChange);
+            this.Controls.LayoutChange += new System.EventHandler(Controls_LayoutChange);            
         }
 
         void Controls_LayoutChange(object sender, System.EventArgs e)
@@ -87,8 +88,8 @@ namespace Skill.Framework.UI
         /// When Layout changed
         /// </summary>
         protected override void OnLayoutChanged()
-        {            
-            this.RequestUpdateLayout();            
+        {
+            this.RequestUpdateLayout();
             base.OnLayoutChanged();
 
         }
@@ -111,31 +112,32 @@ namespace Skill.Framework.UI
         private void CalcDesiredSize()
         {
             Rect ra = RenderArea;
-            Vector2 min = new Vector2(ra.xMin, ra.yMin);
-            Vector2 max = new Vector2(ra.xMax, ra.yMax);
-
-            Size maxDesiredSize = new Size(0, 0);
+            Vector2 min = Vector2.zero;
+            Vector2 max = Vector2.zero;
 
             foreach (var c in Controls)
             {
                 Rect cRenderArea = c.RenderArea;
-                Thickness cMargin = c.Margin;
+                // covert to local
+                Rect cLocalRenderArea = new Rect(cRenderArea.xMin - ra.xMin, cRenderArea.yMin - ra.yMin, cRenderArea.width, cRenderArea.height);
 
-                min.x = Mathf.Min(cRenderArea.xMin - cMargin.Left, min.x);
-                min.y = Mathf.Min(cRenderArea.yMin - cMargin.Top, min.y);
+                min.x = Mathf.Min(cLocalRenderArea.xMin, min.x);
+                min.y = Mathf.Min(cLocalRenderArea.yMin, min.y);
 
-                max.x = Mathf.Max(cRenderArea.xMax + cMargin.Right, max.x);
-                max.y = Mathf.Max(cRenderArea.yMax + cMargin.Bottom, max.y);
+                max.x = Mathf.Max(cLocalRenderArea.xMax, max.x);
+                max.y = Mathf.Max(cLocalRenderArea.yMax, max.y);
 
                 if (c.ControlType == UI.ControlType.Panel)
                 {
-                    Size ds = ((Panel)c).DesiredSize;
-                    maxDesiredSize.Width = Mathf.Max(maxDesiredSize.Width, ds.Width);
-                    maxDesiredSize.Height = Mathf.Max(maxDesiredSize.Height, ds.Height);
+                    Rect ds = ((Panel)c)._DesiredSize;
+                    min.x = Mathf.Min(min.x, ds.xMin);
+                    min.y = Mathf.Min(min.y, ds.yMin);
+                    max.x = Mathf.Max(max.x, ds.xMax);
+                    max.y = Mathf.Max(max.y, ds.yMax);
                 }
 
             }
-            _DesiredSize = new Size(Mathf.Max(max.x - min.x, maxDesiredSize.Width), Mathf.Max(max.y - min.y, maxDesiredSize.Height));
+            _DesiredSize = new Rect(min.x + ra.xMin, min.y + ra.yMin, max.x - min.x, max.y - min.y);
         }
 
         /// <summary>
@@ -199,6 +201,47 @@ namespace Skill.Framework.UI
             return null;
         }
 
+        /// <summary>
+        /// Is control in hierarchy of this control
+        /// </summary>
+        /// <param name="control">control to check</param>
+        /// <returns>true if is in hierarchy, otherwise false</returns>
+        public override bool IsInHierarchy(Skill.Framework.UI.BaseControl control)
+        {
+            if (base.IsInHierarchy(control)) return true;
+            foreach (var c in Controls)
+            {
+                if (c != null)
+                {
+                    bool result = c.IsInHierarchy(control);
+                    if (result) return result;
+                }
+            }
+            return false;
+        }
+
+
+        /// <summary>
+        /// Returns first control that given point is inside
+        /// </summary>
+        /// <param name="point">Point</param>
+        /// <returns>found BaseControl </returns>
+        public override BaseControl GetControlAtPoint(Vector2 point)
+        {
+            if (Containes(point))
+            {
+                foreach (var c in Controls)
+                {
+                    if (c != null)
+                    {
+                        BaseControl result = c.GetControlAtPoint(point);
+                        if (result != null) return result;
+                    }
+                }
+                return this;
+            }
+            return null;
+        }
 
         /// <summary>
         /// Find control in hierarchy with specified tab index

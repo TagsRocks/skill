@@ -60,5 +60,24 @@ namespace Skill.Editor.UI
             this.Position = position;
             base.OnGUI();
         }
+
+        /// <summary>
+        /// Repaint the root EditorWindow of given control (if exist)
+        /// </summary>
+        /// <param name="control">a control in hierarchy</param>
+        public static void RepaintParentEditorWindow(BaseControl control)
+        {
+            if (control != null)
+            {
+                Frame frame = control.OwnerFrame;
+                if (frame != null)
+                {
+                    if (frame is EditorFrame)
+                    {
+                        ((EditorFrame)frame).Owner.Repaint();
+                    }
+                }
+            }
+        }
     }
 }

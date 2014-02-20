@@ -400,18 +400,18 @@ namespace Skill.Framework.UI.Extended
                 {
                     Thickness padding = base.Padding;
                     if (Orientation == UI.Orientation.Vertical)
-                        padding.Right -= ScrollbarThickness;
+                        padding.Right -= _ScrollbarThickness;
                     else
-                        padding.Bottom -= ScrollbarThickness;
+                        padding.Bottom -= _ScrollbarThickness;
                     return padding;
                 }
             }
             set
             {
                 if (Orientation == UI.Orientation.Vertical)
-                    value.Right += ScrollbarThickness;
+                    value.Right += _ScrollbarThickness;
                 else
-                    value.Bottom += ScrollbarThickness;
+                    value.Bottom += _ScrollbarThickness;
                 base.Padding = value;
             }
         }
@@ -437,15 +437,15 @@ namespace Skill.Framework.UI.Extended
             base.BeginRender();
             _IgnoreScrollbarThickness = false;
             Rect ra = RenderAreaShrinksByPadding;
-            _ScrollViewRect = ra;
-            Size ds = DesiredSize;
-            _ScrollViewRect.width = Mathf.Max(ra.width, ds.Width);
-            _ScrollViewRect.height = Mathf.Max(ra.height, ds.Height);
+            Rect ds = DesiredSize;
+            _ScrollViewRect = ds;
+            _ScrollViewRect.width = Mathf.Max(ra.width, ds.width);
+            _ScrollViewRect.height = Mathf.Max(ra.height, ds.height);
 
             if (Orientation == UI.Orientation.Vertical)
-                _ScrollViewRect.width -= ScrollbarThickness;
+                _ScrollViewRect.width -= _ScrollbarThickness;
             else
-                _ScrollViewRect.height -= ScrollbarThickness;
+                _ScrollViewRect.height -= _ScrollbarThickness;
 
             if (this.Background.Visibility == Visibility.Visible)
             {
@@ -520,16 +520,7 @@ namespace Skill.Framework.UI.Extended
                     _SelectedIndex = Controls.IndexOf(_SelectedItems[0]);
             }
             return selectionChanged;
-        }
-
-        /// <summary>
-        /// Convert mouse to local position
-        /// </summary>
-        /// <param name="mousePosition">Position of mouse</param>
-        protected override Vector2 ConvertToLocal(Vector2 mousePosition)
-        {
-            return mousePosition - _ScrollPosition;
-        }
+        }        
 
         /// <summary>
         /// Render ListBox
@@ -546,7 +537,7 @@ namespace Skill.Framework.UI.Extended
                 if (e.isMouse && e.type == EventType.MouseDown && e.button == 0)
                 {
                     Vector2 mousePos = e.mousePosition;
-                    Vector2 localMouse = ConvertToLocal(mousePos);
+                    Vector2 localMouse = mousePos - _ScrollPosition;
                     Rect ra = RenderAreaShrinksByPadding;
                     if (ra.Contains(localMouse))
                     {
@@ -853,5 +844,6 @@ namespace Skill.Framework.UI.Extended
                 Focus();
             return handled;
         }
+     
     }
 }

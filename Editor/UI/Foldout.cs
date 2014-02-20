@@ -33,18 +33,18 @@ namespace Skill.Editor.UI
             if (StateChanged != null) StateChanged(this, EventArgs.Empty);
         }
 
-        private bool _FoldoutState;
+        private bool _IsOpen;
         /// <summary>
         /// boolean - The foldout state selected by the user.
         /// </summary>
-        public bool FoldoutState
+        public bool IsOpen
         {
-            get { return _FoldoutState; }
+            get { return _IsOpen; }
             set
             {
-                if (_FoldoutState != value)
+                if (_IsOpen != value)
                 {
-                    _FoldoutState = value;
+                    _IsOpen = value;
                     OnStateChanged();
                 }
             }
@@ -68,11 +68,11 @@ namespace Skill.Editor.UI
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)
             {
-                FoldoutState = EditorGUI.Foldout(RenderArea, _FoldoutState, Content, ToggleOnLabelClick, Style);
+                IsOpen = EditorGUI.Foldout(RenderArea, _IsOpen, Content, ToggleOnLabelClick, Style);
             }
             else
             {
-                FoldoutState = EditorGUI.Foldout(RenderArea, _FoldoutState, Content, ToggleOnLabelClick);
+                IsOpen = EditorGUI.Foldout(RenderArea, _IsOpen, Content, ToggleOnLabelClick);
             }
         }
     }

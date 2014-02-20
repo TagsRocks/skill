@@ -84,12 +84,9 @@ namespace Skill.Editor.UI.Extended
         protected override void BeginRender()
         {
             base.BeginRender();
-            Rect ra = RenderAreaShrinksByPadding;
-            if (ra.xMax < ra.xMin) ra.xMax = ra.xMin;
-            if (ra.yMax < ra.yMin) ra.yMax = ra.yMin;
-            Rect viewRect = ra;
-            viewRect.x = viewRect.y = 0;
-            GUI.BeginScrollView(RenderArea, Vector3.zero, viewRect, false, false);
+            Rect ra = RenderAreaShrinksByPadding;            
+            Rect viewRect = ra;            
+            GUI.BeginScrollView(ra, Vector3.zero, viewRect, false, false);
         }
 
         /// <summary> End Render control's content </summary>
@@ -111,12 +108,7 @@ namespace Skill.Editor.UI.Extended
         /// </summary>
         protected override void OnLayoutChanged()
         {
-            Frame frame = OwnerFrame;
-            if (frame != null)
-            {
-                if (frame is Skill.Editor.UI.EditorFrame)
-                    ((Skill.Editor.UI.EditorFrame)frame).Owner.Repaint();
-            }
+            Skill.Editor.UI.EditorFrame.RepaintParentEditorWindow(this);
             base.OnLayoutChanged();
         }
 
@@ -134,7 +126,7 @@ namespace Skill.Editor.UI.Extended
                     _IsMouseDown = OwnerFrame.RegisterPrecedenceEvent(this);
                     args.Handled = true;
                 }
-                _MousePivot = ConvertToLocal(args.MousePosition);
+                _MousePivot = args.MousePosition;
                 _MouseButton = args.Button == MouseButton.Right ? 1 : 2;
             }
             base.OnMouseDown(args);

@@ -43,7 +43,7 @@ namespace Skill.Editor.UI
                 if (_IsExpanded != value)
                 {
                     _IsExpanded = value;
-                    Foldout.FoldoutState = _IsExpanded;
+                    Foldout.IsOpen = _IsExpanded;
                     if (_IsExpanded)
                         OnExpanded();
                     else
@@ -91,9 +91,9 @@ namespace Skill.Editor.UI
             {
                 if (Visibility != Skill.Framework.UI.Visibility.Collapsed)
                 {
-                    Size ds = Panel.DesiredSize;
-                    if (ds.Height > 0)
-                        Panel.Height = ds.Height;
+                    Rect ds = Panel.DesiredSize;
+                    if (ds.height > 0)
+                        Panel.Height = ds.height;
                     if (IsExpanded)
                         return Foldout.LayoutHeight + Panel.LayoutHeight;
                     else
@@ -129,9 +129,9 @@ namespace Skill.Editor.UI
 
         private void _Foldout_StateChanged(object sender, EventArgs e)
         {
-            if (_IsExpanded != Foldout.FoldoutState)
+            if (_IsExpanded != Foldout.IsOpen)
             {
-                _IsExpanded = Foldout.FoldoutState;
+                _IsExpanded = Foldout.IsOpen;
                 if (_IsExpanded)
                     OnExpanded();
                 else
@@ -175,6 +175,16 @@ namespace Skill.Editor.UI
             Foldout.OnGUI();
             if (IsExpanded)
                 Panel.OnGUI();
+        }
+        /// <summary>
+        /// Is control in hierarchy of this control
+        /// </summary>
+        /// <param name="control">control to check</param>
+        /// <returns>true if is in hierarchy, otherwise false</returns>
+        public override bool IsInHierarchy(Skill.Framework.UI.BaseControl control)
+        {
+            if (base.IsInHierarchy(control)) return true;
+            else return Panel.IsInHierarchy(control);
         }
     }
 }

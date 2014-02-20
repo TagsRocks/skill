@@ -24,7 +24,6 @@ namespace Skill.Editor
 
         public static void ApplyImportSettings()
         {
-            SetTextureImportType(GetUIResourcePath("SelectedItemBg.png"), TextureImporterType.GUI);
             SetTextureImportType(GetUIResourcePath("Condition.png"), TextureImporterType.GUI);
             SetTextureImportType(GetUIResourcePath("Action.png"), TextureImporterType.GUI);
             SetTextureImportType(GetUIResourcePath("Decorator.png"), TextureImporterType.GUI);
@@ -35,15 +34,6 @@ namespace Skill.Editor
             SetTextureImportType(GetUIResourcePath("Plus.png"), TextureImporterType.GUI);
             SetTextureImportType(GetUIResourcePath("PlusNext.png"), TextureImporterType.GUI);
             SetTextureImportType(GetUIResourcePath("Minus.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("EvenItem.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("OddItem.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Colors/Red.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Colors/Green.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Colors/Blue.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Colors/Black.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Colors/White.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Colors/Yellow.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Colors/Transparent.png"), TextureImporterType.GUI);            
         }
 
         private static Texture2D LoadTexture2D(string path)
@@ -54,20 +44,29 @@ namespace Skill.Editor
             return result;
         }
 
-
-        public static class Textures
+        /// <summary>
+        /// Create a texture and fill it with specified color
+        /// </summary>
+        /// <param name="color">Color of texture</param>
+        /// <returns>Texture</returns>
+        public static Texture2D CreateColorTexture(Color color, int size = 1)
         {
-            private static Texture2D _SelectedItemBackground;
-            public static Texture2D SelectedItemBackground
+            size = Mathf.Max(size, 1);
+            Texture2D texture = new Texture2D(size, size, TextureFormat.ARGB32, true);
+            for (int i = 0; i < size; i++)
             {
-                get
+                for (int j = 0; j < size; j++)
                 {
-                    if (_SelectedItemBackground == null)
-                        _SelectedItemBackground = LoadTexture2D(GetUIResourcePath("SelectedItemBg.png"));
-                    return _SelectedItemBackground;
+                    texture.SetPixel(i, j, color);
                 }
             }
+            texture.Apply();
+            return texture;
+        }
 
+
+        public static class Textures
+        {            
             private static Texture2D _Condition;
             public static Texture2D Condition
             {
@@ -132,18 +131,7 @@ namespace Skill.Editor
                         _Running = LoadTexture2D(GetUIResourcePath("Running.png"));
                     return _Running;
                 }
-            }
-
-            private static Texture2D _WhiteTexture;
-            public static Texture2D WhiteTexture
-            {
-                get
-                {
-                    if (_WhiteTexture == null)
-                        _WhiteTexture = LoadTexture2D(GetUIResourcePath("White.png"));
-                    return _WhiteTexture;
-                }
-            }
+            }            
 
             private static Texture2D _Plus;
             public static Texture2D Plus
@@ -178,27 +166,7 @@ namespace Skill.Editor
                 }
             }
 
-            private static Texture2D _EvenItem;
-            public static Texture2D EvenItem
-            {
-                get
-                {
-                    if (_EvenItem == null)
-                        _EvenItem = LoadTexture2D(GetUIResourcePath("EvenItem.png"));
-                    return _EvenItem;
-                }
-            }
 
-            private static Texture2D _OddItem;
-            public static Texture2D OddItem
-            {
-                get
-                {
-                    if (_OddItem == null)
-                        _OddItem = LoadTexture2D(GetUIResourcePath("OddItem.png"));
-                    return _OddItem;
-                }
-            }
 
             private static Texture2D _Red;
             public static Texture2D Red
@@ -206,7 +174,7 @@ namespace Skill.Editor
                 get
                 {
                     if (_Red == null)
-                        _Red = LoadTexture2D(GetUIResourcePath("Colors/Red.png"));
+                        _Red = CreateColorTexture(Color.red, 2);
                     return _Red;
                 }
             }
@@ -216,7 +184,7 @@ namespace Skill.Editor
                 get
                 {
                     if (_Green == null)
-                        _Green = LoadTexture2D(GetUIResourcePath("Colors/Green.png"));
+                        _Green = CreateColorTexture(Color.green, 2);
                     return _Green;
                 }
             }
@@ -227,7 +195,7 @@ namespace Skill.Editor
                 get
                 {
                     if (_Blue == null)
-                        _Blue = LoadTexture2D(GetUIResourcePath("Colors/Blue.png"));
+                        _Blue = CreateColorTexture(Color.blue, 2);
                     return _Blue;
                 }
             }
@@ -238,7 +206,7 @@ namespace Skill.Editor
                 get
                 {
                     if (_Black == null)
-                        _Black = LoadTexture2D(GetUIResourcePath("Colors/Black.png"));
+                        _Black = CreateColorTexture(Color.black, 2);
                     return _Black;
                 }
             }
@@ -249,7 +217,7 @@ namespace Skill.Editor
                 get
                 {
                     if (_White == null)
-                        _White = LoadTexture2D(GetUIResourcePath("Colors/White.png"));
+                        _White = CreateColorTexture(Color.white, 2);
                     return _White;
                 }
             }
@@ -260,10 +228,10 @@ namespace Skill.Editor
                 get
                 {
                     if (_Transparent == null)
-                        _Transparent = LoadTexture2D(GetUIResourcePath("Colors/Transparent.png"));
+                        _Transparent = CreateColorTexture(Color.clear, 2);
                     return _Transparent;
                 }
-            }            
+            }
 
             private static Texture2D _Yellow;
             public static Texture2D Yellow
@@ -271,25 +239,37 @@ namespace Skill.Editor
                 get
                 {
                     if (_Yellow == null)
-                        _Yellow = LoadTexture2D(GetUIResourcePath("Colors/Yellow.png"));
+                        _Yellow = CreateColorTexture(Color.yellow, 2);
                     return _Yellow;
                 }
             }
         }
         public static class Styles
         {
-            private static GUIStyle _SmallButtonStyle;
-            public static GUIStyle SmallButtonStyle
+            private static GUIStyle _SmallButton;
+            public static GUIStyle SmallButton
             {
                 get
                 {
-                    if (_SmallButtonStyle == null)
+                    if (_SmallButton == null)
                     {
-                        _SmallButtonStyle = new GUIStyle();
-                        _SmallButtonStyle.padding = new RectOffset(0, 0, 0, 0);
-                        _SmallButtonStyle.margin = new RectOffset(1, 1, 1, 1);
+                        _SmallButton = new GUIStyle();
+                        _SmallButton.padding = new RectOffset(0, 0, 0, 0);
+                        _SmallButton.margin = new RectOffset(1, 1, 1, 1);
                     }
-                    return _SmallButtonStyle;
+                    return _SmallButton;
+                }
+            }
+
+
+            private static GUIStyle _SelectedItem;
+            public static GUIStyle SelectedItem
+            {
+                get
+                {
+                    if (_SelectedItem == null)
+                        _SelectedItem = (GUIStyle)"SelectionRect";
+                    return _SelectedItem;
                 }
             }
         }
