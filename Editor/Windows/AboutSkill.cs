@@ -75,7 +75,7 @@ namespace Skill.Editor
             {
                 if (_Instance == null)
                 {
-                    _Instance = EditorWindow.GetWindow<AboutSkill>();
+                    _Instance = ScriptableObject.CreateInstance<AboutSkill>();
                 }
                 return _Instance;
             }

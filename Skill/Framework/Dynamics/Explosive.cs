@@ -13,6 +13,8 @@ namespace Skill.Framework.Dynamics
         public GameObject ExpPrefab;
         /// <summary> Positions to spawn ExpPrefab </summary>
         public Transform[] ExpPositions;
+        /// <summary> use rotation of ExpPosition for ExpPrefab </summary>
+        public bool OrientToExpPosition = false;
         /// <summary> Amount of self destruction delay after explosion (set it to negative to disable self destruction)</summary>
         public float DestroyDelay = 0;
         /// <summary> Shake camera on explosion </summary>
@@ -71,7 +73,7 @@ namespace Skill.Framework.Dynamics
         /// <param name="position">Where to spawn</param>
         protected virtual void SpawnExplosionPrefab(Transform position)
         {
-            Cache.Spawn(ExpPrefab, position.position, ExpPrefab.transform.rotation);
+            Cache.Spawn(ExpPrefab, position.position, OrientToExpPosition ? position.rotation : ExpPrefab.transform.rotation);
         }
 
         /// <summary>

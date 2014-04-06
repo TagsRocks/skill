@@ -70,8 +70,7 @@ namespace Skill.Editor.UI
         /// Render ObjectField
         /// </summary>
         protected override void Render()
-        {
-            //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
+        {            
             UnityEngine.Object obj = EditorGUI.ObjectField(RenderArea, Label, _Object, ObjectType, AllowSceneObjects);
             if (obj != null)
                 Object = (T)obj;

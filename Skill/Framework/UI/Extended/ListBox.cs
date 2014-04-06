@@ -420,7 +420,7 @@ namespace Skill.Framework.UI.Extended
         /// Create an instance of ScrollView
         /// </summary>
         public ListBox()
-        {
+        {            
             this.AutoScroll = true;
             this.ScrollbarThickness = 16;
             this.HandleScrollWheel = true;
@@ -520,17 +520,16 @@ namespace Skill.Framework.UI.Extended
                     _SelectedIndex = Controls.IndexOf(_SelectedItems[0]);
             }
             return selectionChanged;
-        }        
+        }
 
         /// <summary>
         /// Render ListBox
         /// </summary>
         protected override void Render()
         {
-
-            //
             bool selectionChange = CheckForRemovedSelectedItems();
 
+            // we need to check event here because render called inside scroll view and mouse position is in scrollview space
             Event e = Event.current;
             if (e != null)
             {
@@ -844,6 +843,6 @@ namespace Skill.Framework.UI.Extended
                 Focus();
             return handled;
         }
-     
+        
     }
 }

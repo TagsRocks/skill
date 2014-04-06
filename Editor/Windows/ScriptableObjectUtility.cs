@@ -15,6 +15,7 @@ namespace Skill.Editor
         /// </summary>
         /// <typeparam name="T"> Type of asset </typeparam>
         /// <param name="assetName"> name of asset</param>
+        /// <param name="setDefault"> setDefault method</param>
         public static void CreateAsset<T>(string assetName, Action<T> setDefault = null) where T : ScriptableObject
         {
             T asset = ScriptableObject.CreateInstance<T>();

@@ -30,7 +30,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Skill.Editor.XML</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -50,9 +51,34 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HandleHelper.cs" />
+    <Compile Include="Sequence\BaseTrackBar.cs" />
+    <Compile Include="Sequence\BooleanTrackBar.cs" />
+    <Compile Include="Sequence\ColorTrackBar.cs" />
+    <Compile Include="Sequence\EventTrackBar.cs" />
+    <Compile Include="Sequence\ExposeProperties.cs" />
+    <Compile Include="Sequence\FloatTrackBar.cs" />
+    <Compile Include="Sequence\IntegerTrackBar.cs" />
+    <Compile Include="Sequence\MatineeEditor.cs" />
+    <Compile Include="Sequence\MatineeResources.cs" />
+    <Compile Include="Sequence\MediaButton.cs" />
+    <Compile Include="Sequence\PropertyGrid.cs" />
+    <Compile Include="Sequence\PropertyTrackBar.cs" />
+    <Compile Include="Sequence\PropertyTrackProperties.cs" />
+    <Compile Include="Sequence\QuaternionTrackBar.cs" />
+    <Compile Include="Sequence\SoundTrackBar.cs" />
+    <Compile Include="Sequence\SoundTrackProperties.cs" />
+    <Compile Include="Sequence\TrackTreeView.cs" />
+    <Compile Include="Sequence\TrackTreeViewGroup.cs" />
+    <Compile Include="Sequence\TrackTreeViewItem.cs" />
+    <Compile Include="Sequence\Vector2TrackBar.cs" />
+    <Compile Include="Sequence\Vector3TrackBar.cs" />
+    <Compile Include="Sequence\Vector4TrackBar.cs" />
+    <Compile Include="Tools\BatchMeshEditor.cs" />
     <Compile Include="Tools\BrushProjector.cs" />
     <Compile Include="Tools\CacheObjectField.cs" />
     <Compile Include="Tools\CacheGroupEditor.cs" />
+    <Compile Include="Tools\ChildCounterEditor.cs" />
+    <Compile Include="Tools\CreateGroupDialog.cs" />
     <Compile Include="Tools\CRSpline3DEditor.cs" />
     <Compile Include="Tools\Curve3DEditor.cs" />
     <Compile Include="Tools\EditorListItem.cs" />
@@ -73,6 +99,7 @@
     <Compile Include="Tools\ImplantObject.cs" />
     <Compile Include="Tools\MeterEditor.cs" />
     <Compile Include="Tools\PaintColorEditor.cs" />
+    <Compile Include="Tools\ScreenShotEditor.cs" />
     <Compile Include="Tools\SpawnAssetEditor.cs" />
     <Compile Include="Tools\SpawnObjectField.cs" />
     <Compile Include="Tools\TextureBrush.cs" />
@@ -90,6 +117,10 @@
     <Compile Include="UI\Extended\MenuBar.cs" />
     <Compile Include="UI\Extended\TabHeader.cs" />
     <Compile Include="UI\Extended\TextureBrushGrid.cs" />
+    <Compile Include="UI\Extended\TimeBar.cs" />
+    <Compile Include="UI\Extended\TimeLine.cs" />
+    <Compile Include="UI\Extended\TrackBar.cs" />
+    <Compile Include="UI\Extended\TrackView.cs" />
     <Compile Include="UI\Extended\TreeView.cs" />
     <Compile Include="UI\Extended\ZoomPanel.cs" />
     <Compile Include="UI\GridSplitter.cs" />
@@ -163,6 +194,27 @@
     <Content Include="Resources\UI\Action.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\UI\Colors\Black.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Colors\Blue.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Colors\Green.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Colors\Red.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Colors\Transparent.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Colors\White.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Colors\Yellow.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\UI\Condition.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -172,7 +224,70 @@
     <Content Include="Resources\UI\Failure.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\UI\Loop.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\LoopOn.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Matinee\Boolean.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Matinee\Checkbox_Checked.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Matinee\Checkbox_Unchecked.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Matinee\Color.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Matinee\Event.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Matinee\Float.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Matinee\Folder.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Matinee\Integer.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Matinee\Keyframe.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Matinee\Quaternion.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Matinee\SelectedEventBorder.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Matinee\Sound.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Matinee\Vector2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Matinee\Vector3.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Matinee\Vector4.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\UI\Minus.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Pause.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\PauseOn.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Play.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\PlayOn.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\UI\Plus.png">
@@ -185,6 +300,18 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\UI\SelectedItemBg.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\StepBackward.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\StepBackwardOn.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\StepForward.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\StepForwardOn.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\UI\Success.png">

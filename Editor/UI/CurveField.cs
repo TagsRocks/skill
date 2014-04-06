@@ -23,6 +23,7 @@ namespace Skill.Editor.UI
         public AnimationCurve Curve
         {
             get { return _Curve; }
+            set { _Curve = value; }
         }
 
         /// <summary>
@@ -54,8 +55,6 @@ namespace Skill.Editor.UI
         public CurveField(AnimationCurve curve)
         {
             _Curve = curve;
-            if (_Curve == null)
-                throw new ArgumentNullException("Invalid AnimationCurve");
             Label = new GUIContent();
             this.Height = 32;
 
@@ -66,11 +65,13 @@ namespace Skill.Editor.UI
         /// </summary>
         protected override void Render()
         {
-            //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
-            if (UseColor)
-                _Curve = EditorGUI.CurveField(RenderArea, Label, _Curve, Color, Ranges);
-            else
-                _Curve = EditorGUI.CurveField(RenderArea, Label, _Curve);            
+            if (_Curve != null)
+            {
+                if (UseColor)
+                    _Curve = EditorGUI.CurveField(RenderArea, Label, _Curve, Color, Ranges);
+                else
+                    _Curve = EditorGUI.CurveField(RenderArea, Label, _Curve);
+            }
         }
     }
 }

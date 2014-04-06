@@ -1,4 +1,4 @@
-﻿    using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,6 +20,9 @@ namespace Skill.Framework.UI
 
         /// <summary> Index of item in collection</summary>
         public int Index { get; internal set; }
+
+        /// <summary> UserData  </summary>
+        public object UserData { get; set; }
 
         private bool _IsSelected;
         /// <summary>
@@ -70,12 +73,15 @@ namespace Skill.Framework.UI
         /// <summary>
         /// Create a SelectionGridItem
         /// </summary>
-        public SelectionGridItem()
+        /// <param name="text">text of content</param>
+        public SelectionGridItem(string text = "")
         {
             Content = new GUIContent();
+            Content.text = text;
             Index = -1;
+
         }
-    } 
+    }
     #endregion
 
     #region SelectionGridItemCollection
@@ -258,7 +264,7 @@ namespace Skill.Framework.UI
         {
             return _Items.IndexOf(item);
         }
-    } 
+    }
     #endregion
 
 

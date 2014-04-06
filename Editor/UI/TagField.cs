@@ -28,19 +28,19 @@ namespace Skill.Editor.UI
             if (TagChanged != null) TagChanged(this, EventArgs.Empty);
         }
 
-        private string _Tag;
+        private string _SelectedTag;
         /// <summary>
         /// The tag selected by the user.
         /// </summary>
-        public string Tag
+        public string SelectedTag
         {
-            get { return _Tag; }
+            get { return _SelectedTag; }
             set
             {
-                if (_Tag != value)
+                if (_SelectedTag != value)
                 {
-                    _Tag = value;
-                    OnTagChanged();
+                    _SelectedTag = value;
+                    OnTagChanged();                    
                 }
             }
         }
@@ -62,11 +62,11 @@ namespace Skill.Editor.UI
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)
             {
-                Tag = EditorGUI.TagField(RenderArea, Label, _Tag, Style);
+                SelectedTag = EditorGUI.TagField(RenderArea, Label, _SelectedTag, Style);
             }
             else
             {
-                Tag = EditorGUI.TagField(RenderArea, Label, _Tag);
+                SelectedTag = EditorGUI.TagField(RenderArea, Label, _SelectedTag);
             }
         }        
     }

@@ -15,6 +15,8 @@ namespace Skill.Framework.UI
         /// </summary>
         public RowDefinition()
         {
+            this._MinHeight = 0;
+            this._MaxHeight = float.MaxValue;
         }
 
         /// <summary>
@@ -55,7 +57,7 @@ namespace Skill.Framework.UI
                 if (_MaxHeight != value)
                 {
                     _MaxHeight = value;
-                    if (_MaxHeight > 0 && _MaxHeight < _MinHeight) _MaxHeight = _MinHeight;
+                    if (_MaxHeight < _MinHeight) _MaxHeight = _MinHeight;
                     OnChange();
                 }
             }

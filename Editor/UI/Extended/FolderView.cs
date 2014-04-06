@@ -42,10 +42,9 @@ namespace Skill.Editor.UI.Extended
         }
 
         /// <summary> UpdateLayout </summary>
-        public override void UpdateLayout()
+        protected override void UpdateLayout()
         {
             Rect rect = RenderArea;
-
             // set RenderArea of foldout
             rect.height = this.Height * this.ScaleFactor;
             this._Foldout.RenderArea = rect;
@@ -117,7 +116,19 @@ namespace Skill.Editor.UI.Extended
         {
             if (_Foldout.IsOpen)
             {
-                return base.GetControlAtPoint(point);
+                if (Contains(point))
+                {
+                    foreach (var c in Controls)
+                    {
+                        if (c != null)
+                        {
+                            if (c.Contains(point))
+                                return c;
+                        }
+                    }
+                    return this;
+                }
+                return null;
             }
             else
             {
@@ -135,6 +146,17 @@ namespace Skill.Editor.UI.Extended
             this._Foldout.OnGUI();
             if (_Foldout.IsOpen)
                 base.Render();
+        }
+
+
+        /// <summary>
+        /// HandleEvent
+        /// </summary>
+        /// <param name="e">Event</param>
+        public override void HandleEvent(Event e)
+        {
+            if (_Foldout.IsOpen)
+                base.HandleEvent(e);
         }
     }
 }

@@ -17,6 +17,8 @@ namespace Skill.Framework.UI
         /// </summary>
         public ColumnDefinition()
         {
+            _MinWidth = 0;
+            _MaxWidth = float.MaxValue;
         }
 
 
@@ -59,7 +61,7 @@ namespace Skill.Framework.UI
                 if (_MaxWidth != value)
                 {
                     _MaxWidth = value;
-                    if (_MaxWidth > 0 && _MaxWidth < _MinWidth) _MaxWidth = _MinWidth;
+                    if (_MaxWidth < _MinWidth) _MaxWidth = _MinWidth;
                     OnChange();
                 }
             }

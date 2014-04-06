@@ -37,7 +37,7 @@ namespace Skill.Framework.UI
                             float height = 0;
                             foreach (var c in Controls)
                             {
-                                if (c != null)
+                                if (c != null && c.Visibility != UI.Visibility.Collapsed)
                                     height += c.LayoutHeight + c.Margin.Vertical;
                             }
 
@@ -77,7 +77,7 @@ namespace Skill.Framework.UI
                             float width = 0;
                             foreach (var c in Controls)
                             {
-                                if (c != null)
+                                if (c != null && c.Visibility != UI.Visibility.Collapsed)
                                     width += c.LayoutWidth + c.Margin.Horizontal;
                             }
 
@@ -97,7 +97,7 @@ namespace Skill.Framework.UI
         /// <summary>
         /// Ensures that all visual child elements of this element are properly updated for layout.
         /// </summary>
-        public override void UpdateLayout()
+        protected override void UpdateLayout()
         {
             switch (Orientation)
             {
@@ -211,7 +211,7 @@ namespace Skill.Framework.UI
         /// <summary>
         /// When Layout changed
         /// </summary>
-        protected override void OnLayoutChanged() 
+        protected override void OnLayoutChanged()
         {
             _UpdateLayoutHeight = true;
             _UpdateLayoutWidth = true;

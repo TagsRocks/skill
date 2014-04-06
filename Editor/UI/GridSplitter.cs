@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
         protected override void BeginRender()
         {
             base.BeginRender();
-            EditorGUIUtility.AddCursorRect(RenderArea, Orientation == Skill.Framework.UI.Orientation.Horizontal ? MouseCursor.ResizeVertical : MouseCursor.ResizeHorizontal);
+            EditorGUIUtility.AddCursorRect(_RenderAreaWidthOverFlow, Orientation == Skill.Framework.UI.Orientation.Horizontal ? MouseCursor.ResizeVertical : MouseCursor.ResizeHorizontal);
         }
     }
 }

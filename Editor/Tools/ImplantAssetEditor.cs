@@ -67,7 +67,6 @@ namespace Skill.Editor.Tools
 
             _ItemsList = new ListBox() { Row = 3, Column = 0, Margin = new Thickness(2) };
             _ItemsList.BackgroundVisible = true;
-            _ItemsList.SelectedStyle = Resources.Styles.SelectedItem;
             _ItemsList.DisableFocusable();
 
             _BtnAdd = new Skill.Editor.UI.Button() { Row = 2, Column = 0, Margin = new Thickness(2) };
@@ -186,6 +185,9 @@ namespace Skill.Editor.Tools
 
         public override void OnInspectorGUI()
         {
+            if (_ItemsList.SelectedStyle == null)
+                _ItemsList.SelectedStyle = Resources.Styles.SelectedItem;
+
             ApplyChanges();
             _Frame.Update();
             _Frame.OnInspectorGUI(FrameHeight);

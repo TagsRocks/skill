@@ -615,7 +615,15 @@ namespace Skill.Framework.UI
         }
 
         /// <summary> check mouse events? (MouseDown, MouseUp, MouseDrag, MouseMove, ScrollWheel) </summary>        
-        public bool WantsMouseEvents { get; set; }        
+        public bool WantsMouseEvents { get; set; }
+
+        /// <summary> if control is renderd inside a scrollview then HandleEvent must called inside Render method</summary>        
+        public bool IsInScrollView { get; set; }
+
+        /// <summary>
+        /// Is handle event called inside render method
+        /// </summary>
+        protected bool IsHandlingEventInternal { get; private set; }
 
         protected virtual MouseButton ConvertButton(int ebutton)
         {
@@ -636,8 +644,14 @@ namespace Skill.Framework.UI
         /// <summary>
         /// Check for events
         /// </summary>
+        /// <remarks>
+        /// this method does not works correct if control is inside ScrollView,
+        /// so for that controls you must check mouse events  inside Render method,
+        /// and to do that set 'IsInScrollView = true'
+        /// </remarks>
         public virtual void HandleEvent(Event e)
         {
+            if (IsInScrollView && !IsHandlingEventInternal) return;
             if (e != null)
             {
                 if (WantsMouseEvents)
@@ -646,7 +660,7 @@ namespace Skill.Framework.UI
                     {
                         EventType type = e.type;
                         Vector2 localMouse = e.mousePosition;
-                        if (_RenderArea.Contains(localMouse))
+                        if (Contains(localMouse))
                         {
                             if (!IsMouseOver)
                             {
@@ -694,9 +708,9 @@ namespace Skill.Framework.UI
                 if (ContextMenu != null && e.type != EventType.Used && e.type == EventType.ContextClick)
                 {
                     Vector2 localMouse = e.mousePosition;
-                    if (_RenderArea.Contains(localMouse))
+                    if (Contains(localMouse))
                     {
-                        ContextMenu.Show();
+                        ContextMenu.Show(this, e.mousePosition);
                         e.Use();
                     }
                 }
@@ -786,6 +800,12 @@ namespace Skill.Framework.UI
             if (Visibility == UI.Visibility.Visible)
             {
                 BeginRender();
+                if (IsInScrollView)
+                {
+                    IsHandlingEventInternal = true;
+                    HandleEvent(Event.current);
+                    IsHandlingEventInternal = false;
+                }
                 Render();
                 EndRender();
             }
@@ -806,24 +826,11 @@ namespace Skill.Framework.UI
         }
 
         /// <summary>
-        /// Returns true if the x and y components of mousePosition is inside RenderArea.
-        /// </summary>
-        /// <param name="mousePosition">Mouse position</param>
-        /// <param name="screenOffset">ScreenOffset (specified by RenderParams)</param>
-        /// <returns>true if the x and y components of mousePosition is inside RenderArea, otherwise false</returns>
-        public bool Containes(Vector2 mousePosition, Vector2 screenOffset)
-        {
-            mousePosition.x -= screenOffset.x;
-            mousePosition.y -= screenOffset.y;
-            return _RenderArea.Contains(mousePosition);
-        }
-
-        /// <summary>
         /// Returns true if the x and y components of point is inside RenderArea.
         /// </summary>
         /// <param name="point">Mouse position</param>        
         /// <returns>true if the x and y components of point is inside RenderArea, otherwise false</returns>
-        public bool Containes(Vector2 point)
+        public bool Contains(Vector2 point)
         {
             return _RenderArea.Contains(point);
         }
@@ -851,7 +858,7 @@ namespace Skill.Framework.UI
             return control == this;
         }
 
-        
+
         /// <summary>
         /// Returns first control that given point is inside
         /// </summary>
@@ -859,8 +866,26 @@ namespace Skill.Framework.UI
         /// <returns>found BaseControl </returns>
         public virtual BaseControl GetControlAtPoint(Vector2 point)
         {
-            if (Containes(point)) return this;
+            if (Contains(point)) return this;
             return null;
+        }
+
+
+        /// <summary>
+        /// Find first object of type T in parents
+        /// </summary>
+        /// <typeparam name="T">Type of parent</typeparam>
+        /// <returns>T</returns>
+        public T FindInParents<T>() where T : IControl
+        {
+            IControl parent = this.Parent;
+            while (parent != null)
+            {
+                if (parent is T)
+                    return (T)parent;
+                parent = parent.Parent;
+            }
+            return default(T);
         }
 
         #endregion
@@ -879,12 +904,14 @@ namespace Skill.Framework.UI
 
 
         // the following variables defined to avoid modification of collection during render        
-        private bool _IsRenderBegined;
+        private int _IsChangeHappens;
         enum CollectionChangeType
         {
             Add,
             Remove,
-            Insert
+            Insert,
+            BringToFront,
+            BringToBack,
         }
 
         class CollectionChange
@@ -922,38 +949,51 @@ namespace Skill.Framework.UI
         internal BaseControlCollection(Panel panel)
         {
             this.Panel = panel;
-            _Changes = new List<CollectionChange>();
-            _Items = new List<BaseControl>();
-            _LayoutChangeHandler = Control_LayoutChange;
+            this._Changes = new List<CollectionChange>();
+            this._Items = new List<BaseControl>();
+            this._LayoutChangeHandler = Control_LayoutChange;
+            this._IsChangeHappens = 0;
 
         }
 
-        internal void BeginRender()
+        internal void BeginChanges()
         {
-            _IsRenderBegined = true;
+            _IsChangeHappens++;
         }
 
-        internal void EndRender()
+        internal void EndChanges(bool force = false)
         {
-            _IsRenderBegined = false;
-            if (_Changes.Count > 0)
+            _IsChangeHappens--;
+            if (force)
+                _IsChangeHappens = 0;
+
+            if (_IsChangeHappens == 0)
             {
-                for (int i = 0; i < _Changes.Count; i++)
+                if (_Changes.Count > 0)
                 {
-                    switch (_Changes[i].ChangeType)
+                    for (int i = 0; i < _Changes.Count; i++)
                     {
-                        case CollectionChangeType.Add:
-                            Add(_Changes[i].Control);
-                            break;
-                        case CollectionChangeType.Remove:
-                            Remove(_Changes[i].Control);
-                            break;
-                        case CollectionChangeType.Insert:
-                            Insert(_Changes[i].Index, _Changes[i].Control);
-                            break;
+                        switch (_Changes[i].ChangeType)
+                        {
+                            case CollectionChangeType.Add:
+                                Add(_Changes[i].Control);
+                                break;
+                            case CollectionChangeType.Remove:
+                                Remove(_Changes[i].Control);
+                                break;
+                            case CollectionChangeType.Insert:
+                                Insert(_Changes[i].Index, _Changes[i].Control);
+                                break;
+                            case CollectionChangeType.BringToFront:
+                                BringToFront(_Changes[i].Control);
+                                break;
+                            case CollectionChangeType.BringToBack:
+                                BringToBack(_Changes[i].Control);
+                                break;
+                        }
                     }
+                    _Changes.Clear();
                 }
-                _Changes.Clear();
             }
         }
 
@@ -983,7 +1023,7 @@ namespace Skill.Framework.UI
                 throw new ArgumentNullException("BaseControl is null");
             if (_Items.Contains(control)) return;
 
-            if (_IsRenderBegined)
+            if (_IsChangeHappens > 0)
             {
                 _Changes.Add(new CollectionChange() { ChangeType = CollectionChangeType.Add, Control = control });
             }
@@ -1006,7 +1046,7 @@ namespace Skill.Framework.UI
             if (control == null)
                 throw new ArgumentNullException("BaseControl is null");
             if (_Items.Contains(control)) return;
-            if (_IsRenderBegined)
+            if (_IsChangeHappens > 0)
             {
                 _Changes.Add(new CollectionChange() { ChangeType = CollectionChangeType.Insert, Control = control, Index = index });
             }
@@ -1086,7 +1126,7 @@ namespace Skill.Framework.UI
         /// </returns>
         public bool Remove(BaseControl control)
         {
-            if (_IsRenderBegined)
+            if (_IsChangeHappens > 0)
             {
                 _Changes.Add(new CollectionChange() { ChangeType = CollectionChangeType.Remove, Control = control });
                 return _Items.Contains(control);
@@ -1130,9 +1170,19 @@ namespace Skill.Framework.UI
         /// <param name="control">BaseControl to bring to front</param>
         internal void BringToFront(BaseControl control)
         {
-            if (Remove(control))
+            if (_IsChangeHappens > 0)
             {
-                _Items.Insert(Count, control);
+                _Changes.Add(new CollectionChange() { ChangeType = CollectionChangeType.BringToFront, Control = control });
+            }
+            else
+            {
+                int index = _Items.IndexOf(control);
+                if (index >= 0)
+                {
+                    for (int i = index; i < Count - 1; i++)
+                        _Items[i] = _Items[i + 1];
+                    _Items[Count - 1] = control;
+                }
             }
         }
 
@@ -1142,9 +1192,19 @@ namespace Skill.Framework.UI
         /// <param name="control">BaseControl to bring to back</param>
         internal void BringToBack(BaseControl control)
         {
-            if (Remove(control))
+            if (_IsChangeHappens > 0)
             {
-                _Items.Insert(0, control);
+                _Changes.Add(new CollectionChange() { ChangeType = CollectionChangeType.BringToBack, Control = control });
+            }
+            else
+            {
+                int index = _Items.IndexOf(control);
+                if (index >= 0)
+                {
+                    for (int i = index; i > 0; i--)
+                        _Items[i] = _Items[i - 1];
+                    _Items[0] = control;
+                }
             }
         }
 
@@ -1159,23 +1219,6 @@ namespace Skill.Framework.UI
         public int IndexOf(BaseControl control)
         {
             return _Items.IndexOf(control);
-        }
-
-        internal void HandleEvent(Event e)
-        {
-            if (e != null && e.type != EventType.Used)
-            {
-                foreach (var c in _Items)
-                {
-                    if (c != null)
-                    {
-                        c.HandleEvent(e);
-                        if (e.type == EventType.Used)
-                            break;
-                    }
-                }
-
-            }
         }
 
         //internal void SetScaleFactor(float scaleFactor)

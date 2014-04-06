@@ -246,23 +246,20 @@ namespace Skill.Framework.UI
         /// <summary>
         /// request to have chance for handle events frst
         /// </summary>
-        /// <param name="pe">IPrecedenceEvent to register</param>
+        /// <param name="pe">BaseControl to register</param>
         /// <returns>True if succes, oterwise false
         /// </returns>
         public bool RegisterPrecedenceEvent(BaseControl pe)
         {
             if (_PrecedenceEvent == null)
-            {
                 _PrecedenceEvent = pe;
-                return true;
-            }
-            return false;
+            return _PrecedenceEvent == pe;
         }
 
         /// <summary>
         /// unregister from chance for handle events frst
         /// </summary>
-        /// <param name="pe">IPrecedenceEvent to unregister</param>
+        /// <param name="pe">BaseControl to unregister</param>
         /// <returns>True if succes, oterwise false</returns>
         /// <remarks> pe must registered before </remarks>
         public bool UnregisterPrecedenceEvent(BaseControl pe)
@@ -273,6 +270,16 @@ namespace Skill.Framework.UI
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Is registered for PrecedenceEvent
+        /// </summary>
+        /// <param name="pe"> BaseControl to check </param>
+        /// <returns></returns>
+        public bool IsPrecedenceEvent(BaseControl pe)
+        {
+            return pe == _PrecedenceEvent;
         }
 
         #endregion
@@ -302,7 +309,7 @@ namespace Skill.Framework.UI
                 if (e.type != EventType.Used && _PrecedenceEvent != null)
                     _PrecedenceEvent.HandleEvent(e);
 
-                if (e.type != EventType.Used && _FocusedControl != null)
+                if (e.type != EventType.Used && _FocusedControl != null && _FocusedControl != _PrecedenceEvent)
                     _FocusedControl.HandleEvent(e);
 
                 if (e.type != EventType.Used)
@@ -406,7 +413,7 @@ namespace Skill.Framework.UI
 
             rect.x += x;
             rect.y += y;
-            Grid.RenderArea = rect;
+            Grid.RenderArea = rect;            
         }
 
         /// <summary>

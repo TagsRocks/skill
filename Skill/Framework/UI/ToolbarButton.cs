@@ -19,6 +19,9 @@ namespace Skill.Framework.UI
         /// <summary> Index of button </summary>
         public int Index { get; internal set; }
 
+        /// <summary> UserData  </summary>
+        public object UserData { get; set; }
+
         private string _Name;
         /// <summary>
         /// Optional name for button

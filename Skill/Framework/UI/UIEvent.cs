@@ -57,7 +57,7 @@ namespace Skill.Framework.UI
         /// <summary> Is Shift held down? (Read Only) </summary>
         public bool Shift { get { return (Modifiers & EventModifiers.Shift) == EventModifiers.Shift; } }
         /// <summary> Is Control key held down? (Read Only) </summary>
-        public bool Control { get { return (Modifiers & EventModifiers.Control) == EventModifiers.Control; } }
+        public bool Ctrl { get { return (Modifiers & EventModifiers.Control) == EventModifiers.Control; } }
         /// <summary> Is Alt/Option key held down? (Read Only) </summary>
         public bool Alt { get { return (Modifiers & EventModifiers.Alt) == EventModifiers.Alt; } }
 

@@ -52,8 +52,7 @@ namespace Skill.Editor.Tools
             _MainPanel.RowDefinitions.Add(_ObjectField.LayoutHeight, GridUnitType.Pixel);
 
             _ItemsList = new ListBox() { Row = 1, Column = 0, Margin = new Thickness(2) };
-            _ItemsList.BackgroundVisible = true;
-            _ItemsList.SelectedStyle = Resources.Styles.SelectedItem;
+            _ItemsList.BackgroundVisible = true;            
             _ItemsList.DisableFocusable();
 
             _BtnAdd = new Skill.Editor.UI.Button() { Row = 0, Column = 0, Margin = new Thickness(2) };
@@ -161,6 +160,8 @@ namespace Skill.Editor.Tools
 
         public override void OnInspectorGUI()
         {
+            if (_ItemsList.SelectedStyle == null)
+                _ItemsList.SelectedStyle = Resources.Styles.SelectedItem;
             ApplyChanges();
             _Frame.Update();
             _Frame.OnInspectorGUI(FrameHeight);

@@ -29,7 +29,7 @@ namespace Skill.Framework.UI
         /// <summary>
         ///  Ensures that all visual child elements of this element are properly updated for layout.
         /// </summary>
-        public override void UpdateLayout()
+        protected override void UpdateLayout()
         {
             Rect renderArea = RenderAreaShrinksByPadding;
 

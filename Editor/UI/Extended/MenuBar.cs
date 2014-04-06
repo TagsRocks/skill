@@ -40,7 +40,6 @@ namespace Skill.Editor.UI.Extended
         {
             WantsMouseEvents = true;
             Background = new Skill.Framework.UI.Box(); Background.Parent = this;
-            Background.Style = new GUIStyle(EditorStyles.toolbar);
             Orientation = Skill.Framework.UI.Orientation.Horizontal;
         }
 
@@ -58,6 +57,8 @@ namespace Skill.Editor.UI.Extended
         /// </summary>
         protected override void Render()
         {
+            if (Background.Style == null)
+                Background.Style = new GUIStyle(EditorStyles.toolbar);
             Background.OnGUI();
             base.Render();
         }
@@ -127,16 +128,6 @@ namespace Skill.Editor.UI.Extended
             Width = 35;
             _ContextMenu = new Skill.Editor.UI.ContextMenu();
 
-
-            this.DefaultStyle = new GUIStyle(EditorStyles.toolbarButton);
-
-            this.HoverStyle = new GUIStyle(EditorStyles.toolbarButton);
-            this.HoverStyle.normal = this.HoverStyle.hover;
-
-            this.PressedStyle = new GUIStyle(EditorStyles.toolbarButton);
-            this.PressedStyle.normal = this.PressedStyle.active;
-
-            this.Style = DefaultStyle;
         }
 
         protected override void OnMouseDown(Skill.Framework.UI.MouseClickEventArgs args)
@@ -188,6 +179,28 @@ namespace Skill.Editor.UI.Extended
         /// <summary> Render </summary>
         protected override void Render()
         {
+            // we have to set styles here because maybe user goes in playmode or already stop playing
+            // and we do not have access to EditorStyles right after playmode stopped
+            if (this.DefaultStyle == null)
+            {
+                this.DefaultStyle = new GUIStyle(EditorStyles.toolbarButton);
+            }
+            if (this.HoverStyle == null)
+            {
+                this.HoverStyle = new GUIStyle(EditorStyles.toolbarButton);
+                this.HoverStyle.normal = this.HoverStyle.hover;
+            }
+            if (this.PressedStyle == null)
+            {
+                this.PressedStyle = new GUIStyle(EditorStyles.toolbarButton);
+                this.PressedStyle.normal = this.PressedStyle.active;
+            }
+            if (this.Style == null)
+            {
+                this.Style = DefaultStyle;
+            }
+
+
             base.Render();
             if (_IsActive)
             {

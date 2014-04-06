@@ -81,5 +81,30 @@ namespace Skill.Editor.Tools
                 Debug.LogError("No selected transform to paste.");
             }
         }
+
+
+        /// <summary>
+        /// Group selected objects
+        /// </summary>
+        public static void GroupObjects(string groupName)
+        {
+            Transform[] transforms = Selection.transforms;
+            if (transforms != null && transforms.Length > 0)
+            {                
+                GameObject group = new GameObject(groupName);
+                Vector3 center = transforms[0].position;
+                for (int i = 1; i < transforms.Length; i++)
+                    center += transforms[i].position;
+
+                center /= transforms.Length;
+                group.transform.position = center;
+                foreach (var t in transforms)
+                    Undo.SetTransformParent(t, group.transform, string.Format("Group {0} to {1}", t.name, group.name));
+            }
+            else
+            {
+                Debug.LogError("No selected objects to group.");
+            }
+        }        
     }
 }

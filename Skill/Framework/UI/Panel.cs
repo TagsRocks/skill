@@ -24,7 +24,7 @@ namespace Skill.Framework.UI
         /// The default is a thickness of 0 on all four sides.
         /// </returns>
         public virtual Thickness Padding { get; set; }
-        
+
 
         /// <summary>
         /// Gets a BaseControlCollection of child elements of this Panel.
@@ -66,7 +66,7 @@ namespace Skill.Framework.UI
         {
             this._NeedUpdateLayout = true;
             this.Controls = new BaseControlCollection(this);
-            this.Controls.LayoutChange += new System.EventHandler(Controls_LayoutChange);            
+            this.Controls.LayoutChange += new System.EventHandler(Controls_LayoutChange);
         }
 
         void Controls_LayoutChange(object sender, System.EventArgs e)
@@ -100,13 +100,13 @@ namespace Skill.Framework.UI
         protected override void BeginRender()
         {
             base.BeginRender();
-            Controls.BeginRender();
             if (_NeedUpdateLayout)
             {
                 UpdateLayout();
                 CalcDesiredSize();
                 _NeedUpdateLayout = false;
             }
+            Controls.BeginChanges();
         }
 
         private void CalcDesiredSize()
@@ -127,14 +127,14 @@ namespace Skill.Framework.UI
                 max.x = Mathf.Max(cLocalRenderArea.xMax, max.x);
                 max.y = Mathf.Max(cLocalRenderArea.yMax, max.y);
 
-                if (c.ControlType == UI.ControlType.Panel)
-                {
-                    Rect ds = ((Panel)c)._DesiredSize;
-                    min.x = Mathf.Min(min.x, ds.xMin);
-                    min.y = Mathf.Min(min.y, ds.yMin);
-                    max.x = Mathf.Max(max.x, ds.xMax);
-                    max.y = Mathf.Max(max.y, ds.yMax);
-                }
+                //if (c.ControlType == UI.ControlType.Panel)
+                //{
+                //    Rect ds = ((Panel)c)._DesiredSize;
+                //    min.x = Mathf.Min(min.x, ds.xMin);
+                //    min.y = Mathf.Min(min.y, ds.yMin);
+                //    max.x = Mathf.Max(max.x, ds.xMax);
+                //    max.y = Mathf.Max(max.y, ds.yMax);
+                //}
 
             }
             _DesiredSize = new Rect(min.x + ra.xMin, min.y + ra.yMin, max.x - min.x, max.y - min.y);
@@ -155,7 +155,7 @@ namespace Skill.Framework.UI
         protected override void EndRender()
         {
             base.EndRender();
-            Controls.EndRender();
+            Controls.EndChanges(true);
         }
 
 
@@ -170,7 +170,7 @@ namespace Skill.Framework.UI
         /// The layout system will perform element layout in a deferred manner, using an algorithm that balances performance and currency, and with a weighting strategy to defer changes to roots until all child elements are valid.
         /// You should only call UpdateLayout if you absolutely need updated sizes and positions, and only after you are certain that all changes to properties that you control and that may affect layout are completed.
         /// </remarks>
-        public abstract void UpdateLayout();
+        protected abstract void UpdateLayout();
 
 
         /// <summary>
@@ -228,7 +228,7 @@ namespace Skill.Framework.UI
         /// <returns>found BaseControl </returns>
         public override BaseControl GetControlAtPoint(Vector2 point)
         {
-            if (Containes(point))
+            if (Contains(point))
             {
                 foreach (var c in Controls)
                 {
@@ -460,13 +460,33 @@ namespace Skill.Framework.UI
             return base.HandleCommand(command);
         }
 
+        /// <summary>
+        /// HandleEvent event
+        /// </summary>
+        /// <param name="e">event to handle</param>
         public override void HandleEvent(Event e)
         {
+            if (IsInScrollView && !IsHandlingEventInternal) return;
             if (e != null && e.type != EventType.Used)
             {
-                Controls.HandleEvent(e);
+                Controls.BeginChanges();
+
+                for (int i = Controls.Count - 1; i >= 0; i--)
+                {
+                    var c = Controls[i];
+                    if (c != null)
+                    {
+                        if (OwnerFrame != null && OwnerFrame.IsPrecedenceEvent(c))
+                            continue;
+                        c.HandleEvent(e);
+                        if (e.type == EventType.Used)
+                            break;
+                    }
+                }
                 if (e.type != EventType.Used)
                     base.HandleEvent(e);
+
+                Controls.EndChanges();
             }
 
         }

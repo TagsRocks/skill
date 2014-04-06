@@ -86,7 +86,7 @@ namespace Skill.Editor
         /// <returns>Texture</returns>
         public static Texture2D CreateLineTexture()
         {
-            return Resources.CreateColorTexture(Color.white, 1);
+            return Resources.CreateTexture(Color.white, 1);
         }
 
         /// <summary>

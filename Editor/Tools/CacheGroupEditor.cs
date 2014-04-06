@@ -27,7 +27,7 @@ namespace Skill.Editor.Tools
     }
 
     [UnityEditor.CustomEditor(typeof(Framework.Managers.CacheGroup))]
-    class CacheGroupEditor : UnityEditor.Editor , IEditor
+    class CacheGroupEditor : UnityEditor.Editor, IEditor
     {
         #region CreateUI
         private const float FrameHeight = 234;
@@ -42,16 +42,15 @@ namespace Skill.Editor.Tools
 
         private void CreateUI()
         {
-            _ObjectField = new CacheObjectField(this) { Row = 2, Column = 1 };            
+            _ObjectField = new CacheObjectField(this) { Row = 2, Column = 1 };
 
             _MainPanel = new ChangeCheck();
             _MainPanel.RowDefinitions.Add(ButtonRowHeight, GridUnitType.Pixel);
-            _MainPanel.RowDefinitions.Add(1, GridUnitType.Star);            
+            _MainPanel.RowDefinitions.Add(1, GridUnitType.Star);
             _MainPanel.RowDefinitions.Add(_ObjectField.LayoutHeight, GridUnitType.Pixel);
 
             _ItemsList = new ListBox() { Row = 1, Column = 0, Margin = new Thickness(2) };
             _ItemsList.BackgroundVisible = true;
-            _ItemsList.SelectedStyle = Resources.Styles.SelectedItem;
             _ItemsList.DisableFocusable();
 
             _BtnAdd = new Skill.Editor.UI.Button() { Row = 0, Column = 0, Margin = new Thickness(2) };
@@ -158,6 +157,11 @@ namespace Skill.Editor.Tools
 
         public override void OnInspectorGUI()
         {
+
+            if (_ItemsList.SelectedStyle == null)
+                _ItemsList.SelectedStyle = Resources.Styles.SelectedItem;
+
+
             ApplyChanges();
             _Frame.Update();
             _Frame.OnInspectorGUI(FrameHeight);
@@ -170,6 +174,6 @@ namespace Skill.Editor.Tools
         }
     }
 
-    
+
 
 }

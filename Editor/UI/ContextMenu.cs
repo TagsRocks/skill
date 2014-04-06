@@ -143,7 +143,13 @@ namespace Skill.Editor.UI
         /// <summary> Height of n separator </summary>
         public float SeparatorHeight { get; set; }
 
+        /// <summary> Owner ui object that showthis contenxt menu  </summary>
+        public Framework.UI.BaseControl Owner { get; private set; }
 
+        /// <summary>
+        /// position of ContextMenu
+        /// </summary>
+        public Vector2 Position { get; private set; }
 
         /// <summary>
         /// Create a ContextMenu
@@ -211,12 +217,17 @@ namespace Skill.Editor.UI
         public void DropDown(Rect position)
         {
             ApplyChanges();
+            this.Position = new Vector2(position.x, position.y);
             _GenericMenu.DropDown(position);
         }
 
         /// <summary> Show the menu under the mouse. </summary>
-        public void Show()
+        /// <param name="owner"> Owner ui object that showthis contenxt menu  </param>
+        /// <param name="position">Mouse position</param>
+        public void Show(Framework.UI.BaseControl owner, Vector2 position)
         {
+            this.Position = position;
+            this.Owner = owner;
             ApplyChanges();
             _GenericMenu.ShowAsContext();
         }
@@ -231,6 +242,8 @@ namespace Skill.Editor.UI
         {
             IsChanged = true;
         }
+
+
     }
 
 

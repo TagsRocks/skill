@@ -26,6 +26,9 @@ namespace Skill.Editor.UI
         /// <summary> Value of item</summary>
         public int Value { get; private set; }
 
+        /// <summary> UserData  </summary>
+        public object UserData { get; set; }
+
         private bool _IsSelected;
         /// <summary>
         /// is option selected
@@ -85,10 +88,20 @@ namespace Skill.Editor.UI
         /// </summary>
         /// <param name="value">Value of option</param>
         public PopupOption(int value)
+            : this(value, string.Empty)
+        {
+        }
+
+
+        /// <summary>
+        /// Create an instance of PopupOption
+        /// </summary>
+        /// <param name="value">Value of option</param>
+        /// <param name="content">content</param>
+        public PopupOption(int value, string content)
         {
             this.Value = value;
-            this.Content = new GUIContent();
-            this.Name = string.Empty;
+            this.Content = new GUIContent() { text = content };
             this.Index = -1;
         }
     }

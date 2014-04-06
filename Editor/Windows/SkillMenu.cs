@@ -21,11 +21,19 @@ namespace Skill.Editor
             Tools.AnimationCopy.Instance.Show();
         }
 
+        [MenuItem("Skill/Matinee Editor", false, 20)]
+        static void ShowMatineeEditor()
+        {
+            Skill.Editor.Sequence.MatineeEditor.Instance.Show();
+        }
+
         [MenuItem("Skill/Diagnostics/BehaviorTree State", false, 50)]
         static void ShowBTreeStateDebugger()
         {
             Diagnostics.BehaviorTreeStateDebugger.Instance.Show();
         }
+
+        
 
         [MenuItem("Skill/Export to Skill Studio", false, 1001)]
         static void ShowExporter()
@@ -42,7 +50,7 @@ namespace Skill.Editor
         [MenuItem("Skill/About", false, 1002)]
         static void ShowAbout()
         {
-            AboutSkill.Instance.Show();
+            AboutSkill.Instance.ShowUtility();
         }
 
 
@@ -73,6 +81,20 @@ namespace Skill.Editor
 
 
         // commands
+
+        [MenuItem("Skill/Commands/Group %g")]
+        static void GroupObjects()
+        {
+            Skill.Editor.Tools.Commands.GroupObjects("Group");
+        }
+
+        [MenuItem("Skill/Commands/GroupDialog %#g")]
+        static void GroupObjectsWithName()
+        {
+            //ScriptableWizard.DisplayWizard<Skill.Editor.Tools.CreateGroupWizard>("Create Group", "Create", "Cancel");
+            Skill.Editor.Tools.CreateGroupDialog.Instance.ShowUtility();
+        }
+
         [MenuItem("Skill/Commands/Copy Transform")]
         static void CopyTransform()
         {
@@ -84,5 +106,7 @@ namespace Skill.Editor
         {
             Skill.Editor.Tools.Commands.PasteTransform();
         }
+
+
     }
 }
