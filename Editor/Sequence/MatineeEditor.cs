@@ -10,21 +10,21 @@ using Skill.Framework.Sequence;
 namespace Skill.Editor.Sequence
 {
     // editor of matinee
-    public class MatineeEditor : UnityEditor.EditorWindow
+    public class MatineeEditorWindow : UnityEditor.EditorWindow
     {
         #region Basic
-        private static MatineeEditor _Instance;        
-        public static MatineeEditor Instance
+        private static MatineeEditorWindow _Instance;        
+        public static MatineeEditorWindow Instance
         {
             get
             {
                 if (_Instance == null)
-                    _Instance = EditorWindow.CreateInstance<MatineeEditor>();
+                    _Instance = EditorWindow.CreateInstance<MatineeEditorWindow>();
                 return _Instance;
             }
         }
         
-        public MatineeEditor()
+        public MatineeEditorWindow()
         {
             base.wantsMouseMove = true; 
             base.title = "Matinee Editor";
@@ -114,6 +114,7 @@ namespace Skill.Editor.Sequence
         {
             Undo.undoRedoPerformed = Refresh;
             _Instance = this;
+            _RefreshStyles = true;
             this.CreateUI();
         }
 
@@ -742,5 +743,30 @@ namespace Skill.Editor.Sequence
         }
         #endregion
 
+    }
+
+
+
+    [CustomEditor(typeof(Matinee))]
+
+    public class MatineeEditor : UnityEditor.Editor
+    {
+        private Matinee _Matinee;
+        void OnEnable()
+        {            
+            _Matinee = (Matinee)target;
+        }
+
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+            EditorGUILayout.BeginVertical();
+            if (GUILayout.Button("Edit"))
+            {
+                MatineeEditorWindow.Instance.Show();
+                MatineeEditorWindow.Instance.Matinee = _Matinee;
+            }
+            EditorGUILayout.EndVertical();
+        }
     }
 }

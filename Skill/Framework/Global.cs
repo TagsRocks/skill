@@ -69,7 +69,7 @@ namespace Skill.Framework
         /// <param name="source">Source of sound</param>
         /// <param name="clip">Sound to play</param>
         /// <param name="category">Category of sound</param>
-        public virtual void PlayOneShot(AudioSource source, AudioClip clip, Skill.Framework.Sounds.SoundCategory category)
+        public virtual void PlayOneShot(AudioSource source, AudioClip clip, Skill.Framework.Audio.SoundCategory category)
         {
             if (source != null && clip != null)
             {

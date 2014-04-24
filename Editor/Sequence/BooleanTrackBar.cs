@@ -45,9 +45,9 @@ namespace Skill.Editor.Sequence
             protected override void Render()
             {
                 if (PropertyKey.ValueKey)
-                    _ImgState.Texture = MatineeResources.Textures.Checkbox_Checked;
+                    _ImgState.Texture = Resources.Textures.Matinee.Checkbox_Checked;
                 else
-                    _ImgState.Texture = MatineeResources.Textures.Checkbox_Unchecked;
+                    _ImgState.Texture = Resources.Textures.Matinee.Checkbox_Unchecked;
                 base.Render();
             }            
         }

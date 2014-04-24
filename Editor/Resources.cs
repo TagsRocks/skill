@@ -48,6 +48,28 @@ namespace Skill.Editor
             SetTextureImportType(GetResourcePath("UI/StepBackwardOn.png"), TextureImporterType.GUI);
             SetTextureImportType(GetResourcePath("UI/Loop.png"), TextureImporterType.GUI);
             SetTextureImportType(GetResourcePath("UI/LoopOn.png"), TextureImporterType.GUI);
+
+            SetTextureImportType(GetResourcePath("UI/Add.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetResourcePath("UI/Remove.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetResourcePath("UI/Save.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetResourcePath("UI/Arrow_Right.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetResourcePath("UI/SelectedEventBorder.png"), TextureImporterType.GUI);
+
+            SetTextureImportType(GetResourcePath("UI/Paste.png"), TextureImporterType.GUI);
+
+            SetTextureImportType(GetResourcePath("UI/Matinee/Folder.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetResourcePath("UI/Matinee/Sound.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetResourcePath("UI/Matinee/Event.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetResourcePath("UI/Matinee/Boolean.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetResourcePath("UI/Matinee/Integer.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetResourcePath("UI/Matinee/Float.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetResourcePath("UI/Matinee/Quaternion.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetResourcePath("UI/Matinee/Color.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetResourcePath("UI/Matinee/Vector2.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetResourcePath("UI/Matinee/Vector3.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetResourcePath("UI/Matinee/Vector4.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetResourcePath("UI/Matinee/Checkbox_Checked.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetResourcePath("UI/Matinee/Checkbox_Unchecked.png"), TextureImporterType.GUI);
         }
 
         /// <summary>
@@ -128,6 +150,13 @@ namespace Skill.Editor
             public static Texture2D Plus { get { return GetTexture("UI/Plus.png"); } }
             public static Texture2D PlusNext { get { return GetTexture("UI/PlusNext.png"); } }
             public static Texture2D Minus { get { return GetTexture("UI/Minus.png"); } }
+            public static Texture2D SelectedEventBorder { get { return GetTexture("UI/SelectedEventBorder.png"); } }
+            public static Texture2D Add { get { return GetTexture("UI/Add.png"); } }
+            public static Texture2D Remove { get { return GetTexture("UI/Remove.png"); } }
+            public static Texture2D Save { get { return GetTexture("UI/Save.png"); } }
+            public static Texture2D ArrowRight { get { return GetTexture("UI/Arrow_Right.png"); } }
+            public static Texture2D Paste { get { return GetTexture("UI/Paste.png"); } }
+
 
             #region Color Textures
             private static Texture2D _Red;
@@ -245,12 +274,31 @@ namespace Skill.Editor
             public static Texture2D StepBackward { get { return GetTexture("UI/StepBackward.png"); } }
             public static Texture2D StepBackwardOn { get { return GetTexture("UI/StepBackwardOn.png"); } }
             public static Texture2D Loop { get { return GetTexture("UI/Loop.png"); } }
-            public static Texture2D LoopOn { get { return GetTexture("UI/LoopOn.png"); } } 
+            public static Texture2D LoopOn { get { return GetTexture("UI/LoopOn.png"); } }
+            #endregion
+
+            #region Matinee
+            public static class Matinee
+            {
+                public static Texture2D Folder { get { return GetTexture("UI/Matinee/Folder.png"); } }
+                public static Texture2D Sound { get { return GetTexture("UI/Matinee/Sound.png"); } }
+                public static Texture2D Event { get { return GetTexture("UI/Matinee/Event.png"); } }
+                public static Texture2D Boolean { get { return GetTexture("UI/Matinee/Boolean.png"); } }
+                public static Texture2D Integer { get { return GetTexture("UI/Matinee/Integer.png"); } }
+                public static Texture2D Float { get { return GetTexture("UI/Matinee/Float.png"); } }
+                public static Texture2D Quaternion { get { return GetTexture("UI/Matinee/Quaternion.png"); } }
+                public static Texture2D Color { get { return GetTexture("UI/Matinee/Color.png"); } }
+                public static Texture2D Vector2 { get { return GetTexture("UI/Matinee/Vector2.png"); } }
+                public static Texture2D Vector3 { get { return GetTexture("UI/Matinee/Vector3.png"); } }
+                public static Texture2D Vector4 { get { return GetTexture("UI/Matinee/Vector4.png"); } }
+                public static Texture2D Checkbox_Checked { get { return GetTexture("UI/Matinee/Checkbox_Checked.png"); } }
+                public static Texture2D Checkbox_Unchecked { get { return GetTexture("UI/Matinee/Checkbox_Unchecked.png"); } }
+            }
             #endregion
 
         }
         public static class Styles
-        {            
+        {
             private static GUIStyle _SmallButton;
             public static GUIStyle SmallButton
             {
@@ -418,6 +466,115 @@ namespace Skill.Editor
                     return _LargeMiddleButton;
                 }
             }
+
+            private static GUIStyle _PreviewBackground;
+            public static GUIStyle PreviewBackground
+            {
+                get
+                {
+                    if (_PreviewBackground == null)
+                        _PreviewBackground = (GUIStyle)"PreBackground";
+                    return _PreviewBackground;
+                }
+            }
+
+
+            private static GUIStyle _TreeViewItem;
+            public static GUIStyle TreeViewItem
+            {
+                get
+                {
+                    if (_TreeViewItem == null)
+                    {
+                        _TreeViewItem = new GUIStyle();
+                        _TreeViewItem.imagePosition = ImagePosition.ImageLeft;
+                        _TreeViewItem.alignment = TextAnchor.MiddleLeft;
+                        _TreeViewItem.padding = new RectOffset(2, 2, 2, 2);
+                        _TreeViewItem.normal.textColor = Color.white;
+                    }
+                    return _TreeViewItem;
+                }
+            }
+
+            private static GUIStyle _HiddenTreeViewItem;
+            public static GUIStyle HiddenTreeViewItem
+            {
+                get
+                {
+                    if (_HiddenTreeViewItem == null)
+                    {
+                        _HiddenTreeViewItem = new GUIStyle(TreeViewItem);
+                        _HiddenTreeViewItem.normal.textColor = Color.gray;
+                    }
+                    return _HiddenTreeViewItem;
+                }
+            }
+
+
+            private static GUIStyle _EventLabel;
+            public static GUIStyle EventLabel
+            {
+                get
+                {
+                    if (_EventLabel == null)
+                    {
+                        _EventLabel = new GUIStyle();
+                        _EventLabel.clipping = TextClipping.Clip;
+                        _EventLabel.alignment = TextAnchor.UpperLeft;
+                        _EventLabel.padding = new RectOffset(2, 2, 2, 2);
+                        _EventLabel.normal.textColor = Color.white;
+                    }
+                    return _EventLabel;
+                }
+            }
+
+            private static GUIStyle _SelectedEventBorder;
+            public static GUIStyle SelectedEventBorder
+            {
+                get
+                {
+                    if (_SelectedEventBorder == null)
+                    {
+                        _SelectedEventBorder = new GUIStyle();
+                        _SelectedEventBorder.normal.background = Textures.SelectedEventBorder;
+                        _SelectedEventBorder.border = new RectOffset(2, 2, 2, 2);
+                        _SelectedEventBorder.overflow = new RectOffset(1, 1, 1, 1);
+
+                    }
+                    return _SelectedEventBorder;
+                }
+            }
+        }
+
+        public static Texture2D FlipHorizontalFrom(Texture2D texture)
+        {
+            Texture2D result = new Texture2D(texture.width, texture.height, texture.format, false);
+            Color[] colors = texture.GetPixels(0, 0, texture.width, texture.height, 0);
+
+            for (int i = 0; i < result.height; i++)
+            {
+                for (int j = 0; j < result.width / 2; j++)
+                {
+                    int j2 = result.width - j;
+                    Color temp = colors[j];
+                    colors[j] = colors[j2];
+                    colors[j2] = temp;
+                }
+            }
+            result.SetPixels(colors);
+            result.Apply();
+            return result;
+        }
+
+        public static void SaveTexture(Texture2D texture, string address)
+        {
+            byte[] bytes = texture.EncodeToPNG();
+
+            System.IO.FileStream fs = new System.IO.FileStream(address, System.IO.FileMode.CreateNew);
+            System.IO.BinaryWriter w = new System.IO.BinaryWriter(fs);
+            w.Write(bytes);
+            w.Close();
+            fs.Close();
         }
     }
 }

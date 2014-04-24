@@ -651,7 +651,7 @@ namespace Skill.Framework.UI
         /// </remarks>
         public virtual void HandleEvent(Event e)
         {
-            if (IsInScrollView && !IsHandlingEventInternal) return;
+            if (IsInScrollView && !IsHandlingEventInternal || !IsEnabled) return;
             if (e != null)
             {
                 if (WantsMouseEvents)
@@ -901,27 +901,9 @@ namespace Skill.Framework.UI
         // Variables
         private EventHandler _LayoutChangeHandler;
         private List<BaseControl> _Items;
-
-
+        private List<BaseControl> _ImmediateChangeItems;
         // the following variables defined to avoid modification of collection during render        
-        private int _IsChangeHappens;
-        enum CollectionChangeType
-        {
-            Add,
-            Remove,
-            Insert,
-            BringToFront,
-            BringToBack,
-        }
-
-        class CollectionChange
-        {
-            public BaseControl Control;
-            public CollectionChangeType ChangeType;
-            public int Index;
-        }
-
-        private List<CollectionChange> _Changes;
+        private bool _IsChanged;
 
         // Events
 
@@ -949,51 +931,20 @@ namespace Skill.Framework.UI
         internal BaseControlCollection(Panel panel)
         {
             this.Panel = panel;
-            this._Changes = new List<CollectionChange>();
             this._Items = new List<BaseControl>();
+            this._ImmediateChangeItems = new List<BaseControl>();
             this._LayoutChangeHandler = Control_LayoutChange;
-            this._IsChangeHappens = 0;
+            this._IsChanged = false;
 
         }
 
-        internal void BeginChanges()
+        private void ApplyChanges()
         {
-            _IsChangeHappens++;
-        }
-
-        internal void EndChanges(bool force = false)
-        {
-            _IsChangeHappens--;
-            if (force)
-                _IsChangeHappens = 0;
-
-            if (_IsChangeHappens == 0)
+            if (_IsChanged)
             {
-                if (_Changes.Count > 0)
-                {
-                    for (int i = 0; i < _Changes.Count; i++)
-                    {
-                        switch (_Changes[i].ChangeType)
-                        {
-                            case CollectionChangeType.Add:
-                                Add(_Changes[i].Control);
-                                break;
-                            case CollectionChangeType.Remove:
-                                Remove(_Changes[i].Control);
-                                break;
-                            case CollectionChangeType.Insert:
-                                Insert(_Changes[i].Index, _Changes[i].Control);
-                                break;
-                            case CollectionChangeType.BringToFront:
-                                BringToFront(_Changes[i].Control);
-                                break;
-                            case CollectionChangeType.BringToBack:
-                                BringToBack(_Changes[i].Control);
-                                break;
-                        }
-                    }
-                    _Changes.Clear();
-                }
+                _Items.Clear();
+                _Items.AddRange(_ImmediateChangeItems);
+                _IsChanged = false;
             }
         }
 
@@ -1009,7 +960,7 @@ namespace Skill.Framework.UI
         /// <returns>Control at specified index</returns>
         public BaseControl this[int index]
         {
-            get { return _Items[index]; }
+            get { return _ImmediateChangeItems[index]; }
         }
 
 
@@ -1021,19 +972,14 @@ namespace Skill.Framework.UI
         {
             if (control == null)
                 throw new ArgumentNullException("BaseControl is null");
-            if (_Items.Contains(control)) return;
+            if (_ImmediateChangeItems.Contains(control)) return;
 
-            if (_IsChangeHappens > 0)
-            {
-                _Changes.Add(new CollectionChange() { ChangeType = CollectionChangeType.Add, Control = control });
-            }
-            else
-            {
-                _Items.Add(control);
-                control.Parent = Panel;
-                control.LayoutChanged += _LayoutChangeHandler;
-                OnLayoutChange();
-            }
+            _ImmediateChangeItems.Add(control);
+            _IsChanged = true;
+            control.Parent = Panel;
+            control.LayoutChanged += _LayoutChangeHandler;
+            OnLayoutChange();
+
         }
 
         /// <summary>
@@ -1045,18 +991,13 @@ namespace Skill.Framework.UI
         {
             if (control == null)
                 throw new ArgumentNullException("BaseControl is null");
-            if (_Items.Contains(control)) return;
-            if (_IsChangeHappens > 0)
-            {
-                _Changes.Add(new CollectionChange() { ChangeType = CollectionChangeType.Insert, Control = control, Index = index });
-            }
-            else
-            {
-                _Items.Insert(index, control);
-                control.Parent = Panel;
-                control.LayoutChanged += _LayoutChangeHandler;
-                OnLayoutChange();
-            }
+            if (_ImmediateChangeItems.Contains(control)) return;
+            _ImmediateChangeItems.Insert(index, control);
+            _IsChanged = true;
+            control.Parent = Panel;
+            control.LayoutChanged += _LayoutChangeHandler;
+            OnLayoutChange();
+
         }
 
         /// <summary>
@@ -1064,12 +1005,13 @@ namespace Skill.Framework.UI
         /// </summary>
         public void Clear()
         {
-            foreach (var c in _Items)
+            foreach (var c in _ImmediateChangeItems)
             {
                 c.Parent = null;
                 c.LayoutChanged -= _LayoutChangeHandler;
             }
-            _Items.Clear();
+            _ImmediateChangeItems.Clear();
+            _IsChanged = true;
             OnLayoutChange();
         }
 
@@ -1080,7 +1022,7 @@ namespace Skill.Framework.UI
         /// <returns> true if Control is found in the collection; otherwise, false.</returns>
         public bool Contains(BaseControl control)
         {
-            return _Items.Contains(control);
+            return _ImmediateChangeItems.Contains(control);
         }
 
         /// <summary>
@@ -1098,7 +1040,7 @@ namespace Skill.Framework.UI
         /// </exception>
         public void CopyTo(BaseControl[] array, int arrayIndex)
         {
-            _Items.CopyTo(array, arrayIndex);
+            _ImmediateChangeItems.CopyTo(array, arrayIndex);
         }
 
         /// <summary>
@@ -1106,7 +1048,7 @@ namespace Skill.Framework.UI
         /// </summary>
         public int Count
         {
-            get { return _Items.Count; }
+            get { return _ImmediateChangeItems.Count; }
         }
         /// <summary>
         /// Gets a value indicating whether the collection is read-only.
@@ -1126,22 +1068,15 @@ namespace Skill.Framework.UI
         /// </returns>
         public bool Remove(BaseControl control)
         {
-            if (_IsChangeHappens > 0)
+            if (_ImmediateChangeItems.Remove(control))
             {
-                _Changes.Add(new CollectionChange() { ChangeType = CollectionChangeType.Remove, Control = control });
-                return _Items.Contains(control);
+                _IsChanged = true;
+                control.Parent = null;
+                control.LayoutChanged -= _LayoutChangeHandler;
+                OnLayoutChange();
+                return true;
             }
-            else
-            {
-                if (_Items.Remove(control))
-                {
-                    control.Parent = null;
-                    control.LayoutChanged -= _LayoutChangeHandler;
-                    OnLayoutChange();
-                    return true;
-                }
-                return false;
-            }
+            return false;
         }
 
 
@@ -1151,6 +1086,7 @@ namespace Skill.Framework.UI
         /// <returns>A IEnumerator;ltBaseControl;gt that can be used to iterate through the collection.</returns>
         public IEnumerator<BaseControl> GetEnumerator()
         {
+            ApplyChanges();
             return _Items.GetEnumerator();
         }
 
@@ -1160,6 +1096,7 @@ namespace Skill.Framework.UI
         /// <returns>An System.Collections.IEnumerator object that can be used to iterate through the collection. </returns>
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
+            ApplyChanges();
             return (_Items as System.Collections.IEnumerable).GetEnumerator();
         }
 
@@ -1170,19 +1107,13 @@ namespace Skill.Framework.UI
         /// <param name="control">BaseControl to bring to front</param>
         internal void BringToFront(BaseControl control)
         {
-            if (_IsChangeHappens > 0)
+            int index = _ImmediateChangeItems.IndexOf(control);
+            if (index >= 0)
             {
-                _Changes.Add(new CollectionChange() { ChangeType = CollectionChangeType.BringToFront, Control = control });
-            }
-            else
-            {
-                int index = _Items.IndexOf(control);
-                if (index >= 0)
-                {
-                    for (int i = index; i < Count - 1; i++)
-                        _Items[i] = _Items[i + 1];
-                    _Items[Count - 1] = control;
-                }
+                for (int i = index; i < Count - 1; i++)
+                    _ImmediateChangeItems[i] = _ImmediateChangeItems[i + 1];
+                _ImmediateChangeItems[Count - 1] = control;
+                _IsChanged = true;
             }
         }
 
@@ -1192,19 +1123,13 @@ namespace Skill.Framework.UI
         /// <param name="control">BaseControl to bring to back</param>
         internal void BringToBack(BaseControl control)
         {
-            if (_IsChangeHappens > 0)
+            int index = _ImmediateChangeItems.IndexOf(control);
+            if (index >= 0)
             {
-                _Changes.Add(new CollectionChange() { ChangeType = CollectionChangeType.BringToBack, Control = control });
-            }
-            else
-            {
-                int index = _Items.IndexOf(control);
-                if (index >= 0)
-                {
-                    for (int i = index; i > 0; i--)
-                        _Items[i] = _Items[i - 1];
-                    _Items[0] = control;
-                }
+                for (int i = index; i > 0; i--)
+                    _ImmediateChangeItems[i] = _ImmediateChangeItems[i - 1];
+                _ImmediateChangeItems[0] = control;
+                _IsChanged = true;
             }
         }
 
@@ -1218,17 +1143,8 @@ namespace Skill.Framework.UI
         /// </returns>
         public int IndexOf(BaseControl control)
         {
-            return _Items.IndexOf(control);
+            return _ImmediateChangeItems.IndexOf(control);
         }
-
-        //internal void SetScaleFactor(float scaleFactor)
-        //{
-        //    foreach (var c in _Items)
-        //    {
-        //        if (c != null)
-        //            c.ScaleFactor = scaleFactor;
-        //    }
-        //}
     }
     #endregion
 

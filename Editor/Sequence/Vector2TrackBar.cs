@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Skill.Framework.Sequence;
+using Skill.Editor.UI.Extended;
 
 namespace Skill.Editor.Sequence
 {
@@ -82,7 +83,7 @@ namespace Skill.Editor.Sequence
                 }
             }
 
-            protected override Properties CreateProperties() { return new Vector2KeyViewProperties(this); }
+            protected override PropertiesPanel CreateProperties() { return new Vector2KeyViewProperties(this); }
 
             private Vector2Key _Vector2Key;
             public Vector2KeyView(Vector2TrackBar trackbar, IPropertyKey<Vector2> key)

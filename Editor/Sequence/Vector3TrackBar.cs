@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Skill.Framework.Sequence;
+using Skill.Editor.UI.Extended;
 
 namespace Skill.Editor.Sequence
 {
@@ -87,7 +88,7 @@ namespace Skill.Editor.Sequence
                 }
             }
 
-            protected override Properties CreateProperties() { return new Vector3KeyViewProperties(this); }
+            protected override PropertiesPanel CreateProperties() { return new Vector3KeyViewProperties(this); }
 
             private Vector3Key _Vector3Key;
             public Vector3KeyView(Vector3TrackBar trackbar, IPropertyKey<Vector3> key)

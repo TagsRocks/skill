@@ -105,8 +105,7 @@ namespace Skill.Framework.UI
                 UpdateLayout();
                 CalcDesiredSize();
                 _NeedUpdateLayout = false;
-            }
-            Controls.BeginChanges();
+            }            
         }
 
         private void CalcDesiredSize()
@@ -149,14 +148,7 @@ namespace Skill.Framework.UI
             {
                 c.OnGUI();
             }
-        }
-
-        /// <summary> End Render control's content </summary>
-        protected override void EndRender()
-        {
-            base.EndRender();
-            Controls.EndChanges(true);
-        }
+        }     
 
 
 
@@ -468,9 +460,7 @@ namespace Skill.Framework.UI
         {
             if (IsInScrollView && !IsHandlingEventInternal) return;
             if (e != null && e.type != EventType.Used)
-            {
-                Controls.BeginChanges();
-
+            {                
                 for (int i = Controls.Count - 1; i >= 0; i--)
                 {
                     var c = Controls[i];
@@ -484,9 +474,7 @@ namespace Skill.Framework.UI
                     }
                 }
                 if (e.type != EventType.Used)
-                    base.HandleEvent(e);
-
-                Controls.EndChanges();
+                    base.HandleEvent(e);                
             }
 
         }

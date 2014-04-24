@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Skill.Framework.Sequence;
+using Skill.Editor.UI.Extended;
 
 namespace Skill.Editor.Sequence
 {
@@ -53,7 +54,7 @@ namespace Skill.Editor.Sequence
             }
             public override string Title { get { return "Float Event"; } }
 
-            protected override Properties CreateProperties() { return new FloatKeyViewProperties(this); }
+            protected override PropertiesPanel CreateProperties() { return new FloatKeyViewProperties(this); }
 
             private float _MinWidth;
             private float _PreValue;

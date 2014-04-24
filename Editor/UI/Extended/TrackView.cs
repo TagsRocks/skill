@@ -60,7 +60,7 @@ namespace Skill.Editor.UI.Extended
             this.WantsMouseEvents = true;
             this._TimeLine = timeLine;
             this._MouseButton = -1;
-            this._ZoomSpeed = 0.1f;
+            this._ZoomSpeed = 2.0f;
             this.ThumbColor = new Color(1.0f, 0.0f, 0.0f, 0.8f);
             this.ShowSelectionTime = true;
             this.SelectionTimeColor = new Color(1.0f, 0.1f, 0.0f, 0.3f);
@@ -93,7 +93,7 @@ namespace Skill.Editor.UI.Extended
             }
 
             _ViewRect.yMax = y;
-            _ViewRect.height = Mathf.Max(ra.height, _ViewRect.height);
+            _ViewRect.height = Mathf.Max(ra.height - ScrollbarThickness + 1, _ViewRect.height);
 
         }
 
@@ -155,26 +155,29 @@ namespace Skill.Editor.UI.Extended
             if (ShowSelectionTime && TimeLine.SelectionLenght > 0)
             {
                 Rect rect = ra;
-                rect.x += (float)((TimeLine.StartSelection - TimeLine.StartVisible) * dPx);
-                rect.width = (float)(TimeLine.SelectionLenght * dPx);
-                rect.height -= ScrollbarThickness;
-                if (!(rect.xMax < 0 || rect.xMin > ra.xMax))
+                if (TimeLine.StartVisible < TimeLine.EndSelection && TimeLine.EndVisible > TimeLine.StartSelection)
                 {
-                    if (rect.x < ra.x)
-                    {
-                        float delta = ra.x - rect.x;
-                        rect.x += delta;
-                        rect.width -= delta;
-                    }
-                    if (rect.xMax > ra.xMax)
-                    {
-                        rect.xMax = ra.xMax;
-                    }
 
-                    GUI.color = SelectionTimeColor;
-                    GUI.DrawTexture(rect, UnityEditor.EditorGUIUtility.whiteTexture, ScaleMode.StretchToFill);
+                    rect.x += (float)((TimeLine.StartSelection - TimeLine.StartVisible) * dPx);
+                    rect.width = (float)(TimeLine.SelectionLenght * dPx);
+                    rect.height -= ScrollbarThickness;
+                    if (!(rect.xMax < 0 || rect.xMin > ra.xMax))
+                    {
+                        if (rect.x < ra.x)
+                        {
+                            float delta = ra.x - rect.x;
+                            rect.x += delta;
+                            rect.width -= delta;
+                        }
+                        if (rect.xMax > ra.xMax)
+                        {
+                            rect.xMax = ra.xMax;
+                        }
+
+                        GUI.color = SelectionTimeColor;
+                        GUI.DrawTexture(rect, UnityEditor.EditorGUIUtility.whiteTexture, ScaleMode.StretchToFill);
+                    }
                 }
-
                 rect.xMin = ra.x + ScrollbarThickness + (float)(((TimeLine.StartSelection - TimeLine.MinTime) / (TimeLine.MaxTime - TimeLine.MinTime)) * width2);
                 rect.xMax = ra.x + ScrollbarThickness + (float)(((TimeLine.EndSelection - TimeLine.MinTime) / (TimeLine.MaxTime - TimeLine.MinTime)) * width2);
                 rect.yMin = ra.yMax - ScrollbarThickness + 2;
@@ -182,6 +185,7 @@ namespace Skill.Editor.UI.Extended
 
                 GUI.color = SelectionTimeColor;
                 GUI.DrawTexture(rect, UnityEditor.EditorGUIUtility.whiteTexture, ScaleMode.StretchToFill);
+
             }
             #endregion
 
@@ -221,13 +225,15 @@ namespace Skill.Editor.UI.Extended
                     {
                         if (e.button == 2) // middle
                         {
-                            double deltaTime = (-e.delta.x * _TimeLine.ZoomFactor) / _ViewRect.width;
+                            double dx = -e.delta.x;
+                            double deltaTime = (dx / RenderAreaShrinksByPadding.width) * (_EndVisibleTime - _StartVisibleTime);
                             _TimeLine.Scroll(deltaTime);
                             e.Use();
                         }
                         else if (e.button == 1) // right
                         {
-                            double deltaTime = e.delta.x / _TimeLine.ZoomFactor * _ZoomSpeed;
+                            double dx = -e.delta.x;
+                            double deltaTime = (dx / RenderAreaShrinksByPadding.width) * (_EndVisibleTime - _StartVisibleTime) * _ZoomSpeed;
                             _TimeLine.Zoom(deltaTime);
                             e.Use();
                         }

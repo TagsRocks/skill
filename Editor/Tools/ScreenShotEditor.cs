@@ -9,8 +9,7 @@ namespace Skill.Editor.Tools
     [CustomEditor(typeof(ScreenShot))]
     public class ScreenShotEditor : UnityEditor.Editor
     {
-        private const int FrameHeight = 50;
-
+        private const int FrameHeight = 50;        
         private Skill.Framework.UI.Frame _Frame;
         private Skill.Editor.UI.ToggleButton _BtnCustomSize;
         private Skill.Editor.UI.IntField _IFieldWidth;

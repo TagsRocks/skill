@@ -100,22 +100,22 @@ namespace Skill.Framework
                 return sampleRate;
             }
 
-            public float GetVolume(Skill.Framework.Sounds.SoundCategory category)
+            public float GetVolume(Skill.Framework.Audio.SoundCategory category)
             {
                 float volume = 1.0f;
 
                 switch (category)
                 {
-                    case Skill.Framework.Sounds.SoundCategory.FX:
+                    case Skill.Framework.Audio.SoundCategory.FX:
                         volume = FxVolume;
                         break;
-                    case Skill.Framework.Sounds.SoundCategory.Music:
+                    case Skill.Framework.Audio.SoundCategory.Music:
                         volume = MusicVolume;
                         break;
-                    case Skill.Framework.Sounds.SoundCategory.Voice:
+                    case Skill.Framework.Audio.SoundCategory.Voice:
                         volume = VoiceVolume;
                         break;
-                    case Skill.Framework.Sounds.SoundCategory.Cinematic:
+                    case Skill.Framework.Audio.SoundCategory.Cinematic:
                         volume = CinematicVolume;
                         break;
                     default:

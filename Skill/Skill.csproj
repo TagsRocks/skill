@@ -60,6 +60,12 @@
     <Compile Include="Framework\Animation\BlendWeight.cs" />
     <Compile Include="Framework\Animation\Vector3Keyframes.cs" />
     <Compile Include="Framework\Animation\RootMotion.cs" />
+    <Compile Include="Framework\Audio\AudioSubtitle.cs" />
+    <Compile Include="Framework\Dictionary.cs" />
+    <Compile Include="Framework\DictionaryData.cs" />
+    <Compile Include="Framework\Audio\SubRendererGUIText.cs" />
+    <Compile Include="Framework\Audio\SubRendererOnGUI.cs" />
+    <Compile Include="Framework\Audio\SubtitleRenderer.cs" />
     <Compile Include="Framework\AvoidScreenSleep.cs" />
     <Compile Include="Framework\CameraShake.cs" />
     <Compile Include="Framework\CameraShakeParams.cs" />
@@ -133,7 +139,7 @@
     <Compile Include="Framework\Rendering\RandomizeBeam.cs" />
     <Compile Include="Framework\Rendering\WaveBeam.cs" />
     <Compile Include="Framework\SlowMotionController.cs" />
-    <Compile Include="Framework\Sounds\SoundVolume.cs" />
+    <Compile Include="Framework\Audio\SoundVolume.cs" />
     <Compile Include="Framework\SpawnAsset.cs" />
     <Compile Include="Framework\Spawner.cs" />
     <Compile Include="Framework\SpawnObject.cs" />
@@ -160,10 +166,10 @@
     <Compile Include="Framework\Modules\Vehicles\PuncturableChassis.cs" />
     <Compile Include="Framework\Modules\Vehicles\PuncturableWheel.cs" />
     <Compile Include="Framework\Settings.cs" />
-    <Compile Include="Framework\Sounds\PitchController.cs" />
-    <Compile Include="Framework\Sounds\RandomSound.cs" />
-    <Compile Include="Framework\Sounds\SoundCategory.cs" />
-    <Compile Include="Framework\Sounds\PitchListener.cs" />
+    <Compile Include="Framework\Audio\PitchController.cs" />
+    <Compile Include="Framework\Audio\RandomSound.cs" />
+    <Compile Include="Framework\Audio\SoundCategory.cs" />
+    <Compile Include="Framework\Audio\PitchListener.cs" />
     <Compile Include="Framework\StaticBehaviour.cs" />
     <Compile Include="Framework\Smoothing.cs" />
     <Compile Include="Framework\Text\CharInfo.cs" />

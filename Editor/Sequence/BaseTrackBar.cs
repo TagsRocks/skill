@@ -71,9 +71,9 @@ namespace Skill.Editor.Sequence
     /// </summary>
     public abstract class EventView : TimeLineEvent, IProperties
     {
-        private Properties _Properties;
+        private PropertiesPanel _Properties;
         /// <summary> Properties </summary>
-        public Properties Properties
+        public PropertiesPanel Properties
         {
             get
             {
@@ -83,7 +83,7 @@ namespace Skill.Editor.Sequence
             }
         }
 
-        protected virtual Properties CreateProperties()
+        protected virtual PropertiesPanel CreateProperties()
         {
             return new EventProperties(this);
         }
@@ -154,9 +154,9 @@ namespace Skill.Editor.Sequence
             // show properties when used select this event 
             if (args.Button == Skill.Framework.UI.MouseButton.Left)
             {
-                if (MatineeEditor.Instance != null)
+                if (MatineeEditorWindow.Instance != null)
                 {
-                    MatineeEditor.Instance.PropertyGrid.SelectedObject = this;
+                    MatineeEditorWindow.Instance.PropertyGrid.SelectedObject = this;
                 }
             }
             base.OnMouseDown(args);
@@ -170,7 +170,7 @@ namespace Skill.Editor.Sequence
             base.Render();
             if (IsSelectedProperties)
                 // draw a border around event to show selected
-                GUI.Box(RenderArea, string.Empty, MatineeResources.Styles.SelectedEventBorder);
+                GUI.Box(RenderArea, string.Empty, Resources.Styles.SelectedEventBorder);
         }
 
     }

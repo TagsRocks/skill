@@ -90,7 +90,7 @@ namespace Skill.Editor.Tools
         {
             Transform[] transforms = Selection.transforms;
             if (transforms != null && transforms.Length > 0)
-            {                
+            {
                 GameObject group = new GameObject(groupName);
                 Vector3 center = transforms[0].position;
                 for (int i = 1; i < transforms.Length; i++)
@@ -105,6 +105,24 @@ namespace Skill.Editor.Tools
             {
                 Debug.LogError("No selected objects to group.");
             }
-        }        
+        }
+
+
+        /// <summary>
+        /// Create child GameObject
+        /// </summary>
+        public static void CreateEmptyChild(string objectName)
+        {
+            GameObject obj = new GameObject(objectName);
+            Transform[] transforms = Selection.transforms;
+            if (transforms != null && transforms.Length == 1)
+            {
+                obj.transform.parent = transforms[0];
+                obj.transform.localPosition = Vector3.zero;
+                obj.transform.localRotation = Quaternion.identity;
+            }
+
+            Undo.RegisterCreatedObjectUndo(obj, "Create empty GameObject");
+        }
     }
 }

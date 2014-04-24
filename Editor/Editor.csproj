@@ -55,13 +55,23 @@
     <Compile Include="Sequence\BooleanTrackBar.cs" />
     <Compile Include="Sequence\ColorTrackBar.cs" />
     <Compile Include="Sequence\EventTrackBar.cs" />
-    <Compile Include="Sequence\ExposeProperties.cs" />
+    <Compile Include="Tools\AudioClipSubtitleEditor.cs" />
+    <Compile Include="Tools\AudioSubtitleEditor.cs" />
+    <Compile Include="Tools\AudioSubtitleEditorWindow.cs" />
+    <Compile Include="Tools\DictionaryDataEditor.cs" />
+    <Compile Include="Tools\DictionaryDataEditorWindow.cs" />
+    <Compile Include="Tools\DictionaryDataTranslateWindow.cs" />
+    <Compile Include="Tools\PasteTextField.cs" />
+    <Compile Include="Tools\PickTextWindow.cs" />
+    <Compile Include="UI\Extended\AudioClipCurveData.cs" />
+    <Compile Include="UI\Extended\AudioPreviewCurve.cs" />
+    <Compile Include="UI\Extended\AudioPreviewImage.cs" />
+    <Compile Include="UI\Extended\ExposeProperties.cs" />
     <Compile Include="Sequence\FloatTrackBar.cs" />
     <Compile Include="Sequence\IntegerTrackBar.cs" />
     <Compile Include="Sequence\MatineeEditor.cs" />
-    <Compile Include="Sequence\MatineeResources.cs" />
-    <Compile Include="Sequence\MediaButton.cs" />
-    <Compile Include="Sequence\PropertyGrid.cs" />
+    <Compile Include="UI\Extended\MediaButton.cs" />
+    <Compile Include="UI\Extended\PropertyGrid.cs" />
     <Compile Include="Sequence\PropertyTrackBar.cs" />
     <Compile Include="Sequence\PropertyTrackProperties.cs" />
     <Compile Include="Sequence\QuaternionTrackBar.cs" />
@@ -78,6 +88,7 @@
     <Compile Include="Tools\CacheObjectField.cs" />
     <Compile Include="Tools\CacheGroupEditor.cs" />
     <Compile Include="Tools\ChildCounterEditor.cs" />
+    <Compile Include="Tools\CreateEmptyChildObjectDialog.cs" />
     <Compile Include="Tools\CreateGroupDialog.cs" />
     <Compile Include="Tools\CRSpline3DEditor.cs" />
     <Compile Include="Tools\Curve3DEditor.cs" />
@@ -164,15 +175,15 @@
     <Compile Include="UI\Vector4Field.cs" />
     <Compile Include="UI\VerticalExpander.cs" />
     <Compile Include="UI\Extended\XYZComponent.cs" />
-    <Compile Include="Windows\AboutSkill.cs" />
+    <Compile Include="AboutSkill.cs" />
     <Compile Include="Tools\AnimationCopy.cs" />
     <Compile Include="Diagnostics\BehaviorTreeStateDebugger.cs" />
-    <Compile Include="Windows\Exporter.cs" />
+    <Compile Include="Exporter.cs" />
     <Compile Include="Tools\ImplantEditor.cs" />
     <Compile Include="Tools\ImplantObjectField.cs" />
-    <Compile Include="Windows\LineDrawer.cs" />
-    <Compile Include="Windows\ScriptableObjectUtility.cs" />
-    <Compile Include="Windows\SkillMenu.cs" />
+    <Compile Include="LineDrawer.cs" />
+    <Compile Include="ScriptableObjectUtility.cs" />
+    <Compile Include="SkillMenu.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -186,12 +197,18 @@
       <Name>DataModels</Name>
     </ProjectReference>
     <ProjectReference Include="..\Skill\Skill.csproj">
-      <Project>{5AAE3714-704C-4150-91FE-B73B05808D14}</Project>
+      <Project>{5aae3714-704c-4150-91fe-b73b05808d14}</Project>
       <Name>Skill</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\UI\Action.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Add.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Arrow_Right.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\UI\Colors\Black.png">
@@ -260,7 +277,10 @@
     <Content Include="Resources\UI\Matinee\Quaternion.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Matinee\SelectedEventBorder.png">
+    <Content Include="Resources\UI\Paste.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\SelectedEventBorder.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\UI\Matinee\Sound.png">
@@ -296,7 +316,13 @@
     <Content Include="Resources\UI\PlusNext.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\UI\Remove.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\UI\Running.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\Save.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\UI\SelectedItemBg.png">

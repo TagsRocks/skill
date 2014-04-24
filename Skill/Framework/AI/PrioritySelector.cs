@@ -73,11 +73,21 @@ namespace Skill.Framework.AI
                     RunningChildIndex = -1;
                 if (result == BehaviorResult.Success)
                 {
+                    ResetNext(i, status);
                     break;
                 }
             }
             return result;
-        }        
+        }
+
+        private void ResetNext(int index, BehaviorTreeStatus status)
+        {
+            for (int i = index + 1; i < ChildCount; i++)
+            {
+                BehaviorContainer node = this[i];
+                node.Behavior.ResetBehavior(status);
+            }
+        }         
     }
     #endregion    
 }

@@ -95,5 +95,10 @@ namespace Skill.Editor.Tools
         {
             _Instance = null;
         }
+
+        void OnEnable()
+        {
+            base.position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);
+        }
     }
 }

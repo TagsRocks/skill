@@ -11,7 +11,7 @@ namespace Skill.Editor.Tools
         #region Variables
         private static Vector2 Size = new Vector2(340, 220);
         private static Distance _Instance;
-        private Skill.Framework.Modules.Meter _Meter;
+        private Skill.Framework.Modules.Meter _Meter;        
         #endregion
 
         #region Properties

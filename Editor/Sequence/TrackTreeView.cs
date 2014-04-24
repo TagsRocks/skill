@@ -9,11 +9,11 @@ namespace Skill.Editor.Sequence
     public class TrackTreeView : Skill.Framework.UI.Grid
     {
         private TreeView _TreeView;
-        private MatineeEditor _Editor;
+        private MatineeEditorWindow _Editor;
         private TrackGroupContextMenu _TrackGroupContextMenu;
         private TrackItemContextMenu _TrackItemContextMenu;
         private Skill.Framework.UI.Label _Title;
-        internal TrackTreeView(MatineeEditor editor)
+        internal TrackTreeView(MatineeEditorWindow editor)
         {
             this._Editor = editor;
             RowDefinitions.Add(18, Skill.Framework.UI.GridUnitType.Pixel);

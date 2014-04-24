@@ -207,8 +207,8 @@ namespace Skill.Framework
             }
             else
             {
-                rotation = transform.rotation;
-                position = transform.position;
+                rotation = _Transform.rotation;
+                position = _Transform.position;
             }
 
             if (SpawnRadius > 0)

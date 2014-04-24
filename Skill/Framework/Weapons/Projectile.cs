@@ -86,5 +86,8 @@ namespace Skill.Framework.Weapons
         public int Ammo { get; set; }
         /// <summary> Total number of ammo </summary>
         public int TotalAmmo { get { return ClipAmmo + Ammo; } }
+
+
+        internal Vector3 SpawnPosition { get; set; }
     }
 }

@@ -12,7 +12,7 @@ namespace Skill.Editor.Tools
         private CRSpline3D _Path;
 
         private Skill.Framework.UI.Frame _Frame;
-        private ChangeCheck _ChangeCheck;
+        private ChangeCheck _ChangeCheck;        
 
         private Button _BtnAdd;
         private Button _BtnRemove;

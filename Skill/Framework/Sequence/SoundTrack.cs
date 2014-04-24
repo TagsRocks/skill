@@ -43,13 +43,21 @@ namespace Skill.Framework.Sequence
 
         [HideInInspector]
         [SerializeField]
-        public Skill.Framework.Sounds.SoundCategory Category = Skill.Framework.Sounds.SoundCategory.Cinematic;
+        public Skill.Framework.Audio.SoundCategory Category = Skill.Framework.Audio.SoundCategory.Cinematic;
+
+        [HideInInspector]
+        [SerializeField]
+        public bool PlayOneShot = false;
+
 
         [ExposeProperty(0, "Source", "Source AudioSource")]
         public AudioSource ExSource { get { return Source; } set { Source = value; } }
 
         [ExposeProperty(1, "Category", "Sound Category")]
-        public Skill.Framework.Sounds.SoundCategory ExCategory { get { return Category; } set { Category = value; } }
+        public Skill.Framework.Audio.SoundCategory ExCategory { get { return Category; } set { Category = value; } }
+
+        [ExposeProperty(2, "PlayOneShot", "user PlayOneShot method")]
+        public bool ExPlayOneShot { get { return PlayOneShot; } set { PlayOneShot = value; } }
 
         // to avoid show in PropertyGrid
         public new AudioClip ExDefaultValue { get; set; }
@@ -68,10 +76,31 @@ namespace Skill.Framework.Sequence
                 float volume = 1.0f;
                 if (Skill.Framework.Global.Instance != null)
                     volume = Skill.Framework.Global.Instance.Settings.Audio.GetVolume(Category);
-                Source.PlayOneShot(sKey.ValueKey, volume * sKey.VolumeFactor);
+                if (PlayOneShot)
+                {
+                    Source.PlayOneShot(sKey.ValueKey, volume * sKey.VolumeFactor);
+                }
+                else
+                {
+                    if (Source.isPlaying) Source.Stop();
+                    Source.clip = sKey.Clip;
+                    Source.Play();
+                }
+                if (Audio.AudioSubtitle.Instance != null)
+                    Audio.AudioSubtitle.Instance.Show(sKey.ValueKey);
             }
         }
 
+        protected override void SetValue(AudioClip value) { /* nothing to set */}
         protected override void Evaluate(IPropertyKey<AudioClip> key) { /* nothing */ }
+
+
+        public override void Stop()
+        {
+            if (Source != null)
+                Source.Stop();
+            Source.clip = null;
+            base.Stop();
+        }
     }
 }

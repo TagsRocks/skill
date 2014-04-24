@@ -94,7 +94,7 @@ namespace Skill.Editor.UI.Extended
             this._SampleText = new GUIContent() { text = "00.000" };
 
 
-                       
+
 
             this._LineColor = this._LabelStyle.normal.textColor;
             this._LineThickness = 1.0f;
@@ -215,26 +215,29 @@ namespace Skill.Editor.UI.Extended
             #region Draw Selection time
             if (ShowSelectionTime && TimeLine.SelectionLenght > 0)
             {
-                Rect rect = ra;
-                rect.x += (float)((TimeLine.StartSelection - TimeLine.StartVisible) * _DPx);
-                rect.width = (float)(TimeLine.SelectionLenght * _DPx);
-
-
-                if (!(rect.xMax < 0 || rect.xMin > ra.xMax))
+                if (TimeLine.StartVisible < TimeLine.EndSelection && TimeLine.EndVisible > TimeLine.StartSelection)
                 {
-                    if (rect.x < ra.x)
-                    {
-                        float delta = ra.x - rect.x;
-                        rect.x += delta;
-                        rect.width -= delta;
-                    }
-                    if (rect.xMax > ra.xMax)
-                    {
-                        rect.xMax = ra.xMax;
-                    }
+                    Rect rect = ra;
+                    rect.x += (float)((TimeLine.StartSelection - TimeLine.StartVisible) * _DPx);
+                    rect.width = (float)(TimeLine.SelectionLenght * _DPx);
 
-                    GUI.color = SelectionTimeColor;
-                    GUI.DrawTexture(rect, UnityEditor.EditorGUIUtility.whiteTexture, ScaleMode.StretchToFill);
+
+                    if (!(rect.xMax < 0 || rect.xMin > ra.xMax))
+                    {
+                        if (rect.x < ra.x)
+                        {
+                            float delta = ra.x - rect.x;
+                            rect.x += delta;
+                            rect.width -= delta;
+                        }
+                        if (rect.xMax > ra.xMax)
+                        {
+                            rect.xMax = ra.xMax;
+                        }
+
+                        GUI.color = SelectionTimeColor;
+                        GUI.DrawTexture(rect, UnityEditor.EditorGUIUtility.whiteTexture, ScaleMode.StretchToFill);
+                    }
                 }
             }
             #endregion

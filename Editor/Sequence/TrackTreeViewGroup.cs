@@ -4,12 +4,13 @@ using UnityEditor;
 using Skill.Framework.UI;
 using Skill.Editor.UI;
 using Skill.Framework.Sequence;
+using Skill.Editor.UI.Extended;
 
 namespace Skill.Editor.Sequence
 {
     public class TrackTreeViewGroup : Skill.Editor.UI.Extended.FolderView, IProperties
     {
-        public Properties Properties { get; private set; }
+        public PropertiesPanel Properties { get; private set; }
         public bool IsSelectedProperties { get; set; }
         public string Title { get { return "Track Group"; } }
         public TrackGroup Group { get; private set; }
@@ -35,7 +36,7 @@ namespace Skill.Editor.Sequence
                 throw new System.ArgumentNullException("Invalid TrackGroup");
             this.Height = 20;
             this.Group = group;
-            Foldout.Content.image = MatineeResources.Textures.Folder;
+            Foldout.Content.image = Resources.Textures.Matinee.Folder;
             Foldout.IsOpen = group.IsOpen;
             Properties = new TrackTreeViewGroupProperties(this);
 
@@ -62,7 +63,7 @@ namespace Skill.Editor.Sequence
     }
 
 
-    class TrackTreeViewGroupProperties : Properties
+    class TrackTreeViewGroupProperties : PropertiesPanel
     {
         private TrackTreeViewGroup _Group;
         private Skill.Editor.UI.TextField _TxtName;

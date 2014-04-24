@@ -117,8 +117,8 @@ namespace Skill.Editor.Sequence
                 newKey.FireTime = (float)timeLine.Timebar.GetTime(x);
 
                 PropertyTimeLineEvent e = CreateEvent(newKey);
-                if (MatineeEditor.Instance != null)
-                    MatineeEditor.Instance.PropertyGrid.SelectedObject = e;
+                if (MatineeEditorWindow.Instance != null)
+                    MatineeEditorWindow.Instance.PropertyGrid.SelectedObject = e;
                 RebuildTrackKeys();
 
                 for (int i = 0; i < _PropertyTrack.PropertyKeys.Length; i++)

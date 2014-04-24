@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Skill.Framework.Sequence;
+using Skill.Editor.UI.Extended;
 
 namespace Skill.Editor.Sequence
 {
@@ -85,7 +86,7 @@ namespace Skill.Editor.Sequence
                     }
                 }
             }
-            protected override Properties CreateProperties() { return new QuaternionKeyViewProperties(this); }
+            protected override PropertiesPanel CreateProperties() { return new QuaternionKeyViewProperties(this); }
 
             private QuaternionKey _QuaternionKey;
             public QuaternionKeyView(QuaternionTrackBar trackbar, IPropertyKey<Quaternion> key)

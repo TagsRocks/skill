@@ -87,6 +87,7 @@ namespace Skill.Editor.UI.Extended
         private double _StartSelectionTime;
         private double _EndSelectionTime;
         private double _TimePosition;
+        private bool _SelectionEnable;
 
         private TimeBar _Timebar;
         private TrackView _TrackView;
@@ -154,6 +155,18 @@ namespace Skill.Editor.UI.Extended
         public double EndSelection { get { return _EndSelectionTime; } }
         /// <summary> Lenght of selection time </summary>
         public double SelectionLenght { get { return _EndSelectionTime - _StartSelectionTime; } }
+        public bool SelectionEnable
+        {
+            get { return _SelectionEnable; }
+            set
+            {
+                _SelectionEnable = value;
+                if(!_SelectionEnable)
+                {
+                    _EndSelectionTime = _EndSelectionTime = 0;
+                }
+            }
+        }
 
         /// <summary> Selected time </summary>
         public double TimePosition
@@ -170,7 +183,7 @@ namespace Skill.Editor.UI.Extended
                     OnTimePositionChanged();
                 }
             }
-        }
+        }        
 
         /// <summary> Occurs when PositionChanged changed </summary>
         public event System.EventHandler TimePositionChanged;
@@ -186,6 +199,7 @@ namespace Skill.Editor.UI.Extended
         /// </summary>
         public TimeLine()
         {
+            this._SelectionEnable = true;
             this._StartVisibleTime = 0;
             this._EndVisibleTime = 1.0;
             this._MaxTime = 10.0;
@@ -211,6 +225,7 @@ namespace Skill.Editor.UI.Extended
         /// <param name="endTime">end time</param>
         public void SelectTime(double startTime, double endTime)
         {
+            if (!_SelectionEnable) return;
             _StartSelectionTime = startTime;
             if (_StartSelectionTime < _MinTime) _StartSelectionTime = _MinTime;
             else if (_StartSelectionTime > _MaxTime) _StartSelectionTime = _MaxTime;

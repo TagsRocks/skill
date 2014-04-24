@@ -181,7 +181,7 @@ namespace Skill.Framework.Sequence
             }
         }
 
-        private void SetValue(V value)
+        protected virtual void SetValue(V value)
         {
             ValidateSetter();
             if (Component != null && _Setter != null)

@@ -154,6 +154,16 @@ namespace Skill.Framework.Weapons
         /// <summary> If true, weapon try to calculate initial speed of curve projectiles to hit Target(if valid) </summary>
         public bool ThrowCurveProjectilesOnTarget { get; set; }
 
+
+        private bool _AutoUpdateSpawnPosition = true;
+        /// <summary> Automatic update bullet spawn positions from SpawnPoint </summary>
+        /// <remarks>
+        /// If weapon is attached to hand of an actor, it is possible to handle direction of hand with IK, in most case ik applied at LateUpdate so if
+        /// we shoot a bullet it start from wrong place because position of SpawnPoint updated in Update and IK applied in LateUpdate
+        /// in situation like this disable auto update of spawn position and call UpdateSpawnPosition() when IK applied.
+        /// </remarks>
+        public bool AutoUpdateSpawnPosition { get { return _AutoUpdateSpawnPosition; } set { _AutoUpdateSpawnPosition = value; } }
+
         private List<Collider> _IgnoreColliders;
         /// <summary>
         /// Add collider to ignored by bullets
@@ -190,6 +200,8 @@ namespace Skill.Framework.Weapons
         /// <summary> Occurs when a shoot happpened </summary>
         protected virtual void OnShoot()
         {
+            if (AutoUpdateSpawnPosition)
+                UpdateSpawnPosition();
             PlayFireSound();
             int consummed = ConsumeAmmo();
 
@@ -214,6 +226,18 @@ namespace Skill.Framework.Weapons
 
             if (Shoot != null)
                 Shoot(this, new WeaponShootEventArgs(consummed));
+        }
+
+        /// <summary>
+        /// Update bullet spawn position from SpawnPoint.Position
+        /// </summary>
+        public void UpdateSpawnPosition()
+        {
+            foreach (var p in Projectiles)
+            {
+                if (p.SpawnPoint != null)
+                    p.SpawnPosition = p.SpawnPoint.position;
+            }
         }
 
         /// <summary>
@@ -620,7 +644,7 @@ namespace Skill.Framework.Weapons
             {
                 if (Global.Instance != null)
                 {
-                    Global.Instance.PlayOneShot(_AudioSource, sound, Sounds.SoundCategory.FX);
+                    Global.Instance.PlayOneShot(_AudioSource, sound, Audio.SoundCategory.FX);
                 }
                 else
                 {
@@ -657,7 +681,7 @@ namespace Skill.Framework.Weapons
             for (int i = 0; i < bulletCount; i++)
             {
                 // spawn a bullet but inactive
-                GameObject go = Cache.Spawn(SelectedProjectile.BulletPrefab, SelectedProjectile.SpawnPoint.position, iniRotation) as GameObject;
+                GameObject go = Cache.Spawn(SelectedProjectile.BulletPrefab, SelectedProjectile.SpawnPosition, iniRotation) as GameObject;
 
                 Bullet bullet = go.GetComponent<Bullet>();// get reference to bullet
                 if (bullet != null) // set bullet parameters
@@ -695,7 +719,7 @@ namespace Skill.Framework.Weapons
                         dir.y = range * SelectedProjectile.CurveParams.TangentThrowAngle;  // set dir to the elevation angle
                         range += h / SelectedProjectile.CurveParams.TangentThrowAngle;  // correct for small height differences
                         // calculate the velocity magnitude
-                        speed = Mathf.Sqrt(range * Physics.gravity.magnitude / SelectedProjectile.CurveParams.Sin2ThrowAngle);                        
+                        speed = Mathf.Sqrt(range * Physics.gravity.magnitude / SelectedProjectile.CurveParams.Sin2ThrowAngle);
                         dir.Normalize();
                     }
 
@@ -751,7 +775,7 @@ namespace Skill.Framework.Weapons
 
             Vector3 direction;
             if (Target != null && Target.HasValue)
-                direction = (Target.Value - SelectedProjectile.SpawnPoint.position).normalized;
+                direction = (Target.Value - SelectedProjectile.SpawnPosition).normalized;
             else
                 direction = SelectedProjectile.SpawnPoint.forward;
 
@@ -762,7 +786,7 @@ namespace Skill.Framework.Weapons
                 Vector3 bulletDirection = (bulletRotation * Vector3.forward).normalized;
 
                 // spawn a bullet but inactive
-                GameObject go = Cache.Spawn(SelectedProjectile.BulletPrefab, SelectedProjectile.SpawnPoint.position, bulletRotation) as GameObject;
+                GameObject go = Cache.Spawn(SelectedProjectile.BulletPrefab, SelectedProjectile.SpawnPosition, bulletRotation) as GameObject;
                 Rigidbody rb = go.rigidbody;
                 if (rb != null && !rb.isKinematic)
                 {
@@ -825,7 +849,7 @@ namespace Skill.Framework.Weapons
 
             Vector3 direction;
             if (Target != null && Target.HasValue)
-                direction = (Target.Value - SelectedProjectile.SpawnPoint.position).normalized;
+                direction = (Target.Value - SelectedProjectile.SpawnPosition).normalized;
             else
                 direction = SelectedProjectile.SpawnPoint.forward;
 
@@ -836,7 +860,7 @@ namespace Skill.Framework.Weapons
                 Vector3 bulletDirection = (bulletRotation * Vector3.forward).normalized;
 
                 // spawn a bullet but inactive
-                GameObject go = Cache.Spawn(SelectedProjectile.BulletPrefab, SelectedProjectile.SpawnPoint.position, bulletRotation, false) as GameObject;
+                GameObject go = Cache.Spawn(SelectedProjectile.BulletPrefab, SelectedProjectile.SpawnPosition, bulletRotation, false) as GameObject;
                 StraightLineBullet bullet = go.GetComponent<StraightLineBullet>();// get reference to bullet
 
                 if (bullet != null) // set bullet parameters
@@ -851,7 +875,7 @@ namespace Skill.Framework.Weapons
                     if (SelectedProjectile.HitAtSpawn) // if is is needed to check hit at spawn time
                     {
                         _Ray.direction = bulletDirection;
-                        _Ray.origin = SelectedProjectile.SpawnPoint.position;
+                        _Ray.origin = SelectedProjectile.SpawnPosition;
 
                         if (Physics.Raycast(_Ray, out _HitInfo, SelectedProjectile.Range, SelectedProjectile.LayerMask))
                         {

@@ -4,6 +4,7 @@ using Skill.Framework.UI;
 
 
 using Skill.Framework.Sequence;
+using Skill.Editor.UI.Extended;
 
 namespace Skill.Editor.Sequence
 {
@@ -12,7 +13,7 @@ namespace Skill.Editor.Sequence
         public Track Track { get; private set; }
         public BaseTrackBar TrackBar { get; private set; }
 
-        public Properties Properties { get; private set; }
+        public PropertiesPanel Properties { get; private set; }
         public bool IsSelectedProperties { get; set; }
         public string Title { get { return string.Format("{0} Track", Track.Type.ToString()); } }
 
@@ -23,7 +24,7 @@ namespace Skill.Editor.Sequence
 
         internal void SetVisibleStyle(bool visible)
         {
-            this._ContentBox.Style = visible ? MatineeResources.Styles.TreeViewItem : MatineeResources.Styles.HiddenTreeViewItem;
+            this._ContentBox.Style = visible ? Resources.Styles.TreeViewItem : Resources.Styles.HiddenTreeViewItem;
         }
 
         internal TrackTreeViewItem(Track track, BaseTrackBar trackBar)
@@ -35,7 +36,7 @@ namespace Skill.Editor.Sequence
             this.ColumnDefinitions.Add(1, GridUnitType.Star);
             this.ColumnDefinitions.Add(16, GridUnitType.Pixel);
 
-            this._ContentBox = new Box() { Column = 0, Style = MatineeResources.Styles.TreeViewItem };
+            this._ContentBox = new Box() { Column = 0, Style = Resources.Styles.TreeViewItem };
             this._ImgColor = new Image() { Column = 1, Texture = UnityEditor.EditorGUIUtility.whiteTexture, Scale = ScaleMode.StretchToFill, Margin = new Thickness(2, 4) };
 
             this.Controls.Add(_ContentBox);
@@ -47,7 +48,7 @@ namespace Skill.Editor.Sequence
             this._ContentBox.Content.text = Track.gameObject.name;
         }
 
-        private Properties CreateProperties()
+        private PropertiesPanel CreateProperties()
         {
             switch (Track.Type)
             {
@@ -80,25 +81,25 @@ namespace Skill.Editor.Sequence
             switch (Track.Type)
             {
                 case TrackType.Event:
-                    return MatineeResources.Textures.Event;
+                    return Resources.Textures.Matinee.Event;
                 case TrackType.Bool:
-                    return MatineeResources.Textures.Boolean;
+                    return Resources.Textures.Matinee.Boolean;
                 case TrackType.Float:
-                    return MatineeResources.Textures.Float;
+                    return Resources.Textures.Matinee.Float;
                 case TrackType.Integer:
-                    return MatineeResources.Textures.Integer;
+                    return Resources.Textures.Matinee.Integer;
                 case TrackType.Color:
-                    return MatineeResources.Textures.Color;
+                    return Resources.Textures.Matinee.Color;
                 case TrackType.Vector2:
-                    return MatineeResources.Textures.Vector2;
+                    return Resources.Textures.Matinee.Vector2;
                 case TrackType.Vector3:
-                    return MatineeResources.Textures.Vector3;
+                    return Resources.Textures.Matinee.Vector3;
                 case TrackType.Vector4:
-                    return MatineeResources.Textures.Vector4;
+                    return Resources.Textures.Matinee.Vector4;
                 case TrackType.Quaternion:
-                    return MatineeResources.Textures.Quaternion;
+                    return Resources.Textures.Matinee.Quaternion;
                 case TrackType.Sound:
-                    return MatineeResources.Textures.Sound;
+                    return Resources.Textures.Matinee.Sound;
                 default:
                     return null;
             }

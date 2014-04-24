@@ -201,8 +201,8 @@ namespace Skill.Framework
                 {
                     if (_MotionTW.IsOver)
                     {
-                        if (Skill.Framework.Sounds.PitchController.Instance != null)
-                            Skill.Framework.Sounds.PitchController.Instance.Pitch = 1.0f;
+                        if (Skill.Framework.Audio.PitchController.Instance != null)
+                            Skill.Framework.Audio.PitchController.Instance.Pitch = 1.0f;
                         Time.timeScale = _PreTimeScale;
                         Time.fixedDeltaTime = _PreFixedDeltaTime;
                         enabled = false;
@@ -217,8 +217,8 @@ namespace Skill.Framework
                         if (_FreezeTW.IsEnabledAndOver)
                             _FreezeTW.End();
 
-                        if (Skill.Framework.Sounds.PitchController.Instance != null)
-                            Skill.Framework.Sounds.PitchController.Instance.Pitch = _Info.Pitch;
+                        if (Skill.Framework.Audio.PitchController.Instance != null)
+                            Skill.Framework.Audio.PitchController.Instance.Pitch = _Info.Pitch;
                         if (!_FreezeTW.IsEnabled)
                         {
                             Time.timeScale = _Info.TimeScale;
