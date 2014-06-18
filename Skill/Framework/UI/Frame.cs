@@ -157,6 +157,10 @@ namespace Skill.Framework.UI
             }
         }
 
+        /// <summary>
+        /// User data.
+        /// </summary>
+        public object UserData { get; set; }
 
         /// <summary>
         /// Retrieves parent menu of frame
@@ -302,7 +306,7 @@ namespace Skill.Framework.UI
         private void CheckEvents()
         {
             Event e = Event.current;
-            if (e != null)
+            if (e != null && e.type != EventType.repaint)
             {
                 EventType type = e.type;
 
@@ -413,7 +417,7 @@ namespace Skill.Framework.UI
 
             rect.x += x;
             rect.y += y;
-            Grid.RenderArea = rect;            
+            Grid.RenderArea = rect;
         }
 
         /// <summary>
@@ -568,23 +572,27 @@ namespace Skill.Framework.UI
         #endregion
 
         #region Handle Dialog
+
+        /// <summary>
+        /// Let Frame handle requested dialog
+        /// </summary>
+        /// <param name="dialog">The dialog requested by this frame and closed right now</param>
+        public delegate void DialogHandler(Frame dialog);
+
+
         /// <summary>
         /// Let Frame handle requested dialog
         /// </summary>
         /// <param name="dialog">The dialog requested by this frame</param>
         internal void HandleDialog(Frame dialog)
         {
-            OnHandleDialog(dialog);
+            if (Dialog != null)
+                Dialog(dialog);
         }
-
         /// <summary>
-        /// Let Frame handle requested dialog
+        /// Occurs when a dialog on top of this frame closed and return result to this frame
         /// </summary>
-        /// <param name="dialog">The dialog requested by this frame</param>
-        protected virtual void OnHandleDialog(Frame dialog)
-        {
-
-        }
+        public event DialogHandler Dialog;
         #endregion
 
         #region Commands

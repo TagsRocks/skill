@@ -54,15 +54,15 @@
     <Compile Include="Framework\AI\CompositeType.cs" />
     <Compile Include="Framework\AI\RunningActionCollection.cs" />
     <Compile Include="Framework\AnimationCurve3D.cs" />
-    <Compile Include="Framework\AnimationCurveUtility.cs" />
     <Compile Include="Framework\Animation\AnimationTreeState.cs" />
     <Compile Include="Framework\Animation\AnimNodeMultilayer.cs" />
     <Compile Include="Framework\Animation\BlendWeight.cs" />
     <Compile Include="Framework\Animation\Vector3Keyframes.cs" />
     <Compile Include="Framework\Animation\RootMotion.cs" />
     <Compile Include="Framework\Audio\AudioSubtitle.cs" />
+    <Compile Include="Framework\CameraLimit.cs" />
+    <Compile Include="Framework\CurveEditorAttribute.cs" />
     <Compile Include="Framework\Dictionary.cs" />
-    <Compile Include="Framework\DictionaryData.cs" />
     <Compile Include="Framework\Audio\SubRendererGUIText.cs" />
     <Compile Include="Framework\Audio\SubRendererOnGUI.cs" />
     <Compile Include="Framework\Audio\SubtitleRenderer.cs" />
@@ -76,6 +76,8 @@
     <Compile Include="Framework\Dynamics\MoveAround.cs" />
     <Compile Include="Framework\ExposePropertyAttribute.cs" />
     <Compile Include="Framework\FollowCamera.cs" />
+    <Compile Include="Framework\GizmosHelper.cs" />
+    <Compile Include="Framework\LevelLoadManager.cs" />
     <Compile Include="Framework\Modules\BatchMesh.cs" />
     <Compile Include="Framework\Modules\ChildCounter.cs" />
     <Compile Include="Framework\Modules\ScreenShot.cs" />
@@ -97,6 +99,9 @@
     <Compile Include="Framework\Sequence\Vector2Track.cs" />
     <Compile Include="Framework\Sequence\Vector3Track.cs" />
     <Compile Include="Framework\Sequence\Vector4Track.cs" />
+    <Compile Include="Framework\Subtitle.cs" />
+    <Compile Include="Framework\Triggers\ActivateTrigger.cs" />
+    <Compile Include="Framework\Triggers\IsometricCameraTrigger.cs" />
     <Compile Include="Framework\Triggers\IsometricCameraMotionTrigger.cs" />
     <Compile Include="Framework\UI\Cursor.cs" />
     <Compile Include="Framework\UI\Extended\ProgressBar.cs" />
@@ -218,6 +223,7 @@
     <Compile Include="Framework\UI\IContextMenu.cs" />
     <Compile Include="Framework\UI\ImageShake.cs" />
     <Compile Include="Framework\UI\ImageZoom.cs" />
+    <Compile Include="Framework\UI\Loading.cs" />
     <Compile Include="Framework\UI\Menu.cs" />
     <Compile Include="Framework\UI\MenuFrame.cs" />
     <Compile Include="Framework\UI\PauseMenu.cs" />

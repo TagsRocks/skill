@@ -49,14 +49,12 @@ namespace Skill.Editor.UI
         }
 
         /// <summary>
-        /// IsEnable of one sub items changed
+        /// When any properties of item is changed
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        protected virtual void Item_EnableChanged(object sender, EventArgs e)
+        protected virtual void OnChanged()
         {
             if (Parent != null)
-                Parent.Item_EnableChanged(sender, e);
+                Parent.OnChanged();
         }
 
         /// <summary>
@@ -71,7 +69,6 @@ namespace Skill.Editor.UI
             ValidateNameForDuplicate(item);
 
             item.Parent = this;
-            item.EnableChanged += Item_EnableChanged;
             _Items.Add(item);
 
             IsChanged = true;
@@ -121,7 +118,6 @@ namespace Skill.Editor.UI
                 if (item != null)
                 {
                     item.Parent = null;
-                    item.EnableChanged -= Item_EnableChanged;
                 }
             }
             _Items.Clear();
@@ -183,7 +179,10 @@ namespace Skill.Editor.UI
                     MenuItem item = contextMenu[i];
                     if (item == null)
                     {
-                        genericMenu.AddSeparator(path + "/");
+                        if (string.IsNullOrEmpty(path))
+                            genericMenu.AddSeparator(string.Empty);
+                        else
+                            genericMenu.AddSeparator(path + "/");
                     }
                     else
                     {
@@ -225,12 +224,19 @@ namespace Skill.Editor.UI
         /// <param name="owner"> Owner ui object that showthis contenxt menu  </param>
         /// <param name="position">Mouse position</param>
         public void Show(Framework.UI.BaseControl owner, Vector2 position)
-        {
-            this.Position = position;
+        {            
             this.Owner = owner;
+            this.Position = position;
+            BeginShow();
             ApplyChanges();
             _GenericMenu.ShowAsContext();
         }
+
+        /// <summary>
+        /// Prepare right before show
+        /// </summary>
+        /// <param name="owner"> Owner ui object that showthis contenxt menu  </param>
+        protected virtual void BeginShow() { }
 
 
         private void Item_Click(object userData)
@@ -238,7 +244,7 @@ namespace Skill.Editor.UI
             ((MenuItem)userData).RaiseClick();
         }
 
-        protected override void Item_EnableChanged(object sender, EventArgs e)
+        protected override void OnChanged()
         {
             IsChanged = true;
         }
@@ -263,8 +269,22 @@ namespace Skill.Editor.UI
         /// <summary> Path of item </summary>
         public string Path { get; internal set; }
 
+
+        private bool _IsChecked;
         /// <summary> Is checked </summary>
-        public bool IsChecked { get; set; }
+        public bool IsChecked
+        {
+            get { return _IsChecked; }
+            set
+            {
+
+                if (_IsChecked != value)
+                {
+                    _IsChecked = value;
+                    OnCheckedChanged();
+                }
+            }
+        }
 
         /// <summary> User data </summary>
         public object UserData { get; set; }
@@ -314,7 +334,24 @@ namespace Skill.Editor.UI
         {
             if (EnableChanged != null)
                 EnableChanged(this, EventArgs.Empty);
+            OnChanged();
         }
+
+
+        /// <summary>
+        /// Occurs When item checked is changed
+        /// </summary>
+        public event EventHandler CheckedChanged;
+        /// <summary>
+        /// Occurs When item checked is changed
+        /// </summary>
+        protected virtual void OnCheckedChanged()
+        {
+            if (CheckedChanged != null)
+                CheckedChanged(this, EventArgs.Empty);
+            OnChanged();
+        }
+
 
         /// <summary>
         /// Create an instance of MenuItem

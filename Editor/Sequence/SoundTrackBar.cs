@@ -19,6 +19,7 @@ namespace Skill.Editor.Sequence
         public SoundTrackBar(SoundTrack track)
             : base(track)
         {
+            this.Height = 40;
         }
 
         protected override void EvaluateNewKey(IPropertyKey<AudioClip> newKey, IPropertyKey<AudioClip> previousKey)
@@ -33,20 +34,17 @@ namespace Skill.Editor.Sequence
         /// </summary>
         class SoundKeyView : PropertyTimeLineEvent
         {
-            private AudioClip _Clip;
             private Skill.Framework.UI.Label _LblClipName;
-            private Skill.Framework.UI.Image _PreviewImage;
+            private Skill.Editor.UI.Extended.AudioPreviewCurve _PreviewImage;
+
             public override double Duration { get { return PropertyKey.ValueKey != null ? PropertyKey.ValueKey.length : 0.5f; } set { } }
             public override string Title { get { return "Sound Event"; } }
 
             public SoundKeyView(SoundTrackBar trackBar, SoundKey key)
                 : base(trackBar, key)
             {
-                RowDefinitions.Add(20, Skill.Framework.UI.GridUnitType.Pixel);
-                RowDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star);
-
-                _PreviewImage = new Skill.Framework.UI.Image() { Row = 1, Column = 0, Visibility = Skill.Framework.UI.Visibility.Hidden, Scale = ScaleMode.StretchToFill, Margin = new Skill.Framework.UI.Thickness(2) };
-                _LblClipName = new Skill.Framework.UI.Label() { Row = 0, Column = 0, RowSpan = 10, ColumnSpan = 10, Style = Resources.Styles.EventLabel };
+                _PreviewImage = new AudioPreviewCurve() { Margin = new Skill.Framework.UI.Thickness(2), BackgroundColor = Color.clear };
+                _LblClipName = new Skill.Framework.UI.Label() { Style = Resources.Styles.EventLabel };
 
                 Controls.Add(_PreviewImage);
                 Controls.Add(_LblClipName);
@@ -54,26 +52,41 @@ namespace Skill.Editor.Sequence
                 base.WantsMouseEvents = true;
             }
 
-            protected override void Render()
+
+            protected override void BeginRender()
             {
-                if (_Clip != PropertyKey.ValueKey)
+                _PreviewImage.Clip = PropertyKey.ValueKey;
+
+                if (PropertyKey.ValueKey != null)
+                    _LblClipName.Text = PropertyKey.ValueKey.name;
+                else
+                    _LblClipName.Text = string.Empty;
+
+                TimeLine timeLine = FindInParents<TimeLine>();
+                Rect trackRa = TrackBar.RenderArea;
+                double deltaTime = (timeLine.MaxTime - timeLine.MinTime);
+
+                float minVisibleX = trackRa.x + trackRa.width * (float)((timeLine.StartVisible - timeLine.MinTime) / deltaTime);
+                float maxVisibleX = trackRa.x + trackRa.width * (float)((timeLine.EndVisible - timeLine.MinTime) / deltaTime);
+
+                Rect ra = RenderArea;
+
+                float xMin = Mathf.Max(ra.xMin, minVisibleX);
+                float xMax = Mathf.Min(ra.xMax, maxVisibleX);
+                float delta = xMax - xMin;
+                if (delta >= 1)
                 {
-                    _Clip = PropertyKey.ValueKey;
-                    if (_Clip != null && _PreviewImage.Texture == null)
-                        _PreviewImage.Texture = UnityEditor.AssetPreview.GetAssetPreview(_Clip);
-                    if (_Clip != null)
-                    {
-                        _PreviewImage.Visibility = Skill.Framework.UI.Visibility.Visible;
-                        _LblClipName.Text = _Clip.name;
-                    }
-                    else
-                    {
-                        _LblClipName.Text = "None";
-                        _PreviewImage.Texture = null;
-                        _PreviewImage.Visibility = Skill.Framework.UI.Visibility.Hidden;
-                    }
+                    _PreviewImage.Visibility = Framework.UI.Visibility.Visible;
+                    Rect ranges = new Rect(((xMin - ra.xMin) / ra.width) * _PreviewImage.Resolution, 0, ((xMax - ra.xMin) / ra.width) * _PreviewImage.Resolution, 1);
+                    ra.xMin = xMin;
+                    ra.xMax = xMax;
+                    _PreviewImage.RenderArea = ra;
+                    _PreviewImage.Ranges = ranges;
                 }
-                base.Render();
+                else
+                    _PreviewImage.Visibility = Framework.UI.Visibility.Hidden;
+
+                base.BeginRender();
             }
 
         }

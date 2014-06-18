@@ -14,6 +14,12 @@ namespace Skill.Framework.Sequence
     public class Matinee : Skill.Framework.DynamicBehaviour
     {
         #region Editor data
+
+        /// <summary> End time of visible area </summary>
+        [HideInInspector]
+        [SerializeField]
+        public float MaxTime = 10;
+
         /// <summary> Start time of visible area </summary>
         [HideInInspector]
         [SerializeField]
@@ -40,8 +46,7 @@ namespace Skill.Framework.Sequence
         public float TimePosition = 0;
         #endregion
 
-        /// <summary> Length of matinee over time</summary>
-        public float Length = 10;
+
         /// <summary> Is loop? </summary>
         public bool Loop = false;
         /// <summary> Playback speed </summary>
@@ -49,6 +54,24 @@ namespace Skill.Framework.Sequence
         /// <summary> Is game enters cutscene mode? </summary>
         public bool Cutscene = true;
 
+
+
+        private float _Length;
+        /// <summary> Length of matinee over time</summary>
+        public float Length
+        {
+            get
+            {
+                if (!Application.isPlaying)
+                {
+                    Track[] tracks = GetComponentsInChildren<Track>();
+                    _Length = 0;
+                    foreach (var t in tracks)
+                        _Length = Mathf.Max(_Length, t.Length);
+                }
+                return _Length;
+            }
+        }
 
         /// <summary> Is Matinee playing? </summary>
         public bool IsPlaying { get; private set; }
@@ -74,6 +97,11 @@ namespace Skill.Framework.Sequence
             base.Awake();
             enabled = false;
             _Tracks = GetComponentsInChildren<Track>();
+
+            _Length = 0;
+            foreach (var t in _Tracks)
+                _Length = Mathf.Max(_Length, t.Length);
+
             _PlayTime = 0;
             IsPaused = false;
             IsPlaying = false;

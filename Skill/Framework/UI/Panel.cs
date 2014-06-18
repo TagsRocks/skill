@@ -10,7 +10,7 @@ namespace Skill.Framework.UI
     public abstract class Panel : BaseControl
     {
         // Variables
-        private bool _NeedUpdateLayout; // true when panel needs update layout at next render
+        private bool _Invalidate; // true when panel needs update layout at next render
 
         /// <summary>  Type of Control : Panel </summary>
         public override ControlType ControlType { get { return ControlType.Panel; } }
@@ -53,9 +53,9 @@ namespace Skill.Framework.UI
         }
 
         /// <summary>
-        /// used by inherited objets to request UpdateLayout
+        /// Invalidate to force update layout in next render
         /// </summary>
-        protected void RequestUpdateLayout() { _NeedUpdateLayout = true; }
+        public virtual void Invalidate() { _Invalidate = true; }
 
 
         #region Constructor
@@ -64,7 +64,7 @@ namespace Skill.Framework.UI
         /// </summary>
         protected Panel()
         {
-            this._NeedUpdateLayout = true;
+            this._Invalidate = true;
             this.Controls = new BaseControlCollection(this);
             this.Controls.LayoutChange += new System.EventHandler(Controls_LayoutChange);
         }
@@ -79,7 +79,7 @@ namespace Skill.Framework.UI
         /// </summary>
         protected override void OnRenderAreaChanged()
         {
-            this.RequestUpdateLayout();
+            this.Invalidate();
             base.OnRenderAreaChanged();
         }
         #endregion
@@ -89,7 +89,7 @@ namespace Skill.Framework.UI
         /// </summary>
         protected override void OnLayoutChanged()
         {
-            this.RequestUpdateLayout();
+            this.Invalidate();
             base.OnLayoutChanged();
 
         }
@@ -100,12 +100,12 @@ namespace Skill.Framework.UI
         protected override void BeginRender()
         {
             base.BeginRender();
-            if (_NeedUpdateLayout)
+            if (_Invalidate)
             {
                 UpdateLayout();
                 CalcDesiredSize();
-                _NeedUpdateLayout = false;
-            }            
+                _Invalidate = false;
+            }
         }
 
         private void CalcDesiredSize()
@@ -148,7 +148,7 @@ namespace Skill.Framework.UI
             {
                 c.OnGUI();
             }
-        }     
+        }
 
 
 
@@ -460,7 +460,7 @@ namespace Skill.Framework.UI
         {
             if (IsInScrollView && !IsHandlingEventInternal) return;
             if (e != null && e.type != EventType.Used)
-            {                
+            {
                 for (int i = Controls.Count - 1; i >= 0; i--)
                 {
                     var c = Controls[i];
@@ -468,13 +468,14 @@ namespace Skill.Framework.UI
                     {
                         if (OwnerFrame != null && OwnerFrame.IsPrecedenceEvent(c))
                             continue;
-                        c.HandleEvent(e);
+                        if (c.Visibility == UI.Visibility.Visible)
+                            c.HandleEvent(e);
                         if (e.type == EventType.Used)
                             break;
                     }
                 }
                 if (e.type != EventType.Used)
-                    base.HandleEvent(e);                
+                    base.HandleEvent(e);
             }
 
         }

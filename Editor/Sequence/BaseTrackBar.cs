@@ -18,10 +18,8 @@ namespace Skill.Editor.Sequence
         public BaseTrackBar(Track track)
         {
             this.Track = track;
-            this.Height = 60;
+            this.Height = 22;
             this.Margin = new Skill.Framework.UI.Thickness(0, 1);
-
-            
         }
 
 
@@ -29,7 +27,7 @@ namespace Skill.Editor.Sequence
         {
             Rect ra = RenderArea;
             Color savedColor = GUI.color;
-            
+
             // draw background box at entire RenderArea            
             Color c = Track.Color;
             c.a *= 0.4f;
@@ -38,8 +36,8 @@ namespace Skill.Editor.Sequence
 
             // draw name of track at bottom left corner of trackbar
             GUI.color = _NameColor;
-            Rect rect = ((TrackView)Parent).RenderArea;
-            rect.x += ((TrackView)Parent).ScrollPosition.x;
+            Rect rect = ((TrackBarView)Parent).RenderArea;
+            rect.x += ((TrackBarView)Parent).ScrollPosition.x;
             rect.y = ra.y - 4;
             rect.height = ra.height;
             rect.width = Track.name.Length * 8;
@@ -63,6 +61,8 @@ namespace Skill.Editor.Sequence
             Skill.Editor.UI.EditorFrame.RepaintParentEditorWindow(this);
             this.OnLayoutChanged();
         }
+
+        public override double GetValidTime() { return Track.Length; }
     }
 
 
@@ -71,6 +71,12 @@ namespace Skill.Editor.Sequence
     /// </summary>
     public abstract class EventView : TimeLineEvent, IProperties
     {
+        public static Color CurveBgColor = new Color(0.1f, 0.1f, 0.1f);
+        public static Color CurveXColor = new Color(1.0f, 0.0f, 0.0f);
+        public static Color CurveYColor = new Color(0.0f, 1.0f, 0.0f);
+        public static Color CurveZColor = new Color(0.0f, 0.0f, 1.0f);
+        public static Color CurveWColor = new Color(1.0f, 1.0f, 0.0f);
+
         private PropertiesPanel _Properties;
         /// <summary> Properties </summary>
         public PropertiesPanel Properties
@@ -92,7 +98,7 @@ namespace Skill.Editor.Sequence
 
         private bool _SelectedProperties;
         /// <summary> Is selected by PropertyGrid </summary>
-        public bool IsSelectedProperties
+        public virtual bool IsSelectedProperties
         {
             get { return _SelectedProperties; }
             set
@@ -130,16 +136,16 @@ namespace Skill.Editor.Sequence
         }
 
 
-        private TrackView _TrackView;
+        private TrackBarView _TrackView;
         /// <summary>
         /// Owner TrackView in upper hierarchy
         /// </summary>
-        public TrackView TrackView
+        public TrackBarView TrackView
         {
             get
             {
                 if (_TrackView == null)
-                    _TrackView = FindInParents<TrackView>();
+                    _TrackView = FindInParents<TrackBarView>();
                 return _TrackView;
             }
         }
@@ -174,41 +180,6 @@ namespace Skill.Editor.Sequence
         }
 
     }
-
-    /// <summary>
-    /// base class for Properties of BaseTimeLineEvent used in Matinee Editor
-    /// </summary>
-    //public abstract class BaseTimeLineEventProperties : Properties
-    //{
-    //    private Skill.Editor.UI.FloatField _FFTime;
-    //    protected static Skill.Framework.UI.Thickness ControlMargin = new Skill.Framework.UI.Thickness(2);
-    //    public BaseTimeLineEventProperties(TimeLineEvent e)
-    //        : base(e)
-    //    {
-    //        _FFTime = new Skill.Editor.UI.FloatField() { Margin = new Skill.Framework.UI.Thickness(2) }; _FFTime.Label.text = "Time";
-    //        Controls.Add(_FFTime);
-    //        _FFTime.ValueChanged += _FFTime_ValueChanged;
-    //    }
-    //    protected override void SetDirty()
-    //    {
-    //        ((BaseTrackBar)((EventView)this.Object).TrackBar).SetDirty();
-    //    }
-    //    void _FFTime_ValueChanged(object sender, System.EventArgs e)
-    //    {
-    //        if (IgnoreChanges) return;
-    //        ((EventView)Object).Key.FireTime = _FFTime.Value;
-    //        SetDirty();
-    //    }
-
-    //    protected override void RefreshData()
-    //    {
-    //        _FFTime.Value = ((EventView)Object).Key.FireTime;
-    //    }
-
-    //}
-
-
-
 
     public class EventProperties : ExposeProperties
     {

@@ -96,10 +96,22 @@ namespace Skill.Editor.Tools
                 for (int i = 1; i < transforms.Length; i++)
                     center += transforms[i].position;
 
+                Undo.RegisterCreatedObjectUndo(group, "Create : " + group.name);
+
+                Transform parent = transforms[0].parent;
                 center /= transforms.Length;
                 group.transform.position = center;
                 foreach (var t in transforms)
+                {
+                    if (parent != null)
+                    {
+                        if (parent != t.parent)
+                            parent = null;
+                    }
                     Undo.SetTransformParent(t, group.transform, string.Format("Group {0} to {1}", t.name, group.name));
+                }
+                if (parent != null)
+                    Undo.SetTransformParent(group.transform, parent, string.Format("Group {0} to {1}", group.name, parent.name));
             }
             else
             {

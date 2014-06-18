@@ -124,9 +124,14 @@ namespace Skill.Framework
                         if (_Index >= TimeEvents.Length)
                         {
                             if (Loop)
+                            {
                                 _ElapsedTime -= TimeEvents[TimeEvents.Length - 1].Time;
+                                _Index = 0;
+                            }
                             else
+                            {
                                 Finished = true;
+                            }
                         }
                     }
                 }
@@ -142,6 +147,34 @@ namespace Skill.Framework
             _ElapsedTime = 0;
             _Index = 0;
             Finished = false;
+        }
+        /// <summary>
+        /// Seek to specified time
+        /// </summary>
+        /// <param name="time">Time to seek</param>
+        public void Seek(float time)
+        {
+            _ElapsedTime = time;
+
+            for (; _Index < TimeEvents.Length; _Index++)
+            {
+                if (!(TimeEvents[_Index].Time <= _ElapsedTime))
+                    break;
+            }
+
+            if (_Index >= TimeEvents.Length)
+            {
+                if (Loop)
+                {
+                    _ElapsedTime -= TimeEvents[TimeEvents.Length - 1].Time;
+                    _Index = 0;
+                }
+                else
+                {
+                    Finished = true;
+                }
+            }
+
         }
     }
 }

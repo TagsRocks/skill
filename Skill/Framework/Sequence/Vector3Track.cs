@@ -14,8 +14,11 @@ namespace Skill.Framework.Sequence
         [ExposeProperty(0, "Time", "Event time")]
         public float ExTime { get { return Time; } set { Time = value; } }
 
+        [CurveEditor(1, 0, 0, "X")]
         public AnimationCurve CurveX;
+        [CurveEditor(0, 1, 0, "Y")]
         public AnimationCurve CurveY;
+        [CurveEditor(0, 0, 1, "Z")]
         public AnimationCurve CurveZ;
 
         public Vector3 ValueKey { get { return this.Value; } set { this.Value = value; } }
@@ -27,6 +30,33 @@ namespace Skill.Framework.Sequence
         public override Type PropertyType { get { return typeof(Vector3); } }
         public override TrackType Type { get { return TrackType.Vector3; } }
 
+
+        public override float Length
+        {
+            get
+            {
+                if (Keys != null && Keys.Length > 0)
+                {
+                    if (!Application.isPlaying)
+                        SortKeys();
+
+                    Vector3Key v3k = Keys[Keys.Length - 1];
+                    float maxLenght = v3k.FireTime;
+
+                    if (v3k.CurveX != null && v3k.CurveX.length > 0)
+                        maxLenght = Mathf.Max(maxLenght, v3k.CurveX.keys[v3k.CurveX.length - 1].time);
+
+                    if (v3k.CurveY != null && v3k.CurveY.length > 0)
+                        maxLenght = Mathf.Max(maxLenght, v3k.CurveY.keys[v3k.CurveY.length - 1].time);
+
+                    if (v3k.CurveZ != null && v3k.CurveZ.length > 0)
+                        maxLenght = Mathf.Max(maxLenght, v3k.CurveZ.keys[v3k.CurveZ.length - 1].time);                    
+
+                    return maxLenght;
+                }
+                return 0;
+            }
+        }
 
         [SerializeField]
         [HideInInspector]

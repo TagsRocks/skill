@@ -33,7 +33,7 @@ namespace Skill.Framework.UI
 
         private void RowColumnDefinitions_Change(object sender, System.EventArgs e)
         {
-            base.RequestUpdateLayout();
+            base.Invalidate();
         }
 
         /// <summary>

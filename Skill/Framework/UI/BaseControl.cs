@@ -104,7 +104,7 @@ namespace Skill.Framework.UI
         /// <summary>
         /// Position of control relative to parent
         /// </summary>
-        public Rect Position
+        public virtual Rect Position
         {
             get { return _Position; }
             set
@@ -120,7 +120,7 @@ namespace Skill.Framework.UI
         /// <summary>
         /// Gets or sets Position.X
         /// </summary>
-        public float X
+        public virtual float X
         {
             get
             {
@@ -139,7 +139,7 @@ namespace Skill.Framework.UI
         /// <summary>
         /// Gets or sets Position.Y
         /// </summary>
-        public float Y
+        public virtual float Y
         {
             get
             {
@@ -159,7 +159,7 @@ namespace Skill.Framework.UI
         /// <summary>
         /// Gets or sets the suggested width of the element
         /// </summary>
-        public float Width
+        public virtual float Width
         {
             get
             {
@@ -178,7 +178,7 @@ namespace Skill.Framework.UI
         /// <summary>
         /// Gets or sets the suggested height of the element.
         /// </summary>
-        public float Height
+        public virtual float Height
         {
             get
             {

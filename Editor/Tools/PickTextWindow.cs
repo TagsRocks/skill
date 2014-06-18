@@ -156,38 +156,32 @@ namespace Skill.Editor.Tools
             }
             else
             {
-                if (_Dictionary.Data != null)
+                if (Dictionary.Keys != null)
                 {
-                    foreach (var d in _Dictionary.Data)
+                    foreach (var k in Dictionary.Keys)
                     {
-                        if (d != null && d.Keys != null)
+                        if (k != null)
                         {
-                            foreach (var k in d.Keys)
+                            if (!ViewExist(k))
                             {
-                                if (k != null)
-                                {
-                                    if (!ViewExist(k))
-                                    {
-                                        TextKeyView view = new TextKeyView(k);
-                                        this._List.Add(view);
-                                        this.Controls.Add(view);
-                                    }
-                                }
-                            }
-
-                            int index = 0;
-                            while (index < _List.Count)
-                            {
-                                var view = _List[index];
-                                if (!KeyExist(view, d.Keys))
-                                {
-                                    this._List.Remove(view);
-                                    this.Controls.Remove(view);
-                                    continue;
-                                }
-                                index++;
+                                TextKeyView view = new TextKeyView(k);
+                                this._List.Add(view);
+                                this.Controls.Add(view);
                             }
                         }
+                    }
+
+                    int index = 0;
+                    while (index < _List.Count)
+                    {
+                        var view = _List[index];
+                        if (!KeyExist(view, Dictionary.Keys))
+                        {
+                            this._List.Remove(view);
+                            this.Controls.Remove(view);
+                            continue;
+                        }
+                        index++;
                     }
                 }
             }

@@ -28,6 +28,21 @@ namespace Skill.Framework.Sequence
         public override TrackType Type { get { return TrackType.Event; } }
         protected float CurrecntTime { get; private set; }
 
+        public override float Length
+        {
+            get
+            {
+                if (EventKeys != null && EventKeys.Length > 0)
+                {
+                    if (!Application.isPlaying)
+                        SortKeys();
+
+                    return EventKeys[EventKeys.Length].FireTime;
+                }
+                return 0;
+            }
+        }
+
         private int _Index;
         public override void Evaluate(float time)
         {

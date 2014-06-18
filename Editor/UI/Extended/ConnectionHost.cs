@@ -98,7 +98,7 @@ namespace Skill.Editor.UI.Extended
                     this._EndPreviewConnector = e.mousePosition;
                     e.Use();
                 }
-                else if (e.type == EventType.MouseUp && e.button == 0)
+                else if ((e.type == EventType.MouseUp || e.rawType == EventType.MouseUp) && e.button == 0)
                 {
                     Frame of = OwnerFrame;
                     if (of != null)

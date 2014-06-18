@@ -127,6 +127,8 @@ namespace Skill.Framework.Managers
         {
             objToFree.SetActive(false);
             _DeactiveObjects.Enqueue(objToFree);
+            if (Group.MakeAsChild)
+                objToFree.transform.parent = Group.transform;
         }
 
         /// <summary>

@@ -14,9 +14,13 @@ namespace Skill.Framework.Sequence
         [ExposeProperty(0, "Time", "Event time")]
         public float ExTime { get { return Time; } set { Time = value; } }
 
+        [CurveEditor(1, 0, 0, "X")]
         public AnimationCurve CurveX;
+        [CurveEditor(0, 1, 0, "Y")]
         public AnimationCurve CurveY;
+        [CurveEditor(0, 0, 1, "Z")]
         public AnimationCurve CurveZ;
+        [CurveEditor(0, 1, 1, "W")]
         public AnimationCurve CurveW;
 
         public Vector4 ValueKey { get { return this.Value; } set { this.Value = value; } }
@@ -30,6 +34,36 @@ namespace Skill.Framework.Sequence
         public override Type PropertyType { get { return typeof(Vector4); } }
         public override TrackType Type { get { return TrackType.Vector4; } }
 
+
+        public override float Length
+        {
+            get
+            {
+                if (Keys != null && Keys.Length > 0)
+                {
+                    if (!Application.isPlaying)
+                        SortKeys();
+
+                    Vector4Key v4k = Keys[Keys.Length - 1];
+                    float maxLenght = v4k.FireTime;
+
+                    if (v4k.CurveX != null && v4k.CurveX.length > 0)
+                        maxLenght = Mathf.Max(maxLenght, v4k.CurveX.keys[v4k.CurveX.length - 1].time);
+
+                    if (v4k.CurveY != null && v4k.CurveY.length > 0)
+                        maxLenght = Mathf.Max(maxLenght, v4k.CurveY.keys[v4k.CurveY.length - 1].time);
+
+                    if (v4k.CurveZ != null && v4k.CurveZ.length > 0)
+                        maxLenght = Mathf.Max(maxLenght, v4k.CurveZ.keys[v4k.CurveZ.length - 1].time);
+
+                    if (v4k.CurveW != null && v4k.CurveW.length > 0)
+                        maxLenght = Mathf.Max(maxLenght, v4k.CurveW.keys[v4k.CurveW.length - 1].time);
+
+                    return maxLenght;
+                }
+                return 0;
+            }
+        }
 
 
         [SerializeField]

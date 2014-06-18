@@ -61,6 +61,7 @@ namespace Skill.Framework.UI
             }
         }
 
+
         /// <summary> Name of dialog to show before last frame removed from view stack</summary>
         public string ExitDialog { get; set; }
 
@@ -396,14 +397,14 @@ namespace Skill.Framework.UI
             else if (TopFrame != null)
                 handled = TopFrame.HandleCommand(command, handleTabIndex);
 
-            if (!handled)
-            {
-                if (command.Key == KeyCommand.Cancel && _DialogStack.Count == 0 && _ViewStack.Count > 0)
-                {
-                    Back();
-                    handled = true;
-                }
-            }
+            //if (!handled)
+            //{
+            //    if (command.Key == KeyCommand.Cancel && _DialogStack.Count == 0 && _ViewStack.Count > 0)
+            //    {
+            //        Back();
+            //        handled = true;
+            //    }
+            //}
             return handled;
         }
         #endregion

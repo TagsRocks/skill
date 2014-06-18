@@ -22,7 +22,7 @@ namespace Skill.Framework.UI
         /// <summary> Allow escape slapsh after this time </summary>
         public float AllowEscapeAfter = 20.0f;
         /// <summary> Level to load in background.(Unity Pro) </summary>
-        public int LevelToLoad = -1;
+        public string LevelToLoad = null;
         /// <summary> Show movies in fullscreen size</summary>
         public bool FullScreenMovies = true;
         /// <summary>
@@ -73,7 +73,6 @@ namespace Skill.Framework.UI
         protected override void Start()
         {
             base.Start();
-            useGUILayout = false;
             _Frame = new Frame("SplashFrame");
 
             for (int i = 0; i < 3; i++)
@@ -104,7 +103,7 @@ namespace Skill.Framework.UI
 
         private void LoadLevel()
         {
-            if (LevelToLoad >= 0 && Application.HasProLicense())
+            if (!string.IsNullOrEmpty(LevelToLoad) && Application.HasProLicense())
             {
                 _LoadingAsyncOperation = Application.LoadLevelAsync(LevelToLoad);
                 _LoadingAsyncOperation.allowSceneActivation = false;

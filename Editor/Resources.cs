@@ -57,6 +57,12 @@ namespace Skill.Editor
 
             SetTextureImportType(GetResourcePath("UI/Paste.png"), TextureImporterType.GUI);
 
+            SetTextureImportType(GetResourcePath("UI/TimeFormat.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetResourcePath("UI/SequenceFormat.png"), TextureImporterType.GUI);
+
+            SetTextureImportType(GetResourcePath("UI/Keyframe.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetResourcePath("UI/KeyframeSelected.png"), TextureImporterType.GUI);
+
             SetTextureImportType(GetResourcePath("UI/Matinee/Folder.png"), TextureImporterType.GUI);
             SetTextureImportType(GetResourcePath("UI/Matinee/Sound.png"), TextureImporterType.GUI);
             SetTextureImportType(GetResourcePath("UI/Matinee/Event.png"), TextureImporterType.GUI);
@@ -157,6 +163,11 @@ namespace Skill.Editor
             public static Texture2D ArrowRight { get { return GetTexture("UI/Arrow_Right.png"); } }
             public static Texture2D Paste { get { return GetTexture("UI/Paste.png"); } }
 
+            public static Texture2D TimeFormat { get { return GetTexture("UI/TimeFormat.png"); } }
+            public static Texture2D SequenceFormat { get { return GetTexture("UI/SequenceFormat.png"); } }
+
+            public static Texture2D Keyframe { get { return GetTexture("UI/Keyframe.png"); } }
+            public static Texture2D KeyframeSelected { get { return GetTexture("UI/KeyframeSelected.png"); } }
 
             #region Color Textures
             private static Texture2D _Red;
@@ -295,6 +306,7 @@ namespace Skill.Editor
                 public static Texture2D Checkbox_Unchecked { get { return GetTexture("UI/Matinee/Checkbox_Unchecked.png"); } }
             }
             #endregion
+
 
         }
         public static class Styles

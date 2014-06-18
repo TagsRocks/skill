@@ -147,7 +147,7 @@ namespace Skill.Framework.UI
                             _IsMouseDown = false;
                         }
                     }
-                    else if (type == EventType.MouseUp)
+                    else if (type == EventType.MouseUp || e.rawType == EventType.MouseUp)
                     {
                         MouseButton mb = ConvertButton(e.button);
                         MouseClickEventArgs args = new MouseClickEventArgs(e.mousePosition, e.modifiers, mb, e.clickCount);

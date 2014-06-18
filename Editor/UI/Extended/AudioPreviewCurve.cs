@@ -22,10 +22,15 @@ namespace Skill.Editor.UI.Extended
                 if (_Resolution != value)
                 {
                     _Resolution = Mathf.Max(16, value);
+                    _Ranges = new Rect(0, 0, _Resolution, 1);
                     _Changed = true;
                 }
             }
         }
+
+        private Rect _Ranges;
+        public Rect Ranges { get { return _Ranges; } set { _Ranges = value; } }
+
         public AudioClip Clip
         {
             get { return _Clip; }
@@ -55,7 +60,7 @@ namespace Skill.Editor.UI.Extended
         {
             PreviewBackground = true;
             _Data = new AudioClipCurveData();
-            _Resolution = 800;
+            Resolution = 800;
             BackgroundColor = new Color(0, 0, 0, 0);
             Color = new Color(0.3f, 0.3f, 1.0f, 1.0f);
         }
@@ -68,9 +73,9 @@ namespace Skill.Editor.UI.Extended
             if (PreviewBackground)
                 GUI.Box(RenderArea, string.Empty, Skill.Editor.Resources.Styles.PreviewBackground);
             if (_Data.MinCurve != null)
-            {
-                Rect rect = new Rect(0, 0, _Resolution, 1);
-                EditorGUIUtility.DrawRegionSwatch(RenderArea, _Data.MinCurve, _Data.MaxCurve, Color, BackgroundColor, rect);
+            {                
+                Rect ra = RenderArea;
+                EditorGUIUtility.DrawRegionSwatch(ra, _Data.MinCurve, _Data.MaxCurve, Color, BackgroundColor, Ranges);
             }
         }
 

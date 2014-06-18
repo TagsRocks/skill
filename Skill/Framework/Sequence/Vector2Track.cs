@@ -15,7 +15,9 @@ namespace Skill.Framework.Sequence
         [ExposeProperty(0, "Time", "Event time")]
         public float ExTime { get { return Time; } set { Time = value; } }
 
+        [CurveEditor(1, 0, 0, "X")]
         public AnimationCurve CurveX;
+        [CurveEditor(0, 1, 0, "Y")]
         public AnimationCurve CurveY;
 
         public Vector2 ValueKey { get { return this.Value; } set { this.Value = value; } }
@@ -27,6 +29,31 @@ namespace Skill.Framework.Sequence
 
         public override Type PropertyType { get { return typeof(Vector2); } }
         public override TrackType Type { get { return TrackType.Vector2; } }
+
+
+        public override float Length
+        {
+            get
+            {
+                if (Keys != null && Keys.Length > 0)
+                {
+                    if (!Application.isPlaying)
+                        SortKeys();
+
+                    Vector2Key v2k = Keys[Keys.Length - 1];
+                    float maxLenght = v2k.FireTime;
+
+                    if (v2k.CurveX != null && v2k.CurveX.length > 0)
+                        maxLenght = Mathf.Max(maxLenght, v2k.CurveX.keys[v2k.CurveX.length - 1].time);
+
+                    if (v2k.CurveY != null && v2k.CurveY.length > 0)
+                        maxLenght = Mathf.Max(maxLenght, v2k.CurveY.keys[v2k.CurveY.length - 1].time);
+
+                    return maxLenght;
+                }
+                return 0;
+            }
+        }
 
 
         [SerializeField]

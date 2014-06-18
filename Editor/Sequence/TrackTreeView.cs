@@ -126,7 +126,7 @@ namespace Skill.Editor.Sequence
                     if (trackItem == null)
                     {
                         BaseTrackBar bar = CreateNewTrackBar(track);
-                        _Editor.TimeLine.TrackView.Controls.Add(bar);
+                        _Editor.TimeLine.View.Controls.Add(bar);
                         trackItem = new TrackTreeViewItem(track, bar);
                         trackItem.ContextMenu = _TrackItemContextMenu;
                         panel.Controls.Add(trackItem);
@@ -155,7 +155,7 @@ namespace Skill.Editor.Sequence
                     if (!trackList.Contains(track))
                     {
                         panel.Controls.Remove(item);
-                        _Editor.TimeLine.TrackView.Controls.Remove(((TrackTreeViewItem)item).TrackBar);
+                        _Editor.TimeLine.View.Controls.Remove(((TrackTreeViewItem)item).TrackBar);
                         continue;
                     }
                 }
@@ -209,7 +209,7 @@ namespace Skill.Editor.Sequence
             foreach (var item in group.Controls)
             {
                 if (item is TrackTreeViewItem)
-                    _Editor.TimeLine.TrackView.Controls.Remove(((TrackTreeViewItem)item).TrackBar);
+                    _Editor.TimeLine.View.Controls.Remove(((TrackTreeViewItem)item).TrackBar);
                 else if (item is TrackTreeViewGroup)
                     RemoveTracks((TrackTreeViewGroup)item);
             }
@@ -222,7 +222,7 @@ namespace Skill.Editor.Sequence
                 Track newTrack = CreateNewTrack(newObj, type);
                 BaseTrackBar bar = CreateNewTrackBar(newTrack);
 
-                _Editor.TimeLine.TrackView.Controls.Add(bar);
+                _Editor.TimeLine.View.Controls.Add(bar);
                 TrackTreeViewItem newItem = new TrackTreeViewItem(newTrack, bar);
                 newItem.ContextMenu = _TrackItemContextMenu;
 
@@ -300,7 +300,7 @@ namespace Skill.Editor.Sequence
                 {
                     ((Skill.Framework.UI.Panel)track.Parent).Controls.Remove(track);
                     Skill.Editor.UI.EditorFrame.RepaintParentEditorWindow(track);
-                    if (track.TrackBar != null) _Editor.TimeLine.TrackView.Controls.Remove(track.TrackBar);
+                    if (track.TrackBar != null) _Editor.TimeLine.View.Controls.Remove(track.TrackBar);
                     GameObject.DestroyImmediate(track.Track.gameObject);
                     _Editor.TrackChanged();
                 }

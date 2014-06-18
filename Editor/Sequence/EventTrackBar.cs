@@ -34,7 +34,7 @@ namespace Skill.Editor.Sequence
             _Events = new List<EventKeyView>();
             CreateEvents();
             this.ContextMenu = EventTrackBarContextMenu.Instance;
-            this.Height = 22;
+            //this.Height = 22;
         }
 
 
@@ -122,8 +122,8 @@ namespace Skill.Editor.Sequence
             if (timeLine != null)
             {
                 // convert to local position of TimeBar - because of zooming
-                x -= timeLine.TrackView.ScrollPosition.x;
-                newKey.FireTime = (float)timeLine.Timebar.GetTime(x);
+                x -= timeLine.View.ScrollPosition.x;
+                newKey.FireTime = (float)timeLine.TimeBar.GetTime(x);
 
                 EventKeyView e = CreateEvent(newKey);
                 if (MatineeEditorWindow.Instance != null)

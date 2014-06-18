@@ -17,7 +17,8 @@ namespace Skill.Framework.UI.Extended
         public Texture FillImage { get { return _ImgFill.Texture; } set { _ImgFill.Texture = value; } }
         /// <summary> Style to use as background Box of ProgressBar </summary>
         public GUIStyle BackgroundStyle { get { return _Background.Style; } set { _Background.Style = value; } }
-
+        /// <summary> TintColor of texture to use as fill ProgressBar </summary>
+        public Color FillTintColor { get { return _ImgFill.TintColor; } set { _ImgFill.TintColor = value; } }
 
         /// <summary>
         /// Occurs when value of ProgressBar changed

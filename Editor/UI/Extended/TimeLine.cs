@@ -90,12 +90,16 @@ namespace Skill.Editor.UI.Extended
         private bool _SelectionEnable;
 
         private TimeBar _Timebar;
-        private TrackView _TrackView;
+        private TimeLineView _View;
+        private Button _BtnTimeStyle;
 
         /// <summary> TimeBar </summary>
-        public TimeBar Timebar { get { return _Timebar; } }
-        /// <summary> TrackView  </summary>
-        public TrackView TrackView { get { return _TrackView; } }
+        public TimeBar TimeBar { get { return _Timebar; } }
+
+        /// <summary> TimeLineView  </summary>
+        public TimeLineView View { get { return _View; } }
+
+        public bool ExtendMaxTime { get; set; }
 
         /// <summary> ZoomFactor </summary>
         public double ZoomFactor { get; private set; }
@@ -105,10 +109,12 @@ namespace Skill.Editor.UI.Extended
             get { return _StartVisibleTime; }
             set
             {
+                double preValue = _StartVisibleTime;
                 _StartVisibleTime = value;
                 if (_StartVisibleTime < _MinTime) _StartVisibleTime = _MinTime;
                 if (_StartVisibleTime > _EndVisibleTime - MinTimeLine) _StartVisibleTime = _EndVisibleTime - MinTimeLine;
-                OnLayoutChanged();
+                if (preValue != _StartVisibleTime)
+                    OnLayoutChanged();
             }
         }
         /// <summary> End time of visible area </summary>
@@ -117,10 +123,19 @@ namespace Skill.Editor.UI.Extended
             get { return _EndVisibleTime; }
             set
             {
+                double preValue = _EndVisibleTime;
                 _EndVisibleTime = value;
-                if (_EndVisibleTime > _MaxTime) _EndVisibleTime = _MaxTime;
-                if (_EndVisibleTime < _StartVisibleTime + MinTimeLine) _EndVisibleTime = _StartVisibleTime + MinTimeLine;
-                OnLayoutChanged();
+                if (_EndVisibleTime < _StartVisibleTime + MinTimeLine)
+                    _EndVisibleTime = _StartVisibleTime + MinTimeLine;
+                if (_EndVisibleTime > _MaxTime)
+                {
+                    if (ExtendMaxTime)
+                        _MaxTime = _EndVisibleTime;
+                    else
+                        _EndVisibleTime = _MaxTime;
+                }
+                if (preValue != _EndVisibleTime)
+                    OnLayoutChanged();
             }
         }
         /// <summary> Maximum available time to scroll</summary>
@@ -129,11 +144,13 @@ namespace Skill.Editor.UI.Extended
             get { return _MaxTime; }
             set
             {
+                double preValue = _MaxTime;
                 _MaxTime = value;
                 if (_MaxTime < _MinTime + MinTimeLine) _MaxTime = _MinTime + MinTimeLine;
                 if (_MaxTime < _EndVisibleTime) _EndVisibleTime = _MaxTime;
                 SelectTime(_StartSelectionTime, _EndSelectionTime);
-                OnLayoutChanged();
+                if (preValue != _MaxTime)
+                    OnLayoutChanged();
             }
         }
         /// <summary> Minimum available time to scroll</summary>
@@ -142,11 +159,13 @@ namespace Skill.Editor.UI.Extended
             get { return _MinTime; }
             set
             {
+                double preValue = _MinTime;
                 _MinTime = value;
                 if (_MinTime > _MaxTime - MinTimeLine) _MinTime = _MaxTime - MinTimeLine;
                 if (_MinTime < _StartVisibleTime) _StartVisibleTime = _MinTime;
                 SelectTime(_StartSelectionTime, _EndSelectionTime);
-                OnLayoutChanged();
+                if (preValue != _MinTime)
+                    OnLayoutChanged();
             }
         }
         /// <summary> Start time of selected time </summary>
@@ -161,7 +180,7 @@ namespace Skill.Editor.UI.Extended
             set
             {
                 _SelectionEnable = value;
-                if(!_SelectionEnable)
+                if (!_SelectionEnable)
                 {
                     _EndSelectionTime = _EndSelectionTime = 0;
                 }
@@ -183,7 +202,7 @@ namespace Skill.Editor.UI.Extended
                     OnTimePositionChanged();
                 }
             }
-        }        
+        }
 
         /// <summary> Occurs when PositionChanged changed </summary>
         public event System.EventHandler TimePositionChanged;
@@ -197,12 +216,18 @@ namespace Skill.Editor.UI.Extended
         /// <summary>
         /// Create a ZoomPanel
         /// </summary>
-        public TimeLine()
+        /// <param name="view">instance of a TimeLineView implemented class</param>
+        public TimeLine(TimeLineView view)
         {
+            if (view == null) throw new System.InvalidOperationException("Invalid TimeLineView");
+            _View = view;
+            _View.TimeLine = this;
+
+            this.ExtendMaxTime = true;
             this._SelectionEnable = true;
             this._StartVisibleTime = 0;
             this._EndVisibleTime = 1.0;
-            this._MaxTime = 10.0;
+            this._MaxTime = 1.0;
             this._MinTime = 0.0;
 
             this.Padding = new Thickness(2);
@@ -211,11 +236,39 @@ namespace Skill.Editor.UI.Extended
             this.RowDefinitions.Add(4, GridUnitType.Pixel);
             this.RowDefinitions.Add(1, GridUnitType.Star);
 
-            _Timebar = new TimeBar(this) { Row = 0, Column = 0, Margin = new Thickness(0, 0, 16, 0) };
-            _TrackView = new TrackView(this) { Row = 2, Column = 0, ScrollbarThickness = 16, Padding = new Thickness(0, 0, 16, 0) };
+            _BtnTimeStyle = new Button() { Row = 0, Column = 0, HorizontalAlignment = Framework.UI.HorizontalAlignment.Right, Width = 16, Margin = new Thickness(0, 1) };
+            _BtnTimeStyle.Style = new GUIStyle();
+            _BtnTimeStyle.Style.padding = new RectOffset(1, 1, 2, 2);
 
+            _BtnTimeStyle.Click += _BtnTimeStyle_Click;
+
+            _Timebar = new TimeBar(this) { Row = 0, Column = 0, Margin = new Thickness(0, 0, 16, 0) };
+
+            _View.Row = 2;
+            _View.Column = 0;
+            _View.ScrollbarThickness = 16;
+            _View.Padding = new Thickness(0, 0, 16, 0);
+
+            this.Controls.Add(_BtnTimeStyle);
             this.Controls.Add(_Timebar);
-            this.Controls.Add(_TrackView);
+            this.Controls.Add(_View);
+        }
+
+        void _BtnTimeStyle_Click(object sender, System.EventArgs e)
+        {
+            _Timebar.TimeStyle = !_Timebar.TimeStyle;
+            Skill.Editor.UI.EditorFrame.RepaintParentEditorWindow(this);
+        }
+
+        protected override void Render()
+        {
+            RefreshStyles();
+            base.Render();
+        }
+
+        private void RefreshStyles()
+        {
+            _BtnTimeStyle.Content.image = _Timebar.TimeStyle ? Skill.Editor.Resources.Textures.TimeFormat : Skill.Editor.Resources.Textures.SequenceFormat;
         }
 
         /// <summary>
@@ -284,6 +337,7 @@ namespace Skill.Editor.UI.Extended
                 EndVisible -= deltaTime;
                 StartVisible += deltaTime;
             }
+            EditorFrame.RepaintParentEditorWindow(this);
         }
 
         /// <summary>
@@ -293,7 +347,7 @@ namespace Skill.Editor.UI.Extended
         /// <returns></returns>
         public double GetDeltaTime(float deltaPixel)
         {
-            return Timebar.GetDeltaTime(deltaPixel);
+            return TimeBar.GetDeltaTime(deltaPixel);
         }
 
         /// <summary>
@@ -303,7 +357,7 @@ namespace Skill.Editor.UI.Extended
         /// <returns>time</returns>
         public double GetTime(float mousePosX)
         {
-            return Timebar.GetTime(mousePosX);
+            return TimeBar.GetTime(mousePosX);
         }
 
         /// <summary>
@@ -313,7 +367,7 @@ namespace Skill.Editor.UI.Extended
         /// <returns>Snapped time</returns>
         public double GetSnapedTime(double time)
         {
-            return Timebar.GetSnapedTime(time);
+            return TimeBar.GetSnapedTime(time);
         }
 
         /// <summary>
@@ -321,7 +375,7 @@ namespace Skill.Editor.UI.Extended
         /// </summary>
         public void Clear()
         {
-            TrackView.Controls.Clear();
+            View.Controls.Clear();
         }
     }
 }

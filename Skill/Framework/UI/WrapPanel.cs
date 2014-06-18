@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Skill.Framework.UI
 {
-        
+
     /// <summary>
     /// Positions child elements in sequential position from left to right, breaking
     /// content to the next line at the edge of the containing box. Subsequent ordering
@@ -12,7 +12,7 @@ namespace Skill.Framework.UI
     /// on the value of the WrapPanel.Orientation property.
     /// </summary>
     public class WrapPanel : Panel
-    {                
+    {
         /// <summary>
         /// Gets or sets a value that specifies the dimension in which child content is arranged.
         /// </summary> 
@@ -82,6 +82,22 @@ namespace Skill.Framework.UI
                 xMax = Mathf.Max(cRect.xMax, xMax);
                 c.RenderArea = new Rect(cRect.x + c.Margin.Left, cRect.y + c.Margin.Top, c.LayoutWidth, c.LayoutHeight);
             }
+        }
+
+
+        protected override void Render()
+        {
+            Rect ra = RenderArea;
+            foreach (var c in Controls)
+            {
+                if (Contains(ra, c.RenderArea))
+                    c.OnGUI();
+            }
+        }
+
+        private bool Contains(Rect rect1, Rect rect2)
+        {
+            return ((rect2.xMin >= rect1.xMin) && (rect2.yMin >= rect1.yMin) && (rect2.xMax <= rect1.xMax) && (rect2.yMax <= rect1.yMax));
         }
     }
 }

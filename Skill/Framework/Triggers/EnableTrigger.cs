@@ -48,11 +48,6 @@ namespace Skill.Framework.Triggers
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Name of file in Gizmos folder
-        /// </summary>
-        protected override string GizmoFilename { get { return "Enable.png"; } }
+        }        
     }
 }

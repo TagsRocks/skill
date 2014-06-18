@@ -50,17 +50,27 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CurveUtility.cs" />
+    <Compile Include="Curve\CurveEditor.cs" />
+    <Compile Include="Curve\CurveEditorWindow.cs" />
+    <Compile Include="Curve\CurveKey.cs" />
+    <Compile Include="Curve\CurveKeyContextMenu.cs" />
+    <Compile Include="Curve\CurveKeyProperties.cs" />
+    <Compile Include="Curve\CurveKeyTangent.cs" />
+    <Compile Include="Curve\CurvePreset.cs" />
+    <Compile Include="Curve\CurveTrack.cs" />
+    <Compile Include="Curve\CurveTrackContextMenu.cs" />
+    <Compile Include="Curve\TimeLineCurveView.cs" />
+    <Compile Include="Curve\TimeLineGrid.cs" />
     <Compile Include="HandleHelper.cs" />
     <Compile Include="Sequence\BaseTrackBar.cs" />
     <Compile Include="Sequence\BooleanTrackBar.cs" />
     <Compile Include="Sequence\ColorTrackBar.cs" />
     <Compile Include="Sequence\EventTrackBar.cs" />
     <Compile Include="Tools\AudioClipSubtitleEditor.cs" />
-    <Compile Include="Tools\AudioSubtitleEditor.cs" />
-    <Compile Include="Tools\AudioSubtitleEditorWindow.cs" />
-    <Compile Include="Tools\DictionaryDataEditor.cs" />
-    <Compile Include="Tools\DictionaryDataEditorWindow.cs" />
-    <Compile Include="Tools\DictionaryDataTranslateWindow.cs" />
+    <Compile Include="Tools\DictionaryEditor.cs" />
+    <Compile Include="Tools\DictionaryEditorWindow.cs" />
+    <Compile Include="Tools\DictionaryTranslateWindow.cs" />
     <Compile Include="Tools\PasteTextField.cs" />
     <Compile Include="Tools\PickTextWindow.cs" />
     <Compile Include="UI\Extended\AudioClipCurveData.cs" />
@@ -130,8 +140,9 @@
     <Compile Include="UI\Extended\TextureBrushGrid.cs" />
     <Compile Include="UI\Extended\TimeBar.cs" />
     <Compile Include="UI\Extended\TimeLine.cs" />
+    <Compile Include="UI\Extended\TimeLineView.cs" />
     <Compile Include="UI\Extended\TrackBar.cs" />
-    <Compile Include="UI\Extended\TrackView.cs" />
+    <Compile Include="UI\Extended\TrackBarView.cs" />
     <Compile Include="UI\Extended\TreeView.cs" />
     <Compile Include="UI\Extended\ZoomPanel.cs" />
     <Compile Include="UI\GridSplitter.cs" />
@@ -241,6 +252,12 @@
     <Content Include="Resources\UI\Failure.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\UI\Keyframe.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\KeyframeSelected.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\UI\Loop.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -328,6 +345,9 @@
     <Content Include="Resources\UI\SelectedItemBg.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\UI\SequenceFormat.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\UI\StepBackward.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -341,6 +361,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\UI\Success.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\TimeFormat.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\UI\White.png">

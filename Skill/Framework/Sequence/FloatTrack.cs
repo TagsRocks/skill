@@ -13,6 +13,7 @@ namespace Skill.Framework.Sequence
         public float Value;
         /// <summary> Value curve </summary>
         [SerializeField]
+        [CurveEditor(1, 0, 0, "Value")]
         public AnimationCurve Curve;
 
 
@@ -28,6 +29,26 @@ namespace Skill.Framework.Sequence
     {
         public override Type PropertyType { get { return typeof(float); } }
         public override TrackType Type { get { return TrackType.Float; } }
+
+
+        public override float Length
+        {
+            get
+            {
+                if (Keys != null && Keys.Length > 0)
+                {
+                    if (!Application.isPlaying)
+                        SortKeys();
+
+                    FloatKey fk = (FloatKey)Keys[Keys.Length - 1];
+                    if (fk.Curve != null && fk.Curve.length > 0)
+                        return fk.Curve.keys[fk.Curve.length - 1].time;
+                    else
+                        return fk.FireTime;
+                }
+                return 0;
+            }
+        }
 
 
         [SerializeField]

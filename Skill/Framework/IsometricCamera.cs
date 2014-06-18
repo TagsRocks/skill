@@ -14,6 +14,8 @@ namespace Skill.Framework
         public Transform Target;
         /// <summary> How to damp movement of camera when following target</summary>
         public float Damping = 2.0f;
+        /// <summary> How to damp offset of camera when following target</summary>
+        public float OffsetDamping = 1.0f;
         /// <summary> Camera moves by mouse when mouse position gets far from center of screen. </summary>
         public float CameraPreview = 2.0f;
         /// <summary> Rotation angle around target ( 0 - 360) </summary>
@@ -55,14 +57,21 @@ namespace Skill.Framework
         /// <summary>  Camera screen space </summary>
         public Quaternion ScreenSpace { get { return _ScreenMovementSpace; } }
 
+        /// <summary> Temporarily ignore CustomOffset </summary>
+        /// <remarks> you want ignore CustomOffset but do not lose previous value </remarks>
+        public bool IgnoreCustomOffset { get; set; }
 
         // Private memeber data                
+        private CameraLimit[] _Limits;
         private Transform _CameraTransform;
+        private Transform _PreTarget;
 
         private Quaternion _ScreenMovementSpace;
         private Plane _MovementPlane;
 
+        private Vector3? _PrePosition;
         private Vector3 _Offset;
+        private Vector3 _SomeOFOffsets;
         private float _Zoom;
         private float _LengthOffset;
 
@@ -81,6 +90,9 @@ namespace Skill.Framework
             CursorScreenPosition = new Vector3(0.5f * Screen.width, 0.5f * Screen.height, 0);
         }
 
+        /// <summary>
+        /// Get required references
+        /// </summary>
         protected override void GetReferences()
         {
             base.GetReferences();
@@ -91,6 +103,8 @@ namespace Skill.Framework
                 Debug.LogError("Camera component not found. Isometric camera shold assigned to a camera GameOject.");
                 return;
             }
+
+            _Limits = GetComponents<CameraLimit>();
         }
 
         /// <summary>
@@ -226,11 +240,25 @@ namespace Skill.Framework
                 offsetToCenter.y = _YDistace;
                 // Set the target position of the camera to point at the focus point
 
-                Vector3 finalOffset = _Offset + offsetToCenter + (cameraAdjustmentVector * CameraPreview) + (_ScreenMovementSpace * CustomOffset);
+                Vector3 off = _Offset;
+                if (!IgnoreCustomOffset)
+                    off += (_ScreenMovementSpace * CustomOffset);
+                _SomeOFOffsets = Vector3.Lerp(_SomeOFOffsets, off, OffsetDamping * Time.deltaTime);
+                Vector3 finalOffset = _SomeOFOffsets + offsetToCenter + (cameraAdjustmentVector * CameraPreview);
                 Vector3 finalPosition = Target.position + finalOffset;
+
+                if (_PreTarget != Target)
+                    _PrePosition = null;
+                // apply camera limits
+                if (_Limits != null && _Limits.Length > 0 && _PrePosition != null)
+                {
+                    for (int i = 0; i < _Limits.Length; i++)
+                        _Limits[i].ApplyLimit(ref finalPosition, _PrePosition.Value);
+                }
 
                 if (!force)
                     finalPosition = Vector3.Lerp(_CameraTransform.position, finalPosition, Damping * Time.deltaTime);
+
 
                 if (FastTarget)
                 {
@@ -250,7 +278,10 @@ namespace Skill.Framework
                 // Apply some smoothing to the camera movement
                 _CameraTransform.position = finalPosition;
                 _CameraTransform.rotation = finalRotation;
+
+                _PrePosition = finalPosition;
             }
+            _PreTarget = Target;
         }
 
 

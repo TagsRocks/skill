@@ -30,7 +30,7 @@ namespace Skill.Editor.Tools
     class CacheGroupEditor : UnityEditor.Editor, IEditor
     {
         #region CreateUI
-        private const float FrameHeight = 234;
+        private const float FrameHeight = 290;
         private const float ButtonRowHeight = 26;
 
         private Skill.Editor.UI.ChangeCheck _MainPanel;
@@ -40,33 +40,77 @@ namespace Skill.Editor.Tools
         private CacheObjectField _ObjectField;
         private bool _IsCollectionChanged;
 
+
+        private Skill.Framework.UI.StackPanel _PnlControls;
+        private Skill.Editor.UI.ToggleButton _BtnInitializeOnAwake;
+        private Skill.Editor.UI.ToggleButton _BtnMakeAsChild;
+        private Skill.Editor.UI.FloatField _FlCleanInterval;
+
         private void CreateUI()
         {
             _ObjectField = new CacheObjectField(this) { Row = 2, Column = 1 };
 
-            _MainPanel = new ChangeCheck();
-            _MainPanel.RowDefinitions.Add(ButtonRowHeight, GridUnitType.Pixel);
-            _MainPanel.RowDefinitions.Add(1, GridUnitType.Star);
-            _MainPanel.RowDefinitions.Add(_ObjectField.LayoutHeight, GridUnitType.Pixel);
-
-            _ItemsList = new ListBox() { Row = 1, Column = 0, Margin = new Thickness(2) };
-            _ItemsList.BackgroundVisible = true;
-            _ItemsList.DisableFocusable();
+            _MainPanel = new ChangeCheck() { Row = 1, Column = 0 };
+            _MainPanel.RowDefinitions.Add(ButtonRowHeight, GridUnitType.Pixel); // _BtnAdd
+            _MainPanel.RowDefinitions.Add(1, GridUnitType.Star); // _ItemsList
+            _MainPanel.RowDefinitions.Add(_ObjectField.LayoutHeight, GridUnitType.Pixel); // _ObjectField
 
             _BtnAdd = new Skill.Editor.UI.Button() { Row = 0, Column = 0, Margin = new Thickness(2) };
             _BtnAdd.Content.text = "Add";
             _BtnAdd.Click += new System.EventHandler(_BtnAdd_Click);
 
+            _ItemsList = new ListBox() { Row = 1, Column = 0, Margin = new Thickness(2) };
+            _ItemsList.BackgroundVisible = true;
+            _ItemsList.DisableFocusable();
+            
             _MainPanel.Controls.Add(new Box() { Row = 2, Column = 1 });
+            _MainPanel.Controls.Add(_BtnAdd);
             _MainPanel.Controls.Add(_ItemsList);
             _MainPanel.Controls.Add(_ObjectField);
-            _MainPanel.Controls.Add(_BtnAdd);
+
+
+            _PnlControls = new StackPanel() { Row = 0, Column = 0 };
+            _BtnInitializeOnAwake = new UI.ToggleButton() { Height = 18 };
+            _BtnInitializeOnAwake.Label.text = "Initialize On Awake";
+            _BtnInitializeOnAwake.Label.tooltip = "create all cached objects on awake";
+            _BtnInitializeOnAwake.IsChecked = _Data.InitializeOnAwake;
+
+            _BtnMakeAsChild = new UI.ToggleButton() { Height = 18 };
+            _BtnMakeAsChild.Label.text = "Make as Child";
+            _BtnMakeAsChild.Label.tooltip = "create all cached objects as childs of group";
+            _BtnMakeAsChild.IsChecked = _Data.MakeAsChild;
+
+            _FlCleanInterval = new FloatField() { Height = 18 };
+            _FlCleanInterval.Label.text = "Clean Interval";
+            _FlCleanInterval.Label.tooltip = "Clean Interval of this group";
+            _FlCleanInterval.Value = _Data.CleanInterval;
+
+            _PnlControls.Controls.Add(_BtnInitializeOnAwake);
+            _PnlControls.Controls.Add(_BtnMakeAsChild);
+            _PnlControls.Controls.Add(_FlCleanInterval);
 
             _Frame = new Frame("MainFrame");
+
+            _Frame.Grid.RowDefinitions.Add(56, GridUnitType.Pixel); // _PnlControls
+            _Frame.Grid.RowDefinitions.Add(1, GridUnitType.Star); // _MainPanel
+
+            _Frame.Grid.Controls.Add(_PnlControls);
             _Frame.Grid.Controls.Add(_MainPanel);
 
             _MainPanel.Changed += new EventHandler(_ChangeCheck_Changed);
             _ItemsList.SelectionChanged += _ItemsPanel_SelectionChanged;
+
+            _BtnInitializeOnAwake.Changed += Properties_Changed;
+            _BtnMakeAsChild.Changed += Properties_Changed;
+            _FlCleanInterval.ValueChanged += Properties_Changed;
+        }
+
+        void Properties_Changed(object sender, EventArgs e)
+        {
+            _Data.InitializeOnAwake = _BtnInitializeOnAwake.IsChecked;
+            _Data.MakeAsChild = _BtnMakeAsChild.IsChecked;
+            _Data.CleanInterval = _FlCleanInterval.Value;
+            EditorUtility.SetDirty(_Data);
         }
 
         void _ItemsPanel_SelectionChanged(object sender, EventArgs e)
@@ -112,16 +156,15 @@ namespace Skill.Editor.Tools
         {
             if (_IsCollectionChanged)
             {
-                Skill.Framework.Managers.CacheGroup data = target as Skill.Framework.Managers.CacheGroup;
-                if (data != null)
+                if (_Data != null)
                 {
-                    data.Caches = new Framework.Managers.CacheObject[_ItemsList.Controls.Count];
+                    _Data.Caches = new Framework.Managers.CacheObject[_ItemsList.Controls.Count];
                     for (int i = 0; i < _ItemsList.Controls.Count; i++)
                     {
                         CacheGroupListItem field = (CacheGroupListItem)_ItemsList.Controls[i];
-                        data.Caches[i] = field.Object;
+                        _Data.Caches[i] = field.Object;
                     }
-                    EditorUtility.SetDirty(data);
+                    EditorUtility.SetDirty(_Data);
                 }
                 _IsCollectionChanged = false;
 
@@ -129,15 +172,16 @@ namespace Skill.Editor.Tools
         }
         #endregion
 
+        private Skill.Framework.Managers.CacheGroup _Data;
         void OnEnable()
         {
+            _Data = target as Skill.Framework.Managers.CacheGroup;
             CreateUI();
-            Skill.Framework.Managers.CacheGroup data = target as Skill.Framework.Managers.CacheGroup;
-            if (data != null)
+            if (_Data != null)
             {
-                if (data.Caches != null)
+                if (_Data.Caches != null)
                 {
-                    foreach (var item in data.Caches)
+                    foreach (var item in _Data.Caches)
                     {
                         if (item != null)
                         {

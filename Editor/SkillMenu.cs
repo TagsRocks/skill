@@ -27,26 +27,27 @@ namespace Skill.Editor
         {
             Skill.Editor.Sequence.MatineeEditorWindow.Instance.Show();
         }
-        [MenuItem("Skill/Subtitle", false, 21)]
-        static void ShowSubtitleEditor()
+
+        [UnityEditor.MenuItem("Skill/Curve Editor", false, 21)]
+        static void ShowCurveEditorWindow()
         {
-            Skill.Editor.Tools.AudioSubtitleEditorWindow.Instance.Show();
+            Skill.Editor.Curve.CurveEditorWindow.Instance.Show();
         }
 
         [MenuItem("Skill/Dictionary", false, 22)]
         static void ShowDictionaryEditor()
         {
-            Skill.Editor.Tools.DictionaryDataEditorWindow.Instance.Show();
+            Skill.Editor.Tools.DictionaryEditorWindow.Instance.Show();
         }
 
         [MenuItem("Skill/Translator", false, 23)]
         static void ShowDictionaryTranslate()
         {
-            Skill.Editor.Tools.DictionaryDataTranslateWindow.Instance.Show();
+            Skill.Editor.Tools.DictionaryTranslateWindow.Instance.Show();
         }
 
 
-       
+
 
         [MenuItem("Skill/Diagnostics/BehaviorTree State", false, 50)]
         static void ShowBTreeStateDebugger()
@@ -98,10 +99,10 @@ namespace Skill.Editor
             ScriptableObjectUtility.CreateAsset<Skill.Framework.SpawnAsset>("SpawnData");
         }
 
-        [UnityEditor.MenuItem("Assets/Create/Skill/Dictionary Data", false, 43)]
+        [UnityEditor.MenuItem("Assets/Create/Skill/Dictionary", false, 43)]
         static void CreateDictionary()
         {
-            Skill.Editor.ScriptableObjectUtility.CreateAsset<Skill.Framework.DictionaryData>("NewDictionaryData");
+            Skill.Editor.ScriptableObjectUtility.CreateAsset<Skill.Framework.Dictionary>("Dictionary");
         }
 
 

@@ -91,5 +91,23 @@ namespace Skill.Framework.UI
             if (PauseOnApplicationPause && pause && !IsVisible)
                 PauseGame();
         }
+        void OnApplicationFocus(bool focusStatus)
+        {
+            if (focusStatus)
+            {
+                if (IsVisible)
+                {
+                    if (PauseTime)
+                        Time.timeScale = 0;
+                    Global.IsGamePaused = true;
+                    if (PauseAudioListener)
+                        AudioListener.pause = Global.IsGamePaused;
+                }
+            }
+            else if (PauseOnApplicationPause && !IsVisible)
+            {
+                PauseGame();
+            }
+        }
     }
 }

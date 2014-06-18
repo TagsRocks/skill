@@ -2,72 +2,7 @@
 using System.Collections;
 namespace Skill.Framework.Audio
 {
-    /// <summary>
-    /// Text subtitle to draw at bottom of screen when playing audios
-    /// </summary>
-    [System.Serializable]
-    public class Subtitle
-    {
-        /// <summary> Time to show subtitle </summary>
-        [SerializeField]
-        public float Time;
 
-        /// <summary> Duration of subtitle </summary>
-        [SerializeField]
-        public float Duration;
-
-        /// <summary> Key in DictionaryData </summary>
-        [SerializeField]
-        public string TitleKey;
-
-        /// <summary> Override global AudioSubtitle style</summary>
-        [SerializeField]
-        public bool OverrideStyle;
-
-        /// <summary> Font Color </summary>
-        [SerializeField]
-        public Color FontColor;
-
-        /// <summary> Font Style </summary>
-        [SerializeField]
-        public FontStyle FontStyle;
-
-        /// <summary> Text Alignment </summary>
-        [SerializeField]
-        public TextAlignment Alignment;
-    }
-
-    class SubtitleComparer : System.Collections.Generic.IComparer<Subtitle>
-    {
-        private static SubtitleComparer _Instance;
-        public static SubtitleComparer Instance
-        {
-            get
-            {
-                if (_Instance == null) _Instance = new SubtitleComparer();
-                return _Instance;
-            }
-        }
-
-        public int Compare(Subtitle x, Subtitle y)
-        {
-            return x.Time.CompareTo(y.Time);
-        }
-    }
-
-
-    /// <summary>
-    /// Aollection of subtitles for an AudioClip
-    /// </summary>
-    [System.Serializable]
-    public class AudioClipSubtitle
-    {
-        [SerializeField]
-        public AudioClip Clip;
-
-        [SerializeField]
-        public Subtitle[] Titles;
-    }
 
 
     /// <summary>
@@ -77,62 +12,118 @@ namespace Skill.Framework.Audio
     {
         public static AudioSubtitle Instance { get; private set; }
 
-        public Dictionary Dictionary;
+        public Dictionary[] Dictionaries;
         public SubtitleRenderer SubRenderer;
-        public Color FontColor = Color.white;
-        public FontStyle FontStyle = FontStyle.Normal;
-        public TextAlignment Alignment = TextAlignment.Center;
-        public Font EditorFont;
-        public int EditorFontSize = 10;
 
-
-        [HideInInspector]
-        public AudioClipSubtitle[] Subtitles;
-
-        private System.Collections.Generic.Dictionary<int, AudioClipSubtitle> _AudioMap;
+        private Color _FontColor = Color.white;
+        private FontStyle _FontStyle = FontStyle.Normal;
+        private TextAlignment _Alignment = TextAlignment.Center;
         private System.Collections.Generic.Queue<SubTime> _Queue;
 
+
+        /// <summary>
+        /// Use Translations if not null - (this is a temporary solution for translation)
+        /// </summary>
+        public Dictionary[] Translations { get; set; }
+
+        /// <summary>
+        /// Awake
+        /// </summary>
         protected override void Awake()
         {
             Instance = this;
             base.Awake();
-            _AudioMap = new System.Collections.Generic.Dictionary<int, AudioClipSubtitle>();
             _Queue = new System.Collections.Generic.Queue<SubTime>(100);
-            if (this.Dictionary != null)
+            if (Dictionaries != null && Dictionaries.Length > 0)
             {
-                if (!this.Dictionary.IsLoaded)
-                    this.Dictionary.Reload();
+                foreach (var dictionary in Dictionaries)
+                {
+                    if (dictionary != null)
+                    {
+                        if (!dictionary.IsLoaded)
+                            dictionary.Reload();
+                    }
+                }
             }
-            Reload();
         }
+        /// <summary>
+        /// GetReferences
+        /// </summary>
         protected override void GetReferences()
         {
             base.GetReferences();
             if (SubRenderer == null)
                 SubRenderer = GetComponent<SubtitleRenderer>();
         }
-
-        private void Reload()
+        
+        private AudioClipSubtitle GetSubtitle(AudioClip clip, out  Dictionary dictionary)
         {
-            _AudioMap.Clear();
-            if (Subtitles != null)
+            if (Dictionaries != null && Dictionaries.Length > 0)
             {
-                foreach (var item in Subtitles)
+                int instanceID = clip.GetInstanceID();
+                foreach (var d in Dictionaries)
                 {
-                    if (item.Clip != null && item.Titles != null)
-                        _AudioMap.Add(item.Clip.GetInstanceID(), item);
+                    if (d != null)
+                    {
+                        if (!d.IsLoaded)
+                            d.Reload();
+
+                        AudioClipSubtitle subtitle = d.GetSubtitle(instanceID);
+                        if (subtitle != null)
+                        {
+                            dictionary = d;
+                            return subtitle;
+                        }
+                    }
                 }
             }
+            dictionary = null;
+            return null;
         }
+
+        private string GetText(string key)
+        {
+            if (Translations != null && Translations.Length > 0)
+                return GetText(Translations, key);
+            else
+                return GetText(Dictionaries, key);
+        }
+        private string GetText(Dictionary[] dictionaries, string key)
+        {
+            if (dictionaries != null && dictionaries.Length > 0)
+            {
+                foreach (var dictionary in dictionaries)
+                {
+                    if (dictionary != null)
+                    {
+                        if (!dictionary.IsLoaded)
+                            dictionary.Reload();
+
+                        string text = dictionary.GetValue(key);
+                        if (text != null) return text;
+                    }
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Start show subtitles of specified AudioClip
+        /// </summary>
+        /// <param name="clip">AudioClip to show it's subtitles (must be exists in Dictionaries)</param>
         public void Show(AudioClip clip)
         {
             if (clip != null)
             {
                 _Queue.Clear();
-                int id = clip.GetInstanceID();
-                AudioClipSubtitle at;
-                if (_AudioMap.TryGetValue(id, out at))
+                Dictionary dictionary = null;
+                AudioClipSubtitle at = GetSubtitle(clip, out dictionary);
+                if (at != null)
                 {
+                    this._FontColor = dictionary.FontColor;
+                    this._FontStyle = dictionary.FontStyle;
+                    this._Alignment = dictionary.Alignment;
+
                     if (at.Titles.Length > 0)
                     {
                         if (at.Titles.Length > 1)
@@ -149,21 +140,24 @@ namespace Skill.Framework.Audio
             }
         }
 
+        /// <summary>
+        /// Update
+        /// </summary>
         protected override void Update()
         {
             if (Skill.Framework.Global.IsGamePaused) return;
             while (_Queue.Count > 0 && _Queue.Peek().Time <= Time.time)
             {
                 SubTime st = _Queue.Dequeue();
-                if (SubRenderer != null && Dictionary != null)
+                string valueText = GetText(st.Title.TitleKey);
+                if (SubRenderer != null && valueText != null)
                 {
-                    string valueText = Dictionary[st.Title.TitleKey];
                     if (!string.IsNullOrEmpty(valueText))
                     {
                         if (st.Title.OverrideStyle)
                             SubRenderer.ShowTitle(valueText, st.Title.Duration, st.Title.FontColor, st.Title.FontStyle, st.Title.Alignment);
                         else
-                            SubRenderer.ShowTitle(valueText, st.Title.Duration, this.FontColor, this.FontStyle, this.Alignment);
+                            SubRenderer.ShowTitle(valueText, st.Title.Duration, this._FontColor, this._FontStyle, this._Alignment);
                     }
                 }
             }

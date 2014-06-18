@@ -13,7 +13,7 @@ namespace Skill.Editor.Sequence
         public BooleanTrackBar(BooleanTrack track)
             : base(track)
         {
-            this.Height = 22;
+            //this.Height = 22;
         }
 
         protected override void EvaluateNewKey(IPropertyKey<bool> newKey, IPropertyKey<bool> previousKey)

@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Skill.Editor
 {
@@ -43,6 +44,51 @@ namespace Skill.Editor
         }
 
         /// <summary>
+        /// /// Draw polyline between points
+        /// </summary>
+        /// <param name="points">Points</param>                
+        /// <param name="color">line color</param>
+        /// <param name="thickness"> line thickness</param>        
+        /// <param name="lineTexture">The thickness of the line</param>    
+        public static void DrawPolyLine(IList<Vector2> points, Color color, float thickness, Texture2D lineTexture)
+        {
+            if (points == null)
+                throw new ArgumentNullException("Invalid points to DrawPolyLine");
+            if (points.Count < 2)
+                throw new ArgumentException("Invalid points to DrawPolyLine");
+            Color savedColor = GUI.color;
+            Matrix4x4 savedMatrix = GUI.matrix;
+
+            Vector3 lineStart = points[0];
+            Vector3 lineEnd;
+
+            for (int i = 1; i < points.Count; i++)
+            {
+                lineEnd = points[i];
+
+                float angle = Vector3.Angle(lineEnd - lineStart, Vector2.right) * (lineStart.y <= lineEnd.y ? 1 : -1);
+                float m = (lineEnd - lineStart).magnitude;
+                if (m > 0.01f)
+                {
+                    Vector3 dz = new Vector3(lineStart.x, lineStart.y, 0);
+
+                    GUI.color = color;
+                    GUI.matrix = TranslationMatrix(dz) * GUI.matrix;
+                    GUIUtility.ScaleAroundPivot(new Vector2(m, thickness), new Vector3(-0.5f, 0, 0));
+                    GUI.matrix = TranslationMatrix(-dz) * GUI.matrix;
+                    GUIUtility.RotateAroundPivot(angle, Vector2.zero);
+                    GUI.matrix = TranslationMatrix(dz + new Vector3(thickness / 2, -m / 2) * Mathf.Sin(angle * Mathf.Deg2Rad)) * GUI.matrix;
+
+                    GUI.DrawTexture(new Rect(0, 0, 1, 1), lineTexture);
+                }
+                lineStart = lineEnd;
+            }
+
+            GUI.matrix = savedMatrix;
+            GUI.color = savedColor;
+        }
+
+        /// <summary>
         /// Draw a BezierLine between two point
         /// </summary>
         /// <param name="start">Start point</param>
@@ -55,13 +101,11 @@ namespace Skill.Editor
         /// <param name="lineTexture">line texture</param>        
         public static void DrawBezierLine(Vector2 start, Vector2 startTangent, Vector2 end, Vector2 endTangent, Color color, float thickness, int segments, Texture2D lineTexture)
         {
-            Vector2 lastV = CubeBezier(start, startTangent, end, endTangent, 0);
+            Vector2[] points = new Vector2[segments + 1];
+            points[0] = CubeBezier(start, startTangent, end, endTangent, 0);
             for (int i = 1; i <= segments; ++i)
-            {
-                Vector2 v = CubeBezier(start, startTangent, end, endTangent, i / (float)segments);
-                DrawLine(lastV, v, color, thickness, lineTexture);
-                lastV = v;
-            }
+                points[i] = CubeBezier(start, startTangent, end, endTangent, i / (float)segments);
+            DrawPolyLine(points, color, thickness, lineTexture);
         }
 
         private static Vector2 CubeBezier(Vector2 s, Vector2 st, Vector2 e, Vector2 et, float t)
@@ -109,137 +153,168 @@ namespace Skill.Editor
         }
 
 
-        /*  Old Methods
-          
-        /// <summary>
-        /// Draw a line between two points with the thickness of 1
-        /// </summary>
-        /// <param name="lineStart">The start of the line</param>
-        /// <param name="lineEnd">The end of the line</param>        
-        public static void DrawLine(Vector2 lineStart, Vector2 lineEnd, Color color)
-        {
-            DrawLine(lineStart, lineEnd, color, 1);
-        }
 
-        /// <summary>
-        /// Draw a line between two points the specified thickness
-        /// Inspired by code posted by Sylvan 
-        /// <!-- http://forum.unity3d.com/threads/17066-How-to-draw-a-GUI-2D-quot-line-quot?p=407005&viewfull=1#post407005 --> 
-        /// </summary>
-        /// <param name="lineStart">The start of the line</param>
-        /// <param name="lineEnd">The end of the line</param>        
-        /// <param name="thickness">The thickness of the line</param>
-        public static void DrawLine(Vector2 lineStart, Vector2 lineEnd, Color color, int thickness)
+        private static Material _LineMaterialGL;
+        private static void CreateMaterial()
         {
-            DrawLineStretched(lineStart, lineEnd, UnityEditor.EditorGUIUtility.whiteTexture, color, thickness);
-        }
-
-        /// <summary>
-        /// Draw a line between two points with the specified texture and thickness.
-        /// The texture will be stretched to fill the drawing rectangle.
-        /// Inspired by code posted by Sylvan
-        /// <!-- http://forum.unity3d.com/threads/17066-How-to-draw-a-GUI-2D-quot-line-quot?p=407005&viewfull=1#post407005 -->
-        /// </summary>
-        /// <param name="lineStart">The start of the line</param>
-        /// <param name="lineEnd">The end of the line</param>
-        /// <param name="texture">The texture of the line</param>
-        /// <param name="thickness">The thickness of the line</param>
-        public static void DrawLineStretched(Vector2 lineStart, Vector2 lineEnd, Texture2D texture, Color color, int thickness)
-        {
-            Vector2 lineVector = lineEnd - lineStart;
-            float angle = Mathf.Rad2Deg * Mathf.Atan(lineVector.y / lineVector.x);
-            if (lineVector.x < 0)
+            if (_LineMaterialGL == null)
             {
-                angle += 180;
+                _LineMaterialGL = new Material("Shader \"Lines/Colored Blended\" {" +
+                    "SubShader { Pass { " +
+                    "    Blend SrcAlpha OneMinusSrcAlpha " +
+                    "    ZWrite Off Cull Off Fog { Mode Off } " +
+                    "    BindChannels {" +
+                    "      Bind \"vertex\", vertex Bind \"color\", color }" +
+                    "} } }");
+                _LineMaterialGL.hideFlags = HideFlags.HideAndDontSave;
+                _LineMaterialGL.shader.hideFlags = HideFlags.HideAndDontSave;
             }
-
-            if (thickness < 1)
-            {
-                thickness = 1;
-            }
-
-            // The center of the line will always be at the center
-            // regardless of the thickness.
-            int thicknessOffset = (int)Mathf.Ceil(thickness / 2);
-
-            Matrix4x4 preGUIMatrix = GUI.matrix;
-            Color preColor = GUI.color;
-
-            GUIUtility.RotateAroundPivot(angle, lineStart);
-            GUI.DrawTexture(new Rect(lineStart.x, lineStart.y - thicknessOffset, lineVector.magnitude, thickness), texture);
-
-            GUI.color = preColor;
-            GUI.matrix = preGUIMatrix;
         }
 
 
         /// <summary>
-        /// Draw a line between two points with the specified texture and a thickness of 1
-        /// The texture will be repeated to fill the drawing rectangle.
+        /// Draw line between points using GL
         /// </summary>
-        /// <param name="lineStart">The start of the line</param>
-        /// <param name="lineEnd">The end of the line</param>
-        /// <param name="texture">The texture of the line</param>
-        public static void DrawLine(Vector2 lineStart, Vector2 lineEnd, Texture2D texture, Color color)
+        /// <param name="lineStart">Line start</param>
+        /// <param name="lineEnd">Line end</param>
+        /// <param name="color">Line color</param>        
+        public static void DrawLineGL(Vector2 lineStart, Vector2 lineEnd, Color color)
         {
-            DrawLine(lineStart, lineEnd, texture, color, 1);
+            CreateMaterial();
+
+            GL.PushMatrix();
+            _LineMaterialGL.SetPass(0);
+            GL.Begin(GL.LINES);
+            GL.Color(color);
+
+            GL.Vertex(lineStart);
+            GL.Vertex(lineEnd);
+
+            GL.End();
+            GL.PopMatrix();
         }
 
         /// <summary>
-        /// Draw a line between two points with the specified texture and thickness.
-        /// The texture will be repeated to fill the drawing rectangle.
-        /// Inspired by code posted by Sylvan and ArenMook
-        /// <!-- http://forum.unity3d.com/threads/17066-How-to-draw-a-GUI-2D-quot-line-quot?p=407005&viewfull=1#post407005 -->
-        /// <!-- http://forum.unity3d.com/threads/28247-Tile-texture-on-a-GUI?p=416986&viewfull=1#post416986 -->
+        /// Draw a BezierLine between two point useing GL
         /// </summary>
-        /// <param name="lineStart">The start of the line</param>
-        /// <param name="lineEnd">The end of the line</param>
-        /// <param name="texture">The texture of the line</param>
-        /// <param name="thickness">The thickness of the line</param>
-        public static void DrawLine(Vector2 lineStart, Vector2 lineEnd, Texture2D texture, Color color, int thickness)
+        /// <param name="start">Start point</param>
+        /// <param name="startTangent"> start tangent </param>
+        /// <param name="end">End Point</param>
+        /// <param name="endTangent">end tangent  </param>
+        /// <param name="color">line color</param>        
+        /// <param name="segments">number of segments</param>        
+        public static void DrawBezierLineGL(Vector2 start, Vector2 startTangent, Vector2 end, Vector2 endTangent, Color color, int segments)
         {
-            Vector2 lineVector = lineEnd - lineStart;
-            float angle = Mathf.Rad2Deg * Mathf.Atan(lineVector.y / lineVector.x);
-            if (lineVector.x < 0)
-            {
-                angle += 180;
-            }
-            if (thickness < 1)
-            {
-                thickness = 1;
-            }
-
-            // The center of the line will always be at the center
-            // regardless of the thickness.
-            int thicknessOffset = (int)Mathf.Ceil(thickness / 2);
-
-            Rect drawingRect = new Rect(lineStart.x, lineStart.y - thicknessOffset, Vector2.Distance(lineStart, lineEnd), (float)thickness);
-
-            Matrix4x4 preGUIMatrix = GUI.matrix;
-            Color preColor = GUI.color;
-
-            GUI.color = color;
-            GUIUtility.RotateAroundPivot(angle, lineStart);
-
-
-            GUI.BeginGroup(drawingRect);
-            {
-                int drawingRectWidth = Mathf.RoundToInt(drawingRect.width);
-                int drawingRectHeight = Mathf.RoundToInt(drawingRect.height);
-                for (int y = 0; y < drawingRectHeight; y += texture.height)
-                {
-                    for (int x = 0; x < drawingRectWidth; x += texture.width)
-                    {
-                        GUI.DrawTexture(new Rect(x, y, texture.width, texture.height), texture);
-                    }
-                }
-            }
-            GUI.EndGroup();
-
-            GUI.color = preColor;
-            GUI.matrix = preGUIMatrix;
+            Vector2[] points = new Vector2[segments + 1];
+            points[0] = CubeBezier(start, startTangent, end, endTangent, 0);
+            for (int i = 1; i <= segments; ++i)
+                points[i] = CubeBezier(start, startTangent, end, endTangent, i / (float)segments);
+            DrawPolyLineGL(points, color);
         }
-         */
+
+        /// <summary>
+        /// Draw polyline between points using GL
+        /// </summary>
+        /// <param name="points">Points</param>
+        /// <param name="color">line color</param>  
+        /// <param name="startIndex">start index</param>
+        /// <param name="pointCount">number of points to use in drawing</param>      
+        public static void DrawPolyLineGL(IList<Vector2> points, Color color, int startIndex, int pointCount)
+        {
+            if (points == null)
+                throw new ArgumentNullException("Invalid points to DrawPolyLineGL");
+            if (points.Count < 2)
+                throw new ArgumentException("Invalid points to DrawPolyLineGL");
+
+            startIndex = Mathf.Max(startIndex, 0);
+            int endIndex = startIndex + Mathf.Min(pointCount, points.Count - startIndex) - 1;
+            CreateMaterial();
+
+            GL.PushMatrix();
+            _LineMaterialGL.SetPass(0);
+            GL.Begin(GL.LINES);
+            GL.Color(color);
+
+            Vector3 lineStart = points[startIndex];
+            Vector3 lineEnd;
+            startIndex++;
+            for (int i = startIndex; i <= endIndex; i++)
+            {
+                lineEnd = points[i];
+                lineStart.z = lineEnd.z = 0;
+
+                GL.Vertex(lineStart);
+                GL.Vertex(lineEnd);
+
+                lineStart = lineEnd;
+            }
+
+            GL.End();
+            GL.PopMatrix();
+        }
+
+        /// <summary>
+        /// Draw polyline between points using GL
+        /// </summary>
+        /// <param name="points">Points</param>
+        /// <param name="color">line color</param>          
+        public static void DrawPolyLineGL(IList<Vector2> points, Color color)
+        {
+            if (points == null || points.Count < 2)
+                throw new ArgumentNullException("Invalid points to DrawPolyLineGL");
+            DrawPolyLineGL(points, color, 0, points.Count);
+        }
+        /// <summary>
+        /// Draw lines between each pair of points using GL
+        /// </summary>
+        /// <param name="points">Points</param>
+        /// <param name="color">line color</param>
+        /// <param name="lineCount">Number of lines</param>          
+        public static void DrawLinesGL(IList<Vector2> points, Color color, int lineCount)
+        {
+            if (points == null)
+                throw new ArgumentNullException("Invalid points to DrawLinesGL");
+            if (points.Count % 2 != 0)
+                throw new ArgumentException("Invalid points to DrawLinesGL");
+
+            if (points.Count < lineCount * 2)
+                throw new ArgumentException("Invalid lineCount to DrawLinesGL");
+
+            CreateMaterial();
+
+            GL.PushMatrix();
+            _LineMaterialGL.SetPass(0);
+            GL.Begin(GL.LINES);
+            GL.Color(color);
+
+            lineCount *= 2;
+
+            for (int i = 0; i < lineCount; i += 2)
+            {
+                GL.Vertex(points[i]);
+                GL.Vertex(points[i + 1]);
+            }
+
+            GL.End();
+            GL.PopMatrix();
+        }
+
+        /// <summary>
+        /// Draw lines between each pair of points using GL
+        /// </summary>
+        /// <param name="points">Points</param>
+        /// <param name="color">line color</param>          
+        public static void DrawLinesGL(IList<Vector2> points, Color color)
+        {
+            if (points == null)
+                throw new ArgumentNullException("Invalid points to DrawLinesGL");
+
+            DrawLinesGL(points, color, points.Count / 2);
+        }
+
+
+
+
     }
 
 

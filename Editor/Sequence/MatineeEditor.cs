@@ -13,7 +13,7 @@ namespace Skill.Editor.Sequence
     public class MatineeEditorWindow : UnityEditor.EditorWindow
     {
         #region Basic
-        private static MatineeEditorWindow _Instance;        
+        private static MatineeEditorWindow _Instance;
         public static MatineeEditorWindow Instance
         {
             get
@@ -23,10 +23,10 @@ namespace Skill.Editor.Sequence
                 return _Instance;
             }
         }
-        
+
         public MatineeEditorWindow()
         {
-            base.wantsMouseMove = true; 
+            base.wantsMouseMove = true;
             base.title = "Matinee Editor";
             base.position = new Rect((Screen.width - 1280) / 2.0f, (Screen.height - 720) / 2.0f, 1280, 720);
             base.minSize = new Vector2(1280 * 0.3f, 720 * 0.3f);
@@ -37,7 +37,7 @@ namespace Skill.Editor.Sequence
             if (_IsPlaying) Stop();
             SaveTimeLine();
             Rollback();
-            _Frame = null;            
+            _Frame = null;
         }
 
         // rollback all changes do to preview of editor
@@ -104,9 +104,9 @@ namespace Skill.Editor.Sequence
             {
                 _Instance = null;
             }
-            else if(!this.Equals(_Instance))
+            else if (!this.Equals(_Instance))
             {
-                throw new System.ApplicationException("_Instance does not equal this"); 
+                throw new System.ApplicationException("_Instance does not equal this");
             }
         }
 
@@ -131,6 +131,7 @@ namespace Skill.Editor.Sequence
         private Matinee _Matinee;
         private EditorFrame _Frame;
         private TimeLine _TimeLine;
+        private Curve.CurveEditor _CurveEditor;
         private TrackTreeView _TracksTreeView;
         private PropertyGrid _PropertyGrid;
         private bool _RefreshStyles;
@@ -170,13 +171,15 @@ namespace Skill.Editor.Sequence
 
             // grid for CurveEditor and Timeline
             Skill.Framework.UI.Grid mainGrid = new Skill.Framework.UI.Grid();
-            mainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20, Skill.Framework.UI.GridUnitType.Pixel), MinHeight = 20 }); // reserved for curve editor
+            mainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(300, Skill.Framework.UI.GridUnitType.Pixel), MinHeight = 100 }); // _CurveEditor
             mainGrid.RowDefinitions.Add(2, Skill.Framework.UI.GridUnitType.Pixel); // splitter
             mainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, Skill.Framework.UI.GridUnitType.Star), MinHeight = 30 }); // _TimeLine
 
             // curve editor must placed here at row = 0
-            Label lbl = new Label() { Text = "Reserved for curve editor" };
-            mainGrid.Controls.Add(lbl);
+            _CurveEditor = new Curve.CurveEditor() { Row = 0 };
+            _CurveEditor.TimeLine.TimeBar.ShowTimePosition = true;
+            _CurveEditor.TimeLine.View.ShowTimePosition = true;
+            mainGrid.Controls.Add(_CurveEditor);
 
             Skill.Editor.UI.GridSplitter hSplitter = new Skill.Editor.UI.GridSplitter() { Orientation = Orientation.Horizontal, Row = 1, Column = 0, Style = Skill.Editor.Resources.Styles.HorizontalSplitter };
             mainGrid.Controls.Add(hSplitter);
@@ -223,18 +226,68 @@ namespace Skill.Editor.Sequence
 
             // fill remaining area with mainGrid
             dockPanel.Controls.Add(mainGrid);
+
+            _CurveEditor.PropertyGrid = _PropertyGrid;
+            _CurveEditor.TimeLine.TimePositionChanged += CurveEditorTimeLine_PositionChanged;
+            _CurveEditor.Changed += _CurveEditor_Changed;
         }
+
+        #region Edit Curve
+
+        private TimeLineEvent _EditingEvent;
+        private ITrackKey _EditingCurve;
+        private int _IgnorePosition;
+        internal void EditCurve(TimeLineEvent tle, ITrackKey key)
+        {
+            _EditingEvent = tle;
+            _EditingCurve = key;
+            _CurveEditor.RemoveAllCurves();
+            Curve.CurveEditor.EditCurveInfo[] curves = Curve.CurveEditor.GetCurves(key);
+            if (curves != null && curves.Length > 0)
+            {
+                foreach (var c in curves)
+                    _CurveEditor.AddCurve(c.GetCurve(), c.Attribute.Color);
+            }
+        }
+
+        private void _TimeLine_TimePositionChanged(object sender, System.EventArgs e)
+        {
+            if (_IgnorePosition == 1) return;
+            if (!_IsPlaying)
+                _SeekUpdate = true;
+            if (_EditingCurve != null)
+            {
+                _IgnorePosition = 1;
+                _CurveEditor.TimeLine.TimePosition = System.Math.Max(0, System.Math.Min(_TimeLine.TimePosition - _EditingCurve.FireTime, _CurveEditor.TimeLine.MaxTime));
+                _IgnorePosition = 0;
+            }
+        }
+
+        void _CurveEditor_Changed(object sender, System.EventArgs e)
+        {
+            if (_EditingEvent != null)
+            {
+                _EditingEvent.TrackBar.Invalidate();
+                _EditingEvent.Invalidate();
+            }
+        }
+        void CurveEditorTimeLine_PositionChanged(object sender, System.EventArgs e)
+        {
+            if (_IgnorePosition == 2) return;
+            if (_EditingCurve != null)
+            {
+                _IgnorePosition = 2;
+                _TimeLine.TimePosition = System.Math.Max(0, System.Math.Min(_CurveEditor.TimeLine.TimePosition + _EditingCurve.FireTime, _TimeLine.MaxTime));
+                _IgnorePosition = 0;
+            }
+        }
+        #endregion
 
         #region TimeLine
         private void CreateTimeLine()
         {
-            _TimeLine = new TimeLine() { Row = 0, Column = 2 };
+            _TimeLine = new TimeLine(new TrackBarView()) { Row = 0, Column = 2 };
             _TimeLine.TimePositionChanged += _TimeLine_TimePositionChanged;
-        }
-        private void _TimeLine_TimePositionChanged(object sender, System.EventArgs e)
-        {
-            if (!_IsPlaying)
-                _SeekUpdate = true;
         }
         #endregion
 
@@ -422,7 +475,7 @@ namespace Skill.Editor.Sequence
             //Skill.Editor.UI.MenuItem edit_1 = new Skill.Editor.UI.MenuItem("edit_1"); edit_1.Click += item_Click;
             //Skill.Editor.UI.MenuItem edit_2 = new Skill.Editor.UI.MenuItem("edit_2"); edit_2.Click += item_Click;
             //edit.Add(edit_1);
-            //edit.Add(edit_2);        
+            //edit.Add(edit_2);            
         }
         #endregion
 
@@ -469,7 +522,7 @@ namespace Skill.Editor.Sequence
                     _Frame.Grid.IsEnabled = false;
                     _TracksTreeView.Clear();
                     _TimeLine.Clear();
-                    _TimeLine.MaxTime = 10;
+                    _TimeLine.MaxTime = 1;
                     _PropertyGrid.SelectedObject = null;
                 }
                 else
@@ -487,8 +540,8 @@ namespace Skill.Editor.Sequence
         {
             if (_Matinee != null)
             {
-                _TimeLine.MaxTime = _Matinee.Length;
-                _TimeLine.StartVisible = _Matinee.StartVisible;
+                _TimeLine.MaxTime = _Matinee.MaxTime;
+                _TimeLine.StartVisible = Mathf.Max(0, Mathf.Min(_Matinee.StartVisible, _Matinee.Length - 1));
                 _TimeLine.EndVisible = _Matinee.EndVisible;
                 _TimeLine.TimePosition = _Matinee.TimePosition;
                 _TimeLine.SelectTime(_Matinee.StartSelection, _Matinee.EndSelection);
@@ -500,6 +553,7 @@ namespace Skill.Editor.Sequence
         {
             if (_Matinee != null)
             {
+                _Matinee.MaxTime = (float)_TimeLine.MaxTime;
                 _Matinee.StartVisible = (float)_TimeLine.StartVisible;
                 _Matinee.EndVisible = (float)_TimeLine.EndVisible;
                 _Matinee.StartSelection = (float)_TimeLine.StartSelection;
@@ -623,7 +677,7 @@ namespace Skill.Editor.Sequence
                     else if (_StepForward == -1)
                         StepPlaybackBackward(1.0f / _Fps.SelectedValue); // step backward with fpsTime
                     _StepForward = 0;
-                    Repaint();
+                    Evaluate();
                 }
                 else
                 {
@@ -639,15 +693,18 @@ namespace Skill.Editor.Sequence
                             }
                         }
                         _SeekUpdate = false;
-                        Repaint();
+                        Evaluate();
                     }
                 }
-
-                _TimeLine.TimePosition = _PlayTime;
-                foreach (var t in _Tracks)
-                    t.Evaluate(_PlayTime);
-
             }
+        }
+
+        private void Evaluate()
+        {
+            _TimeLine.TimePosition = _PlayTime;
+            foreach (var t in _Tracks)
+                t.Evaluate(_PlayTime);
+            Repaint();
         }
         public void TrackChanged()
         {
@@ -658,7 +715,7 @@ namespace Skill.Editor.Sequence
         private void StartPlayback()
         {
             _TimePositionBeforePlay = _TimeLine.TimePosition; // save position of timeline
-            _SnapTimeBeforePlay = _TimeLine.Timebar.SnapTime; // save snaptime        
+            _SnapTimeBeforePlay = _TimeLine.TimeBar.SnapTime; // save snaptime        
             if (_Tracks != null)
             {
                 if (_TimeLine.SelectionLenght > 0)
@@ -702,7 +759,7 @@ namespace Skill.Editor.Sequence
             _BtnPlay.IsPressed = false;
             _BtnPause.IsPressed = false;
 
-            _TimeLine.Timebar.SnapTime = _SnapTimeBeforePlay;// rollback snaptime
+            _TimeLine.TimeBar.SnapTime = _SnapTimeBeforePlay;// rollback snaptime
             _TimeLine.TimePosition = _TimePositionBeforePlay; // rollback time position
 
             foreach (var t in _Tracks) t.Stop();
@@ -739,7 +796,7 @@ namespace Skill.Editor.Sequence
             if (_BtnPlay.IsPlayMode)
                 _SnapTimeBeforePlay = snapTime;
             else
-                _TimeLine.Timebar.SnapTime = snapTime;
+                _TimeLine.TimeBar.SnapTime = snapTime;
         }
         #endregion
 
@@ -753,7 +810,7 @@ namespace Skill.Editor.Sequence
     {
         private Matinee _Matinee;
         void OnEnable()
-        {            
+        {
             _Matinee = (Matinee)target;
         }
 

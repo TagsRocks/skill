@@ -14,8 +14,7 @@ namespace Skill.Framework.Audio
         private GUIStyle _Style;
         protected override void Awake()
         {
-            base.Awake();
-            useGUILayout = false;
+            base.Awake();            
             _Style = new GUIStyle();
         }
 

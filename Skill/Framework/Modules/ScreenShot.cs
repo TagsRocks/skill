@@ -114,7 +114,15 @@ namespace Skill.Framework.Modules
                     if (!System.IO.Directory.Exists(dir))
                         System.IO.Directory.CreateDirectory(dir);
 
-                    System.IO.File.WriteAllBytes(filename, bytes);
+                    if (System.IO.File.Exists(filename))
+                        System.IO.File.Delete(filename);
+
+                    System.IO.FileStream fileStream = new System.IO.FileStream(filename, System.IO.FileMode.Create, System.IO.FileAccess.Write);
+                    System.IO.BinaryWriter writer = new System.IO.BinaryWriter(fileStream);
+                    writer.Write(bytes);
+                    writer.Close();
+                    fileStream.Close();
+
                     Debug.Log(string.Format("Took screenshot to: {0}", filename));
                     _TakeShot = false;
                     _ShotTaked = true;

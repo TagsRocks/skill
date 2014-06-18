@@ -870,7 +870,13 @@ namespace Skill.Framework
             {
                 if (keys == null || keys.Length == 0)
                     throw new Exception("Invalid Keys");
-                _Keys = keys;
+                _Keys = keys;                
+            }
+
+            internal void Build()
+            {
+                if (_Keys == null || _Keys.Length == 0)
+                    throw new Exception("Invalid Keys to build");
                 _KeyDictionary.Clear();
                 for (int i = 0; i < _Keys.Length; i++)
                 {
@@ -1143,7 +1149,13 @@ namespace Skill.Framework
             SetDefaultQualitySettings();
             SetDefaultInputSettings();
 
+            Build();
+        }
+
+        private void Build()
+        {
             _Quality.CopyNewValues();
+            _Input.Build();
         }
 
         public static Settings CreateSettings()
@@ -1186,14 +1198,14 @@ namespace Skill.Framework
                 }
                 element = element.NextSibling as IO.XmlElement;
             }
-
+            Build();
         }
         public void Load(Skill.Framework.IO.BinaryLoadStream stream)
         {
             this._Audio = stream.ReadSavable<AudioSettings>(AudioSettings.CreateAudioSettings);
             this._Quality = stream.ReadSavable<QualitySettings>(QualitySettings.CreateQualitySettings);
             this._Input = stream.ReadSavable<InputSettings>(InputSettings.CreateInputSettings);
-
+            Build();
         }
 
         public virtual void SetDefaultAudioSettings()

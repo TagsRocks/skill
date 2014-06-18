@@ -14,6 +14,7 @@ namespace Skill.Editor.Sequence
         public Vector3TrackBar(Vector3Track track)
             : base(track)
         {
+            this.Height = 40;
         }
 
         protected override void EvaluateNewKey(IPropertyKey<Vector3> newKey, IPropertyKey<Vector3> previousKey)
@@ -66,6 +67,25 @@ namespace Skill.Editor.Sequence
             }
             public override string Title { get { return "Vector3 Event"; } }
 
+            public override bool IsSelectedProperties
+            {
+                get
+                {
+                    return base.IsSelectedProperties;
+                }
+                set
+                {
+                    if (base.IsSelectedProperties != value)
+                    {
+                        if (value)
+                        {
+                            MatineeEditorWindow.Instance.EditCurve(this, _Vector3Key);                            
+                        }
+                    }
+                    base.IsSelectedProperties = value;
+                }
+            }
+
             private float _MinWidth;
             private Vector3 _PreValue;
             public override float MinWidth
@@ -103,9 +123,9 @@ namespace Skill.Editor.Sequence
             {
                 if (_Vector3Key.CurveX != null && _Vector3Key.CurveY != null && _Vector3Key.CurveZ != null)
                 {
-                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _Vector3Key.CurveX, null, Color.red, Color.clear);
-                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _Vector3Key.CurveY, null, Color.green, Color.clear);
-                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _Vector3Key.CurveZ, null, Color.blue, Color.clear);
+                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _Vector3Key.CurveX, null, CurveXColor, CurveBgColor);
+                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _Vector3Key.CurveY, null, CurveYColor, CurveBgColor);
+                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _Vector3Key.CurveZ, null, CurveZColor, CurveBgColor);
                 }
                 else
                 {

@@ -60,8 +60,8 @@ namespace Skill.Editor.Tools
             private void UpdateStyle()
             {
 
-                _LblTitle.Style.font = Editor.Editor.Subtitle.EditorFont;
-                _LblTitle.Style.fontSize = Editor.Editor.Subtitle.EditorFontSize;
+                _LblTitle.Style.font = Editor.Editor.Dictionary.Font;
+                _LblTitle.Style.fontSize = Editor.Editor.Dictionary.FontSize;
                 if (Subtitle.OverrideStyle)
                 {
                     _LblTitle.Style.fontStyle = Subtitle.FontStyle;
@@ -70,9 +70,9 @@ namespace Skill.Editor.Tools
                 }
                 else
                 {
-                    _LblTitle.Style.fontStyle = Editor.Editor.Subtitle.FontStyle;
-                    _LblTitle.Style.normal.textColor = Editor.Editor.Subtitle.FontColor;
-                    _LblTitle.Style.alignment = AlignmentToAnchor(Editor.Editor.Subtitle.Alignment);
+                    _LblTitle.Style.fontStyle = Editor.Editor.Dictionary.FontStyle;
+                    _LblTitle.Style.normal.textColor = Editor.Editor.Dictionary.FontColor;
+                    _LblTitle.Style.alignment = AlignmentToAnchor(Editor.Editor.Dictionary.Alignment);
                 }
 
             }
@@ -278,6 +278,13 @@ namespace Skill.Editor.Tools
 
         class SubtitleTrackBar : TrackBar
         {
+            private AudioClipSubtitleEditor _Editor;
+
+            public SubtitleTrackBar(AudioClipSubtitleEditor editor)
+            {
+                _Editor = editor;
+            }
+
             protected override void Render()
             {
                 GUI.Box(RenderArea, string.Empty);
@@ -286,7 +293,15 @@ namespace Skill.Editor.Tools
 
             public void SetDirty()
             {
-                RequestUpdateLayout();
+                Invalidate();
+            }
+
+            public override double GetValidTime()
+            {
+                if (_Editor._AudioPreview.Clip != null)
+                    return _Editor._AudioPreview.Clip.length;
+                else
+                    return 1.0f;
             }
         }
 
@@ -324,9 +339,9 @@ namespace Skill.Editor.Tools
             }
         }
 
-        public AudioSubtitleEditorWindow Editor { get; private set; }
+        public DictionaryEditorWindow Editor { get; private set; }
 
-        public AudioClipSubtitleEditor(AudioSubtitleEditorWindow editor)
+        public AudioClipSubtitleEditor(DictionaryEditorWindow editor)
         {
             this.Editor = editor;
             GameObject obj = UnityEditor.EditorUtility.CreateGameObjectWithHideFlags("AudioPreview", HideFlags.HideAndDontSave | HideFlags.HideInHierarchy,
@@ -341,7 +356,7 @@ namespace Skill.Editor.Tools
             RowDefinitions.Add(80, GridUnitType.Pixel);
             RowDefinitions.Add(1, GridUnitType.Star);
 
-            _TimeLine = new TimeLine() { Row = 1, Column = 0, RowSpan = 3, SelectionEnable = false };
+            _TimeLine = new TimeLine(new TrackBarView()) { Row = 1, Column = 0, RowSpan = 3, SelectionEnable = false , ExtendMaxTime = false };
             _TimeLine.MinTime = 0;
             _TimeLine.MaxTime = 1;
 
@@ -351,9 +366,9 @@ namespace Skill.Editor.Tools
 
             _AudioPreview = new AudioPreviewCurve() { Row = 2, Margin = new Thickness(0, 0, 16, 0) };
             _AudioTrack = new TrackBar() { Height = 138 };
-            _SubtitleTrack = new SubtitleTrackBar() { Height = 60 };
-            _TimeLine.TrackView.Controls.Add(_AudioTrack);
-            _TimeLine.TrackView.Controls.Add(_SubtitleTrack);
+            _SubtitleTrack = new SubtitleTrackBar(this) { Height = 60 };
+            _TimeLine.View.Controls.Add(_AudioTrack);
+            _TimeLine.View.Controls.Add(_SubtitleTrack);
 
             this.Controls.Add(_ToolbarBg);
             this.Controls.Add(_BtnPlay);
@@ -377,7 +392,7 @@ namespace Skill.Editor.Tools
             addSubtitle.Click += AddSubtitle_Click;
             deleteItem.Click += DeleteSubtitle_Click;
             _BtnPlay.Click += _BtnPlay_Click;
-            _TimeLine.Timebar.MouseDown += Timebar_MouseDown;
+            _TimeLine.TimeBar.MouseDown += Timebar_MouseDown;
         }
 
         void Timebar_MouseDown(object sender, MouseClickEventArgs args)
@@ -399,10 +414,10 @@ namespace Skill.Editor.Tools
         {
             float x = _SubtitleTrackContextMenu.Position.x;
             // convert to local position of TimeBar - because of zooming
-            x -= _TimeLine.TrackView.ScrollPosition.x;
+            x -= _TimeLine.View.ScrollPosition.x;
 
             Subtitle newTitle = new Subtitle();
-            newTitle.Time = (float)_TimeLine.Timebar.GetTime(x);
+            newTitle.Time = (float)_TimeLine.TimeBar.GetTime(x);
             newTitle.FontColor = Color.white;
             newTitle.Duration = 0.1f;
             newTitle.FontStyle = FontStyle.Normal;
@@ -482,6 +497,7 @@ namespace Skill.Editor.Tools
                 _SubtitleTrack.Controls.Clear();
             }
 
+            _TimeLine.View.FrameAll();
             _Refresh = false;
         }
 

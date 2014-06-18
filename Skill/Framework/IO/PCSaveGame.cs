@@ -67,7 +67,12 @@ namespace Skill.Framework.IO
             if (savable == null) throw new ArgumentNullException("Invalid ISavable object.");
             if (!File.Exists(fileName)) throw new FileNotFoundException("Invalie fileName.");
 
-            string xmlContent = File.ReadAllText(fileName);
+            System.IO.FileStream fileStream = new System.IO.FileStream(fileName, System.IO.FileMode.Open, System.IO.FileAccess.Read);
+            System.IO.TextReader reader = new System.IO.StreamReader(fileStream);
+            string xmlContent = reader.ReadToEnd();
+            reader.Close();
+            fileStream.Close();
+
             LoadFromXmlContent(savable, xmlContent);
 
         }
@@ -206,7 +211,12 @@ namespace Skill.Framework.IO
             }
 
             string xmlContent = SaveToXmlContent(savable);
-            File.WriteAllText(tempFile, xmlContent);
+
+            System.IO.FileStream fileStream = new System.IO.FileStream(tempFile, System.IO.FileMode.Create, System.IO.FileAccess.Write);
+            System.IO.TextWriter writer = new System.IO.StreamWriter(fileStream);
+            writer.Write(xmlContent);
+            writer.Close();
+            fileStream.Close();
 
             if (System.IO.File.Exists(fileName))
                 System.IO.File.Delete(fileName);

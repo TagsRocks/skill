@@ -62,7 +62,7 @@ namespace Skill.Framework.Modules
             Gizmos.color = this.Color;
             Gizmos.DrawWireSphere(StartPosition, GizmoRadius);
             Gizmos.DrawWireSphere(EndPosition, GizmoRadius);
-            Gizmos.DrawLine(StartPosition, EndPosition);
+            Gizmos.DrawLine(StartPosition, EndPosition);            
         }
     }
 }

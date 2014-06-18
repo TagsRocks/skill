@@ -14,6 +14,7 @@ namespace Skill.Editor.Sequence
         public Vector2TrackBar(Vector2Track track)
             : base(track)
         {
+            this.Height = 40;
         }
 
         protected override void EvaluateNewKey(IPropertyKey<Vector2> newKey, IPropertyKey<Vector2> previousKey)
@@ -85,6 +86,26 @@ namespace Skill.Editor.Sequence
 
             protected override PropertiesPanel CreateProperties() { return new Vector2KeyViewProperties(this); }
 
+            public override bool IsSelectedProperties
+            {
+                get
+                {
+                    return base.IsSelectedProperties;
+                }
+                set
+                {
+                    if (base.IsSelectedProperties != value)
+                    {
+                        if (value)
+                        {
+                            MatineeEditorWindow.Instance.EditCurve(this, _Vector2Key);                            
+                        }
+                    }
+                    base.IsSelectedProperties = value;
+                }
+            }
+
+
             private Vector2Key _Vector2Key;
             public Vector2KeyView(Vector2TrackBar trackbar, IPropertyKey<Vector2> key)
                 : base(trackbar, key)
@@ -98,8 +119,8 @@ namespace Skill.Editor.Sequence
             {
                 if (_Vector2Key.CurveX != null && _Vector2Key.CurveY != null)
                 {
-                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _Vector2Key.CurveX, null, Color.red, Color.clear);
-                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _Vector2Key.CurveY, null, Color.green, Color.clear);
+                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _Vector2Key.CurveX, null, CurveXColor, CurveBgColor);
+                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _Vector2Key.CurveY, null, CurveYColor, CurveBgColor);
                 }
                 else
                 {

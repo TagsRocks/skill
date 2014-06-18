@@ -76,9 +76,7 @@ namespace Skill.Editor.Sequence
                         return _MinWidth;
                     }
                 }
-            }
-
-            public override float MaxWidth { get { return MinWidth; } }
+            }            
 
 
             private FloatKey _FloatKey;
@@ -92,7 +90,7 @@ namespace Skill.Editor.Sequence
             {
                 if (_FloatKey.Curve != null)
                 {
-                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _FloatKey.Curve, null, Color.green, Color.clear);
+                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _FloatKey.Curve, null, CurveYColor, CurveBgColor);
                 }
                 else
                 {
@@ -183,6 +181,25 @@ namespace Skill.Editor.Sequence
                         }
                         k.Curve = _CurveField.Curve;
                     }
+                }
+            }
+
+            public override bool IsSelectedProperties
+            {
+                get
+                {
+                    return base.IsSelectedProperties;
+                }
+                set
+                {
+                    if (base.IsSelectedProperties != value)
+                    {
+                        if (value)
+                        {
+                            MatineeEditorWindow.Instance.EditCurve(this, _FloatKey);                            
+                        }
+                    }
+                    base.IsSelectedProperties = value;
                 }
             }
         }

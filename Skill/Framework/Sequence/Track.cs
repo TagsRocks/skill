@@ -37,6 +37,9 @@ namespace Skill.Framework.Sequence
         /// <summary> Type of Track </summary>
         public abstract TrackType Type { get; }
 
+        /// <summary> Length of track over time</summary>
+        public abstract float Length { get; }
+
         /// <summary> Awake </summary>
         protected override void Awake()
         {

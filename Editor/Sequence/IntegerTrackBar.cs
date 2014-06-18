@@ -13,7 +13,7 @@ namespace Skill.Editor.Sequence
         public IntegerTrackBar(IntegerTrack track)
             : base(track)
         {
-            this.Height = 22;
+            //this.Height = 22;
         }
 
         protected override void EvaluateNewKey(IPropertyKey<int> newKey, IPropertyKey<int> previousKey)

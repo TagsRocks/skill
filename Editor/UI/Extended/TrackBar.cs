@@ -13,9 +13,9 @@ namespace Skill.Editor.UI.Extended
 
         protected override void UpdateLayout()
         {
-            if (Parent != null && Parent is TrackView)
+            if (Parent != null && Parent is TrackBarView)
             {
-                TrackView tw = (TrackView)Parent;
+                TrackBarView tw = (TrackBarView)Parent;
                 Rect ra = RenderAreaShrinksByPadding;
 
                 double deltaTime = (tw.TimeLine.MaxTime - tw.TimeLine.MinTime);
@@ -43,6 +43,7 @@ namespace Skill.Editor.UI.Extended
             }
         }
 
+        public virtual double GetValidTime() { return 1; }
     }
 
 
@@ -194,7 +195,7 @@ namespace Skill.Editor.UI.Extended
                             }
                         }
                     }
-                    else if (type == EventType.MouseUp)
+                    else if (type == EventType.MouseUp || e.rawType == EventType.MouseUp)
                     {
                         MouseButton mb = ConvertButton(e.button);
                         MouseClickEventArgs args = new MouseClickEventArgs(e.mousePosition, e.modifiers, mb, e.clickCount);

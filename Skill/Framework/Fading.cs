@@ -21,6 +21,9 @@ namespace Skill.Framework
         public bool IsFadeIn { get; private set; }
         /// <summary>  Is in fadeout mode </summary>
         public bool IsFadeOut { get; private set; }
+        /// <summary> Is in fadein or fadeout  </summary>
+        public bool IsFading { get { return IsFadeIn || IsFadeOut; } }
+
         /// <summary> Current alpha between (0.0f - 1.0f)  </summary>
         public float Alpha { get { return _Alpha; } set { _Alpha = Mathf.Clamp01(value); } }
 

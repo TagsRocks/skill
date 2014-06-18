@@ -205,6 +205,28 @@ namespace Skill.Framework
             return frustumHeight * 0.5f / Mathf.Tan(camera.fieldOfView * 0.5f * Mathf.Deg2Rad);
         }
 
+        /// <summary>
+        /// Calculate height of frustum at specified distance
+        /// </summary>
+        /// <param name="camera">Camera</param>
+        /// <param name="distance">Distance to camera</param>
+        /// <returns>height of frustum</returns>
+        public static float FrustumHeightAtDistance(Camera camera, float distance)
+        {
+            return distance * Mathf.Tan(camera.fieldOfView * 0.5f * Mathf.Deg2Rad) * 2.0f;
+        }
+
+        /// <summary>
+        /// Calculate width of frustum at specified distance
+        /// </summary>
+        /// <param name="camera">Camera</param>
+        /// <param name="distance">Distance to camera</param>
+        /// <returns>width of frustum</returns>
+        public static float FrustumWidthAtDistance(Camera camera, float distance)
+        {
+            return FrustumHeightAtDistance(camera, distance) * camera.aspect;
+        }
+
 
         private static Dictionary<int, Vector3[]> _Circles;
 

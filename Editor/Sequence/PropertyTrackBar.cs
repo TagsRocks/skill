@@ -111,14 +111,12 @@ namespace Skill.Editor.Sequence
             if (timeLine != null)
             {
                 // convert to local position of TimeBar - because of zooming
-                x -= timeLine.TrackView.ScrollPosition.x;
+                x -= timeLine.View.ScrollPosition.x;
 
                 IPropertyKey<V> newKey = CreateNewKey();
-                newKey.FireTime = (float)timeLine.Timebar.GetTime(x);
+                newKey.FireTime = (float)timeLine.TimeBar.GetTime(x);
 
-                PropertyTimeLineEvent e = CreateEvent(newKey);
-                if (MatineeEditorWindow.Instance != null)
-                    MatineeEditorWindow.Instance.PropertyGrid.SelectedObject = e;
+                PropertyTimeLineEvent e = CreateEvent(newKey);                
                 RebuildTrackKeys();
 
                 for (int i = 0; i < _PropertyTrack.PropertyKeys.Length; i++)
@@ -132,6 +130,9 @@ namespace Skill.Editor.Sequence
                         break;
                     }
                 }
+
+                if (MatineeEditorWindow.Instance != null)
+                    MatineeEditorWindow.Instance.PropertyGrid.SelectedObject = e;
             }
         }
 
@@ -150,7 +151,7 @@ namespace Skill.Editor.Sequence
         protected static AnimationCurve CreateNextCurve(Keyframe k1)
         {
             Keyframe k2 = k1;
-            k2.time = 0.01f;
+            k2.time = 0.1f;
             return new AnimationCurve(new Keyframe[] { k1, k2 });
         }
 
@@ -188,6 +189,8 @@ namespace Skill.Editor.Sequence
         /// </summary>
         protected abstract class PropertyTimeLineEvent : EventView
         {
+            
+
             public override float MinWidth { get { return 6; } }
 
             public IPropertyKey<V> PropertyKey { get; private set; }

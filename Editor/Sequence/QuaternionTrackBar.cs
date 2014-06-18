@@ -14,6 +14,7 @@ namespace Skill.Editor.Sequence
         public QuaternionTrackBar(QuaternionTrack track)
             : base(track)
         {
+            this.Height = 40;
         }
 
 
@@ -26,7 +27,7 @@ namespace Skill.Editor.Sequence
 
             QuaternionKey newfKey = (QuaternionKey)newKey;
             if (previousKey != null)
-            {                
+            {
                 QuaternionKey prefKey = (QuaternionKey)previousKey;
 
                 newfKey.CurveX = CreateNextCurve(prefKey.CurveX, ((QuaternionTrack)Track).DefaultValue.x);
@@ -37,7 +38,7 @@ namespace Skill.Editor.Sequence
             {
                 newfKey.CurveX = CreateNextCurve(new Keyframe() { value = newKey.ValueKey.x });
                 newfKey.CurveY = CreateNextCurve(new Keyframe() { value = newKey.ValueKey.y });
-                newfKey.CurveZ = CreateNextCurve(new Keyframe() { value = newKey.ValueKey.z });                
+                newfKey.CurveZ = CreateNextCurve(new Keyframe() { value = newKey.ValueKey.z });
             }
         }
 
@@ -64,6 +65,25 @@ namespace Skill.Editor.Sequence
                 set { }
             }
             public override string Title { get { return "Quaternion Event"; } }
+
+            public override bool IsSelectedProperties
+            {
+                get
+                {
+                    return base.IsSelectedProperties;
+                }
+                set
+                {
+                    if (base.IsSelectedProperties != value)
+                    {
+                        if (value)
+                        {
+                            MatineeEditorWindow.Instance.EditCurve(this, _QuaternionKey);
+                        }
+                    }
+                    base.IsSelectedProperties = value;
+                }
+            }
 
             private float _MinWidth;
             private Quaternion _PreValue;
@@ -101,9 +121,9 @@ namespace Skill.Editor.Sequence
             {
                 if (_QuaternionKey.CurveX != null && _QuaternionKey.CurveY != null && _QuaternionKey.CurveZ != null)
                 {
-                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _QuaternionKey.CurveX, null, Color.red, Color.clear);
-                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _QuaternionKey.CurveY, null, Color.green, Color.clear);
-                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _QuaternionKey.CurveZ, null, Color.blue, Color.clear);
+                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _QuaternionKey.CurveX, null, CurveXColor, CurveBgColor);
+                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _QuaternionKey.CurveY, null, CurveYColor, CurveBgColor);
+                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _QuaternionKey.CurveZ, null, CurveZColor, CurveBgColor);
                 }
                 else
                 {

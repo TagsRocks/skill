@@ -8,11 +8,12 @@ namespace Skill.Framework.UI
     /// <summary> Simple game menu that contains MenuFrames. can show on frame at time</summary>
     public class GameMenu : DynamicBehaviour
     {
+        /// <summary> The sorting depth. </summary>
+        public int Depth = 0;
         /// <summary> Skin </summary>
         public GUISkin Skin;
         public string MainFrame = "MainFrame";
-        /// <summary> The sorting depth. </summary>
-        public int Depth = 0;
+        public bool ShowOnAwake = false;
 
         /// <summary> Menu </summary>
         public Menu Menu { get; private set; }
@@ -20,20 +21,25 @@ namespace Skill.Framework.UI
         /// <summary> Start </summary>
         protected override void Start()
         {
-            base.Start();
-            useGUILayout = false;
+            base.Start();            
             MenuFrame[] pages = GetComponentsInChildren<MenuFrame>();
             if (pages != null && pages.Length > 0)
             {
                 List<Frame> frameList = new List<Frame>();
                 for (int i = 0; i < pages.Length; i++)
+                {
+                    pages[i].Menu = this;
                     frameList.Add(pages[i].Frame);
+                }
                 Menu = new Menu(frameList.ToArray());
             }
             else
             {
                 Debug.LogError("Can not find any MenuFrame as child of GameMenu");
             }
+
+            if (ShowOnAwake)
+                Show();
         }
 
         /// <summary> Is GameMenu visible? </summary>

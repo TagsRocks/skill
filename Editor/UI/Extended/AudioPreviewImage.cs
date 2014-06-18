@@ -6,7 +6,7 @@ using Skill.Framework.UI;
 
 namespace Skill.Editor.UI.Extended
 {
-    public class AudioPreviewImage : Image
+    public class AudioPreviewImage : Skill.Framework.UI.Image
     {
 
         private int _TextureWidth;

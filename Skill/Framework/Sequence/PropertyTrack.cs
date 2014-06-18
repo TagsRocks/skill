@@ -35,6 +35,20 @@ namespace Skill.Framework.Sequence
         [ExposeProperty(100, "Default Value")]
         public virtual V ExDefaultValue { get { return DefaultValue; } set { DefaultValue = value; } }
 
+        public override float Length
+        {
+            get
+            {
+                if (PropertyKeys != null && PropertyKeys.Length > 0)
+                {
+                    if (!Application.isPlaying)
+                        SortKeys();
+
+                    return PropertyKeys[PropertyKeys.Length - 1].FireTime;
+                }
+                return 0;
+            }
+        }
 
         public abstract IPropertyKey<V>[] PropertyKeys { get; set; }
         public abstract Type PropertyType { get; }
@@ -208,7 +222,7 @@ namespace Skill.Framework.Sequence
 
         public void Invalidate()
         {
-            _Setter = null;            
+            _Setter = null;
         }
     }
 

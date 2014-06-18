@@ -159,9 +159,7 @@ namespace Skill.Framework.Triggers
                     index++;
                 }
             }            
-        }
-
-        protected override string GizmoFilename { get { return "Damage.png"; } }
+       }        
 
         protected override void OnDrawGizmos()
         {

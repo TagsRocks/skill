@@ -25,8 +25,7 @@ namespace Skill.Framework.UI
         protected override void GetReferences()
         {
             base.GetReferences();
-            this.Fading = GetComponent<Fading>();
-            useGUILayout = false;
+            this.Fading = GetComponent<Fading>();            
         }
 
         void OnGUI()

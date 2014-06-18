@@ -23,11 +23,6 @@ namespace Skill.Framework.Triggers
             if (Motion.SlowMotion > 0)
                 Skill.Framework.Global.RaiseSlowMotion(this, Motion);
             return true;
-        }
-
-        /// <summary>
-        /// Name of file in Gizmos folder 
-        /// </summary>
-        protected override string GizmoFilename { get { return "SlowMotion.png"; } }
+        }        
     }
 }

@@ -68,6 +68,25 @@ namespace Skill.Framework.Sequence
         public override IPropertyKey<AudioClip>[] PropertyKeys { get { return Keys; } set { Keys = (SoundKey[])value; } }
 
 
+        public override float Length
+        {
+            get
+            {
+                if (Keys != null && Keys.Length > 0)
+                {
+                    if (!Application.isPlaying)
+                        SortKeys();
+
+                    float length = Keys[Keys.Length - 1].FireTime;
+                    if (Keys[Keys.Length - 1].Clip != null)
+                        length += Keys[Keys.Length - 1].Clip.length;                    
+                    return length;
+                }
+                return 0;
+            }
+        }
+
+
         protected override void Execute(IPropertyKey<AudioClip> key)
         {
             SoundKey sKey = (SoundKey)key;

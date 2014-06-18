@@ -23,10 +23,6 @@ namespace Skill.Framework.Triggers
             Skill.Framework.Global.RaiseCameraShake(this, Shake, transform.position);
             return true;
         }
-
-        /// <summary>
-        /// Name of file in Gizmos folder 
-        /// </summary>
-        protected override string GizmoFilename { get { return "CameraShake.png"; } }
+        
     }
 }

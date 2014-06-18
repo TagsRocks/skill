@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Skill.Framework.UI;
+using System.Collections.Generic;
 
 namespace Skill.Editor.UI.Extended
 {
@@ -29,21 +30,29 @@ namespace Skill.Editor.UI.Extended
         private long _LongFirstStep; // scaled first step in timebar
 
         private string _Format; // format of time label
+        private string _TimeFormat; // format of time label
 
-        private Color _LineColor; // color of lines
-        private float _LineThickness; // thickness of lines    
+        private Color _LineColor; // color of lines          
 
         private ITimeLine _TimeLine;
         private GUIStyle _LabelStyle; // time label style
-        private GUIContent _SampleText; // sample text to measure label size    
+        private GUIContent _SampleText; // sample text to measure label size 
+
+        private List<Vector2> _ThickLinePoints;
+        private List<Vector2> _ThinLinePoints;
+        private int _ThickLineCount;
+        private int _ThinLineCount;
+        private bool _TimeStyle;
+        private double _BigStep;
+        private double _SmallStep;
+
 
         /// <summary> TimeLine </summary>
         public ITimeLine TimeLine { get { return _TimeLine; } }
 
         /// <summary> Color of lines </summary>
         public Color LineColor { get { return _LineColor; } }
-        /// <summary>Thickness of lines </summary>
-        public float LineThickness { get { return _LineThickness; } }
+
         /// <summary> Time label style </summary>
         public GUIStyle LabelStyle { get { return _LabelStyle; } }
         /// <summary> style used for a box to show selected time</summary>
@@ -59,8 +68,33 @@ namespace Skill.Editor.UI.Extended
         /// <summary> Background color of time position label </summary>
         public Color TimePositionBackColor { get; set; }
 
+        /// <summary> Show position time of TimeBar </summary>
+        public bool ShowTimePosition { get; set; }
+
         /// <summary> Snap time </summary>
         public double SnapTime { get; set; }
+
+        /// <summary> Big Step time </summary>
+        public double BigStep { get { return _BigStep; } }
+
+        /// <summary> Small Step time </summary>
+        public double SmallStep { get { return _SmallStep; } }
+
+        /// <summary>
+        /// Show numbers in time style
+        /// </summary>
+        public bool TimeStyle
+        {
+            get { return _TimeStyle; }
+            set
+            {
+                if (_TimeStyle != value)
+                {
+                    _TimeStyle = value;
+                    _IsChanged = true;
+                }
+            }
+        }
 
 
         /// <summary> RenderArea changed </summary>
@@ -78,6 +112,7 @@ namespace Skill.Editor.UI.Extended
         {
             if (timeLine == null)
                 throw new System.ArgumentNullException("Invalid timeLine");
+            this.TimeStyle = true;
             this._MouseButton = MouseButton.None;
             this._TimeLine = timeLine;
             this.WantsMouseEvents = true;
@@ -85,6 +120,7 @@ namespace Skill.Editor.UI.Extended
             this._EndTime = 0.01f;
             this._IsChanged = true;
             this.SnapTime = 0;
+            this.ShowTimePosition = true;
 
             this._LabelStyle = new GUIStyle();
             this._LabelStyle.alignment = TextAnchor.MiddleCenter;
@@ -93,16 +129,17 @@ namespace Skill.Editor.UI.Extended
 
             this._SampleText = new GUIContent() { text = "00.000" };
 
-
-
-
             this._LineColor = this._LabelStyle.normal.textColor;
-            this._LineThickness = 1.0f;
             this.ThumbWidth = 6.0f;
             this.ShowSelectionTime = true;
             this.SelectionTimeColor = new Color(1.0f, 0.1f, 0.0f, 0.3f);
             this.ThumbColor = new Color(1.0f, 0.0f, 0.0f, 1.0f);
             this.TimePositionBackColor = new Color(0.9f, 0.9f, 0.9f, 0.8f);
+
+            _ThickLinePoints = new List<Vector2>();
+            _ThinLinePoints = new List<Vector2>();
+            _ThickLineCount = 0;
+            _ThinLineCount = 0;
         }
         private void UpdateView()
         {
@@ -117,30 +154,128 @@ namespace Skill.Editor.UI.Extended
             {
                 _IsChanged = false;
 
-                float pixels = RenderArea.width; // number of available pixels to render Timebar
-                _PixelRequiredForLabel = _LabelStyle.CalcSize(_SampleText).x + 1; // number of pixel required to draw a time label
-                int num = Mathf.FloorToInt(pixels / _PixelRequiredForLabel);// number of labels can we draw
+                RebuildTimeFormat();
 
+                float pixels = RenderArea.width; // number of available pixels to render Timebar                
                 double deltaTime = _EndTime - _StartTime;
-                double step = deltaTime / num;
-                bool extraDecimal = NormalizeStep(ref step);// normalize step to first upper round value            
 
-                if (step >= 0.1) { _Format = extraDecimal ? "{0:F2}" : "{0:F1}"; _Factor = 10; }
-                else if (step >= 0.01) { _Format = extraDecimal ? "{0:F3}" : "{0:F2}"; _Factor = 100; }
-                else if (step >= 0.001) { _Format = extraDecimal ? "{0:F4}" : "{0:F3}"; _Factor = 1000; }
+                _PixelRequiredForLabel = _LabelStyle.CalcSize(_SampleText).x + 5; // number of pixel required to draw a time label                
+
+                int num = Mathf.FloorToInt(pixels / _PixelRequiredForLabel);// number of labels can we draw
+                _BigStep = deltaTime / num;
+                bool extraDecimal = NormalizeStep(ref _BigStep);// normalize step to first upper round value            
+
+                if (_BigStep >= 0.1) { _Format = extraDecimal ? "{0:F2}" : "{0:F1}"; _Factor = 10; }
+                else if (_BigStep >= 0.01) { _Format = extraDecimal ? "{0:F3}" : "{0:F2}"; _Factor = 100; }
+                else if (_BigStep >= 0.001) { _Format = extraDecimal ? "{0:F4}" : "{0:F3}"; _Factor = 1000; }
                 else { _Format = extraDecimal ? "{0:F5}" : "{0:F4}"; _Factor = 10000; }
 
-                bool fiveSplit = (long)(step * _Factor) % 10 == 5;
-                double step2 = step * (fiveSplit ? 0.2 : 0.5);
+                bool fiveSplit = (long)(_BigStep * _Factor) % 10 == 5;
+                _SmallStep = _BigStep * (fiveSplit ? 0.2 : 0.5);
 
                 _Factor = 1000000; // scale doubles and convert to longs because of better divide precision
-                _LongStep = (long)(step * _Factor);
-                _LongMiniStep = (long)(step2 * _Factor);
+                _LongStep = (long)(_BigStep * _Factor);
+                _LongMiniStep = (long)(_SmallStep * _Factor);
                 _LongStartTime = (long)(_StartTime * _Factor);
                 _LongEndTime = (long)(_EndTime * _Factor);
                 _LongFirstStep = (_LongStartTime / _LongMiniStep + 1) * _LongMiniStep;
 
                 _DPx = pixels / deltaTime; // number of pixel required for each unit of time
+            }
+        }
+
+        private void RebuildTimeFormat()
+        {
+            if (TimeStyle)
+            {
+                if (TimeLine.MaxTime >= 3600)
+                {
+                    if (_LongStep > 60 * _Factor)
+                    {
+                        _TimeFormat = "{0:D1}:{1:D2}";
+                        _SampleText.text = " 0.00 ";
+                    }
+                    else if (_LongStep > _Factor)
+                    {
+                        _TimeFormat = "{0:D1}:{1:D2}:{2:D2}";
+                        _SampleText.text = " 0.00.00 ";
+                    }
+                    else
+                    {
+                        _TimeFormat = "{0:D1}:{1:D2}:{2:D2}:{3:D3}";
+                        _SampleText.text = " 0.00.00.000 ";
+                    }
+                }
+                if (TimeLine.MaxTime >= 60)
+                {
+                    if (_LongStep > _Factor)
+                    {
+                        _TimeFormat = "{1:D2}:{2:D2}";
+                        _SampleText.text = " 00.00 ";
+                    }
+                    else
+                    {
+                        _TimeFormat = "{1:D2}:{2:D2}:{3:D3}";
+                        _SampleText.text = " 00.00.000 ";
+                    }
+                }
+
+                if (_LongStep > _Factor)
+                {
+                    _TimeFormat = "{1:D2}:{2:D2}";
+                    _SampleText.text = " 00.00 ";
+                }
+                else
+                {
+                    _TimeFormat = "{1:D2}:{2:D2}:{3:D3}";
+                    _SampleText.text = " 00.00.000 ";
+                }
+            }
+            else
+            {
+                _TimeFormat = null;
+                _SampleText.text = " 00.000 ";
+            }
+        }
+
+        /// <summary>
+        /// Draw line
+        /// </summary>
+        /// <param name="x">position of line</param>
+        /// <param name="thick">thickness of line</param>
+        public delegate void DrawLineHandler(float x, bool thick);
+        /// <summary>
+        /// Draw text
+        /// </summary>
+        /// <param name="x">position of text</param>
+        /// <param name="thickness">text of line</param>
+        public delegate void DrawTextHandler(float x, string text);
+
+        /// <summary>
+        /// Draw grid
+        /// </summary>
+        /// <param name="drawLine">method to use for drawing lines</param>
+        /// <param name="drawText">method to use for drawing labels</param>
+        public void DrawGrid(DrawLineHandler drawLine, DrawTextHandler drawText = null)
+        {
+            Rect ra = RenderArea;
+            long fs = _LongFirstStep; // start by first time
+            while (fs < _LongEndTime)
+            {
+                float x = (float)((double)(fs - _LongStartTime) / _Factor * _DPx);
+                if (x >= ra.xMax - 1) break;
+                if (fs % _LongStep == 0)
+                {
+                    drawLine(x, true);
+                    string text = GetFormattedTime(fs);
+                    if (drawText != null)
+                        drawText(x, text);
+                }
+                else
+                {
+                    drawLine(x, false);
+                }
+                fs += _LongMiniStep;
             }
         }
 
@@ -165,28 +300,17 @@ namespace Skill.Editor.UI.Extended
             base.Render();
 
             #region Draw base time bar
-            long fs = _LongFirstStep; // start by first time
-            while (fs < _LongEndTime)
-            {
-                float x = (float)((double)(fs - _LongStartTime) / _Factor * _DPx);
-                if (fs % _LongStep == 0)
-                {
-                    DrawLine(x, 2);
-                    DrawText(x, string.Format(_Format, (double)fs / _Factor));
-                }
-                else
-                {
-                    DrawLine(x);
-                }
-                fs += _LongMiniStep;
-            }
+
+            DrawGrid(this.DrawLine, this.DrawText);
+            DrawLines();
+
             #endregion
 
             Color savedColor = GUI.color;
             Rect ra = RenderArea;
 
             #region Draw Time position
-            if (TimeLine.TimePosition >= TimeLine.StartVisible && TimeLine.TimePosition < TimeLine.EndVisible)
+            if (ShowTimePosition && TimeLine.TimePosition >= TimeLine.StartVisible && TimeLine.TimePosition < TimeLine.EndVisible)
             {
                 Rect rect = ra;
                 rect.x += (float)((TimeLine.TimePosition - TimeLine.StartVisible) * _DPx) - ThumbWidth * 0.5f;
@@ -208,7 +332,19 @@ namespace Skill.Editor.UI.Extended
                     GUI.DrawTexture(rect, UnityEditor.EditorGUIUtility.whiteTexture, ScaleMode.StretchToFill);
                     GUI.color = ThumbColor;
                 }
-                GUI.Label(rect, string.Format("{0:F6}", TimeLine.TimePosition), _LabelStyle);
+                string label = string.Empty;
+                if (TimeStyle)
+                {
+                    if (TimeLine.TimePosition > 3600)
+                        label = GetTimeStyleFormat((long)(TimeLine.TimePosition * _Factor), "{0:D1}:{1:D2}:{2:D2}:{3:D3}");
+                    else
+                        label = GetTimeStyleFormat((long)(TimeLine.TimePosition * _Factor), "{1:D2}:{2:D2}:{3:D3}");
+                }
+                else
+                {
+                    label = string.Format("{0:F6}", TimeLine.TimePosition);
+                }
+                GUI.Label(rect, label, _LabelStyle);
             }
             #endregion
 
@@ -244,10 +380,12 @@ namespace Skill.Editor.UI.Extended
 
             GUI.color = savedColor;
         }
-
-        //normalize step to upper round step
-        // return true if we need extra decimal to show times
-        private bool NormalizeStep(ref double step)
+        /// <summary>
+        /// normalize step to upper round step
+        /// </summary>
+        /// <param name="step">Step</param>
+        /// <returns> return true if we need extra decimal to show times </returns>
+        public static bool NormalizeStep(ref double step)
         {
             bool extraDecimal = false;
             double num = 0.0001;
@@ -282,14 +420,51 @@ namespace Skill.Editor.UI.Extended
             return extraDecimal;
         }
 
-        private void DrawLine(float x, float lineScale = 1)
+        private void DrawLine(float x, bool thick)
         {
             Rect ra = RenderArea;
-            float h = ra.height * 0.15f * lineScale;
+            float scale = thick ? 2 : 1;
+            float h = ra.height * 0.15f * scale;
             x += ra.x;
-            if (x >= ra.xMax - 1) return;
             float y = ra.y + ra.height - h;
-            Skill.Editor.LineDrawer.DrawLine(new Vector2(x, y), new Vector2(x, y + h), _LineColor, _LineThickness, UnityEditor.EditorGUIUtility.whiteTexture);
+
+            if (thick)
+                AddLine(ref _ThickLinePoints, ref _ThickLineCount, new Vector2(x, y), new Vector2(x, y + h));
+            else
+                AddLine(ref _ThinLinePoints, ref _ThinLineCount, new Vector2(x, y), new Vector2(x, y + h));
+        }
+
+        private void AddLine(ref List<Vector2> linePoints, ref int lineCount, Vector2 lineStart, Vector2 lineEnd)
+        {
+            int index = lineCount * 2;
+            if (linePoints.Count > index)
+                linePoints[index] = lineStart;
+            else
+                linePoints.Add(lineStart);
+
+            index++;
+            if (linePoints.Count > index)
+                linePoints[index] = lineEnd;
+            else
+                linePoints.Add(lineEnd);
+
+            lineCount++;
+        }
+
+        private void DrawLines()
+        {
+            if (_ThickLineCount > 0)
+            {
+                Skill.Editor.LineDrawer.DrawLinesGL(_ThickLinePoints, _LineColor, _ThickLineCount);
+                _ThickLineCount = 0;
+            }
+            if (_ThinLineCount > 0)
+            {
+                Color thinColor = _LineColor;
+                thinColor.a *= 0.5f;
+                Skill.Editor.LineDrawer.DrawLinesGL(_ThinLinePoints, thinColor, _ThinLineCount);
+                _ThinLineCount = 0;
+            }
         }
 
         private void DrawText(float x, string text)
@@ -304,6 +479,31 @@ namespace Skill.Editor.UI.Extended
             ra.height *= 0.2f;
             ra.y += ra.height;
             GUI.Label(ra, text, _LabelStyle);
+        }
+
+        private string GetFormattedTime(long time)
+        {
+            if (_TimeFormat != null)
+                return GetTimeStyleFormat(time, _TimeFormat);
+            else
+                return string.Format(_Format, (double)time / _Factor);
+
+        }
+        private string GetTimeStyleFormat(long time, string format)
+        {
+            long time2 = time / _Factor;
+
+            long hour = time2 / 3600;
+            time2 -= hour * 3600;
+
+            long minute = time2 / 60;
+            time2 -= minute * 60;
+
+            long s = time2;
+
+            long ms = (long)((((double)time / _Factor) - (hour * 3600 + minute * 60 + s)) * 1000);
+            return string.Format(format, hour, minute, s, ms);
+
         }
 
 
@@ -417,7 +617,7 @@ namespace Skill.Editor.UI.Extended
                             _MouseButton = MouseButton.None;
                         }
                     }
-                    else if (type == EventType.MouseUp)
+                    else if (type == EventType.MouseUp || e.rawType == EventType.MouseUp)
                     {
                         MouseButton mb = ConvertButton(e.button);
                         MouseClickEventArgs args = new MouseClickEventArgs(e.mousePosition, e.modifiers, mb, e.clickCount);
