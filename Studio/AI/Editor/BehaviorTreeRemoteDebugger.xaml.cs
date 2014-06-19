@@ -277,7 +277,8 @@ namespace Skill.Studio.AI.Editor
 
                             for (int i = 0; i < updateMsg.BehaviorResults.Length; i++)
                             {
-                                _Behaviors[i].Debug.Behavior.Result = (Framework.AI.BehaviorResult)updateMsg.BehaviorResults[i];
+                                if (_Behaviors[i] != null)
+                                    _Behaviors[i].Debug.Behavior.Result = (Framework.AI.BehaviorResult)updateMsg.BehaviorResults[i];
                             }
 
                             // notify debug behaviors that all ExecutionSequence is visited
