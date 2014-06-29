@@ -6,6 +6,7 @@ using Skill.Editor.UI.Extended;
 using Skill.Framework.UI;
 using System.Collections.Generic;
 using Skill.Framework.Sequence;
+using Skill.Editor.Curve;
 
 namespace Skill.Editor.Sequence
 {
@@ -37,6 +38,7 @@ namespace Skill.Editor.Sequence
             if (_IsPlaying) Stop();
             SaveTimeLine();
             Rollback();
+            _CurveTrackTreeView.RemoveAll(false);
             _Frame = null;
         }
 
@@ -79,7 +81,32 @@ namespace Skill.Editor.Sequence
                 _Frame.Update();
                 UpdatePlayback();
             }
+
         }
+
+        private IEnumerable<Track> Tracks()
+        {
+            foreach (var c in _TimeLine.View.Controls)
+            {
+                if (c is BaseTrackBar)
+                {
+                    BaseTrackBar tb = (BaseTrackBar)c;
+                    yield return tb.Track;
+                }
+            }
+        }
+
+        private IEnumerable<BaseTrackBar> TrackBars()
+        {
+            foreach (var c in _TimeLine.View.Controls)
+            {
+                if (c is BaseTrackBar)
+                {
+                    yield return (BaseTrackBar)c;
+                }
+            }
+        }
+
 
         void OnFocus()
         {
@@ -125,7 +152,6 @@ namespace Skill.Editor.Sequence
 
         #endregion
 
-
         #region Variables
         [SerializeField]
         private Matinee _Matinee;
@@ -134,12 +160,15 @@ namespace Skill.Editor.Sequence
         private Curve.CurveEditor _CurveEditor;
         private TrackTreeView _TracksTreeView;
         private PropertyGrid _PropertyGrid;
+        private CurveTrackTreeView _CurveTrackTreeView;
         private bool _RefreshStyles;
         #endregion
 
         #region Properties
         internal PropertyGrid PropertyGrid { get { return _PropertyGrid; } }
         internal TimeLine TimeLine { get { return _TimeLine; } }
+        internal CurveTrackTreeView CurveTracks { get { return _CurveTrackTreeView; } }
+
         public Matinee Matinee
         {
             get { return _Matinee; }
@@ -175,41 +204,39 @@ namespace Skill.Editor.Sequence
             mainGrid.RowDefinitions.Add(2, Skill.Framework.UI.GridUnitType.Pixel); // splitter
             mainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, Skill.Framework.UI.GridUnitType.Star), MinHeight = 30 }); // _TimeLine
 
-            // curve editor must placed here at row = 0
-            _CurveEditor = new Curve.CurveEditor() { Row = 0 };
+            mainGrid.ColumnDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star); // _CurveTreeView, _TracksTreeView and _PropertyGrid
+            mainGrid.ColumnDefinitions.Add(4, Skill.Framework.UI.GridUnitType.Pixel); // splitter
+            mainGrid.ColumnDefinitions.Add(2, Skill.Framework.UI.GridUnitType.Star); // _TimeLine  and _CurveEditor
+
+            _CurveEditor = new Curve.CurveEditor() { Row = 0, Column = 2 };
             _CurveEditor.TimeLine.TimeBar.ShowTimePosition = true;
             _CurveEditor.TimeLine.View.ShowTimePosition = true;
             mainGrid.Controls.Add(_CurveEditor);
 
-            Skill.Editor.UI.GridSplitter hSplitter = new Skill.Editor.UI.GridSplitter() { Orientation = Orientation.Horizontal, Row = 1, Column = 0, Style = Skill.Editor.Resources.Styles.HorizontalSplitter };
+
+            _CurveTrackTreeView = new CurveTrackTreeView(_CurveEditor) { Row = 0, Column = 0, Margin = new Thickness(0, 2, 0, 0) };
+            mainGrid.Controls.Add(_CurveTrackTreeView);
+
+            Skill.Editor.UI.GridSplitter hSplitter = new Skill.Editor.UI.GridSplitter() { Orientation = Orientation.Horizontal, Row = 1, Column = 0, ColumnSpan = 3, Style = Skill.Editor.Resources.Styles.HorizontalSplitter };
             mainGrid.Controls.Add(hSplitter);
 
-            Skill.Framework.UI.Grid timeLineGrid = new Skill.Framework.UI.Grid() { Row = 2, Column = 0 };
-            timeLineGrid.ColumnDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star); // _TracksTreeView and _PropertyGrid
-            timeLineGrid.ColumnDefinitions.Add(4, Skill.Framework.UI.GridUnitType.Pixel); // splitter
-            timeLineGrid.ColumnDefinitions.Add(2, Skill.Framework.UI.GridUnitType.Star); // _TimeLine 
-
-            mainGrid.Controls.Add(timeLineGrid);
-
             CreateTimeLine();
+            _TimeLine.Row = 2;
+            _TimeLine.Column = 2;
 
-            timeLineGrid.Controls.Add(_TimeLine);
 
             #region TracksTreeView and PropertyGrid
 
             // grid to split TracksTreeView and PropertyGrid
-            Grid grid = new Grid() { Row = 0, Column = 0 };
+            Grid grid = new Grid() { Row = 2, Column = 0 };
             grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, Skill.Framework.UI.GridUnitType.Star), MinHeight = 80 });
             grid.RowDefinitions.Add(2, GridUnitType.Pixel);
             grid.RowDefinitions.Add(1, GridUnitType.Star);
 
             // **************************** _TracksTreeView *****************************
 
-            _TracksTreeView = new TrackTreeView(this);
-
-            DockPanel dock = new DockPanel() { Row = 0 };
-            dock.Controls.Add(_TracksTreeView);
-            grid.Controls.Add(dock);
+            _TracksTreeView = new TrackTreeView(this) { Row = 0 };
+            grid.Controls.Add(_TracksTreeView);
 
             Skill.Editor.UI.GridSplitter splitter = new Skill.Editor.UI.GridSplitter() { Orientation = Orientation.Horizontal, Row = 1, Column = 0, Style = Skill.Editor.Resources.Styles.HorizontalSplitter, OverFlow = 3 };
             grid.Controls.Add(splitter);
@@ -217,37 +244,31 @@ namespace Skill.Editor.Sequence
             _PropertyGrid = new PropertyGrid() { Row = 2 };
             grid.Controls.Add(_PropertyGrid);
 
-            timeLineGrid.Controls.Add(grid);
+            mainGrid.Controls.Add(grid);
             #endregion
 
-            // add splitter between _TimeLine and (TracksTreeView and PropertyGrid)
-            Skill.Editor.UI.GridSplitter vSplitter = new Skill.Editor.UI.GridSplitter() { Orientation = Orientation.Vertical, Row = 0, Column = 1, Style = Skill.Editor.Resources.Styles.VerticalSplitter };
-            timeLineGrid.Controls.Add(vSplitter);
+            // add splitter between (_TimeLine and _CurveEditor) and (_CurveTreeView, _TracksTreeView and _PropertyGrid)
+            Skill.Editor.UI.GridSplitter vSplitter = new Skill.Editor.UI.GridSplitter() { Orientation = Orientation.Vertical, Row = 0, Column = 1, RowSpan = 3, Style = Skill.Editor.Resources.Styles.VerticalSplitter };
+            mainGrid.Controls.Add(vSplitter);
+
+            mainGrid.Controls.Add(_TimeLine);
 
             // fill remaining area with mainGrid
             dockPanel.Controls.Add(mainGrid);
 
             _CurveEditor.PropertyGrid = _PropertyGrid;
             _CurveEditor.TimeLine.TimePositionChanged += CurveEditorTimeLine_PositionChanged;
-            _CurveEditor.Changed += _CurveEditor_Changed;
+
+            _CurveEditor.TimeLine.TimeBar.SnapTime = 0.001;
+            _TimeLine.TimeBar.SnapTime = 0.001;
         }
 
         #region Edit Curve
 
-        private TimeLineEvent _EditingEvent;
-        private ITrackKey _EditingCurve;
         private int _IgnorePosition;
-        internal void EditCurve(TimeLineEvent tle, ITrackKey key)
+        internal void EditCurve(BaseTrackBar trackBar)
         {
-            _EditingEvent = tle;
-            _EditingCurve = key;
-            _CurveEditor.RemoveAllCurves();
-            Curve.CurveEditor.EditCurveInfo[] curves = Curve.CurveEditor.GetCurves(key);
-            if (curves != null && curves.Length > 0)
-            {
-                foreach (var c in curves)
-                    _CurveEditor.AddCurve(c.GetCurve(), c.Attribute.Color);
-            }
+            _CurveTrackTreeView.Add(trackBar, trackBar.FirstKey);
         }
 
         private void _TimeLine_TimePositionChanged(object sender, System.EventArgs e)
@@ -255,38 +276,26 @@ namespace Skill.Editor.Sequence
             if (_IgnorePosition == 1) return;
             if (!_IsPlaying)
                 _SeekUpdate = true;
-            if (_EditingCurve != null)
-            {
-                _IgnorePosition = 1;
-                _CurveEditor.TimeLine.TimePosition = System.Math.Max(0, System.Math.Min(_TimeLine.TimePosition - _EditingCurve.FireTime, _CurveEditor.TimeLine.MaxTime));
-                _IgnorePosition = 0;
-            }
+
+            _IgnorePosition = 1;
+            _CurveEditor.TimeLine.TimePosition = System.Math.Max(0, _TimeLine.TimePosition);
+            _IgnorePosition = 0;
+
         }
 
-        void _CurveEditor_Changed(object sender, System.EventArgs e)
-        {
-            if (_EditingEvent != null)
-            {
-                _EditingEvent.TrackBar.Invalidate();
-                _EditingEvent.Invalidate();
-            }
-        }
         void CurveEditorTimeLine_PositionChanged(object sender, System.EventArgs e)
         {
             if (_IgnorePosition == 2) return;
-            if (_EditingCurve != null)
-            {
-                _IgnorePosition = 2;
-                _TimeLine.TimePosition = System.Math.Max(0, System.Math.Min(_CurveEditor.TimeLine.TimePosition + _EditingCurve.FireTime, _TimeLine.MaxTime));
-                _IgnorePosition = 0;
-            }
+            _IgnorePosition = 2;
+            _TimeLine.TimePosition = System.Math.Max(0, _CurveEditor.TimeLine.TimePosition);
+            _IgnorePosition = 0;
         }
         #endregion
 
         #region TimeLine
         private void CreateTimeLine()
         {
-            _TimeLine = new TimeLine(new TrackBarView()) { Row = 0, Column = 2 };
+            _TimeLine = new TimeLine(new TrackBarView());
             _TimeLine.TimePositionChanged += _TimeLine_TimePositionChanged;
         }
         #endregion
@@ -521,15 +530,20 @@ namespace Skill.Editor.Sequence
                 {
                     _Frame.Grid.IsEnabled = false;
                     _TracksTreeView.Clear();
+                    _CurveTrackTreeView.RemoveAll(true);
                     _TimeLine.Clear();
                     _TimeLine.MaxTime = 1;
                     _PropertyGrid.SelectedObject = null;
                 }
                 else
                 {
-                    TrackChanged();
                     LoadTimeLine();
                     _TracksTreeView.Refresh();
+                    foreach (BaseTrackBar bt in TrackBars())
+                    {
+                        if (bt.IsEditingCurves)
+                            EditCurve(bt);
+                    }
                     _Frame.Grid.IsEnabled = true;
                 }
             }
@@ -582,7 +596,6 @@ namespace Skill.Editor.Sequence
         private bool _SeekUpdate; // seek preview to TimeLine position in next update
         private int _StepForward; // step forward(1) or backward(-1) in next update when playback is active and paused    
 
-        private Track[] _Tracks;
 
         // step playback in positive stepTime
         private void StepPlaybackForward(float stepTime)
@@ -601,7 +614,7 @@ namespace Skill.Editor.Sequence
                         if (_IsLoop)
                         {
                             _PlayTime -= (float)_TimeLine.SelectionLenght;
-                            foreach (var t in _Tracks) t.Seek(_PlayTime);
+                            foreach (var t in Tracks()) t.Seek(_PlayTime);
                         }
                         else if (_IsPause)
                             _PlayTime = (float)_TimeLine.EndSelection;
@@ -614,7 +627,7 @@ namespace Skill.Editor.Sequence
                     if (_IsLoop)
                     {
                         _PlayTime -= (float)(_TimeLine.MaxTime - _TimeLine.MinTime);
-                        foreach (var t in _Tracks) t.Seek(_PlayTime);
+                        foreach (var t in Tracks()) t.Seek(_PlayTime);
                     }
                     else if (_IsPause)
                         _PlayTime = (float)_TimeLine.MaxTime;
@@ -641,7 +654,7 @@ namespace Skill.Editor.Sequence
                         if (_IsLoop)
                         {
                             _PlayTime += (float)_TimeLine.SelectionLenght;
-                            foreach (var t in _Tracks) t.Seek(_PlayTime);
+                            foreach (var t in Tracks()) t.Seek(_PlayTime);
                         }
                         else if (_IsPause)
                             _PlayTime = (float)_TimeLine.StartSelection;
@@ -654,7 +667,7 @@ namespace Skill.Editor.Sequence
                     if (_IsLoop)
                     {
                         _PlayTime += (float)(_TimeLine.MaxTime - _TimeLine.MinTime);
-                        foreach (var t in _Tracks) t.Seek(_PlayTime);
+                        foreach (var t in Tracks()) t.Seek(_PlayTime);
                     }
                     else if (_IsPause)
                         _PlayTime = (float)_TimeLine.MinTime;
@@ -684,13 +697,10 @@ namespace Skill.Editor.Sequence
                     _PlayTime = (float)_TimeLine.TimePosition;
                     if (_SeekUpdate) // user changed timeline position and we must force seek to that position
                     {
-                        if (_Tracks != null)
+                        foreach (var tb in TrackBars())
                         {
-                            foreach (var t in _Tracks)
-                            {
-                                t.SortKeys();
-                                t.Seek(_PlayTime); // and seek to TimeLine position
-                            }
+                            tb.Track.SortKeys();
+                            tb.Seek(_PlayTime); // and seek to TimeLine position
                         }
                         _SeekUpdate = false;
                         Evaluate();
@@ -702,13 +712,9 @@ namespace Skill.Editor.Sequence
         private void Evaluate()
         {
             _TimeLine.TimePosition = _PlayTime;
-            foreach (var t in _Tracks)
+            foreach (var t in TrackBars())
                 t.Evaluate(_PlayTime);
             Repaint();
-        }
-        public void TrackChanged()
-        {
-            _Tracks = _Matinee.GetComponentsInChildren<Track>(); // get reference to tracks
         }
 
         // initilize variables to start playback
@@ -716,20 +722,19 @@ namespace Skill.Editor.Sequence
         {
             _TimePositionBeforePlay = _TimeLine.TimePosition; // save position of timeline
             _SnapTimeBeforePlay = _TimeLine.TimeBar.SnapTime; // save snaptime        
-            if (_Tracks != null)
+
+            if (_TimeLine.SelectionLenght > 0)
+                _PlayTime = (float)_TimeLine.StartSelection; // we must start at start selected area
+            else
+                _PlayTime = (float)_TimeLine.TimePosition; // we must start at position of timeline selected by user
+            _DeltaTime = 0;
+            foreach (var t in Tracks())
             {
-                if (_TimeLine.SelectionLenght > 0)
-                    _PlayTime = (float)_TimeLine.StartSelection; // we must start at start selected area
-                else
-                    _PlayTime = (float)_TimeLine.TimePosition; // we must start at position of timeline selected by user
-                _DeltaTime = 0;
-                foreach (var t in _Tracks)
-                {
-                    t.SortKeys();
-                    t.Seek(_PlayTime);
-                }
-                Repaint();// repaint to force update scene
+                t.SortKeys();
+                t.Seek(_PlayTime);
             }
+            Repaint();// repaint to force update scene
+
         }
 
         // play or resume playback
@@ -762,7 +767,7 @@ namespace Skill.Editor.Sequence
             _TimeLine.TimeBar.SnapTime = _SnapTimeBeforePlay;// rollback snaptime
             _TimeLine.TimePosition = _TimePositionBeforePlay; // rollback time position
 
-            foreach (var t in _Tracks) t.Stop();
+            foreach (var t in Tracks()) t.Stop();
         }
 
         // pause playback
@@ -799,6 +804,8 @@ namespace Skill.Editor.Sequence
                 _TimeLine.TimeBar.SnapTime = snapTime;
         }
         #endregion
+
+
 
     }
 

@@ -474,10 +474,15 @@ namespace Skill.Framework.UI
                             break;
                     }
                 }
-                if (e.type != EventType.Used)
-                    base.HandleEvent(e);
+                BaseHandleEvent(e);
             }
 
+        }
+
+        protected void BaseHandleEvent(Event e)
+        {
+            if (e.type != EventType.Used)
+            base.HandleEvent(e);
         }
     }
 }

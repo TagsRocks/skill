@@ -20,7 +20,7 @@ namespace Skill.Framework.Sequence
         Sound,
 
     }
-
+    
     /// <summary>
     /// Base class for all available tracks in Matinee
     /// </summary>
@@ -32,6 +32,10 @@ namespace Skill.Framework.Sequence
         public Color Color = new Color(1, 1, 1, 0.4f);
         [HideInInspector]
         public bool Visible = true;
+        [HideInInspector]
+        public int RecordState;
+        [HideInInspector]
+        public bool IsEditingCurves;
         #endregion
 
         /// <summary> Type of Track </summary>
@@ -53,6 +57,13 @@ namespace Skill.Framework.Sequence
         /// </summary>
         /// <param name="time">time to evaluate</param>
         public abstract void Evaluate(float time);
+
+        /// <summary>
+        /// evaluate time relative to previous evaluation
+        /// </summary>
+        /// <param name="time">time to evaluate</param>
+        /// <param name="evaluation"> Evaluation filter </param>
+        //public abstract void Evaluate(float time, Evaluation evaluation);
 
         /// <summary>
         /// Seek to specific time because Evaluate is continues relative to previous evaluation

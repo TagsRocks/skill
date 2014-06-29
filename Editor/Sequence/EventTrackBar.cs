@@ -23,6 +23,8 @@ namespace Skill.Editor.Sequence
         private List<EventKeyView> _Events;
         private EventTrack _EventTrack;
 
+        public override ITrackKey FirstKey { get { return _EventTrack.EventKeys[0]; } }
+
         /// <summary>
         /// Create a SoundTrackBar
         /// </summary>
@@ -34,7 +36,7 @@ namespace Skill.Editor.Sequence
             _Events = new List<EventKeyView>();
             CreateEvents();
             this.ContextMenu = EventTrackBarContextMenu.Instance;
-            //this.Height = 22;
+            this.Height = 22;
         }
 
 

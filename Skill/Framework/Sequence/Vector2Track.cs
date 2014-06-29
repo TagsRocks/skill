@@ -35,19 +35,15 @@ namespace Skill.Framework.Sequence
         {
             get
             {
-                if (Keys != null && Keys.Length > 0)
+                if (Key != null )
                 {
-                    if (!Application.isPlaying)
-                        SortKeys();
+                    float maxLenght = Key.FireTime;
 
-                    Vector2Key v2k = Keys[Keys.Length - 1];
-                    float maxLenght = v2k.FireTime;
+                    if (Key.CurveX != null && Key.CurveX.length > 0)
+                        maxLenght = Mathf.Max(maxLenght, Key.CurveX.keys[Key.CurveX.length - 1].time);
 
-                    if (v2k.CurveX != null && v2k.CurveX.length > 0)
-                        maxLenght = Mathf.Max(maxLenght, v2k.CurveX.keys[v2k.CurveX.length - 1].time);
-
-                    if (v2k.CurveY != null && v2k.CurveY.length > 0)
-                        maxLenght = Mathf.Max(maxLenght, v2k.CurveY.keys[v2k.CurveY.length - 1].time);
+                    if (Key.CurveY != null && Key.CurveY.length > 0)
+                        maxLenght = Mathf.Max(maxLenght, Key.CurveY.keys[Key.CurveY.length - 1].time);
 
                     return maxLenght;
                 }
@@ -58,9 +54,21 @@ namespace Skill.Framework.Sequence
 
         [SerializeField]
         [HideInInspector]
-        public Vector2Key[] Keys = new Vector2Key[0];
+        public Vector2Key Key;
 
-        public override IPropertyKey<Vector2>[] PropertyKeys { get { return Keys; } set { Keys = (Vector2Key[])value; } }
+        public override IPropertyKey<Vector2>[] PropertyKeys
+        {
+            get
+            {
+                if (Key == null)
+                    Key = new Vector2Key() { Time = 0, Value = Vector2.zero};
+                return new IPropertyKey<Vector2>[] { Key };
+            }
+            set
+            {
+                Key = (Vector2Key)value[0];
+            }
+        }
 
         private Vector2Key _TempKey = new Vector2Key();
 

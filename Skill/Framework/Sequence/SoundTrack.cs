@@ -79,7 +79,7 @@ namespace Skill.Framework.Sequence
 
                     float length = Keys[Keys.Length - 1].FireTime;
                     if (Keys[Keys.Length - 1].Clip != null)
-                        length += Keys[Keys.Length - 1].Clip.length;                    
+                        length += Keys[Keys.Length - 1].Clip.length;
                     return length;
                 }
                 return 0;
@@ -110,7 +110,7 @@ namespace Skill.Framework.Sequence
             }
         }
 
-        protected override void SetValue(AudioClip value) { /* nothing to set */}
+        public override void SetValue(AudioClip value) { /* nothing to set */}
         protected override void Evaluate(IPropertyKey<AudioClip> key) { /* nothing */ }
 
 

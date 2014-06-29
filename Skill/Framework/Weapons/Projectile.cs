@@ -82,6 +82,17 @@ namespace Skill.Framework.Weapons
 
         /// <summary> Number of ammo in current clip </summary>
         public int ClipAmmo { get; set; }
+
+        /// <summary> Normalized number of ammo in current clip </summary>
+        public float NormalizedClipAmmo
+        {
+            get { return (float)ClipAmmo / ClipSize; }
+            set
+            {
+                ClipAmmo = Mathf.FloorToInt(ClipSize * Mathf.Clamp01(value));
+            }
+        }
+
         /// <summary> Total number of ammo without clip ammo </summary>
         public int Ammo { get; set; }
         /// <summary> Total number of ammo </summary>

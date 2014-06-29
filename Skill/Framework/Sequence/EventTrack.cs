@@ -16,7 +16,7 @@ namespace Skill.Framework.Sequence
         public virtual float FireTime { get { return _Time; } set { _Time = value; } }
 
         /// <summary>Fire event </summary>
-        public abstract void Fire();        
+        public abstract void Fire();
     }
 
     public class EventTrack : Track
@@ -37,7 +37,7 @@ namespace Skill.Framework.Sequence
                     if (!Application.isPlaying)
                         SortKeys();
 
-                    return EventKeys[EventKeys.Length].FireTime;
+                    return EventKeys[EventKeys.Length - 1].FireTime;
                 }
                 return 0;
             }
@@ -45,22 +45,24 @@ namespace Skill.Framework.Sequence
 
         private int _Index;
         public override void Evaluate(float time)
-        {
+        {            
             float preTime = CurrecntTime;
             CurrecntTime = time;
             float deltaTime = CurrecntTime - preTime;
             if (deltaTime > 0)
             {
-                if (Events != null)
+                if (EventKeys != null)
                 {
                     if (_Index < 0) _Index = 0;
                     for (; _Index < EventKeys.Length; _Index++)
                     {
-                        float t = EventKeys[_Index].FireTime;
+                        float t = EventKeys[_Index].FireTime;                        
                         if (t <= CurrecntTime)
                         {
-                            if (t < CurrecntTime && t >= preTime)
-                                EventKeys[_Index].Fire();
+                            if (t >= preTime)
+                            {
+                                EventKeys[_Index].Fire();                                
+                            }
                             _Index++;
                         }
                         else

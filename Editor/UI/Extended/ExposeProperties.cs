@@ -648,9 +648,7 @@ namespace Skill.Editor.UI.Extended
         {
             //Type objectType = typeof(object);
             Type unityObjectType = typeof(UnityEngine.Object);
-
-
-            return t.IsSubclassOf(unityObjectType);
+            return t.IsSubclassOf(unityObjectType) || t == unityObjectType;
 
             //while (t != objectType)
             //{

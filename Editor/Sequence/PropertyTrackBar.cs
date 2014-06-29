@@ -14,6 +14,10 @@ namespace Skill.Editor.Sequence
         private List<PropertyTimeLineEvent> _Events;
         private PropertyTrack<V> _PropertyTrack;
 
+
+        public override ITrackKey FirstKey { get { return _PropertyTrack.PropertyKeys[0]; } }
+        protected virtual bool IsCurve { get { return false; } }
+
         /// <summary>
         /// Create a SoundTrackBar
         /// </summary>
@@ -105,7 +109,7 @@ namespace Skill.Editor.Sequence
         /// add key at position
         /// </summary>
         /// <param name="x">position inside track</param>
-        private void AddKeyAt(float x)
+        private void AddKeyAtPosition(float x)
         {
             TimeLine timeLine = FindInParents<TimeLine>();
             if (timeLine != null)
@@ -116,7 +120,7 @@ namespace Skill.Editor.Sequence
                 IPropertyKey<V> newKey = CreateNewKey();
                 newKey.FireTime = (float)timeLine.TimeBar.GetTime(x);
 
-                PropertyTimeLineEvent e = CreateEvent(newKey);                
+                PropertyTimeLineEvent e = CreateEvent(newKey);
                 RebuildTrackKeys();
 
                 for (int i = 0; i < _PropertyTrack.PropertyKeys.Length; i++)
@@ -137,7 +141,10 @@ namespace Skill.Editor.Sequence
         }
 
         protected abstract void EvaluateNewKey(IPropertyKey<V> newKey, IPropertyKey<V> previousKey);
-
+        protected void EditCurves()
+        {
+            MatineeEditorWindow.Instance.EditCurve(this);
+        }
         protected static AnimationCurve CreateNextCurve(AnimationCurve preCurve, float defaultValue)
         {
             Keyframe k1;
@@ -181,7 +188,6 @@ namespace Skill.Editor.Sequence
             SetDirty();
         }
 
-
         #region PropertyEvent
 
         /// <summary>
@@ -189,7 +195,7 @@ namespace Skill.Editor.Sequence
         /// </summary>
         protected abstract class PropertyTimeLineEvent : EventView
         {
-            
+
 
             public override float MinWidth { get { return 6; } }
 
@@ -199,6 +205,69 @@ namespace Skill.Editor.Sequence
                 : base(trackBar, key)
             {
                 PropertyKey = key;
+            }
+
+
+            protected void CalcCurveRenderArea(ref Rect[] renderAreas, ref Rect[] ranges, params AnimationCurve[] curves)
+            {
+                TimeLine timeLine = FindInParents<TimeLine>();
+                Rect trackRa = TrackBar.RenderArea;
+                double deltaTime = (timeLine.MaxTime - timeLine.MinTime);
+
+                float minVisibleX = trackRa.x + trackRa.width * (float)((timeLine.StartVisible - timeLine.MinTime) / deltaTime);
+                float maxVisibleX = trackRa.x + trackRa.width * (float)((timeLine.EndVisible - timeLine.MinTime) / deltaTime);
+
+
+                float maxTime = 0;
+                foreach (AnimationCurve curve in curves)
+                {
+                    if (curve != null && curve.length > 1)
+                        maxTime = Mathf.Max(maxTime, curve[curve.length - 1].time);
+                }
+
+                for (int i = 0; i < curves.Length; i++)
+                {
+                    AnimationCurve curve = curves[i];
+                    Rect ra = RenderArea;
+                    if (curve != null && curve.length > 1 && maxTime > 0.01f)
+                    {
+                        ra.x += curve[0].time / maxTime * ra.width;
+                        ra.width = curve[curve.length - 1].time / maxTime * ra.width;
+                    }
+
+                    float xMin = Mathf.Max(ra.xMin, minVisibleX);
+                    float xMax = Mathf.Min(ra.xMax, maxVisibleX);
+                    float delta = xMax - xMin;
+                    Rect range = new Rect(0, 0, 1, 1);
+                    range.xMin = (xMin - ra.xMin) / ra.width;
+                    range.xMax = (xMax - ra.xMin) / ra.width;
+                    ra.xMin = xMin;
+                    ra.xMax = xMax;
+
+                    if (curve != null && curve.length > 1)
+                    {
+                        for (int j = 0; j < curve.length; j++)
+                        {
+                            float value = curve[j].value;
+                            range.yMin = Mathf.Min(range.yMin, value);
+                            range.yMax = Mathf.Max(range.yMax, value);
+                        }
+                    }
+
+                    renderAreas[i] = ra;                    
+                    ranges[i] = range;
+                }
+            }
+
+            protected static void DrawCurve(Rect ra, Rect ranges, AnimationCurve curve, Color color)
+            {
+                if (curve != null && curve.length > 1 && ra.xMax - ra.xMin >= 1)
+                {
+                    float time = curve[curve.length - 1].time;
+                    ranges.x *= time;
+                    ranges.width *= time;
+                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(ra, curve, null, color, CurveBgColor, ranges);
+                }
             }
         }
         #endregion
@@ -216,19 +285,42 @@ namespace Skill.Editor.Sequence
                 }
             }
 
+            private Skill.Editor.UI.MenuItem _DeleteItem;
+            private Skill.Editor.UI.MenuItem _EditCurves;
+
             public PropertyEventContextMenu()
             {
-                Skill.Editor.UI.MenuItem deleteItem = new Skill.Editor.UI.MenuItem("Delete");
-                Add(deleteItem);
+                _DeleteItem = new Skill.Editor.UI.MenuItem("Delete");
+                _EditCurves = new Skill.Editor.UI.MenuItem("Edit Curves");
 
-                deleteItem.Click += deleteItem_Click;
-
+                _DeleteItem.Click += _DeleteItem_Click;
+                _EditCurves.Click += _EditCurves_Click;
             }
 
-            void deleteItem_Click(object sender, System.EventArgs e)
+            void _EditCurves_Click(object sender, System.EventArgs e)
+            {
+                PropertyTimeLineEvent se = (PropertyTimeLineEvent)Owner;
+                ((PropertyTrackBar<V>)se.TrackBar).EditCurves();
+            }
+
+            void _DeleteItem_Click(object sender, System.EventArgs e)
             {
                 PropertyTimeLineEvent se = (PropertyTimeLineEvent)Owner;
                 ((PropertyTrackBar<V>)se.TrackBar).Delete(se);
+            }
+            protected override void BeginShow()
+            {
+                Clear();
+                PropertyTimeLineEvent se = (PropertyTimeLineEvent)Owner;
+                PropertyTrackBar<V> p = (PropertyTrackBar<V>)se.TrackBar;
+                if (p != null)
+                {
+                    if (p.IsCurve)
+                        Add(_EditCurves);
+                    else
+                        Add(_DeleteItem);
+                }
+                base.BeginShow();
             }
         }
         #endregion
@@ -246,21 +338,48 @@ namespace Skill.Editor.Sequence
                 }
             }
 
+            private Skill.Editor.UI.MenuItem _AddItem;
+            private Skill.Editor.UI.MenuItem _EditCurves;
+
             private PropertyTrackBarContextMenu()
             {
-                Skill.Editor.UI.MenuItem addItem = new Skill.Editor.UI.MenuItem("New");
-                Add(addItem);
+                _AddItem = new Skill.Editor.UI.MenuItem("New");
+                _EditCurves = new Skill.Editor.UI.MenuItem("Edit Curves");
 
-                addItem.Click += addItem_Click;
+
+                _AddItem.Click += _AddItem_Click;
+                _EditCurves.Click += _EditCurves_Click;
             }
 
-            void addItem_Click(object sender, System.EventArgs e)
+            void _EditCurves_Click(object sender, System.EventArgs e)
             {
                 PropertyTrackBar<V> trackBar = (PropertyTrackBar<V>)Owner;
-                trackBar.AddKeyAt(Position.x);
+                trackBar.EditCurves();
+            }
+
+            void _AddItem_Click(object sender, System.EventArgs e)
+            {
+                PropertyTrackBar<V> trackBar = (PropertyTrackBar<V>)Owner;
+                trackBar.AddKeyAtPosition(Position.x);
+            }
+
+            protected override void BeginShow()
+            {
+                Clear();
+                PropertyTrackBar<V> p = Owner as PropertyTrackBar<V>;
+                if (p != null)
+                {
+                    if (p.IsCurve)
+                        Add(_EditCurves);
+                    else
+                        Add(_AddItem);
+                }
+                base.BeginShow();
             }
         }
         #endregion
+
+
 
 
     }

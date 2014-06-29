@@ -105,6 +105,7 @@ namespace Skill.Framework.Sequence
             _PlayTime = 0;
             IsPaused = false;
             IsPlaying = false;
+            _NextStop = false;
         }
 
         /// <summary>
@@ -137,6 +138,7 @@ namespace Skill.Framework.Sequence
                 if (Cutscene)
                     Skill.Framework.Global.CutSceneEnable = false;
                 enabled = false;
+                _NextStop = false;
                 OnPlaybackChanged();
             }
         }
@@ -150,6 +152,7 @@ namespace Skill.Framework.Sequence
                 IsPlaying = true;
                 IsPaused = false;
                 enabled = true;
+                _NextStop = false;
                 OnPlaybackChanged();
             }
         }
@@ -161,6 +164,7 @@ namespace Skill.Framework.Sequence
             {
                 IsPaused = true;
                 enabled = false;
+                _NextStop = false;
                 OnPlaybackChanged();
             }
         }
@@ -176,21 +180,28 @@ namespace Skill.Framework.Sequence
             base.Update();
         }
 
+        private bool _NextStop;
         // step forward playback with stepTime
         private void StepForward(float stepTime)
         {
             _PlayTime += stepTime * Speed;
+
+            if (_NextStop)
+                Stop();
 
             if (_PlayTime >= Length)
             {
                 if (Loop)
                 {
                     _PlayTime -= Length;
+                    _NextStop = false;
                     foreach (var t in _Tracks) t.Seek(_PlayTime);
+
                 }
-                else
+                else 
                 {
-                    Stop();
+                    // let last keys evaluate
+                    _NextStop = true;                    
                 }
             }
             else if (_PlayTime <= 0)
@@ -198,11 +209,13 @@ namespace Skill.Framework.Sequence
                 if (Loop)
                 {
                     _PlayTime += Length;
+                    _NextStop = false;
                     foreach (var t in _Tracks) t.Seek(_PlayTime);
                 }
                 else
                 {
-                    Stop();
+                    // let last keys evaluate
+                    _NextStop = true;
                 }
             }
 

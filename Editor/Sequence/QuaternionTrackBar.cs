@@ -11,12 +11,41 @@ namespace Skill.Editor.Sequence
         protected override IPropertyKey<Quaternion> CreateNewKey() { return new QuaternionKey(); }
         protected override IPropertyKey<Quaternion>[] CreateKeyArray(int arraySize) { return new QuaternionKey[arraySize]; }
 
+        protected override bool IsCurve { get { return true; } }
+
         public QuaternionTrackBar(QuaternionTrack track)
             : base(track)
         {
             this.Height = 40;
         }
 
+        internal override void Evaluate(float time)
+        {
+            Seek(time);
+        }
+
+        internal override void Seek(float time)
+        {
+            if ((this.RecordState & RecordState.XYZ) != RecordState.XYZ)
+            {
+                QuaternionTrack qt = (QuaternionTrack)Track;
+                QuaternionKey vk = (QuaternionKey)qt.PropertyKeys[0];
+
+
+                Vector3 curveValue = new Vector3(vk.CurveX.Evaluate(time), vk.CurveY.Evaluate(time), vk.CurveZ.Evaluate(time));
+                Vector3 sceneValue = curveValue;
+                object v = qt.GetValue();
+                if (v != null)
+                    sceneValue = ((Quaternion)v).eulerAngles;
+
+                Vector3 value = curveValue;
+                if ((this.RecordState & RecordState.X) != 0) value.x = sceneValue.x;
+                if ((this.RecordState & RecordState.Y) != 0) value.y = sceneValue.y;
+                if ((this.RecordState & RecordState.Z) != 0) value.z = sceneValue.z;
+
+                qt.SetValue(Quaternion.Euler(value));
+            }
+        }
 
         protected override void EvaluateNewKey(IPropertyKey<Quaternion> newKey, IPropertyKey<Quaternion> previousKey)
         {
@@ -66,24 +95,7 @@ namespace Skill.Editor.Sequence
             }
             public override string Title { get { return "Quaternion Event"; } }
 
-            public override bool IsSelectedProperties
-            {
-                get
-                {
-                    return base.IsSelectedProperties;
-                }
-                set
-                {
-                    if (base.IsSelectedProperties != value)
-                    {
-                        if (value)
-                        {
-                            MatineeEditorWindow.Instance.EditCurve(this, _QuaternionKey);
-                        }
-                    }
-                    base.IsSelectedProperties = value;
-                }
-            }
+            protected override bool CanDrag { get { return false; } }
 
             private float _MinWidth;
             private Quaternion _PreValue;
@@ -116,25 +128,30 @@ namespace Skill.Editor.Sequence
             }
 
 
-
+            private Rect[] _CurevRenderAreas = new Rect[3];
+            private Rect[] _CurevRanges = new Rect[3];
             protected override void Render()
             {
+                GUI.Box(RenderArea, string.Empty, Skill.Editor.Resources.Styles.BackgroundShadow);
                 if (_QuaternionKey.CurveX != null && _QuaternionKey.CurveY != null && _QuaternionKey.CurveZ != null)
                 {
-                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _QuaternionKey.CurveX, null, CurveXColor, CurveBgColor);
-                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _QuaternionKey.CurveY, null, CurveYColor, CurveBgColor);
-                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _QuaternionKey.CurveZ, null, CurveZColor, CurveBgColor);
+                    CalcCurveRenderArea(ref _CurevRenderAreas, ref _CurevRanges, _QuaternionKey.CurveX, _QuaternionKey.CurveY, _QuaternionKey.CurveZ);
+                    if (_CurevRenderAreas[0].width > 0.1f)
+                        DrawCurve(_CurevRenderAreas[0], _CurevRanges[0], _QuaternionKey.CurveX, CurveXColor);
+                    if (_CurevRenderAreas[1].width > 0.1f)
+                        DrawCurve(_CurevRenderAreas[1], _CurevRanges[1], _QuaternionKey.CurveY, CurveYColor);
+                    if (_CurevRenderAreas[2].width > 0.1f)
+                        DrawCurve(_CurevRenderAreas[2], _CurevRanges[2], _QuaternionKey.CurveZ, CurveZColor);
                 }
-                else
-                {
-                    GUI.Label(RenderArea, PropertyKey.ValueKey.ToString());
-                }
+                //else
+                //{
+                //    GUI.Label(RenderArea, PropertyKey.ValueKey.ToString());
+                //}
                 base.Render();
             }
 
             class QuaternionKeyViewProperties : EventProperties
             {
-                private Skill.Editor.UI.ToggleButton _TbConstant;
                 private Skill.Editor.UI.Vector3Field _Value;
                 private Skill.Editor.UI.CurveField _CurveFieldX;
                 private Skill.Editor.UI.CurveField _CurveFieldY;
@@ -144,8 +161,6 @@ namespace Skill.Editor.Sequence
                 public QuaternionKeyViewProperties(QuaternionKeyView e)
                     : base(e)
                 {
-                    _TbConstant = new Skill.Editor.UI.ToggleButton() { Margin = ControlMargin };
-                    _TbConstant.Label.text = "Constant?";
                     _Value = new Skill.Editor.UI.Vector3Field() { Margin = ControlMargin };
                     _Value.Label = "Value";
 
@@ -161,11 +176,9 @@ namespace Skill.Editor.Sequence
                     _ChangeCheck.Controls.Add(_CurveFieldY);
                     _ChangeCheck.Controls.Add(_CurveFieldZ);
 
-                    Controls.Add(_TbConstant);
                     Controls.Add(_Value);
                     Controls.Add(_ChangeCheck);
 
-                    _TbConstant.Changed += _TbConstant_Changed;
                     _Value.ValueChanged += _FFValue_ValueChanged;
                     _ChangeCheck.Changed += ChangeCheck_Changed;
                 }
@@ -173,13 +186,6 @@ namespace Skill.Editor.Sequence
                 void ChangeCheck_Changed(object sender, System.EventArgs e)
                 {
                     if (IgnoreChanges) return;
-                    SetDirty();
-                }
-
-                void _TbConstant_Changed(object sender, System.EventArgs e)
-                {
-                    if (IgnoreChanges) return;
-                    ValidateCurve();
                     SetDirty();
                 }
 
@@ -194,41 +200,26 @@ namespace Skill.Editor.Sequence
                 {
                     base.RefreshData();
                     _Value.Value = ((QuaternionKeyView)_View).PropertyKey.ValueKey.eulerAngles;
-
-                    QuaternionKey k = (QuaternionKey)((QuaternionKeyView)_View).Key;
-                    _TbConstant.IsChecked = k.CurveX == null || k.CurveY == null || k.CurveZ == null;
-                    ValidateCurve();
+                    ValidateCurves();
                 }
 
-                void ValidateCurve()
+                void ValidateCurves()
                 {
-                    if (_TbConstant.IsChecked)
-                    {
-                        _Value.Visibility = Skill.Framework.UI.Visibility.Visible;
-                        _ChangeCheck.Visibility = Skill.Framework.UI.Visibility.Collapsed;
-                        QuaternionKey k = (QuaternionKey)((QuaternionKeyView)_View).Key;
-                        k.CurveX = null;
-                        k.CurveY = null;
-                        k.CurveZ = null;
-                    }
-                    else
-                    {
-                        _Value.Visibility = Skill.Framework.UI.Visibility.Collapsed;
-                        _ChangeCheck.Visibility = Skill.Framework.UI.Visibility.Visible;
+                    _Value.Visibility = Skill.Framework.UI.Visibility.Collapsed;
+                    _ChangeCheck.Visibility = Skill.Framework.UI.Visibility.Visible;
 
-                        QuaternionKey k = (QuaternionKey)((QuaternionKeyView)_View).Key;
-                        if (k.CurveX != null) _CurveFieldX.Curve = k.CurveX;
-                        if (k.CurveY != null) _CurveFieldY.Curve = k.CurveY;
-                        if (k.CurveZ != null) _CurveFieldZ.Curve = k.CurveZ;
+                    QuaternionKey k = (QuaternionKey)((QuaternionKeyView)_View).Key;
+                    if (k.CurveX != null) _CurveFieldX.Curve = k.CurveX;
+                    if (k.CurveY != null) _CurveFieldY.Curve = k.CurveY;
+                    if (k.CurveZ != null) _CurveFieldZ.Curve = k.CurveZ;
 
-                        if (_CurveFieldX.Curve == null) _CurveFieldX.Curve = new AnimationCurve();
-                        if (_CurveFieldY.Curve == null) _CurveFieldY.Curve = new AnimationCurve();
-                        if (_CurveFieldZ.Curve == null) _CurveFieldZ.Curve = new AnimationCurve();
+                    if (_CurveFieldX.Curve == null) _CurveFieldX.Curve = new AnimationCurve();
+                    if (_CurveFieldY.Curve == null) _CurveFieldY.Curve = new AnimationCurve();
+                    if (_CurveFieldZ.Curve == null) _CurveFieldZ.Curve = new AnimationCurve();
 
-                        k.CurveX = _CurveFieldX.Curve;
-                        k.CurveY = _CurveFieldY.Curve;
-                        k.CurveZ = _CurveFieldZ.Curve;
-                    }
+                    k.CurveX = _CurveFieldX.Curve;
+                    k.CurveY = _CurveFieldY.Curve;
+                    k.CurveZ = _CurveFieldZ.Curve;
                 }
             }
         }

@@ -241,22 +241,40 @@ namespace Skill.Framework.Sequence
     public class ToggleObject : EventKey
     {
         [SerializeField]
-        private GameObject _Object;
-        [SerializeField]
         private bool _Active = true;
+        [SerializeField]
+        private GameObject _Object1;
+        [SerializeField]
+        private GameObject _Object2;
+        [SerializeField]
+        private GameObject _Object3;
+        [SerializeField]
+        private GameObject _Object4;
+        [SerializeField]
+        private GameObject _Object5;
 
-        [ExposeProperty(1, "Object", "Object to toggle")]
-        public GameObject Object { get { return _Object; } set { _Object = value; } }
-
-        [ExposeProperty(2, "Active", "Should we acivate, or deactivate this GameObject")]
+        [ExposeProperty(1, "Active", "Should we acivate, or deactivate this GameObject")]
         public bool Active { get { return _Active; } set { _Active = value; } }
+
+        [ExposeProperty(2, "Object1", "Object to toggle")]
+        public GameObject Object1 { get { return _Object1; } set { _Object1 = value; } }
+        [ExposeProperty(3, "Object2", "Object to toggle")]
+        public GameObject Object2 { get { return _Object2; } set { _Object2 = value; } }
+        [ExposeProperty(4, "Object3", "Object to toggle")]
+        public GameObject Object3 { get { return _Object3; } set { _Object3 = value; } }
+        [ExposeProperty(5, "Object4", "Object to toggle")]
+        public GameObject Object4 { get { return _Object4; } set { _Object4 = value; } }
+        [ExposeProperty(6, "Object5", "Object to toggle")]
+        public GameObject Object5 { get { return _Object5; } set { _Object5 = value; } }
+
 
         public override void Fire()
         {
-            if (_Object != null)
-                _Object.SetActive(_Active);
-            else
-                Debug.LogWarning("You must set a valid GameObject for ToggleObject event");
+            if (_Object1 != null) _Object1.SetActive(_Active);
+            if (_Object2 != null) _Object2.SetActive(_Active);
+            if (_Object3 != null) _Object3.SetActive(_Active);
+            if (_Object4 != null) _Object4.SetActive(_Active);
+            if (_Object5 != null) _Object5.SetActive(_Active);
         }
     }
     #endregion
@@ -550,12 +568,14 @@ namespace Skill.Framework.Sequence
 
     #region Signal
 
-    public class SendMessageParameters
+    public enum SendMessageParameter
     {
-        public float FloatParameter;
-        public int IntParameter;
-        public Object ObjectReferenceParameter;
-        public string StringParameter;
+        None,
+        Float,
+        Int,
+        Bool,
+        ObjectReference,
+        String,
     }
 
     /// <summary>
@@ -569,11 +589,15 @@ namespace Skill.Framework.Sequence
         [SerializeField]
         private string _FunctionName;
         [SerializeField]
+        private SendMessageParameter _ParameterType;
+        [SerializeField]
         private SendMessageOptions _MessageOptions;
         [SerializeField]
         private float _FloatParameter;
         [SerializeField]
         private int _IntParameter;
+        [SerializeField]
+        private bool _BoolParameter;
         [SerializeField]
         private Object _ObjectReferenceParameter;
         [SerializeField]
@@ -587,13 +611,17 @@ namespace Skill.Framework.Sequence
         public string FunctionName { get { return _FunctionName; } set { _FunctionName = value; } }
         [ExposeProperty(3, "MessageOptions", "Options")]
         public SendMessageOptions MessageOptions { get { return _MessageOptions; } set { _MessageOptions = value; } }
-        [ExposeProperty(4, "Float", "Float parameter")]
+        [ExposeProperty(4, "Parameter Type", "Parameter type")]
+        public SendMessageParameter ParameterType { get { return _ParameterType; } set { _ParameterType = value; } }
+        [ExposeProperty(5, "Float", "Float parameter")]
         public float FloatParameter { get { return _FloatParameter; } set { _FloatParameter = value; } }
-        [ExposeProperty(5, "Int", "Int parameter")]
+        [ExposeProperty(6, "Int", "Int parameter")]
         public int IntParameter { get { return _IntParameter; } set { _IntParameter = value; } }
-        [ExposeProperty(6, "ObjectReference", "ObjectReference parameter")]
+        [ExposeProperty(7, "Bool", "Boolean parameter")]
+        public bool BoolParameter { get { return _BoolParameter; } set { _BoolParameter = value; } }
+        [ExposeProperty(8, "Object", "Object reference parameter")]
         public Object ObjectReferenceParameter { get { return _ObjectReferenceParameter; } set { _ObjectReferenceParameter = value; } }
-        [ExposeProperty(7, "String", "String parameter")]
+        [ExposeProperty(9, "String", "String parameter")]
         public string StringParameter { get { return _StringParameter; } set { _StringParameter = value; } }
 
         public override void Fire()
@@ -601,7 +629,29 @@ namespace Skill.Framework.Sequence
             if (_Receiver != null)
             {
                 if (!string.IsNullOrEmpty(_FunctionName))
-                    _Receiver.SendMessage(_FunctionName, new SendMessageParameters() { FloatParameter = _FloatParameter, IntParameter = _IntParameter, ObjectReferenceParameter = _ObjectReferenceParameter, StringParameter = _StringParameter }, _MessageOptions);
+                {
+                    switch (_ParameterType)
+                    {
+                        case SendMessageParameter.None:
+                            _Receiver.SendMessage(_FunctionName, _MessageOptions);
+                            break;
+                        case SendMessageParameter.Float:
+                            _Receiver.SendMessage(_FunctionName, _FloatParameter, _MessageOptions);
+                            break;
+                        case SendMessageParameter.Int:
+                            _Receiver.SendMessage(_FunctionName, _IntParameter, _MessageOptions);
+                            break;
+                        case SendMessageParameter.Bool:
+                            _Receiver.SendMessage(_FunctionName, _BoolParameter, _MessageOptions);
+                            break;
+                        case SendMessageParameter.ObjectReference:
+                            _Receiver.SendMessage(_FunctionName, _ObjectReferenceParameter, _MessageOptions);
+                            break;
+                        case SendMessageParameter.String:
+                            _Receiver.SendMessage(_FunctionName, _StringParameter, _MessageOptions);
+                            break;
+                    }
+                }
                 else
                     Debug.LogWarning("You must specify a valid FunctionName for SendMessage event");
             }

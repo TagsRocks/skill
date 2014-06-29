@@ -66,6 +66,7 @@
     <Compile Include="Sequence\BaseTrackBar.cs" />
     <Compile Include="Sequence\BooleanTrackBar.cs" />
     <Compile Include="Sequence\ColorTrackBar.cs" />
+    <Compile Include="Sequence\CurveTrackTreeView.cs" />
     <Compile Include="Sequence\EventTrackBar.cs" />
     <Compile Include="Tools\AudioClipSubtitleEditor.cs" />
     <Compile Include="Tools\DictionaryEditor.cs" />
@@ -252,6 +253,9 @@
     <Content Include="Resources\UI\Failure.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\UI\Key.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\UI\Keyframe.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -295,6 +299,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\UI\Paste.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\RecordOff.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\UI\RecordOn.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\UI\SelectedEventBorder.png">

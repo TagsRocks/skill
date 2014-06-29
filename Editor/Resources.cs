@@ -49,6 +49,10 @@ namespace Skill.Editor
             SetTextureImportType(GetResourcePath("UI/Loop.png"), TextureImporterType.GUI);
             SetTextureImportType(GetResourcePath("UI/LoopOn.png"), TextureImporterType.GUI);
 
+
+            SetTextureImportType(GetResourcePath("UI/RecordOn.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetResourcePath("UI/RecordOff.png"), TextureImporterType.GUI);
+
             SetTextureImportType(GetResourcePath("UI/Add.png"), TextureImporterType.GUI);
             SetTextureImportType(GetResourcePath("UI/Remove.png"), TextureImporterType.GUI);
             SetTextureImportType(GetResourcePath("UI/Save.png"), TextureImporterType.GUI);
@@ -62,6 +66,7 @@ namespace Skill.Editor
 
             SetTextureImportType(GetResourcePath("UI/Keyframe.png"), TextureImporterType.GUI);
             SetTextureImportType(GetResourcePath("UI/KeyframeSelected.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetResourcePath("UI/Key.png"), TextureImporterType.GUI);
 
             SetTextureImportType(GetResourcePath("UI/Matinee/Folder.png"), TextureImporterType.GUI);
             SetTextureImportType(GetResourcePath("UI/Matinee/Sound.png"), TextureImporterType.GUI);
@@ -168,6 +173,8 @@ namespace Skill.Editor
 
             public static Texture2D Keyframe { get { return GetTexture("UI/Keyframe.png"); } }
             public static Texture2D KeyframeSelected { get { return GetTexture("UI/KeyframeSelected.png"); } }
+
+            public static Texture2D Key { get { return GetTexture("UI/Key.png"); } }
 
             #region Color Textures
             private static Texture2D _Red;
@@ -276,6 +283,10 @@ namespace Skill.Editor
             #endregion
 
             #region Media buttons
+
+            public static Texture2D RecordOn { get { return GetTexture("UI/RecordOn.png"); } }
+            public static Texture2D RecordOff { get { return GetTexture("UI/RecordOff.png"); } }            
+
             public static Texture2D Play { get { return GetTexture("UI/Play.png"); } }
             public static Texture2D PlayOn { get { return GetTexture("UI/PlayOn.png"); } }
             public static Texture2D Pause { get { return GetTexture("UI/Pause.png"); } }

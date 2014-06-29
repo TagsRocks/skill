@@ -11,6 +11,7 @@ namespace Skill.Editor.Sequence
         protected override IPropertyKey<Vector2> CreateNewKey() { return new Vector2Key(); }
         protected override IPropertyKey<Vector2>[] CreateKeyArray(int arraySize) { return new Vector2Key[arraySize]; }
 
+        protected override bool IsCurve { get { return true; } }
         public Vector2TrackBar(Vector2Track track)
             : base(track)
         {
@@ -40,6 +41,33 @@ namespace Skill.Editor.Sequence
             }
         }
 
+        internal override void Evaluate(float time)
+        {
+            Seek(time);
+        }
+
+        internal override void Seek(float time)
+        {
+            if ((this.RecordState & RecordState.XY) != RecordState.XY)
+            {
+                Vector2Track vt = (Vector2Track)Track;
+                Vector2Key vk = (Vector2Key)vt.PropertyKeys[0];
+
+
+                Vector2 curveValue = new Vector2(vk.CurveX.Evaluate(time), vk.CurveY.Evaluate(time));
+                Vector2 sceneValue = curveValue;
+                object v = vt.GetValue();
+                if (v != null)
+                    sceneValue = (Vector2)v;
+
+                Vector2 value = curveValue;
+                if ((this.RecordState & RecordState.X) != 0) value.x = sceneValue.x;
+                if ((this.RecordState & RecordState.Y) != 0) value.y = sceneValue.y;
+
+                vt.SetValue(value);
+            }
+        }
+
         class Vector2KeyView : PropertyTimeLineEvent
         {
             public override double Duration
@@ -61,6 +89,8 @@ namespace Skill.Editor.Sequence
                 set { }
             }
             public override string Title { get { return "Vector2 Event"; } }
+
+            protected override bool CanDrag { get { return false; } }
 
             private float _MinWidth;
             private Vector2 _PreValue;
@@ -86,25 +116,6 @@ namespace Skill.Editor.Sequence
 
             protected override PropertiesPanel CreateProperties() { return new Vector2KeyViewProperties(this); }
 
-            public override bool IsSelectedProperties
-            {
-                get
-                {
-                    return base.IsSelectedProperties;
-                }
-                set
-                {
-                    if (base.IsSelectedProperties != value)
-                    {
-                        if (value)
-                        {
-                            MatineeEditorWindow.Instance.EditCurve(this, _Vector2Key);                            
-                        }
-                    }
-                    base.IsSelectedProperties = value;
-                }
-            }
-
 
             private Vector2Key _Vector2Key;
             public Vector2KeyView(Vector2TrackBar trackbar, IPropertyKey<Vector2> key)
@@ -114,24 +125,28 @@ namespace Skill.Editor.Sequence
             }
 
 
-
+            private Rect[] _CurevRenderAreas = new Rect[2];
+            private Rect[] _CurevRanges = new Rect[2];
             protected override void Render()
             {
+                GUI.Box(RenderArea, string.Empty, Skill.Editor.Resources.Styles.BackgroundShadow);
                 if (_Vector2Key.CurveX != null && _Vector2Key.CurveY != null)
                 {
-                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _Vector2Key.CurveX, null, CurveXColor, CurveBgColor);
-                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _Vector2Key.CurveY, null, CurveYColor, CurveBgColor);
+                    CalcCurveRenderArea(ref _CurevRenderAreas, ref _CurevRanges, _Vector2Key.CurveX, _Vector2Key.CurveY);
+                    if (_CurevRenderAreas[0].width > 0.1f)
+                        DrawCurve(_CurevRenderAreas[0], _CurevRanges[0], _Vector2Key.CurveX, CurveXColor);
+                    if (_CurevRenderAreas[1].width > 0.1f)
+                        DrawCurve(_CurevRenderAreas[1], _CurevRanges[1], _Vector2Key.CurveY, CurveYColor);
                 }
-                else
-                {
-                    GUI.Label(RenderArea, PropertyKey.ValueKey.ToString());
-                }
+                //else
+                //{
+                //    GUI.Label(RenderArea, PropertyKey.ValueKey.ToString());
+                //}
                 base.Render();
             }
 
             class Vector2KeyViewProperties : EventProperties
             {
-                private Skill.Editor.UI.ToggleButton _TbConstant;
                 private Skill.Editor.UI.Vector2Field _Value;
                 private Skill.Editor.UI.CurveField _CurveFieldX;
                 private Skill.Editor.UI.CurveField _CurveFieldY;
@@ -140,8 +155,6 @@ namespace Skill.Editor.Sequence
                 public Vector2KeyViewProperties(Vector2KeyView e)
                     : base(e)
                 {
-                    _TbConstant = new Skill.Editor.UI.ToggleButton() { Margin = ControlMargin };
-                    _TbConstant.Label.text = "Constant?";
                     _Value = new Skill.Editor.UI.Vector2Field() { Margin = ControlMargin };
                     _Value.Label = "Value";
 
@@ -154,11 +167,9 @@ namespace Skill.Editor.Sequence
                     _ChangeCheck.Controls.Add(_CurveFieldX);
                     _ChangeCheck.Controls.Add(_CurveFieldY);
 
-                    Controls.Add(_TbConstant);
                     Controls.Add(_Value);
                     Controls.Add(_ChangeCheck);
 
-                    _TbConstant.Changed += _TbConstant_Changed;
                     _Value.ValueChanged += _FFValue_ValueChanged;
                     _ChangeCheck.Changed += ChangeCheck_Changed;
                 }
@@ -166,13 +177,6 @@ namespace Skill.Editor.Sequence
                 void ChangeCheck_Changed(object sender, System.EventArgs e)
                 {
                     if (IgnoreChanges) return;
-                    SetDirty();
-                }
-
-                void _TbConstant_Changed(object sender, System.EventArgs e)
-                {
-                    if (IgnoreChanges) return;
-                    ValidateCurve();
                     SetDirty();
                 }
 
@@ -187,37 +191,23 @@ namespace Skill.Editor.Sequence
                 {
                     base.RefreshData();
                     _Value.Value = ((Vector2KeyView)_View).PropertyKey.ValueKey;
-
-                    Vector2Key k = (Vector2Key)((Vector2KeyView)_View).Key;
-                    _TbConstant.IsChecked = k.CurveX == null || k.CurveY == null;
-                    ValidateCurve();
+                    ValidateCurves();
                 }
 
-                void ValidateCurve()
+                void ValidateCurves()
                 {
-                    if (_TbConstant.IsChecked)
-                    {
-                        _Value.Visibility = Skill.Framework.UI.Visibility.Visible;
-                        _ChangeCheck.Visibility = Skill.Framework.UI.Visibility.Collapsed;
-                        Vector2Key k = (Vector2Key)((Vector2KeyView)_View).Key;
-                        k.CurveX = null;
-                        k.CurveY = null;
-                    }
-                    else
-                    {
-                        _Value.Visibility = Skill.Framework.UI.Visibility.Collapsed;
-                        _ChangeCheck.Visibility = Skill.Framework.UI.Visibility.Visible;
+                    _Value.Visibility = Skill.Framework.UI.Visibility.Collapsed;
+                    _ChangeCheck.Visibility = Skill.Framework.UI.Visibility.Visible;
 
-                        Vector2Key k = (Vector2Key)((Vector2KeyView)_View).Key;
-                        if (k.CurveX != null) _CurveFieldX.Curve = k.CurveX;
-                        if (k.CurveY != null) _CurveFieldY.Curve = k.CurveY;
+                    Vector2Key k = (Vector2Key)((Vector2KeyView)_View).Key;
+                    if (k.CurveX != null) _CurveFieldX.Curve = k.CurveX;
+                    if (k.CurveY != null) _CurveFieldY.Curve = k.CurveY;
 
-                        if (_CurveFieldX.Curve == null) _CurveFieldX.Curve = new AnimationCurve();
-                        if (_CurveFieldY.Curve == null) _CurveFieldY.Curve = new AnimationCurve();
+                    if (_CurveFieldX.Curve == null) _CurveFieldX.Curve = new AnimationCurve();
+                    if (_CurveFieldY.Curve == null) _CurveFieldY.Curve = new AnimationCurve();
 
-                        k.CurveX = _CurveFieldX.Curve;
-                        k.CurveY = _CurveFieldY.Curve;
-                    }
+                    k.CurveX = _CurveFieldX.Curve;
+                    k.CurveY = _CurveFieldY.Curve;
                 }
             }
         }

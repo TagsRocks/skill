@@ -11,7 +11,7 @@ namespace Skill.Editor.Sequence
         protected override PropertyTrackBar<Vector4>.PropertyTimeLineEvent CreateNewEvent(IPropertyKey<Vector4> key) { return new Vector4KeyView(this, key); }
         protected override IPropertyKey<Vector4> CreateNewKey() { return new Vector4Key(); }
         protected override IPropertyKey<Vector4>[] CreateKeyArray(int arraySize) { return new Vector4Key[arraySize]; }
-
+        protected override bool IsCurve { get { return true; } }
         public Vector4TrackBar(Vector4Track track)
             : base(track)
         {
@@ -45,6 +45,35 @@ namespace Skill.Editor.Sequence
             }
         }
 
+
+        internal override void Evaluate(float time)
+        {
+            Seek(time);
+        }
+
+        internal override void Seek(float time)
+        {
+            if ((this.RecordState & RecordState.XYZW) != RecordState.XYZW)
+            {
+                Vector4Track vt = (Vector4Track)Track;
+                Vector4Key vk = (Vector4Key)vt.PropertyKeys[0];
+
+
+                Vector4 curveValue = new Vector4(vk.CurveX.Evaluate(time), vk.CurveY.Evaluate(time), vk.CurveZ.Evaluate(time), vk.CurveW.Evaluate(time));
+                Vector4 sceneValue = curveValue;
+                object v = vt.GetValue();
+                if (v != null)
+                    sceneValue = (Vector4)v;
+
+                Vector4 value = curveValue;
+                if ((this.RecordState & RecordState.X) != 0) value.x = sceneValue.x;
+                if ((this.RecordState & RecordState.Y) != 0) value.y = sceneValue.y;
+                if ((this.RecordState & RecordState.Z) != 0) value.z = sceneValue.z;
+                if ((this.RecordState & RecordState.W) != 0) value.w = sceneValue.w;
+
+                vt.SetValue(value);
+            }
+        }
         class Vector4KeyView : PropertyTimeLineEvent
         {
             public override double Duration
@@ -72,24 +101,7 @@ namespace Skill.Editor.Sequence
 
             public override string Title { get { return "Vector4 Event"; } }
 
-            public override bool IsSelectedProperties
-            {
-                get
-                {
-                    return base.IsSelectedProperties;
-                }
-                set
-                {
-                    if (base.IsSelectedProperties != value)
-                    {
-                        if (value)
-                        {
-                            MatineeEditorWindow.Instance.EditCurve(this, _Vector4Key);
-                        }
-                    }
-                    base.IsSelectedProperties = value;
-                }
-            }
+            protected override bool CanDrag { get { return false; } }
 
             private float _MinWidth;
             private Vector4 _PreValue;
@@ -122,26 +134,32 @@ namespace Skill.Editor.Sequence
             }
 
 
-
+            private Rect[] _CurevRenderAreas = new Rect[4];
+            private Rect[] _CurevRanges = new Rect[4];
             protected override void Render()
             {
+                GUI.Box(RenderArea, string.Empty, Skill.Editor.Resources.Styles.BackgroundShadow);
                 if (_Vector4Key.CurveX != null && _Vector4Key.CurveY != null && _Vector4Key.CurveZ != null)
                 {
-                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _Vector4Key.CurveX, null, CurveXColor, CurveBgColor);
-                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _Vector4Key.CurveY, null, CurveYColor, CurveBgColor);
-                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _Vector4Key.CurveZ, null, CurveZColor, CurveBgColor);
-                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _Vector4Key.CurveW, null, CurveWColor, CurveBgColor);
+                    CalcCurveRenderArea(ref _CurevRenderAreas, ref _CurevRanges, _Vector4Key.CurveX, _Vector4Key.CurveY, _Vector4Key.CurveZ, _Vector4Key.CurveW);
+                    if (_CurevRenderAreas[0].width > 0.1f)
+                        DrawCurve(_CurevRenderAreas[0], _CurevRanges[0], _Vector4Key.CurveX, CurveXColor);
+                    if (_CurevRenderAreas[1].width > 0.1f)
+                        DrawCurve(_CurevRenderAreas[1], _CurevRanges[1], _Vector4Key.CurveY, CurveYColor);
+                    if (_CurevRenderAreas[2].width > 0.1f)
+                        DrawCurve(_CurevRenderAreas[2], _CurevRanges[2], _Vector4Key.CurveZ, CurveZColor);
+                    if (_CurevRenderAreas[3].width > 0.1f)
+                        DrawCurve(_CurevRenderAreas[3], _CurevRanges[3], _Vector4Key.CurveW, CurveWColor);
                 }
-                else
-                {
-                    GUI.Label(RenderArea, PropertyKey.ValueKey.ToString());
-                }
+                //else
+                //{
+                //    GUI.Label(RenderArea, PropertyKey.ValueKey.ToString());
+                //}
                 base.Render();
             }
 
             class Vector4KeyViewProperties : EventProperties
             {
-                private Skill.Editor.UI.ToggleButton _TbConstant;
                 private Skill.Editor.UI.Vector4Field _Value;
                 private Skill.Editor.UI.CurveField _CurveFieldX;
                 private Skill.Editor.UI.CurveField _CurveFieldY;
@@ -152,8 +170,6 @@ namespace Skill.Editor.Sequence
                 public Vector4KeyViewProperties(Vector4KeyView e)
                     : base(e)
                 {
-                    _TbConstant = new Skill.Editor.UI.ToggleButton() { Margin = ControlMargin };
-                    _TbConstant.Label.text = "Constant?";
                     _Value = new Skill.Editor.UI.Vector4Field() { Margin = ControlMargin };
                     _Value.Label = "Value";
 
@@ -172,11 +188,9 @@ namespace Skill.Editor.Sequence
                     _ChangeCheck.Controls.Add(_CurveFieldZ);
                     _ChangeCheck.Controls.Add(_CurveFieldW);
 
-                    Controls.Add(_TbConstant);
                     Controls.Add(_Value);
                     Controls.Add(_ChangeCheck);
 
-                    _TbConstant.Changed += _TbConstant_Changed;
                     _Value.ValueChanged += _FFValue_ValueChanged;
                     _ChangeCheck.Changed += ChangeCheck_Changed;
                 }
@@ -184,13 +198,6 @@ namespace Skill.Editor.Sequence
                 void ChangeCheck_Changed(object sender, System.EventArgs e)
                 {
                     if (IgnoreChanges) return;
-                    SetDirty();
-                }
-
-                void _TbConstant_Changed(object sender, System.EventArgs e)
-                {
-                    if (IgnoreChanges) return;
-                    ValidateCurve();
                     SetDirty();
                 }
 
@@ -207,43 +214,30 @@ namespace Skill.Editor.Sequence
                     _Value.Value = ((Vector4KeyView)_View).PropertyKey.ValueKey;
 
                     Vector4Key k = (Vector4Key)((Vector4KeyView)_View).Key;
-                    _TbConstant.IsChecked = k.CurveX == null || k.CurveY == null || k.CurveZ == null || k.CurveW == null;
-                    ValidateCurve();
+                    ValidateCurves();
                 }
 
-                void ValidateCurve()
+                void ValidateCurves()
                 {
-                    if (_TbConstant.IsChecked)
-                    {
-                        _Value.Visibility = Skill.Framework.UI.Visibility.Visible;
-                        _ChangeCheck.Visibility = Skill.Framework.UI.Visibility.Collapsed;
-                        Vector4Key k = (Vector4Key)((Vector4KeyView)_View).Key;
-                        k.CurveX = null;
-                        k.CurveY = null;
-                        k.CurveZ = null;
-                        k.CurveW = null;
-                    }
-                    else
-                    {
-                        _Value.Visibility = Skill.Framework.UI.Visibility.Collapsed;
-                        _ChangeCheck.Visibility = Skill.Framework.UI.Visibility.Visible;
+                    _Value.Visibility = Skill.Framework.UI.Visibility.Collapsed;
+                    _ChangeCheck.Visibility = Skill.Framework.UI.Visibility.Visible;
 
-                        Vector4Key k = (Vector4Key)((Vector4KeyView)_View).Key;
-                        if (k.CurveX != null) _CurveFieldX.Curve = k.CurveX;
-                        if (k.CurveY != null) _CurveFieldY.Curve = k.CurveY;
-                        if (k.CurveZ != null) _CurveFieldZ.Curve = k.CurveZ;
-                        if (k.CurveW != null) _CurveFieldW.Curve = k.CurveW;
+                    Vector4Key k = (Vector4Key)((Vector4KeyView)_View).Key;
+                    if (k.CurveX != null) _CurveFieldX.Curve = k.CurveX;
+                    if (k.CurveY != null) _CurveFieldY.Curve = k.CurveY;
+                    if (k.CurveZ != null) _CurveFieldZ.Curve = k.CurveZ;
+                    if (k.CurveW != null) _CurveFieldW.Curve = k.CurveW;
 
-                        if (_CurveFieldX.Curve == null) _CurveFieldX.Curve = new AnimationCurve();
-                        if (_CurveFieldY.Curve == null) _CurveFieldY.Curve = new AnimationCurve();
-                        if (_CurveFieldZ.Curve == null) _CurveFieldZ.Curve = new AnimationCurve();
-                        if (_CurveFieldW.Curve == null) _CurveFieldW.Curve = new AnimationCurve();
+                    if (_CurveFieldX.Curve == null) _CurveFieldX.Curve = new AnimationCurve();
+                    if (_CurveFieldY.Curve == null) _CurveFieldY.Curve = new AnimationCurve();
+                    if (_CurveFieldZ.Curve == null) _CurveFieldZ.Curve = new AnimationCurve();
+                    if (_CurveFieldW.Curve == null) _CurveFieldW.Curve = new AnimationCurve();
 
-                        k.CurveX = _CurveFieldX.Curve;
-                        k.CurveY = _CurveFieldY.Curve;
-                        k.CurveZ = _CurveFieldZ.Curve;
-                        k.CurveW = _CurveFieldW.Curve;
-                    }
+                    k.CurveX = _CurveFieldX.Curve;
+                    k.CurveY = _CurveFieldY.Curve;
+                    k.CurveZ = _CurveFieldZ.Curve;
+                    k.CurveW = _CurveFieldW.Curve;
+
                 }
             }
         }

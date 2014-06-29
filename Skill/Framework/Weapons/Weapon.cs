@@ -143,9 +143,7 @@ namespace Skill.Framework.Weapons
         /// <summary> Current equipped projectile </summary>
         public int SelectedProjectileIndex { get { return _SelectedProjectileIndex; } }
         /// <summary> Can fire immediately? </summary>
-        public virtual bool CanFire { get { return State == WeaponState.Ready && (SelectedClipAmmo > 0 || SelectedProjectile.InfinitAmmo || SelectedProjectile.InfinitClip); } }
-        /// <summary> Number of ammo in current clip </summary>
-        public int SelectedClipAmmo { get { return SelectedProjectile.ClipAmmo; } set { SelectedProjectile.ClipAmmo = value; } }
+        public virtual bool CanFire { get { return State == WeaponState.Ready && (SelectedProjectile.ClipAmmo > 0 || SelectedProjectile.InfinitAmmo || SelectedProjectile.InfinitClip); } }        
         /// <summary> Target of weapon. can be setted by Controller </summary>
         public Vector3? Target { get; set; }
         /// <summary> Gets or set damage factor  </summary>
@@ -207,7 +205,7 @@ namespace Skill.Framework.Weapons
 
             if (!SelectedProjectile.InfinitAmmo)
             {
-                if (SelectedClipAmmo > consummed)
+                if (SelectedProjectile.ClipAmmo > consummed)
                 {
                     SelectedProjectile.ClipAmmo -= consummed;
                 }
@@ -298,7 +296,7 @@ namespace Skill.Framework.Weapons
         /// </summary>        
         protected virtual void OnReloadCompleted()
         {
-            int ammoToFillClip = SelectedProjectile.ClipSize - SelectedClipAmmo;
+            int ammoToFillClip = SelectedProjectile.ClipSize - SelectedProjectile.ClipAmmo;
 
             if (!SelectedProjectile.InfinitClip)
             {
@@ -306,7 +304,7 @@ namespace Skill.Framework.Weapons
                     ammoToFillClip = SelectedProjectile.Ammo;
                 SelectedProjectile.Ammo -= ammoToFillClip;
             }
-            SelectedClipAmmo += ammoToFillClip;
+            SelectedProjectile.ClipAmmo += ammoToFillClip;
 
             if (ReloadCompleted != null)
                 ReloadCompleted(this, EventArgs.Empty);
@@ -359,9 +357,20 @@ namespace Skill.Framework.Weapons
 
             foreach (var p in Projectiles)
             {
+                if (p.MaxAmmo < 0)
+                    p.MaxAmmo = 0;
+                if (p.DefaultAmmo > p.MaxAmmo)
+                    p.DefaultAmmo = p.MaxAmmo;
                 if (p.Ammo <= 0)
                     p.Ammo = p.DefaultAmmo - p.ClipSize;
                 p.ClipAmmo = p.ClipSize;
+                if (p.Ammo < 0)
+                {
+                    p.ClipAmmo += p.Ammo;
+                    p.Ammo = 0;
+                    if (p.ClipAmmo < 0)
+                        p.ClipAmmo = 0;
+                }
             }
         }
 
@@ -388,13 +397,13 @@ namespace Skill.Framework.Weapons
             {
                 if (item.DamageType == damageType)
                 {
-                    int preAmmoCount = item.Ammo;
-                    if (item.Ammo < item.MaxAmmo)
+                    int preAmmoCount = item.TotalAmmo;
+                    if (item.TotalAmmo < item.MaxAmmo)
                     {
-                        int count = item.Ammo + amount;
-                        if (count > item.MaxAmmo) count = item.MaxAmmo;
-                        else if (count < 0) count = 0;
-                        item.Ammo = count;
+                        int totalAmmo = item.TotalAmmo + amount;
+                        if (totalAmmo > item.MaxAmmo) totalAmmo = item.MaxAmmo;
+                        else if (totalAmmo < 0) totalAmmo = 0;
+                        item.Ammo = totalAmmo - item.ClipAmmo;
                     }
 
                     return item.Ammo - preAmmoCount;
@@ -423,7 +432,7 @@ namespace Skill.Framework.Weapons
         {
             if (_RequestReload == false)
             {
-                if (SelectedClipAmmo < SelectedProjectile.ClipSize)
+                if (SelectedProjectile.ClipAmmo < SelectedProjectile.ClipSize)
                 {
                     if (SelectedProjectile.Ammo > 0 || SelectedProjectile.InfinitClip || SelectedProjectile.InfinitAmmo)
                     {
@@ -501,7 +510,7 @@ namespace Skill.Framework.Weapons
             if (IsFiring)
             {
                 int mode = (int)this.Mode;
-                if (mode <= 0 || _ShootCount >= mode || SelectedClipAmmo == 0)
+                if (mode <= 0 || _ShootCount >= mode || SelectedProjectile.ClipAmmo == 0)
                     IsFiring = false;
             }
         }
@@ -531,7 +540,7 @@ namespace Skill.Framework.Weapons
             {
                 if (_RequestReload && (SelectedProjectile.Ammo > 0 || SelectedProjectile.InfinitClip || SelectedProjectile.InfinitAmmo))
                 {
-                    bool completeReload = SelectedClipAmmo == 0;
+                    bool completeReload = SelectedProjectile.ClipAmmo == 0;
                     if (completeReload)
                         _BusyTW.Begin(SelectedProjectile.CompleteReloadTime);
                     else
@@ -554,8 +563,8 @@ namespace Skill.Framework.Weapons
                 }
                 else if (IsFiring)
                 {
-                    if (SelectedClipAmmo < 0) SelectedClipAmmo = 0;
-                    if (SelectedClipAmmo == 0)
+                    if (SelectedProjectile.ClipAmmo < 0) SelectedProjectile.ClipAmmo = 0;
+                    if (SelectedProjectile.ClipAmmo == 0)
                     {
                         if (AutoReload)
                         {
@@ -578,7 +587,7 @@ namespace Skill.Framework.Weapons
                     {
                         OnShoot();
 
-                        if (SelectedClipAmmo == 0)
+                        if (SelectedProjectile.ClipAmmo == 0)
                         {
                             if (AutoReload)
                             {
@@ -597,7 +606,7 @@ namespace Skill.Framework.Weapons
                             IsFiring = false;
                     }
                 }
-                else if (AutoReload && SelectedClipAmmo == 0)
+                else if (AutoReload && SelectedProjectile.ClipAmmo == 0)
                 {
                     if (!_RequestReload)
                     {
@@ -716,6 +725,7 @@ namespace Skill.Framework.Weapons
                         dir.y = 0;  // retain only the horizontal direction
                         range = dir.magnitude;  // get horizontal distance
                         if (range > SelectedProjectile.Range) range = SelectedProjectile.Range;
+                        if (range < Mathf.Epsilon || float.IsNaN(range)) range = Mathf.Epsilon;
                         dir.y = range * SelectedProjectile.CurveParams.TangentThrowAngle;  // set dir to the elevation angle
                         range += h / SelectedProjectile.CurveParams.TangentThrowAngle;  // correct for small height differences
                         // calculate the velocity magnitude
@@ -726,6 +736,9 @@ namespace Skill.Framework.Weapons
                     float euler = Skill.Framework.MathHelper.HorizontalAngle(dir);
                     Quaternion rotation = Quaternion.Euler(-SelectedProjectile.CurveParams.ThrowAngle, euler, 0);
                     dir = rotation * Vector3.forward;
+
+                    if (float.IsNaN(speed))
+                        speed = Mathf.Epsilon;
                     rb.AddForce(dir * speed, ForceMode.Impulse);
 
                     bullet.Direction = dir;

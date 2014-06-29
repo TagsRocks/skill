@@ -10,6 +10,7 @@ namespace Skill.Framework.UI
         public bool PauseAudioListener = true;
         public bool PauseTime = false;
         public bool PauseOnApplicationPause = true;
+        public bool PauseOnApplicationLostFocus = false;
 
         private float _SavedTimeScale;
 
@@ -104,7 +105,7 @@ namespace Skill.Framework.UI
                         AudioListener.pause = Global.IsGamePaused;
                 }
             }
-            else if (PauseOnApplicationPause && !IsVisible)
+            else if (PauseOnApplicationLostFocus && !IsVisible)
             {
                 PauseGame();
             }

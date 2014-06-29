@@ -52,7 +52,9 @@ namespace Skill.Editor.Sequence
                 base.WantsMouseEvents = true;
             }
 
-
+            private Rect[] _CurevRenderAreas = new Rect[1];
+            private Rect[] _CurevRanges = new Rect[1];
+            private AnimationCurve[] _Curves = new AnimationCurve[1];
             protected override void BeginRender()
             {
                 _PreviewImage.Clip = PropertyKey.ValueKey;
@@ -62,30 +64,41 @@ namespace Skill.Editor.Sequence
                 else
                     _LblClipName.Text = string.Empty;
 
-                TimeLine timeLine = FindInParents<TimeLine>();
-                Rect trackRa = TrackBar.RenderArea;
-                double deltaTime = (timeLine.MaxTime - timeLine.MinTime);
+                //TimeLine timeLine = FindInParents<TimeLine>();
+                //Rect trackRa = TrackBar.RenderArea;
+                //double deltaTime = (timeLine.MaxTime - timeLine.MinTime);
 
-                float minVisibleX = trackRa.x + trackRa.width * (float)((timeLine.StartVisible - timeLine.MinTime) / deltaTime);
-                float maxVisibleX = trackRa.x + trackRa.width * (float)((timeLine.EndVisible - timeLine.MinTime) / deltaTime);
+                //float minVisibleX = trackRa.x + trackRa.width * (float)((timeLine.StartVisible - timeLine.MinTime) / deltaTime);
+                //float maxVisibleX = trackRa.x + trackRa.width * (float)((timeLine.EndVisible - timeLine.MinTime) / deltaTime);
 
-                Rect ra = RenderArea;
+                //Rect ra = RenderArea;
 
-                float xMin = Mathf.Max(ra.xMin, minVisibleX);
-                float xMax = Mathf.Min(ra.xMax, maxVisibleX);
-                float delta = xMax - xMin;
-                if (delta >= 1)
-                {
-                    _PreviewImage.Visibility = Framework.UI.Visibility.Visible;
-                    Rect ranges = new Rect(((xMin - ra.xMin) / ra.width) * _PreviewImage.Resolution, 0, ((xMax - ra.xMin) / ra.width) * _PreviewImage.Resolution, 1);
-                    ra.xMin = xMin;
-                    ra.xMax = xMax;
-                    _PreviewImage.RenderArea = ra;
-                    _PreviewImage.Ranges = ranges;
-                }
-                else
-                    _PreviewImage.Visibility = Framework.UI.Visibility.Hidden;
+                //float xMin = Mathf.Max(ra.xMin, minVisibleX);
+                //float xMax = Mathf.Min(ra.xMax, maxVisibleX);
+                //float delta = xMax - xMin;
+                //if (delta >= 1)
+                //{
+                //    _PreviewImage.Visibility = Framework.UI.Visibility.Visible;
+                //    Rect ranges = new Rect(((xMin - ra.xMin) / ra.width) * _PreviewImage.Resolution, 0, ((xMax - ra.xMin) / ra.width) * _PreviewImage.Resolution, 1);
+                //    ra.xMin = xMin;
+                //    ra.xMax = xMax;
+                //    _PreviewImage.RenderArea = ra;
+                //    _PreviewImage.Ranges = ranges;
+                //}
+                //else
+                //    _PreviewImage.Visibility = Framework.UI.Visibility.Hidden;
 
+                CalcCurveRenderArea(ref _CurevRenderAreas, ref _CurevRanges, _Curves);
+
+                Rect ra = _CurevRenderAreas[0];
+                Rect ranges = _CurevRanges[0];
+
+                ranges.x *= _PreviewImage.Resolution;
+                ranges.width *= _PreviewImage.Resolution;
+
+                _PreviewImage.RenderArea = ra;
+                _PreviewImage.Ranges = ranges;
+                _PreviewImage.Visibility = (ra.xMax - ra.xMin >= 1) ? Framework.UI.Visibility.Visible : Framework.UI.Visibility.Hidden;
                 base.BeginRender();
             }
 

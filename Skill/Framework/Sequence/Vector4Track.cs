@@ -39,25 +39,21 @@ namespace Skill.Framework.Sequence
         {
             get
             {
-                if (Keys != null && Keys.Length > 0)
+                if (Key  != null )
                 {
-                    if (!Application.isPlaying)
-                        SortKeys();
+                    float maxLenght = Key.FireTime;
 
-                    Vector4Key v4k = Keys[Keys.Length - 1];
-                    float maxLenght = v4k.FireTime;
+                    if (Key.CurveX != null && Key.CurveX.length > 0)
+                        maxLenght = Mathf.Max(maxLenght, Key.CurveX.keys[Key.CurveX.length - 1].time);
 
-                    if (v4k.CurveX != null && v4k.CurveX.length > 0)
-                        maxLenght = Mathf.Max(maxLenght, v4k.CurveX.keys[v4k.CurveX.length - 1].time);
+                    if (Key.CurveY != null && Key.CurveY.length > 0)
+                        maxLenght = Mathf.Max(maxLenght, Key.CurveY.keys[Key.CurveY.length - 1].time);
 
-                    if (v4k.CurveY != null && v4k.CurveY.length > 0)
-                        maxLenght = Mathf.Max(maxLenght, v4k.CurveY.keys[v4k.CurveY.length - 1].time);
+                    if (Key.CurveZ != null && Key.CurveZ.length > 0)
+                        maxLenght = Mathf.Max(maxLenght, Key.CurveZ.keys[Key.CurveZ.length - 1].time);
 
-                    if (v4k.CurveZ != null && v4k.CurveZ.length > 0)
-                        maxLenght = Mathf.Max(maxLenght, v4k.CurveZ.keys[v4k.CurveZ.length - 1].time);
-
-                    if (v4k.CurveW != null && v4k.CurveW.length > 0)
-                        maxLenght = Mathf.Max(maxLenght, v4k.CurveW.keys[v4k.CurveW.length - 1].time);
+                    if (Key.CurveW != null && Key.CurveW.length > 0)
+                        maxLenght = Mathf.Max(maxLenght, Key.CurveW.keys[Key.CurveW.length - 1].time);
 
                     return maxLenght;
                 }
@@ -68,9 +64,21 @@ namespace Skill.Framework.Sequence
 
         [SerializeField]
         [HideInInspector]
-        public Vector4Key[] Keys = new Vector4Key[0];
+        public Vector4Key Key;
 
-        public override IPropertyKey<Vector4>[] PropertyKeys { get { return Keys; } set { Keys = (Vector4Key[])value; } }
+        public override IPropertyKey<Vector4>[] PropertyKeys
+        {
+            get
+            {
+                if (Key == null)
+                    Key = new Vector4Key() { Time = 0, Value = Vector3.zero };
+                return new IPropertyKey<Vector4>[] { Key };
+            }
+            set
+            {
+                Key = (Vector4Key)value[0];
+            }
+        }
 
         private Vector4Key _TempKey = new Vector4Key();
         protected override void Execute(IPropertyKey<Vector4> key)

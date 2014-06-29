@@ -55,6 +55,8 @@ namespace Skill.Framework.Sequence
         protected float CurrecntTime { get; private set; }
 
         private System.Reflection.MethodInfo _Setter;
+        private System.Reflection.MethodInfo _Getter;
+        private System.Reflection.FieldInfo _Field;
         private int _Index;
 
         public override void Evaluate(float time)
@@ -143,6 +145,7 @@ namespace Skill.Framework.Sequence
             }
         }
 
+
         /// <summary>
         /// When time is paused but make sure key applied (for curve tracks)
         /// </summary>
@@ -171,35 +174,55 @@ namespace Skill.Framework.Sequence
             SetValue(DefaultValue);
         }
 
-        private void ValidateSetter()
+        private void ValidateAccessMethods()
         {
-            if (_Setter == null)
+            if (_Setter == null && _Field == null)
             {
                 if (Component != null && !string.IsNullOrEmpty(PropertyName))
                 {
-                    PropertyInfo[] infos = Component.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-                    foreach (var info in infos)
+                    PropertyInfo info = Component.GetType().GetProperty(PropertyName);
+                    if (info != null)
                     {
-                        if (info.Name == PropertyName)
+                        if (info.PropertyType == PropertyType && info.CanWrite)
                         {
-                            if (info.PropertyType == PropertyType && info.CanWrite)
-                            {
-                                _Setter = info.GetSetMethod();
-                            }
-                            break;
+                            _Setter = info.GetSetMethod();
+                            _Getter = info.GetGetMethod();
                         }
                     }
                 }
-                if (_Setter == null && Application.isPlaying)
+                if (_Setter == null)
+                    _Field = Component.GetType().GetField(PropertyName);
+
+                if (_Setter == null && _Field == null && Application.isPlaying)
                     Debug.LogWarning("Invalid property :" + PropertyName);
             }
         }
 
-        protected virtual void SetValue(V value)
+        public virtual void SetValue(V value)
         {
-            ValidateSetter();
-            if (Component != null && _Setter != null)
-                _Setter.Invoke(Component, new System.Object[] { value });
+            if (Component != null)
+            {
+                ValidateAccessMethods();
+
+                if (_Setter != null)
+                    _Setter.Invoke(Component, new System.Object[] { value });
+                else if (_Field != null)
+                    _Field.SetValue(Component, value);
+            }
+        }
+
+        public virtual object GetValue()
+        {
+            object value = null;
+            if (Component != null)
+            {
+                ValidateAccessMethods();
+                if (_Getter != null)
+                    value = _Getter.Invoke(Component, null);
+                else if (_Field != null)
+                    value = _Field.GetValue(Component);
+            }
+            return value;
         }
 
         protected IPropertyKey<V> GetPreviousKey()

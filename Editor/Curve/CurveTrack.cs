@@ -314,8 +314,11 @@ namespace Skill.Editor.Curve
                 ContextMenu = null;
                 Resample();
                 UpdatePoints();
-                if (UnityEditor.HandleUtility.DistanceToPolyLine(_Points) < 3.0f)
-                    ContextMenu = CurveTrackContextMenu.Instance;
+                if (_Points != null && _Points.Length > 1)
+                {
+                    if (UnityEditor.HandleUtility.DistanceToPolyLine(_Points) < 3.0f)
+                        ContextMenu = CurveTrackContextMenu.Instance;
+                }
             }
             base.HandleEvent(e);
         }

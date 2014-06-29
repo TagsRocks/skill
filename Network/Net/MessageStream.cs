@@ -60,8 +60,8 @@ namespace Skill.Net
 
         private void CreateRWStreams()
         {
-            this._Reader = new BinaryReader(this._Stream);
-            this._Writer = new BinaryWriter(this._Stream);
+            this._Reader = new BinaryReader(this._Stream, Encoding.UTF8);
+            this._Writer = new BinaryWriter(this._Stream, Encoding.UTF8);
         }
 
         #endregion
@@ -187,8 +187,8 @@ namespace Skill.Net
         }
         public void Write(string value)
         {
-            CheckForWrite();            
-            this._Writer.Write(value);            
+            CheckForWrite();
+            this._Writer.Write(value);
             this.ByteCounter += System.Text.Encoding.UTF8.GetByteCount(value);
         }
         public void Write(ushort value)

@@ -141,8 +141,7 @@ namespace Skill.Diagnostics
             if (document != null)
                 Tree.Load(document.Elements().First());
             int idCount = stream.ReadInt32();
-            if (this.Behaviors == null || this.Behaviors.Length < idCount)
-                this.Behaviors = new string[idCount];
+            this.Behaviors = new string[idCount];
             for (int i = 0; i < idCount; i++)
                 this.Behaviors[i] = stream.ReadString();
         }
@@ -159,7 +158,7 @@ namespace Skill.Diagnostics
         /// <summary> Number of Behaviors in update sequences </summary>
         public int SequenceCount { get; set; }
         /// <summary> index of behaviors in  ExecutionSequence</summary>
-        public int[] ExecutionSequence { get; set; }        
+        public int[] ExecutionSequence { get; set; }
         /// <summary> Result of behaviors </summary>
         public int[] BehaviorResults { get; set; }
 
@@ -171,7 +170,7 @@ namespace Skill.Diagnostics
             for (int i = 0; i < SequenceCount; i++)
                 stream.Write(ExecutionSequence[i]);
 
-            
+
 
             stream.Write(BehaviorResults.Length);
             for (int i = 0; i < BehaviorResults.Length; i++)
@@ -185,7 +184,7 @@ namespace Skill.Diagnostics
             if (this.ExecutionSequence == null || this.ExecutionSequence.Length < this.SequenceCount)
                 this.ExecutionSequence = new int[this.SequenceCount];
             for (int i = 0; i < this.SequenceCount; i++)
-                this.ExecutionSequence[i] = stream.ReadInt32();            
+                this.ExecutionSequence[i] = stream.ReadInt32();
 
             int idResult = stream.ReadInt32();
             if (this.BehaviorResults == null || this.BehaviorResults.Length < idResult)

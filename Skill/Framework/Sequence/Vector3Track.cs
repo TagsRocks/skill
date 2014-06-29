@@ -35,22 +35,17 @@ namespace Skill.Framework.Sequence
         {
             get
             {
-                if (Keys != null && Keys.Length > 0)
+                if (Key != null )
                 {
-                    if (!Application.isPlaying)
-                        SortKeys();
+                    float maxLenght = Key.FireTime;
 
-                    Vector3Key v3k = Keys[Keys.Length - 1];
-                    float maxLenght = v3k.FireTime;
+                    if (Key.CurveX != null && Key.CurveX.length > 0)
+                        maxLenght = Mathf.Max(maxLenght, Key.CurveX.keys[Key.CurveX.length - 1].time);
+                    if (Key.CurveY != null && Key.CurveY.length > 0)
+                        maxLenght = Mathf.Max(maxLenght, Key.CurveY.keys[Key.CurveY.length - 1].time);
 
-                    if (v3k.CurveX != null && v3k.CurveX.length > 0)
-                        maxLenght = Mathf.Max(maxLenght, v3k.CurveX.keys[v3k.CurveX.length - 1].time);
-
-                    if (v3k.CurveY != null && v3k.CurveY.length > 0)
-                        maxLenght = Mathf.Max(maxLenght, v3k.CurveY.keys[v3k.CurveY.length - 1].time);
-
-                    if (v3k.CurveZ != null && v3k.CurveZ.length > 0)
-                        maxLenght = Mathf.Max(maxLenght, v3k.CurveZ.keys[v3k.CurveZ.length - 1].time);                    
+                    if (Key.CurveZ != null && Key.CurveZ.length > 0)
+                        maxLenght = Mathf.Max(maxLenght, Key.CurveZ.keys[Key.CurveZ.length - 1].time);
 
                     return maxLenght;
                 }
@@ -60,9 +55,21 @@ namespace Skill.Framework.Sequence
 
         [SerializeField]
         [HideInInspector]
-        public Vector3Key[] Keys = new Vector3Key[0];
+        public Vector3Key Key;
 
-        public override IPropertyKey<Vector3>[] PropertyKeys { get { return Keys; } set { Keys = (Vector3Key[])value; } }
+        public override IPropertyKey<Vector3>[] PropertyKeys
+        {
+            get
+            {
+                if (Key == null)
+                    Key = new Vector3Key() { Time = 0, Value = Vector3.zero};
+                return new IPropertyKey<Vector3>[] { Key };
+            }
+            set
+            {
+                Key = (Vector3Key)value[0];
+            }
+        }
 
         private Vector3Key _TempKey = new Vector3Key();
         protected override void Execute(IPropertyKey<Vector3> key)

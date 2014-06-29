@@ -172,7 +172,7 @@ namespace Skill.Editor.Sequence
         {
             base.RefreshData();
             _TxtName.Text = Item.Track.gameObject.name;
-            _CFColor.Color = Item.Track.Color;            
+            _CFColor.Color = Item.Track.Color;
             _TBVisible.IsChecked = Item.Track.Visible;
             Item.TrackBar.Visibility = Item.Track.Visible ? Skill.Framework.UI.Visibility.Visible : Skill.Framework.UI.Visibility.Collapsed;
             Item.SetVisibleStyle(_TBVisible.IsChecked);
@@ -180,7 +180,8 @@ namespace Skill.Editor.Sequence
 
         protected override void SetDirty()
         {
-            UnityEditor.EditorUtility.SetDirty(Item.Track);
+            if (!Item.Track.IsDestroyed)
+                UnityEditor.EditorUtility.SetDirty(Item.Track);
         }
 
 

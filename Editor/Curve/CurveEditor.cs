@@ -72,6 +72,15 @@ namespace Skill.Editor.Curve
             _CurveView.RemoveAllCurves();
         }
 
+        public void RemoveCurve(CurveTrack track)
+        {
+            if (track != null)
+            {
+                track.Changed -= Track_Changed;
+                _CurveView.Controls.Remove(track);
+            }            
+        }
+
         public double SnapTime { get { return _TimeLine.TimeBar.SmallStep; } }
         public double SnapValue { get { return _Grid.SmallStep; } }
 

@@ -10,7 +10,7 @@ namespace Skill.Editor.Sequence
         protected override PropertyTrackBar<Vector3>.PropertyTimeLineEvent CreateNewEvent(IPropertyKey<Vector3> key) { return new Vector3KeyView(this, key); }
         protected override IPropertyKey<Vector3> CreateNewKey() { return new Vector3Key(); }
         protected override IPropertyKey<Vector3>[] CreateKeyArray(int arraySize) { return new Vector3Key[arraySize]; }
-
+        protected override bool IsCurve { get { return true; } }
         public Vector3TrackBar(Vector3Track track)
             : base(track)
         {
@@ -43,6 +43,34 @@ namespace Skill.Editor.Sequence
             }
         }
 
+        internal override void Evaluate(float time)
+        {
+            Seek(time);
+        }
+
+        internal override void Seek(float time)
+        {
+            if ((this.RecordState & RecordState.XYZ) != RecordState.XYZ)
+            {
+                Vector3Track vt = (Vector3Track)Track;
+                Vector3Key vk = (Vector3Key)vt.PropertyKeys[0];
+
+
+                Vector3 curveValue = new Vector3(vk.CurveX.Evaluate(time), vk.CurveY.Evaluate(time), vk.CurveZ.Evaluate(time));
+                Vector3 sceneValue = curveValue;
+                object v = vt.GetValue();
+                if (v != null)
+                    sceneValue = (Vector3)v;
+
+                Vector3 value = curveValue;
+                if ((this.RecordState & RecordState.X) != 0) value.x = sceneValue.x;
+                if ((this.RecordState & RecordState.Y) != 0) value.y = sceneValue.y;
+                if ((this.RecordState & RecordState.Z) != 0) value.z = sceneValue.z;
+
+                vt.SetValue(value);
+            }
+        }
+
         class Vector3KeyView : PropertyTimeLineEvent
         {
             public override double Duration
@@ -67,25 +95,6 @@ namespace Skill.Editor.Sequence
             }
             public override string Title { get { return "Vector3 Event"; } }
 
-            public override bool IsSelectedProperties
-            {
-                get
-                {
-                    return base.IsSelectedProperties;
-                }
-                set
-                {
-                    if (base.IsSelectedProperties != value)
-                    {
-                        if (value)
-                        {
-                            MatineeEditorWindow.Instance.EditCurve(this, _Vector3Key);                            
-                        }
-                    }
-                    base.IsSelectedProperties = value;
-                }
-            }
-
             private float _MinWidth;
             private Vector3 _PreValue;
             public override float MinWidth
@@ -107,7 +116,7 @@ namespace Skill.Editor.Sequence
                     }
                 }
             }
-
+            protected override bool CanDrag { get { return false; } }
             protected override PropertiesPanel CreateProperties() { return new Vector3KeyViewProperties(this); }
 
             private Vector3Key _Vector3Key;
@@ -118,25 +127,32 @@ namespace Skill.Editor.Sequence
             }
 
 
-
+            private Rect[] _CurevRenderAreas = new Rect[3];
+            private Rect[] _CurevRanges = new Rect[3];
             protected override void Render()
             {
+                GUI.Box(RenderArea, string.Empty, Skill.Editor.Resources.Styles.BackgroundShadow);
                 if (_Vector3Key.CurveX != null && _Vector3Key.CurveY != null && _Vector3Key.CurveZ != null)
                 {
-                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _Vector3Key.CurveX, null, CurveXColor, CurveBgColor);
-                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _Vector3Key.CurveY, null, CurveYColor, CurveBgColor);
-                    UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _Vector3Key.CurveZ, null, CurveZColor, CurveBgColor);
+                    CalcCurveRenderArea(ref _CurevRenderAreas, ref _CurevRanges, _Vector3Key.CurveX, _Vector3Key.CurveY, _Vector3Key.CurveZ);
+                    if (_CurevRenderAreas[0].width > 0.1f)
+                        DrawCurve(_CurevRenderAreas[0], _CurevRanges[0], _Vector3Key.CurveX, CurveXColor);
+                    if (_CurevRenderAreas[1].width > 0.1f)
+                        DrawCurve(_CurevRenderAreas[1], _CurevRanges[1], _Vector3Key.CurveY, CurveYColor);
+                    if (_CurevRenderAreas[2].width > 0.1f)
+                        DrawCurve(_CurevRenderAreas[2], _CurevRanges[2], _Vector3Key.CurveZ, CurveZColor);
                 }
-                else
-                {
-                    GUI.Label(RenderArea, PropertyKey.ValueKey.ToString());
-                }
+                //else
+                //{
+                //    GUI.Label(RenderArea, PropertyKey.ValueKey.ToString());
+                //}
                 base.Render();
             }
 
+
+
             class Vector3KeyViewProperties : EventProperties
             {
-                private Skill.Editor.UI.ToggleButton _TbConstant;
                 private Skill.Editor.UI.Vector3Field _Value;
                 private Skill.Editor.UI.CurveField _CurveFieldX;
                 private Skill.Editor.UI.CurveField _CurveFieldY;
@@ -146,8 +162,6 @@ namespace Skill.Editor.Sequence
                 public Vector3KeyViewProperties(Vector3KeyView e)
                     : base(e)
                 {
-                    _TbConstant = new Skill.Editor.UI.ToggleButton() { Margin = ControlMargin };
-                    _TbConstant.Label.text = "Constant?";
                     _Value = new Skill.Editor.UI.Vector3Field() { Margin = ControlMargin };
                     _Value.Label = "Value";
 
@@ -163,11 +177,9 @@ namespace Skill.Editor.Sequence
                     _ChangeCheck.Controls.Add(_CurveFieldY);
                     _ChangeCheck.Controls.Add(_CurveFieldZ);
 
-                    Controls.Add(_TbConstant);
                     Controls.Add(_Value);
                     Controls.Add(_ChangeCheck);
 
-                    _TbConstant.Changed += _TbConstant_Changed;
                     _Value.ValueChanged += _FFValue_ValueChanged;
                     _ChangeCheck.Changed += ChangeCheck_Changed;
                 }
@@ -175,13 +187,6 @@ namespace Skill.Editor.Sequence
                 void ChangeCheck_Changed(object sender, System.EventArgs e)
                 {
                     if (IgnoreChanges) return;
-                    SetDirty();
-                }
-
-                void _TbConstant_Changed(object sender, System.EventArgs e)
-                {
-                    if (IgnoreChanges) return;
-                    ValidateCurve();
                     SetDirty();
                 }
 
@@ -196,41 +201,26 @@ namespace Skill.Editor.Sequence
                 {
                     base.RefreshData();
                     _Value.Value = ((Vector3KeyView)_View).PropertyKey.ValueKey;
-
-                    Vector3Key k = (Vector3Key)((Vector3KeyView)_View).Key;
-                    _TbConstant.IsChecked = k.CurveX == null || k.CurveY == null || k.CurveZ == null;
-                    ValidateCurve();
+                    ValidateCurves();
                 }
 
-                void ValidateCurve()
+                void ValidateCurves()
                 {
-                    if (_TbConstant.IsChecked)
-                    {
-                        _Value.Visibility = Skill.Framework.UI.Visibility.Visible;
-                        _ChangeCheck.Visibility = Skill.Framework.UI.Visibility.Collapsed;
-                        Vector3Key k = (Vector3Key)((Vector3KeyView)_View).Key;
-                        k.CurveX = null;
-                        k.CurveY = null;
-                        k.CurveZ = null;
-                    }
-                    else
-                    {
-                        _Value.Visibility = Skill.Framework.UI.Visibility.Collapsed;
-                        _ChangeCheck.Visibility = Skill.Framework.UI.Visibility.Visible;
+                    _Value.Visibility = Skill.Framework.UI.Visibility.Collapsed;
+                    _ChangeCheck.Visibility = Skill.Framework.UI.Visibility.Visible;
 
-                        Vector3Key k = (Vector3Key)((Vector3KeyView)_View).Key;
-                        if (k.CurveX != null) _CurveFieldX.Curve = k.CurveX;
-                        if (k.CurveY != null) _CurveFieldY.Curve = k.CurveY;
-                        if (k.CurveZ != null) _CurveFieldZ.Curve = k.CurveZ;
+                    Vector3Key k = (Vector3Key)((Vector3KeyView)_View).Key;
+                    if (k.CurveX != null) _CurveFieldX.Curve = k.CurveX;
+                    if (k.CurveY != null) _CurveFieldY.Curve = k.CurveY;
+                    if (k.CurveZ != null) _CurveFieldZ.Curve = k.CurveZ;
 
-                        if (_CurveFieldX.Curve == null) _CurveFieldX.Curve = new AnimationCurve();
-                        if (_CurveFieldY.Curve == null) _CurveFieldY.Curve = new AnimationCurve();
-                        if (_CurveFieldZ.Curve == null) _CurveFieldZ.Curve = new AnimationCurve();
+                    if (_CurveFieldX.Curve == null) _CurveFieldX.Curve = new AnimationCurve();
+                    if (_CurveFieldY.Curve == null) _CurveFieldY.Curve = new AnimationCurve();
+                    if (_CurveFieldZ.Curve == null) _CurveFieldZ.Curve = new AnimationCurve();
 
-                        k.CurveX = _CurveFieldX.Curve;
-                        k.CurveY = _CurveFieldY.Curve;
-                        k.CurveZ = _CurveFieldZ.Curve;
-                    }
+                    k.CurveX = _CurveFieldX.Curve;
+                    k.CurveY = _CurveFieldY.Curve;
+                    k.CurveZ = _CurveFieldZ.Curve;
                 }
             }
         }

@@ -89,7 +89,7 @@ namespace Skill.Editor.Sequence
         }
 
         private void RefreshDefaultValue()
-        {            
+        {
             PropertyTrack<V> track = GetTrack();
             if (!string.IsNullOrEmpty(track.PropertyName) && track.Component != null)
             {
@@ -99,7 +99,7 @@ namespace Skill.Editor.Sequence
                     if (info.Name == track.PropertyName)
                     {
                         if (info.PropertyType == track.PropertyType && info.CanWrite)
-                        {                            
+                        {
                             track.DefaultValue = (V)info.GetGetMethod().Invoke(track.Component, null);
                             base.Refresh();
                         }
@@ -158,14 +158,14 @@ namespace Skill.Editor.Sequence
             if (_Component.SelectedOption != null)
             {
                 Component c = (Component)_Component.SelectedOption.UserData;
-                PropertyInfo[] infos = c.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                PropertyInfo[] propertyinfos = c.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
                 int index = 0;
-                if (infos != null)
+                if (propertyinfos != null)
                 {
-                    for (int i = 0; i < infos.Length; i++)
+                    for (int i = 0; i < propertyinfos.Length; i++)
                     {
-                        PropertyInfo info = infos[i];
+                        PropertyInfo info = propertyinfos[i];
                         if (info.PropertyType == ((PropertyTrack<V>)base.Item.Track).PropertyType && info.CanWrite)
                         {
                             Skill.Editor.UI.PopupOption option = new Skill.Editor.UI.PopupOption(index, info.Name) { UserData = info.Name };
@@ -175,6 +175,23 @@ namespace Skill.Editor.Sequence
                                 selectedIndex = index;
                             index++;
                         }
+                    }
+                }
+
+                FieldInfo[] fieldInfos = c.GetType().GetFields();
+
+                index = 0;
+                if (fieldInfos != null)
+                {
+                    for (int i = 0; i < fieldInfos.Length; i++)
+                    {
+                        FieldInfo info = fieldInfos[i];
+                        Skill.Editor.UI.PopupOption option = new Skill.Editor.UI.PopupOption(index, info.Name) { UserData = info.Name };
+                        _Property.Options.Add(option);
+
+                        if (((PropertyTrack<V>)base.Item.Track).PropertyName == info.Name)
+                            selectedIndex = index;
+                        index++;
                     }
                 }
             }

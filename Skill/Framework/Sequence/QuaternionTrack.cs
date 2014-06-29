@@ -34,22 +34,19 @@ namespace Skill.Framework.Sequence
         {
             get
             {
-                if (Keys != null && Keys.Length > 0)
+                if (Key != null)
                 {
-                    if (!Application.isPlaying)
-                        SortKeys();
 
-                    QuaternionKey qk = Keys[Keys.Length - 1];
-                    float maxLenght = qk.FireTime;
+                    float maxLenght = Key.FireTime;
 
-                    if (qk.CurveX != null && qk.CurveX.length > 0)
-                        maxLenght = Mathf.Max(maxLenght, qk.CurveX.keys[qk.CurveX.length - 1].time);
+                    if (Key.CurveX != null && Key.CurveX.length > 0)
+                        maxLenght = Mathf.Max(maxLenght, Key.CurveX.keys[Key.CurveX.length - 1].time);
 
-                    if (qk.CurveY != null && qk.CurveY.length > 0)
-                        maxLenght = Mathf.Max(maxLenght, qk.CurveY.keys[qk.CurveY.length - 1].time);
+                    if (Key.CurveY != null && Key.CurveY.length > 0)
+                        maxLenght = Mathf.Max(maxLenght, Key.CurveY.keys[Key.CurveY.length - 1].time);
 
-                    if (qk.CurveZ != null && qk.CurveZ.length > 0)
-                        maxLenght = Mathf.Max(maxLenght, qk.CurveZ.keys[qk.CurveZ.length - 1].time);
+                    if (Key.CurveZ != null && Key.CurveZ.length > 0)
+                        maxLenght = Mathf.Max(maxLenght, Key.CurveZ.keys[Key.CurveZ.length - 1].time);
 
                     return maxLenght;
                 }
@@ -59,9 +56,21 @@ namespace Skill.Framework.Sequence
 
         [SerializeField]
         [HideInInspector]
-        public QuaternionKey[] Keys = new QuaternionKey[0];
+        public QuaternionKey Key;
 
-        public override IPropertyKey<Quaternion>[] PropertyKeys { get { return Keys; } set { Keys = (QuaternionKey[])value; } }
+        public override IPropertyKey<Quaternion>[] PropertyKeys
+        {
+            get
+            {
+                if (Key == null)
+                    Key = new QuaternionKey() { Time = 0, Value = Quaternion.identity };
+                return new IPropertyKey<Quaternion>[] { Key };
+            }
+            set
+            {
+                Key = (QuaternionKey)value[0];
+            }
+        }
 
         private QuaternionKey _TempKey = new QuaternionKey();
 

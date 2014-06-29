@@ -201,7 +201,11 @@ namespace Skill.Editor.UI.Extended
             {
                 if (e.keyCode == KeyCode.F)
                 {
-                    FrameAll();
+                    if (RenderArea.Contains(e.mousePosition))
+                    {
+                        FrameAll();
+                        e.Use();
+                    }
                 }
             }
             else if (_IsMouseDown && Parent != null && e != null)
@@ -234,7 +238,7 @@ namespace Skill.Editor.UI.Extended
                     }
 
                 }
-                else if ((e.type == EventType.MouseUp || e.rawType == EventType.MouseUp ) && e.button == _MouseButton)
+                else if ((e.type == EventType.MouseUp || e.rawType == EventType.MouseUp) && e.button == _MouseButton)
                 {
                     Frame of = OwnerFrame;
                     if (of != null)

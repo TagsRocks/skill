@@ -88,7 +88,7 @@ namespace Skill.Editor.UI.Extended
                     return 0;
                 }
                 else
-                {
+                {                    
                     if (_UpdateLayoutHeight)
                     {
                         _LayoutHeight = this.Height;
@@ -157,6 +157,8 @@ namespace Skill.Editor.UI.Extended
         {
             if (_Foldout.IsOpen)
                 base.HandleEvent(e);
+            else
+                BaseHandleEvent(e);
         }
     }
 }

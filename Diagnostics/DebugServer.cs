@@ -457,9 +457,9 @@ namespace Skill.Diagnostics
                 BTMessage.Identifier = id;
                 BTMessage.Tree = data;
                 BTMessage.Behaviors = new string[_BehaviorList.Count];
-                for (int i = 0; i < _BehaviorList.Count; i++)
-                    BTMessage.Behaviors[i] = _BehaviorList[i].Behavior.Name;
-
+                for (int i = 0; i < _BehaviorList.Count; i++)                
+                    BTMessage.Behaviors[i] = _BehaviorList[i].Behavior.Name;                    
+                
                 BTUpdateMessage = new BehaviorTreeUpdateMessage();
                 BTUpdateMessage.Identifier = id;
                 BTUpdateMessage.BehaviorResults = new int[_BehaviorList.Count];

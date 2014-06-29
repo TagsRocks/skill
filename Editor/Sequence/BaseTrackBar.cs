@@ -5,10 +5,22 @@ using Skill.Framework.Sequence;
 
 namespace Skill.Editor.Sequence
 {
+    public enum RecordState
+    {
+        None = 0,
+        X = 1,
+        Y = 2,
+        Z = 4,
+        W = 8,
+        XY = X | Y,
+        XYZ = X | Y | Z,
+        XYZW = X | Y | Z | W
+    }
+
     /// <summary>
     ///  Base class for TrackBar in Matinee editor
     /// </summary>
-    public class BaseTrackBar : Skill.Editor.UI.Extended.TrackBar
+    public abstract class BaseTrackBar : Skill.Editor.UI.Extended.TrackBar
     {
         private static Color _NameColor = new Color(0.85f, 0.85f, 0.85f, 0.6f);// color used to draw name of track at bottom left corner of trackbar
 
@@ -34,17 +46,23 @@ namespace Skill.Editor.Sequence
             GUI.color = c;
             GUI.DrawTexture(ra, UnityEditor.EditorGUIUtility.whiteTexture);
 
+            GUI.color = savedColor;
+
+            base.Render();
+
+            savedColor = GUI.color;
+
             // draw name of track at bottom left corner of trackbar
             GUI.color = _NameColor;
             Rect rect = ((TrackBarView)Parent).RenderArea;
             rect.x += ((TrackBarView)Parent).ScrollPosition.x;
             rect.y = ra.y - 4;
             rect.height = ra.height;
-            rect.width = Track.name.Length * 8;
+            rect.width = ((TimeLine)((TrackBarView)Parent).TimeLine).RenderArea.width;
             UnityEditor.EditorGUI.DropShadowLabel(rect, Track.name);
 
             GUI.color = savedColor;
-            base.Render();
+
         }
 
         /// <summary>
@@ -63,6 +81,53 @@ namespace Skill.Editor.Sequence
         }
 
         public override double GetValidTime() { return Track.Length; }
+
+        public RecordState RecordState
+        {
+            get { return (RecordState)Track.RecordState; }
+            set
+            {
+                if ((RecordState)Track.RecordState != value)
+                {
+                    Track.RecordState = (int)value;
+                    SetDirty();
+                }
+            }
+
+        }
+
+        public bool IsEditingCurves
+        {
+            get { return Track.IsEditingCurves; }
+            set
+            {
+                if (Track.IsEditingCurves != value)
+                {
+                    Track.IsEditingCurves = value;
+                    SetDirty();
+                }
+            }
+
+        }
+
+        public abstract ITrackKey FirstKey { get; }
+
+        internal virtual void Evaluate(float time)
+        {
+            if (Track != null)
+                Track.Evaluate(time);
+        }
+        internal virtual void Seek(float time)
+        {
+            if (Track != null)
+                Track.Seek(time);
+        }
+        internal virtual void AddKey(RecordState record)
+        {
+
+        }
+
+
     }
 
 
@@ -71,7 +136,8 @@ namespace Skill.Editor.Sequence
     /// </summary>
     public abstract class EventView : TimeLineEvent, IProperties
     {
-        public static Color CurveBgColor = new Color(0.1f, 0.1f, 0.1f);
+        public static Color CurveBgColor = new Color(0.0f, 0.0f, 0.0f, 0.0f);
+        public static Color CurveColor = new Color(1.0f, 0.0f, 1.0f);
         public static Color CurveXColor = new Color(1.0f, 0.0f, 0.0f);
         public static Color CurveYColor = new Color(0.0f, 1.0f, 0.0f);
         public static Color CurveZColor = new Color(0.0f, 0.0f, 1.0f);
@@ -114,6 +180,8 @@ namespace Skill.Editor.Sequence
 
         public ITrackKey Key { get; private set; }
 
+        protected virtual bool CanDrag { get { return true; } }
+
         private TimeLineEventDragDumb _Drag;
 
         public GUIStyle DragStyle { get { return _Drag.Style; } set { _Drag.Style = value; } }
@@ -130,8 +198,11 @@ namespace Skill.Editor.Sequence
         {
             this.Margin = new Skill.Framework.UI.Thickness(0, 2);
             this.Key = key;
-            _Drag = new TimeLineEventDragDumb(this) { Row = 0, Column = 0, RowSpan = 100, ColumnSpan = 100 };
-            Controls.Add(_Drag);
+            if (CanDrag)
+            {
+                _Drag = new TimeLineEventDragDumb(this) { Row = 0, Column = 0, RowSpan = 100, ColumnSpan = 100 };
+                Controls.Add(_Drag);
+            }
             base.WantsMouseEvents = true;
         }
 

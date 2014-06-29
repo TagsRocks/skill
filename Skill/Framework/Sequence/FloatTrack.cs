@@ -13,7 +13,7 @@ namespace Skill.Framework.Sequence
         public float Value;
         /// <summary> Value curve </summary>
         [SerializeField]
-        [CurveEditor(1, 0, 0, "Value")]
+        [CurveEditor(1, 0, 1, "Value")]
         public AnimationCurve Curve;
 
 
@@ -35,16 +35,12 @@ namespace Skill.Framework.Sequence
         {
             get
             {
-                if (Keys != null && Keys.Length > 0)
+                if (Key != null)
                 {
-                    if (!Application.isPlaying)
-                        SortKeys();
-
-                    FloatKey fk = (FloatKey)Keys[Keys.Length - 1];
-                    if (fk.Curve != null && fk.Curve.length > 0)
-                        return fk.Curve.keys[fk.Curve.length - 1].time;
+                    if (Key.Curve != null && Key.Curve.length > 0)
+                        return Key.Curve[Key.Curve.length - 1].time;
                     else
-                        return fk.FireTime;
+                        return 0;
                 }
                 return 0;
             }
@@ -53,9 +49,20 @@ namespace Skill.Framework.Sequence
 
         [SerializeField]
         [HideInInspector]
-        public FloatKey[] Keys = new FloatKey[0];
+        public FloatKey Key;
 
-        public override IPropertyKey<float>[] PropertyKeys { get { return Keys; } set { Keys = (FloatKey[])value; } }
+        public override IPropertyKey<float>[] PropertyKeys
+        {
+            get
+            {
+                if (Key == null) Key = new FloatKey() { Time = 0, Value = 0 };
+                return new FloatKey[] { Key };
+            }
+            set
+            {
+                Key = (FloatKey)value[0];
+            }
+        }
 
         private FloatKey _TempKey = new FloatKey();
         protected override void Execute(IPropertyKey<float> key)

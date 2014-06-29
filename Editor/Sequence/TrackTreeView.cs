@@ -26,6 +26,7 @@ namespace Skill.Editor.Sequence
             Controls.Add(_Title);
 
             _TreeView = new TreeView() { Row = 1, UserData = this };
+            _TreeView.DisableFocusable();
             Controls.Add(_TreeView);
 
             // create context menu
@@ -199,7 +200,6 @@ namespace Skill.Editor.Sequence
                     RemoveTracks(group);
                     Skill.Editor.UI.EditorFrame.RepaintParentEditorWindow(group);
                     GameObject.DestroyImmediate(group.Group.gameObject);
-                    _Editor.TrackChanged();
                 }
             }
         }
@@ -232,8 +232,6 @@ namespace Skill.Editor.Sequence
 
                 newObj.transform.localPosition = Vector3.zero;
                 newObj.transform.localRotation = Quaternion.identity;
-
-                _Editor.TrackChanged();
             }
         }
         private Track CreateNewTrack(GameObject obj, TrackType type)
@@ -300,9 +298,12 @@ namespace Skill.Editor.Sequence
                 {
                     ((Skill.Framework.UI.Panel)track.Parent).Controls.Remove(track);
                     Skill.Editor.UI.EditorFrame.RepaintParentEditorWindow(track);
-                    if (track.TrackBar != null) _Editor.TimeLine.View.Controls.Remove(track.TrackBar);
+                    if (track.TrackBar != null)
+                    {
+                        _Editor.TimeLine.View.Controls.Remove(track.TrackBar);
+                        _Editor.CurveTracks.Remove(track.TrackBar);
+                    }
                     GameObject.DestroyImmediate(track.Track.gameObject);
-                    _Editor.TrackChanged();
                 }
             }
         }
