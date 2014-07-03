@@ -9,6 +9,10 @@ namespace Skill.Framework.UI
     /// </summary>
     public class ImageShake : DynamicBehaviour
     {
+
+        public bool UseInitialTexCoords = true;
+        public bool NegativeTexCoords = false;
+
         class ShakeData
         {
             public bool SaveTexCoords;
@@ -52,15 +56,27 @@ namespace Skill.Framework.UI
                     }
                     else
                     {
-                        Rect textcoord = sd.Image.TextureCoordinate;
+
+                        Rect textcoord;
+                        if (UseInitialTexCoords)
+                            textcoord = sd.InitialTexCoords;
+                        else
+                            textcoord = sd.Image.TextureCoordinate;
 
                         float factor = 1.0f;
                         float timeLeft = sd.Timer.TimeLeft;
                         if (timeLeft < sd.Fadeout)
-                            factor = timeLeft / sd.Fadeout;
+                            factor = Mathf.Max(1.0f, timeLeft / sd.Fadeout);
 
                         textcoord.x += Random.Range(-sd.Amount.x, sd.Amount.x) * factor;
                         textcoord.y += Random.Range(-sd.Amount.y, sd.Amount.y) * factor;
+
+                        if (!NegativeTexCoords)
+                        {
+                            if (textcoord.x < 0) textcoord.x = 0;
+                            if (textcoord.y < 0) textcoord.y = 0;
+                        }
+
                         sd.Image.TextureCoordinate = textcoord;
                     }
                     index++;
@@ -72,17 +88,17 @@ namespace Skill.Framework.UI
         /// Shake image for specific time
         /// </summary>
         /// <param name="image">Image to apply shake </param>
-        /// <param name="lenght">lenght of shake animation</param>
-        /// <param name="shakeAmount">amount of shake in x,y</param>
+        /// <param name="duration">lenght of shake animation</param>
+        /// <param name="shakeAmount">amount of shake in x,y (0.0f - 1.0f)</param>
         /// <param name="saveTexCoords">Whether to return to initial TexCoords after shake </param>
         /// <param name="fadeout">Fade out shake at specified time left of shake</param>
-        public void Shake(ImageWithTexCoords image, float lenght, Vector2 shakeAmount, bool saveTexCoords = false, float fadeout = 0)
+        public void Shake(ImageWithTexCoords image, float duration, Vector2 shakeAmount, bool saveTexCoords = false, float fadeout = 0)
         {
             if (image == null) throw new System.ArgumentNullException("Invalid image");
             ShakeData sd = new ShakeData();
             sd.Image = image;
             sd.Amount = shakeAmount;
-            sd.Timer.Begin(Mathf.Max(0, lenght));
+            sd.Timer.Begin(Mathf.Max(0, duration));
             sd.InitialTexCoords = image.TextureCoordinate;
             sd.SaveTexCoords = saveTexCoords;
             sd.Fadeout = fadeout;

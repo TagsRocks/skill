@@ -170,7 +170,16 @@ namespace Skill.Editor.Sequence
             private GUIContent _Content;
             private float _MinWidth;
 
-            public override double Duration { get { return 0.1f; } set { } }
+            public override double Duration
+            {
+                get
+                {
+                    return Mathf.Max(0.01f, EventKey.Duration);
+                }
+                set
+                {
+                }
+            }
             public override float MinWidth
             {
                 get
@@ -183,9 +192,7 @@ namespace Skill.Editor.Sequence
                     }
                     return _MinWidth;
                 }
-            }
-
-            public override float MaxWidth { get { return MinWidth; } }
+            }            
 
             public EventKey EventKey { get; private set; }
 

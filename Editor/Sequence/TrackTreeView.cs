@@ -25,7 +25,7 @@ namespace Skill.Editor.Sequence
 
             Controls.Add(_Title);
 
-            _TreeView = new TreeView() { Row = 1, UserData = this };
+            _TreeView = new TreeView() { Row = 1, UserData = this , HandleScrollWheel = true };
             _TreeView.DisableFocusable();
             Controls.Add(_TreeView);
 
@@ -171,8 +171,7 @@ namespace Skill.Editor.Sequence
             {
                 GameObject newObj = new GameObject("NewGroup");
                 TrackTreeViewGroup newG = new TrackTreeViewGroup(newObj.AddComponent<TrackGroup>());
-                newG.Foldout.Content.text = newG.Group.gameObject.name;
-                newG.Group.Visible = true;
+                newG.Foldout.Content.text = newG.Group.gameObject.name;                
                 newG.ContextMenu = _TrackGroupContextMenu;
 
                 if (parent != null)

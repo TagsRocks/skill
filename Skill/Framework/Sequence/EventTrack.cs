@@ -7,13 +7,27 @@ using System;
 namespace Skill.Framework.Sequence
 {
 
+    /// <summary>
+    /// Base class for matinee events
+    /// </summary>
+    /// <remarks>
+    /// Subclass must have it's own c# file in unity project
+    /// </remarks>
     public abstract class EventKey : ScriptableObject, ITrackKey
     {
         [SerializeField]
         private float _Time;
 
+        [SerializeField]
+        private float _Duration;
+
+
+
         [ExposeProperty(0, "Fire time")]
         public virtual float FireTime { get { return _Time; } set { _Time = value; } }
+
+        [ExposeProperty(1, "Duration", "Duration of event (optional)")]
+        public virtual float Duration { get { return _Duration; } set { _Duration = value; } }
 
         /// <summary>Fire event </summary>
         public abstract void Fire();
@@ -37,7 +51,9 @@ namespace Skill.Framework.Sequence
                     if (!Application.isPlaying)
                         SortKeys();
 
-                    return EventKeys[EventKeys.Length - 1].FireTime;
+                    var lastEvent = EventKeys[EventKeys.Length - 1];
+                    if (lastEvent != null)
+                        return lastEvent.FireTime + Mathf.Max(0, lastEvent.Duration);
                 }
                 return 0;
             }
@@ -45,7 +61,7 @@ namespace Skill.Framework.Sequence
 
         private int _Index;
         public override void Evaluate(float time)
-        {            
+        {
             float preTime = CurrecntTime;
             CurrecntTime = time;
             float deltaTime = CurrecntTime - preTime;
@@ -56,12 +72,12 @@ namespace Skill.Framework.Sequence
                     if (_Index < 0) _Index = 0;
                     for (; _Index < EventKeys.Length; _Index++)
                     {
-                        float t = EventKeys[_Index].FireTime;                        
+                        float t = EventKeys[_Index].FireTime;
                         if (t <= CurrecntTime)
                         {
                             if (t >= preTime)
                             {
-                                EventKeys[_Index].Fire();                                
+                                EventKeys[_Index].Fire();
                             }
                             _Index++;
                         }

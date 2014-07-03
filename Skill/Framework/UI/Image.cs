@@ -4,10 +4,17 @@ using System;
 
 namespace Skill.Framework.UI
 {
+    public interface IImage
+    {
+         Texture Texture { get; set; }
+        bool AlphaBlend { get; set; }
+        Color TintColor { get; set; }
+    }
+
     /// <summary>
     /// Draw a texture within a rectangle.
     /// </summary>
-    public class Image : Control
+    public class Image : Control, IImage
     {
         /// <summary>
         /// Texture to display.

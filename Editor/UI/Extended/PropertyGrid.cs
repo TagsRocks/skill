@@ -61,7 +61,7 @@ namespace Skill.Editor.UI.Extended
             _Title.Content.text = "Properties";
             Controls.Add(_Title);
 
-            _ScrollView = new Skill.Framework.UI.ScrollView() { Row = 1 };
+            _ScrollView = new Skill.Framework.UI.ScrollView() { Row = 1 , HandleScrollWheel = true };
             Controls.Add(_ScrollView);
         }
 
@@ -107,6 +107,7 @@ namespace Skill.Editor.UI.Extended
     /// </summary>
     public abstract class PropertiesPanel : StackPanel
     {
+        protected static Skill.Framework.UI.Thickness ControlMargin = new Skill.Framework.UI.Thickness(2, 2, 0, 2);
 
         /// <summary>
         /// Ignore changes of edit controls because we are refreshing
@@ -126,6 +127,7 @@ namespace Skill.Editor.UI.Extended
         {
             if (obj == null) throw new System.ArgumentNullException("Invalid Owner");
             this.Object = obj;
+            this.Padding = new Thickness(0,0,16,0);
         }
 
         /// <summary>

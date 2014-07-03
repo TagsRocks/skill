@@ -22,8 +22,25 @@ namespace Skill.Editor.Sequence
     /// </summary>
     public abstract class BaseTrackBar : Skill.Editor.UI.Extended.TrackBar
     {
-        private static Color _NameColor = new Color(0.85f, 0.85f, 0.85f, 0.6f);// color used to draw name of track at bottom left corner of trackbar
 
+        private static GUIStyle _NameStyle;
+        private static GUIStyle NameStyle
+        {
+            get
+            {
+                if (_NameStyle == null)
+                {
+                    GUIStyle labelStyle = "Label";
+                    _NameStyle = new GUIStyle(labelStyle);
+                    _NameStyle.alignment = TextAnchor.LowerLeft;
+                    _NameStyle.fontStyle = FontStyle.Bold;
+                    _NameStyle.fontSize = 11;
+                    _NameStyle.padding = new RectOffset(2, 0, 0, 0);
+                    _NameStyle.normal.textColor = new Color(0.85f, 0.85f, 0.85f, 0.5f);
+                }
+                return _NameStyle;
+            }
+        }
         /// <summary> Track to edit by this TrackBar </summary>
         public Track Track { get; private set; }
 
@@ -50,19 +67,13 @@ namespace Skill.Editor.Sequence
 
             base.Render();
 
-            savedColor = GUI.color;
-
-            // draw name of track at bottom left corner of trackbar
-            GUI.color = _NameColor;
+            // draw name of track at bottom left corner of trackbar            
             Rect rect = ((TrackBarView)Parent).RenderArea;
             rect.x += ((TrackBarView)Parent).ScrollPosition.x;
             rect.y = ra.y - 4;
             rect.height = ra.height;
             rect.width = ((TimeLine)((TrackBarView)Parent).TimeLine).RenderArea.width;
-            UnityEditor.EditorGUI.DropShadowLabel(rect, Track.name);
-
-            GUI.color = savedColor;
-
+            UnityEditor.EditorGUI.DropShadowLabel(rect, Track.name, NameStyle);
         }
 
         /// <summary>
@@ -244,6 +255,7 @@ namespace Skill.Editor.Sequence
         /// </summary>
         protected override void Render()
         {
+            GUI.Box(RenderArea, string.Empty, Skill.Editor.Resources.Styles.BackgroundShadow);
             base.Render();
             if (IsSelectedProperties)
                 // draw a border around event to show selected

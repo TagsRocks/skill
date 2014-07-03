@@ -224,6 +224,7 @@
     <Compile Include="Framework\UI\GridSplitter.cs" />
     <Compile Include="Framework\UI\IContextMenu.cs" />
     <Compile Include="Framework\UI\ImageShake.cs" />
+    <Compile Include="Framework\UI\ImageFading.cs" />
     <Compile Include="Framework\UI\ImageZoom.cs" />
     <Compile Include="Framework\UI\Loading.cs" />
     <Compile Include="Framework\UI\Menu.cs" />

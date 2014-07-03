@@ -24,7 +24,7 @@ namespace Skill.Editor.Sequence
         {
             base.CreateCustomFileds();
 
-            Skill.Framework.UI.Thickness margin = new Skill.Framework.UI.Thickness(2);
+            Skill.Framework.UI.Thickness margin = new Skill.Framework.UI.Thickness(2,2,0,2);
 
             _Object = new Skill.Editor.UI.ObjectField<GameObject>() { Margin = margin }; _Object.Label.text = "Game Object";
             _Component = new Skill.Editor.UI.Popup() { Margin = margin }; _Component.Label.text = "Component";

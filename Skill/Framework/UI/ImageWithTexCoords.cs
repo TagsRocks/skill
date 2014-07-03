@@ -7,7 +7,7 @@ namespace Skill.Framework.UI
     /// <summary>
     /// Draw a texture within a rectangle.
     /// </summary>
-    public class ImageWithTexCoords : Control
+    public class ImageWithTexCoords : Control, IImage
     {
         /// <summary>
         /// Texture to display.

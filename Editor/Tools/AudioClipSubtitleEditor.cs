@@ -148,34 +148,33 @@ namespace Skill.Editor.Tools
                 {
                     _Event = se;
 
-                    Thickness margin = new Thickness(2);
 
-                    _BtnPickTitle = new Skill.Editor.UI.Button() { Margin = margin };
+                    _BtnPickTitle = new Skill.Editor.UI.Button() { Margin = ControlMargin };
                     _BtnPickTitle.Content.text = "Select Subtitle";
                     this.Controls.Add(_BtnPickTitle);
 
-                    _TimeField = new Skill.Editor.UI.FloatField() { Margin = margin };
+                    _TimeField = new Skill.Editor.UI.FloatField() { Margin = ControlMargin };
                     _TimeField.Label.text = "Time";
                     this.Controls.Add(_TimeField);
 
-                    _DurationField = new Skill.Editor.UI.FloatField() { Margin = margin };
+                    _DurationField = new Skill.Editor.UI.FloatField() { Margin = ControlMargin };
                     _DurationField.Label.text = "Duration";
                     this.Controls.Add(_DurationField);
 
 
-                    _TbOverrideStyle = new Skill.Editor.UI.ToggleButton() { Margin = margin };
+                    _TbOverrideStyle = new Skill.Editor.UI.ToggleButton() { Margin = ControlMargin };
                     _TbOverrideStyle.Label.text = "Override Style";
                     this.Controls.Add(_TbOverrideStyle);
 
-                    _ColorField = new Skill.Editor.UI.ColorField() { Margin = margin };
+                    _ColorField = new Skill.Editor.UI.ColorField() { Margin = ControlMargin };
                     _ColorField.Label.text = "Font Color";
                     this.Controls.Add(_ColorField);
 
-                    _FontStyleField = new Skill.Editor.UI.EnumPopup() { Margin = margin };
+                    _FontStyleField = new Skill.Editor.UI.EnumPopup() { Margin = ControlMargin };
                     _FontStyleField.Label.text = "Font Style";
                     this.Controls.Add(_FontStyleField);
 
-                    _AlignmentField = new Skill.Editor.UI.EnumPopup() { Margin = margin };
+                    _AlignmentField = new Skill.Editor.UI.EnumPopup() { Margin = ControlMargin };
                     _AlignmentField.Label.text = "Alignment";
                     this.Controls.Add(_AlignmentField);
 

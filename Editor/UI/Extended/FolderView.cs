@@ -49,11 +49,11 @@ namespace Skill.Editor.UI.Extended
             rect.height = this.Height * this.ScaleFactor;
             this._Foldout.RenderArea = rect;
 
-
             if (_Foldout.IsOpen)
             {
                 rect.x += ChildOffset;
                 rect.y += rect.height + this.Margin.Bottom * this.ScaleFactor;
+                rect.width -= ChildOffset;
 
                 foreach (var c in Controls)
                 {
@@ -88,7 +88,7 @@ namespace Skill.Editor.UI.Extended
                     return 0;
                 }
                 else
-                {                    
+                {
                     if (_UpdateLayoutHeight)
                     {
                         _LayoutHeight = this.Height;
@@ -123,10 +123,18 @@ namespace Skill.Editor.UI.Extended
                         if (c != null)
                         {
                             if (c.Contains(point))
-                                return c;
+                            {
+                                if (c is FolderView)
+                                    return c.GetControlAtPoint(point);
+                                else
+                                    return c;
+                            }
                         }
                     }
-                    return this;
+                    Rect ra = RenderArea;
+                    ra.height = Height;
+                    if (ra.Contains(point))
+                        return this;
                 }
                 return null;
             }

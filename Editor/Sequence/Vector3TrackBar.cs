@@ -131,7 +131,7 @@ namespace Skill.Editor.Sequence
             private Rect[] _CurevRanges = new Rect[3];
             protected override void Render()
             {
-                GUI.Box(RenderArea, string.Empty, Skill.Editor.Resources.Styles.BackgroundShadow);
+                base.Render();
                 if (_Vector3Key.CurveX != null && _Vector3Key.CurveY != null && _Vector3Key.CurveZ != null)
                 {
                     CalcCurveRenderArea(ref _CurevRenderAreas, ref _CurevRanges, _Vector3Key.CurveX, _Vector3Key.CurveY, _Vector3Key.CurveZ);
@@ -146,7 +146,7 @@ namespace Skill.Editor.Sequence
                 //{
                 //    GUI.Label(RenderArea, PropertyKey.ValueKey.ToString());
                 //}
-                base.Render();
+                
             }
 
 

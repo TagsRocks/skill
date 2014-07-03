@@ -154,7 +154,7 @@ namespace Skill.Editor.Sequence
             private Rect[] _CurevRanges = new Rect[1];
             protected override void Render()
             {
-                GUI.Box(RenderArea, string.Empty, Skill.Editor.Resources.Styles.BackgroundShadow);
+                base.Render();
                 if (_FloatKey.Curve != null)
                 {
                     CalcCurveRenderArea(ref _CurevRenderAreas, ref _CurevRanges, _FloatKey.Curve);
@@ -164,8 +164,7 @@ namespace Skill.Editor.Sequence
                 //else
                 //{
                 //    GUI.Label(RenderArea, PropertyKey.ValueKey.ToString());
-                //}
-                base.Render();
+                //}                
             }
 
             class FloatKeyViewProperties : EventProperties

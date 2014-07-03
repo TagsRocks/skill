@@ -67,26 +67,18 @@ namespace Skill.Editor.Sequence
     {
         private TrackTreeViewGroup _Group;
         private Skill.Editor.UI.TextField _TxtName;
-        private Skill.Editor.UI.ToggleButton _TBVisible;
 
         public TrackTreeViewGroupProperties(TrackTreeViewGroup group)
             : base(group)
         {
             _Group = group;
 
-            _TxtName = new Skill.Editor.UI.TextField() { Margin = new Thickness(2) };
+            _TxtName = new Skill.Editor.UI.TextField() { Margin = ControlMargin };
             _TxtName.Label.text = "Name";
             _TxtName.TextChanged += _TxtName_TextChanged;
 
-            _TBVisible = new Skill.Editor.UI.ToggleButton() { Margin = new Thickness(2, 2) };
-            _TBVisible.Label.text = "Visible";
-
             Controls.Add(_TxtName);
-            Controls.Add(_TBVisible);
-
             _TxtName.TextChanged += _TxtName_TextChanged;
-            _TBVisible.Changed += _TBVisible_Changed;
-
             Refresh();
         }
 
@@ -97,14 +89,6 @@ namespace Skill.Editor.Sequence
                 _TxtName.Text = _Group.Foldout.Content.text;
             _Group.Foldout.Content.text = _TxtName.Text;
             _Group.Group.gameObject.name = _TxtName.Text;
-        }
-
-        void _TBVisible_Changed(object sender, System.EventArgs e)
-        {
-            if (IgnoreChanges) return;
-            _Group.Group.Visible = _TBVisible.IsChecked;
-            _TBVisible.IsChecked = _Group.Group.Visible;
-            SetDirty();
         }
 
         protected override void RefreshData()

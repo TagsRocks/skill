@@ -113,7 +113,7 @@ namespace Skill.Editor.Tools
                     : base(af)
                 {
                     _AudioField = af;
-                    this._ObjectField = new Skill.Editor.UI.ObjectField<AudioClip>() { Column = 0, Margin = new Skill.Framework.UI.Thickness(2) };
+                    this._ObjectField = new Skill.Editor.UI.ObjectField<AudioClip>() { Column = 0, Margin = ControlMargin };
                     this._ObjectField.Label.text = "Clip";
                     this.Controls.Add(_ObjectField);
 

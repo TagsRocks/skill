@@ -25,7 +25,7 @@ namespace Skill.Editor.Sequence
 
             Controls.Add(_Title);
 
-            _TreeView = new TreeView() { Row = 1, UserData = this };
+            _TreeView = new TreeView() { Row = 1, UserData = this, HandleScrollWheel = true };
             Controls.Add(_TreeView);
 
             // create context menu            

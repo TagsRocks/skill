@@ -68,17 +68,17 @@ namespace Skill.Framework.UI
         /// Zoom from startTextCoords to destTextCoords
         /// </summary>
         /// <param name="image">Image to apply zoom effect</param>
-        /// <param name="lenght">lenght of zoom animation</param>
+        /// <param name="duration">lenght of zoom animation</param>
         /// <param name="startTextCoords">start TextCoords</param>
         /// <param name="destTextCoords">destination TextCoords</param>
-        public void Zoom(ImageWithTexCoords image, float lenght, Rect startTextCoords, Rect destTextCoords)
+        public void Zoom(ImageWithTexCoords image, float duration, Rect startTextCoords, Rect destTextCoords)
         {
             if (image == null) throw new System.ArgumentNullException("Invalid image");
             ZoomData zd = new ZoomData();
             zd.Image = image;
             zd.SourceRect = startTextCoords;
             zd.DestRect = destTextCoords;
-            zd.Timer.Begin(Mathf.Max(0, lenght));
+            zd.Timer.Begin(Mathf.Max(0, duration));
             _Zooms.Add(zd);
         }
 
@@ -86,10 +86,10 @@ namespace Skill.Framework.UI
         /// Zoom to center of image 
         /// </summary>
         /// <param name="image">Image to apply zoom effect</param>
-        /// <param name="lenght">lenght of zoom animation</param>
+        /// <param name="duration">lenght of zoom animation</param>
         /// <param name="zoomInX">zoom percent in x</param>
         /// <param name="zoomInY"> zoom percent in y </param>
-        public void ZoomTo(ImageWithTexCoords image, float lenght, float zoomInX, float zoomInY)
+        public void ZoomTo(ImageWithTexCoords image, float duration, float zoomInX, float zoomInY)
         {
             if (image == null) throw new System.ArgumentNullException("Invalid image");
             if (zoomInX < Mathf.Epsilon) zoomInX = Mathf.Epsilon;
@@ -104,33 +104,33 @@ namespace Skill.Framework.UI
             destTextCoords.x = (1.0f - destTextCoords.width) * 0.5f;
             destTextCoords.y = (1.0f - destTextCoords.height) * 0.5f;
 
-            Zoom(image, lenght, startTextCoords, destTextCoords);
+            Zoom(image, duration, startTextCoords, destTextCoords);
         }
 
         /// <summary>
         /// Zoom from currect TextCoords to destTextCoords
         /// </summary>
         /// <param name="image">Image to apply zoom effect</param>
-        /// <param name="lenght">lenght of zoom animation</param>
+        /// <param name="duration">lenght of zoom animation</param>
         /// <param name="destTextCoords">destination TextCoords</param>
-        public void ZoomTo(ImageWithTexCoords image, float lenght, Rect destTextCoords)
+        public void ZoomTo(ImageWithTexCoords image, float duration, Rect destTextCoords)
         {
             if (image == null) throw new System.ArgumentNullException("Invalid image");
             Rect startTextCoords = image.TextureCoordinate;
-            Zoom(image, lenght, startTextCoords, destTextCoords);
+            Zoom(image, duration, startTextCoords, destTextCoords);
         }
 
         /// <summary>
         /// zoom from currect TextCoords to rect defined in pixels
         /// </summary>
         /// <param name="image">Image to apply zoom effect</param>
-        /// <param name="lenght">lenght of zoom animation</param>
+        /// <param name="duration">lenght of zoom animation</param>
         /// <param name="x"> pixel x (0 - image.Texture.width)</param>
         /// <param name="y"> pixel y (0 - image.Texture.height) </param>
         /// <param name="width">with of destination in pixel</param>
         /// <param name="height">height of destination in pixel</param>
         /// <param name="inverseY">Inverse y</param>
-        public void ZoomTo(ImageWithTexCoords image, float lenght, int x, int y, int width, int height, bool inverseY = false)
+        public void ZoomTo(ImageWithTexCoords image, float duration, int x, int y, int width, int height, bool inverseY = false)
         {
             if (image == null) throw new System.ArgumentNullException("Invalid image");
             if (image.Texture == null) throw new System.ArgumentNullException("Invalid image.Texture");
@@ -145,7 +145,7 @@ namespace Skill.Framework.UI
 
             if (inverseY) destTextCoords.y = 1.0f - destTextCoords.y;
 
-            Zoom(image, lenght, startTextCoords, destTextCoords);
+            Zoom(image, duration, startTextCoords, destTextCoords);
         }
     }
 }

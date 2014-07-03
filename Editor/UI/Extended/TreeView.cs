@@ -128,18 +128,9 @@ namespace Skill.Editor.UI.Extended
                     Rect ra = RenderAreaShrinksByPadding;
                     if (ra.Contains(localMouse))
                     {
-                        if (_SelectedItem != null && _SelectedItem is FolderView && _SelectedItem.Contains(mousePos)) // maybe selected item is a folder and user clicked on child of it
-                        {
-                            BaseControl select = _SelectedItem.GetControlAtPoint(mousePos);
-                            if (select != null)
-                                SelectedItem = select;
-                        }
-                        else
-                        {
-                            BaseControl select = GetControlAtPoint(mousePos);
-                            if (select != null)
-                                SelectedItem = select;
-                        }
+                        BaseControl select = GetControlAtPoint(mousePos);
+                        if (select != null)
+                            SelectedItem = select;
                     }
                 }
             }

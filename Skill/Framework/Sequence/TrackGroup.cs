@@ -9,10 +9,7 @@ namespace Skill.Framework.Sequence
     {
         #region Editor variables
         [HideInInspector]
-        public bool IsOpen = true; // state of FoldOut
-
-        [HideInInspector]
-        public bool Visible = true;
+        public bool IsOpen = true; // state of FoldOut        
         #endregion
     }
 }

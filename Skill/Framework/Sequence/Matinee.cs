@@ -14,36 +14,9 @@ namespace Skill.Framework.Sequence
     public class Matinee : Skill.Framework.DynamicBehaviour
     {
         #region Editor data
-
-        /// <summary> End time of visible area </summary>
         [HideInInspector]
         [SerializeField]
-        public float MaxTime = 10;
-
-        /// <summary> Start time of visible area </summary>
-        [HideInInspector]
-        [SerializeField]
-        public float StartVisible = 0;
-
-        /// <summary> End time of visible area </summary>
-        [HideInInspector]
-        [SerializeField]
-        public float EndVisible = 10;
-
-        /// <summary> Maximum available time to scroll</summary>    
-        [HideInInspector]
-        [SerializeField]
-        public float StartSelection = 0;
-
-        /// <summary> End time of selected time </summary>
-        [HideInInspector]
-        [SerializeField]
-        public float EndSelection = 0;
-
-        /// <summary> position of time </summary>
-        [HideInInspector]
-        [SerializeField]
-        public float TimePosition = 0;
+        public float[] EditorData;
         #endregion
 
 

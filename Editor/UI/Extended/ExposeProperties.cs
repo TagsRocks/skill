@@ -13,9 +13,7 @@ namespace Skill.Editor.UI.Extended
 
 
     public abstract class ExposeProperties : PropertiesPanel
-    {
-        protected static Skill.Framework.UI.Thickness ControlMargin = new Skill.Framework.UI.Thickness(2);
-
+    {        
         class ControlTag
         {
             public Skill.Framework.UI.BaseControl Field;
@@ -119,11 +117,11 @@ namespace Skill.Editor.UI.Extended
                         case PropertyType.SerializableObject:
                             Debug.Log("SerializableObject peoperties not implemented");
                             break;
-                    }                    
+                    }
 
                     if (control != null)
                     {
-                        control.Margin = new Skill.Framework.UI.Thickness(2);
+                        control.Margin = new Skill.Framework.UI.Thickness(2, 2, 0, 2);
                         PropertyData pd = new PropertyData();
                         pd.Getter = info.GetGetMethod();
                         pd.Setter = info.GetSetMethod();

@@ -129,7 +129,7 @@ namespace Skill.Editor.Sequence
             private Rect[] _CurevRanges = new Rect[2];
             protected override void Render()
             {
-                GUI.Box(RenderArea, string.Empty, Skill.Editor.Resources.Styles.BackgroundShadow);
+                base.Render();
                 if (_Vector2Key.CurveX != null && _Vector2Key.CurveY != null)
                 {
                     CalcCurveRenderArea(ref _CurevRenderAreas, ref _CurevRanges, _Vector2Key.CurveX, _Vector2Key.CurveY);
@@ -141,8 +141,7 @@ namespace Skill.Editor.Sequence
                 //else
                 //{
                 //    GUI.Label(RenderArea, PropertyKey.ValueKey.ToString());
-                //}
-                base.Render();
+                //}                
             }
 
             class Vector2KeyViewProperties : EventProperties

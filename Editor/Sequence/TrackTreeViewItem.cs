@@ -34,10 +34,10 @@ namespace Skill.Editor.Sequence
             this.Height = 20;
 
             this.ColumnDefinitions.Add(1, GridUnitType.Star);
-            this.ColumnDefinitions.Add(16, GridUnitType.Pixel);
+            this.ColumnDefinitions.Add(14, GridUnitType.Pixel);
 
             this._ContentBox = new Box() { Column = 0, Style = Resources.Styles.TreeViewItem };
-            this._ImgColor = new Image() { Column = 1, Texture = UnityEditor.EditorGUIUtility.whiteTexture, Scale = ScaleMode.StretchToFill, Margin = new Thickness(2, 4) };
+            this._ImgColor = new Image() { Column = 1, Texture = UnityEditor.EditorGUIUtility.whiteTexture, Scale = ScaleMode.StretchToFill, Margin = new Thickness(0, 3) };
 
             this.Controls.Add(_ContentBox);
             this.Controls.Add(_ImgColor);
@@ -130,11 +130,11 @@ namespace Skill.Editor.Sequence
 
         protected override void CreateCustomFileds()
         {
-            _TxtName = new Skill.Editor.UI.TextField() { Margin = new Thickness(2, 2) };
+            _TxtName = new Skill.Editor.UI.TextField() { Margin = ControlMargin };
             _TxtName.Label.text = "Name";
-            _CFColor = new Skill.Editor.UI.ColorField() { Margin = new Thickness(2, 2) };
+            _CFColor = new Skill.Editor.UI.ColorField() { Margin = ControlMargin };
             _CFColor.Label.text = "Color";
-            _TBVisible = new Skill.Editor.UI.ToggleButton() { Margin = new Thickness(2, 2) };
+            _TBVisible = new Skill.Editor.UI.ToggleButton() { Margin = ControlMargin };
             _TBVisible.Label.text = "Visible";
 
             Controls.Add(_TxtName);

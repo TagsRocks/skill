@@ -132,7 +132,7 @@ namespace Skill.Editor.Sequence
             private Rect[] _CurevRanges = new Rect[3];
             protected override void Render()
             {
-                GUI.Box(RenderArea, string.Empty, Skill.Editor.Resources.Styles.BackgroundShadow);
+                base.Render();
                 if (_QuaternionKey.CurveX != null && _QuaternionKey.CurveY != null && _QuaternionKey.CurveZ != null)
                 {
                     CalcCurveRenderArea(ref _CurevRenderAreas, ref _CurevRanges, _QuaternionKey.CurveX, _QuaternionKey.CurveY, _QuaternionKey.CurveZ);
@@ -147,7 +147,7 @@ namespace Skill.Editor.Sequence
                 //{
                 //    GUI.Label(RenderArea, PropertyKey.ValueKey.ToString());
                 //}
-                base.Render();
+                
             }
 
             class QuaternionKeyViewProperties : EventProperties
