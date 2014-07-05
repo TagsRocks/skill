@@ -16,7 +16,7 @@ namespace Skill.Framework.Sequence
         #region Editor data
         [HideInInspector]
         [SerializeField]
-        public float[] EditorData;
+        public float[] EditorData = null;
         #endregion
 
 

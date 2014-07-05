@@ -77,7 +77,26 @@ namespace Skill.Editor
 
 
         // ********************************* Create Menu ********************************* 
-        [MenuItem("Assets/Create/Skill/Implant Asset", false, 41)]
+
+        [UnityEditor.MenuItem("Assets/Create/Skill/Matinee", false, 41)]
+        static void CreateMatinee()
+        {
+            Selection.activeObject = new GameObject("New Matinee", typeof(Skill.Framework.Sequence.Matinee));
+        }
+
+        [UnityEditor.MenuItem("Assets/Create/Skill/Dictionary", false, 42)]
+        static void CreateDictionary()
+        {
+            Skill.Editor.ScriptableObjectUtility.CreateAsset<Skill.Framework.Dictionary>("Dictionary");
+        }
+
+        [MenuItem("Assets/Create/Skill/Spawn Asset", false, 43)]
+        static void CreateSpawnData()
+        {
+            ScriptableObjectUtility.CreateAsset<Skill.Framework.SpawnAsset>("SpawnData");
+        }
+
+        [MenuItem("Assets/Create/Skill/Implant Asset", false, 44)]
         static void CreateImplantAsset()
         {
             ScriptableObjectUtility.CreateAsset<Skill.Editor.Tools.ImplantAsset>("ImplantAsset", delegate(Skill.Editor.Tools.ImplantAsset asset)
@@ -93,17 +112,11 @@ namespace Skill.Editor
 
         }
 
-        [MenuItem("Assets/Create/Skill/Spawn Asset", false, 42)]
-        static void CreateSpawnData()
-        {
-            ScriptableObjectUtility.CreateAsset<Skill.Framework.SpawnAsset>("SpawnData");
-        }
 
-        [UnityEditor.MenuItem("Assets/Create/Skill/Dictionary", false, 43)]
-        static void CreateDictionary()
-        {
-            Skill.Editor.ScriptableObjectUtility.CreateAsset<Skill.Framework.Dictionary>("Dictionary");
-        }
+
+
+
+
 
 
         // ********************************* Commands ********************************* 

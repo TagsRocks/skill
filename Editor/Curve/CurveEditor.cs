@@ -14,7 +14,6 @@ namespace Skill.Editor.Curve
         private TimeLineCurveView _CurveView;
         private TimeLineGrid _Grid;
 
-
         public event System.EventHandler Changed;
         private void OnChanged()
         {
@@ -24,7 +23,7 @@ namespace Skill.Editor.Curve
 
 
         public Color Background { get; set; }
-        public PropertyGrid PropertyGrid { get; set; }
+
         public TimeLine TimeLine { get { return _TimeLine; } }
         public CurveEditor()
         {
@@ -78,7 +77,7 @@ namespace Skill.Editor.Curve
             {
                 track.Changed -= Track_Changed;
                 _CurveView.Controls.Remove(track);
-            }            
+            }
         }
 
         public double SnapTime { get { return _TimeLine.TimeBar.SmallStep; } }
@@ -232,8 +231,7 @@ namespace Skill.Editor.Curve
         private void OnSelectionChanged()
         {
             _DragStarted = false;
-            if (PropertyGrid != null)
-                PropertyGrid.SelectedObject = SelectedKey;
+            InspectorProperties.Select(SelectedKey);
         }
         public CurveKey SelectedKey
         {

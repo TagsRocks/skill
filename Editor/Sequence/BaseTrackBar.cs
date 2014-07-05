@@ -65,8 +65,6 @@ namespace Skill.Editor.Sequence
 
             GUI.color = savedColor;
 
-            base.Render();
-
             // draw name of track at bottom left corner of trackbar            
             Rect rect = ((TrackBarView)Parent).RenderArea;
             rect.x += ((TrackBarView)Parent).ScrollPosition.x;
@@ -74,6 +72,12 @@ namespace Skill.Editor.Sequence
             rect.height = ra.height;
             rect.width = ((TimeLine)((TrackBarView)Parent).TimeLine).RenderArea.width;
             UnityEditor.EditorGUI.DropShadowLabel(rect, Track.name, NameStyle);
+
+            GUI.color = savedColor;
+
+            base.Render();
+
+
         }
 
         /// <summary>
@@ -242,10 +246,7 @@ namespace Skill.Editor.Sequence
             // show properties when used select this event 
             if (args.Button == Skill.Framework.UI.MouseButton.Left)
             {
-                if (MatineeEditorWindow.Instance != null)
-                {
-                    MatineeEditorWindow.Instance.PropertyGrid.SelectedObject = this;
-                }
+                InspectorProperties.Select(this);
             }
             base.OnMouseDown(args);
         }

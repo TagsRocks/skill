@@ -128,8 +128,7 @@ namespace Skill.Editor.Sequence
                 newKey.FireTime = (float)timeLine.TimeBar.GetTime(x);
 
                 EventKeyView e = CreateEvent(newKey);
-                if (MatineeEditorWindow.Instance != null)
-                    MatineeEditorWindow.Instance.PropertyGrid.SelectedObject = e;
+                InspectorProperties.Select(e);
                 RebuildTrackKeys();
             }
         }
@@ -192,7 +191,7 @@ namespace Skill.Editor.Sequence
                     }
                     return _MinWidth;
                 }
-            }            
+            }
 
             public EventKey EventKey { get; private set; }
 

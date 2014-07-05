@@ -81,6 +81,7 @@
     <Compile Include="Sequence\FloatTrackBar.cs" />
     <Compile Include="Sequence\IntegerTrackBar.cs" />
     <Compile Include="Sequence\MatineeEditor.cs" />
+    <Compile Include="UI\Extended\InspectorProperties.cs" />
     <Compile Include="UI\Extended\MediaButton.cs" />
     <Compile Include="UI\Extended\PropertyGrid.cs" />
     <Compile Include="Sequence\PropertyTrackBar.cs" />

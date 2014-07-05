@@ -26,7 +26,7 @@ namespace Skill.Editor.Curve
         }
 
         void OnDestroy()
-        {
+        {            
             _Instance = null;
         }
         void OnFocus()
@@ -58,8 +58,7 @@ namespace Skill.Editor.Curve
         private CurveEditor _CurveEditor;
         private Skill.Framework.UI.Grid _PnlLeft;
         private TreeView _CurveTreeView;
-        private ObjectField<UnityEngine.GameObject> _ObjectField;
-        private PropertyGrid _PropertyGrid;
+        private ObjectField<UnityEngine.GameObject> _ObjectField;        
         private Skill.Editor.UI.GridSplitter _GridSplitter;
         private CurvePresetLibrary _PresetPanel;
 
@@ -104,23 +103,20 @@ namespace Skill.Editor.Curve
             _PnlLeft = new Skill.Framework.UI.Grid() { Row = 0, Column = 0 };
             _PnlLeft.RowDefinitions.Add(26, Skill.Framework.UI.GridUnitType.Pixel); // _ObjectField
             _PnlLeft.RowDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star); // _CurveTreeView        
-            _PnlLeft.RowDefinitions.Add(32, Skill.Framework.UI.GridUnitType.Pixel); // _PresetPanel        
-            _PnlLeft.RowDefinitions.Add(64, Skill.Framework.UI.GridUnitType.Pixel); // _PropertyGrid
+            _PnlLeft.RowDefinitions.Add(32, Skill.Framework.UI.GridUnitType.Pixel); // _PresetPanel
 
             _ObjectField = new ObjectField<GameObject>() { Row = 0, Column = 0, VerticalAlignment = Skill.Framework.UI.VerticalAlignment.Center };
             _CurveTreeView = new TreeView() { Row = 1, Column = 0 };
             _CurveTreeView.DisableFocusable();
-            _PresetPanel = new CurvePresetLibrary() { Row = 2, Column = 0 };
-            _PropertyGrid = new PropertyGrid() { Row = 3, Column = 0 };
+            _PresetPanel = new CurvePresetLibrary() { Row = 2, Column = 0 };            
 
             _PnlLeft.Controls.Add(_ObjectField);
             _PnlLeft.Controls.Add(_CurveTreeView);
             _PnlLeft.Controls.Add(_PresetPanel);
-            _PnlLeft.Controls.Add(_PropertyGrid);
 
 
             _GridSplitter = new Skill.Editor.UI.GridSplitter() { Row = 0, Column = 1, Orientation = Skill.Framework.UI.Orientation.Vertical };
-            _CurveEditor = new CurveEditor() { Row = 0, Column = 2, PropertyGrid = _PropertyGrid };
+            _CurveEditor = new CurveEditor() { Row = 0, Column = 2 };
 
             _Frame.Controls.Add(_PnlLeft);
             _Frame.Controls.Add(_GridSplitter);
@@ -197,7 +193,7 @@ namespace Skill.Editor.Curve
 
         }
 
-        
+
         class CurveTrackTreeViewItem : Grid
         {
             private Skill.Editor.UI.ToggleButton _TbVisible;

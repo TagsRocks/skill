@@ -134,9 +134,7 @@ namespace Skill.Editor.Sequence
                         break;
                     }
                 }
-
-                if (MatineeEditorWindow.Instance != null)
-                    MatineeEditorWindow.Instance.PropertyGrid.SelectedObject = e;
+                InspectorProperties.Select(e);
             }
         }
 
@@ -254,7 +252,7 @@ namespace Skill.Editor.Sequence
                         }
                     }
 
-                    renderAreas[i] = ra;                    
+                    renderAreas[i] = ra;
                     ranges[i] = range;
                 }
             }

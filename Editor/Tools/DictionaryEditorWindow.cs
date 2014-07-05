@@ -239,16 +239,11 @@ namespace Skill.Editor.Tools
 
         private Skill.Framework.UI.Box _NameCaption;
         private Skill.Framework.UI.Box _ValueCaption;
-
-
-        private Skill.Editor.UI.GridSplitter _Splitter;
-        private Skill.Editor.UI.Extended.PropertyGrid _PropertyGrid;
+        
         private Skill.Framework.UI.Extended.ListBox _AudioList;
         private Skill.Framework.UI.Button _BtnNew;
         private List<AudioField> _Fields;
         private AudioClipSubtitleEditor _AudioClipEditor;
-
-        public Skill.Editor.UI.Extended.PropertyGrid PropertyGrid { get { return _PropertyGrid; } }
 
         private void CreateUI()
         {
@@ -286,21 +281,12 @@ namespace Skill.Editor.Tools
             _AudioPanel.Controls.Add(_AudioClipEditor);
 
             Skill.Framework.UI.Grid pnl = new Skill.Framework.UI.Grid() { Row = 1, Column = 0 };
-            pnl.ColumnDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star); //
-            pnl.ColumnDefinitions.Add(2, Skill.Framework.UI.GridUnitType.Pixel); //
-            pnl.ColumnDefinitions.Add(260, Skill.Framework.UI.GridUnitType.Pixel); // _PropertyGrid
 
             _Fields = new List<AudioField>();
             _AudioList = new Skill.Framework.UI.Extended.ListBox() { Row = 0, Column = 0, AlwayShowVertical = true };
             _AudioList.BackgroundVisible = true;
             _AudioList.DisableFocusable();
             pnl.Controls.Add(_AudioList);
-
-            _Splitter = new Skill.Editor.UI.GridSplitter() { Row = 0, Column = 1, Orientation = Skill.Framework.UI.Orientation.Vertical };
-            pnl.Controls.Add(_Splitter);
-
-            _PropertyGrid = new PropertyGrid() { Row = 0, Column = 2 };
-            pnl.Controls.Add(_PropertyGrid);
 
             _BtnNew = new Skill.Framework.UI.Button()
             {
@@ -325,13 +311,13 @@ namespace Skill.Editor.Tools
 
         private void CreateFieldPanel()
         {
-            _FieldPanel = new Grid() { Row = 0, Padding = new Thickness(2) };            
+            _FieldPanel = new Grid() { Row = 0, Padding = new Thickness(2) };
             Box box = new Box() { Row = 0, Column = 0, RowSpan = 10, ColumnSpan = 10 };
             _FieldPanel.Controls.Add(box);
 
             _ObjectField = new Skill.Editor.UI.ObjectField<Dictionary>() { Margin = new Thickness(2), VerticalAlignment = VerticalAlignment.Top };
             _ObjectField.Label.text = "Dictionary";
-            _FieldPanel.Controls.Add(_ObjectField);            
+            _FieldPanel.Controls.Add(_ObjectField);
         }
 
         private void CreateTextPanel()
@@ -348,7 +334,7 @@ namespace Skill.Editor.Tools
 
             viewPanel.RowDefinitions.Add(24, GridUnitType.Pixel);
             viewPanel.RowDefinitions.Add(50, GridUnitType.Pixel);
-            viewPanel.RowDefinitions.Add(50, GridUnitType.Pixel);            
+            viewPanel.RowDefinitions.Add(50, GridUnitType.Pixel);
             viewPanel.RowDefinitions.Add(1, GridUnitType.Star);
 
             Box box = new Box() { Row = 0, Column = 0, RowSpan = 10, ColumnSpan = 10 };
@@ -366,7 +352,7 @@ namespace Skill.Editor.Tools
 
             _BtnAdd = new Skill.Editor.UI.Button() { Row = 1, Column = 3, Margin = new Thickness(2) }; _BtnAdd.Content.tooltip = "Add";
             _BtnRemove = new Skill.Editor.UI.Button() { Row = 2, Column = 3, Margin = new Thickness(2) }; _BtnAdd.Content.tooltip = "remove selected";
-            _BtnSave = new Skill.Editor.UI.Button() { Row = 3, Column = 3, Margin = new Thickness(2,2,2,4), VerticalAlignment = VerticalAlignment.Bottom, Height = 46 }; _BtnSave.Content.tooltip = "Save Changes";            
+            _BtnSave = new Skill.Editor.UI.Button() { Row = 3, Column = 3, Margin = new Thickness(2, 2, 2, 4), VerticalAlignment = VerticalAlignment.Bottom, Height = 46 }; _BtnSave.Content.tooltip = "Save Changes";
 
             viewPanel.Controls.Add(_NameCaption);
             viewPanel.Controls.Add(_ValueCaption);
@@ -420,8 +406,7 @@ namespace Skill.Editor.Tools
             _LblComment.Style.alignment = TextAnchor.MiddleCenter;
 
             _AudioClipEditor.RefreshStyles();
-            _AudioList.SelectedStyle = Skill.Editor.Resources.Styles.SelectedItem;
-            _Splitter.Style = Skill.Editor.Resources.Styles.VerticalSplitter;
+            _AudioList.SelectedStyle = Skill.Editor.Resources.Styles.SelectedItem;            
 
             _RefreshStyles = false;
         }
@@ -492,7 +477,7 @@ namespace Skill.Editor.Tools
             {
                 AudioField af = (AudioField)_AudioList.SelectedItem;
                 _AudioClipEditor.Subtitle = af.Subtitle;
-                _PropertyGrid.SelectedObject = af;
+                InspectorProperties.Select(af);
             }
             else
             {

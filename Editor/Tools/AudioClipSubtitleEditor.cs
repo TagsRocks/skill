@@ -9,7 +9,7 @@ using Skill.Framework;
 
 namespace Skill.Editor.Tools
 {
-    
+
     public class AudioClipSubtitleEditor : Grid
     {
         #region SubtitleEvent
@@ -100,7 +100,7 @@ namespace Skill.Editor.Tools
                 // show properties when used select this event 
                 if (args.Button == Skill.Framework.UI.MouseButton.Left)
                 {
-                    Editor.Editor.PropertyGrid.SelectedObject = this;
+                    InspectorProperties.Select(this);
                 }
                 base.OnMouseDown(args);
             }
@@ -355,7 +355,7 @@ namespace Skill.Editor.Tools
             RowDefinitions.Add(80, GridUnitType.Pixel);
             RowDefinitions.Add(1, GridUnitType.Star);
 
-            _TimeLine = new TimeLine(new TrackBarView()) { Row = 1, Column = 0, RowSpan = 3, SelectionEnable = false , ExtendMaxTime = false };
+            _TimeLine = new TimeLine(new TrackBarView()) { Row = 1, Column = 0, RowSpan = 3, SelectionEnable = false, ExtendMaxTime = false };
             _TimeLine.MinTime = 0;
             _TimeLine.MaxTime = 1;
 
@@ -423,7 +423,7 @@ namespace Skill.Editor.Tools
             newTitle.TitleKey = "New Subtitle";
 
             SubtitleEvent se = CreateEvent(newTitle);
-            Editor.PropertyGrid.SelectedObject = se;
+            InspectorProperties.Select(se);
             RebuildSubtitles();
         }
 
@@ -601,5 +601,5 @@ namespace Skill.Editor.Tools
             }
         }
         #endregion
-    }    
+    }
 }

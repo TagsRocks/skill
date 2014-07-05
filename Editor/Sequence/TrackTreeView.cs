@@ -25,7 +25,7 @@ namespace Skill.Editor.Sequence
 
             Controls.Add(_Title);
 
-            _TreeView = new TreeView() { Row = 1, UserData = this , HandleScrollWheel = true };
+            _TreeView = new TreeView() { Row = 1, UserData = this, HandleScrollWheel = true };
             _TreeView.DisableFocusable();
             Controls.Add(_TreeView);
 
@@ -40,7 +40,7 @@ namespace Skill.Editor.Sequence
         void _TreeView_SelectedItemChanged(object sender, System.EventArgs e)
         {
             if (_TreeView.SelectedItem is IProperties)
-                _Editor.PropertyGrid.SelectedObject = (IProperties)_TreeView.SelectedItem;
+                InspectorProperties.Select((IProperties)_TreeView.SelectedItem);
         }
         protected override void Render()
         {
@@ -171,7 +171,7 @@ namespace Skill.Editor.Sequence
             {
                 GameObject newObj = new GameObject("NewGroup");
                 TrackTreeViewGroup newG = new TrackTreeViewGroup(newObj.AddComponent<TrackGroup>());
-                newG.Foldout.Content.text = newG.Group.gameObject.name;                
+                newG.Foldout.Content.text = newG.Group.gameObject.name;
                 newG.ContextMenu = _TrackGroupContextMenu;
 
                 if (parent != null)
@@ -383,7 +383,7 @@ namespace Skill.Editor.Sequence
             private void TrackGroupProperties_Click(object sender, System.EventArgs e)
             {
                 TrackTreeViewGroup group = Owner as TrackTreeViewGroup;
-                _View._Editor.PropertyGrid.SelectedObject = group;
+                InspectorProperties.Select(group);
             }
         }
 
@@ -414,7 +414,7 @@ namespace Skill.Editor.Sequence
             private void TrackGroupProperties_Click(object sender, System.EventArgs e)
             {
                 TrackTreeViewItem track = Owner as TrackTreeViewItem;
-                _View._Editor.PropertyGrid.SelectedObject = track;
+                InspectorProperties.Select(track);
             }
         }
         #endregion

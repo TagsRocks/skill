@@ -27,7 +27,10 @@ namespace Skill.Editor.UI.Extended
                     if (_SelectedObject != null)
                     {
                         _SelectedObject.IsSelectedProperties = false;
-                        _ScrollView.Controls.Remove(_SelectedObject.Properties);
+                        if (_ScrollView != null)
+                            _ScrollView.Controls.Remove(_SelectedObject.Properties);
+                        else
+                            this.Controls.Remove(_SelectedObject.Properties);
                         _SelectedObject = null;
                     }
                     _SelectedObject = value;
@@ -35,7 +38,14 @@ namespace Skill.Editor.UI.Extended
                     {
                         _SelectedObject.IsSelectedProperties = true;
                         _Title.Content.text = string.Format("Properties - ({0})", _SelectedObject.Title);
-                        _ScrollView.Controls.Add(_SelectedObject.Properties);
+
+                        if (_ScrollView != null)
+                            _ScrollView.Controls.Add(_SelectedObject.Properties);
+                        else
+                        {
+                            _SelectedObject.Properties.Row = 1;
+                            this.Controls.Add(_SelectedObject.Properties);
+                        }
                         _SelectedObject.Properties.Refresh();
                     }
                     else
@@ -52,17 +62,23 @@ namespace Skill.Editor.UI.Extended
         /// <summary>
         /// Create a PropertyGrid
         /// </summary>
-        public PropertyGrid()
+        public PropertyGrid(bool autoScroll)
         {
             RowDefinitions.Add(20, Skill.Framework.UI.GridUnitType.Pixel);
-            RowDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star);
+            if (autoScroll)
+                RowDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star);
+            else
+                RowDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Auto);
 
             _Title = new Skill.Framework.UI.Label() { Row = 0 };
             _Title.Content.text = "Properties";
             Controls.Add(_Title);
 
-            _ScrollView = new Skill.Framework.UI.ScrollView() { Row = 1 , HandleScrollWheel = true };
-            Controls.Add(_ScrollView);
+            if (autoScroll)
+            {
+                _ScrollView = new Skill.Framework.UI.ScrollView() { Row = 1, HandleScrollWheel = true };
+                Controls.Add(_ScrollView);
+            }
         }
 
         protected override void OnRenderAreaChanged()
@@ -127,7 +143,7 @@ namespace Skill.Editor.UI.Extended
         {
             if (obj == null) throw new System.ArgumentNullException("Invalid Owner");
             this.Object = obj;
-            this.Padding = new Thickness(0,0,16,0);
+            //this.Padding = new Thickness(0, 0, 16, 0);
         }
 
         /// <summary>

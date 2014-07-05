@@ -18,9 +18,20 @@ namespace Skill.Editor
         /// <param name="setDefault"> setDefault method</param>
         public static void CreateAsset<T>(string assetName, Action<T> setDefault = null) where T : ScriptableObject
         {
+            string uniqueAssetPathAndName = GetNewAssetPath(assetName);
+
             T asset = ScriptableObject.CreateInstance<T>();
             if (setDefault != null)
                 setDefault(asset);
+            AssetDatabase.CreateAsset(asset, uniqueAssetPathAndName);
+            AssetDatabase.SaveAssets();
+            EditorUtility.FocusProjectWindow();
+            Selection.activeObject = asset;
+        }
+
+
+        public static string GetNewAssetPath(string assetName)
+        {
             string path = AssetDatabase.GetAssetPath(Selection.activeObject);
             if (path == "")
             {
@@ -33,11 +44,7 @@ namespace Skill.Editor
 
             string assetPathAndName = System.IO.Path.Combine(path, string.Format("New {0}.asset", assetName));
             string uniqueAssetPathAndName = AssetDatabase.GenerateUniqueAssetPath(assetPathAndName);
-            AssetDatabase.CreateAsset(asset, uniqueAssetPathAndName);
-
-            AssetDatabase.SaveAssets();
-            EditorUtility.FocusProjectWindow();
-            Selection.activeObject = asset;
+            return uniqueAssetPathAndName;
         }
     }
 }
