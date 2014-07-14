@@ -88,10 +88,12 @@
     <Compile Include="Framework\Sequence\BooleanTrack.cs" />
     <Compile Include="Framework\Sequence\BuiltinEvents.cs" />
     <Compile Include="Framework\Sequence\ColorTrack.cs" />
+    <Compile Include="Framework\Sequence\ContinuousTrack.cs" />
     <Compile Include="Framework\Sequence\EventTrack.cs" />
     <Compile Include="Framework\Sequence\FloatTrack.cs" />
     <Compile Include="Framework\Sequence\IntegerTrack.cs" />
     <Compile Include="Framework\Sequence\Matinee.cs" />
+    <Compile Include="Framework\Sequence\DiscreteTrack.cs" />
     <Compile Include="Framework\Sequence\PropertyTrack.cs" />
     <Compile Include="Framework\Sequence\QuaternionTrack.cs" />
     <Compile Include="Framework\Sequence\SoundTrack.cs" />

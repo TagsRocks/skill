@@ -129,12 +129,12 @@ namespace Skill.Editor.Curve
             Rect ra = RenderArea;
             Color savedColor = GUI.color;
             GUI.color = Track.Color;
-            GUI.DrawTexture(ra, Skill.Editor.Resources.Textures.Keyframe);
+            GUI.DrawTexture(ra, Skill.Editor.Resources.UITextures.Keyframe);
 
             if (IsSelected)
             {
                 GUI.color = Color.white;
-                GUI.DrawTexture(ra, Skill.Editor.Resources.Textures.KeyframeSelected);
+                GUI.DrawTexture(ra, Skill.Editor.Resources.UITextures.KeyframeSelected);
             }
             GUI.color = savedColor;
 
@@ -264,5 +264,26 @@ namespace Skill.Editor.Curve
         //}
 
         #endregion
+    }
+
+    class CurveKeyComparer : System.Collections.Generic.IComparer<CurveKey>
+    {
+        private static CurveKeyComparer _Instance;
+
+        public static CurveKeyComparer Instance
+        {
+            get
+            {
+                if (_Instance == null) _Instance = new CurveKeyComparer();
+                return _Instance;
+            }
+        }
+
+        public int Compare(CurveKey x, CurveKey y) { return x.Time.CompareTo(y.Time); }
+
+        private CurveKeyComparer()
+        {
+
+        }
     }
 }

@@ -230,7 +230,7 @@ namespace Skill.Editor.UI.Extended
             this._MaxTime = 1.0;
             this._MinTime = 0.0;
 
-            this.Padding = new Thickness(2);
+            //this.Padding = new Thickness(2);
 
             this.RowDefinitions.Add(24, GridUnitType.Pixel);
             this.RowDefinitions.Add(4, GridUnitType.Pixel);
@@ -268,7 +268,7 @@ namespace Skill.Editor.UI.Extended
 
         private void RefreshStyles()
         {
-            _BtnTimeStyle.Content.image = _Timebar.TimeStyle ? Skill.Editor.Resources.Textures.TimeFormat : Skill.Editor.Resources.Textures.SequenceFormat;
+            _BtnTimeStyle.Content.image = _Timebar.TimeStyle ? Skill.Editor.Resources.UITextures.TimeFormat : Skill.Editor.Resources.UITextures.SequenceFormat;
         }
 
         /// <summary>
@@ -376,6 +376,6 @@ namespace Skill.Editor.UI.Extended
         public void Clear()
         {
             View.Controls.Clear();
-        }
+        }        
     }
 }

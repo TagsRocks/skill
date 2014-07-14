@@ -107,7 +107,10 @@ namespace Skill.Editor.Curve
             float pixels = RenderArea.height; // number of available pixels to render value grid
             double deltaValue = MaxValue - MinValue;
 
-            _PixelRequiredForLabel = _TimeBar.LabelStyle.CalcSize(_SampleText).y; // number of pixel required to draw a value label                
+            if (_LabelStyle != null)
+                _PixelRequiredForLabel = _LabelStyle.CalcSize(_SampleText).y; // number of pixel required to draw a value label                
+            else
+                _PixelRequiredForLabel = 10;
 
             int num = Mathf.FloorToInt(pixels / (_PixelRequiredForLabel * 3));// number of labels can we draw
             _BigStep = deltaValue / num;
@@ -165,15 +168,20 @@ namespace Skill.Editor.Curve
         private void DrawText(float y, string text)
         {
             Color textColor = _TimeBar.LineColor;
-            if (_TimeBar.LabelStyle != null)
-                textColor = _TimeBar.LabelStyle.normal.textColor;
-            //textColor.a = 0.4f;
-            GUI.color = textColor;
+
             if (_LabelStyle == null)
             {
-                _LabelStyle = new GUIStyle(_TimeBar.LabelStyle);
-                _LabelStyle.alignment = TextAnchor.MiddleLeft;
+                this._LabelStyle = new GUIStyle();
+                this._LabelStyle.normal.textColor = UnityEditor.EditorStyles.label.normal.textColor;
+                this._LabelStyle.alignment = TextAnchor.MiddleLeft;
+                this._LabelStyle.fontSize = 10;
+
             }
+
+            if (_LabelStyle != null)
+                textColor = _LabelStyle.normal.textColor;
+            //textColor.a = 0.4f;
+            GUI.color = textColor;
 
             Rect ra = RenderArea;
             float half = _PixelRequiredForLabel * 0.5f;

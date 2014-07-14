@@ -4,47 +4,39 @@ using Skill.Framework.Sequence;
 
 namespace Skill.Editor.Sequence
 {
-    public class ColorTrackBar : PropertyTrackBar<Color>
+    public class ColorTrackBar : DiscreteTrackBar<Color>
     {
-        protected override PropertyTrackBar<Color>.PropertyTimeLineEvent CreateNewEvent(IPropertyKey<Color> key) { return new ColorKeyView(this, key); }
+        protected override DiscreteTrackBar<Color>.DiscreteKeyView CreateNewEvent(IPropertyKey<Color> key) { return new ColorKeyView(this, key); }
         protected override IPropertyKey<Color> CreateNewKey() { return new ColorKey(); }
         protected override IPropertyKey<Color>[] CreateKeyArray(int arraySize) { return new ColorKey[arraySize]; }
 
+        private ColorTrack _ColorTrack;
         public ColorTrackBar(ColorTrack track)
             : base(track)
         {
-            this.Height = 20;
+            _ColorTrack = track;
         }
 
-        protected override void EvaluateNewKey(IPropertyKey<Color> newKey, IPropertyKey<Color> previousKey)
-        {
-            if (previousKey != null)
-                newKey.ValueKey = previousKey.ValueKey;
-            else
-                newKey.ValueKey = ((PropertyTrack<Color>)Track).DefaultValue;
-        }
+        protected override bool IsEqual(Color v1, Color v2) { return v1 == v2; }
 
-        class ColorKeyView : PropertyTimeLineEvent
+        class ColorKeyView : DiscreteKeyView
         {
-            public override double Duration { get { return 0.01f; } set { } }
-            public override string Title { get { return "Color Event"; } }
-            public override float MinWidth { get { return 26; } }
-            public override float MaxWidth { get { return MinWidth; } }
+            public override string Title { get { return "Color Key"; } }
 
             private ColorKey _ColorKey;
+
             public ColorKeyView(ColorTrackBar trackbar, IPropertyKey<Color> key)
                 : base(trackbar, key)
             {
                 _ColorKey = (ColorKey)key;
-                DragStyle = new GUIStyle();
             }
-            protected override void Render()
+
+            protected override Color GetIconColor()
             {
-                UnityEditor.EditorGUIUtility.DrawColorSwatch(RenderArea, _ColorKey.Value);
-                base.Render();
+                Color color = _ColorKey.Value;
+                color.a = Mathf.Max(0.2f, color.a);
+                return color;
             }
         }
-
-
     }
 }

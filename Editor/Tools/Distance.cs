@@ -77,7 +77,7 @@ namespace Skill.Editor.Tools
         private Skill.Editor.UI.LabelField _LblDistance;
 
 
-        private Skill.Editor.UI.Button _BtnEnabled;
+        private Skill.Framework.UI.Button _BtnEnabled;
         private Skill.Editor.UI.HelpBox _InfoBox;
         private bool _IsDistanceEnable;
 
@@ -92,7 +92,7 @@ namespace Skill.Editor.Tools
         {
             _LableStyle = new GUIStyle()
             {
-                normal = new GUIStyleState() { textColor = Color.black, background = Resources.Textures.White },
+                normal = new GUIStyleState() { textColor = Color.black, background = Resources.UITextures.White },
                 padding = new RectOffset(2, 2, 2, 2)
             };
 
@@ -150,7 +150,7 @@ namespace Skill.Editor.Tools
             _PnlInfo.Controls.Add(_LblDistance);
 
 
-            _BtnEnabled = new Skill.Editor.UI.Button() { Margin = new Thickness(2), Row = 4, Column = 0 };
+            _BtnEnabled = new Skill.Framework.UI.Button() { Margin = new Thickness(2), Row = 4, Column = 0 };
             _BtnEnabled.Content.text = "Enable";
             _BtnEnabled.Click += new System.EventHandler(_BtnEnabled_Click);
 

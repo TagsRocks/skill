@@ -17,10 +17,10 @@ namespace Skill.Editor.Tools
         {
             private static GUIStyle _ButtonStyle;
 
-            private Skill.Framework.UI.Box _Bg;
+            //private Skill.Framework.UI.Box _Bg;
             private Skill.Framework.UI.Label _LblClipName;
-            private Skill.Editor.UI.Button _BtnAddNext;
-            private Skill.Editor.UI.Button _BtnRemove;
+            private Skill.Framework.UI.Button _BtnAddNext;
+            private Skill.Framework.UI.Button _BtnRemove;
             private bool _RefreshStyles;
 
             private DictionaryEditorWindow _Editor;
@@ -38,8 +38,8 @@ namespace Skill.Editor.Tools
                 this.ColumnDefinitions.Add(18, Skill.Framework.UI.GridUnitType.Pixel);
                 this.ColumnDefinitions.Add(18, Skill.Framework.UI.GridUnitType.Pixel);
 
-                this._Bg = new Skill.Framework.UI.Box() { Column = 0, ColumnSpan = 3 };
-                this.Controls.Add(_Bg);
+                //this._Bg = new Skill.Framework.UI.Box() { Column = 0, ColumnSpan = 3 };
+                //this.Controls.Add(_Bg);
 
                 this._LblClipName = new Skill.Framework.UI.Label() { Column = 0 };
                 UpdateTitle();
@@ -47,11 +47,11 @@ namespace Skill.Editor.Tools
 
                 if (_ButtonStyle == null) _ButtonStyle = new GUIStyle();
 
-                this._BtnAddNext = new Skill.Editor.UI.Button() { Column = 1, Margin = new Skill.Framework.UI.Thickness(1), Style = _ButtonStyle };
+                this._BtnAddNext = new Skill.Framework.UI.Button() { Column = 1, Margin = new Skill.Framework.UI.Thickness(1), Style = _ButtonStyle };
                 this._BtnAddNext.Content.tooltip = "Add next";
                 this.Controls.Add(_BtnAddNext);
 
-                this._BtnRemove = new Skill.Editor.UI.Button() { Column = 2, Margin = new Skill.Framework.UI.Thickness(1), Style = _ButtonStyle };
+                this._BtnRemove = new Skill.Framework.UI.Button() { Column = 2, Margin = new Skill.Framework.UI.Thickness(1), Style = _ButtonStyle };
                 this._BtnRemove.Content.tooltip = "Remove";
                 this.Controls.Add(_BtnRemove);
 
@@ -63,8 +63,8 @@ namespace Skill.Editor.Tools
             {
                 if (_RefreshStyles)
                 {
-                    this._BtnAddNext.Content.image = Skill.Editor.Resources.Textures.PlusNext;
-                    this._BtnRemove.Content.image = Skill.Editor.Resources.Textures.Minus;
+                    this._BtnAddNext.Content.image = Skill.Editor.Resources.UITextures.PlusNext;
+                    this._BtnRemove.Content.image = Skill.Editor.Resources.UITextures.Minus;
                     _RefreshStyles = false;
                 }
                 base.Render();
@@ -233,9 +233,9 @@ namespace Skill.Editor.Tools
         private PasteTextField _TxtName;
         private PasteTextField _TxtValue;
         private PasteTextField _TxtComment;
-        private Skill.Editor.UI.Button _BtnAdd;
-        private Skill.Editor.UI.Button _BtnRemove;
-        private Skill.Editor.UI.Button _BtnSave;
+        private Skill.Framework.UI.Button _BtnAdd;
+        private Skill.Framework.UI.Button _BtnRemove;
+        private Skill.Framework.UI.Button _BtnSave;
 
         private Skill.Framework.UI.Box _NameCaption;
         private Skill.Framework.UI.Box _ValueCaption;
@@ -350,9 +350,9 @@ namespace Skill.Editor.Tools
             _ListBox.AlwayShowVertical = true;
             _ListBox.AutoScroll = true;
 
-            _BtnAdd = new Skill.Editor.UI.Button() { Row = 1, Column = 3, Margin = new Thickness(2) }; _BtnAdd.Content.tooltip = "Add";
-            _BtnRemove = new Skill.Editor.UI.Button() { Row = 2, Column = 3, Margin = new Thickness(2) }; _BtnAdd.Content.tooltip = "remove selected";
-            _BtnSave = new Skill.Editor.UI.Button() { Row = 3, Column = 3, Margin = new Thickness(2, 2, 2, 4), VerticalAlignment = VerticalAlignment.Bottom, Height = 46 }; _BtnSave.Content.tooltip = "Save Changes";
+            _BtnAdd = new Skill.Framework.UI.Button() { Row = 1, Column = 3, Margin = new Thickness(2) }; _BtnAdd.Content.tooltip = "Add";
+            _BtnRemove = new Skill.Framework.UI.Button() { Row = 2, Column = 3, Margin = new Thickness(2) }; _BtnAdd.Content.tooltip = "remove selected";
+            _BtnSave = new Skill.Framework.UI.Button() { Row = 3, Column = 3, Margin = new Thickness(2, 2, 2, 4), VerticalAlignment = VerticalAlignment.Bottom, Height = 46 }; _BtnSave.Content.tooltip = "Save Changes";
 
             viewPanel.Controls.Add(_NameCaption);
             viewPanel.Controls.Add(_ValueCaption);
@@ -398,9 +398,9 @@ namespace Skill.Editor.Tools
         {
             _PanelSplitter.Style = Skill.Editor.Resources.Styles.HorizontalSplitter;
             _ListBox.SelectedStyle = Skill.Editor.Resources.Styles.SelectedItem;
-            _BtnAdd.Content.image = Skill.Editor.Resources.Textures.Add;
-            _BtnRemove.Content.image = Skill.Editor.Resources.Textures.Remove;
-            _BtnSave.Content.image = Skill.Editor.Resources.Textures.Save;
+            _BtnAdd.Content.image = Skill.Editor.Resources.UITextures.Add;
+            _BtnRemove.Content.image = Skill.Editor.Resources.UITextures.Remove;
+            _BtnSave.Content.image = Skill.Editor.Resources.UITextures.Save;
             if (_LblComment.Style == null)
                 _LblComment.Style = new GUIStyle(UnityEditor.EditorGUIUtility.GetBuiltinSkin(UnityEditor.EditorSkin.Inspector).label);
             _LblComment.Style.alignment = TextAnchor.MiddleCenter;

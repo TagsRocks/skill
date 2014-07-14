@@ -201,14 +201,18 @@ namespace Skill.Editor.UI.Extended
                 if (_ScrollPosition != value)
                 {
                     _ScrollPosition = value;
-                    //if (_ScrollPosition.x < 0) _ScrollPosition.x = 0;
-                    //else if (_ScrollPosition.x > _ViewRect.x) _ScrollPosition.x = _ViewRect.x;
-
-                    //if (_ScrollPosition.y < 0) _ScrollPosition.y = 0;
-                    //else if (_ScrollPosition.y > _ViewRect.y) _ScrollPosition.y = _ViewRect.y;
+                    OnScrollPositionChanged();
                 }
             }
         }
+
+        public event EventHandler ScrollPositionChanged;
+        private void OnScrollPositionChanged()
+        {
+            if (ScrollPositionChanged != null) ScrollPositionChanged(this, System.EventArgs.Empty);
+        }
+
+
 
         private float _ScrollbarThickness = 0;
         /// <summary>

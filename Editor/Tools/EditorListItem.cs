@@ -8,8 +8,8 @@ namespace Skill.Editor.Tools
     {
         private Grid _Panel;
         private Label _NameField;
-        private Skill.Editor.UI.Button _BtnRemove;
-        private Skill.Editor.UI.Button _BtnAdd;
+        private Button _BtnRemove;
+        private Button _BtnAdd;
 
         public IEditor Editor { get; private set; }
         public string ObjectName { get { return _NameField.Text; } set { _NameField.Text = value; } }
@@ -31,12 +31,12 @@ namespace Skill.Editor.Tools
             this._NameField = new Label() { Row = 0, Column = 0, Margin = new Thickness(2, 0) };
             this.ObjectName = "Null";
 
-            _BtnAdd = new UI.Button() { Row = 0, Column = 1, Margin = new Thickness(2, 4, 0, 3), Style = Resources.Styles.SmallButton };
-            _BtnAdd.Content.image = Resources.Textures.PlusNext;
+            _BtnAdd = new Button() { Row = 0, Column = 1, Margin = new Thickness(2, 4, 0, 3), Style = Resources.Styles.SmallButton };
+            _BtnAdd.Content.image = Resources.UITextures.PlusNext;
             _BtnAdd.Content.tooltip = "Add next";
 
-            _BtnRemove = new UI.Button() { Row = 0, Column = 2, Margin = new Thickness(1, 4, 2, 3), Style = Resources.Styles.SmallButton };
-            _BtnRemove.Content.image = Resources.Textures.Minus;
+            _BtnRemove = new Framework.UI.Button() { Row = 0, Column = 2, Margin = new Thickness(1, 4, 2, 3), Style = Resources.Styles.SmallButton };
+            _BtnRemove.Content.image = Resources.UITextures.Minus;
             _BtnRemove.Content.tooltip = "Remove this";
 
             this._Panel = new Grid() { Parent = this };

@@ -11,7 +11,7 @@ namespace Skill.Editor.Curve
         {
             public int StartIndex;
             public int Count;
-        }       
+        }
 
         public AnimationCurve Curve { get; private set; }
         public TimeLineCurveView View { get; private set; }
@@ -52,7 +52,7 @@ namespace Skill.Editor.Curve
             {
                 minTime = 0;
                 maxTime = 0;
-            }            
+            }
         }
         public void GetValueBounds(out float minValue, out float maxValue)
         {
@@ -218,12 +218,26 @@ namespace Skill.Editor.Curve
             _Resample = true;
             OnChanged();
         }
-        public void RemoveKey(int index)
+
+        private List<int> _RemovingKeys = new List<int>();
+        public void RegisterForRemove(int index)
         {
-            Curve.RemoveKey(index);
-            RebuildKeys();
-            _Resample = true;
-            OnChanged();
+            _RemovingKeys.Add(index);
+        }
+
+        public void RemoveKeys()
+        {
+            if (_RemovingKeys.Count > 0)
+            {
+                _RemovingKeys.Sort();
+                for (int i = _RemovingKeys.Count - 1; i >= 0; i--)
+                    Curve.RemoveKey(_RemovingKeys[i]);
+                RebuildKeys();
+                _Resample = true;
+                _RemovingKeys.Clear();
+                OnChanged();
+
+            }
         }
 
         public Vector2 GetPoint(float time, float value, bool relative)

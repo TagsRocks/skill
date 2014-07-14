@@ -42,7 +42,7 @@ namespace Skill.Editor.Curve
         }
     }
 
-    class CurvePresetLibrary : WrapPanel
+    class CurvePresetLibrary : UniformGrid
     {
         public CurvePreset Preset { get; private set; }
 
@@ -55,23 +55,28 @@ namespace Skill.Editor.Curve
 
         public CurvePresetLibrary()
         {
+
             CurvePreset[] presets = new CurvePreset[]
         {
             new CurvePreset(GetConstantKeys(1.0f)),
             new CurvePreset(GetLinearKeys()),
-            //new CurvePreset(GetLinearMirrorKeys()),
+            new CurvePreset(GetLinearMirrorKeys()),
             new CurvePreset(GetEaseInKeys()),
-            //new CurvePreset(GetEaseInMirrorKeys()),
+            new CurvePreset(GetEaseInMirrorKeys()),
             new CurvePreset(GetEaseInOutKeys()),
-            //new CurvePreset(GetEaseInOutMirrorKeys()),
+            new CurvePreset(GetEaseInOutMirrorKeys()),
             new CurvePreset(GetEaseOutKeys()),
-            //new CurvePreset(GetEaseOutMirrorKeys()),                        
+            new CurvePreset(GetEaseOutMirrorKeys()),                        
         };
 
-            foreach (var cp in presets)
+            base.Columns = presets.Length;
+            base.Rows = 1;
+
+            for (int i = 0; i < presets.Length; i++)
             {
-                this.Controls.Add(cp);
-                cp.Click += Preset_Click;
+                presets[i].Column = i;
+                this.Controls.Add(presets[i]);
+                presets[i].Click += Preset_Click;
             }
         }
 

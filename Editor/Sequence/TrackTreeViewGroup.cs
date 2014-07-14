@@ -36,7 +36,7 @@ namespace Skill.Editor.Sequence
                 throw new System.ArgumentNullException("Invalid TrackGroup");
             this.Height = 20;
             this.Group = group;
-            Foldout.Content.image = Resources.Textures.Matinee.Folder;
+            Foldout.Content.image = Resources.UITextures.Matinee.Folder;
             Foldout.IsOpen = group.IsOpen;
             Properties = new TrackTreeViewGroupProperties(this);
 
@@ -46,6 +46,7 @@ namespace Skill.Editor.Sequence
         void Foldout_StateChanged(object sender, System.EventArgs e)
         {
             Group.IsOpen = Foldout.IsOpen;
+            MatineeEditorWindow.Instance.InvalidateTimeLineView();
             EditorUtility.SetDirty(Group);
         }
 

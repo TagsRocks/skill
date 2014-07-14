@@ -44,8 +44,8 @@ namespace Skill.Editor.Tools
         private Skill.Editor.UI.TextField _TxtFilter;
 
         private Skill.Framework.UI.StackPanel _ButtonsPanel;
-        private Skill.Editor.UI.Button _BtnSelect;
-        private Skill.Editor.UI.Button _BtnCancel;
+        private Skill.Framework.UI.Button _BtnSelect;
+        private Skill.Framework.UI.Button _BtnCancel;
 
 
         public PickTextWindow()
@@ -73,11 +73,11 @@ namespace Skill.Editor.Tools
             _ButtonsPanel = new Skill.Framework.UI.StackPanel() { Row = 4, Orientation = Skill.Framework.UI.Orientation.Horizontal };
             _Frame.Controls.Add(_ButtonsPanel);
 
-            _BtnSelect = new Skill.Editor.UI.Button() { Width = 100, Margin = new Skill.Framework.UI.Thickness(2), HorizontalAlignment = Skill.Framework.UI.HorizontalAlignment.Left, IsEnabled = false };
+            _BtnSelect = new Skill.Framework.UI.Button() { Width = 100, Margin = new Skill.Framework.UI.Thickness(2), HorizontalAlignment = Skill.Framework.UI.HorizontalAlignment.Left, IsEnabled = false };
             _BtnSelect.Content.text = "Select";
             _ButtonsPanel.Controls.Add(_BtnSelect);
 
-            _BtnCancel = new Skill.Editor.UI.Button() { Width = 100, Margin = new Skill.Framework.UI.Thickness(2), HorizontalAlignment = Skill.Framework.UI.HorizontalAlignment.Left };
+            _BtnCancel = new Skill.Framework.UI.Button() { Width = 100, Margin = new Skill.Framework.UI.Thickness(2), HorizontalAlignment = Skill.Framework.UI.HorizontalAlignment.Left };
             _BtnCancel.Content.text = "Cancel";
             _ButtonsPanel.Controls.Add(_BtnCancel);
 

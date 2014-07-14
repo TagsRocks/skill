@@ -3,6 +3,7 @@ using UnityEditor;
 using System.Collections;
 using Skill.Editor.UI;
 using Skill.Framework;
+using Skill.Framework.UI;
 
 namespace Skill.Editor.Tools
 {
@@ -13,7 +14,8 @@ namespace Skill.Editor.Tools
 
         private Skill.Framework.UI.Frame _Frame;
         private ChangeCheck _ChangeCheck;        
-
+        
+         
         private Button _BtnAdd;
         private Button _BtnRemove;
         private Skill.Framework.UI.ScrollView _PointsScrollView;
@@ -86,8 +88,8 @@ namespace Skill.Editor.Tools
             _ChangeCheck.RowDefinitions.Add(44, Skill.Framework.UI.GridUnitType.Pixel); // _PnlPoperties
             _ChangeCheck.RowDefinitions.Add(94, Skill.Framework.UI.GridUnitType.Pixel); // _PnlTools
 
-            _BtnAdd = new Button() { Row = 0, Column = 0 }; _BtnAdd.Content.text = "Add"; _BtnAdd.Content.tooltip = "Add new point the end of the path."; _BtnAdd.Content.image = Resources.Textures.Plus;
-            _BtnRemove = new Button() { Row = 0, Column = 1 }; _BtnRemove.Content.text = "Remove"; _BtnRemove.Content.tooltip = "Remove selected point."; _BtnRemove.Content.image = Resources.Textures.Minus;
+            _BtnAdd = new Button() { Row = 0, Column = 0 }; _BtnAdd.Content.text = "Add"; _BtnAdd.Content.tooltip = "Add new point the end of the path."; _BtnAdd.Content.image = Resources.UITextures.Plus;
+            _BtnRemove = new Button() { Row = 0, Column = 1 }; _BtnRemove.Content.text = "Remove"; _BtnRemove.Content.tooltip = "Remove selected point."; _BtnRemove.Content.image = Resources.UITextures.Minus;
             _PointsScrollView = new Skill.Framework.UI.ScrollView() { Row = 1, Column = 0, ColumnSpan = 2, AlwayShowVertical = true, Padding = new Skill.Framework.UI.Thickness(0, 2) };
             _GridPoints = new Skill.Framework.UI.SelectionGrid() { XCount = 5 };
             _PointsScrollView.Controls.Add(_GridPoints);

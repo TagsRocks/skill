@@ -29,11 +29,7 @@ namespace Skill.Framework.Sequence
     {
         #region Editor variables
         [HideInInspector]
-        public Color Color = new Color(1, 1, 1, 0.4f);
-        [HideInInspector]
-        public bool Visible = true;
-        [HideInInspector]
-        public int RecordState;
+        public Color Color = new Color(1, 1, 1, 0.2f);        
         [HideInInspector]
         public bool IsEditingCurves;
         #endregion
@@ -97,7 +93,7 @@ namespace Skill.Framework.Sequence
         /// <remarks>
         /// Keys must be sorted
         /// </remarks>    
-        public static int FindMaxIndexBeforeTime(System.Array keys, float time)
+        protected static int FindMaxIndexBeforeTime(System.Array keys, float time)
         {
             int minTimeIndex = 0;
             int maxTimeIndex = keys.Length - 1;

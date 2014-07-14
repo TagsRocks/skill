@@ -16,20 +16,17 @@ namespace Skill.Framework.Sequence
         [ExposeProperty(1, "Value")]
         public bool ExValue { get { return Value; } set { Value = value; } }
 
-
-
-
         public bool ValueKey { get { return this.Value; } set { this.Value = value; } }
         public float FireTime { get { return this.Time; } set { this.Time = value; if (this.Time < 0) this.Time = 0; } }
     }
 
-    public class BooleanTrack : PropertyTrack<bool>
+    public class BooleanTrack : DiscreteTrack<bool>
     {
         [SerializeField]
         [HideInInspector]
         public BooleanKey[] Keys = new BooleanKey[0];
         public override Type PropertyType { get { return typeof(bool); } }
         public override TrackType Type { get { return TrackType.Bool; } }
-        public override IPropertyKey<bool>[] PropertyKeys { get { return Keys; } set { Keys = (BooleanKey[])value; } }       
+        public override IPropertyKey<bool>[] PropertyKeys { get { return Keys; } set { Keys = (BooleanKey[])value; } }        
     }
 }

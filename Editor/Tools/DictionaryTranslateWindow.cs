@@ -145,8 +145,8 @@ namespace Skill.Editor.Tools
         private Skill.Framework.UI.Extended.ListBox _ListBox;
         private Skill.Framework.UI.Panel _PnlItems;
 
-        private Skill.Editor.UI.Button _BtnCopyKeys;
-        private Skill.Editor.UI.Button _BtnSave;
+        private Skill.Framework.UI.Button _BtnCopyKeys;
+        private Skill.Framework.UI.Button _BtnSave;
 
         private Skill.Framework.UI.Box _SourceCaption;
         private Skill.Framework.UI.Box _TranslateCaption;
@@ -183,7 +183,7 @@ namespace Skill.Editor.Tools
             _TranslateField.Label.text = "Translate";
             grid.Controls.Add(_TranslateField);
 
-            _BtnSave = new Skill.Editor.UI.Button() { Row = 0, Column = 1, RowSpan = 2, Margin = new Thickness(2) };
+            _BtnSave = new Skill.Framework.UI.Button() { Row = 0, Column = 1, RowSpan = 2, Margin = new Thickness(2) };
             _BtnSave.Content.tooltip = "Save Changes";
             grid.Controls.Add(_BtnSave);
 
@@ -203,7 +203,7 @@ namespace Skill.Editor.Tools
             Box box = new Box() { Row = 0, Column = 0, RowSpan = 10, ColumnSpan = 10 };
             grid.Controls.Add(box);
 
-            _BtnCopyKeys = new Skill.Editor.UI.Button() { Row = 0, Column = 0, ColumnSpan = 2, Width = 46, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(2) };
+            _BtnCopyKeys = new Skill.Framework.UI.Button() { Row = 0, Column = 0, ColumnSpan = 2, Width = 46, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(2) };
             _BtnCopyKeys.Content.tooltip = "Copy keys to translate dictionary";
 
             _SourceCaption = new Box() { Row = 1, Column = 0 }; _SourceCaption.Content.text = "Source";
@@ -226,9 +226,9 @@ namespace Skill.Editor.Tools
         private void RefreshStyles()
         {
             _ListBox.SelectedStyle = Skill.Editor.Resources.Styles.SelectedItem;
-            _BtnCopyKeys.Content.image = Skill.Editor.Resources.Textures.Remove;
-            _BtnSave.Content.image = Skill.Editor.Resources.Textures.Save;
-            _BtnCopyKeys.Content.image = Skill.Editor.Resources.Textures.ArrowRight;
+            _BtnCopyKeys.Content.image = Skill.Editor.Resources.UITextures.Remove;
+            _BtnSave.Content.image = Skill.Editor.Resources.UITextures.Save;
+            _BtnCopyKeys.Content.image = Skill.Editor.Resources.UITextures.ArrowRight;
             _RefreshStyles = false;
         }
         private void EnableUI()

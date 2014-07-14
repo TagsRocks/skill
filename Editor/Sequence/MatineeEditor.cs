@@ -38,7 +38,7 @@ namespace Skill.Editor.Sequence
             if (_IsPlaying) Stop();
             SaveEditorData();
             Rollback();
-            _CurveTrackTreeView.RemoveAll(false);            
+            _CurveTrackTreeView.RemoveAll(false);
             _Frame = null;
         }
 
@@ -68,18 +68,40 @@ namespace Skill.Editor.Sequence
                     _RefreshStyles = false;
                 }
 
+                if (_InvalidateTimeLineViewCounter-- > 0)
+                    TimeLine.View.Invalidate();
+
                 _Frame.OnGUI();
             }
         }
+        private int _InvalidateTimeLineViewCounter;
+        internal void InvalidateTimeLineView()
+        {
+            _InvalidateTimeLineViewCounter = 2;
+        }
 
 
-
+        private int _AutoKeyCounter;
         void Update()
         {
             if (_Frame != null)
             {
                 _Frame.Update();
                 UpdatePlayback();
+
+                if (IsAutoKey)
+                {
+                    if (EditorWindow.focusedWindow != this)
+                    {
+                        _AutoKeyCounter++;
+                        if (_AutoKeyCounter > 10)
+                        {
+                            _AutoKeyCounter = 0;
+                            foreach (var tb in TrackBars())
+                                tb.AutoKey();
+                        }
+                    }
+                }
             }
 
         }
@@ -91,7 +113,8 @@ namespace Skill.Editor.Sequence
                 if (c is BaseTrackBar)
                 {
                     BaseTrackBar tb = (BaseTrackBar)c;
-                    yield return tb.Track;
+                    if (!tb.Track.IsDestroyed)
+                        yield return tb.Track;
                 }
             }
         }
@@ -102,7 +125,9 @@ namespace Skill.Editor.Sequence
             {
                 if (c is BaseTrackBar)
                 {
-                    yield return (BaseTrackBar)c;
+                    BaseTrackBar tb = (BaseTrackBar)c;
+                    if (!tb.Track.IsDestroyed)
+                        yield return tb;
                 }
             }
         }
@@ -116,6 +141,11 @@ namespace Skill.Editor.Sequence
 
         void OnLostFocus()
         {
+            if (IsAutoKey)
+            {
+                foreach (var tb in TrackBars())
+                    tb.SaveRecordState();
+            }
             SaveEditorData();
         }
 
@@ -158,17 +188,30 @@ namespace Skill.Editor.Sequence
         private EditorFrame _Frame;
         private TimeLine _TimeLine;
         private Curve.CurveEditor _CurveEditor;
-        private TrackTreeView _TracksTreeView;        
+        private TrackTreeView _TracksTreeView;
         private CurveTrackTreeView _CurveTrackTreeView;
         private Skill.Editor.UI.GridSplitter _HSplitter;
         private Grid _MainGrid;
 
         private bool _RefreshStyles;
-        #endregion        
+        #endregion
 
         #region Properties
         internal TimeLine TimeLine { get { return _TimeLine; } }
         internal CurveTrackTreeView CurveTracks { get { return _CurveTrackTreeView; } }
+
+
+        private bool _IsAutoKey;
+        internal bool IsAutoKey
+        {
+            get { return _IsAutoKey; }
+            set
+            {
+                _IsAutoKey = value;
+                if (_BtnAutoKey != null)
+                    _BtnAutoKey.Content.image = IsAutoKey ? Skill.Editor.Resources.UITextures.RecordOn : Skill.Editor.Resources.UITextures.RecordOff;
+            }
+        }
 
         public Matinee Matinee
         {
@@ -196,13 +239,13 @@ namespace Skill.Editor.Sequence
             CreateToolbar();
 
             dockPanel.Controls.Add(_MenuBar); // add menu at top of window
-            dockPanel.Controls.Add(_Toolbar); // add toolbar at top of window under menu            
+            dockPanel.Controls.Add(_ToolbarPanel); // add toolbar at top of window under menu            
 
             // grid for CurveEditor and Timeline
             _MainGrid = new Skill.Framework.UI.Grid();
             _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star), MinHeight = 30 }); // _TimeLine            
             _MainGrid.RowDefinitions.Add(2, Skill.Framework.UI.GridUnitType.Pixel); // splitter
-            _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(300, GridUnitType.Pixel), MinHeight = 100 }); // _CurveEditor
+            _MainGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star), MinHeight = 100 }); // _CurveEditor
 
             _MainGrid.ColumnDefinitions.Add(1, GridUnitType.Star); // _CurveTreeView, _TracksGrid
             _MainGrid.ColumnDefinitions.Add(4, GridUnitType.Pixel); // splitter
@@ -214,7 +257,7 @@ namespace Skill.Editor.Sequence
             _MainGrid.Controls.Add(_CurveEditor);
 
 
-            _CurveTrackTreeView = new CurveTrackTreeView(_CurveEditor) { Row = 2, Column = 0, Margin = new Thickness(0, 2, 0, 0) };
+            _CurveTrackTreeView = new CurveTrackTreeView(_CurveEditor) { Row = 2, Column = 0, Margin = new Thickness(0, 0, 0, 0) };
             _MainGrid.Controls.Add(_CurveTrackTreeView);
 
             _HSplitter = new Skill.Editor.UI.GridSplitter() { Orientation = Orientation.Horizontal, Row = 1, Column = 0, ColumnSpan = 3, Style = Skill.Editor.Resources.Styles.HorizontalSplitter };
@@ -224,7 +267,7 @@ namespace Skill.Editor.Sequence
             _TimeLine.Row = 0;
             _TimeLine.Column = 2;
 
-            _TracksTreeView = new TrackTreeView(this) { Row = 0, Column = 0, Margin = new Thickness(0, 2, 0, 0) };
+            _TracksTreeView = new TrackTreeView(this) { Row = 0, Column = 0, Margin = new Thickness(0, 0, 0, 0) };
             _MainGrid.Controls.Add(_TracksTreeView);
 
             // add splitter between (_TimeLine and _CurveEditor) and (_CurveTreeView, _TracksTreeView and _PropertyGrid)
@@ -240,14 +283,40 @@ namespace Skill.Editor.Sequence
 
             _CurveEditor.TimeLine.TimeBar.SnapTime = 0.001;
             _TimeLine.TimeBar.SnapTime = 0.001;
+
+            _TimeLine.View.VerticalScrollChanged += View_VerticalScrollChanged;
+            _TracksTreeView.TreeView.ScrollPositionChanged += TreeView_ScrollPositionChanged;
         }
+
+
+        #region Scroll handling
+
+        private int _IgnoreScroll;
+        void TreeView_ScrollPositionChanged(object sender, System.EventArgs e)
+        {
+            if (_IgnoreScroll == 1) return;
+            _IgnoreScroll = 1;
+            _TimeLine.View.VerticalScroll = _TracksTreeView.TreeView.ScrollPosition.y;
+            _IgnoreScroll = 0;
+        }
+        void View_VerticalScrollChanged(object sender, System.EventArgs e)
+        {
+            if (_IgnoreScroll == 2) return;
+            _IgnoreScroll = 2;
+            Vector2 scrollPos = _TracksTreeView.TreeView.ScrollPosition;
+            scrollPos.y = _TimeLine.View.VerticalScroll;
+            _TracksTreeView.TreeView.ScrollPosition = scrollPos;
+            _IgnoreScroll = 0;
+        }
+
+        #endregion
 
         #region Edit Curve
 
         private int _IgnorePosition;
         internal void EditCurve(BaseTrackBar trackBar)
         {
-            _CurveTrackTreeView.Add(trackBar, trackBar.FirstKey);
+            _CurveTrackTreeView.Add(trackBar);
         }
 
         private void _TimeLine_TimePositionChanged(object sender, System.EventArgs e)
@@ -274,14 +343,17 @@ namespace Skill.Editor.Sequence
         #region TimeLine
         private void CreateTimeLine()
         {
-            _TimeLine = new TimeLine(new TrackBarView());
+            _TimeLine = new TimeLine(new TrackBarView() { SideView = true });
             _TimeLine.TimePositionChanged += _TimeLine_TimePositionChanged;
         }
         #endregion
 
         #region Toolbar
 
-        private Grid _Toolbar;
+        private Grid _ToolbarPanel;
+        private Box _ToolbarBg;
+        private Grid _PlaybackButtonsPanel;
+        private Skill.Framework.UI.Button _BtnAutoKey;
         private MediaButton _BtnPlay;
         private MediaButton _BtnPause;
         private MediaButton _BtnStepForward;
@@ -293,58 +365,59 @@ namespace Skill.Editor.Sequence
         private Skill.Editor.UI.IntPopup _Fps;
         private Skill.Editor.UI.IntPopup _PlaybackSpeed;
 
-        private Toolbar _LayoutButtons;
-        private ToolbarButton _TBtnTracks;
+        private Toolbar _LayoutButtonsPanel;
+        private ToolbarButton _TBtnDopeSheet;
         private ToolbarButton _TBtnCurves;
-        private ToolbarButton _TBtnTracksAndCurves;
-
 
         private void CreateToolbar()
         {
-            Box bg = new Box() { ColumnSpan = 10 };
-            _Toolbar = new Grid() { Dock = Skill.Framework.UI.Dock.Top, Height = 24 };
-            _Toolbar.ColumnDefinitions.Add(356, GridUnitType.Pixel);
-            _Toolbar.ColumnDefinitions.Add(1, GridUnitType.Star);
-            _Toolbar.ColumnDefinitions.Add(120, GridUnitType.Pixel);
-            _Toolbar.Controls.Add(bg);
-
-            StackPanel toolbarPanel = new StackPanel() { Column = 0, Orientation = Orientation.Horizontal };
-            _Toolbar.Controls.Add(toolbarPanel);
+            _ToolbarBg = new Box() { Column = 0, ColumnSpan = 20 };
+            _ToolbarPanel = new Grid() { Dock = Skill.Framework.UI.Dock.Top, Height = 20, Margin = new Thickness(0, 0, 0, 0) };
+            _ToolbarPanel.ColumnDefinitions.Add(180, GridUnitType.Pixel); // _PlaybackButtonsPanel
+            _ToolbarPanel.ColumnDefinitions.Add(70, GridUnitType.Pixel); // _SnapTime
+            _ToolbarPanel.ColumnDefinitions.Add(60, GridUnitType.Pixel); // _Fps
+            _ToolbarPanel.ColumnDefinitions.Add(60, GridUnitType.Pixel); // _PlaybackSpeed
+            _ToolbarPanel.ColumnDefinitions.Add(1, GridUnitType.Star);
+            _ToolbarPanel.ColumnDefinitions.Add(140, GridUnitType.Pixel); // _LayoutButtonsPanel
+            _ToolbarPanel.Controls.Add(_ToolbarBg);
 
             #region Playback buttons
-            Grid playButtonsPanel = new Grid() { Width = 150, Margin = new Thickness(1, 2, 1, 3) };
+            _PlaybackButtonsPanel = new Grid() { Column = 0 };
             _PlayButtons = new MediaButton[5];
-            for (int i = 0; i < _PlayButtons.Length; i++)
-                playButtonsPanel.ColumnDefinitions.Add(1, GridUnitType.Star);
+            for (int i = 0; i < 6; i++)
+                _PlaybackButtonsPanel.ColumnDefinitions.Add(1, GridUnitType.Star);
 
-            _BtnStepBackward = new MediaButton(Skill.Editor.Resources.Textures.StepBackward, Skill.Editor.Resources.Textures.StepBackwardOn) { Column = 0, TogglePressed = false, IsEnabled = false }; _BtnStepBackward.Content.tooltip = "Step backward";
-            _BtnPlay = new MediaButton(Skill.Editor.Resources.Textures.Play, Skill.Editor.Resources.Textures.PlayOn) { Column = 1, TogglePressed = true }; _BtnPlay.Content.tooltip = "Start preview playback from current position";
-            _BtnPause = new MediaButton(Skill.Editor.Resources.Textures.Pause, Skill.Editor.Resources.Textures.PauseOn) { Column = 2, TogglePressed = true }; _BtnPause.Content.tooltip = "Pause preview playback ";
-            _BtnStepForward = new MediaButton(Skill.Editor.Resources.Textures.StepForward, Skill.Editor.Resources.Textures.StepForwardOn) { Column = 3, TogglePressed = false, IsEnabled = false }; _BtnStepForward.Content.tooltip = "Step forward";
-            _BtnLoop = new MediaButton(Skill.Editor.Resources.Textures.Loop, Skill.Editor.Resources.Textures.LoopOn) { Column = 4, TogglePressed = true }; _BtnLoop.Content.tooltip = "Loop preview playback of loop section";
+            _BtnAutoKey = new Skill.Framework.UI.Button() { Column = 0 }; _BtnAutoKey.Content.tooltip = "Auto key";
+            _BtnPlay = new MediaButton(Skill.Editor.Resources.UITextures.Play, Skill.Editor.Resources.UITextures.PlayOn) { Column = 1, TogglePressed = true }; _BtnPlay.Content.tooltip = "Start preview playback from current position";
+            _BtnPause = new MediaButton(Skill.Editor.Resources.UITextures.Pause, Skill.Editor.Resources.UITextures.PauseOn) { Column = 2, TogglePressed = true }; _BtnPause.Content.tooltip = "Pause preview playback ";
+            _BtnStepForward = new MediaButton(Skill.Editor.Resources.UITextures.StepForward, Skill.Editor.Resources.UITextures.StepForwardOn) { Column = 3, TogglePressed = false, IsEnabled = false }; _BtnStepForward.Content.tooltip = "Step forward";
+            _BtnStepBackward = new MediaButton(Skill.Editor.Resources.UITextures.StepBackward, Skill.Editor.Resources.UITextures.StepBackwardOn) { Column = 4, TogglePressed = false, IsEnabled = false }; _BtnStepBackward.Content.tooltip = "Step backward";
+            _BtnLoop = new MediaButton(Skill.Editor.Resources.UITextures.Loop, Skill.Editor.Resources.UITextures.LoopOn) { Column = 5, TogglePressed = true }; _BtnLoop.Content.tooltip = "Loop preview playback of loop section";
 
-
-
-            _PlayButtons[0] = _BtnStepBackward;
-            _PlayButtons[1] = _BtnPlay;
-            _PlayButtons[2] = _BtnPause;
+            _PlayButtons[0] = _BtnPlay;
+            _PlayButtons[1] = _BtnPause;
+            _PlayButtons[2] = _BtnStepBackward;
             _PlayButtons[3] = _BtnStepForward;
             _PlayButtons[4] = _BtnLoop;
 
+            _PlaybackButtonsPanel.Controls.Add(_BtnAutoKey);
             for (int i = 0; i < _PlayButtons.Length; i++)
-                playButtonsPanel.Controls.Add(_PlayButtons[i]);
+                _PlaybackButtonsPanel.Controls.Add(_PlayButtons[i]);
 
-            toolbarPanel.Controls.Add(playButtonsPanel);
+            _ToolbarPanel.Controls.Add(_PlaybackButtonsPanel);
 
+            _BtnAutoKey.Click += _BtnAutoKey_Click;
             _BtnPlay.Click += _BtnPlay_Click;
             _BtnPause.Click += _BtnPause_Click;
             _BtnLoop.Click += _BtnLoop_Click;
             _BtnStepBackward.Click += _BtnStepBackward_Click;
             _BtnStepForward.Click += _BtnStepForward_Click;
+
+            IsAutoKey = false;
             #endregion
 
             #region SnapTime
-            _SnapTime = new IntPopup() { Margin = new Thickness(1, 4), Width = 70 };
+            _SnapTime = new IntPopup() { Column = 1 };
             _SnapTime.Label.tooltip = "Snap time";
             _SnapTime.Options.Add(new PopupOption(00, "None") { UserData = 0.0 });
             _SnapTime.Options.Add(new PopupOption(01, "1.0") { UserData = 1.0 });
@@ -356,22 +429,13 @@ namespace Skill.Editor.Sequence
             _SnapTime.Options.Add(new PopupOption(07, "0.025") { UserData = 0.025 });
             _SnapTime.Options.Add(new PopupOption(08, "0.020") { UserData = 0.02 });
             _SnapTime.Options.Add(new PopupOption(09, "0.010") { UserData = 0.01 });
-            _SnapTime.Options.Add(new PopupOption(10, "0.0050") { UserData = 0.005 });
-            _SnapTime.Options.Add(new PopupOption(11, "0.0025") { UserData = 0.0025 });
-            _SnapTime.Options.Add(new PopupOption(12, "0.0020") { UserData = 0.002 });
-            _SnapTime.Options.Add(new PopupOption(13, "0.0010") { UserData = 0.001 });
-            _SnapTime.Options.Add(new PopupOption(14, "0.00050") { UserData = 0.0005 });
-            _SnapTime.Options.Add(new PopupOption(15, "0.00025") { UserData = 0.00025 });
-            _SnapTime.Options.Add(new PopupOption(16, "0.00020") { UserData = 0.0002 });
-            _SnapTime.Options.Add(new PopupOption(17, "0.00010") { UserData = 0.0001 });
-
             _SnapTime.SelectedValue = 0;
-            toolbarPanel.Controls.Add(_SnapTime);
+            _ToolbarPanel.Controls.Add(_SnapTime);
             _SnapTime.OptionChanged += _SnapTime_OptionChanged;
             #endregion
 
             #region FPS
-            _Fps = new IntPopup() { Margin = new Thickness(1, 4), Width = 60 };
+            _Fps = new IntPopup() { Column = 2 };
             _Fps.Label.tooltip = "Sets the timeline granularity for visualiization purposes.";
             _Fps.Options.Add(new PopupOption(30, "30 fps"));
             _Fps.Options.Add(new PopupOption(24, "24 fps"));
@@ -379,12 +443,12 @@ namespace Skill.Editor.Sequence
             _Fps.Options.Add(new PopupOption(60, "60 fps"));
 
             _Fps.SelectedValue = 30;
-            toolbarPanel.Controls.Add(_Fps);
+            _ToolbarPanel.Controls.Add(_Fps);
             #endregion
 
             #region PlaybackSpeed
 
-            _PlaybackSpeed = new IntPopup() { Margin = new Thickness(1, 4), Width = 60 };
+            _PlaybackSpeed = new IntPopup() { Column = 3 };
             _PlaybackSpeed.Options.Add(new PopupOption(100, "100%"));
             _PlaybackSpeed.Options.Add(new PopupOption(50, "50%"));
             _PlaybackSpeed.Options.Add(new PopupOption(25, "25%"));
@@ -392,35 +456,33 @@ namespace Skill.Editor.Sequence
             _PlaybackSpeed.Options.Add(new PopupOption(1, "1%"));
 
             _PlaybackSpeed.SelectedValue = 100;
-            toolbarPanel.Controls.Add(_PlaybackSpeed);
+            _ToolbarPanel.Controls.Add(_PlaybackSpeed);
             #endregion
 
-            #region PanelViewButtons
-            _LayoutButtons = new Toolbar() { Column = 2, Margin = new Thickness(2, 2, 2, 2) };
-            _TBtnTracks = new ToolbarButton();
+            #region LayoutButtons
+
+            _LayoutButtonsPanel = new Toolbar() { Column = 5 };
+            _TBtnDopeSheet = new ToolbarButton();
             _TBtnCurves = new ToolbarButton();
-            _TBtnTracksAndCurves = new ToolbarButton();
 
-            _TBtnTracks.Content.text = "T"; _TBtnTracks.Content.tooltip = "Show Tracks";
-            _TBtnCurves.Content.text = "C"; _TBtnCurves.Content.tooltip = "Show Curves";
-            _TBtnTracksAndCurves.Content.text = "T&C"; _TBtnTracksAndCurves.Content.tooltip = "Show Curves and Tracks";
+            _TBtnDopeSheet.Content.text = "Dope Sheet"; _TBtnDopeSheet.Content.tooltip = "Dope Sheet";
+            _TBtnCurves.Content.text = "Curves"; _TBtnCurves.Content.tooltip = "Curves";
 
-            _LayoutButtons.Items.Add(_TBtnTracksAndCurves);
-            _LayoutButtons.Items.Add(_TBtnTracks);
-            _LayoutButtons.Items.Add(_TBtnCurves);
+            _LayoutButtonsPanel.Items.Add(_TBtnDopeSheet);
+            _LayoutButtonsPanel.Items.Add(_TBtnCurves);
+            _LayoutButtonsPanel.SelectedIndex = 0;
 
-            _Toolbar.Controls.Add(_LayoutButtons);
+            _ToolbarPanel.Controls.Add(_LayoutButtonsPanel);
 
-            _TBtnTracks.Selected += LayoutButtons_Selected;
+            _TBtnDopeSheet.Selected += LayoutButtons_Selected;
             _TBtnCurves.Selected += LayoutButtons_Selected;
-            _TBtnTracksAndCurves.Selected += LayoutButtons_Selected;
 
             #endregion
         }
 
         void LayoutButtons_Selected(object sender, System.EventArgs e)
         {
-            SetLayout(_LayoutButtons.SelectedIndex);
+            SetLayout(_LayoutButtonsPanel.SelectedIndex);
         }
 
         private bool _IgnoreLayout;
@@ -433,7 +495,7 @@ namespace Skill.Editor.Sequence
             _IgnoreLayout = true;
             switch (layoutType)
             {
-                case 1: // only tracks
+                case 0: // dope sheets
 
                     _CurveTrackTreeView.Row = 2;
                     _CurveEditor.Row = 2;
@@ -453,7 +515,7 @@ namespace Skill.Editor.Sequence
 
 
                     break;
-                case 2: // only curves
+                default: // curves
 
                     _CurveTrackTreeView.Row = 0;
                     _CurveEditor.Row = 0;
@@ -471,28 +533,11 @@ namespace Skill.Editor.Sequence
                     _TracksTreeView.Visibility = Visibility.Collapsed;
                     _HSplitter.Visibility = Visibility.Collapsed;
 
-                    break;
-                default: // tracks and curves
-
-                    _CurveTrackTreeView.Row = 2;
-                    _CurveEditor.Row = 2;
-                    _TimeLine.Row = 0;
-                    _TracksTreeView.Row = 0;
-
-                    _CurveTrackTreeView.RowSpan = 1;
-                    _CurveEditor.RowSpan = 1;
-                    _TimeLine.RowSpan = 1;
-                    _TracksTreeView.RowSpan = 1;
-
-                    _CurveTrackTreeView.Visibility = Visibility.Visible;
-                    _CurveEditor.Visibility = Visibility.Visible;
-                    _TimeLine.Visibility = Visibility.Visible;
-                    _TracksTreeView.Visibility = Visibility.Visible;
-                    _HSplitter.Visibility = Visibility.Visible;
-
+                    if (_CurveEditor != null)
+                        _CurveEditor.Invalidate();
                     break;
             }
-            _LayoutButtons.SelectedIndex = layoutType;
+            _LayoutButtonsPanel.SelectedIndex = layoutType;
             _IgnoreLayout = false;
         }
 
@@ -529,6 +574,11 @@ namespace Skill.Editor.Sequence
             else
                 Stop();
         }
+        void _BtnAutoKey_Click(object sender, System.EventArgs e)
+        {
+            IsAutoKey = !IsAutoKey;
+        }
+
 
         void _SnapTime_OptionChanged(object sender, System.EventArgs e)
         {
@@ -579,11 +629,19 @@ namespace Skill.Editor.Sequence
         // refresh styles when state changed between editor mode and play mode
         private void RefreshStyles()
         {
-            _BtnStepBackward.SetStyle(Skill.Editor.Resources.Styles.LargeLeftButton);
-            _BtnPlay.SetStyle(Skill.Editor.Resources.Styles.LargeMiddleButton);
-            _BtnPause.SetStyle(Skill.Editor.Resources.Styles.LargeMiddleButton);
-            _BtnStepForward.SetStyle(Skill.Editor.Resources.Styles.LargeMiddleButton);
-            _BtnLoop.SetStyle(Skill.Editor.Resources.Styles.RightButton);
+            _LayoutButtonsPanel.Style = Skill.Editor.Resources.Styles.ToolbarButton;
+            _ToolbarBg.Style = Skill.Editor.Resources.Styles.Toolbar;
+            _BtnAutoKey.Style = Skill.Editor.Resources.Styles.ToolbarButton;
+            _BtnPlay.SetStyle(Skill.Editor.Resources.Styles.ToolbarButton);
+            _BtnPause.SetStyle(Skill.Editor.Resources.Styles.ToolbarButton);
+            _BtnStepBackward.SetStyle(Skill.Editor.Resources.Styles.ToolbarButton);
+            _BtnStepForward.SetStyle(Skill.Editor.Resources.Styles.ToolbarButton);
+            _BtnLoop.SetStyle(Skill.Editor.Resources.Styles.ToolbarButton);
+
+
+            _SnapTime.Style = Skill.Editor.Resources.Styles.ToolbarPopup;
+            _Fps.Style = Skill.Editor.Resources.Styles.ToolbarPopup;
+            _PlaybackSpeed.Style = Skill.Editor.Resources.Styles.ToolbarPopup;
         }
 
         // refresh editor data to to changes happened to matinee outside of MatineeEditor
@@ -618,7 +676,7 @@ namespace Skill.Editor.Sequence
                     _TracksTreeView.Clear();
                     _CurveTrackTreeView.RemoveAll(true);
                     _TimeLine.Clear();
-                    _TimeLine.MaxTime = 1;                    
+                    _TimeLine.MaxTime = 1;
                     InspectorProperties.Select(null);
                 }
                 else
@@ -653,7 +711,7 @@ namespace Skill.Editor.Sequence
         private void LoadLayout()
         {
             _MainGrid.RowDefinitions[0].Height = new GridLength(EditorData.MainGridRow0, GridUnitType.Star); // _TimeLine                            
-            _MainGrid.RowDefinitions[2].Height = new GridLength(EditorData.MainGridRow2, GridUnitType.Pixel); // _CurveEditor
+            _MainGrid.RowDefinitions[2].Height = new GridLength(EditorData.MainGridRow2, GridUnitType.Star); // _CurveEditor
             _MainGrid.ColumnDefinitions[0].Width = new GridLength(EditorData.MainGridColumn0, GridUnitType.Star); // _CurveTreeView, _TracksTreeView and _PropertyGrid                
             _MainGrid.ColumnDefinitions[2].Width = new GridLength(EditorData.MainGridColumn2, GridUnitType.Star); // _TimeLine  and _CurveEditor
 
@@ -684,7 +742,7 @@ namespace Skill.Editor.Sequence
             EditorData.MainGridRow2 = _MainGrid.RowDefinitions[2].Height.Value;
             EditorData.MainGridColumn0 = _MainGrid.ColumnDefinitions[0].Width.Value;
             EditorData.MainGridColumn2 = _MainGrid.ColumnDefinitions[2].Width.Value;
-            EditorData.LayoutType = _LayoutButtons.SelectedIndex;
+            EditorData.LayoutType = _LayoutButtonsPanel.SelectedIndex;
         }
 
 
@@ -755,7 +813,7 @@ namespace Skill.Editor.Sequence
 
 
             public float MainGridRow0 { get { return GetFloat(6, 1.0f); } set { SetFloat(6, value); } }
-            public float MainGridRow2 { get { return GetFloat(7, 300.0f); } set { SetFloat(7, value); } }
+            public float MainGridRow2 { get { return GetFloat(7, 1.0f); } set { SetFloat(7, value); } }
             public float MainGridColumn0 { get { return GetFloat(8, 1.0f); } set { SetFloat(8, value); } }
             public float MainGridColumn2 { get { return GetFloat(9, 2.0f); } set { SetFloat(9, value); } }
             public float LayoutType { get { return GetFloat(10, 0); } set { SetFloat(10, value); } }
@@ -774,7 +832,7 @@ namespace Skill.Editor.Sequence
             public void SetDefaultLayout()
             {
                 _Matinee.EditorData[6] = 1.0f;
-                _Matinee.EditorData[7] = 300.0f;
+                _Matinee.EditorData[7] = 1.0f;
                 _Matinee.EditorData[8] = 1.0f;
                 _Matinee.EditorData[9] = 2.0f;
                 _Matinee.EditorData[10] = 0.0f;
@@ -785,6 +843,7 @@ namespace Skill.Editor.Sequence
         #region Playback
 
         private float _DeltaTime;// delta time since last playback update
+        private float _ContinuousPlayTime; // playback time
         private float _PlayTime; // playback time
         private bool _IsPause; // is playback paused
         private bool _IsPlaying; // is preview playback
@@ -805,6 +864,7 @@ namespace Skill.Editor.Sequence
         private void StepPlaybackForward(float stepTime)
         {
             _DeltaTime += stepTime;
+            _ContinuousPlayTime += stepTime;
             float fpsTime = 1.0f / _Fps.SelectedValue;
             if (_DeltaTime >= fpsTime) // if we reach fpsTime after last step
             {
@@ -824,6 +884,8 @@ namespace Skill.Editor.Sequence
                             _PlayTime = (float)_TimeLine.EndSelection;
                         else
                             Stop();
+
+                        _ContinuousPlayTime = _PlayTime;
                     }
                 }
                 else if (_PlayTime >= _TimeLine.MaxTime)
@@ -837,6 +899,8 @@ namespace Skill.Editor.Sequence
                         _PlayTime = (float)_TimeLine.MaxTime;
                     else
                         Stop();
+
+                    _ContinuousPlayTime = _PlayTime;
                 }
             }
         }
@@ -845,6 +909,7 @@ namespace Skill.Editor.Sequence
         private void StepPlaybackBackward(float stepTime)
         {
             _DeltaTime -= stepTime;
+            _ContinuousPlayTime -= stepTime;
             if (_DeltaTime < 0) // if we reach fpsTime after last step
             {
                 float fpsTime = 1.0f / _Fps.SelectedValue;
@@ -864,6 +929,8 @@ namespace Skill.Editor.Sequence
                             _PlayTime = (float)_TimeLine.StartSelection;
                         else
                             Stop();
+
+                        _ContinuousPlayTime = _PlayTime;
                     }
                 }
                 else if (_PlayTime <= _TimeLine.MinTime)
@@ -877,6 +944,8 @@ namespace Skill.Editor.Sequence
                         _PlayTime = (float)_TimeLine.MinTime;
                     else
                         Stop();
+
+                    _ContinuousPlayTime = _PlayTime;
                 }
             }
         }
@@ -887,6 +956,7 @@ namespace Skill.Editor.Sequence
             {
                 if (_IsPlaying)
                 {
+                    float prePlayTime = _PlayTime;
                     if (!_IsPause)
                         StepPlaybackForward(1.0f / 100.0f); // update called 100 time per second
                     else if (_StepForward == 1)
@@ -894,11 +964,13 @@ namespace Skill.Editor.Sequence
                     else if (_StepForward == -1)
                         StepPlaybackBackward(1.0f / _Fps.SelectedValue); // step backward with fpsTime
                     _StepForward = 0;
-                    Evaluate();
+                    _TimeLine.TimePosition = _ContinuousPlayTime;
+                    if (prePlayTime != _PlayTime)
+                        Evaluate();
                 }
                 else
                 {
-                    _PlayTime = (float)_TimeLine.TimePosition;
+                    _ContinuousPlayTime = _PlayTime = (float)_TimeLine.TimePosition;
                     if (_SeekUpdate) // user changed timeline position and we must force seek to that position
                     {
                         foreach (var tb in TrackBars())
@@ -915,7 +987,6 @@ namespace Skill.Editor.Sequence
 
         private void Evaluate()
         {
-            _TimeLine.TimePosition = _PlayTime;
             foreach (var t in TrackBars())
                 t.Evaluate(_PlayTime);
             Repaint();
@@ -938,7 +1009,7 @@ namespace Skill.Editor.Sequence
                 t.Seek(_PlayTime);
             }
             Repaint();// repaint to force update scene
-
+            _ContinuousPlayTime = _PlayTime;
         }
 
         // play or resume playback
@@ -969,6 +1040,7 @@ namespace Skill.Editor.Sequence
             _BtnPause.IsPressed = false;
 
             _TimeLine.TimeBar.SnapTime = _SnapTimeBeforePlay;// rollback snaptime
+            _CurveEditor.TimeLine.TimeBar.SnapTime = _SnapTimeBeforePlay;// rollback snaptime
             _TimeLine.TimePosition = _TimePositionBeforePlay; // rollback time position
 
             foreach (var t in Tracks()) t.Stop();
@@ -1005,11 +1077,12 @@ namespace Skill.Editor.Sequence
             if (_BtnPlay.IsPlayMode)
                 _SnapTimeBeforePlay = snapTime;
             else
+            {
                 _TimeLine.TimeBar.SnapTime = snapTime;
+                _CurveEditor.TimeLine.TimeBar.SnapTime = snapTime;
+            }
         }
         #endregion
-
-
 
     }
 

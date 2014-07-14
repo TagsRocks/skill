@@ -63,9 +63,9 @@ namespace Skill.Editor.Diagnostics
 
         void CreateGUI()
         {
-            _SuccessStyle = new GUIStyle() { normal = new GUIStyleState() { background = Resources.Textures.Success } };
-            _FailurStyle = new GUIStyle() { normal = new GUIStyleState() { background = Resources.Textures.Failure } };
-            _RunningStyle = new GUIStyle() { normal = new GUIStyleState() { background = Resources.Textures.Running } };
+            _SuccessStyle = new GUIStyle() { normal = new GUIStyleState() { background = Resources.UITextures.Success } };
+            _FailurStyle = new GUIStyle() { normal = new GUIStyleState() { background = Resources.UITextures.Failure } };
+            _RunningStyle = new GUIStyle() { normal = new GUIStyleState() { background = Resources.UITextures.Running } };
 
             _Frame = new EditorFrame("Frame", this);
 
@@ -86,13 +86,13 @@ namespace Skill.Editor.Diagnostics
 
             _ConditionCaption = new Box() { Row = 2, Column = 0 };
             _ConditionCaption.Content.text = "Conditions";
-            _ConditionCaption.Content.image = Resources.Textures.Condition;
+            _ConditionCaption.Content.image = Resources.UITextures.Condition;
             _DecoratorCaption = new Box() { Row = 2, Column = 1 };
             _DecoratorCaption.Content.text = "Decorators";
-            _DecoratorCaption.Content.image = Resources.Textures.Decorator;
+            _DecoratorCaption.Content.image = Resources.UITextures.Decorator;
             _ActionCaption = new Box() { Row = 2, Column = 2 };
             _ActionCaption.Content.text = "Actions";
-            _ActionCaption.Content.image = Resources.Textures.Action;
+            _ActionCaption.Content.image = Resources.UITextures.Action;
 
             _ConditionPanel = new WrapPanel() { Orientation = Orientation.Horizontal };
             _DecoratorPanel = new WrapPanel() { Orientation = Orientation.Horizontal };
@@ -113,13 +113,13 @@ namespace Skill.Editor.Diagnostics
 
             _SuccessState = new Label() { Margin = new Thickness(2, 2, 0, 2), Width = 100 };
             _SuccessState.Content.text = "Success";
-            _SuccessState.Content.image = Resources.Textures.Success;
+            _SuccessState.Content.image = Resources.UITextures.Success;
             _RunningState = new Label() { Margin = new Thickness(2, 2, 0, 2), Width = 100 };
             _RunningState.Content.text = "Running";
-            _RunningState.Content.image = Resources.Textures.Running;
+            _RunningState.Content.image = Resources.UITextures.Running;
             _FailurState = new Label() { Margin = new Thickness(2, 2, 0, 2), Width = 100 };
             _FailurState.Content.text = "Failure";
-            _FailurState.Content.image = Resources.Textures.Failure;
+            _FailurState.Content.image = Resources.UITextures.Failure;
 
             _InfoPanel = new StackPanel() { Row = 4, Column = 0, ColumnSpan = 3, Orientation = Orientation.Horizontal };
             _InfoPanel.Controls.Add(_SuccessState);

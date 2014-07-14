@@ -101,9 +101,9 @@ namespace Skill.Editor.Curve
             _Frame.Grid.ColumnDefinitions.Add(5, Skill.Framework.UI.GridUnitType.Star);  // _CurveEditor        
 
             _PnlLeft = new Skill.Framework.UI.Grid() { Row = 0, Column = 0 };
-            _PnlLeft.RowDefinitions.Add(26, Skill.Framework.UI.GridUnitType.Pixel); // _ObjectField
+            _PnlLeft.RowDefinitions.Add(24, Skill.Framework.UI.GridUnitType.Pixel); // _ObjectField
             _PnlLeft.RowDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star); // _CurveTreeView        
-            _PnlLeft.RowDefinitions.Add(32, Skill.Framework.UI.GridUnitType.Pixel); // _PresetPanel
+            _PnlLeft.RowDefinitions.Add(26, Skill.Framework.UI.GridUnitType.Pixel); // _PresetPanel
 
             _ObjectField = new ObjectField<GameObject>() { Row = 0, Column = 0, VerticalAlignment = Skill.Framework.UI.VerticalAlignment.Center };
             _CurveTreeView = new TreeView() { Row = 1, Column = 0 };

@@ -35,7 +35,7 @@ namespace Skill.Editor.Tools
 
         private Skill.Editor.UI.ChangeCheck _MainPanel;
         private Skill.Framework.UI.Extended.ListBox _ItemsList;
-        private Skill.Editor.UI.Button _BtnAdd;
+        private Skill.Framework.UI.Button _BtnAdd;
         private Skill.Framework.UI.Frame _Frame;
         private CacheObjectField _ObjectField;
         private bool _IsCollectionChanged;
@@ -55,7 +55,7 @@ namespace Skill.Editor.Tools
             _MainPanel.RowDefinitions.Add(1, GridUnitType.Star); // _ItemsList
             _MainPanel.RowDefinitions.Add(_ObjectField.LayoutHeight, GridUnitType.Pixel); // _ObjectField
 
-            _BtnAdd = new Skill.Editor.UI.Button() { Row = 0, Column = 0, Margin = new Thickness(2) };
+            _BtnAdd = new Skill.Framework.UI.Button() { Row = 0, Column = 0, Margin = new Thickness(2) };
             _BtnAdd.Content.text = "Add";
             _BtnAdd.Click += new System.EventHandler(_BtnAdd_Click);
 

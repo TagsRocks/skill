@@ -41,7 +41,6 @@ namespace Skill.Framework.Sequence
 
         public override TrackType Type { get { return TrackType.Event; } }
         protected float CurrecntTime { get; private set; }
-
         public override float Length
         {
             get
@@ -58,7 +57,6 @@ namespace Skill.Framework.Sequence
                 return 0;
             }
         }
-
         private int _Index;
         public override void Evaluate(float time)
         {
@@ -99,7 +97,6 @@ namespace Skill.Framework.Sequence
         {
             if (Events != null && EventKeys.Length > 1)
                 Skill.Framework.MathHelper.QuickSort(EventKeys, new TrackKeyComparer<EventKey>());
-
         }
         public override void Stop() { }
     }

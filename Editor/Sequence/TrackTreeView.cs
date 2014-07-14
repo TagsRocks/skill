@@ -12,20 +12,28 @@ namespace Skill.Editor.Sequence
         private MatineeEditorWindow _Editor;
         private TrackGroupContextMenu _TrackGroupContextMenu;
         private TrackItemContextMenu _TrackItemContextMenu;
+        private Skill.Framework.UI.Grid _Toolbar;
         private Skill.Framework.UI.Label _Title;
+
+        internal TreeView TreeView { get { return _TreeView; } }
+
         internal TrackTreeView(MatineeEditorWindow editor)
         {
             this._Editor = editor;
-            RowDefinitions.Add(18, Skill.Framework.UI.GridUnitType.Pixel);
+            RowDefinitions.Add(25, Skill.Framework.UI.GridUnitType.Pixel);
             RowDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star);
 
+            _Toolbar = new Framework.UI.Grid();
+            _Toolbar.ColumnDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star);
+
             // create header
-            _Title = new Skill.Framework.UI.Label() { Row = 0 };
+            _Title = new Skill.Framework.UI.Label() { Row = 0, Column = 0 };
             _Title.Text = "Tracks";
+            _Toolbar.Controls.Add(_Title);
 
-            Controls.Add(_Title);
+            Controls.Add(_Toolbar);
 
-            _TreeView = new TreeView() { Row = 1, UserData = this, HandleScrollWheel = true };
+            _TreeView = new TreeView() { Row = 1, UserData = this, HandleScrollWheel = true, AlwayShowVertical = true , Padding = new Framework.UI.Thickness(0,0,0,16) };
             _TreeView.DisableFocusable();
             Controls.Add(_TreeView);
 
@@ -42,12 +50,16 @@ namespace Skill.Editor.Sequence
             if (_TreeView.SelectedItem is IProperties)
                 InspectorProperties.Select((IProperties)_TreeView.SelectedItem);
         }
+
+        private bool _RefreshStyle;
         protected override void Render()
         {
-            if (_Title.Style == null)
+            if (!_RefreshStyle)
+            {
                 _Title.Style = Skill.Editor.Resources.Styles.Header;
-            if (_TreeView.Background.Style == null)
                 _TreeView.Background.Style = Skill.Editor.Resources.Styles.BackgroundShadow;
+                _RefreshStyle = true;
+            }
 
             base.Render();
         }
@@ -75,7 +87,7 @@ namespace Skill.Editor.Sequence
             {
                 Transform childT = transform.GetChild(childIndex);
                 TrackGroup group = childT.GetComponent<TrackGroup>();
-                if (group != null)
+                if (group != null && !group.IsDestroyed)
                 {
                     groupList.Add(group);
 
@@ -108,7 +120,7 @@ namespace Skill.Editor.Sequence
 
                 // if group not exist look for track
                 Track track = childT.GetComponent<Track>();
-                if (track != null)
+                if (track != null && !track.IsDestroyed)
                 {
                     trackList.Add(track);
                     TrackTreeViewItem trackItem = null;
@@ -390,32 +402,42 @@ namespace Skill.Editor.Sequence
         class TrackItemContextMenu : Skill.Editor.UI.ContextMenu
         {
             private TrackTreeView _View;
+            private Skill.Editor.UI.MenuItem _DeleteItem;
+            private Skill.Editor.UI.MenuItem _EditCurvesItem;
 
             public TrackItemContextMenu(TrackTreeView view)
             {
                 _View = view;
 
-                Skill.Editor.UI.MenuItem deleteItem = new Skill.Editor.UI.MenuItem("Delete");
-                deleteItem.Click += TrackGroupDelete_Click;
+                _DeleteItem = new Skill.Editor.UI.MenuItem("Delete");
+                _EditCurvesItem = new Skill.Editor.UI.MenuItem("Edit Curves");
 
-                Skill.Editor.UI.MenuItem propertiesItem = new Skill.Editor.UI.MenuItem("Properties");
-                propertiesItem.Click += TrackGroupProperties_Click;
+                Add(_DeleteItem);
+                Add(_EditCurvesItem);
 
-                Add(deleteItem);
-                AddSeparator();
-                Add(propertiesItem);
+                _DeleteItem.Click += _DeleteItem_Click;
+                _EditCurvesItem.Click += _EditCurvesItem_Click;
             }
 
-            private void TrackGroupDelete_Click(object sender, System.EventArgs e)
+            void _EditCurvesItem_Click(object sender, System.EventArgs e)
+            {
+                TrackTreeViewItem track = Owner as TrackTreeViewItem;
+                MatineeEditorWindow.Instance.EditCurve(track.TrackBar);
+            }
+
+            private void _DeleteItem_Click(object sender, System.EventArgs e)
             {
                 TrackTreeViewItem track = Owner as TrackTreeViewItem;
                 _View.DeleteTrack(track);
             }
-            private void TrackGroupProperties_Click(object sender, System.EventArgs e)
+
+            protected override void BeginShow()
             {
                 TrackTreeViewItem track = Owner as TrackTreeViewItem;
-                InspectorProperties.Select(track);
+                _EditCurvesItem.IsVisible = track.TrackBar.IsContinuous;
+                base.BeginShow();
             }
+
         }
         #endregion
     }

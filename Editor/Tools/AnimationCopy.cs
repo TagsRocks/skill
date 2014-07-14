@@ -65,8 +65,8 @@ namespace Skill.Editor.Tools
         private Skill.Framework.UI.ScrollView _DestinationsView;
         private Skill.Editor.UI.ObjectField<UnityEngine.Animation> _SourceAnimation;
 
-        private Skill.Editor.UI.Button _BtnAdd;
-        private Skill.Editor.UI.Button _BtnCopy;
+        private Skill.Framework.UI.Button _BtnAdd;
+        private Skill.Framework.UI.Button _BtnCopy;
 
         private void CreateUI()
         {
@@ -74,11 +74,11 @@ namespace Skill.Editor.Tools
             _SourceAnimation.Label.text = "Source Animation";
             _SourceAnimation.ObjectChanged += new EventHandler(_SourceAnimation_ObjectChanged);
 
-            _BtnCopy = new UI.Button() { Margin = new Skill.Framework.UI.Thickness(4, 0, 4, 2), Row = 0, Column = 1, IsEnabled = false };
+            _BtnCopy = new Framework.UI.Button() { Margin = new Skill.Framework.UI.Thickness(4, 0, 4, 2), Row = 0, Column = 1, IsEnabled = false };
             _BtnCopy.Content.text = "Copy";
             _BtnCopy.Click += new EventHandler(_BtnAssign_Click);
 
-            _BtnAdd = new UI.Button() { Margin = new Skill.Framework.UI.Thickness(4, 6, 4, 2), Row = 1, Column = 1 };
+            _BtnAdd = new Framework.UI.Button() { Margin = new Skill.Framework.UI.Thickness(4, 6, 4, 2), Row = 1, Column = 1 };
             _BtnAdd.Content.text = "Add";
             _BtnAdd.Click += new EventHandler(_BtnAdd_Click);
 

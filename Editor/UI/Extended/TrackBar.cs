@@ -1,10 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Skill.Framework.UI;
+
 namespace Skill.Editor.UI.Extended
 {
+    public interface ITrackBarTreeViewItem
+    {
+        Rect RenderArea { get; }
+        bool IsVisible { get; }
+    }
+
     public class TrackBar : Panel
     {
+
+        public ITrackBarTreeViewItem TreeViewItem { get; set; }
+
         public TrackBar()
         {
             Padding = new Thickness(0, 1);
@@ -28,7 +38,7 @@ namespace Skill.Editor.UI.Extended
                     if (c is TimeLineEvent)
                     {
                         TimeLineEvent tle = (TimeLineEvent)c;
-                        cRect.x = ra.x + ra.width * (float)((tle.FireTime - tw.TimeLine.MinTime) / deltaTime);
+                        cRect.x = ra.x + ra.width * (float)((tle.FireTime - tw.TimeLine.MinTime) / deltaTime) - tle.CenterOffset;
                         cRect.width = Mathf.Min(tle.MaxWidth, Mathf.Max(tle.MinWidth, ra.width * (float)(tle.Duration / deltaTime)));
                     }
                     else
@@ -43,7 +53,7 @@ namespace Skill.Editor.UI.Extended
             }
         }
 
-        public virtual double GetValidTime() { return 1; }
+        public virtual double Length { get { return 1; } }
     }
 
 
@@ -63,6 +73,62 @@ namespace Skill.Editor.UI.Extended
             if (trackBar == null) throw new System.ArgumentNullException("Invalid BaseTrackBar");
             this._TrackBar = trackBar;
             this.WantsMouseEvents = true;
+        }
+
+        public virtual float CenterOffset { get { return 0; } }
+
+        public void CalcCurveRenderArea(ref Rect[] renderAreas, ref Rect[] ranges, params AnimationCurve[] curves)
+        {
+            TimeLine timeLine = FindInParents<TimeLine>();
+            if (timeLine != null)
+            {
+                Rect trackRa = TrackBar.RenderArea;
+                double deltaTime = (timeLine.MaxTime - timeLine.MinTime);
+
+                float minVisibleX = trackRa.x + trackRa.width * (float)((timeLine.StartVisible - timeLine.MinTime) / deltaTime);
+                float maxVisibleX = trackRa.x + trackRa.width * (float)((timeLine.EndVisible - timeLine.MinTime) / deltaTime);
+
+
+                float maxTime = 0;
+                foreach (AnimationCurve curve in curves)
+                {
+                    if (curve != null && curve.length > 1)
+                        maxTime = Mathf.Max(maxTime, curve[curve.length - 1].time);
+                }
+
+                for (int i = 0; i < curves.Length; i++)
+                {
+                    AnimationCurve curve = curves[i];
+                    Rect ra = RenderArea;
+                    if (curve != null && curve.length > 1 && maxTime > 0.01f)
+                    {
+                        ra.x += curve[0].time / maxTime * ra.width;
+                        ra.width = curve[curve.length - 1].time / maxTime * ra.width;
+                    }
+
+                    float xMin = Mathf.Max(ra.xMin, minVisibleX);
+                    float xMax = Mathf.Min(ra.xMax, maxVisibleX);
+                    float delta = xMax - xMin;
+                    Rect range = new Rect(0, 0, 1, 1);
+                    range.xMin = (xMin - ra.xMin) / ra.width;
+                    range.xMax = (xMax - ra.xMin) / ra.width;
+                    ra.xMin = xMin;
+                    ra.xMax = xMax;
+
+                    if (curve != null && curve.length > 1)
+                    {
+                        for (int j = 0; j < curve.length; j++)
+                        {
+                            float value = curve[j].value;
+                            range.yMin = Mathf.Min(range.yMin, value);
+                            range.yMax = Mathf.Max(range.yMax, value);
+                        }
+                    }
+
+                    renderAreas[i] = ra;
+                    ranges[i] = range;
+                }
+            }
         }
     }
 

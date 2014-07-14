@@ -135,7 +135,7 @@ namespace Skill.Editor.Tools
             {
                 private Skill.Editor.UI.FloatField _TimeField;
                 private Skill.Editor.UI.FloatField _DurationField;
-                private Skill.Editor.UI.Button _BtnPickTitle;
+                private Skill.Framework.UI.Button _BtnPickTitle;
                 private Skill.Editor.UI.ToggleButton _TbOverrideStyle;
                 private Skill.Editor.UI.ColorField _ColorField;
                 private Skill.Editor.UI.EnumPopup _FontStyleField;
@@ -149,7 +149,7 @@ namespace Skill.Editor.Tools
                     _Event = se;
 
 
-                    _BtnPickTitle = new Skill.Editor.UI.Button() { Margin = ControlMargin };
+                    _BtnPickTitle = new Skill.Framework.UI.Button() { Margin = ControlMargin };
                     _BtnPickTitle.Content.text = "Select Subtitle";
                     this.Controls.Add(_BtnPickTitle);
 
@@ -295,12 +295,15 @@ namespace Skill.Editor.Tools
                 Invalidate();
             }
 
-            public override double GetValidTime()
+            public override double Length
             {
-                if (_Editor._AudioPreview.Clip != null)
-                    return _Editor._AudioPreview.Clip.length;
-                else
-                    return 1.0f;
+                get
+                {
+                    if (_Editor._AudioPreview.Clip != null)
+                        return _Editor._AudioPreview.Clip.length;
+                    else
+                        return 1.0f;
+                }
             }
         }
 
@@ -430,7 +433,7 @@ namespace Skill.Editor.Tools
         protected override void Render()
         {
             if (_TitleStyle == null)
-                _TitleStyle = UnityEditor.EditorGUIUtility.GetBuiltinSkin(UnityEditor.EditorSkin.Game).label;
+                _TitleStyle = new GUIStyle(UnityEditor.EditorStyles.label);
 
             if (!_Refresh)
             {
@@ -502,11 +505,11 @@ namespace Skill.Editor.Tools
 
         public void RefreshStyles()
         {
-            _ToolbarBg.Style = UnityEditor.EditorStyles.toolbar;
+            _ToolbarBg.Style = Skill.Editor.Resources.Styles.Toolbar;
 
             _BtnPlay.NormalTexture = UnityEditor.EditorGUIUtility.FindTexture("d_preAudioPlayOff");
             _BtnPlay.OnTexture = UnityEditor.EditorGUIUtility.FindTexture("d_preAudioPlayOn");
-            _BtnPlay.SetStyle(UnityEditor.EditorStyles.toolbarButton);
+            _BtnPlay.SetStyle(Skill.Editor.Resources.Styles.ToolbarButton);
         }
 
         private SubtitleEvent CreateEvent(Subtitle title)

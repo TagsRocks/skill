@@ -66,8 +66,11 @@
     <Compile Include="Sequence\BaseTrackBar.cs" />
     <Compile Include="Sequence\BooleanTrackBar.cs" />
     <Compile Include="Sequence\ColorTrackBar.cs" />
+    <Compile Include="Sequence\ContinuousTrackBar.cs" />
     <Compile Include="Sequence\CurveTrackTreeView.cs" />
+    <Compile Include="Sequence\DiscreteTrackBar.cs" />
     <Compile Include="Sequence\EventTrackBar.cs" />
+    <Compile Include="Sequence\KeyView.cs" />
     <Compile Include="Tools\AudioClipSubtitleEditor.cs" />
     <Compile Include="Tools\DictionaryEditor.cs" />
     <Compile Include="Tools\DictionaryEditorWindow.cs" />
@@ -127,7 +130,6 @@
     <Compile Include="Tools\SpawnObjectField.cs" />
     <Compile Include="Tools\TextureBrush.cs" />
     <Compile Include="UI\BoundsField.cs" />
-    <Compile Include="UI\Button.cs" />
     <Compile Include="UI\ChangeCheck.cs" />
     <Compile Include="UI\ColorField.cs" />
     <Compile Include="UI\ContextMenu.cs" />
@@ -173,6 +175,7 @@
     <Compile Include="UI\PrefixLabel.cs" />
     <Compile Include="UI\ProgressBar.cs" />
     <Compile Include="UI\PropertyField.cs" />
+    <Compile Include="UI\Rectangle.cs" />
     <Compile Include="UI\RectField.cs" />
     <Compile Include="UI\SelectableLabel.cs" />
     <Compile Include="UI\Extended\SelectionField.cs" />
@@ -215,169 +218,328 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\UI\Action.png">
+    <Content Include="Resources\LightSkin\Action.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Add.png">
+    <Content Include="Resources\LightSkin\Add.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Arrow_Right.png">
+    <Content Include="Resources\LightSkin\Arrow_Right.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Colors\Black.png">
+    <Content Include="Resources\LightSkin\Colors\Black.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Colors\Blue.png">
+    <Content Include="Resources\LightSkin\Colors\Blue.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Colors\Green.png">
+    <Content Include="Resources\LightSkin\Colors\Green.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Colors\Red.png">
+    <Content Include="Resources\LightSkin\Colors\Red.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Colors\Transparent.png">
+    <Content Include="Resources\LightSkin\Colors\Transparent.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Colors\White.png">
+    <Content Include="Resources\LightSkin\Colors\White.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Colors\Yellow.png">
+    <Content Include="Resources\LightSkin\Colors\Yellow.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Condition.png">
+    <Content Include="Resources\LightSkin\Condition.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Decorator.png">
+    <Content Include="Resources\LightSkin\Decorator.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Failure.png">
+    <Content Include="Resources\LightSkin\Event.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Key.png">
+    <Content Include="Resources\LightSkin\Failure.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Keyframe.png">
+    <Content Include="Resources\LightSkin\Key.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\KeyframeSelected.png">
+    <Content Include="Resources\LightSkin\Keyframe.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Loop.png">
+    <Content Include="Resources\LightSkin\KeyframeEmpty.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\LoopOn.png">
+    <Content Include="Resources\LightSkin\KeyframeSelected.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Matinee\Boolean.png">
+    <Content Include="Resources\LightSkin\Loop.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Matinee\Checkbox_Checked.png">
+    <Content Include="Resources\LightSkin\LoopOn.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Matinee\Checkbox_Unchecked.png">
+    <Content Include="Resources\LightSkin\Matinee\Boolean.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Matinee\Color.png">
+    <Content Include="Resources\LightSkin\Matinee\Color.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Matinee\Event.png">
+    <Content Include="Resources\LightSkin\Matinee\Event.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Matinee\Float.png">
+    <Content Include="Resources\LightSkin\Matinee\Float.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Matinee\Folder.png">
+    <Content Include="Resources\LightSkin\Matinee\Folder.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Matinee\Integer.png">
+    <Content Include="Resources\LightSkin\Matinee\Integer.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Matinee\Keyframe.png">
+    <Content Include="Resources\LightSkin\Matinee\Quaternion.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Matinee\Quaternion.png">
+    <Content Include="Resources\LightSkin\Matinee\Sound.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Paste.png">
+    <Content Include="Resources\LightSkin\Matinee\Vector2.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\RecordOff.png">
+    <Content Include="Resources\LightSkin\Matinee\Vector3.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\RecordOn.png">
+    <Content Include="Resources\LightSkin\Matinee\Vector4.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\SelectedEventBorder.png">
+    <Content Include="Resources\LightSkin\Minus.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Matinee\Sound.png">
+    <Content Include="Resources\LightSkin\Paste.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Matinee\Vector2.png">
+    <Content Include="Resources\LightSkin\Pause.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Matinee\Vector3.png">
+    <Content Include="Resources\LightSkin\PauseOn.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Matinee\Vector4.png">
+    <Content Include="Resources\LightSkin\Play.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Minus.png">
+    <Content Include="Resources\LightSkin\PlayOn.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Pause.png">
+    <Content Include="Resources\LightSkin\Plus.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\PauseOn.png">
+    <Content Include="Resources\LightSkin\PlusNext.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Play.png">
+    <Content Include="Resources\LightSkin\RecordOff.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\PlayOn.png">
+    <Content Include="Resources\LightSkin\RecordOn.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Plus.png">
+    <Content Include="Resources\LightSkin\Remove.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\PlusNext.png">
+    <Content Include="Resources\LightSkin\Running.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Remove.png">
+    <Content Include="Resources\LightSkin\Save.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Running.png">
+    <Content Include="Resources\LightSkin\SelectedEventBorder.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Save.png">
+    <Content Include="Resources\LightSkin\SelectedItemBg.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\SelectedItemBg.png">
+    <Content Include="Resources\LightSkin\SequenceFormat.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\SequenceFormat.png">
+    <Content Include="Resources\LightSkin\StepBackward.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\StepBackward.png">
+    <Content Include="Resources\LightSkin\StepBackwardOn.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\StepBackwardOn.png">
+    <Content Include="Resources\LightSkin\StepForward.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\StepForward.png">
+    <Content Include="Resources\LightSkin\StepForwardOn.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\StepForwardOn.png">
+    <Content Include="Resources\LightSkin\Success.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\Success.png">
+    <Content Include="Resources\LightSkin\TimeFormat.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\TimeFormat.png">
+    <Content Include="Resources\LightSkin\White.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\UI\White.png">
+    <Content Include="Resources\ProSkin\Action.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Add.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Arrow_Right.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Colors\Black.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Colors\Blue.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Colors\Green.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Colors\Red.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Colors\Transparent.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Colors\White.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Colors\Yellow.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Condition.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Decorator.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Event.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Failure.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Key.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Keyframe.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\KeyframeEmpty.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\KeyframeSelected.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Loop.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\LoopOn.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Matinee\Boolean.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Matinee\Color.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Matinee\Event.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Matinee\Float.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Matinee\Folder.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Matinee\Integer.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Matinee\Quaternion.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Paste.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\RecordOff.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\RecordOn.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\SelectedEventBorder.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Matinee\Sound.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Matinee\Vector2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Matinee\Vector3.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Matinee\Vector4.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Minus.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Pause.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\PauseOn.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Play.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\PlayOn.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Plus.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\PlusNext.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Remove.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Running.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Save.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\SelectedItemBg.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\SequenceFormat.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\StepBackward.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\StepBackwardOn.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\StepForward.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\StepForwardOn.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Success.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\TimeFormat.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\White.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

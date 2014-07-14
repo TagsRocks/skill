@@ -25,8 +25,8 @@ namespace Skill.Editor.Tools
 
         private Skill.Editor.UI.EditorFrame _Frame;
         private Skill.Editor.UI.TextField _TxtObjectName;
-        private Skill.Editor.UI.Button _BtnCreate;
-        private Skill.Editor.UI.Button _BtnCancel;
+        private Skill.Framework.UI.Button _BtnCreate;
+        private Skill.Framework.UI.Button _BtnCancel;
 
 
         public void OnGUI()
@@ -64,11 +64,11 @@ namespace Skill.Editor.Tools
             _TxtObjectName = new UI.TextField() { Row = 0, Column = 1, ColumnSpan = 3, Margin = new Framework.UI.Thickness(4) }; _TxtObjectName.Label.text = "Object Name";
             _TxtObjectName.Text = "GameObject";
 
-            _BtnCreate = new UI.Button() { Row = 1, Column = 1, Margin = new Framework.UI.Thickness(4, 0, 4, 4) };
+            _BtnCreate = new Framework.UI.Button() { Row = 1, Column = 1, Margin = new Framework.UI.Thickness(4, 0, 4, 4) };
             _BtnCreate.Content.text = "Create";
             _BtnCreate.Click += _BtnCreate_Click;
 
-            _BtnCancel = new UI.Button() { Row = 1, Column = 3, Margin = new Framework.UI.Thickness(4, 0, 4, 4) };
+            _BtnCancel = new Framework.UI.Button() { Row = 1, Column = 3, Margin = new Framework.UI.Thickness(4, 0, 4, 4) };
             _BtnCancel.Content.text = "Cancel";
             _BtnCancel.Click += _BtnCancel_Click;
 

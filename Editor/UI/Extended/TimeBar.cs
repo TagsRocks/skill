@@ -53,8 +53,6 @@ namespace Skill.Editor.UI.Extended
         /// <summary> Color of lines </summary>
         public Color LineColor { get { return _LineColor; } }
 
-        /// <summary> Time label style </summary>
-        public GUIStyle LabelStyle { get { return _LabelStyle; } }
         /// <summary> style used for a box to show selected time</summary>
         public GUIStyle ThumbStyle { get; set; }
         /// <summary> width of box to show selected time</summary>
@@ -122,19 +120,17 @@ namespace Skill.Editor.UI.Extended
             this.SnapTime = 0;
             this.ShowTimePosition = true;
 
-            this._LabelStyle = new GUIStyle();
-            this._LabelStyle.alignment = TextAnchor.MiddleCenter;
-            this._LabelStyle.normal.textColor = new Color(0.8f, 0.8f, 0.8f, 1.0f);
-            this._LabelStyle.fontSize = 10;
-
             this._SampleText = new GUIContent() { text = "00.000" };
-
-            this._LineColor = this._LabelStyle.normal.textColor;
             this.ThumbWidth = 6.0f;
             this.ShowSelectionTime = true;
-            this.SelectionTimeColor = new Color(1.0f, 0.1f, 0.0f, 0.3f);
+
             this.ThumbColor = new Color(1.0f, 0.0f, 0.0f, 1.0f);
-            this.TimePositionBackColor = new Color(0.9f, 0.9f, 0.9f, 0.8f);
+            this.SelectionTimeColor = new Color(1.0f, 0.1f, 0.0f, 0.3f);
+
+            if (UnityEditor.EditorGUIUtility.isProSkin)
+                this.TimePositionBackColor = new Color(0.9f, 0.9f, 0.9f, 0.8f);
+            else
+                this.TimePositionBackColor = new Color(0.7f, 0.7f, 0.7f, 0.8f);
 
             _ThickLinePoints = new List<Vector2>();
             _ThinLinePoints = new List<Vector2>();
@@ -279,8 +275,25 @@ namespace Skill.Editor.UI.Extended
             }
         }
 
+        private void CreateStyles()
+        {
+            this._LabelStyle = new GUIStyle();
+            this._LabelStyle.normal.textColor = UnityEditor.EditorStyles.label.normal.textColor;
+            this._LabelStyle.alignment = TextAnchor.MiddleCenter;
+            this._LabelStyle.fontSize = 10;
+
+            this._LineColor = this._LabelStyle.normal.textColor;
+            _CreateStyles = true;
+        }
+
+        private bool _CreateStyles;
         protected override void Render()
         {
+            if (!_CreateStyles)
+            {
+                CreateStyles();
+            }
+
             if (this.ThumbStyle == null)
             {
                 this.ThumbStyle = (GUIStyle)"ColorPickerHorizThumb";
@@ -330,7 +343,6 @@ namespace Skill.Editor.UI.Extended
                 {
                     GUI.color = TimePositionBackColor;
                     GUI.DrawTexture(rect, UnityEditor.EditorGUIUtility.whiteTexture, ScaleMode.StretchToFill);
-                    GUI.color = ThumbColor;
                 }
                 string label = string.Empty;
                 if (TimeStyle)
@@ -344,7 +356,11 @@ namespace Skill.Editor.UI.Extended
                 {
                     label = string.Format("{0:F6}", TimeLine.TimePosition);
                 }
+
+                Color pretextColor = _LabelStyle.normal.textColor;
+                _LabelStyle.normal.textColor = ThumbColor;
                 GUI.Label(rect, label, _LabelStyle);
+                _LabelStyle.normal.textColor = pretextColor;
             }
             #endregion
 
@@ -380,6 +396,7 @@ namespace Skill.Editor.UI.Extended
 
             GUI.color = savedColor;
         }
+
         /// <summary>
         /// normalize step to upper round step
         /// </summary>

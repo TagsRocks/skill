@@ -10,7 +10,7 @@ namespace Skill.Editor.Tools
     {
         private static UnityEngine.GUIStyle _ButtonStyle;
         private Skill.Framework.UI.TextField _TextField;
-        private Skill.Editor.UI.Button _BtnPaste;
+        private Skill.Framework.UI.Button _BtnPaste;
 
         public Skill.Framework.UI.TextField TextField { get { return _TextField; } }
 
@@ -25,8 +25,8 @@ namespace Skill.Editor.Tools
             this.RowDefinitions.Add(16, GridUnitType.Pixel);
             this.RowDefinitions.Add(1, GridUnitType.Star);
 
-            _TextField = new  TextField() { Row = 0, RowSpan = 2, Column = 0, Margin = new Thickness(0,0,2,0) };            
-            _BtnPaste = new UI.Button() { Row = 0, Column = 1, Style = _ButtonStyle, Margin = new Thickness(1) };
+            _TextField = new  TextField() { Row = 0, RowSpan = 2, Column = 0, Margin = new Thickness(0,0,2,0) };
+            _BtnPaste = new Framework.UI.Button() { Row = 0, Column = 1, Style = _ButtonStyle, Margin = new Thickness(1) };
             _BtnPaste.Content.tooltip = "Paste from Clipboard";
 
 
@@ -51,7 +51,7 @@ namespace Skill.Editor.Tools
         protected override void Render()
         {
             if (_BtnPaste.Content.image == null)
-                _BtnPaste.Content.image = Skill.Editor.Resources.Textures.Paste;
+                _BtnPaste.Content.image = Skill.Editor.Resources.UITextures.Paste;
             base.Render();
         }
     }

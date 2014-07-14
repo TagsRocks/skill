@@ -58,7 +58,7 @@ namespace Skill.Editor.UI.Extended
         protected override void Render()
         {
             if (Background.Style == null)
-                Background.Style = new GUIStyle(EditorStyles.toolbar);
+                Background.Style = new GUIStyle(Skill.Editor.Resources.Styles.Toolbar);
             Background.OnGUI();
             base.Render();
         }
@@ -183,16 +183,16 @@ namespace Skill.Editor.UI.Extended
             // and we do not have access to EditorStyles right after playmode stopped
             if (this.DefaultStyle == null)
             {
-                this.DefaultStyle = new GUIStyle(EditorStyles.toolbarButton);
+                this.DefaultStyle = new GUIStyle(Skill.Editor.Resources.Styles.ToolbarButton);
             }
             if (this.HoverStyle == null)
             {
-                this.HoverStyle = new GUIStyle(EditorStyles.toolbarButton);
+                this.HoverStyle = new GUIStyle(Skill.Editor.Resources.Styles.ToolbarButton);
                 this.HoverStyle.normal = this.HoverStyle.hover;
             }
             if (this.PressedStyle == null)
             {
-                this.PressedStyle = new GUIStyle(EditorStyles.toolbarButton);
+                this.PressedStyle = new GUIStyle(Skill.Editor.Resources.Styles.ToolbarButton);
                 this.PressedStyle.normal = this.PressedStyle.active;
             }
             if (this.Style == null)

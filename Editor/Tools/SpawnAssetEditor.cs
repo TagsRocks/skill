@@ -36,7 +36,7 @@ namespace Skill.Editor.Tools
         private const float FrameHeight = 290;
 
         private Skill.Framework.UI.Extended.ListBox _ItemsList;
-        private Skill.Editor.UI.Button _BtnAdd;
+        private Skill.Framework.UI.Button _BtnAdd;
         private Skill.Editor.UI.ChangeCheck _MainPanel;
         private Skill.Framework.UI.Frame _Frame;
         private SpawnObjectField _ObjectField;
@@ -55,7 +55,7 @@ namespace Skill.Editor.Tools
             _ItemsList.BackgroundVisible = true;            
             _ItemsList.DisableFocusable();
 
-            _BtnAdd = new Skill.Editor.UI.Button() { Row = 0, Column = 0, Margin = new Thickness(2) };
+            _BtnAdd = new Skill.Framework.UI.Button() { Row = 0, Column = 0, Margin = new Thickness(2) };
             _BtnAdd.Content.text = "Add";
             _BtnAdd.Click += new System.EventHandler(_BtnAdd_Click);
 

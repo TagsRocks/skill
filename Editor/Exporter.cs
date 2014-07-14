@@ -66,8 +66,8 @@ namespace Skill.Editor
         private Skill.Editor.UI.ObjectField<Transform> _RootBone;
         private Skill.Editor.UI.ObjectField<UnityEngine.Animation> _Animations;
 
-        private Skill.Editor.UI.Button _BtnCopySkeleton;
-        private Skill.Editor.UI.Button _BtnCopyAimations;
+        private Skill.Framework.UI.Button _BtnCopySkeleton;
+        private Skill.Framework.UI.Button _BtnCopyAimations;
 
         private void CreateUI()
         {
@@ -79,11 +79,11 @@ namespace Skill.Editor
             _Animations.Label.text = "Animations";
             _Animations.ObjectChanged += new EventHandler(_Animations_ObjectChanged);
 
-            _BtnCopySkeleton = new UI.Button() { Margin = new Skill.Framework.UI.Thickness(4, 2, 4, 2), VerticalAlignment = Skill.Framework.UI.VerticalAlignment.Center, IsEnabled = false, Row = 1, Column = 0 };
+            _BtnCopySkeleton = new Framework.UI.Button() { Margin = new Skill.Framework.UI.Thickness(4, 2, 4, 2), VerticalAlignment = Skill.Framework.UI.VerticalAlignment.Center, IsEnabled = false, Row = 1, Column = 0 };
             _BtnCopySkeleton.Content.text = "Copy Skeleton to Clipboard";
             _BtnCopySkeleton.Click += new EventHandler(_BtnCopySkeleton_Click);
 
-            _BtnCopyAimations = new UI.Button() { Margin = new Skill.Framework.UI.Thickness(4, 2, 4, 2), VerticalAlignment = Skill.Framework.UI.VerticalAlignment.Center, IsEnabled = false, Row = 4, Column = 0 };
+            _BtnCopyAimations = new Framework.UI.Button() { Margin = new Skill.Framework.UI.Thickness(4, 2, 4, 2), VerticalAlignment = Skill.Framework.UI.VerticalAlignment.Center, IsEnabled = false, Row = 4, Column = 0 };
             _BtnCopyAimations.Content.text = "Copy Animations to Clipboard";
             _BtnCopyAimations.Click += new EventHandler(_BtnCopyAimations_Click);
 

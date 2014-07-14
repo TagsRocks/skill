@@ -16,13 +16,11 @@ namespace Skill.Framework.Sequence
         [ExposeProperty(1, "Value")]
         public int ExValue { get { return Value; } set { Value = value; } }
 
-
-
         public int ValueKey { get { return this.Value; } set { this.Value = value; } }
         public float FireTime { get { return this.Time; } set { this.Time = value; if (this.Time < 0)this.Time = 0; } }
     }
 
-    public class IntegerTrack : PropertyTrack<int>
+    public class IntegerTrack : DiscreteTrack<int>
     {
         public override Type PropertyType { get { return typeof(int); } }
         public override TrackType Type { get { return TrackType.Integer; } }

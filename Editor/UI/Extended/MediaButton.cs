@@ -8,7 +8,7 @@ namespace Skill.Editor.UI.Extended
     /// <summary>
     /// a multistate button to use in playback
     /// </summary>
-    public class MediaButton : Button
+    public class MediaButton : Skill.Framework.UI.Button
     {
         private GUIStyle _NormalStyle;
         private GUIStyle _PressedStyle;

@@ -8,7 +8,7 @@ using Skill.Editor.UI.Extended;
 
 namespace Skill.Editor.Sequence
 {
-    public class TrackTreeViewItem : Grid, IProperties
+    public class TrackTreeViewItem : Grid, IProperties, ITrackBarTreeViewItem
     {
         public Track Track { get; private set; }
         public BaseTrackBar TrackBar { get; private set; }
@@ -18,33 +18,48 @@ namespace Skill.Editor.Sequence
         public string Title { get { return string.Format("{0} Track", Track.Type.ToString()); } }
 
         private Box _ContentBox;
-        private Image _ImgColor;
-        public void SetColor(Color color) { Track.Color = _ImgColor.TintColor = color; }
+        private Skill.Editor.UI.Rectangle _Background;
+        public void SetColor(Color color) { Track.Color = _Background.Color = color; }
         public void SetName(string name) { Track.gameObject.name = _ContentBox.Content.text = name; }
 
-        internal void SetVisibleStyle(bool visible)
+        public bool IsVisible
         {
-            this._ContentBox.Style = visible ? Resources.Styles.TreeViewItem : Resources.Styles.HiddenTreeViewItem;
+            get
+            {
+                FolderView fv = Parent as FolderView;
+                while (fv != null)
+                {
+                    if (!fv.Foldout.IsOpen)
+                        return false;
+                    fv = fv.Parent as FolderView;
+                }
+
+                return true;
+            }
         }
 
         internal TrackTreeViewItem(Track track, BaseTrackBar trackBar)
         {
+
             this.Track = track;
             this.TrackBar = trackBar;
-            this.Height = 20;
+            this.TrackBar.TreeViewItem = this;
+            this.Height = TrackBar.Height;
 
             this.ColumnDefinitions.Add(1, GridUnitType.Star);
             this.ColumnDefinitions.Add(14, GridUnitType.Pixel);
 
-            this._ContentBox = new Box() { Column = 0, Style = Resources.Styles.TreeViewItem };
-            this._ImgColor = new Image() { Column = 1, Texture = UnityEditor.EditorGUIUtility.whiteTexture, Scale = ScaleMode.StretchToFill, Margin = new Thickness(0, 3) };
 
+            this._Background = new UI.Rectangle() { Column = 0, ColumnSpan = 20, Margin = new Thickness(0, 2) };
+            this._ContentBox = new Box() { Column = 0 };
+
+            this.Controls.Add(_Background);
             this.Controls.Add(_ContentBox);
-            this.Controls.Add(_ImgColor);
+
 
             this.Properties = CreateProperties();
             this._ContentBox.Content.image = GetIcon();
-            this._ImgColor.TintColor = track.Color;
+            this._Background.Color = track.Color;
             this._ContentBox.Content.text = Track.gameObject.name;
         }
 
@@ -81,25 +96,25 @@ namespace Skill.Editor.Sequence
             switch (Track.Type)
             {
                 case TrackType.Event:
-                    return Resources.Textures.Matinee.Event;
+                    return Resources.UITextures.Matinee.Event;
                 case TrackType.Bool:
-                    return Resources.Textures.Matinee.Boolean;
+                    return Resources.UITextures.Matinee.Boolean;
                 case TrackType.Float:
-                    return Resources.Textures.Matinee.Float;
+                    return Resources.UITextures.Matinee.Float;
                 case TrackType.Integer:
-                    return Resources.Textures.Matinee.Integer;
+                    return Resources.UITextures.Matinee.Integer;
                 case TrackType.Color:
-                    return Resources.Textures.Matinee.Color;
+                    return Resources.UITextures.Matinee.Color;
                 case TrackType.Vector2:
-                    return Resources.Textures.Matinee.Vector2;
+                    return Resources.UITextures.Matinee.Vector2;
                 case TrackType.Vector3:
-                    return Resources.Textures.Matinee.Vector3;
+                    return Resources.UITextures.Matinee.Vector3;
                 case TrackType.Vector4:
-                    return Resources.Textures.Matinee.Vector4;
+                    return Resources.UITextures.Matinee.Vector4;
                 case TrackType.Quaternion:
-                    return Resources.Textures.Matinee.Quaternion;
+                    return Resources.UITextures.Matinee.Quaternion;
                 case TrackType.Sound:
-                    return Resources.Textures.Matinee.Sound;
+                    return Resources.UITextures.Matinee.Sound;
                 default:
                     return null;
             }
@@ -111,7 +126,12 @@ namespace Skill.Editor.Sequence
             TrackBar.Refresh();
         }
 
-
+        protected override void BeginRender()
+        {
+            if (this._ContentBox.Style == null)
+                this._ContentBox.Style = Skill.Editor.Resources.Styles.TreeViewItem;
+            base.BeginRender();
+        }
     }
 
     public class TrackTreeViewItemPropertiesBase : ExposeProperties
@@ -120,7 +140,6 @@ namespace Skill.Editor.Sequence
 
         private Skill.Editor.UI.TextField _TxtName;
         private Skill.Editor.UI.ColorField _CFColor;
-        private Skill.Editor.UI.ToggleButton _TBVisible;
 
         public TrackTreeViewItemPropertiesBase(TrackTreeViewItem item)
             : base(item.Track)
@@ -134,16 +153,12 @@ namespace Skill.Editor.Sequence
             _TxtName.Label.text = "Name";
             _CFColor = new Skill.Editor.UI.ColorField() { Margin = ControlMargin };
             _CFColor.Label.text = "Color";
-            _TBVisible = new Skill.Editor.UI.ToggleButton() { Margin = ControlMargin };
-            _TBVisible.Label.text = "Visible";
 
             Controls.Add(_TxtName);
             Controls.Add(_CFColor);
-            Controls.Add(_TBVisible);
 
             _TxtName.TextChanged += _TxtName_TextChanged;
             _CFColor.ColorChanged += _CFColor_ColorChanged;
-            _TBVisible.Changed += _TBVisible_Changed;
         }
         void _TxtName_TextChanged(object sender, System.EventArgs e)
         {
@@ -159,23 +174,12 @@ namespace Skill.Editor.Sequence
             Item.SetColor(_CFColor.Color);
             SetDirty();
         }
-        void _TBVisible_Changed(object sender, System.EventArgs e)
-        {
-            if (IgnoreChanges) return;
-            Item.Track.Visible = _TBVisible.IsChecked;
-            Item.TrackBar.Visibility = Item.Track.Visible ? Skill.Framework.UI.Visibility.Visible : Skill.Framework.UI.Visibility.Collapsed;
-            Item.SetVisibleStyle(_TBVisible.IsChecked);
-            SetDirty();
-        }
 
         protected override void RefreshData()
         {
             base.RefreshData();
             _TxtName.Text = Item.Track.gameObject.name;
             _CFColor.Color = Item.Track.Color;
-            _TBVisible.IsChecked = Item.Track.Visible;
-            Item.TrackBar.Visibility = Item.Track.Visible ? Skill.Framework.UI.Visibility.Visible : Skill.Framework.UI.Visibility.Collapsed;
-            Item.SetVisibleStyle(_TBVisible.IsChecked);
         }
 
         protected override void SetDirty()

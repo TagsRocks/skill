@@ -70,12 +70,16 @@ namespace Skill.Editor.UI.Extended
             if (_Changed)
                 UpdatePreview();
 
-            if (PreviewBackground)
-                GUI.Box(RenderArea, string.Empty, Skill.Editor.Resources.Styles.PreviewBackground);
-            if (_Data.MinCurve != null)
-            {                
-                Rect ra = RenderArea;
-                EditorGUIUtility.DrawRegionSwatch(ra, _Data.MinCurve, _Data.MaxCurve, Color, BackgroundColor, Ranges);
+            Rect ra = RenderArea;
+            if (ra.width >= 1)
+            {
+                if (PreviewBackground)
+                    GUI.Box(ra, string.Empty, Skill.Editor.Resources.Styles.PreviewBackground);
+                if (_Data.MinCurve != null)
+                {
+
+                    EditorGUIUtility.DrawRegionSwatch(ra, _Data.MinCurve, _Data.MaxCurve, Color, BackgroundColor, Ranges);
+                }
             }
         }
 

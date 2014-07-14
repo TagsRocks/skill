@@ -7,9 +7,12 @@ namespace Skill.Editor
 {
     public static class Resources
     {
-        public static string GetResourcePath(string resourceFileName)
+        public static string GetUIResourcePath(string resourceFileName)
         {
-            return "Assets/Skill/Editor/Resources/" + resourceFileName;
+            if (UnityEditor.EditorGUIUtility.isProSkin)
+                return "Assets/Skill/Editor/Resources/ProSkin/" + resourceFileName;
+            else
+                return "Assets/Skill/Editor/Resources/LightSkin/" + resourceFileName;
         }
         private static void SetTextureImportType(string path, TextureImporterType type)
         {
@@ -17,126 +20,65 @@ namespace Skill.Editor
             textureImporter.textureType = TextureImporterType.GUI;
             AssetDatabase.ImportAsset(path);
         }
-        private static Texture2D LoadTexture2D(string path)
-        {
-            Texture2D result = AssetDatabase.LoadAssetAtPath(GetResourcePath(path), typeof(Texture2D)) as Texture2D;
-            if (result == null)
-                Debug.LogWarning("Can not load " + path);
-            return result;
-        }
-
         public static void ApplyImportSettings()
         {
-            SetTextureImportType(GetResourcePath("UI/Condition.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Action.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Decorator.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Failure.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Success.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Running.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/White.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Plus.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/PlusNext.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Minus.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Condition.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Action.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Decorator.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Failure.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Success.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Running.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("White.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Plus.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("PlusNext.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Minus.png"), TextureImporterType.GUI);
 
-            SetTextureImportType(GetResourcePath("UI/Play.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/PlayOn.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Pause.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/PauseOn.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/StepForward.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/StepForwardOn.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/StepBackward.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/StepBackwardOn.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Loop.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/LoopOn.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Play.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("PlayOn.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Pause.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("PauseOn.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("StepForward.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("StepForwardOn.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("StepBackward.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("StepBackwardOn.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Loop.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("LoopOn.png"), TextureImporterType.GUI);
 
 
-            SetTextureImportType(GetResourcePath("UI/RecordOn.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/RecordOff.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("RecordOn.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("RecordOff.png"), TextureImporterType.GUI);
 
-            SetTextureImportType(GetResourcePath("UI/Add.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Remove.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Save.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Arrow_Right.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/SelectedEventBorder.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Add.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Remove.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Save.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Arrow_Right.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("SelectedEventBorder.png"), TextureImporterType.GUI);
 
-            SetTextureImportType(GetResourcePath("UI/Paste.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Paste.png"), TextureImporterType.GUI);
 
-            SetTextureImportType(GetResourcePath("UI/TimeFormat.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/SequenceFormat.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("TimeFormat.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("SequenceFormat.png"), TextureImporterType.GUI);
+            
+            SetTextureImportType(GetUIResourcePath("Keyframe.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("KeyframeSelected.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("KeyframeEmpty.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Event.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Key.png"), TextureImporterType.GUI);
 
-            SetTextureImportType(GetResourcePath("UI/Keyframe.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/KeyframeSelected.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Key.png"), TextureImporterType.GUI);
-
-            SetTextureImportType(GetResourcePath("UI/Matinee/Folder.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Matinee/Sound.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Matinee/Event.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Matinee/Boolean.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Matinee/Integer.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Matinee/Float.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Matinee/Quaternion.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Matinee/Color.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Matinee/Vector2.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Matinee/Vector3.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Matinee/Vector4.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Matinee/Checkbox_Checked.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetResourcePath("UI/Matinee/Checkbox_Unchecked.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Matinee/Folder.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Matinee/Sound.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Matinee/Event.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Matinee/Boolean.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Matinee/Integer.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Matinee/Float.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Matinee/Quaternion.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Matinee/Color.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Matinee/Vector2.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Matinee/Vector3.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Matinee/Vector4.png"), TextureImporterType.GUI);
         }
 
-        /// <summary>
-        /// Create a texture and fill it with specified color
-        /// </summary>
-        /// <param name="color">Color of texture</param>
-        /// <returns>Texture</returns>
-        /// <param name="size">size of texture</param>
-        /// <returns>Texture</returns>
-        public static Texture2D CreateTexture(Color color, int size)
-        {
-            size = Mathf.Max(size, 1);
-            Texture2D texture = new Texture2D(size, size, TextureFormat.ARGB32, true);
-            FillImage(texture, 0, 0, size, size, color);
-            texture.Apply();
-            return texture;
-        }
-
-        /// <summary>
-        /// Create a texture and fill it with specified color
-        /// </summary>
-        /// <param name="color">Color of texture</param>
-        /// <returns>Texture</returns>
-        /// <param name="size">size of texture</param>
-        /// <param name="border">Border</param>
-        /// <param name="borderColor">Border color</param>
-        /// <returns>Texture</returns>        
-        public static Texture2D CreateTexture(Color color, int size, Skill.Framework.UI.Thickness border, Color borderColor)
-        {
-            size = Mathf.Max(size, 1);
-            Texture2D texture = new Texture2D(size, size, TextureFormat.ARGB32, true);
-            FillImage(texture, 0, 0, size, size, color);
-
-            if (border.Left >= 1) FillImage(texture, 0, 0, size, (int)border.Left, borderColor);
-            if (border.Right >= 1) FillImage(texture, 0, size - (int)border.Right - 1, size, (int)border.Left, borderColor);
-            if (border.Top >= 1) FillImage(texture, 0, 0, (int)border.Top, size, borderColor);
-            if (border.Bottom >= 1) FillImage(texture, size - (int)border.Bottom - 1, 0, (int)border.Bottom, size, borderColor);
-
-            texture.Apply();
-            return texture;
-        }
-
-        private static void FillImage(Texture2D texture, int rowIndex, int columnIndex, int rowCount, int columnCount, Color color)
-        {
-            rowCount += rowIndex;
-            columnCount += columnIndex;
-            for (int i = rowIndex; i < rowCount; i++)
-            {
-                for (int j = columnIndex; j < columnCount; j++)
-                {
-                    texture.SetPixel(i, j, color);
-                }
-            }
-        }
-
-        public static class Textures
+        public static class UITextures
         {
             private static System.Collections.Generic.Dictionary<string, Texture2D> _Textures;
             private static Texture2D GetTexture(string name)
@@ -145,36 +87,41 @@ namespace Skill.Editor
                 Texture2D result = null;
                 if (!_Textures.TryGetValue(name, out result))
                 {
-                    result = LoadTexture2D(name);
+                    result = AssetDatabase.LoadAssetAtPath(GetUIResourcePath(name), typeof(Texture2D)) as Texture2D;
+                    if (result == null)
+                        Debug.LogWarning("Can not load " + name);
+
                     if (result != null)
                         _Textures.Add(name, result);
                 }
                 return result;
             }
 
-            public static Texture2D Condition { get { return GetTexture("UI/Condition.png"); } }
-            public static Texture2D Decorator { get { return GetTexture("UI/Decorator.png"); } }
-            public static Texture2D Action { get { return GetTexture("UI/Action.png"); } }
-            public static Texture2D Failure { get { return GetTexture("UI/Failure.png"); } }
-            public static Texture2D Success { get { return GetTexture("UI/Success.png"); } }
-            public static Texture2D Running { get { return GetTexture("UI/Running.png"); } }
-            public static Texture2D Plus { get { return GetTexture("UI/Plus.png"); } }
-            public static Texture2D PlusNext { get { return GetTexture("UI/PlusNext.png"); } }
-            public static Texture2D Minus { get { return GetTexture("UI/Minus.png"); } }
-            public static Texture2D SelectedEventBorder { get { return GetTexture("UI/SelectedEventBorder.png"); } }
-            public static Texture2D Add { get { return GetTexture("UI/Add.png"); } }
-            public static Texture2D Remove { get { return GetTexture("UI/Remove.png"); } }
-            public static Texture2D Save { get { return GetTexture("UI/Save.png"); } }
-            public static Texture2D ArrowRight { get { return GetTexture("UI/Arrow_Right.png"); } }
-            public static Texture2D Paste { get { return GetTexture("UI/Paste.png"); } }
+            public static Texture2D Condition { get { return GetTexture("Condition.png"); } }
+            public static Texture2D Decorator { get { return GetTexture("Decorator.png"); } }
+            public static Texture2D Action { get { return GetTexture("Action.png"); } }
+            public static Texture2D Failure { get { return GetTexture("Failure.png"); } }
+            public static Texture2D Success { get { return GetTexture("Success.png"); } }
+            public static Texture2D Running { get { return GetTexture("Running.png"); } }
+            public static Texture2D Plus { get { return GetTexture("Plus.png"); } }
+            public static Texture2D PlusNext { get { return GetTexture("PlusNext.png"); } }
+            public static Texture2D Minus { get { return GetTexture("Minus.png"); } }
+            public static Texture2D SelectedEventBorder { get { return GetTexture("SelectedEventBorder.png"); } }
+            public static Texture2D Add { get { return GetTexture("Add.png"); } }
+            public static Texture2D Remove { get { return GetTexture("Remove.png"); } }
+            public static Texture2D Save { get { return GetTexture("Save.png"); } }
+            public static Texture2D ArrowRight { get { return GetTexture("Arrow_Right.png"); } }
+            public static Texture2D Paste { get { return GetTexture("Paste.png"); } }
 
-            public static Texture2D TimeFormat { get { return GetTexture("UI/TimeFormat.png"); } }
-            public static Texture2D SequenceFormat { get { return GetTexture("UI/SequenceFormat.png"); } }
+            public static Texture2D TimeFormat { get { return GetTexture("TimeFormat.png"); } }
+            public static Texture2D SequenceFormat { get { return GetTexture("SequenceFormat.png"); } }
+            
+            public static Texture2D Keyframe { get { return GetTexture("Keyframe.png"); } }
+            public static Texture2D KeyframeSelected { get { return GetTexture("KeyframeSelected.png"); } }
+            public static Texture2D KeyframeEmpty { get { return GetTexture("KeyframeEmpty.png"); } }
+            public static Texture2D Event { get { return GetTexture("Event.png"); } }
 
-            public static Texture2D Keyframe { get { return GetTexture("UI/Keyframe.png"); } }
-            public static Texture2D KeyframeSelected { get { return GetTexture("UI/KeyframeSelected.png"); } }
-
-            public static Texture2D Key { get { return GetTexture("UI/Key.png"); } }
+            public static Texture2D Key { get { return GetTexture("Key.png"); } }
 
             #region Color Textures
             private static Texture2D _Red;
@@ -262,7 +209,12 @@ namespace Skill.Editor
                 {
                     if (_HorizontalSplitter == null)
                     {
-                        _HorizontalSplitter = Skill.Editor.Resources.CreateTexture(new Color(0.129f, 0.129f, 0.129f, 1.0f), 2);
+                        float f;
+                        if (UnityEditor.EditorGUIUtility.isProSkin)
+                            f = 0.129f;
+                        else
+                            f = 0.629f;
+                        _HorizontalSplitter = Skill.Editor.Resources.CreateTexture(new Color(f, f, f, 1.0f), 2);
                     }
                     return _HorizontalSplitter;
                 }
@@ -275,7 +227,12 @@ namespace Skill.Editor
                 {
                     if (_VerticalSplitter == null)
                     {
-                        _VerticalSplitter = Skill.Editor.Resources.CreateTexture(new Color(0.129f, 0.129f, 0.129f, 1.0f), 2);
+                        float f;
+                        if (UnityEditor.EditorGUIUtility.isProSkin)
+                            f = 0.129f;
+                        else
+                            f = 0.629f;
+                        _VerticalSplitter = Skill.Editor.Resources.CreateTexture(new Color(f, f, f, 1.0f), 2);
                     }
                     return _VerticalSplitter;
                 }
@@ -284,37 +241,35 @@ namespace Skill.Editor
 
             #region Media buttons
 
-            public static Texture2D RecordOn { get { return GetTexture("UI/RecordOn.png"); } }
-            public static Texture2D RecordOff { get { return GetTexture("UI/RecordOff.png"); } }            
+            public static Texture2D RecordOn { get { return GetTexture("RecordOn.png"); } }
+            public static Texture2D RecordOff { get { return GetTexture("RecordOff.png"); } }
 
-            public static Texture2D Play { get { return GetTexture("UI/Play.png"); } }
-            public static Texture2D PlayOn { get { return GetTexture("UI/PlayOn.png"); } }
-            public static Texture2D Pause { get { return GetTexture("UI/Pause.png"); } }
-            public static Texture2D PauseOn { get { return GetTexture("UI/PauseOn.png"); } }
-            public static Texture2D StepForward { get { return GetTexture("UI/StepForward.png"); } }
-            public static Texture2D StepForwardOn { get { return GetTexture("UI/StepForwardOn.png"); } }
-            public static Texture2D StepBackward { get { return GetTexture("UI/StepBackward.png"); } }
-            public static Texture2D StepBackwardOn { get { return GetTexture("UI/StepBackwardOn.png"); } }
-            public static Texture2D Loop { get { return GetTexture("UI/Loop.png"); } }
-            public static Texture2D LoopOn { get { return GetTexture("UI/LoopOn.png"); } }
+            public static Texture2D Play { get { return GetTexture("Play.png"); } }
+            public static Texture2D PlayOn { get { return GetTexture("PlayOn.png"); } }
+            public static Texture2D Pause { get { return GetTexture("Pause.png"); } }
+            public static Texture2D PauseOn { get { return GetTexture("PauseOn.png"); } }
+            public static Texture2D StepForward { get { return GetTexture("StepForward.png"); } }
+            public static Texture2D StepForwardOn { get { return GetTexture("StepForwardOn.png"); } }
+            public static Texture2D StepBackward { get { return GetTexture("StepBackward.png"); } }
+            public static Texture2D StepBackwardOn { get { return GetTexture("StepBackwardOn.png"); } }
+            public static Texture2D Loop { get { return GetTexture("Loop.png"); } }
+            public static Texture2D LoopOn { get { return GetTexture("LoopOn.png"); } }
             #endregion
 
             #region Matinee
             public static class Matinee
             {
-                public static Texture2D Folder { get { return GetTexture("UI/Matinee/Folder.png"); } }
-                public static Texture2D Sound { get { return GetTexture("UI/Matinee/Sound.png"); } }
-                public static Texture2D Event { get { return GetTexture("UI/Matinee/Event.png"); } }
-                public static Texture2D Boolean { get { return GetTexture("UI/Matinee/Boolean.png"); } }
-                public static Texture2D Integer { get { return GetTexture("UI/Matinee/Integer.png"); } }
-                public static Texture2D Float { get { return GetTexture("UI/Matinee/Float.png"); } }
-                public static Texture2D Quaternion { get { return GetTexture("UI/Matinee/Quaternion.png"); } }
-                public static Texture2D Color { get { return GetTexture("UI/Matinee/Color.png"); } }
-                public static Texture2D Vector2 { get { return GetTexture("UI/Matinee/Vector2.png"); } }
-                public static Texture2D Vector3 { get { return GetTexture("UI/Matinee/Vector3.png"); } }
-                public static Texture2D Vector4 { get { return GetTexture("UI/Matinee/Vector4.png"); } }
-                public static Texture2D Checkbox_Checked { get { return GetTexture("UI/Matinee/Checkbox_Checked.png"); } }
-                public static Texture2D Checkbox_Unchecked { get { return GetTexture("UI/Matinee/Checkbox_Unchecked.png"); } }
+                public static Texture2D Folder { get { return GetTexture("Matinee/Folder.png"); } }
+                public static Texture2D Sound { get { return GetTexture("Matinee/Sound.png"); } }
+                public static Texture2D Event { get { return GetTexture("Matinee/Event.png"); } }
+                public static Texture2D Boolean { get { return GetTexture("Matinee/Boolean.png"); } }
+                public static Texture2D Integer { get { return GetTexture("Matinee/Integer.png"); } }
+                public static Texture2D Float { get { return GetTexture("Matinee/Float.png"); } }
+                public static Texture2D Quaternion { get { return GetTexture("Matinee/Quaternion.png"); } }
+                public static Texture2D Color { get { return GetTexture("Matinee/Color.png"); } }
+                public static Texture2D Vector2 { get { return GetTexture("Matinee/Vector2.png"); } }
+                public static Texture2D Vector3 { get { return GetTexture("Matinee/Vector3.png"); } }
+                public static Texture2D Vector4 { get { return GetTexture("Matinee/Vector4.png"); } }
             }
             #endregion
 
@@ -357,7 +312,7 @@ namespace Skill.Editor
                     if (_HSplitter == null)
                     {
                         _HSplitter = new GUIStyle();
-                        _HSplitter.normal.background = Textures.HorizontalSplitter;
+                        _HSplitter.normal.background = UITextures.HorizontalSplitter;
                         _HSplitter.border = new RectOffset(0, 0, 1, 1);
                     }
                     return _HSplitter;
@@ -372,7 +327,7 @@ namespace Skill.Editor
                     if (_VSplitter == null)
                     {
                         _VSplitter = new GUIStyle();
-                        _VSplitter.normal.background = Textures.VerticalSplitter;
+                        _VSplitter.normal.background = UITextures.VerticalSplitter;
                         _VSplitter.border = new RectOffset(1, 1, 0, 0);
                     }
                     return _VSplitter;
@@ -386,8 +341,9 @@ namespace Skill.Editor
                 {
                     if (_Header == null)
                     {
-                        _Header = UnityEditor.EditorStyles.toolbar;
-                        _Header.normal.textColor = Color.white;
+                        _Header = new GUIStyle(UnityEditor.EditorStyles.toolbar);
+                        _Header.normal.textColor = UnityEditor.EditorStyles.label.normal.textColor;
+                        _Header.fixedHeight = 0;
                         _Header.alignment = TextAnchor.MiddleLeft;
 
                     }
@@ -395,6 +351,49 @@ namespace Skill.Editor
                 }
             }
 
+
+            private static GUIStyle _Toolbar;
+            public static GUIStyle Toolbar
+            {
+                get
+                {
+                    if (_Toolbar == null)
+                    {
+                        _Toolbar = new GUIStyle(UnityEditor.EditorStyles.toolbar);
+                        _Toolbar.fixedHeight = 0;
+                    }
+                    return _Toolbar;
+                }
+            }
+
+            private static GUIStyle _ToolbarButton;
+            public static GUIStyle ToolbarButton
+            {
+                get
+                {
+                    if (_ToolbarButton == null)
+                    {
+                        _ToolbarButton = new GUIStyle(UnityEditor.EditorStyles.toolbarButton);
+                        _ToolbarButton.fixedHeight = 0;
+                    }
+                    return _ToolbarButton;
+                }
+            }
+
+
+            private static GUIStyle _ToolbarPopup;
+            public static GUIStyle ToolbarPopup
+            {
+                get
+                {
+                    if (_ToolbarPopup == null)
+                    {
+                        _ToolbarPopup = new GUIStyle(UnityEditor.EditorStyles.toolbarPopup);
+                        _ToolbarPopup.fixedHeight = 0;
+                    }
+                    return _ToolbarPopup;
+                }
+            }
 
             private static GUIStyle _BackgroundShadow;
             public static GUIStyle BackgroundShadow
@@ -509,11 +508,10 @@ namespace Skill.Editor
                 {
                     if (_TreeViewItem == null)
                     {
-                        _TreeViewItem = new GUIStyle();
+                        _TreeViewItem = new GUIStyle(EditorStyles.label);
                         _TreeViewItem.imagePosition = ImagePosition.ImageLeft;
                         _TreeViewItem.alignment = TextAnchor.MiddleLeft;
                         _TreeViewItem.padding = new RectOffset(2, 2, 2, 2);
-                        _TreeViewItem.normal.textColor = Color.white;
                     }
                     return _TreeViewItem;
                 }
@@ -527,7 +525,9 @@ namespace Skill.Editor
                     if (_HiddenTreeViewItem == null)
                     {
                         _HiddenTreeViewItem = new GUIStyle(TreeViewItem);
-                        _HiddenTreeViewItem.normal.textColor = Color.gray;
+                        Color color = _HiddenTreeViewItem.normal.textColor;
+                        color.a -= 0.2f;
+                        _HiddenTreeViewItem.normal.textColor = color;
                     }
                     return _HiddenTreeViewItem;
                 }
@@ -559,7 +559,7 @@ namespace Skill.Editor
                     if (_SelectedEventBorder == null)
                     {
                         _SelectedEventBorder = new GUIStyle();
-                        _SelectedEventBorder.normal.background = Textures.SelectedEventBorder;
+                        _SelectedEventBorder.normal.background = UITextures.SelectedEventBorder;
                         _SelectedEventBorder.border = new RectOffset(2, 2, 2, 2);
                         _SelectedEventBorder.overflow = new RectOffset(1, 1, 1, 1);
 
@@ -567,8 +567,93 @@ namespace Skill.Editor
                     return _SelectedEventBorder;
                 }
             }
+
+            private static GUIStyle _MiniToolbarButton;
+            public static GUIStyle MiniToolbarButton
+            {
+                get
+                {
+                    if (_MiniToolbarButton == null)
+                        _MiniToolbarButton = (GUIStyle)"MiniToolbarButton";
+                    return _MiniToolbarButton;
+                }
+            }
+
+            private static GUIStyle _MiniToolbarButtonLeft;
+            public static GUIStyle MiniToolbarButtonLeft
+            {
+                get
+                {
+                    if (_MiniToolbarButtonLeft == null)
+                        _MiniToolbarButtonLeft = (GUIStyle)"MiniToolbarButtonLeft";
+                    return _MiniToolbarButtonLeft;
+                }
+            }
+
+            private static GUIStyle _MiniToolbarPopup;
+            public static GUIStyle MiniToolbarPopup
+            {
+                get
+                {
+                    if (_MiniToolbarPopup == null)
+                        _MiniToolbarPopup = (GUIStyle)"MiniToolbarPopup";
+                    return _MiniToolbarPopup;
+                }
+            }
         }
 
+        #region Helper methods
+        /// <summary>
+        /// Create a texture and fill it with specified color
+        /// </summary>
+        /// <param name="color">Color of texture</param>
+        /// <returns>Texture</returns>
+        /// <param name="size">size of texture</param>
+        /// <returns>Texture</returns>
+        public static Texture2D CreateTexture(Color color, int size)
+        {
+            size = Mathf.Max(size, 1);
+            Texture2D texture = new Texture2D(size, size, TextureFormat.ARGB32, true);
+            FillImage(texture, 0, 0, size, size, color);
+            texture.Apply();
+            return texture;
+        }
+
+        /// <summary>
+        /// Create a texture and fill it with specified color
+        /// </summary>
+        /// <param name="color">Color of texture</param>
+        /// <returns>Texture</returns>
+        /// <param name="size">size of texture</param>
+        /// <param name="border">Border</param>
+        /// <param name="borderColor">Border color</param>
+        /// <returns>Texture</returns>        
+        public static Texture2D CreateTexture(Color color, int size, Skill.Framework.UI.Thickness border, Color borderColor)
+        {
+            size = Mathf.Max(size, 1);
+            Texture2D texture = new Texture2D(size, size, TextureFormat.ARGB32, true);
+            FillImage(texture, 0, 0, size, size, color);
+
+            if (border.Left >= 1) FillImage(texture, 0, 0, size, (int)border.Left, borderColor);
+            if (border.Right >= 1) FillImage(texture, 0, size - (int)border.Right - 1, size, (int)border.Left, borderColor);
+            if (border.Top >= 1) FillImage(texture, 0, 0, (int)border.Top, size, borderColor);
+            if (border.Bottom >= 1) FillImage(texture, size - (int)border.Bottom - 1, 0, (int)border.Bottom, size, borderColor);
+
+            texture.Apply();
+            return texture;
+        }
+        private static void FillImage(Texture2D texture, int rowIndex, int columnIndex, int rowCount, int columnCount, Color color)
+        {
+            rowCount += rowIndex;
+            columnCount += columnIndex;
+            for (int i = rowIndex; i < rowCount; i++)
+            {
+                for (int j = columnIndex; j < columnCount; j++)
+                {
+                    texture.SetPixel(i, j, color);
+                }
+            }
+        }
         public static Texture2D FlipHorizontalFrom(Texture2D texture)
         {
             Texture2D result = new Texture2D(texture.width, texture.height, texture.format, false);
@@ -588,7 +673,6 @@ namespace Skill.Editor
             result.Apply();
             return result;
         }
-
         public static void SaveTexture(Texture2D texture, string address)
         {
             byte[] bytes = texture.EncodeToPNG();
@@ -599,5 +683,6 @@ namespace Skill.Editor
             w.Close();
             fs.Close();
         }
+        #endregion
     }
 }

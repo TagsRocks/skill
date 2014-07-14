@@ -5,231 +5,206 @@ using Skill.Editor.UI.Extended;
 
 namespace Skill.Editor.Sequence
 {
-    public class FloatTrackBar : PropertyTrackBar<float>
+    public class FloatTrackBar : ContinuousTrackBar<float>
     {
-        protected override PropertyTrackBar<float>.PropertyTimeLineEvent CreateNewEvent(IPropertyKey<float> key) { return new FloatKeyView(this, key); }
-        protected override IPropertyKey<float> CreateNewKey() { return new FloatKey(); }
-        protected override IPropertyKey<float>[] CreateKeyArray(int arraySize) { return new FloatKey[arraySize]; }
+        public override int CurveCount { get { return 1; } }
+        public override AnimationCurve GetCurve(int index) { return _FloatTrack.Curve; }
 
+        private FloatTrack _FloatTrack;
         public FloatTrackBar(FloatTrack track)
             : base(track)
         {
-            this.Height = 40;
+            this._FloatTrack = track;
+            CheckCurves();
+            Refresh();
         }
 
-        protected override void EvaluateNewKey(IPropertyKey<float> newKey, IPropertyKey<float> previousKey)
+        public override void UpdateDefaultValue(float defaultValue)
         {
-            if (previousKey != null)
-                newKey.ValueKey = previousKey.ValueKey;
+            base.UpdateDefaultValue(defaultValue);
+            CheckCurves();
+            ValidateCurve(_FloatTrack.Curve, defaultValue);
+        }
+
+        private void CheckCurves()
+        {
+            if (_FloatTrack.Curve == null) _FloatTrack.Curve = new AnimationCurve();
+        }
+
+
+        protected override void AddCurveKey(KeyType keyType, float time)
+        {
+            float sceneValue = 0;
+            object v = _FloatTrack.GetValue();
+            if (v != null)
+            {
+                sceneValue = (float)v;
+            }
             else
-                newKey.ValueKey = ((PropertyTrack<float>)Track).DefaultValue;
-
-            FloatKey newfKey = (FloatKey)newKey;
-            if (previousKey != null)
             {
-
-                FloatKey prefKey = (FloatKey)previousKey;
-                newfKey.Curve = CreateNextCurve(prefKey.Curve, ((FloatTrack)Track).DefaultValue);
-            }
-            else
-            {
-                newfKey.Curve = CreateNextCurve(new Keyframe() { value = newKey.ValueKey });
+                sceneValue = _FloatTrack.Curve.Evaluate(time);
             }
 
+            if ((keyType & Sequence.KeyType.X) == KeyType.X)
+                AddKeyToCurve(_FloatTrack.Curve, time, sceneValue);
         }
 
-        protected override bool IsCurve { get { return true; } }
-
-        internal override void AddKey(RecordState record)
+        protected override KeyType GetEquality(float v1, float v2)
         {
-            if (record == RecordState.X)
-            {
-                TimeLine timeLine = FindInParents<TimeLine>();
-                if (timeLine != null)
-                {
-                    float time = (float)timeLine.TimePosition;
-                    float newValue;
-                    FloatTrack ft = (FloatTrack)Track;
-                    FloatKey fk = (FloatKey)ft.PropertyKeys[0];
+            KeyType equality = KeyType.None;
 
-                    if ((this.RecordState & RecordState.X) == RecordState.X)
-                    {
-                        object v = ft.GetValue();
-                        if (v == null)
-                            v = fk.Curve.Evaluate(time);
-                        newValue = (float)v;
-                    }
-                    else
-                    {
-                        newValue = fk.Curve.Evaluate(time);
-                    }
+            if (Mathf.Approximately(v1, v2)) equality |= KeyType.X;
 
-                    for (int i = 0; i < fk.Curve.length; i++)
-                    {
-                        if (Mathf.Approximately(fk.Curve[i].time, time))
-                        {
-                            Keyframe keyframe = fk.Curve[i];
-                            keyframe.value = newValue;
-                            fk.Curve.MoveKey(i, keyframe);
-                            SetDirty();
-                            return;
-                        }
-                    }
-
-                    int keyIndex = fk.Curve.AddKey(time, newValue);
-                    Skill.Editor.CurveUtility.SetKeyModeFromContext(fk.Curve, keyIndex);
-                    Skill.Editor.CurveUtility.UpdateTangentsFromModeSurrounding(fk.Curve, keyIndex);
-                    SetDirty();
-                }
-            }
+            return equality;
         }
 
-        internal override void Evaluate(float time)
-        {
-            Seek(time);
-        }
+        // Old Code
+        //internal override void Evaluate(float time)
+        //{
+        //    Seek(time);
+        //}
 
-        internal override void Seek(float time)
-        {
-            if ((this.RecordState & RecordState.X) == 0)
-            {
-                FloatTrack ft = (FloatTrack)Track;
-                FloatKey fk = (FloatKey)ft.PropertyKeys[0];
-                float value = fk.Curve.Evaluate(time);
-                ft.SetValue(value);
-            }
-        }
-
-
-        class FloatKeyView : PropertyTimeLineEvent
-        {
-
-            protected override bool CanDrag { get { return false; } }
-            public override double Duration
-            {
-                get
-                {
-                    if (_FloatKey.Curve != null && _FloatKey.Curve.length > 0)
-                        return _FloatKey.Curve.keys[_FloatKey.Curve.length - 1].time;
-                    else
-                        return 0.05f;
-                }
-                set { }
-            }
-            public override string Title { get { return "Float Event"; } }
-
-            protected override PropertiesPanel CreateProperties() { return new FloatKeyViewProperties(this); }
-
-            private float _MinWidth;
-            private float _PreValue;
-            public override float MinWidth
-            {
-                get
-                {
-                    if (_FloatKey.Curve != null && _FloatKey.Curve.length > 0)
-                        return 22;
-                    else
-                    {
-                        if (_MinWidth < 1f || _PreValue != _FloatKey.Value)
-                        {
-                            _PreValue = _FloatKey.Value;
-                            GUIStyle labelStyle = "Label";
-                            GUIContent content = new GUIContent() { text = _FloatKey.Value.ToString() };
-                            _MinWidth = labelStyle.CalcSize(content).x;
-                        }
-                        return _MinWidth;
-                    }
-                }
-            }
+        //internal override void Seek(float time)
+        //{
+        //    if ((this.RecordState & KeyType.X) == 0)
+        //    {
+        //        FloatTrack ft = (FloatTrack)Track;
+        //        FloatKey fk = (FloatKey)ft.PropertyKeys[0];
+        //        float value = fk.Curve.Evaluate(time);
+        //        ft.SetValue(value);
+        //    }
+        //}
 
 
-            private FloatKey _FloatKey;
-            public FloatKeyView(FloatTrackBar trackbar, IPropertyKey<float> key)
-                : base(trackbar, key)
-            {
-                _FloatKey = (FloatKey)key;
-            }
+        //class FloatKeyView : PropertyTimeLineEvent
+        //{
 
-            private Rect[] _CurevRenderAreas = new Rect[1];
-            private Rect[] _CurevRanges = new Rect[1];
-            protected override void Render()
-            {
-                base.Render();
-                if (_FloatKey.Curve != null)
-                {
-                    CalcCurveRenderArea(ref _CurevRenderAreas, ref _CurevRanges, _FloatKey.Curve);
-                    if (_CurevRenderAreas[0].width > 0.1f)
-                        DrawCurve(_CurevRenderAreas[0], _CurevRanges[0], _FloatKey.Curve, CurveColor);
-                }
-                //else
-                //{
-                //    GUI.Label(RenderArea, PropertyKey.ValueKey.ToString());
-                //}                
-            }
+        //    protected override bool CanDrag { get { return false; } }
+        //    public override double Duration
+        //    {
+        //        get
+        //        {
+        //            if (_FloatKey.Curve != null && _FloatKey.Curve.length > 0)
+        //                return _FloatKey.Curve.keys[_FloatKey.Curve.length - 1].time;
+        //            else
+        //                return 0.05f;
+        //        }
+        //        set { }
+        //    }
+        //    public override string Title { get { return "Float Event"; } }
 
-            class FloatKeyViewProperties : EventProperties
-            {
-                private Skill.Editor.UI.FloatField _FFValue;
-                private Skill.Editor.UI.CurveField _CurveField;
+        //    protected override PropertiesPanel CreateProperties() { return new FloatKeyViewProperties(this); }
 
-                public FloatKeyViewProperties(FloatKeyView e)
-                    : base(e)
-                {
-                    _FFValue = new Skill.Editor.UI.FloatField() { Margin = ControlMargin };
-                    _FFValue.Label.text = "Value";
+        //    private float _MinWidth;
+        //    private float _PreValue;
+        //    public override float MinWidth
+        //    {
+        //        get
+        //        {
+        //            if (_FloatKey.Curve != null && _FloatKey.Curve.length > 0)
+        //                return 22;
+        //            else
+        //            {
+        //                if (_MinWidth < 1f || _PreValue != _FloatKey.Value)
+        //                {
+        //                    _PreValue = _FloatKey.Value;
+        //                    GUIStyle labelStyle = "Label";
+        //                    GUIContent content = new GUIContent() { text = _FloatKey.Value.ToString() };
+        //                    _MinWidth = labelStyle.CalcSize(content).x;
+        //                }
+        //                return _MinWidth;
+        //            }
+        //        }
+        //    }
 
-                    _CurveField = new Skill.Editor.UI.CurveField(null) { Margin = ControlMargin };
-                    _CurveField.Label.text = "Curve";
-                    Skill.Editor.UI.ChangeCheck changeCheck = new Skill.Editor.UI.ChangeCheck() { Height = 20 };
-                    changeCheck.Controls.Add(_CurveField);
 
-                    Controls.Add(_FFValue);
-                    Controls.Add(changeCheck);
+        //    private FloatKey _FloatKey;
+        //    public FloatKeyView(FloatTrackBar trackbar, IPropertyKey<float> key)
+        //        : base(trackbar, key)
+        //    {
+        //        _FloatKey = (FloatKey)key;
+        //    }
 
-                    _FFValue.ValueChanged += _FFValue_ValueChanged;
-                    changeCheck.Changed += changeCheck_Changed;
-                }
+        //    private Rect[] _CurevRenderAreas = new Rect[1];
+        //    private Rect[] _CurevRanges = new Rect[1];
+        //    protected override void Render()
+        //    {
+        //        base.Render();
+        //        if (_FloatKey.Curve != null)
+        //        {
+        //            CalcCurveRenderArea(ref _CurevRenderAreas, ref _CurevRanges, _FloatKey.Curve);
+        //            if (_CurevRenderAreas[0].width > 0.1f)
+        //                DrawCurve(_CurevRenderAreas[0], _CurevRanges[0], _FloatKey.Curve, CurveColor);
+        //        }
+        //        //else
+        //        //{
+        //        //    GUI.Label(RenderArea, PropertyKey.ValueKey.ToString());
+        //        //}                
+        //    }
 
-                void changeCheck_Changed(object sender, System.EventArgs e)
-                {
-                    if (IgnoreChanges) return;
-                    SetDirty();
-                }
+        //    class FloatKeyViewProperties : EventProperties
+        //    {
+        //        private Skill.Editor.UI.FloatField _FFValue;
+        //        private Skill.Editor.UI.CurveField _CurveField;
 
-                void _FFValue_ValueChanged(object sender, System.EventArgs e)
-                {
-                    if (IgnoreChanges) return;
-                    ((FloatKeyView)_View).PropertyKey.ValueKey = _FFValue.Value;
-                    SetDirty();
-                }
+        //        public FloatKeyViewProperties(FloatKeyView e)
+        //            : base(e)
+        //        {
+        //            _FFValue = new Skill.Editor.UI.FloatField() { Margin = ControlMargin };
+        //            _FFValue.Label.text = "Value";
 
-                protected override void RefreshData()
-                {
-                    base.RefreshData();
-                    _FFValue.Value = ((FloatKeyView)_View).PropertyKey.ValueKey;
-                    FloatKey k = (FloatKey)((FloatKeyView)_View).Key;
-                    ValidateCurves();
-                }
+        //            _CurveField = new Skill.Editor.UI.CurveField(null) { Margin = ControlMargin };
+        //            _CurveField.Label.text = "Curve";
+        //            Skill.Editor.UI.ChangeCheck changeCheck = new Skill.Editor.UI.ChangeCheck() { Height = 20 };
+        //            changeCheck.Controls.Add(_CurveField);
 
-                void ValidateCurves()
-                {
-                    _FFValue.Visibility = Skill.Framework.UI.Visibility.Collapsed;
-                    _CurveField.Visibility = Skill.Framework.UI.Visibility.Visible;
+        //            Controls.Add(_FFValue);
+        //            Controls.Add(changeCheck);
 
-                    FloatKey k = (FloatKey)((FloatKeyView)_View).Key;
-                    if (k.Curve != null)
-                    {
-                        _CurveField.Curve = k.Curve;
-                    }
-                    else if (_CurveField.Curve == null)
-                    {
-                        _CurveField.Curve = new AnimationCurve();
-                    }
-                    k.Curve = _CurveField.Curve;
+        //            _FFValue.ValueChanged += _FFValue_ValueChanged;
+        //            changeCheck.Changed += changeCheck_Changed;
+        //        }
 
-                }
-            }
-        }
+        //        void changeCheck_Changed(object sender, System.EventArgs e)
+        //        {
+        //            if (IgnoreChanges) return;
+        //            SetDirty();
+        //        }
+
+        //        void _FFValue_ValueChanged(object sender, System.EventArgs e)
+        //        {
+        //            if (IgnoreChanges) return;
+        //            ((FloatKeyView)_View).PropertyKey.ValueKey = _FFValue.Value;
+        //            SetDirty();
+        //        }
+
+        //        protected override void RefreshData()
+        //        {
+        //            base.RefreshData();
+        //            _FFValue.Value = ((FloatKeyView)_View).PropertyKey.ValueKey;
+        //            FloatKey k = (FloatKey)((FloatKeyView)_View).Key;
+        //            ValidateCurves();
+        //        }
+
+        //        void ValidateCurves()
+        //        {
+        //            _FFValue.Visibility = Skill.Framework.UI.Visibility.Collapsed;
+        //            _CurveField.Visibility = Skill.Framework.UI.Visibility.Visible;
+
+        //            FloatKey k = (FloatKey)((FloatKeyView)_View).Key;
+        //            if (k.Curve != null)
+        //            {
+        //                _CurveField.Curve = k.Curve;
+        //            }
+        //            else if (_CurveField.Curve == null)
+        //            {
+        //                _CurveField.Curve = new AnimationCurve();
+        //            }
+        //            k.Curve = _CurveField.Curve;
+
+        //        }
+        //    }
+        //}
 
 
     }

@@ -3,6 +3,7 @@ using UnityEditor;
 using System.Collections;
 using Skill.Editor.UI;
 using Skill.Framework;
+using Skill.Framework.UI;
 
 
 namespace Skill.Editor.Tools
@@ -25,7 +26,7 @@ namespace Skill.Editor.Tools
         private Button _BtnSetLinearTime;
         private FloatField _FFLinearTime;
         private LabelField _LblFLinearTime;
-        private Slider _SliSmoothValue;
+        private Skill.Editor.UI.Slider _SliSmoothValue;
         private Skill.Framework.UI.Grid _PnlTools;
 
         private LayerMaskField _LmGroundLayer;
@@ -108,8 +109,8 @@ namespace Skill.Editor.Tools
             _ChangeCheck.RowDefinitions.Add(86, Skill.Framework.UI.GridUnitType.Pixel); // _PnlPoperties
             _ChangeCheck.RowDefinitions.Add(130, Skill.Framework.UI.GridUnitType.Pixel);//_PnlTools
 
-            _BtnAdd = new Button() { Row = 0, Column = 0 }; _BtnAdd.Content.text = "Add"; _BtnAdd.Content.tooltip = "Add new point the end of the path."; _BtnAdd.Content.image = Resources.Textures.Plus;
-            _BtnRemove = new Button() { Row = 0, Column = 1 }; _BtnRemove.Content.text = "Remove"; _BtnRemove.Content.tooltip = "Remove selected point."; _BtnRemove.Content.image = Resources.Textures.Minus;
+            _BtnAdd = new Button() { Row = 0, Column = 0 }; _BtnAdd.Content.text = "Add"; _BtnAdd.Content.tooltip = "Add new point the end of the path."; _BtnAdd.Content.image = Resources.UITextures.Plus;
+            _BtnRemove = new Button() { Row = 0, Column = 1 }; _BtnRemove.Content.text = "Remove"; _BtnRemove.Content.tooltip = "Remove selected point."; _BtnRemove.Content.image = Resources.UITextures.Minus;
             _PointsScrollView = new Skill.Framework.UI.ScrollView() { Row = 1, Column = 0, ColumnSpan = 2, AlwayShowVertical = true, Padding = new Skill.Framework.UI.Thickness(0, 2) };
             _GridPoints = new Skill.Framework.UI.SelectionGrid() { XCount = 5 };
             _PointsScrollView.Controls.Add(_GridPoints);
@@ -147,7 +148,7 @@ namespace Skill.Editor.Tools
             _FFLinearTime = new FloatField() { Row = 2, Column = 1, Margin = new Skill.Framework.UI.Thickness(0, 2), Value = _Path.PathTime };
             _BtnSetLinearTime = new Button() { Row = 2, Column = 2, Margin = new Skill.Framework.UI.Thickness(2, 2) }; _BtnSetLinearTime.Content.text = "Set Time by Distance"; _BtnSetLinearTime.Content.tooltip = "Set time of nodes by relative distance";
 
-            _SliSmoothValue = new Slider() { Row = 3, Column = 0, ColumnSpan = 3, MinValue = 0.0f, MaxValue = 1.0f, Value = _Path.SmoothValue }; _SliSmoothValue.Label.text = "Smooth Value";
+            _SliSmoothValue = new Skill.Editor.UI.Slider() { Row = 3, Column = 0, ColumnSpan = 3, MinValue = 0.0f, MaxValue = 1.0f, Value = _Path.SmoothValue }; _SliSmoothValue.Label.text = "Smooth Value";
             _BtnSmoothCurve = new Button() { Row = 4, Column = 0, ColumnSpan = 2, Margin = new Skill.Framework.UI.Thickness(2, 2) }; _BtnSmoothCurve.Content.text = "Smooth Curve"; _BtnSmoothCurve.Content.tooltip = "Smooth the in and out tangents of the keys.";
             _BtnSmoothPoint = new Button() { Row = 4, Column = 2, Margin = new Skill.Framework.UI.Thickness(2, 2) }; _BtnSmoothPoint.Content.text = "Smooth Point"; _BtnSmoothPoint.Content.tooltip = "Smooth the in and out tangents of the selected key.";            
 

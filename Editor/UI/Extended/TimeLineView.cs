@@ -15,8 +15,7 @@ namespace Skill.Editor.UI.Extended
         private double _MinTime;
         private double _MaxTime;
 
-        protected Rect _ViewRect;
-        protected float _ScrollY;
+        protected Rect _ViewRect;        
 
         /// <summary> Speed of zoom when user hold alt and drag with right mouse button (default : 0.1) </summary>
         public float ZoomSpeed { get { return _ZoomSpeed; } set { _ZoomSpeed = value; } }
@@ -31,7 +30,28 @@ namespace Skill.Editor.UI.Extended
         public Color SelectionTimeColor { get; set; }
 
 
-        public Vector2 ScrollPosition { get { return new Vector2((float)((_TimeLine.StartVisible - _TimeLine.MinTime) / (_TimeLine.MaxTime - _TimeLine.MinTime) * _ViewRect.width), _ScrollY); } }
+        public Vector2 ScrollPosition { get { return new Vector2((float)((_TimeLine.StartVisible - _TimeLine.MinTime) / (_TimeLine.MaxTime - _TimeLine.MinTime) * _ViewRect.width), VerticalScroll); } }
+
+
+        private float _VerticalScroll;
+        public float VerticalScroll
+        {
+            get { return _VerticalScroll; }
+            set
+            {
+                if (_VerticalScroll != value)
+                {
+                    _VerticalScroll = value;
+                    OnVerticalScrollChanged();
+                }
+            }
+        }
+
+        public event System.EventHandler VerticalScrollChanged;
+        private void OnVerticalScrollChanged()
+        {
+            if (VerticalScrollChanged != null) VerticalScrollChanged(this, System.EventArgs.Empty);
+        }
 
         /// <summary> TimeLine </summary>
         public ITimeLine TimeLine { get { return _TimeLine; } internal set { _TimeLine = value; } }
@@ -167,7 +187,7 @@ namespace Skill.Editor.UI.Extended
             }
             #endregion
 
-            GUI.color = savedColor;
+            GUI.color = savedColor;            
         }
 
 
@@ -283,7 +303,7 @@ namespace Skill.Editor.UI.Extended
         {
             if (dy != 0)
             {
-                _ScrollY += dy;
+                VerticalScroll += dy;
                 OnLayoutChanged();
             }
         }

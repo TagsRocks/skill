@@ -14,7 +14,7 @@ namespace Skill.Editor
 
         private Skill.Editor.UI.EditorFrame _Frame;
         private Skill.Editor.UI.LabelField _LblAbout;
-        private Skill.Editor.UI.Button _BtnClose;
+        private Skill.Framework.UI.Button _BtnClose;
 
         public void OnGUI()
         {
@@ -50,7 +50,7 @@ namespace Skill.Editor
             _LblAbout = new UI.LabelField() { Row = 0, Column = 0 };
             _LblAbout.Label2.text = Skill.Editor.Properties.Resources.AppDescription;
 
-            _BtnClose = new UI.Button() { Row = 1, Column = 0 };
+            _BtnClose = new Framework.UI.Button() { Row = 1, Column = 0 };
             _BtnClose.Content.text = "Close";
             _BtnClose.Click += new EventHandler(_BtnClose_Click);
 

@@ -22,12 +22,22 @@ namespace Skill.Editor.Curve
         }
 
 
+        public override void Invalidate()
+        {
+            base.Invalidate();
+            if (_CurveView != null)
+                _CurveView.Invalidate();
+        }
+
         public Color Background { get; set; }
 
         public TimeLine TimeLine { get { return _TimeLine; } }
         public CurveEditor()
         {
-            Background = new Color(0.15f, 0.15f, 0.15f, 1.0f);
+            if (UnityEditor.EditorGUIUtility.isProSkin)
+                Background = new Color(0.15f, 0.15f, 0.15f, 1.0f);
+            else
+                Background = new Color(0.55f, 0.55f, 0.55f, 1.0f);
             _CurveView = new TimeLineCurveView(this);
             _TimeLine = new TimeLine(_CurveView) { SelectionEnable = false };
             _TimeLine.TimeBar.ShowTimePosition = false;
@@ -79,9 +89,6 @@ namespace Skill.Editor.Curve
                 _CurveView.Controls.Remove(track);
             }
         }
-
-        public double SnapTime { get { return _TimeLine.TimeBar.SmallStep; } }
-        public double SnapValue { get { return _Grid.SmallStep; } }
 
         #region CurveKeyMultiSelector
         internal class CurveKeyMultiSelector : Skill.Framework.UI.Panel
@@ -287,10 +294,17 @@ namespace Skill.Editor.Curve
             {
                 foreach (var key in _SelectedKeys)
                 {
-                    key.Track.RemoveKey(key.Index);
+                    key.Track.RegisterForRemove(key.Index);
                     key.IsSelected = false;
                 }
+                foreach (var c in _TimeLine.View.Controls)
+                {
+                    if (c is CurveTrack)
+                        ((CurveTrack)c).RemoveKeys();
+                }
+
                 ClearSelection();
+
                 OnSelectionChanged();
             }
         }
@@ -328,12 +342,12 @@ namespace Skill.Editor.Curve
                 if (snap)
                 {
                     float x = key.StartDrag.x + delta.x;
-                    float time = GetSnappedValue(key.Track.GetTime(x, true), SnapTime);
+                    float time = GetSnappedValue(key.Track.GetTime(x, true), _TimeLine.TimeBar.SmallStep);
                     x = key.Track.GetX(time, true);
                     delta.x = x - key.StartDrag.x - (key.Width * 0.5f);
 
                     float y = key.StartDrag.y + delta.y;
-                    float value = GetSnappedValue(key.Track.GetValue(y, true), SnapValue);
+                    float value = GetSnappedValue(key.Track.GetValue(y, true), _Grid.SmallStep);
                     y = key.Track.GetY(value, true);
                     delta.y = y - key.StartDrag.y - (key.Height * 0.5f);
                 }

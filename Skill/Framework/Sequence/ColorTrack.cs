@@ -17,16 +17,11 @@ namespace Skill.Framework.Sequence
         [ExposeProperty(1, "Color")]
         public Color ExValue { get { return Value; } set { Value = value; } }
 
-
-
-
-
-
         public Color ValueKey { get { return this.Value; } set { this.Value = value; } }
         public float FireTime { get { return this.Time; } set { this.Time = value; if (this.Time < 0)this.Time = 0; } }
     }
 
-    public class ColorTrack : PropertyTrack<Color>
+    public class ColorTrack : DiscreteTrack<Color>
     {
         [SerializeField]
         [HideInInspector]
@@ -35,7 +30,6 @@ namespace Skill.Framework.Sequence
         public override Type PropertyType { get { return typeof(Color); } }
         public override TrackType Type { get { return TrackType.Color; } }
         public override IPropertyKey<Color>[] PropertyKeys { get { return Keys; } set { Keys = (ColorKey[])value; } }
-
 
         private ColorKey _TempKey = new ColorKey();
 

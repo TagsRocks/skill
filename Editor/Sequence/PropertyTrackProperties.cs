@@ -12,7 +12,7 @@ namespace Skill.Editor.Sequence
         private Skill.Editor.UI.ObjectField<GameObject> _Object;
         private Skill.Editor.UI.Popup _Component;
         private Skill.Editor.UI.Popup _Property;
-        private Skill.Editor.UI.Button _BtnRefresh;
+        private Skill.Framework.UI.Button _BtnRefresh;
 
         public PropertyTrackProperties(TrackTreeViewItem item)
             : base(item)
@@ -24,12 +24,12 @@ namespace Skill.Editor.Sequence
         {
             base.CreateCustomFileds();
 
-            Skill.Framework.UI.Thickness margin = new Skill.Framework.UI.Thickness(2,2,0,2);
+            Skill.Framework.UI.Thickness margin = new Skill.Framework.UI.Thickness(2, 2, 0, 2);
 
             _Object = new Skill.Editor.UI.ObjectField<GameObject>() { Margin = margin }; _Object.Label.text = "Game Object";
             _Component = new Skill.Editor.UI.Popup() { Margin = margin }; _Component.Label.text = "Component";
             _Property = new Skill.Editor.UI.Popup() { Margin = margin }; _Property.Label.text = "Property";
-            _BtnRefresh = new Skill.Editor.UI.Button() { Margin = margin, Width = 80, HorizontalAlignment = Framework.UI.HorizontalAlignment.Right }; _BtnRefresh.Content.text = "Refresh";
+            _BtnRefresh = new Skill.Framework.UI.Button() { Margin = margin, Width = 80, HorizontalAlignment = Framework.UI.HorizontalAlignment.Right }; _BtnRefresh.Content.text = "Refresh";
 
             Controls.Add(_Object);
             Controls.Add(_BtnRefresh);
@@ -48,6 +48,7 @@ namespace Skill.Editor.Sequence
         }
 
         private PropertyTrack<V> GetTrack() { return (PropertyTrack<V>)base.Item.Track; }
+        private PropertyTrackBar<V> GetTrackBar() { return (PropertyTrackBar<V>)base.Item.TrackBar; }
 
         void _Object_ObjectChanged(object sender, System.EventArgs e)
         {
@@ -100,7 +101,7 @@ namespace Skill.Editor.Sequence
                     {
                         if (info.PropertyType == track.PropertyType && info.CanWrite)
                         {
-                            track.DefaultValue = (V)info.GetGetMethod().Invoke(track.Component, null);
+                            GetTrackBar().UpdateDefaultValue((V)info.GetGetMethod().Invoke(track.Component, null));
                             base.Refresh();
                         }
                         break;

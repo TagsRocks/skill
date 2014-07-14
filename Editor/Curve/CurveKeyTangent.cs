@@ -24,7 +24,7 @@ namespace Skill.Editor.Curve
         protected override void Render()
         {
             if (Texture == null)
-                Texture = Skill.Editor.Resources.Textures.KeyframeSelected;
+                Texture = Skill.Editor.Resources.UITextures.KeyframeSelected;
 
             Vector2 keyCenter = Key.RenderArea.center;
             Vector2 center = RenderArea.center;

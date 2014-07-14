@@ -35,7 +35,7 @@ namespace Skill.Editor.Tools
         private Grid _PnlFavoriteColors;
         private Color[] _FavoriteColors;
 
-        private Skill.Editor.UI.Button _BtnSaveTexture;
+        private Skill.Framework.UI.Button _BtnSaveTexture;
 
         private void CreateUI()
         {
@@ -86,15 +86,15 @@ namespace Skill.Editor.Tools
             for (int i = 0; i < _FavoriteColors.Length; i++)
             {
                 _PnlFavoriteColors.ColumnDefinitions.Add(1, GridUnitType.Star);
-                Skill.Editor.UI.Button btn = new Skill.Editor.UI.Button() { Tag = i.ToString(), Margin = new Thickness(4), Style = new GUIStyle(), Column = i };
+                Skill.Framework.UI.Button btn = new Skill.Framework.UI.Button() { Tag = i.ToString(), Margin = new Thickness(4), Style = new GUIStyle(), Column = i };
                 string toolTip = string.Empty;
                 Texture2D background = null;
-                if (i == 0) { background = Skill.Editor.Resources.Textures.Red; toolTip = "Red"; }
-                else if (i == 1) { background = Skill.Editor.Resources.Textures.Green; toolTip = "Green"; }
-                else if (i == 2) { background = Skill.Editor.Resources.Textures.Blue; toolTip = "Blue"; }
-                else if (i == 3) { background = Skill.Editor.Resources.Textures.Transparent; toolTip = "Alpha"; }
-                else if (i == 4) { background = Skill.Editor.Resources.Textures.White; toolTip = "White"; }
-                else if (i == 5) { background = Skill.Editor.Resources.Textures.Black; toolTip = "Black"; }
+                if (i == 0) { background = Skill.Editor.Resources.UITextures.Red; toolTip = "Red"; }
+                else if (i == 1) { background = Skill.Editor.Resources.UITextures.Green; toolTip = "Green"; }
+                else if (i == 2) { background = Skill.Editor.Resources.UITextures.Blue; toolTip = "Blue"; }
+                else if (i == 3) { background = Skill.Editor.Resources.UITextures.Transparent; toolTip = "Alpha"; }
+                else if (i == 4) { background = Skill.Editor.Resources.UITextures.White; toolTip = "White"; }
+                else if (i == 5) { background = Skill.Editor.Resources.UITextures.Black; toolTip = "Black"; }
                 btn.Style.normal.background = btn.Style.focused.background = btn.Style.hover.background = btn.Style.active.background = background;
                 btn.Content.tooltip = toolTip;
                 btn.Click += btn_Click;
@@ -108,7 +108,7 @@ namespace Skill.Editor.Tools
             _SliFalloff = new Skill.Editor.UI.Slider() { Value = _PaintColor.Falloff, MinValue = 0.0f, MaxValue = 1.0f, Margin = new Thickness(2), Height = 16 }; _SliFalloff.Label.text = "Falloff";
             _HelpBox = new HelpBox() { Height = 60, Message = "Hold CTRL and drag with Right Click to paint.\nTexture must be read/write enable\nValid texture format:\n    ARGB32, RGBA32, RGB24 and Alpha8" };
 
-            _BtnSaveTexture = new Skill.Editor.UI.Button() { Margin = new Thickness(2), Height = 40 }; _BtnSaveTexture.Content.text = "Save Texture";
+            _BtnSaveTexture = new Skill.Framework.UI.Button() { Margin = new Thickness(2), Height = 40 }; _BtnSaveTexture.Content.text = "Save Texture";
 
 
             _Panel.Controls.Add(_TextureField);            
@@ -174,7 +174,7 @@ namespace Skill.Editor.Tools
 
         void btn_Click(object sender, EventArgs e)
         {
-            Skill.Editor.UI.Button btn = (Skill.Editor.UI.Button)sender;
+            Skill.Framework.UI.Button btn = (Skill.Framework.UI.Button)sender;
             int index;
             if (int.TryParse(btn.Tag, out index))
             {

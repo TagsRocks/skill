@@ -23,7 +23,7 @@ namespace Skill.Editor.Sequence
         private List<EventKeyView> _Events;
         private EventTrack _EventTrack;
 
-        public override ITrackKey FirstKey { get { return _EventTrack.EventKeys[0]; } }
+        public override bool IsContinuous { get { return false; } }
 
         /// <summary>
         /// Create a SoundTrackBar
@@ -101,7 +101,7 @@ namespace Skill.Editor.Sequence
         private bool IsEventExistWithKey(EventKey key)
         {
             foreach (var e in _Events)
-                if (e.Key == (ITrackKey)key) return true;
+                if (e.Key == key) return true;
             return false;
         }
         private bool IsKeyExistInEventTrack(ITrackKey key)
@@ -153,7 +153,7 @@ namespace Skill.Editor.Sequence
         {
             var keys = new EventKey[_Events.Count];
             for (int i = 0; i < _Events.Count; i++)
-                keys[i] = _Events[i].EventKey;
+                keys[i] = _Events[i].Key;
             _EventTrack.EventKeys = keys;
             _EventTrack.SortKeys();
             SetDirty();
@@ -164,48 +164,13 @@ namespace Skill.Editor.Sequence
         /// <summary>
         /// Visual representation of EventKey
         /// </summary>
-        public class EventKeyView : EventView
+        public class EventKeyView : KeyView
         {
-            private GUIContent _Content;
-            private float _MinWidth;
+            public override double Duration { get { return 0.01f; } set { } }
+            public override float MinWidth { get { return 10; } }
+            public override float MaxWidth { get { return MinWidth; } }
 
-            public override double Duration
-            {
-                get
-                {
-                    return Mathf.Max(0.01f, EventKey.Duration);
-                }
-                set
-                {
-                }
-            }
-            public override float MinWidth
-            {
-                get
-                {
-                    if (_MinWidth < 1f)
-                    {
-                        GUIStyle labelStyle = "Label";
-                        ValidateContent();
-                        _MinWidth = labelStyle.CalcSize(_Content).x;
-                    }
-                    return _MinWidth;
-                }
-            }
-
-            public EventKey EventKey { get; private set; }
-
-
-            private string _DisplayName;
-            protected string DisplayName
-            {
-                get
-                {
-                    if (_DisplayName == null)
-                        _DisplayName = ((CustomEventAttribute)EventKey.GetType().GetCustomAttributes(typeof(CustomEventAttribute), true)[0]).DisplayName;
-                    return _DisplayName;
-                }
-            }
+            public EventKey Key { get; private set; }
 
             private string _Title;
             public override string Title
@@ -213,30 +178,49 @@ namespace Skill.Editor.Sequence
                 get
                 {
                     if (_Title == null)
-                        _Title = EventKey.GetType().Name;
+                        _Title = Key.GetType().Name;
                     return _Title;
                 }
             }
 
+            private Skill.Framework.UI.Image _ImgState;
             public EventKeyView(EventTrackBar trackBar, EventKey key)
-                : base(trackBar, key)
+                : base(trackBar)
             {
-                this.EventKey = key;
+                this.Key = key;
+                _ImgState = new Skill.Framework.UI.Image() { Row = 0, Column = 0, RowSpan = 10, ColumnSpan = 10, HorizontalAlignment = Skill.Framework.UI.HorizontalAlignment.Center, VerticalAlignment = Skill.Framework.UI.VerticalAlignment.Center, Width = 10, Height = 10 };
+                Controls.Add(_ImgState);
+            }
+            protected override void BeginRender()
+            {
+                _ImgState.Texture = Resources.UITextures.Event;
+                base.BeginRender();
             }
 
-            private void ValidateContent()
+            private EventKeyViewProperties _Properties;
+            /// <summary> Properties </summary>
+            public override PropertiesPanel Properties
             {
-                if (_Content == null)
+                get
                 {
-                    _Content = new GUIContent();
-                    _Content.text = DisplayName;
+                    if (_Properties == null)
+                        _Properties = new EventKeyViewProperties(this);
+                    return _Properties;
                 }
             }
-
-            protected override void Render()
+            public override double FireTime { get { return Key.FireTime; } set { Key.FireTime = (float)value; Properties.Refresh(); } }
+            public class EventKeyViewProperties : ExposeProperties
             {
-                base.Render();
-                GUI.Label(RenderArea, _Content);
+                protected EventKeyView _View;
+                public EventKeyViewProperties(EventKeyView view)
+                    : base(view.Key)
+                {
+                    _View = view;
+                }
+                protected override void SetDirty()
+                {
+                    ((BaseTrackBar)_View.TrackBar).SetDirty();
+                }
             }
         }
         #endregion

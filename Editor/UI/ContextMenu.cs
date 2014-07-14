@@ -42,7 +42,7 @@ namespace Skill.Editor.UI
                 {
                     if (_Items[i] == null)
                         Height += sepratorH;
-                    else
+                    else if (_Items[i].IsVisible)
                         Height += itemH;
                 }
             }
@@ -194,7 +194,7 @@ namespace Skill.Editor.UI
                         {
                             GenerateMenu(item, genericMenu, item.Path);
                         }
-                        else
+                        else if (item.IsVisible)
                         {
                             GUIContent content = new GUIContent(item.Content);
                             content.text = item.Path;
@@ -224,7 +224,7 @@ namespace Skill.Editor.UI
         /// <param name="owner"> Owner ui object that showthis contenxt menu  </param>
         /// <param name="position">Mouse position</param>
         public void Show(Framework.UI.BaseControl owner, Vector2 position)
-        {            
+        {
             this.Owner = owner;
             this.Position = position;
             BeginShow();
@@ -323,6 +323,22 @@ namespace Skill.Editor.UI
             }
         }
 
+        private bool _IsVisible;
+        /// <summary> Is visible </summary>
+        public bool IsVisible
+        {
+            get { return _IsVisible; }
+            set
+            {
+
+                if (_IsVisible != value)
+                {
+                    _IsVisible = value;
+                    OnVisibleChanged();
+                }
+            }
+        }
+
         /// <summary>
         /// Occurs When item enabled or disabled
         /// </summary>
@@ -354,6 +370,20 @@ namespace Skill.Editor.UI
 
 
         /// <summary>
+        /// Occurs When item visible changed
+        /// </summary>
+        public event EventHandler VisibleChanged;
+        /// <summary>
+        /// Occurs When item visible changed
+        /// </summary>
+        protected virtual void OnVisibleChanged()
+        {
+            if (VisibleChanged != null)
+                VisibleChanged(this, EventArgs.Empty);
+            OnChanged();
+        }
+
+        /// <summary>
         /// Create an instance of MenuItem
         /// </summary>    
 
@@ -364,6 +394,7 @@ namespace Skill.Editor.UI
             this.Content = new GUIContent() { text = name };
             this._IsEnabled = true;
             this.IsChecked = false;
+            this._IsVisible = true;
         }
     }
 }

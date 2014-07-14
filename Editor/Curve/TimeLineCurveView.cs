@@ -227,7 +227,7 @@ namespace Skill.Editor.Curve
             if (deltaValue < MinVisibleRange)
                 deltaValue = MinVisibleRange;
 
-            _ScrollY = (float)(((_MaxValue - _MaxVisibleValue) / (deltaValue)) * _ViewRect.height);
+            VerticalScroll = (float)(((_MaxValue - _MaxVisibleValue) / (deltaValue)) * _ViewRect.height);
 
             foreach (var c in Controls)
             {
