@@ -10,29 +10,6 @@ namespace Skill.Framework.Sequence
         public override TrackType Type { get { return TrackType.Vector4; } }
 
 
-        public override float Length
-        {
-            get
-            {
-
-                float maxLenght = 0;
-                if (CurveX != null && CurveX.length > 0)
-                    maxLenght = Mathf.Max(maxLenght, CurveX.keys[CurveX.length - 1].time);
-
-                if (CurveY != null && CurveY.length > 0)
-                    maxLenght = Mathf.Max(maxLenght, CurveY.keys[CurveY.length - 1].time);
-
-                if (CurveZ != null && CurveZ.length > 0)
-                    maxLenght = Mathf.Max(maxLenght, CurveZ.keys[CurveZ.length - 1].time);
-
-                if (CurveW != null && CurveW.length > 0)
-                    maxLenght = Mathf.Max(maxLenght, CurveW.keys[CurveW.length - 1].time);
-
-                return maxLenght;
-
-            }
-        }
-
 
         [SerializeField]
         [HideInInspector]
@@ -51,7 +28,6 @@ namespace Skill.Framework.Sequence
         [CurveEditor(0, 1, 1, "W")]
         public AnimationCurve CurveW;
 
-        
 
         protected override Vector4 EvaluateCurves(float time)
         {
@@ -62,5 +38,17 @@ namespace Skill.Framework.Sequence
             if (CurveW != null) result.w = CurveW.Evaluate(time);
             return result;
         }
+
+
+        public override int CurveCount { get { return 4; } }
+
+        public override AnimationCurve GetCurve(int index)
+        {
+            if (index == 0) return CurveX;
+            if (index == 1) return CurveY;
+            if (index == 2) return CurveZ;
+            return CurveW;
+        }
+
     }
 }

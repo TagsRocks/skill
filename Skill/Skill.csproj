@@ -85,10 +85,13 @@
     <Compile Include="Framework\Modules\ScreenShot.cs" />
     <Compile Include="Framework\Modules\ShowFPS.cs" />
     <Compile Include="Framework\Rendering\UVShift.cs" />
+    <Compile Include="Framework\Sequence\AnimationTrack.cs" />
+    <Compile Include="Framework\Sequence\AnimatorTrack.cs" />
     <Compile Include="Framework\Sequence\BooleanTrack.cs" />
     <Compile Include="Framework\Sequence\BuiltinEvents.cs" />
     <Compile Include="Framework\Sequence\ColorTrack.cs" />
     <Compile Include="Framework\Sequence\ContinuousTrack.cs" />
+    <Compile Include="Framework\Sequence\EventOrientedTrack.cs" />
     <Compile Include="Framework\Sequence\EventTrack.cs" />
     <Compile Include="Framework\Sequence\FloatTrack.cs" />
     <Compile Include="Framework\Sequence\IntegerTrack.cs" />

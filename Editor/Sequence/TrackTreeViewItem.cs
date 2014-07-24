@@ -50,7 +50,7 @@ namespace Skill.Editor.Sequence
             this.ColumnDefinitions.Add(14, GridUnitType.Pixel);
 
 
-            this._Background = new UI.Rectangle() { Column = 0, ColumnSpan = 20, Margin = new Thickness(0, 2) };
+            this._Background = new UI.Rectangle() { Column = 0, ColumnSpan = 20, Margin = new Thickness(0, 1) };
             this._ContentBox = new Box() { Column = 0 };
 
             this.Controls.Add(_Background);
@@ -68,6 +68,9 @@ namespace Skill.Editor.Sequence
             switch (Track.Type)
             {
                 case TrackType.Event:
+                case TrackType.Animator:
+                case TrackType.Animation:
+                case TrackType.Sound:
                     return new TrackTreeViewItemPropertiesBase(this);
                 case TrackType.Bool:
                     return new PropertyTrackProperties<bool>(this);
@@ -85,8 +88,6 @@ namespace Skill.Editor.Sequence
                     return new PropertyTrackProperties<Vector4>(this);
                 case TrackType.Quaternion:
                     return new PropertyTrackProperties<Quaternion>(this);
-                case TrackType.Sound:
-                    return new SoundTrackProperties(this);
                 default:
                     return null;
             }
@@ -115,6 +116,10 @@ namespace Skill.Editor.Sequence
                     return Resources.UITextures.Matinee.Quaternion;
                 case TrackType.Sound:
                     return Resources.UITextures.Matinee.Sound;
+                case TrackType.Animator:
+                    return Resources.UITextures.Matinee.Animator;
+                case TrackType.Animation:
+                    return Resources.UITextures.Matinee.Animation;
                 default:
                     return null;
             }

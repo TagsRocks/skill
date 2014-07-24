@@ -14,7 +14,12 @@ namespace Skill.Editor.UI
         /// <summary>
         /// Optional label in front of the toggle.
         /// </summary>
-        public GUIContent Label { get; private set; }        
+        public GUIContent Label { get; private set; }
+
+        /// <summary>
+        /// Make a toggle field where the toggle is to the left and the label immediately to the right of it.
+        /// </summary>
+        public bool Left { get; set; }
 
         private bool _IsChecked;
         /// <summary>
@@ -47,7 +52,7 @@ namespace Skill.Editor.UI
         private void OnChecked()
         {
             if (Checked != null)
-                Checked(this, EventArgs.Empty);           
+                Checked(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -60,7 +65,7 @@ namespace Skill.Editor.UI
         private void OnUnchecked()
         {
             if (Unchecked != null)
-                Unchecked(this, EventArgs.Empty);            
+                Unchecked(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -107,16 +112,22 @@ namespace Skill.Editor.UI
         /// </summary>
         protected override void Render()
         {
-            //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
-            if (Style != null)
+
+            if (Left)
             {
-                IsChecked = EditorGUI.Toggle(RenderArea, Label, IsChecked, Style);
+                if (Style != null)
+                    IsChecked = EditorGUI.ToggleLeft(RenderArea, Label, IsChecked, Style);
+                else
+                    IsChecked = EditorGUI.ToggleLeft(RenderArea, Label, IsChecked);
             }
             else
             {
-                IsChecked = EditorGUI.Toggle(RenderArea, Label, IsChecked);
+                if (Style != null)
+                    IsChecked = EditorGUI.Toggle(RenderArea, Label, IsChecked, Style);
+                else
+                    IsChecked = EditorGUI.Toggle(RenderArea, Label, IsChecked);
             }
         }
-        
+
     }
 }

@@ -10,15 +10,11 @@ namespace Skill.Framework.Sequence
         public override TrackType Type { get { return TrackType.Float; } }
 
 
-        public override float Length
+        public override int CurveCount { get { return 1; } }
+
+        public override AnimationCurve GetCurve(int index)
         {
-            get
-            {
-                if (Curve != null && Curve.length > 0)
-                    return Curve[Curve.length - 1].time;
-                else
-                    return 0;
-            }
+            return Curve;
         }
 
 
@@ -33,7 +29,7 @@ namespace Skill.Framework.Sequence
             if (Curve != null)
                 return Curve.Evaluate(time);
             return 0;
-        }        
+        }
     }
 
 }

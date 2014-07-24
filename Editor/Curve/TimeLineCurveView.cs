@@ -101,51 +101,74 @@ namespace Skill.Editor.Curve
 
 
         }
-        protected override double GetFrameAllTime()
+
+        protected override void GetTimeBounds(out double minTime, out double maxTime)
         {
-            double maxTime = 1.0f;
-            foreach (var c in Controls)
+            minTime = 0.0f;
+            maxTime = 1.0f;
+            if (Controls.Count > 1) // because of _MultiSelector
             {
-                if (c is CurveTrack && c.Visibility == Skill.Framework.UI.Visibility.Visible)
+                bool found = false;
+                foreach (var c in Controls)
                 {
-                    CurveTrack ct = (CurveTrack)c;
-                    float ctMinTime, ctMaxTime;
-                    ct.GetTimeBounds(out ctMinTime, out ctMaxTime);
-                    if (maxTime < ctMaxTime)
-                        maxTime = ctMaxTime;
+                    if (c is CurveTrack && c.Visibility == Skill.Framework.UI.Visibility.Visible)
+                    {
+                        CurveTrack ct = (CurveTrack)c;
+                        if (ct.Curve.length > 1)
+                        {
+                            if (!found)
+                            {
+                                minTime = float.MaxValue;
+                                maxTime = float.MinValue;
+                                found = true;
+                            }
+
+                            float ctMinTime, ctMaxTime;
+                            ct.GetTimeBounds(out ctMinTime, out ctMaxTime);
+
+                            if (maxTime < ctMaxTime) maxTime = ctMaxTime;
+                            if (minTime > ctMinTime) minTime = ctMinTime;
+                        }
+                    }
                 }
             }
-            maxTime += 0.1f;
-            return maxTime;
+            if (maxTime - minTime < 0.1f)
+                maxTime = minTime + 0.1f;
         }
         public override void FrameAll()
         {
+            _MinValue = -1.0f;
+            _MaxValue = 1.0f;
             if (Controls.Count > 1) // because of _MultiSelector
             {
-                _MinValue = float.MaxValue;
-                _MaxValue = float.MinValue;
+                bool found = false;
 
                 foreach (var c in Controls)
                 {
                     if (c is CurveTrack)
                     {
                         CurveTrack ct = (CurveTrack)c;
-                        float ctMinValue, ctMaxValue;
-                        ct.GetValueBounds(out ctMinValue, out ctMaxValue);
+                        if (ct.Curve.length > 1)
+                        {
+                            if (!found)
+                            {
+                                found = true;
+                                _MinValue = float.MaxValue;
+                                _MaxValue = float.MinValue;
+                            }
 
-                        if (_MinValue > ctMinValue) _MinValue = ctMinValue;
-                        if (_MaxValue < ctMaxValue) _MaxValue = ctMaxValue;
+                            float ctMinValue, ctMaxValue;
+                            ct.GetValueBounds(out ctMinValue, out ctMaxValue);
+
+                            if (_MinValue > ctMinValue) _MinValue = ctMinValue;
+                            if (_MaxValue < ctMaxValue) _MaxValue = ctMaxValue;
+                        }
                     }
                 }
 
                 double delta = _MaxValue - _MinValue;
                 _MinValue -= delta * 0.05f;
                 _MaxValue += delta * 0.05f;
-            }
-            else
-            {
-                _MinValue = -1.0f;
-                _MaxValue = 1.0f;
             }
 
             _MinVisibleValue = _MinValue;

@@ -10,7 +10,7 @@ namespace Skill.Editor.Sequence
     /// <summary>
     /// TrackBar to edit PropertyTrack
     /// </summary>
-    public class EventTrackBar : BaseTrackBar
+    public class EventTrackBar : EventOrientedTrackBar
     {
         class EventInfo
         {
@@ -20,10 +20,7 @@ namespace Skill.Editor.Sequence
             public string Path;
         }
 
-        private List<EventKeyView> _Events;
         private EventTrack _EventTrack;
-
-        public override bool IsContinuous { get { return false; } }
 
         /// <summary>
         /// Create a SoundTrackBar
@@ -33,85 +30,13 @@ namespace Skill.Editor.Sequence
             : base(track)
         {
             _EventTrack = track;
-            _Events = new List<EventKeyView>();
-            CreateEvents();
             this.ContextMenu = EventTrackBarContextMenu.Instance;
-            this.Height = 22;
         }
 
 
-        /// <summary>
-        /// Refresh data do to changes outside of MatineeEditor
-        /// </summary>
-        public override void Refresh()
+        protected override EventOrientedKeyView CreateNewEvent(EventOrientedKey key)
         {
-            base.Refresh();
-            CreateEvents();
-        }
-        private void CreateEvents()
-        {
-            if (_EventTrack.EventKeys != null)
-            {
-                // search for new events in SoundTrack that we didn't create SoundEvent for them 
-                foreach (var key in _EventTrack.EventKeys)
-                {
-                    if (key != null)
-                    {
-                        if (!IsEventExistWithKey(key))
-                            CreateEvent(key);
-                    }
-                }
-
-                // search for removed keys in SoundTrack that we did create SoundEvent for them 
-                int index = 0;
-                while (index < _Events.Count)
-                {
-                    var e = _Events[index];
-                    if (!IsKeyExistInEventTrack(e.Key))
-                    {
-                        _Events.Remove(e);
-                        Controls.Remove(e);
-                        continue;
-                    }
-                    index++;
-                }
-            }
-            else
-            {
-                _Events.Clear();
-                Controls.Clear();
-            }
-        }
-
-        // create a SoundEvent and initialize it
-        private EventKeyView CreateEvent(EventKey key)
-        {
-            EventKeyView view = CreateNewEvent(key);
-            view.ContextMenu = EventKeyViewContextMenu.Instance;
-            this.Controls.Add(view);
-            this._Events.Add(view);
-            return view;
-        }
-
-        protected EventKeyView CreateNewEvent(EventKey key)
-        {
-            return new EventKeyView(this, key);
-        }
-
-        private bool IsEventExistWithKey(EventKey key)
-        {
-            foreach (var e in _Events)
-                if (e.Key == key) return true;
-            return false;
-        }
-        private bool IsKeyExistInEventTrack(ITrackKey key)
-        {
-            foreach (var k in _EventTrack.EventKeys)
-            {
-                if ((ITrackKey)k == key)
-                    return true;
-            }
-            return false;
+            return new EventKeyView(this, (EventKey)key);
         }
 
         /// <summary>
@@ -127,36 +52,10 @@ namespace Skill.Editor.Sequence
                 x -= timeLine.View.ScrollPosition.x;
                 newKey.FireTime = (float)timeLine.TimeBar.GetTime(x);
 
-                EventKeyView e = CreateEvent(newKey);
+                EventOrientedKeyView e = CreateEvent(newKey);
                 InspectorProperties.Select(e);
                 RebuildTrackKeys();
             }
-        }
-
-        /// <summary>
-        /// Delete SoundEvent 
-        /// </summary>
-        /// <param name="soundEvent">SoundEvent to delete</param>
-        private void Delete(EventKeyView e)
-        {
-            if (_Events.Remove(e))
-            {
-                this.Controls.Remove(e);
-                RebuildTrackKeys();
-            }
-        }
-
-        /// <summary>
-        /// Rebuild Keys pf SoundTrack
-        /// </summary>
-        private void RebuildTrackKeys()
-        {
-            var keys = new EventKey[_Events.Count];
-            for (int i = 0; i < _Events.Count; i++)
-                keys[i] = _Events[i].Key;
-            _EventTrack.EventKeys = keys;
-            _EventTrack.SortKeys();
-            SetDirty();
         }
 
         #region EventKeyView
@@ -164,14 +63,8 @@ namespace Skill.Editor.Sequence
         /// <summary>
         /// Visual representation of EventKey
         /// </summary>
-        public class EventKeyView : KeyView
+        protected class EventKeyView : EventOrientedKeyView
         {
-            public override double Duration { get { return 0.01f; } set { } }
-            public override float MinWidth { get { return 10; } }
-            public override float MaxWidth { get { return MinWidth; } }
-
-            public EventKey Key { get; private set; }
-
             private string _Title;
             public override string Title
             {
@@ -184,73 +77,29 @@ namespace Skill.Editor.Sequence
             }
 
             private Skill.Framework.UI.Image _ImgState;
+            private Skill.Framework.UI.Box _Bg;
+
+            private EventKey _EventKey;
+
             public EventKeyView(EventTrackBar trackBar, EventKey key)
-                : base(trackBar)
+                : base(trackBar, key)
             {
-                this.Key = key;
-                _ImgState = new Skill.Framework.UI.Image() { Row = 0, Column = 0, RowSpan = 10, ColumnSpan = 10, HorizontalAlignment = Skill.Framework.UI.HorizontalAlignment.Center, VerticalAlignment = Skill.Framework.UI.VerticalAlignment.Center, Width = 10, Height = 10 };
+                _EventKey = key;
+
+                this.ColumnDefinitions.Add(10, Framework.UI.GridUnitType.Pixel);
+                this.ColumnDefinitions.Add(1, Framework.UI.GridUnitType.Star);
+
+
+                _Bg = new Framework.UI.Box();
+                _ImgState = new Skill.Framework.UI.Image() { Row = 0, Column = 0 };
+
+                Controls.Add(_Bg);
                 Controls.Add(_ImgState);
             }
             protected override void BeginRender()
             {
                 _ImgState.Texture = Resources.UITextures.Event;
                 base.BeginRender();
-            }
-
-            private EventKeyViewProperties _Properties;
-            /// <summary> Properties </summary>
-            public override PropertiesPanel Properties
-            {
-                get
-                {
-                    if (_Properties == null)
-                        _Properties = new EventKeyViewProperties(this);
-                    return _Properties;
-                }
-            }
-            public override double FireTime { get { return Key.FireTime; } set { Key.FireTime = (float)value; Properties.Refresh(); } }
-            public class EventKeyViewProperties : ExposeProperties
-            {
-                protected EventKeyView _View;
-                public EventKeyViewProperties(EventKeyView view)
-                    : base(view.Key)
-                {
-                    _View = view;
-                }
-                protected override void SetDirty()
-                {
-                    ((BaseTrackBar)_View.TrackBar).SetDirty();
-                }
-            }
-        }
-        #endregion
-
-        #region EventKeyViewContextMenu
-        class EventKeyViewContextMenu : Skill.Editor.UI.ContextMenu
-        {
-            private static EventKeyViewContextMenu _Instance;
-            public static EventKeyViewContextMenu Instance
-            {
-                get
-                {
-                    if (_Instance == null) _Instance = new EventKeyViewContextMenu();
-                    return _Instance;
-                }
-            }
-
-            public EventKeyViewContextMenu()
-            {
-                Skill.Editor.UI.MenuItem deleteItem = new Skill.Editor.UI.MenuItem("Delete");
-                Add(deleteItem);
-
-                deleteItem.Click += deleteItem_Click;
-
-            }
-
-            void deleteItem_Click(object sender, System.EventArgs e)
-            {
-                EventKeyView view = (EventKeyView)Owner;
-                ((EventTrackBar)view.TrackBar).Delete(view);
             }
         }
         #endregion
@@ -267,7 +116,6 @@ namespace Skill.Editor.Sequence
                     return _Instance;
                 }
             }
-
 
             class MenuItemData
             {

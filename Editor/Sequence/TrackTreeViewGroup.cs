@@ -41,6 +41,7 @@ namespace Skill.Editor.Sequence
             Properties = new TrackTreeViewGroupProperties(this);
 
             Foldout.StateChanged += Foldout_StateChanged;
+            Margin = new Thickness(0, 1);
         }
 
         void Foldout_StateChanged(object sender, System.EventArgs e)

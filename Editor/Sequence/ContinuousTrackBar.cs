@@ -19,8 +19,8 @@ namespace Skill.Editor.Sequence
     {
         private static Color[] CurveColors = new Color[] { new Color(1.0f, 0.0f, 0.0f), new Color(0.0f, 1.0f, 0.0f), new Color(0.0f, 0.0f, 1.0f), new Color(1.0f, 1.0f, 0.0f) };
 
-        public abstract int CurveCount { get; }
-        public abstract AnimationCurve GetCurve(int index);
+        //public int CurveCount { get { return _ContinuousTrack.CurveCount; } }
+        //public AnimationCurve GetCurve(int index) { return _ContinuousTrack.GetCurve(index); }
 
         public override bool IsContinuous { get { return true; } }
 
@@ -34,10 +34,10 @@ namespace Skill.Editor.Sequence
         public ContinuousTrackBar(ContinuousTrack<V> track)
             : base(track)
         {
-            this.Height = CurveCount * BaseHeight;
             _ContinuousTrack = track;
-            _CurveKeyViews = new CurveKeyView[CurveCount];
-            for (int i = 0; i < CurveCount; i++)
+            this.Height = _ContinuousTrack.CurveCount * BaseHeight;
+            _CurveKeyViews = new CurveKeyView[_ContinuousTrack.CurveCount];
+            for (int i = 0; i < _ContinuousTrack.CurveCount; i++)
                 _CurveKeyViews[i] = new CurveKeyView(this, i);
 
             this.ContextMenu = ContinuousTrackBarContextMenu.Instance;
@@ -46,38 +46,62 @@ namespace Skill.Editor.Sequence
         {
             base.Refresh();
             for (int i = 0; i < _CurveKeyViews.Length; i++)
-                _CurveKeyViews[i].Refresh(GetCurve(i));
+                _CurveKeyViews[i].Refresh(_ContinuousTrack.GetCurve(i));
         }
 
-        protected static void ValidateCurve(AnimationCurve curve, float value)
-        {
-            if (curve.length < 2)
-            {
-                if (curve.length < 1)
-                    curve.AddKey(0.0f, value);
-                else
-                    curve.MoveKey(0, new Keyframe() { time = 0.0f, value = value });
+        //protected static void ValidateCurve(AnimationCurve curve, float value)
+        //{
+        //    if (curve.length < 2)
+        //    {
+        //        if (curve.length < 1)
+        //            curve.AddKey(0.0f, value);
+        //        else
+        //            curve.MoveKey(0, new Keyframe() { time = 0.0f, value = value });
 
-                if (curve.length < 2)
-                    curve.AddKey(0.1f, value);
-                else
-                    curve.MoveKey(1, new Keyframe() { time = 0.1f, value = value });
+        //        if (curve.length < 2)
+        //            curve.AddKey(0.1f, value);
+        //        else
+        //            curve.MoveKey(1, new Keyframe() { time = 0.1f, value = value });
+        //    }
+        //}
+
+        public override void Delete(KeyView keyView)
+        {
+            ContinuousKeyView kv = keyView as ContinuousKeyView;
+            if (kv != null)
+            {
+                if (_CurveKeyViews[kv.CurveIndex].Remove(kv))
+                {
+                    if (InspectorProperties.IsSelected(keyView))
+                        InspectorProperties.Select(null);
+                    SetDirty();
+                    Invalidate();
+                }
             }
         }
 
-        private void Delete(ContinuousKeyView keyView)
+        private void Update(ContinuousKeyView keyView)
         {
-            if (_CurveKeyViews[keyView.CurveIndex].Remove(keyView))
-            {
-                keyView.Curve.RemoveKey(keyView.KeyIndex);
-                SetDirty();
-                Invalidate();
-            }
+            float time = keyView.Time;
+
+            KeyType keyType = KeyType.None;
+            if (keyView.CurveIndex == 0) keyType = KeyType.X;
+            if (keyView.CurveIndex == 1) keyType = KeyType.Y;
+            if (keyView.CurveIndex == 2) keyType = KeyType.Z;
+            if (keyView.CurveIndex == 3) keyType = KeyType.W;
+
+            AddCurveKey(keyType, time);
+            RefreshCurveKeyView(keyType);
+        }
+
+        public override void AddKey()
+        {
+            AddCurveKey(KeyType.All);
         }
 
         internal override void AddCurveKey(KeyType keyType)
         {
-            if (CurveCount > 0)
+            if (_ContinuousTrack.CurveCount > 0)
             {
                 TimeLine timeLine = FindInParents<TimeLine>();
                 if (timeLine != null)
@@ -102,27 +126,35 @@ namespace Skill.Editor.Sequence
 
         private void RefreshCurveKeyView(KeyType keyType)
         {
-            if ((CurveCount > 0) && (keyType & KeyType.X) == KeyType.X) _CurveKeyViews[0].Refresh(GetCurve(0));
-            if ((CurveCount > 1) && (keyType & KeyType.Y) == KeyType.Y) _CurveKeyViews[1].Refresh(GetCurve(1));
-            if ((CurveCount > 2) && (keyType & KeyType.Z) == KeyType.Z) _CurveKeyViews[2].Refresh(GetCurve(2));
-            if ((CurveCount > 3) && (keyType & KeyType.W) == KeyType.W) _CurveKeyViews[3].Refresh(GetCurve(3));
+            if ((_ContinuousTrack.CurveCount > 0) && (keyType & KeyType.X) == KeyType.X) _CurveKeyViews[0].Refresh(_ContinuousTrack.GetCurve(0));
+            if ((_ContinuousTrack.CurveCount > 1) && (keyType & KeyType.Y) == KeyType.Y) _CurveKeyViews[1].Refresh(_ContinuousTrack.GetCurve(1));
+            if ((_ContinuousTrack.CurveCount > 2) && (keyType & KeyType.Z) == KeyType.Z) _CurveKeyViews[2].Refresh(_ContinuousTrack.GetCurve(2));
+            if ((_ContinuousTrack.CurveCount > 3) && (keyType & KeyType.W) == KeyType.W) _CurveKeyViews[3].Refresh(_ContinuousTrack.GetCurve(3));
         }
         protected abstract void AddCurveKey(KeyType keyType, float time);
         protected void AddKeyToCurve(AnimationCurve curve, float time, float value)
         {
-            bool found = false;
+            float closestTime = 0.005f;
+            int closestIndex = -1;
             for (int i = 0; i < curve.length; i++)
             {
-                if (Mathf.Abs(curve[i].time - time) < 0.005f)
+                float deltaTime = Mathf.Abs(curve[i].time - time);
+                if (deltaTime < closestTime)
                 {
-                    Keyframe keyframe = curve[i];
-                    keyframe.value = value;
-                    curve.MoveKey(i, keyframe);
-                    found = true;
-                    break;
+                    closestTime = deltaTime;
+                    closestIndex = i;
                 }
+                else if (closestIndex >= 0) // getting far from time
+                    break;
             }
-            if (!found)
+
+            if (closestIndex >= 0)
+            {
+                Keyframe keyframe = curve[closestIndex];
+                keyframe.value = value;
+                curve.MoveKey(closestIndex, keyframe);
+            }
+            else
             {
                 int keyIndex = curve.AddKey(time, value);
                 Skill.Editor.CurveUtility.SetKeyModeFromContext(curve, keyIndex);
@@ -185,7 +217,7 @@ namespace Skill.Editor.Sequence
                 _Curve = curve;
                 Refresh();
             }
-            private void Refresh()
+            public void Refresh()
             {
                 if (_Curve != null && _Curve.length > 0)
                 {
@@ -203,8 +235,9 @@ namespace Skill.Editor.Sequence
                         int index = _Keys.Count - 1;
                         while (index >= _Curve.length)
                         {
-                            _TrackBar.Controls.Remove(_Keys[index]);
-                            _Keys.RemoveAt(index);
+                            var kv = _Keys[index];
+                            _TrackBar.Controls.Remove(kv);
+                            _Keys.Remove(kv);
                             index--;
                         }
                     }
@@ -233,6 +266,7 @@ namespace Skill.Editor.Sequence
             {
                 if (_Keys.Remove(keyView))
                 {
+                    if (_Curve != null) _Curve.RemoveKey(keyView.KeyIndex);
                     _TrackBar.Controls.Remove(keyView);
                     Refresh();
                     return true;
@@ -262,7 +296,13 @@ namespace Skill.Editor.Sequence
             public int CurveIndex { get; private set; }
             public Keyframe Keyframe
             {
-                get { return Curve[Mathf.Clamp(KeyIndex, 0, Curve.length - 1)]; }
+                get
+                {
+                    //if (KeyIndex < Curve.length)
+                    return Curve[Mathf.Clamp(KeyIndex, 0, Curve.length - 1)];
+                    //else
+                    //    return new Keyframe();
+                }
                 set
                 {
                     Curve.MoveKey(KeyIndex, value);
@@ -293,6 +333,7 @@ namespace Skill.Editor.Sequence
                 set
                 {
                     Keyframe k = this.Keyframe;
+                    if (value < 0) value = 0;
                     k.time = (float)ClampTime(value);
                     this.Keyframe = k;
                     Properties.Refresh();
@@ -391,12 +432,23 @@ namespace Skill.Editor.Sequence
             }
 
             private Skill.Editor.UI.MenuItem _DeleteItem;
+            private Skill.Editor.UI.MenuItem _Update;
 
             public ContinuousKeyViewContextMenu()
             {
                 _DeleteItem = new Skill.Editor.UI.MenuItem("Delete");
+                _Update = new Skill.Editor.UI.MenuItem("Update");
                 Add(_DeleteItem);
+                AddSeparator();
+                Add(_Update);
                 _DeleteItem.Click += _DeleteItem_Click;
+                _Update.Click += _Update_Click;
+            }
+
+            void _Update_Click(object sender, System.EventArgs e)
+            {
+                ContinuousKeyView se = (ContinuousKeyView)Owner;
+                ((ContinuousTrackBar<V>)se.TrackBar).Update(se);
             }
 
             void _DeleteItem_Click(object sender, System.EventArgs e)
@@ -480,11 +532,11 @@ namespace Skill.Editor.Sequence
             protected override void BeginShow()
             {
                 ContinuousTrackBar<V> trackBar = (ContinuousTrackBar<V>)Owner;
-                _AddKeyXItem.IsVisible = trackBar.CurveCount > 0;
-                _AddKeyYItem.IsVisible = trackBar.CurveCount > 1;
-                _AddKeyZItem.IsVisible = trackBar.CurveCount > 2;
-                _AddKeyWItem.IsVisible = trackBar.CurveCount > 3;
-                _AddKeyAllItem.IsVisible = trackBar.CurveCount > 1;
+                _AddKeyXItem.IsVisible = trackBar._ContinuousTrack.CurveCount > 0;
+                _AddKeyYItem.IsVisible = trackBar._ContinuousTrack.CurveCount > 1;
+                _AddKeyZItem.IsVisible = trackBar._ContinuousTrack.CurveCount > 2;
+                _AddKeyWItem.IsVisible = trackBar._ContinuousTrack.CurveCount > 3;
+                _AddKeyAllItem.IsVisible = trackBar._ContinuousTrack.CurveCount > 1;
                 base.BeginShow();
             }
         }

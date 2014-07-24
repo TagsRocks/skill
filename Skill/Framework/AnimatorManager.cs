@@ -290,10 +290,10 @@ namespace Skill.Framework
 
     public enum AnimatorParameterType
     {
-        Boolean,
-        Integer,
-        Float,
-        Trigger
+        Float = 1,
+        Int = 3,
+        Bool = 4,
+        Trigger = 9,
     }
 
     public abstract class AnimatorParameter
@@ -334,7 +334,7 @@ namespace Skill.Framework
 
         internal BooleanParameter(string name, Animator animator) : base(name, animator) { }
 
-        public override AnimatorParameterType ParameterType { get { return AnimatorParameterType.Boolean; } }
+        public override AnimatorParameterType ParameterType { get { return AnimatorParameterType.Bool; } }
 
         public static implicit operator bool(BooleanParameter b)
         {
@@ -361,7 +361,7 @@ namespace Skill.Framework
         public event EventHandler Changed;
         protected virtual void OnChanged() { if (Changed != null) Changed(this, EventArgs.Empty); }
         internal IntegerParameter(string name, Animator animator) : base(name, animator) { }
-        public override AnimatorParameterType ParameterType { get { return AnimatorParameterType.Integer; } }
+        public override AnimatorParameterType ParameterType { get { return AnimatorParameterType.Int; } }
 
         public static implicit operator int(IntegerParameter i) { return i.Value; }
     }

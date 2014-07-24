@@ -8,13 +8,13 @@ namespace Skill.Editor.UI.Extended
     {
         Rect RenderArea { get; }
         bool IsVisible { get; }
+
+        Thickness Margin { get; }
     }
 
     public class TrackBar : Panel
     {
-
         public ITrackBarTreeViewItem TreeViewItem { get; set; }
-
         public TrackBar()
         {
             Padding = new Thickness(0, 1);
@@ -53,7 +53,11 @@ namespace Skill.Editor.UI.Extended
             }
         }
 
-        public virtual double Length { get { return 1; } }
+        public virtual void GetTimeBounds(out double minTime, out double maxTime)
+        {
+            minTime = 0;
+            maxTime = 1.0f;
+        }
     }
 
 

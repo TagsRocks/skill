@@ -6,8 +6,6 @@ namespace Skill.Editor.Curve
 {
     public class CurveKey : Canvas, Skill.Editor.UI.Extended.IProperties
     {
-        internal Vector2 StartDrag;
-
         class CurveKeyDragThumb : Skill.Editor.UI.Extended.DragThumb
         {
             private CurveKey _Key;
@@ -27,8 +25,10 @@ namespace Skill.Editor.Curve
         private TangentHandle _HandleLeft;
         private TangentHandle _HandleRight;
 
+        internal Vector2 StartDrag;
 
         public bool IsSelected { get; set; }
+
         public int Index { get; private set; }
         public CurveTrack Track { get; private set; }
         public Keyframe Keyframe
@@ -103,7 +103,7 @@ namespace Skill.Editor.Curve
             set
             {
                 Keyframe key = this.Keyframe;
-                key.time = Mathf.Max(0, Track.GetTime(value + (Width * 0.5f), true));
+                key.time = Track.GetTime(value + (Width * 0.5f), true);
                 key.time = ClampTime(key.time);
                 Track.MoveKey(Index, key);
                 base.X = value;
@@ -181,7 +181,7 @@ namespace Skill.Editor.Curve
         }
 
         private float ClampTime(float time)
-        {
+        {            
             if (Index > 0)
             {
                 if (Index == 1 || Index == Curve.length - 1)
@@ -220,7 +220,7 @@ namespace Skill.Editor.Curve
         {
             get { return Keyframe.time; }
             set
-            {
+            {                
                 Keyframe k = this.Keyframe;
                 k.time = ClampTime(value);
                 this.Keyframe = k;

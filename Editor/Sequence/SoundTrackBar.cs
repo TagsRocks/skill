@@ -9,90 +9,43 @@ namespace Skill.Editor.Sequence
     /// <summary>
     /// TrackBar to edit SoundTrack
     /// </summary>
-    public class SoundTrackBar : BaseTrackBar
+    public class SoundTrackBar : EventOrientedTrackBar
     {
-        private List<SoundKeyView> _Events;
         private SoundTrack _SoundTrack;
-
-        public override bool IsContinuous { get { return false; } }
 
         public SoundTrackBar(SoundTrack track)
             : base(track)
         {
             this.Height = BaseHeight * 2;
             _SoundTrack = track;
-            _Events = new List<SoundKeyView>();
-            CreateEvents();
             this.ContextMenu = SoundTrackBarContextMenu.Instance;
         }
 
-        /// <summary>
-        /// Refresh data do to changes outside of MatineeEditor
-        /// </summary>
-        public override void Refresh()
+        protected override EventOrientedKeyView CreateNewEvent(EventOrientedKey key)
         {
-            base.Refresh();
-            CreateEvents();
+            return new SoundKeyView(this, (SoundKey)key);
         }
-        private void CreateEvents()
-        {
-            if (_SoundTrack.Keys != null)
-            {
-                // search for new events in DiscreteTrack that we didn't create DiscreteEvent for them 
-                foreach (var key in _SoundTrack.Keys)
-                {
-                    if (key != null)
-                    {
-                        if (!IsEventExistWithKey(key))
-                            CreateEvent(key);
-                    }
-                }
 
-                // search for removed keys in SoundTrack that we did create SoundEvent for them 
-                int index = 0;
-                while (index < _Events.Count)
-                {
-                    var e = _Events[index];
-                    if (!IsKeyExistInDiscreteTrack(e.Key))
-                    {
-                        _Events.Remove(e);
-                        Controls.Remove(e);
-                        continue;
-                    }
-                    index++;
-                }
-            }
-            else
+        public override void AddKey()
+        {
+            TimeLine timeLine = FindInParents<TimeLine>();
+            if (timeLine != null)
             {
-                _Events.Clear();
-                Controls.Clear();
+                float time = (float)timeLine.TimePosition;
+                AddKey(time);
             }
         }
 
-        // create a SoundEvent and initialize it
-        private SoundKeyView CreateEvent(SoundKey key)
+        private void AddKey(float time)
         {
-            SoundKeyView se = new SoundKeyView(this, key);
-            se.ContextMenu = SoundEventContextMenu.Instance;
-            this.Controls.Add(se);
-            this._Events.Add(se);
-            return se;
-        }
+            SoundKey newKey = new SoundKey();
+            newKey.Clip = null;
+            newKey.FireTime = time;
 
-        private bool IsEventExistWithKey(SoundKey key)
-        {
-            foreach (var e in _Events)
-                if (e.Key == key) return true;
-            return false;
-        }
-        private bool IsKeyExistInDiscreteTrack(SoundKey key)
-        {
-            foreach (var k in _SoundTrack.Keys)
-            {
-                if (k == key)
-                    return true;
-            }
-            return false;
+            EventOrientedKeyView e = CreateEvent(newKey);
+            RebuildTrackKeys();
+            InspectorProperties.Select(e);
+
         }
 
         /// <summary>
@@ -106,44 +59,8 @@ namespace Skill.Editor.Sequence
             {
                 // convert to local position of TimeBar - because of zooming
                 x -= timeLine.View.ScrollPosition.x;
-
-                SoundKey newKey = new SoundKey();
-                newKey.Clip = null;
-                newKey.FireTime = (float)timeLine.TimeBar.GetTime(x);
-
-                SoundKeyView e = CreateEvent(newKey);
-                RebuildTrackKeys();
-
-                InspectorProperties.Select(e);
+                AddKey((float)timeLine.TimeBar.GetTime(x));
             }
-        }
-
-
-
-        /// <summary>
-        /// Delete SoundEvent 
-        /// </summary>
-        /// <param name="soundEvent">SoundEvent to delete</param>
-        private void Delete(SoundKeyView e)
-        {
-            if (_Events.Remove(e))
-            {
-                this.Controls.Remove(e);
-                RebuildTrackKeys();
-            }
-        }
-
-        /// <summary>
-        /// Rebuild Keys pf SoundTrack
-        /// </summary>
-        private void RebuildTrackKeys()
-        {
-            SoundKey[] keys = new SoundKey[_Events.Count];
-            for (int i = 0; i < _Events.Count; i++)
-                keys[i] = _Events[i].Key;
-            _SoundTrack.Keys = keys;
-            _SoundTrack.SortKeys();
-            SetDirty();
         }
 
         #region SoundKeyView
@@ -151,20 +68,19 @@ namespace Skill.Editor.Sequence
         /// <summary>
         /// Visual representation of SoundKey
         /// </summary>
-        class SoundKeyView : KeyView
+        class SoundKeyView : EventOrientedKeyView
         {
             private Skill.Framework.UI.Label _LblClipName;
             private Skill.Editor.UI.Extended.AudioPreviewCurve _PreviewImage;
-
-            public SoundKey Key { get; private set; }
-            public override double Duration { get { return Key.ValueKey != null ? Key.ValueKey.length : 0.01; } set { } }
             public override string Title { get { return "Sound Event"; } }
             public override float MinWidth { get { return 20; } }
 
+            private SoundKey _SoundKey;
+
             public SoundKeyView(SoundTrackBar trackBar, SoundKey key)
-                : base(trackBar)
+                : base(trackBar, key)
             {
-                this.Key = key;
+                this._SoundKey = key;
                 _PreviewImage = new AudioPreviewCurve() { Margin = new Skill.Framework.UI.Thickness(2), BackgroundColor = Color.clear };
                 _LblClipName = new Skill.Framework.UI.Label() { Style = Resources.Styles.EventLabel };
 
@@ -177,11 +93,11 @@ namespace Skill.Editor.Sequence
             private AnimationCurve[] _Curves = new AnimationCurve[1];
             protected override void BeginRender()
             {
-                _PreviewImage.Clip = Key.ValueKey;
+                _PreviewImage.Clip = _SoundKey.Clip;
 
-                if (Key.ValueKey != null)
+                if (_SoundKey.Clip != null)
                 {
-                    _LblClipName.Text = Key.ValueKey.name;
+                    _LblClipName.Text = _SoundKey.Clip.name;
                     CalcCurveRenderArea(ref _CurevRenderAreas, ref _CurevRanges, _Curves);
 
                     Rect ra = _CurevRenderAreas[0];
@@ -203,65 +119,9 @@ namespace Skill.Editor.Sequence
                 }
                 base.BeginRender();
             }            
-
-
-            private SoundKeyViewProperties _Properties;
-            /// <summary> Properties </summary>
-            public override PropertiesPanel Properties
-            {
-                get
-                {
-                    if (_Properties == null)
-                        _Properties = new SoundKeyViewProperties(this);
-                    return _Properties;
-                }
-            }
-            public override double FireTime { get { return Key.FireTime; } set { Key.FireTime = (float)value; Properties.Refresh(); } }
-            public class SoundKeyViewProperties : ExposeProperties
-            {
-                protected SoundKeyView _View;
-                public SoundKeyViewProperties(SoundKeyView view)
-                    : base(view.Key)
-                {
-                    _View = view;
-                }
-                protected override void SetDirty()
-                {
-                    ((BaseTrackBar)_View.TrackBar).SetDirty();
-                }
-            }
         }
         #endregion
 
-        #region SoundEventContextMenu
-        class SoundEventContextMenu : Skill.Editor.UI.ContextMenu
-        {
-            private static SoundEventContextMenu _Instance;
-            public static SoundEventContextMenu Instance
-            {
-                get
-                {
-                    if (_Instance == null) _Instance = new SoundEventContextMenu();
-                    return _Instance;
-                }
-            }
-
-            private Skill.Editor.UI.MenuItem _DeleteItem;
-
-            public SoundEventContextMenu()
-            {
-                _DeleteItem = new Skill.Editor.UI.MenuItem("Delete");
-                Add(_DeleteItem);
-                _DeleteItem.Click += _DeleteItem_Click;
-            }
-
-            void _DeleteItem_Click(object sender, System.EventArgs e)
-            {
-                SoundKeyView se = (SoundKeyView)Owner;
-                ((SoundTrackBar)se.TrackBar).Delete(se);
-            }
-        }
-        #endregion
 
         #region SoundTrackBarContextMenu
         class SoundTrackBarContextMenu : Skill.Editor.UI.ContextMenu

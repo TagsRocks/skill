@@ -58,7 +58,7 @@ namespace Skill.Editor
 
             SetTextureImportType(GetUIResourcePath("TimeFormat.png"), TextureImporterType.GUI);
             SetTextureImportType(GetUIResourcePath("SequenceFormat.png"), TextureImporterType.GUI);
-            
+
             SetTextureImportType(GetUIResourcePath("Keyframe.png"), TextureImporterType.GUI);
             SetTextureImportType(GetUIResourcePath("KeyframeSelected.png"), TextureImporterType.GUI);
             SetTextureImportType(GetUIResourcePath("KeyframeEmpty.png"), TextureImporterType.GUI);
@@ -76,6 +76,8 @@ namespace Skill.Editor
             SetTextureImportType(GetUIResourcePath("Matinee/Vector2.png"), TextureImporterType.GUI);
             SetTextureImportType(GetUIResourcePath("Matinee/Vector3.png"), TextureImporterType.GUI);
             SetTextureImportType(GetUIResourcePath("Matinee/Vector4.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Matinee/Animator.png"), TextureImporterType.GUI);
+            SetTextureImportType(GetUIResourcePath("Matinee/Animation.png"), TextureImporterType.GUI);
         }
 
         public static class UITextures
@@ -115,7 +117,7 @@ namespace Skill.Editor
 
             public static Texture2D TimeFormat { get { return GetTexture("TimeFormat.png"); } }
             public static Texture2D SequenceFormat { get { return GetTexture("SequenceFormat.png"); } }
-            
+
             public static Texture2D Keyframe { get { return GetTexture("Keyframe.png"); } }
             public static Texture2D KeyframeSelected { get { return GetTexture("KeyframeSelected.png"); } }
             public static Texture2D KeyframeEmpty { get { return GetTexture("KeyframeEmpty.png"); } }
@@ -270,6 +272,9 @@ namespace Skill.Editor
                 public static Texture2D Vector2 { get { return GetTexture("Matinee/Vector2.png"); } }
                 public static Texture2D Vector3 { get { return GetTexture("Matinee/Vector3.png"); } }
                 public static Texture2D Vector4 { get { return GetTexture("Matinee/Vector4.png"); } }
+
+                public static Texture2D Animator { get { return GetTexture("Matinee/Animator.png"); } }
+                public static Texture2D Animation { get { return GetTexture("Matinee/Animation.png"); } }
             }
             #endregion
 
@@ -598,6 +603,20 @@ namespace Skill.Editor
                     if (_MiniToolbarPopup == null)
                         _MiniToolbarPopup = (GUIStyle)"MiniToolbarPopup";
                     return _MiniToolbarPopup;
+                }
+            }
+        }
+
+        public static class Colors
+        {
+            public static Color ThumbColor
+            {
+                get
+                {
+                    if (UnityEditor.EditorGUIUtility.isProSkin) 
+                        return new Color(1.0f, 0.0f, 1.0f, 1.0f);
+                    else
+                        return new Color(0.5f, 0.0f, 0.5f, 1.0f);
                 }
             }
         }

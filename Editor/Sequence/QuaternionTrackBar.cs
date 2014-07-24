@@ -7,15 +7,7 @@ namespace Skill.Editor.Sequence
 {
     public class QuaternionTrackBar : ContinuousTrackBar<Quaternion>
     {
-        public override int CurveCount { get { return 3; } }
-        public override AnimationCurve GetCurve(int index)
-        {
-            if (index == 0) return _QuaternionTrack.CurveX;
-            if (index == 1) return _QuaternionTrack.CurveY;
-            return _QuaternionTrack.CurveZ;
-        }
-
-        private QuaternionTrack _QuaternionTrack;
+                private QuaternionTrack _QuaternionTrack;
 
         public QuaternionTrackBar(QuaternionTrack track)
             : base(track)
@@ -32,15 +24,15 @@ namespace Skill.Editor.Sequence
             if (_QuaternionTrack.CurveZ == null) _QuaternionTrack.CurveZ = new AnimationCurve();
         }
 
-        public override void UpdateDefaultValue(Quaternion defaultValue)
-        {
-            Vector3 eulers = defaultValue.eulerAngles;
-            base.UpdateDefaultValue(defaultValue);
-            CheckCurves();
-            ValidateCurve(_QuaternionTrack.CurveX, eulers.x);
-            ValidateCurve(_QuaternionTrack.CurveY, eulers.y);
-            ValidateCurve(_QuaternionTrack.CurveZ, eulers.z);
-        }
+        //public override void UpdateDefaultValue(Quaternion defaultValue)
+        //{
+        //    Vector3 eulers = defaultValue.eulerAngles;
+        //    base.UpdateDefaultValue(defaultValue);
+        //    CheckCurves();
+        //    ValidateCurve(_QuaternionTrack.CurveX, eulers.x);
+        //    ValidateCurve(_QuaternionTrack.CurveY, eulers.y);
+        //    ValidateCurve(_QuaternionTrack.CurveZ, eulers.z);
+        //}
 
         protected override void AddCurveKey(KeyType keyType, float time)
         {

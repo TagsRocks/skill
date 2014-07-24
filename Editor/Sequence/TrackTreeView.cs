@@ -14,6 +14,7 @@ namespace Skill.Editor.Sequence
         private TrackItemContextMenu _TrackItemContextMenu;
         private Skill.Framework.UI.Grid _Toolbar;
         private Skill.Framework.UI.Label _Title;
+        private Skill.Framework.UI.Button _BtnAddKey;
 
         internal TreeView TreeView { get { return _TreeView; } }
 
@@ -25,6 +26,7 @@ namespace Skill.Editor.Sequence
 
             _Toolbar = new Framework.UI.Grid();
             _Toolbar.ColumnDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star);
+            _Toolbar.ColumnDefinitions.Add(30, Skill.Framework.UI.GridUnitType.Pixel);
 
             // create header
             _Title = new Skill.Framework.UI.Label() { Row = 0, Column = 0 };
@@ -33,7 +35,11 @@ namespace Skill.Editor.Sequence
 
             Controls.Add(_Toolbar);
 
-            _TreeView = new TreeView() { Row = 1, UserData = this, HandleScrollWheel = true, AlwayShowVertical = true , Padding = new Framework.UI.Thickness(0,0,0,16) };
+            _BtnAddKey = new Framework.UI.Button() { Row = 0, Column = 1, IsEnabled = false };
+            _BtnAddKey.Content.tooltip = "Add key to Selected";
+            _Toolbar.Controls.Add(_BtnAddKey);
+
+            _TreeView = new TreeView() { Row = 1, UserData = this, HandleScrollWheel = true, AlwayShowVertical = true, Padding = new Framework.UI.Thickness(0, 0, 0, 16) };
             _TreeView.DisableFocusable();
             Controls.Add(_TreeView);
 
@@ -43,12 +49,61 @@ namespace Skill.Editor.Sequence
             this._TrackItemContextMenu = new TrackItemContextMenu(this);
 
             _TreeView.SelectedItemChanged += _TreeView_SelectedItemChanged;
+            _BtnAddKey.Click += _BtnAddKey_Click;
+        }
+
+        void _BtnAddKey_Click(object sender, System.EventArgs e)
+        {
+            AddKey();
+        }
+
+        public void AddKey()
+        {
+            if (_TreeView.SelectedItem != null)
+            {
+                if (_TreeView.SelectedItem is FolderView)
+                {
+                    AddKeyRecursive((FolderView)_TreeView.SelectedItem);
+                }
+                else if (_TreeView.SelectedItem is TrackTreeViewItem)
+                {
+                    ((TrackTreeViewItem)_TreeView.SelectedItem).TrackBar.AddKey();
+                }
+            }
+        }
+
+        private void AddKeyRecursive(FolderView folderView)
+        {
+            foreach (var item in folderView.Controls)
+            {
+                if (item is FolderView)
+                {
+                    AddKeyRecursive((FolderView)item);
+                }
+                else if (item is TrackTreeViewItem)
+                {
+                    ((TrackTreeViewItem)item).TrackBar.AddKey();
+                }
+            }
         }
 
         void _TreeView_SelectedItemChanged(object sender, System.EventArgs e)
         {
+            if (_TreeView.SelectedItem == null)
+            {
+                IProperties selected = InspectorProperties.GetSelected();
+                if (selected != null)
+                {
+                    if (selected is TrackTreeViewItem || selected is TrackTreeViewGroup)
+                        InspectorProperties.Select(null);
+                }
+            }
             if (_TreeView.SelectedItem is IProperties)
+            {
                 InspectorProperties.Select((IProperties)_TreeView.SelectedItem);
+            }
+
+            _BtnAddKey.IsEnabled = _TreeView.SelectedItem != null;
         }
 
         private bool _RefreshStyle;
@@ -56,6 +111,8 @@ namespace Skill.Editor.Sequence
         {
             if (!_RefreshStyle)
             {
+                _BtnAddKey.Style = Skill.Editor.Resources.Styles.ToolbarButton;
+                _BtnAddKey.Content.image = UnityEditor.EditorGUIUtility.FindTexture("d_Animation.AddKeyframe");
                 _Title.Style = Skill.Editor.Resources.Styles.Header;
                 _TreeView.Background.Style = Skill.Editor.Resources.Styles.BackgroundShadow;
                 _RefreshStyle = true;
@@ -201,7 +258,7 @@ namespace Skill.Editor.Sequence
                 newObj.transform.localRotation = Quaternion.identity;
             }
         }
-        private void DeleteGroup(TrackTreeViewGroup group)
+        public void DeleteGroup(TrackTreeViewGroup group)
         {
             if (_Editor.Matinee != null)
             {
@@ -269,6 +326,10 @@ namespace Skill.Editor.Sequence
                     return obj.AddComponent<QuaternionTrack>();
                 case TrackType.Sound:
                     return obj.AddComponent<SoundTrack>();
+                case TrackType.Animator:
+                    return obj.AddComponent<AnimatorTrack>();
+                case TrackType.Animation:
+                    return obj.AddComponent<AnimationTrack>();
                 default:
                     return null;
             }
@@ -297,11 +358,15 @@ namespace Skill.Editor.Sequence
                     return new QuaternionTrackBar((QuaternionTrack)track);
                 case TrackType.Sound:
                     return new SoundTrackBar((SoundTrack)track);
+                case TrackType.Animator:
+                    return new AnimatorTrackBar((AnimatorTrack)track);
+                case TrackType.Animation:
+                    return new AnimationTrackBar((AnimationTrack)track);
                 default:
                     return null;
             }
         }
-        private void DeleteTrack(TrackTreeViewItem track)
+        public void DeleteTrack(TrackTreeViewItem track)
         {
             if (_Editor.Matinee != null)
             {

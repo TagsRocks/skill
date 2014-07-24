@@ -124,7 +124,7 @@ namespace Skill.Editor.UI.Extended
             this.ThumbWidth = 6.0f;
             this.ShowSelectionTime = true;
 
-            this.ThumbColor = new Color(1.0f, 0.0f, 0.0f, 1.0f);
+            this.ThumbColor = Resources.Colors.ThumbColor;
             this.SelectionTimeColor = new Color(1.0f, 0.1f, 0.0f, 0.3f);
 
             if (UnityEditor.EditorGUIUtility.isProSkin)
@@ -174,7 +174,7 @@ namespace Skill.Editor.UI.Extended
                 _LongMiniStep = (long)(_SmallStep * _Factor);
                 _LongStartTime = (long)(_StartTime * _Factor);
                 _LongEndTime = (long)(_EndTime * _Factor);
-                _LongFirstStep = (_LongStartTime / _LongMiniStep + 1) * _LongMiniStep;
+                _LongFirstStep = (_LongStartTime / _LongMiniStep ) * _LongMiniStep;
 
                 _DPx = pixels / deltaTime; // number of pixel required for each unit of time
             }
@@ -184,7 +184,8 @@ namespace Skill.Editor.UI.Extended
         {
             if (TimeStyle)
             {
-                if (TimeLine.MaxTime >= 3600)
+                double deltaTime = TimeLine.MaxTime - TimeLine.MinTime;
+                if (deltaTime >= 3600)
                 {
                     if (_LongStep > 60 * _Factor)
                     {
@@ -202,7 +203,7 @@ namespace Skill.Editor.UI.Extended
                         _SampleText.text = " 0.00.00.000 ";
                     }
                 }
-                if (TimeLine.MaxTime >= 60)
+                if (deltaTime >= 60)
                 {
                     if (_LongStep > _Factor)
                     {

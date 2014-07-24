@@ -30,14 +30,14 @@ namespace Skill.Editor.Curve
         }
 
         public Color Background { get; set; }
-
+       
         public TimeLine TimeLine { get { return _TimeLine; } }
         public CurveEditor()
         {
             if (UnityEditor.EditorGUIUtility.isProSkin)
                 Background = new Color(0.15f, 0.15f, 0.15f, 1.0f);
             else
-                Background = new Color(0.55f, 0.55f, 0.55f, 1.0f);
+                Background = new Color(0.55f, 0.55f, 0.55f, 1.0f);            
             _CurveView = new TimeLineCurveView(this);
             _TimeLine = new TimeLine(_CurveView) { SelectionEnable = false };
             _TimeLine.TimeBar.ShowTimePosition = false;
@@ -53,11 +53,7 @@ namespace Skill.Editor.Curve
         {
             _Grid.MaxValue = _CurveView.MaxVisibleValue;
             _Grid.MinValue = _CurveView.MinVisibleValue;
-
-            Color savedColor = GUI.color;
-            GUI.color = Background;
-            GUI.DrawTexture(RenderArea, UnityEditor.EditorGUIUtility.whiteTexture, ScaleMode.StretchToFill);
-            GUI.color = savedColor;
+            UnityEditor.EditorGUI.DrawRect(RenderArea, Background);
             base.Render();
         }
         public CurveTrack AddCurve(AnimationCurve animationCurve, Color color)

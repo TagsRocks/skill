@@ -11,21 +11,12 @@ namespace Skill.Framework.Sequence
         public override TrackType Type { get { return TrackType.Vector2; } }
 
 
-        public override float Length
+        public override int CurveCount { get { return 2; } }
+
+        public override AnimationCurve GetCurve(int index)
         {
-            get
-            {
-
-                float maxLenght = 0;
-                if (CurveX != null && CurveX.length > 0)
-                    maxLenght = Mathf.Max(maxLenght, CurveX.keys[CurveX.length - 1].time);
-
-                if (CurveY != null && CurveY.length > 0)
-                    maxLenght = Mathf.Max(maxLenght, CurveY.keys[CurveY.length - 1].time);
-
-                return maxLenght;
-
-            }
+            if (index == 0) return CurveX;
+            return CurveY;
         }
 
 
@@ -36,7 +27,7 @@ namespace Skill.Framework.Sequence
         [SerializeField]
         [HideInInspector]
         [CurveEditor(0, 1, 0, "Y")]
-        public AnimationCurve CurveY;                
+        public AnimationCurve CurveY;
 
         protected override Vector2 EvaluateCurves(float time)
         {

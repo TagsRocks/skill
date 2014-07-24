@@ -8,24 +8,13 @@ namespace Skill.Framework.Sequence
         public override Type PropertyType { get { return typeof(Quaternion); } }
         public override TrackType Type { get { return TrackType.Quaternion; } }
 
-        public override float Length
+        public override int CurveCount { get { return 3; } }
+
+        public override AnimationCurve GetCurve(int index)
         {
-            get
-            {
-
-                float maxLenght = 0;
-                if (CurveX != null && CurveX.length > 0)
-                    maxLenght = Mathf.Max(maxLenght, CurveX.keys[CurveX.length - 1].time);
-
-                if (CurveY != null && CurveY.length > 0)
-                    maxLenght = Mathf.Max(maxLenght, CurveY.keys[CurveY.length - 1].time);
-
-                if (CurveZ != null && CurveZ.length > 0)
-                    maxLenght = Mathf.Max(maxLenght, CurveZ.keys[CurveZ.length - 1].time);
-
-                return maxLenght;
-
-            }
+            if (index == 0) return CurveX;
+            if (index == 1) return CurveY;
+            return CurveZ;
         }
 
         [SerializeField]

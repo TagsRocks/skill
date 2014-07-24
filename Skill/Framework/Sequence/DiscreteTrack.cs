@@ -13,20 +13,6 @@ namespace Skill.Framework.Sequence
 
     public abstract class DiscreteTrack<V> : PropertyTrack<V>
     {
-        public override float Length
-        {
-            get
-            {
-                if (PropertyKeys != null && PropertyKeys.Length > 0)
-                {
-                    if (!Application.isPlaying)
-                        SortKeys();
-
-                    return PropertyKeys[PropertyKeys.Length - 1].FireTime;
-                }
-                return 0;
-            }
-        }
         public abstract IPropertyKey<V>[] PropertyKeys { get; set; }
         protected float CurrecntTime { get; private set; }
 
@@ -143,7 +129,30 @@ namespace Skill.Framework.Sequence
                 return PropertyKeys[_Index + 1];
             else
                 return null;
-        }        
+        }
+
+
+        public override void GetTimeBounds(out float minTime, out float maxTime)
+        {
+            minTime = 0.0f;
+            maxTime = 0.0f;
+
+            if (PropertyKeys != null && PropertyKeys.Length > 0)
+            {
+                if (!Application.isPlaying)
+                    SortKeys();
+
+                var firstEvent = PropertyKeys[0];
+                var lastEvent = PropertyKeys[PropertyKeys.Length - 1];
+
+                if (firstEvent != null)
+                    minTime = Mathf.Min(0, firstEvent.FireTime);
+                if (lastEvent != null)
+                    maxTime = lastEvent.FireTime;
+            }
+            if (maxTime - minTime < 0.1f)
+                maxTime = minTime + 0.1f;
+        }
     }
 
 }

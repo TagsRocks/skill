@@ -21,8 +21,29 @@ namespace Skill.Editor.UI.Extended
             if (_Instance == null)
                 _Instance = UnityEngine.ScriptableObject.CreateInstance<InspectorProperties>();
 
+            if (_Instance._SelectedObject != p)
+            {
+                if (_Instance._SelectedObject != null)
+                    _Instance._SelectedObject.IsSelectedProperties = false;
+            }
+
             _Instance._SelectedObject = p;
             UnityEditor.Selection.activeObject = _Instance;
+        }
+
+        public static bool IsSelected(IProperties p)
+        {
+            if (_Instance != null)
+                return _Instance._SelectedObject == p;
+
+            return false;
+        }
+
+        public static IProperties GetSelected()
+        {
+            if (_Instance != null)
+                return _Instance._SelectedObject;
+            else return null;
         }
     }
 

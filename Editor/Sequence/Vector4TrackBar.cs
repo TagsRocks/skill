@@ -8,15 +8,7 @@ namespace Skill.Editor.Sequence
 
     public class Vector4TrackBar : ContinuousTrackBar<Vector4>
     {
-        public override int CurveCount { get { return 4; } }
-        public override AnimationCurve GetCurve(int index)
-        {
-            if (index == 0) return _Vector4Track.CurveX;
-            if (index == 1) return _Vector4Track.CurveY;
-            if (index == 2) return _Vector4Track.CurveZ;
-            return _Vector4Track.CurveW;
-        }
-
+        
         private Vector4Track _Vector4Track;
 
 
@@ -37,15 +29,15 @@ namespace Skill.Editor.Sequence
         }
 
 
-        public override void UpdateDefaultValue(Vector4 defaultValue)
-        {
-            base.UpdateDefaultValue(defaultValue);
-            CheckCurves();
-            ValidateCurve(_Vector4Track.CurveX, defaultValue.x);
-            ValidateCurve(_Vector4Track.CurveY, defaultValue.y);
-            ValidateCurve(_Vector4Track.CurveZ, defaultValue.z);
-            ValidateCurve(_Vector4Track.CurveW, defaultValue.w);
-        }
+        //public override void UpdateDefaultValue(Vector4 defaultValue)
+        //{
+        //    base.UpdateDefaultValue(defaultValue);
+        //    CheckCurves();
+        //    ValidateCurve(_Vector4Track.CurveX, defaultValue.x);
+        //    ValidateCurve(_Vector4Track.CurveY, defaultValue.y);
+        //    ValidateCurve(_Vector4Track.CurveZ, defaultValue.z);
+        //    ValidateCurve(_Vector4Track.CurveW, defaultValue.w);
+        //}
 
         protected override void AddCurveKey(KeyType keyType, float time)
         {

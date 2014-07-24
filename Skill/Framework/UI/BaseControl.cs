@@ -900,7 +900,7 @@ namespace Skill.Framework.UI
     {
         // Variables
         private EventHandler _LayoutChangeHandler;
-        private List<BaseControl> _Items;
+        //private List<BaseControl> _Items;
         private List<BaseControl> _ImmediateChangeItems;
         // the following variables defined to avoid modification of collection during render        
         private bool _IsChanged;
@@ -931,7 +931,7 @@ namespace Skill.Framework.UI
         internal BaseControlCollection(Panel panel)
         {
             this.Panel = panel;
-            this._Items = new List<BaseControl>();
+            //this._Items = new List<BaseControl>();
             this._ImmediateChangeItems = new List<BaseControl>();
             this._LayoutChangeHandler = Control_LayoutChange;
             this._IsChanged = false;
@@ -942,8 +942,8 @@ namespace Skill.Framework.UI
         {
             if (_IsChanged)
             {
-                _Items.Clear();
-                _Items.AddRange(_ImmediateChangeItems);
+                //_Items.Clear();
+                //_Items.AddRange(_ImmediateChangeItems);
                 _IsChanged = false;
             }
         }
@@ -1087,7 +1087,7 @@ namespace Skill.Framework.UI
         public IEnumerator<BaseControl> GetEnumerator()
         {
             ApplyChanges();
-            return _Items.GetEnumerator();
+            return new ControlEnumerator(this._ImmediateChangeItems);
         }
 
         /// <summary>
@@ -1097,7 +1097,60 @@ namespace Skill.Framework.UI
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             ApplyChanges();
-            return (_Items as System.Collections.IEnumerable).GetEnumerator();
+            return new ControlEnumerator(this._ImmediateChangeItems);
+        }
+
+        class ControlEnumerator : IEnumerator<BaseControl>
+        {
+            private int _Index;
+            private BaseControl _Current;
+            private List<BaseControl> _Controls;
+            private int _PreCount;
+            public ControlEnumerator(List<BaseControl> controls)
+            {
+                this._Controls = controls;
+                this._Index = -1;
+                this._Current = null;
+                this._PreCount = this._Controls.Count;
+            }
+
+            public BaseControl Current { get { return this._Current; } }
+            object IEnumerator.Current { get { return _Current; } }
+
+            public void Dispose() { _Index = int.MaxValue; }
+
+            public bool MoveNext()
+            {
+                if (_PreCount != _Controls.Count) // list is changed
+                {
+                    if (_Current != null && _Index >= 0)
+                    {
+                        int i = _Controls.IndexOf(_Current);
+                        if (i >= 0) // last item exists and one of previous or next items removed
+                        {
+                            _Index = i;
+                        }
+                    }
+                    _PreCount = _Controls.Count;
+                }
+
+                _Index++;
+                if (_Index < _Controls.Count)
+                {
+                    this._Current = _Controls[_Index];
+                    return true;
+                }
+                else
+                {
+                    this._Current = null;
+                    return false;
+                }
+            }
+
+            public void Reset()
+            {
+                _Index = -1;
+            }
         }
 
 

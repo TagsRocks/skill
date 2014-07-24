@@ -18,9 +18,10 @@ namespace Skill.Framework.Sequence
         Vector4,
         Quaternion,
         Sound,
-
+        Animator,
+        Animation
     }
-    
+
     /// <summary>
     /// Base class for all available tracks in Matinee
     /// </summary>
@@ -29,17 +30,14 @@ namespace Skill.Framework.Sequence
     {
         #region Editor variables
         [HideInInspector]
-        public Color Color = new Color(1, 1, 1, 0.2f);        
+        public Color Color = new Color(1, 1, 1, 0.1f);
         [HideInInspector]
         public bool IsEditingCurves;
         #endregion
 
         /// <summary> Type of Track </summary>
         public abstract TrackType Type { get; }
-
-        /// <summary> Length of track over time</summary>
-        public abstract float Length { get; }
-
+        
         /// <summary> Awake </summary>
         protected override void Awake()
         {
@@ -95,6 +93,9 @@ namespace Skill.Framework.Sequence
         /// </remarks>    
         protected static int FindMaxIndexBeforeTime(System.Array keys, float time)
         {
+            if (keys == null || keys.Length < 1)
+                return -1;
+
             int minTimeIndex = 0;
             int maxTimeIndex = keys.Length - 1;
 
@@ -130,5 +131,8 @@ namespace Skill.Framework.Sequence
 
             return minTimeIndex;
         }
+
+
+        public abstract void GetTimeBounds(out float minTime, out float maxTime);
     }
 }

@@ -63,12 +63,15 @@
     <Compile Include="Curve\TimeLineCurveView.cs" />
     <Compile Include="Curve\TimeLineGrid.cs" />
     <Compile Include="HandleHelper.cs" />
+    <Compile Include="Sequence\AnimationTrackBar.cs" />
     <Compile Include="Sequence\BaseTrackBar.cs" />
     <Compile Include="Sequence\BooleanTrackBar.cs" />
     <Compile Include="Sequence\ColorTrackBar.cs" />
     <Compile Include="Sequence\ContinuousTrackBar.cs" />
     <Compile Include="Sequence\CurveTrackTreeView.cs" />
     <Compile Include="Sequence\DiscreteTrackBar.cs" />
+    <Compile Include="Sequence\EventOrientedTrackBar.cs" />
+    <Compile Include="Sequence\AnimatorTrackBar.cs" />
     <Compile Include="Sequence\EventTrackBar.cs" />
     <Compile Include="Sequence\KeyView.cs" />
     <Compile Include="Tools\AudioClipSubtitleEditor.cs" />
@@ -91,7 +94,6 @@
     <Compile Include="Sequence\PropertyTrackProperties.cs" />
     <Compile Include="Sequence\QuaternionTrackBar.cs" />
     <Compile Include="Sequence\SoundTrackBar.cs" />
-    <Compile Include="Sequence\SoundTrackProperties.cs" />
     <Compile Include="Sequence\TrackTreeView.cs" />
     <Compile Include="Sequence\TrackTreeViewGroup.cs" />
     <Compile Include="Sequence\TrackTreeViewItem.cs" />
@@ -168,6 +170,7 @@
     <Compile Include="UI\LayerMaskField.cs" />
     <Compile Include="UI\MaskField.cs" />
     <Compile Include="UI\MinMaxSlider.cs" />
+    <Compile Include="UI\MultiFloatField.cs" />
     <Compile Include="UI\ObjectField.cs" />
     <Compile Include="UI\PasswordField.cs" />
     <Compile Include="UI\Popup.cs" />
@@ -184,7 +187,7 @@
     <Compile Include="UI\TagField.cs" />
     <Compile Include="UI\TextArea.cs" />
     <Compile Include="UI\TextField.cs" />
-    <Compile Include="UI\Image.cs" />
+    <Compile Include="UI\PreviewTexture.cs" />
     <Compile Include="UI\ToggleButton.cs" />
     <Compile Include="UI\Vector2Field.cs" />
     <Compile Include="UI\Vector3Field.cs" />
@@ -276,6 +279,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\LightSkin\LoopOn.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\LightSkin\Matinee\Animation.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\LightSkin\Matinee\Animator.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\LightSkin\Matinee\Boolean.png">
@@ -438,6 +447,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\ProSkin\LoopOn.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Matinee\Animation.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ProSkin\Matinee\Animator.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\ProSkin\Matinee\Boolean.png">

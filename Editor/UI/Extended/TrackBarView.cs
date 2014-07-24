@@ -33,8 +33,8 @@ namespace Skill.Editor.UI.Extended
                     if (tb.TreeViewItem != null && tb.TreeViewItem.IsVisible)
                     {
                         Rect itemRa = tb.TreeViewItem.RenderArea;
-                        cRect.y = itemRa.y + 2;
-                        cRect.height = itemRa.height - 4;
+                        cRect.y = itemRa.y + tb.TreeViewItem.Margin.Top + 1;
+                        cRect.height = itemRa.height - tb.TreeViewItem.Margin.Vertical - 2;
                         yMax = Mathf.Max(yMax, itemRa.yMax);
                         tb.Visibility = Framework.UI.Visibility.Visible;
                     }
@@ -56,19 +56,31 @@ namespace Skill.Editor.UI.Extended
 
         }
 
-        protected override double GetFrameAllTime()
+        protected override void GetTimeBounds(out double minTime, out double maxTime)
         {
-            double time = 1.0;
+            minTime = 0.0;
+            maxTime = 1.0;
+
+            bool found = false;
+
             foreach (var c in Controls)
             {
                 if (c is TrackBar)
                 {
-                    double t = ((TrackBar)c).Length;
-                    if (t > time)
-                        time = t;
+                    if (!found)
+                    {
+                        found = true;
+                        minTime = float.MaxValue;
+                        maxTime = float.MinValue;
+                    }
+
+                    double dMinTime, dMaxTime;
+                    ((TrackBar)c).GetTimeBounds(out dMinTime, out dMaxTime);
+
+                    if (dMaxTime > maxTime) maxTime = dMaxTime;
+                    if (dMinTime < minTime) minTime = dMinTime;
                 }
             }
-            return time;
         }
     }
 

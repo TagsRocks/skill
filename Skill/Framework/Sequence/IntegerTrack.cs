@@ -17,7 +17,7 @@ namespace Skill.Framework.Sequence
         public int ExValue { get { return Value; } set { Value = value; } }
 
         public int ValueKey { get { return this.Value; } set { this.Value = value; } }
-        public float FireTime { get { return this.Time; } set { this.Time = value; if (this.Time < 0)this.Time = 0; } }
+        public float FireTime { get { return this.Time; } set { this.Time = value; } }
     }
 
     public class IntegerTrack : DiscreteTrack<int>

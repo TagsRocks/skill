@@ -12,7 +12,7 @@ namespace Skill.Editor.Sequence
     /// </summary>
     public abstract class BaseTrackBar : Skill.Editor.UI.Extended.TrackBar
     {
-        protected static float BaseHeight = 20;
+        protected static float BaseHeight = 18;
 
         /// <summary> Track to edit by this TrackBar </summary>
         public Track Track { get; private set; }
@@ -23,14 +23,14 @@ namespace Skill.Editor.Sequence
         {
             this.Track = track;
             this.Height = BaseHeight;
-            this.Margin = new Skill.Framework.UI.Thickness(0, 1);
         }
 
         protected override void Render()
         {
             Rect ra = RenderArea;
-            // draw background box at entire RenderArea                        
-            UnityEditor.EditorGUI.DrawRect(ra, Track.Color);
+            // draw background box at entire RenderArea   
+            if (Track.Color.a > 0)
+                UnityEditor.EditorGUI.DrawRect(ra, Track.Color);
             base.Render();
         }
 
@@ -48,8 +48,6 @@ namespace Skill.Editor.Sequence
             Skill.Editor.UI.EditorFrame.RepaintParentEditorWindow(this);
             this.OnLayoutChanged();
         }
-
-        public override double Length { get { return Track.Length; } }
 
         public bool IsEditingCurves
         {
@@ -77,10 +75,28 @@ namespace Skill.Editor.Sequence
         }
 
 
-        internal virtual void AddCurveKey(KeyType keyType) { }        
+        internal virtual void AddCurveKey(KeyType keyType) { }
 
+        public abstract void AddKey();
 
         public virtual void SaveRecordState() { }
         public virtual void AutoKey() { }
+        public abstract void Delete(KeyView keyView);
+
+        public override void GetTimeBounds(out double minTime, out double maxTime)
+        {
+            if (Track != null)
+            {
+                float fminTime, fmaxTime;
+                Track.GetTimeBounds(out fminTime, out fmaxTime);
+                minTime = fminTime;
+                maxTime = fmaxTime;
+            }
+            else
+            {
+                minTime = 0;
+                maxTime = 0.1f;
+            }
+        }
     }
 }

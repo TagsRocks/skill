@@ -26,7 +26,7 @@ namespace Skill.Editor.Curve
         }
 
         void OnDestroy()
-        {            
+        {
             _Instance = null;
         }
         void OnFocus()
@@ -58,7 +58,7 @@ namespace Skill.Editor.Curve
         private CurveEditor _CurveEditor;
         private Skill.Framework.UI.Grid _PnlLeft;
         private TreeView _CurveTreeView;
-        private ObjectField<UnityEngine.GameObject> _ObjectField;        
+        private ObjectField<UnityEngine.GameObject> _ObjectField;
         private Skill.Editor.UI.GridSplitter _GridSplitter;
         private CurvePresetLibrary _PresetPanel;
 
@@ -108,7 +108,7 @@ namespace Skill.Editor.Curve
             _ObjectField = new ObjectField<GameObject>() { Row = 0, Column = 0, VerticalAlignment = Skill.Framework.UI.VerticalAlignment.Center };
             _CurveTreeView = new TreeView() { Row = 1, Column = 0 };
             _CurveTreeView.DisableFocusable();
-            _PresetPanel = new CurvePresetLibrary() { Row = 2, Column = 0 };            
+            _PresetPanel = new CurvePresetLibrary() { Row = 2, Column = 0 };
 
             _PnlLeft.Controls.Add(_ObjectField);
             _PnlLeft.Controls.Add(_CurveTreeView);
@@ -116,7 +116,7 @@ namespace Skill.Editor.Curve
 
 
             _GridSplitter = new Skill.Editor.UI.GridSplitter() { Row = 0, Column = 1, Orientation = Skill.Framework.UI.Orientation.Vertical };
-            _CurveEditor = new CurveEditor() { Row = 0, Column = 2 };
+            _CurveEditor = new CurveEditor() { Row = 0, Column = 2};
 
             _Frame.Controls.Add(_PnlLeft);
             _Frame.Controls.Add(_GridSplitter);

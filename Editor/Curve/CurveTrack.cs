@@ -47,11 +47,13 @@ namespace Skill.Editor.Curve
             {
                 minTime = Curve[0].time;
                 maxTime = Curve[Curve.length - 1].time;
+                if (maxTime - minTime < 0.1f)
+                    maxTime = minTime + 0.1f;
             }
             else
             {
                 minTime = 0;
-                maxTime = 0;
+                maxTime = 0.1f;
             }
         }
         public void GetValueBounds(out float minValue, out float maxValue)
@@ -116,12 +118,10 @@ namespace Skill.Editor.Curve
                 _Parts.Clear();
                 if (Curve.length > 1)
                 {
-                    _MinValue = float.PositiveInfinity;
-                    _MaxValue = float.NegativeInfinity;
+                    _MinValue = float.MaxValue;
+                    _MaxValue = float.MinValue;
                     float minTime, maxTime;
                     GetTimeBounds(out minTime, out maxTime);
-
-                    if (minTime > View.TimeLine.EndVisible || maxTime < View.TimeLine.StartVisible) return;
 
                     int index = -1;
                     CurvePart part = null;
@@ -133,6 +133,13 @@ namespace Skill.Editor.Curve
                     if (endTime > maxTime) endTime = maxTime;
 
                     double stepTime = (endTime - startTime) / View.RenderArea.width;
+
+                    if (stepTime <= 0.0)
+                    {
+                        _MinValue = 0;
+                        _MaxValue = 1;
+                        return;
+                    }
 
                     double time = startTime;
                     while (time <= endTime)
@@ -259,7 +266,7 @@ namespace Skill.Editor.Curve
         {
             float x;
             if (renderArea.width > Mathf.Epsilon)
-                x = renderArea.x + (float)(time / View.TimeLine.MaxTime) * renderArea.width;
+                x = renderArea.x + (float)((time - View.TimeLine.MinTime) / (View.TimeLine.MaxTime - View.TimeLine.MinTime)) * renderArea.width;
             else
                 x = renderArea.x;
             if (relative)
@@ -292,7 +299,7 @@ namespace Skill.Editor.Curve
         {
             if (relative) x += renderArea.xMin;
             if (renderArea.width > Mathf.Epsilon)
-                return (float)(((x - renderArea.xMin) / renderArea.width) * (View.TimeLine.MaxTime));
+                return (float)(View.TimeLine.MinTime + ((x - renderArea.xMin) / renderArea.width) * (View.TimeLine.MaxTime - View.TimeLine.MinTime));
             else
                 return 0;
         }

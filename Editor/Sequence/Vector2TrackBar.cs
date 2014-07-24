@@ -7,14 +7,7 @@ namespace Skill.Editor.Sequence
 {
     public class Vector2TrackBar : ContinuousTrackBar<Vector2>
     {
-        public override int CurveCount { get { return 2; } }
-        public override AnimationCurve GetCurve(int index)
-        {
-            if (index == 0) return _Vector2Track.CurveX;
-            return _Vector2Track.CurveY;
-        }
-
-        private Vector2Track _Vector2Track;
+                private Vector2Track _Vector2Track;
 
         public Vector2TrackBar(Vector2Track track)
             : base(track)
@@ -30,13 +23,13 @@ namespace Skill.Editor.Sequence
             if (_Vector2Track.CurveY == null) _Vector2Track.CurveY = new AnimationCurve();  
         }
 
-        public override void UpdateDefaultValue(Vector2 defaultValue)
-        {
-            base.UpdateDefaultValue(defaultValue);
-            CheckCurves();            
-            ValidateCurve(_Vector2Track.CurveX, defaultValue.x);
-            ValidateCurve(_Vector2Track.CurveY, defaultValue.y);
-        }
+        //public override void UpdateDefaultValue(Vector2 defaultValue)
+        //{
+        //    base.UpdateDefaultValue(defaultValue);
+        //    CheckCurves();            
+        //    ValidateCurve(_Vector2Track.CurveX, defaultValue.x);
+        //    ValidateCurve(_Vector2Track.CurveY, defaultValue.y);
+        //}
         protected override void AddCurveKey(KeyType keyType, float time)
         {            
             Vector2 sceneValue = new Vector2();

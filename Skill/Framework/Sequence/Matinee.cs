@@ -16,10 +16,14 @@ namespace Skill.Framework.Sequence
         #region Editor data
         [HideInInspector]
         [SerializeField]
-        public float[] EditorData = null;
+        public float[] EditorData = null;        
         #endregion
 
 
+        /// <summary> start time of matine to play</summary>
+        public float StartTime = 0.0f;
+        /// <summary> End time of matinee to play</summary>
+        public float EndTime = 5.0f;
         /// <summary> Is loop? </summary>
         public bool Loop = false;
         /// <summary> Playback speed </summary>
@@ -27,24 +31,6 @@ namespace Skill.Framework.Sequence
         /// <summary> Is game enters cutscene mode? </summary>
         public bool Cutscene = true;
 
-
-
-        private float _Length;
-        /// <summary> Length of matinee over time</summary>
-        public float Length
-        {
-            get
-            {
-                if (!Application.isPlaying)
-                {
-                    Track[] tracks = GetComponentsInChildren<Track>();
-                    _Length = 0;
-                    foreach (var t in tracks)
-                        _Length = Mathf.Max(_Length, t.Length);
-                }
-                return _Length;
-            }
-        }
 
         /// <summary> Is Matinee playing? </summary>
         public bool IsPlaying { get; private set; }
@@ -71,10 +57,6 @@ namespace Skill.Framework.Sequence
             enabled = false;
             _Tracks = GetComponentsInChildren<Track>();
 
-            _Length = 0;
-            foreach (var t in _Tracks)
-                _Length = Mathf.Max(_Length, t.Length);
-
             _PlayTime = 0;
             IsPaused = false;
             IsPlaying = false;
@@ -87,7 +69,7 @@ namespace Skill.Framework.Sequence
         /// <param name="seekTime">time to seek (0 - Length)</param>
         public void Seek(float seekTime)
         {
-            seekTime = Mathf.Clamp(seekTime, 0, Length);
+            seekTime = Mathf.Clamp(seekTime, StartTime, EndTime);
             if (_Tracks != null)
             {
                 foreach (var t in _Tracks)
@@ -116,7 +98,7 @@ namespace Skill.Framework.Sequence
             }
         }
 
-        /// <summary> Start playing matinee from curret(seek) time </summary>
+        /// <summary> Start playing matinee from current(seek) time </summary>
         public void Play()
         {
             if (!IsPlaying)
@@ -162,26 +144,26 @@ namespace Skill.Framework.Sequence
             if (_NextStop)
                 Stop();
 
-            if (_PlayTime >= Length)
+            if (_PlayTime >= EndTime)
             {
                 if (Loop)
                 {
-                    _PlayTime -= Length;
+                    _PlayTime -= (EndTime - StartTime);
                     _NextStop = false;
                     foreach (var t in _Tracks) t.Seek(_PlayTime);
 
                 }
-                else 
+                else
                 {
                     // let last keys evaluate
-                    _NextStop = true;                    
+                    _NextStop = true;
                 }
             }
-            else if (_PlayTime <= 0)
+            else if (_PlayTime <= StartTime)
             {
                 if (Loop)
                 {
-                    _PlayTime += Length;
+                    _PlayTime += (EndTime - StartTime);
                     _NextStop = false;
                     foreach (var t in _Tracks) t.Seek(_PlayTime);
                 }
@@ -195,6 +177,28 @@ namespace Skill.Framework.Sequence
             if (IsPlaying)
             {
                 foreach (var t in _Tracks) t.Evaluate(_PlayTime);
+            }
+        }
+
+        public void GetTimeBounds(out float minTime, out float maxTime)
+        {
+            minTime = 0;
+            maxTime = 1.0f;
+
+            Track[] tracks = GetComponentsInChildren<Track>();
+            if (tracks.Length > 0)
+            {
+                minTime = float.MaxValue;
+                maxTime = float.MinValue;
+
+                foreach (var t in tracks)
+                {
+                    float tminTime, tmaxTime;
+                    t.GetTimeBounds(out tminTime, out tmaxTime);
+
+                    minTime = Mathf.Min(minTime, tminTime);
+                    maxTime = Mathf.Max(maxTime, tmaxTime);
+                }
             }
         }
     }

@@ -150,27 +150,35 @@ namespace Skill.Editor.Sequence
         private void AddKey(float time)
         {
             object v = _DiscreteTrack.GetValue();
+            V sceneValue;
             if (v != null)
+                sceneValue = (V)v;
+            else
+                sceneValue = _DiscreteTrack.DefaultValue;
+
+            double closestTime = 0.005f;
+            int closestIndex = -1;
+            for (int i = 0; i < _Events.Count; i++)
             {
-                V sceneValue = (V)v;
-                bool found = false;
-                for (int i = 0; i < _Events.Count; i++)
+                double deltaTime = System.Math.Abs(_Events[i].FireTime - time);
+                if (deltaTime < closestTime)
                 {
-                    if (System.Math.Abs(_Events[i].FireTime - time) < 0.005)
-                    {
-                        _Events[i].Key.ValueKey = sceneValue;
-                        break;
-                    }
+                    closestTime = deltaTime;
+                    closestIndex = i;
                 }
-                if (!found)
-                {
-                    CreateKey(time, sceneValue);
-                }
-                SetDirty();
+                else if (closestIndex >= 0) // getting far from time
+                    break;
             }
+
+            if (closestIndex >= 0)
+                _Events[closestIndex].Key.ValueKey = sceneValue;
+            else
+                CreateKey(time, sceneValue);
+
+            SetDirty();
         }
 
-        protected void AddKey()
+        public override void AddKey()
         {
             TimeLine timeLine = FindInParents<TimeLine>();
             if (timeLine != null)
@@ -214,13 +222,23 @@ namespace Skill.Editor.Sequence
         /// Delete SoundEvent 
         /// </summary>
         /// <param name="soundEvent">SoundEvent to delete</param>
-        private void Delete(DiscreteKeyView e)
+        public override void Delete(KeyView keyView)
         {
-            if (_Events.Remove(e))
+            DiscreteKeyView dv = keyView as DiscreteKeyView;
+            if (dv != null)
             {
-                this.Controls.Remove(e);
-                RebuildTrackKeys();
+                if (_Events.Remove(dv))
+                {
+                    this.Controls.Remove(dv);
+                    if (InspectorProperties.IsSelected(dv))
+                        InspectorProperties.Select(null);
+                    RebuildTrackKeys();
+                }
             }
+        }
+        private void Update(DiscreteKeyView keyView)
+        {
+            AddKey((float)keyView.FireTime);
         }
 
         /// <summary>
@@ -323,12 +341,23 @@ namespace Skill.Editor.Sequence
             }
 
             private Skill.Editor.UI.MenuItem _DeleteItem;
+            private Skill.Editor.UI.MenuItem _Update;
 
             public DiscreteKeyContextMenu()
             {
                 _DeleteItem = new Skill.Editor.UI.MenuItem("Delete");
+                _Update = new Skill.Editor.UI.MenuItem("Update");
                 Add(_DeleteItem);
+                AddSeparator();
+                Add(_Update);
                 _DeleteItem.Click += _DeleteItem_Click;
+                _Update.Click += _Update_Click;
+            }
+
+            void _Update_Click(object sender, System.EventArgs e)
+            {
+                DiscreteKeyView se = (DiscreteKeyView)Owner;
+                ((DiscreteTrackBar<V>)se.TrackBar).Update(se);
             }
 
             void _DeleteItem_Click(object sender, System.EventArgs e)

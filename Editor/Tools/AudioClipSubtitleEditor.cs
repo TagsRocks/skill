@@ -295,15 +295,13 @@ namespace Skill.Editor.Tools
                 Invalidate();
             }
 
-            public override double Length
+            public override void GetTimeBounds(out double minTime, out double maxTime)
             {
-                get
-                {
-                    if (_Editor._AudioPreview.Clip != null)
-                        return _Editor._AudioPreview.Clip.length;
-                    else
-                        return 1.0f;
-                }
+                minTime = 0;
+                if (_Editor._AudioPreview.Clip != null)
+                    maxTime = _Editor._AudioPreview.Clip.length;
+                else
+                    maxTime = 1.0f;
             }
         }
 
@@ -358,8 +356,7 @@ namespace Skill.Editor.Tools
             RowDefinitions.Add(80, GridUnitType.Pixel);
             RowDefinitions.Add(1, GridUnitType.Star);
 
-            _TimeLine = new TimeLine(new TrackBarView()) { Row = 1, Column = 0, RowSpan = 3, SelectionEnable = false, ExtendMaxTime = false };
-            _TimeLine.MinTime = 0;
+            _TimeLine = new TimeLine(new TrackBarView()) { Row = 1, Column = 0, RowSpan = 3, SelectionEnable = false, ExtendTime = false };
             _TimeLine.MaxTime = 1;
 
             _ToolbarBg = new Box() { Row = 0, Column = 0, Margin = new Thickness(0, 0, 16, 0) };
@@ -455,7 +452,7 @@ namespace Skill.Editor.Tools
             else
                 _AudioPreview.Clip = null;
 
-            _TimeLine.StartVisible = _TimeLine.MinTime = 0;
+            _TimeLine.StartVisible = 0;
             if (_AudioPreview.Clip != null)
             {
                 _TimeLine.MaxTime = _AudioPreview.Clip.length;

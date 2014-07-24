@@ -7,14 +7,7 @@ namespace Skill.Editor.Sequence
 {
     public class Vector3TrackBar : ContinuousTrackBar<Vector3>
     {
-        public override int CurveCount { get { return 3; } }
-        public override AnimationCurve GetCurve(int index)
-        {
-            if (index == 0) return _Vector3Track.CurveX;
-            if (index == 1) return _Vector3Track.CurveY;
-            return _Vector3Track.CurveZ;
-        }
-
+        
         private Vector3Track _Vector3Track;
 
         public Vector3TrackBar(Vector3Track track)
@@ -25,14 +18,14 @@ namespace Skill.Editor.Sequence
             Refresh();
         }
 
-        public override void UpdateDefaultValue(Vector3 defaultValue)
-        {
-            base.UpdateDefaultValue(defaultValue);
-            CheckCurves();
-            ValidateCurve(_Vector3Track.CurveX, defaultValue.x);
-            ValidateCurve(_Vector3Track.CurveY, defaultValue.y);
-            ValidateCurve(_Vector3Track.CurveZ, defaultValue.z);
-        }
+        //public override void UpdateDefaultValue(Vector3 defaultValue)
+        //{
+        //    base.UpdateDefaultValue(defaultValue);
+        //    CheckCurves();
+        //    ValidateCurve(_Vector3Track.CurveX, defaultValue.x);
+        //    ValidateCurve(_Vector3Track.CurveY, defaultValue.y);
+        //    ValidateCurve(_Vector3Track.CurveZ, defaultValue.z);
+        //}
 
         private void CheckCurves()
         {

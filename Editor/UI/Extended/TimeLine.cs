@@ -99,10 +99,13 @@ namespace Skill.Editor.UI.Extended
         /// <summary> TimeLineView  </summary>
         public TimeLineView View { get { return _View; } }
 
-        public bool ExtendMaxTime { get; set; }
+        public Color Background { get; set; }
+
+        public bool ExtendTime { get; set; }
 
         /// <summary> ZoomFactor </summary>
         public double ZoomFactor { get; private set; }
+
         /// <summary> Start time of visible area </summary>
         public double StartVisible
         {
@@ -111,7 +114,13 @@ namespace Skill.Editor.UI.Extended
             {
                 double preValue = _StartVisibleTime;
                 _StartVisibleTime = value;
-                if (_StartVisibleTime < _MinTime) _StartVisibleTime = _MinTime;
+                if (_StartVisibleTime < _MinTime)
+                {
+                    if (ExtendTime)
+                        _MinTime = _StartVisibleTime;
+                    else
+                        _StartVisibleTime = _MinTime;
+                }
                 if (_StartVisibleTime > _EndVisibleTime - MinTimeLine) _StartVisibleTime = _EndVisibleTime - MinTimeLine;
                 if (preValue != _StartVisibleTime)
                     OnLayoutChanged();
@@ -129,7 +138,7 @@ namespace Skill.Editor.UI.Extended
                     _EndVisibleTime = _StartVisibleTime + MinTimeLine;
                 if (_EndVisibleTime > _MaxTime)
                 {
-                    if (ExtendMaxTime)
+                    if (ExtendTime)
                         _MaxTime = _EndVisibleTime;
                     else
                         _EndVisibleTime = _MaxTime;
@@ -156,7 +165,10 @@ namespace Skill.Editor.UI.Extended
         /// <summary> Minimum available time to scroll</summary>
         public double MinTime
         {
-            get { return _MinTime; }
+            get
+            {
+                return _MinTime;
+            }
             set
             {
                 double preValue = _MinTime;
@@ -168,6 +180,7 @@ namespace Skill.Editor.UI.Extended
                     OnLayoutChanged();
             }
         }
+
         /// <summary> Start time of selected time </summary>
         public double StartSelection { get { return _StartSelectionTime; } }
         /// <summary> End time of selected time </summary>
@@ -196,7 +209,8 @@ namespace Skill.Editor.UI.Extended
                 if (value < _MinTime) value = _MinTime;
                 else if (value > _MaxTime) value = _MaxTime;
 
-                if (_TimePosition != value)
+                double delta = _TimePosition - value;
+                if (delta > 0.00001 || delta < -0.00001)
                 {
                     _TimePosition = value;
                     OnTimePositionChanged();
@@ -223,12 +237,16 @@ namespace Skill.Editor.UI.Extended
             _View = view;
             _View.TimeLine = this;
 
-            this.ExtendMaxTime = true;
+            if (UnityEditor.EditorGUIUtility.isProSkin)
+                Background = new Color(0.15f, 0.15f, 0.15f, 1.0f);
+            else
+                Background = new Color(0.55f, 0.55f, 0.55f, 1.0f);
+
+            this.ExtendTime = true;
             this._SelectionEnable = true;
             this._StartVisibleTime = 0;
             this._EndVisibleTime = 1.0;
             this._MaxTime = 1.0;
-            this._MinTime = 0.0;
 
             //this.Padding = new Thickness(2);
 
@@ -263,6 +281,7 @@ namespace Skill.Editor.UI.Extended
         protected override void Render()
         {
             RefreshStyles();
+            UnityEditor.EditorGUI.DrawRect(RenderArea, Background);
             base.Render();
         }
 
@@ -376,6 +395,6 @@ namespace Skill.Editor.UI.Extended
         public void Clear()
         {
             View.Controls.Clear();
-        }        
+        }
     }
 }

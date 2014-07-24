@@ -7,9 +7,6 @@ namespace Skill.Editor.Sequence
 {
     public class FloatTrackBar : ContinuousTrackBar<float>
     {
-        public override int CurveCount { get { return 1; } }
-        public override AnimationCurve GetCurve(int index) { return _FloatTrack.Curve; }
-
         private FloatTrack _FloatTrack;
         public FloatTrackBar(FloatTrack track)
             : base(track)
@@ -19,12 +16,12 @@ namespace Skill.Editor.Sequence
             Refresh();
         }
 
-        public override void UpdateDefaultValue(float defaultValue)
-        {
-            base.UpdateDefaultValue(defaultValue);
-            CheckCurves();
-            ValidateCurve(_FloatTrack.Curve, defaultValue);
-        }
+        //public override void UpdateDefaultValue(float defaultValue)
+        //{
+        //    base.UpdateDefaultValue(defaultValue);
+        //    CheckCurves();
+        //    ValidateCurve(_FloatTrack.Curve, defaultValue);
+        //}
 
         private void CheckCurves()
         {
