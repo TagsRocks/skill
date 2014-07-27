@@ -177,7 +177,7 @@ namespace Skill.Editor.Sequence
         void OnFocus()
         {
             if (_Frame != null)
-                Refresh();
+                Refresh();            
         }
 
         void OnLostFocus()
@@ -527,8 +527,8 @@ namespace Skill.Editor.Sequence
             {
                 case 0: // dope sheets
 
-                    _CurveTrackTreeView.Visibility = Visibility.Collapsed;
-                    _CurveEditor.Visibility = Visibility.Collapsed;
+                    _CurveTrackTreeView.Visibility = Visibility.Hidden;
+                    _CurveEditor.Visibility = Visibility.Hidden;
                     _TimeLine.Visibility = Visibility.Visible;
                     _TracksTreeView.Visibility = Visibility.Visible;
 
@@ -538,8 +538,8 @@ namespace Skill.Editor.Sequence
 
                     _CurveTrackTreeView.Visibility = Visibility.Visible;
                     _CurveEditor.Visibility = Visibility.Visible;
-                    _TimeLine.Visibility = Visibility.Collapsed;
-                    _TracksTreeView.Visibility = Visibility.Collapsed;
+                    _TimeLine.Visibility = Visibility.Hidden;
+                    _TracksTreeView.Visibility = Visibility.Hidden;
 
                     if (_CurveEditor != null)
                         _CurveEditor.Invalidate();
@@ -692,6 +692,7 @@ namespace Skill.Editor.Sequence
                 {
                     LoadEditorData();
                     _TracksTreeView.Refresh();
+                    _CurveTrackTreeView.RemoveDestroyed();
                     foreach (BaseTrackBar bt in TrackBars())
                     {
                         if (bt.IsEditingCurves)

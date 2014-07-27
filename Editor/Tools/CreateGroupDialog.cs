@@ -27,10 +27,19 @@ namespace Skill.Editor.Tools
         private Skill.Editor.UI.TextField _TxtGroupName;
         private Skill.Framework.UI.Button _BtnCreate;
         private Skill.Framework.UI.Button _BtnCancel;
-               
+
 
         public void OnGUI()
         {
+            Event e = Event.current;
+            if (e != null)
+            {
+                if (e.type == EventType.KeyDown)
+                {
+                    if (e.keyCode == KeyCode.Return)
+                        _BtnCreate_Click(_BtnCreate, EventArgs.Empty);
+                }
+            }
             _Frame.OnGUI();
         }
 
@@ -42,7 +51,7 @@ namespace Skill.Editor.Tools
             base.position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);
             base.minSize = new Vector2(Size.x, Size.y);
             base.maxSize = new Vector2(Size.x + 200, Size.y);
-            
+
             CreateUI();
         }
 
@@ -77,12 +86,12 @@ namespace Skill.Editor.Tools
         }
 
         void _BtnCancel_Click(object sender, EventArgs e)
-        {            
+        {
             base.Close();
         }
 
         void _BtnCreate_Click(object sender, EventArgs e)
-        {            
+        {
             string groupName = _TxtGroupName.Text;
             if (string.IsNullOrEmpty(groupName))
                 groupName = "Group";

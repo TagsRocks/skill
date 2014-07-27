@@ -163,6 +163,21 @@ namespace Skill.Editor.Sequence
             }
         }
 
+        public void RemoveDestroyed()
+        {
+            int index = 0;
+            while (index < _TreeView.Controls.Count)
+            {
+                FolderView fv = (FolderView)_TreeView.Controls[index];
+                BaseTrackBar trackBar = (BaseTrackBar)fv.UserData;
+                if (trackBar.Track.IsDestroyed)
+                    Remove(fv);
+                else
+                    index++;
+            }
+        }
+
+
         public void RemoveAll(bool clearIsEditingCurves)
         {
             foreach (FolderView group in _TreeView.Controls)

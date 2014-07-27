@@ -82,13 +82,18 @@ namespace Skill.Framework.Sequence
                         {
                             if (t >= PreviousTime)
                             {
-                                if (key.Length >= 0.01f)
+                                if (Application.isPlaying)
                                 {
                                     key.InitializeEvent(this);
-                                    AddUpdatingKey(key);
+                                    if (key.Length >= 0.01f)
+                                    {
+                                        AddUpdatingKey(key);
+                                    }
+                                    else
+                                    {
+                                        key.ExecuteEvent(this);
+                                    }
                                 }
-                                else
-                                    key.ExecuteEvent(this);
                             }
                             _Index++;
                         }
@@ -146,18 +151,13 @@ namespace Skill.Framework.Sequence
                 while (index < _UpdatingKeys.Count)
                 {
                     EventOrientedKey task = _UpdatingKeys[index];
-                    if (CurrecntTime < task.FireTime)
-                    {
-                        task.ExecuteEvent(this);
-                        continue;
-                    }
-                    else if (CurrecntTime >= task.FireTime + task.Length)
+                    if (CurrecntTime >= task.FireTime + task.Length)
                     {
                         task.ExecuteEvent(this);
                         _UpdatingKeys.RemoveAt(index);
                         continue;
                     }
-                    else
+                    else if (CurrecntTime > task.FireTime)
                     {
                         task.ProcessEvent(this, CurrecntTime);
                     }

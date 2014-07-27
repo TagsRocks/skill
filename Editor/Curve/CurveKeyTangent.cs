@@ -32,6 +32,9 @@ namespace Skill.Editor.Curve
             base.Render();
         }
 
+        private Vector2 _StartPosition;
+        private Vector2 _EndPosition;
+        private Vector2 _DeltaDrag;
         private bool _IsMouseDown;
         protected override void OnMouseDown(MouseClickEventArgs args)
         {
@@ -41,6 +44,8 @@ namespace Skill.Editor.Curve
                 if (of != null)
                 {
                     _IsMouseDown = OwnerFrame.RegisterPrecedenceEvent(this);
+                    _StartPosition = _EndPosition = args.MousePosition;
+                    _DeltaDrag = Vector2.zero;
                     args.Handled = true;
                 }
             }
@@ -57,7 +62,9 @@ namespace Skill.Editor.Curve
             {
                 if (e.type == EventType.MouseDrag)
                 {
-                    UpdateTangent(e.mousePosition + Key.Track.View.ScrollPosition);
+                    _DeltaDrag += e.delta;
+                    _EndPosition = _StartPosition + _DeltaDrag;
+                    UpdateTangent(_EndPosition);
                     e.Use();
                 }
                 else if (e.type == EventType.MouseUp && e.button == 0)

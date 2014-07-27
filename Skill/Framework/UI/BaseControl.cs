@@ -651,6 +651,11 @@ namespace Skill.Framework.UI
         /// </remarks>
         public virtual void HandleEvent(Event e)
         {
+            BaseHandleEvent(e);
+        }
+
+        protected void BaseHandleEvent(Event e)
+        {
             if (IsInScrollView && !IsHandlingEventInternal || !IsEnabled) return;
             if (e != null)
             {

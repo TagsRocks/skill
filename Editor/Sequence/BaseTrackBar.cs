@@ -44,9 +44,12 @@ namespace Skill.Editor.Sequence
         /// </summary>
         public virtual void SetDirty()
         {
-            UnityEditor.EditorUtility.SetDirty(Track);
-            Skill.Editor.UI.EditorFrame.RepaintParentEditorWindow(this);
-            this.OnLayoutChanged();
+            if (!Track.IsDestroyed)
+            {
+                UnityEditor.EditorUtility.SetDirty(Track);
+                Skill.Editor.UI.EditorFrame.RepaintParentEditorWindow(this);
+                this.OnLayoutChanged();
+            }
         }
 
         public bool IsEditingCurves

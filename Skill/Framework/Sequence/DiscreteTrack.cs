@@ -15,7 +15,6 @@ namespace Skill.Framework.Sequence
     {
         public abstract IPropertyKey<V>[] PropertyKeys { get; set; }
         protected float CurrecntTime { get; private set; }
-
         private int _Index;
 
         public override void Evaluate(float time)
@@ -73,17 +72,16 @@ namespace Skill.Framework.Sequence
         }
         private void Evaluate(int evaluatedIndex)
         {
-            if (_Index < 0)
-                Rollback();
-            else
+            //if (_Index < 0)
+            //    Rollback();
+            //else
+            //{
+            if (_Index >= PropertyKeys.Length) _Index = PropertyKeys.Length - 1;
+            if (evaluatedIndex != _Index && _Index >= 0 && _Index < PropertyKeys.Length)
             {
-                if (_Index >= PropertyKeys.Length)
-                    _Index = PropertyKeys.Length - 1;
-                if (evaluatedIndex != _Index && _Index >= 0 && _Index < PropertyKeys.Length)
-                {
-                    Execute(PropertyKeys[_Index]);
-                }
+                Execute(PropertyKeys[_Index]);
             }
+            //}
         }
 
         public override void Seek(float time)

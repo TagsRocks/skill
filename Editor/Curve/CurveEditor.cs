@@ -30,14 +30,14 @@ namespace Skill.Editor.Curve
         }
 
         public Color Background { get; set; }
-       
+
         public TimeLine TimeLine { get { return _TimeLine; } }
         public CurveEditor()
         {
             if (UnityEditor.EditorGUIUtility.isProSkin)
                 Background = new Color(0.15f, 0.15f, 0.15f, 1.0f);
             else
-                Background = new Color(0.55f, 0.55f, 0.55f, 1.0f);            
+                Background = new Color(0.55f, 0.55f, 0.55f, 1.0f);
             _CurveView = new TimeLineCurveView(this);
             _TimeLine = new TimeLine(_CurveView) { SelectionEnable = false };
             _TimeLine.TimeBar.ShowTimePosition = false;
@@ -93,6 +93,7 @@ namespace Skill.Editor.Curve
             private bool _IsMouseDown;
             private Vector2 _StartSelection;
             private Vector2 _EndSelection;
+            private Vector2 _DeltaSelection;
 
             private List<CurveKey> _KeepKeysSelected;
             private List<CurveKey> _RemoveKeys;
@@ -123,6 +124,7 @@ namespace Skill.Editor.Curve
                     {
                         _IsMouseDown = OwnerFrame.RegisterPrecedenceEvent(this);
                         _StartSelection = _EndSelection = args.MousePosition;
+                        _DeltaSelection = Vector2.zero;
                         _Shift = args.Shift;
                         _KeepKeysSelected.Clear();
                         if (!_Shift)
@@ -150,7 +152,10 @@ namespace Skill.Editor.Curve
                 {
                     if (e.type == EventType.MouseDrag)
                     {
-                        _EndSelection = e.mousePosition + _View.ScrollPosition;
+                        //_EndSelection = e.mousePosition + _View.ScrollPosition;
+
+                        _DeltaSelection += e.delta;
+                        _EndSelection = _StartSelection + _DeltaSelection;
                         UpdateSelection();
                         e.Use();
                     }

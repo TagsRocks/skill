@@ -7,6 +7,9 @@ namespace Skill.Framework.Sequence
 {
     public abstract class ContinuousTrack<V> : PropertyTrack<V>
     {
+        private float _MinTime;
+        private float _MaxTime;
+
         public abstract int CurveCount { get; }
         public abstract AnimationCurve GetCurve(int index);
 
@@ -14,21 +17,48 @@ namespace Skill.Framework.Sequence
 
         public override void Evaluate(float time)
         {
-            SetValue(EvaluateCurves(time));
+            if (time >= _MinTime && time <= _MaxTime)
+                SetValue(EvaluateCurves(time));
         }
         public override void Seek(float time)
         {
-            SetValue(EvaluateCurves(time));
+            if (time >= _MinTime && time <= _MaxTime)
+                SetValue(EvaluateCurves(time));
         }
 
         public override void SortKeys()
         {
+            _MinTime = 0;
+            _MaxTime = 0;
+
+            bool found = false;
+            for (int i = 0; i < CurveCount; i++)
+            {
+                var curve = GetCurve(i);
+                if (curve != null)
+                {
+                    if (curve.length > 1)
+                    {
+                        if (!found)
+                        {
+                            found = true;
+                            _MinTime = float.MaxValue;
+                            _MaxTime = float.MinValue;
+                        }
+
+                        _MinTime = Mathf.Min(_MinTime, curve[0].time);
+                        _MaxTime = Mathf.Max(_MaxTime, curve[curve.length - 1].time);
+                    }
+                }
+            }
+
         }
 
         public override void GetTimeBounds(out float minTime, out float maxTime)
         {
             minTime = 0.0f;
             maxTime = 0.0f;
+            bool found = false;
 
             if (CurveCount > 0)
             {
@@ -37,8 +67,15 @@ namespace Skill.Framework.Sequence
                     AnimationCurve curve = GetCurve(i);
                     if (curve != null && curve.length > 0)
                     {
-                        maxTime = Mathf.Max(maxTime, curve.keys[curve.length - 1].time);
+                        if (!found)
+                        {
+                            found = true;
+                            minTime = float.MaxValue;
+                            maxTime = float.MinValue;
+                        }
+
                         minTime = Mathf.Min(minTime, curve.keys[0].time);
+                        maxTime = Mathf.Max(maxTime, curve.keys[curve.length - 1].time);
                     }
                 }
             }

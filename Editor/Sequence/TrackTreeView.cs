@@ -168,8 +168,8 @@ namespace Skill.Editor.Sequence
                         groupItem.ContextMenu = _TrackGroupContextMenu;
                         panel.Controls.Add(groupItem);
                     }
-                    else
-                        groupItem.Refresh();
+                    //else
+                        //groupItem.Refresh();
                     Refresh(groupItem.Group.transform, groupItem);
 
                     continue;
@@ -231,6 +231,12 @@ namespace Skill.Editor.Sequence
                 }
 
                 index++;
+            }
+
+            foreach (var item in Controls)
+            {
+                if (item is TrackTreeViewItem)
+                    ((TrackTreeViewItem)item).Refresh();
             }
         }
 

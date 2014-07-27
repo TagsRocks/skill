@@ -477,12 +477,6 @@ namespace Skill.Framework.UI
                 BaseHandleEvent(e);
             }
 
-        }
-
-        protected void BaseHandleEvent(Event e)
-        {
-            if (e.type != EventType.Used)
-            base.HandleEvent(e);
-        }
+        }       
     }
 }

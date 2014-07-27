@@ -31,6 +31,15 @@ namespace Skill.Editor.Tools
 
         public void OnGUI()
         {
+            Event e = Event.current;
+            if (e != null)
+            {
+                if (e.type == EventType.KeyDown)
+                {
+                    if (e.keyCode == KeyCode.Return)
+                        _BtnCreate_Click(_BtnCreate, EventArgs.Empty);
+                }
+            }
             _Frame.OnGUI();
         }
 
