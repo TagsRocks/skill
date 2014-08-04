@@ -30,6 +30,16 @@ namespace Skill.Framework.Sequence
         [CurveEditor(0, 0, 1, "Z")]
         public AnimationCurve CurveZ;
 
+
+        [ExposeProperty(80, "CurveX")]
+        public AnimationCurve CurveXP { get { return CurveX; } set { CurveX = value; } }
+
+        [ExposeProperty(81, "CurveY")]
+        public AnimationCurve CurveYP { get { return CurveY; } set { CurveY = value; } }
+
+        [ExposeProperty(82, "CurveZ")]
+        public AnimationCurve CurveZP { get { return CurveZ; } set { CurveZ = value; } }
+
         protected override Quaternion EvaluateCurves(float time)
         {
             Vector3 eulers = new Vector3();

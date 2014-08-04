@@ -13,7 +13,7 @@ namespace Skill.Editor.Curve
         /// <summary>
         /// Minimum allowed value between MinValue and MaxValue
         /// </summary>
-        public const double MinVisibleRange = 0.01;
+        public const double MinVisibleRange = 0.1;
 
         private double _MinVisibleValue;
         private double _MaxVisibleValue;
@@ -148,7 +148,7 @@ namespace Skill.Editor.Curve
                     if (c is CurveTrack)
                     {
                         CurveTrack ct = (CurveTrack)c;
-                        if (ct.Curve.length > 1)
+                        if (ct.Visibility == Framework.UI.Visibility.Visible && ct.Curve.length > 1)
                         {
                             if (!found)
                             {

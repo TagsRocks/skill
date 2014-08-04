@@ -16,12 +16,9 @@ namespace Skill.Framework.Sequence
         #region Editor data
         [HideInInspector]
         [SerializeField]
-        public float[] EditorData = null;        
+        public float[] EditorData = null;
         #endregion
 
-
-        /// <summary> start time of matine to play</summary>
-        public float StartTime = 0.0f;
         /// <summary> End time of matinee to play</summary>
         public float EndTime = 5.0f;
         /// <summary> Is loop? </summary>
@@ -39,6 +36,7 @@ namespace Skill.Framework.Sequence
 
         private Track[] _Tracks;
         private float _PlayTime;
+        private float _LastTime;
 
 
         /// <summary>
@@ -69,7 +67,7 @@ namespace Skill.Framework.Sequence
         /// <param name="seekTime">time to seek (0 - Length)</param>
         public void Seek(float seekTime)
         {
-            seekTime = Mathf.Clamp(seekTime, StartTime, EndTime);
+            seekTime = Mathf.Clamp(seekTime, 0, EndTime);
             if (_Tracks != null)
             {
                 foreach (var t in _Tracks)
@@ -103,6 +101,7 @@ namespace Skill.Framework.Sequence
         {
             if (!IsPlaying)
             {
+                _LastTime = Time.realtimeSinceStartup;
                 Skill.Framework.Global.CutSceneEnable = Cutscene;
                 IsPlaying = true;
                 IsPaused = false;
@@ -127,12 +126,16 @@ namespace Skill.Framework.Sequence
         /// <summary> Update </summary>
         protected override void Update()
         {
-            if (Skill.Framework.Global.IsGamePaused) return;
-            if (IsPlaying && !IsPaused)
+            if (!Skill.Framework.Global.IsGamePaused)
             {
-                StepForward(Time.deltaTime);
+                if (IsPlaying && !IsPaused)
+                {
+                    float deltaTime = Time.realtimeSinceStartup - _LastTime;
+                    StepForward(deltaTime);
+                }
+                base.Update();
             }
-            base.Update();
+            _LastTime = Time.realtimeSinceStartup;
         }
 
         private bool _NextStop;
@@ -148,7 +151,7 @@ namespace Skill.Framework.Sequence
             {
                 if (Loop)
                 {
-                    _PlayTime -= (EndTime - StartTime);
+                    _PlayTime -= EndTime;
                     _NextStop = false;
                     foreach (var t in _Tracks) t.Seek(_PlayTime);
 
@@ -159,11 +162,11 @@ namespace Skill.Framework.Sequence
                     _NextStop = true;
                 }
             }
-            else if (_PlayTime <= StartTime)
+            else if (_PlayTime <= 0)
             {
                 if (Loop)
                 {
-                    _PlayTime += (EndTime - StartTime);
+                    _PlayTime += EndTime;
                     _NextStop = false;
                     foreach (var t in _Tracks) t.Seek(_PlayTime);
                 }

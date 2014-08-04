@@ -13,16 +13,26 @@ namespace Skill.Framework.Sequence
         public abstract int CurveCount { get; }
         public abstract AnimationCurve GetCurve(int index);
 
+        private bool HasKey()
+        {
+            for (int i = 0; i < CurveCount; i++)
+            {
+                if (GetCurve(i).length > 0)
+                    return true;
+            }
+            return false;
+        }
+
         protected abstract V EvaluateCurves(float time);
 
         public override void Evaluate(float time)
         {
-            if (time >= _MinTime && time <= _MaxTime)
+            if (HasKey() && time >= _MinTime && time <= _MaxTime)
                 SetValue(EvaluateCurves(time));
         }
         public override void Seek(float time)
         {
-            if (time >= _MinTime && time <= _MaxTime)
+            if (HasKey() && time >= _MinTime && time <= _MaxTime)
                 SetValue(EvaluateCurves(time));
         }
 

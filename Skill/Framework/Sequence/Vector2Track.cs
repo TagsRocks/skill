@@ -29,6 +29,14 @@ namespace Skill.Framework.Sequence
         [CurveEditor(0, 1, 0, "Y")]
         public AnimationCurve CurveY;
 
+
+        [ExposeProperty(80, "CurveX")]
+        public AnimationCurve CurveXP { get { return CurveX; } set { CurveX = value; } }
+
+        [ExposeProperty(81, "CurveY")]
+        public AnimationCurve CurveYP { get { return CurveY; } set { CurveY = value; } }
+        
+
         protected override Vector2 EvaluateCurves(float time)
         {
             Vector2 result = new Vector2();

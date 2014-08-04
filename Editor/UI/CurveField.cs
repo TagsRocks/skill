@@ -56,7 +56,7 @@ namespace Skill.Editor.UI
         {
             _Curve = curve;
             Label = new GUIContent();
-            this.Height = 32;
+            this.Height = 18;
 
         }
 

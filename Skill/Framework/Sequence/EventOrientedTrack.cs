@@ -74,7 +74,7 @@ namespace Skill.Framework.Sequence
                 if (Keys != null)
                 {
                     if (_Index < 0) _Index = 0;
-                    for (; _Index < Keys.Length; _Index++)
+                    while (_Index < Keys.Length)
                     {
                         var key = Keys[_Index];
                         float t = key.FireTime;
@@ -98,7 +98,9 @@ namespace Skill.Framework.Sequence
                             _Index++;
                         }
                         else
+                        {                            
                             break;
+                        }
                     }
                 }
                 UpdateKeys();

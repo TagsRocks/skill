@@ -118,6 +118,7 @@ namespace Skill.Editor.Tools
                     filters.Add(fs[i]);
             }
 
+            if (filters.Count == 0) return;
 
             // find a rect that contains all tese meshes
             Vector3 min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
@@ -131,7 +132,7 @@ namespace Skill.Editor.Tools
                 CheckMinMax(ref min, ref max, boundMin);
                 CheckMinMax(ref min, ref max, boundMax);
             }
-
+            
             //seprate world to squares
             int unitX = (int)((max.x - min.x) / _Data.UnitLength.x) + 1;
             int unitY = (int)((max.y - min.y) / _Data.UnitLength.y) + 1;
@@ -147,9 +148,9 @@ namespace Skill.Editor.Tools
             foreach (MeshFilter mf in filters)
             {
                 Vector3 pos = mf.transform.position;
-                int ix = (int)((pos.x - min.x) / _Data.UnitLength.x);
-                int iy = (int)((pos.y - min.y) / _Data.UnitLength.y);
-                int iz = (int)((pos.z - min.z) / _Data.UnitLength.z);
+                int ix = Mathf.FloorToInt((pos.x - min.x) / _Data.UnitLength.x);
+                int iy = Mathf.FloorToInt((pos.y - min.y) / _Data.UnitLength.y);
+                int iz = Mathf.FloorToInt((pos.z - min.z) / _Data.UnitLength.z);
                 units[ix, iy, iz].Meshes.Add(mf);
             }
 

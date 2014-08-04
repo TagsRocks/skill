@@ -38,7 +38,7 @@ namespace Skill.Editor.Sequence
             if (_IsPlaying) Stop();
             SaveEditorData();
             Rollback();
-            _CurveTrackTreeView.RemoveAll(false);
+            Clear();
             _Frame = null;
         }
 
@@ -177,7 +177,7 @@ namespace Skill.Editor.Sequence
         void OnFocus()
         {
             if (_Frame != null)
-                Refresh();            
+                CheckSeleced();
         }
 
         void OnLostFocus()
@@ -261,10 +261,25 @@ namespace Skill.Editor.Sequence
             {
                 if (_Matinee != value)
                 {
-                    _Matinee = value;
-                    Refresh();
+                    if (_Matinee != null)
+                    {                        
+                        Rollback();
+                        Clear();
+                    }
+                    _Matinee = value;                    
                 }
+                Refresh();
             }
+        }
+
+        private void Clear()
+        {
+            _TracksTreeView.Clear();
+            _CurveTrackTreeView.RemoveAll(true);
+            _TimeLine.Clear();
+            _TimeLine.MinTime = 0;
+            _TimeLine.MaxTime = 1;
+            InspectorProperties.Select(null);
         }
         #endregion
 
@@ -653,8 +668,9 @@ namespace Skill.Editor.Sequence
             _VSplitter.Style = Skill.Editor.Resources.Styles.VerticalSplitter;
         }
 
-        // refresh editor data to to changes happened to matinee outside of MatineeEditor
-        private void Refresh()
+
+
+        private void CheckSeleced()
         {
             if (Selection.activeObject != null)
             {
@@ -671,22 +687,23 @@ namespace Skill.Editor.Sequence
                     {
                         PrefabType pt = PrefabUtility.GetPrefabType(newMatinee.gameObject);
                         if (pt == PrefabType.None || pt == PrefabType.PrefabInstance || pt == PrefabType.MissingPrefabInstance || pt == PrefabType.DisconnectedPrefabInstance)
-                            _Matinee = newMatinee;
+                            Matinee = newMatinee;
                         else
-                            _Matinee = null;
+                            Matinee = null;
                     }
                 }
             }
+        }
+
+        // refresh editor data to to changes happened to matinee outside of MatineeEditor
+        private void Refresh()
+        {            
             if (_Frame != null)
             {
                 if (_Matinee == null)
                 {
+                    Clear();
                     _Frame.Grid.IsEnabled = false;
-                    _TracksTreeView.Clear();
-                    _CurveTrackTreeView.RemoveAll(true);
-                    _TimeLine.Clear();
-                    _TimeLine.MaxTime = 1;
-                    InspectorProperties.Select(null);
                 }
                 else
                 {
@@ -714,6 +731,13 @@ namespace Skill.Editor.Sequence
                 _TimeLine.TimePosition = EditorData.TimePosition;
                 _TimeLine.SelectTime(EditorData.StartSelection, EditorData.EndSelection);
 
+                _SnapTime.SelectedValue = (int)EditorData.Snap;
+                _Fps.SelectedValue = (int)EditorData.Fps;
+                _PlaybackSpeed.SelectedValue = (int)EditorData.PlaybackSpeed;
+
+                _TimeLine.TimeBar.TimeStyle = EditorData.DropSheetTimeStyle > 1;
+                _CurveEditor.TimeLine.TimeBar.TimeStyle = EditorData.CurveEditorTimeStyle > 1;
+
                 LoadLayout();
             }
         }
@@ -737,6 +761,13 @@ namespace Skill.Editor.Sequence
                 EditorData.StartSelection = (float)_TimeLine.StartSelection;
                 EditorData.EndSelection = (float)_TimeLine.EndSelection;
                 EditorData.TimePosition = (float)_TimeLine.TimePosition;
+
+                EditorData.Snap = _SnapTime.SelectedValue;
+                EditorData.Fps = _Fps.SelectedValue;
+                EditorData.PlaybackSpeed = _PlaybackSpeed.SelectedValue;
+
+                EditorData.DropSheetTimeStyle = _TimeLine.TimeBar.TimeStyle ? 2 : 0;
+                EditorData.CurveEditorTimeStyle = _CurveEditor.TimeLine.TimeBar.TimeStyle ? 2 : 0;
 
                 SaveLayout();
 
@@ -781,6 +812,10 @@ namespace Skill.Editor.Sequence
                             _Matinee.EditorData = new float[20];
                             SetDefault();
                         }
+
+                        if (Fps == 0) Fps = 30;
+                        if (PlaybackSpeed == 0) PlaybackSpeed = 100;
+
                     }
                 }
             }
@@ -816,6 +851,14 @@ namespace Skill.Editor.Sequence
             public float MainGridColumn2 { get { return GetFloat(7, 2.0f); } set { SetFloat(7, value); } }
             public float LayoutType { get { return GetFloat(8, 0); } set { SetFloat(8, value); } }
 
+
+            public float Snap { get { return GetFloat(9, 0); } set { SetFloat(9, value); } }
+            public float Fps { get { return GetFloat(10, 0); } set { SetFloat(10, value); } }
+            public float PlaybackSpeed { get { return GetFloat(11, 0); } set { SetFloat(11, value); } }
+
+            public float DropSheetTimeStyle { get { return GetFloat(12, 0); } set { SetFloat(12, value); } }
+            public float CurveEditorTimeStyle { get { return GetFloat(13, 0); } set { SetFloat(13, value); } }
+
             public void SetDefault()
             {
                 MaxTime = 1.0f;
@@ -824,6 +867,11 @@ namespace Skill.Editor.Sequence
                 StartSelection = 0.0f;
                 EndSelection = 0.0f;
                 TimePosition = 0.0f;
+                Snap = 0;
+                Fps = 30;
+                PlaybackSpeed = 100;
+                DropSheetTimeStyle = 0;
+                CurveEditorTimeStyle = 0;
                 SetDefaultLayout();
             }
 
@@ -859,13 +907,14 @@ namespace Skill.Editor.Sequence
         // step playback in positive stepTime
         private void StepPlaybackForward(float stepTime)
         {
+            float speed = (float)_PlaybackSpeed.SelectedValue / 100.0f;
             _DeltaTime += stepTime;
-            _ContinuousPlayTime += stepTime;
+            _ContinuousPlayTime += stepTime * speed;
             float fpsTime = 1.0f / _Fps.SelectedValue;
             if (_DeltaTime >= fpsTime) // if we reach fpsTime after last step
             {
                 _DeltaTime -= fpsTime;
-                _PlayTime += fpsTime * (float)_PlaybackSpeed.SelectedValue / 100.0f;
+                _PlayTime += fpsTime * speed;
 
                 if (_TimeLine.SelectionLenght > 0)
                 {
@@ -904,13 +953,14 @@ namespace Skill.Editor.Sequence
         // step playback in negative stepTime
         private void StepPlaybackBackward(float stepTime)
         {
+            float speed = (float)_PlaybackSpeed.SelectedValue / 100.0f;
             _DeltaTime -= stepTime;
-            _ContinuousPlayTime -= stepTime;
+            _ContinuousPlayTime -= stepTime * speed;
             if (_DeltaTime < 0) // if we reach fpsTime after last step
             {
                 float fpsTime = 1.0f / _Fps.SelectedValue;
                 _DeltaTime += fpsTime;
-                _PlayTime -= fpsTime * (float)_PlaybackSpeed.SelectedValue / 100.0f;
+                _PlayTime -= fpsTime * speed;
 
                 if (_TimeLine.SelectionLenght > 0)
                 {

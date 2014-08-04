@@ -110,7 +110,7 @@ namespace Skill.Framework
         {
             if (Camera == null) return;
 
-            if (!Global.CutSceneEnable) // do not modify camera if game is in cutscene mode
+            if (!Global.IsGamePaused) // do not modify camera if game is in cutscene mode
             {
                 bool updating = false;
 

@@ -7,7 +7,7 @@ namespace Skill.Editor.Sequence
 {
     public class QuaternionTrackBar : ContinuousTrackBar<Quaternion>
     {
-                private QuaternionTrack _QuaternionTrack;
+        private QuaternionTrack _QuaternionTrack;
 
         public QuaternionTrackBar(QuaternionTrack track)
             : base(track)
@@ -34,6 +34,52 @@ namespace Skill.Editor.Sequence
         //    ValidateCurve(_QuaternionTrack.CurveZ, eulers.z);
         //}
 
+
+        private float Closify(AnimationCurve curve, float angle, float time)
+        {
+            if (curve != null && curve.length > 0)
+            {
+                int index = -1;
+                for (int i = 0; i < curve.length; i++)
+                {
+                    if (curve[i].time > time)
+                    {
+                        if (index == -1)
+                            index = i;
+                        break;
+                    }
+                    else
+                        index = i;
+                }
+
+                if (index >= 0)
+                {
+                    float neighbor = curve[index].value;
+                    if (angle > neighbor)
+                    {
+                        float lowerAngle = angle - 360;
+                        while (lowerAngle > neighbor) lowerAngle -= 360;
+
+                        if (neighbor - lowerAngle < angle - neighbor)
+                        {
+                            angle = lowerAngle;
+                        }
+                    }
+                    else if (angle < neighbor)
+                    {
+                        float upperAngle = angle + 360;
+                        while (upperAngle < neighbor) upperAngle += 360;
+
+                        if (upperAngle - neighbor < neighbor - angle)
+                        {
+                            angle = upperAngle;
+                        }
+                    }
+                }
+            }
+            return angle;
+        }
+        
         protected override void AddCurveKey(KeyType keyType, float time)
         {
             Vector3 sceneValue = new Vector3();
@@ -47,14 +93,23 @@ namespace Skill.Editor.Sequence
                 sceneValue.x = _QuaternionTrack.CurveX.Evaluate(time);
                 sceneValue.y = _QuaternionTrack.CurveY.Evaluate(time);
                 sceneValue.z = _QuaternionTrack.CurveZ.Evaluate(time);
-            }
+            }            
 
             if ((keyType & Sequence.KeyType.X) == KeyType.X)
+            {
+                sceneValue.x = Closify(_QuaternionTrack.CurveX, sceneValue.x, time);
                 AddKeyToCurve(_QuaternionTrack.CurveX, time, sceneValue.x);
+            }
             if ((keyType & Sequence.KeyType.Y) == KeyType.Y)
+            {
+                sceneValue.y = Closify(_QuaternionTrack.CurveY, sceneValue.y, time);
                 AddKeyToCurve(_QuaternionTrack.CurveY, time, sceneValue.y);
+            }
             if ((keyType & Sequence.KeyType.Z) == KeyType.Z)
+            {
+                sceneValue.z = Closify(_QuaternionTrack.CurveZ, sceneValue.z, time);
                 AddKeyToCurve(_QuaternionTrack.CurveZ, time, sceneValue.z);
+            }
         }
 
         protected override KeyType GetEquality(Quaternion v1, Quaternion v2)

@@ -92,12 +92,13 @@ namespace Skill.Framework
 
         private float _CurrentAngleVelocity;
         private float _CurrentAngle;
+        private float _TargetAngle;
 
         /// <summary> Last result of call Update function </summary>
-        public float CurrentAngle { get { return _CurrentAngle; } set { _CurrentAngle = value; _CurrentAngleVelocity = 0; } }
+        public float CurrentAngle { get { return _CurrentAngle; } set { _CurrentAngle = MathHelper.ClampAngle(value); _CurrentAngleVelocity = 0; } }
 
         /// <summary> The position we are trying to reach. </summary>
-        public float TargetAngle { get; set; }
+        public float TargetAngle { get { return _TargetAngle; } set { _TargetAngle = MathHelper.ClampAngle(value); } }
 
         /// <summary>
         /// Update one step and return result

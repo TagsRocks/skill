@@ -24,6 +24,10 @@ namespace Skill.Framework.Sequence
         public AnimationCurve Curve;
 
 
+        [ExposeProperty(80, "Curve")]
+        public AnimationCurve CurveP { get { return Curve; } set { Curve = value; } }
+
+
         protected override float EvaluateCurves(float time)
         {
             if (Curve != null)

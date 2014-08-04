@@ -34,7 +34,7 @@ namespace Skill.Framework.Sequence
                         if (t <= CurrecntTime)
                         {
                             evaluatedIndex = _Index;
-                            if (t < CurrecntTime && t >= preTime)
+                            if (t >= preTime)
                             {
                                 Execute(PropertyKeys[_Index]);
                             }

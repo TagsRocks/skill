@@ -6,7 +6,8 @@ namespace Skill.Editor.Curve
     abstract class TangentHandle : Skill.Framework.UI.Image
     {
         public static Color TangentColor = new Color(1.0f, 1.0f, 1.0f, 0.6f);
-        public const float TangentLenght = 60;
+        public const float TangentLenght = 50;
+        protected static Vector2 TangentScale = new Vector2(1f, -1f);
 
         public CurveKey Key { get; private set; }
 
@@ -64,7 +65,8 @@ namespace Skill.Editor.Curve
                 {
                     _DeltaDrag += e.delta;
                     _EndPosition = _StartPosition + _DeltaDrag;
-                    UpdateTangent(_EndPosition);
+
+                    UpdateTangent(new Vector2(Key.Track.GetTime(_EndPosition.x, false), Key.Track.GetValue(_EndPosition.y, false)));
                     e.Use();
                 }
                 else if (e.type == EventType.MouseUp && e.button == 0)
@@ -94,32 +96,39 @@ namespace Skill.Editor.Curve
 
         public override void UpdatePosition()
         {
-            Keyframe key = Key.Keyframe;
-            float angle = Mathf.Atan(key.inTangent);
-            float x = -Mathf.Cos(angle) * TangentLenght;
-            float y = Mathf.Sin(angle) * TangentLenght;
-            Position = new Rect(x, y, 8, 8);
+            Keyframe keyframe = Key.Keyframe;
+            Vector2 vector1 = new Vector2(keyframe.time, keyframe.value);
+            Vector2 vector2 = new Vector2(1f, keyframe.inTangent);
+            if (keyframe.inTangent == float.PositiveInfinity)
+            {
+                vector2 = new Vector2(0f, -1f);
+            }
+            vector2.Normalize();
+
+            vector2 = vector1 - vector2;
+            Vector2 point = Key.Track.GetPoint(vector2.x, vector2.y, false);
+
+            Vector2 dir = (point - Key.RenderArea.center).normalized;
+            point = dir * TangentLenght;
+
+            Position = new Rect(point.x, point.y, 8, 8);
+
         }
+
+
+
+
 
         protected override void UpdateTangent(Vector2 mousePosition)
         {
-            Rect ra = Key.RenderArea;
-            Vector2 center = ra.center;
             Keyframe keyframe = Key.Keyframe;
-
-            if (mousePosition.x > center.x) mousePosition.x = center.x;
+            Vector2 center = new Vector2(keyframe.time, keyframe.value);
             Vector2 delta = mousePosition - center;
-            delta.Normalize();
 
             if (delta.x >= -0.0001f)
-            {
-                if (delta.y < 0)
-                    keyframe.outTangent = float.NegativeInfinity;
-                else
-                    keyframe.outTangent = float.PositiveInfinity;
-            }
+                keyframe.inTangent = float.PositiveInfinity;
             else
-                keyframe.inTangent = -delta.y / delta.x;
+                keyframe.inTangent = delta.y / delta.x;
 
             Skill.Editor.CurveUtility.SetKeyTangentMode(ref keyframe, 0, Skill.Editor.CurveUtility.TangentMode.Editable);
             if (!Skill.Editor.CurveUtility.GetKeyBroken(keyframe))
@@ -148,32 +157,34 @@ namespace Skill.Editor.Curve
 
         public override void UpdatePosition()
         {
-            Keyframe key = Key.Keyframe;
-            float angle = Mathf.Atan(key.outTangent);
-            float x = Mathf.Cos(angle) * TangentLenght;
-            float y = -Mathf.Sin(angle) * TangentLenght;
-            Position = new Rect(x, y, 8, 8);
+            Keyframe keyframe = Key.Keyframe;
+            Vector2 vector1 = new Vector2(keyframe.time, keyframe.value);
+            Vector2 vector2 = new Vector2(1f, keyframe.outTangent);
+            if (keyframe.outTangent == float.PositiveInfinity)
+                vector2 = new Vector2(0f, -1f);
+            else
+                vector2.Normalize();
+
+            vector2 = vector1 + vector2;
+            Vector2 point = Key.Track.GetPoint(vector2.x, vector2.y, false);
+
+            Vector2 dir = (point - Key.RenderArea.center).normalized;
+            point = dir * TangentLenght;
+
+            Position = new Rect(point.x, point.y, 8, 8);
         }
 
         protected override void UpdateTangent(Vector2 mousePosition)
         {
-            Rect ra = Key.RenderArea;
-            Vector2 center = ra.center;
             Keyframe keyframe = Key.Keyframe;
-
-            if (mousePosition.x < center.x) mousePosition.x = center.x;
+            Vector2 center = new Vector2(keyframe.time, keyframe.value);
             Vector2 delta = mousePosition - center;
             delta.Normalize();
 
             if (delta.x > 0.0001f)
-                keyframe.outTangent = -delta.y / delta.x;
+                keyframe.outTangent = delta.y / delta.x;
             else
-            {
-                if (delta.y < 0)
-                    keyframe.outTangent = float.NegativeInfinity;
-                else
-                    keyframe.outTangent = float.PositiveInfinity;
-            }
+                keyframe.outTangent = float.PositiveInfinity;
 
 
             Skill.Editor.CurveUtility.SetKeyTangentMode(ref keyframe, 1, Skill.Editor.CurveUtility.TangentMode.Editable);

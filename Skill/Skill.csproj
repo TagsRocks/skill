@@ -110,6 +110,7 @@
     <Compile Include="Framework\Triggers\ActivateTrigger.cs" />
     <Compile Include="Framework\Triggers\IsometricCameraTrigger.cs" />
     <Compile Include="Framework\Triggers\IsometricCameraMotionTrigger.cs" />
+    <Compile Include="Framework\Triggers\PlayMatineeTrigger.cs" />
     <Compile Include="Framework\UI\Cursor.cs" />
     <Compile Include="Framework\UI\Extended\ProgressBar.cs" />
     <Compile Include="Framework\UI\Extended\RoundSidedProgressBar.cs" />

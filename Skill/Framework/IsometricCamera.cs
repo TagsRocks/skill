@@ -34,6 +34,8 @@ namespace Skill.Framework
         public float CursorPlaneHeight = 0;
         /// <summary> If target can move very fast do not allow camera to loose it</summary>
         public bool FastTarget;
+        /// <summary> raycast world if failed to raycast move plane</summary>
+        public LayerMask WorldRayastLayerMask;
 
         /// <summary>
         /// Apply relative custom offset to position of camera
@@ -130,7 +132,7 @@ namespace Skill.Framework
         /// </summary>
         protected virtual void LateUpdate()
         {
-            if (!Global.IsGamePaused && !Global.CutSceneEnable) // do not modify camera if game is in cutscene mode
+            if (!Global.IsGamePaused) // do not modify camera if game is paused
             {
                 if (Target != null)
                 {
@@ -213,7 +215,7 @@ namespace Skill.Framework
                 CursorScreenPosition = HandleMousePosition();
 
                 // Find out where the mouse ray intersects with the movement plane of the player
-                CursorWorldPosition = ScreenPointToWorldPointOnPlane(CursorScreenPosition, _MovementPlane, Camera);
+                CursorWorldPosition = ScreenPointToWorldPoint(CursorScreenPosition, _MovementPlane, Camera);
 
                 Vector3 cameraAdjustmentVector = Vector3.zero;
 
@@ -292,13 +294,23 @@ namespace Skill.Framework
         /// <param name="plane">Plane in world space</param>
         /// <param name="camera">Camera to create ray</param>
         /// <returns> Intersection poitn of ray and plane </returns>
-        public static Vector3 ScreenPointToWorldPointOnPlane(Vector3 screenPoint, Plane plane, Camera camera)
+        private Vector3 ScreenPointToWorldPoint(Vector3 screenPoint, Plane plane, Camera camera)
         {
             // Set up a ray corresponding to the screen position
             Ray ray = camera.ScreenPointToRay(screenPoint);
 
+            Vector3 pos;
             // Find out where the ray intersects with the plane
-            return PlaneRayIntersection(plane, ray);
+            if (PlaneRayIntersection(plane, ray, out pos))
+                return pos;
+            else
+            {
+                RaycastHit hit;
+                if (Physics.Raycast(ray, out hit, WorldRayastLayerMask))
+                    return hit.point;
+                else
+                    return Vector3.zero;
+            }
         }
 
         /// <summary>
@@ -307,11 +319,19 @@ namespace Skill.Framework
         /// <param name="plane">Plane</param>
         /// <param name="ray">Ray</param>
         /// <returns>Intersection poitn of ray and plane</returns>
-        public static Vector3 PlaneRayIntersection(Plane plane, Ray ray)
+        public static bool PlaneRayIntersection(Plane plane, Ray ray, out Vector3 intersectPosition)
         {
             float dist;
-            plane.Raycast(ray, out dist);
-            return ray.GetPoint(dist);
+            if (plane.Raycast(ray, out dist))
+            {
+                intersectPosition = ray.GetPoint(dist);
+                return true;
+            }
+            else
+            {
+                intersectPosition = Vector3.zero;
+                return false;
+            }
         }
     }
 }

@@ -29,6 +29,20 @@ namespace Skill.Framework.Sequence
         public AnimationCurve CurveW;
 
 
+        [ExposeProperty(80, "CurveX")]
+        public AnimationCurve CurveXP { get { return CurveX; } set { CurveX = value; } }
+
+        [ExposeProperty(81, "CurveY")]
+        public AnimationCurve CurveYP { get { return CurveY; } set { CurveY = value; } }
+
+        [ExposeProperty(82, "CurveZ")]
+        public AnimationCurve CurveZP { get { return CurveZ; } set { CurveZ = value; } }
+
+        [ExposeProperty(83, "CurveW")]
+        public AnimationCurve CurveWP { get { return CurveW; } set { CurveW = value; } }
+
+
+
         protected override Vector4 EvaluateCurves(float time)
         {
             Vector4 result = new Vector4();

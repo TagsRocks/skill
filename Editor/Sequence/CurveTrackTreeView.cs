@@ -46,6 +46,7 @@ namespace Skill.Editor.Sequence
             Controls.Add(_Toolbar);
 
             _TreeView = new TreeView() { Row = 1, UserData = this, HandleScrollWheel = true };
+            _TreeView.DisableFocusable();
             Controls.Add(_TreeView);
 
             _BtnClear.Click += _BtnClear_Click;
