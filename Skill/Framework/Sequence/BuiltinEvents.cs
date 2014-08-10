@@ -19,16 +19,16 @@ namespace Skill.Framework.Sequence
         [SerializeField]
         private PlayMode _PlayMode = PlayMode.StopAll;
 
-        [ExposeProperty(11, "Animation", "Animation component")]
+        [ExposeProperty(101, "Animation", "Animation component")]
         public UnityEngine.Animation Animation { get { return _Animation; } set { _Animation = value; } }
-        [ExposeProperty(12, "Animation Name", "Animation clip name")]
+        [ExposeProperty(102, "Animation Name", "Animation clip name")]
         public string AnimationName { get { return _AnimationName; } set { _AnimationName = value; } }
-        [ExposeProperty(13, "Fade Length", "")]
+        [ExposeProperty(103, "Fade Length", "")]
         public float FadeLength { get { return _FadeLength; } set { _FadeLength = value; } }
-        [ExposeProperty(14, "PlayMode", "")]
+        [ExposeProperty(104, "PlayMode", "")]
         public PlayMode PlayMode { get { return _PlayMode; } set { _PlayMode = value; } }
 
-        public override void Fire()
+        public override void FireEvent()
         {
             if (Animation != null && !string.IsNullOrEmpty(AnimationName))
                 Animation.CrossFade(AnimationName, _FadeLength, _PlayMode);
@@ -51,14 +51,14 @@ namespace Skill.Framework.Sequence
         private Transform _Parent;
 
 
-        [ExposeProperty(11, "Child", " child object to change it's parent ")]
+        [ExposeProperty(101, "Child", " child object to change it's parent ")]
         public Transform Child { get { return _Child; } set { _Child = value; } }
 
-        [ExposeProperty(12, "Parent", "This is the object that you want to be the new parent. If you don't specify a parent, the object will be detached.")]
+        [ExposeProperty(102, "Parent", "This is the object that you want to be the new parent. If you don't specify a parent, the object will be detached.")]
         public Transform Parent { get { return _Parent; } set { _Parent = value; } }
 
 
-        public override void Fire()
+        public override void FireEvent()
         {
             if (_Child != null)
                 _Child.parent = _Parent;
@@ -82,16 +82,16 @@ namespace Skill.Framework.Sequence
         [SerializeField]
         private bool _UseObjectRotation;
 
-        [ExposeProperty(11, "Wrapping Object", " child object to change it's parent ")]
+        [ExposeProperty(101, "Wrapping Object", " child object to change it's parent ")]
         public Transform WrappingObject { get { return _WrappingObject; } set { _WrappingObject = value; } }
 
-        [ExposeProperty(12, "Object To Warp To", "The transform, or object in the scene, whose position we will use to complete this warp.")]
+        [ExposeProperty(102, "Object To Warp To", "The transform, or object in the scene, whose position we will use to complete this warp.")]
         public Transform ObjectToWarpTo { get { return _ObjectToWarpTo; } set { _ObjectToWarpTo = value; } }
 
-        [ExposeProperty(13, "Object To Warp To", "This defines if, upon warping, we should use the target objects orientation or not.")]
+        [ExposeProperty(103, "Target Rotation?", "This defines if, upon warping, we should use the target objects orientation or not.")]
         public bool UseObjectRotation { get { return _UseObjectRotation; } set { _UseObjectRotation = value; } }
 
-        public override void Fire()
+        public override void FireEvent()
         {
             if (_WrappingObject != null && _ObjectToWarpTo != null)
             {
@@ -121,13 +121,13 @@ namespace Skill.Framework.Sequence
         private bool _Pause;
 
 
-        [ExposeProperty(11, "Source", "Audio Source")]
+        [ExposeProperty(101, "Source", "Audio Source")]
         public AudioSource Source { get { return _Source; } set { _Source = value; } }
 
-        [ExposeProperty(12, "Pause", "Are we pausing or resuming this Audio Clip")]
+        [ExposeProperty(102, "Pause", "Are we pausing or resuming this Audio Clip")]
         public bool Pause { get { return _Pause; } set { _Pause = value; } }
 
-        public override void Fire()
+        public override void FireEvent()
         {
             if (_Source != null)
             {
@@ -160,16 +160,16 @@ namespace Skill.Framework.Sequence
         private bool _Loop;
 
 
-        [ExposeProperty(11, "Source", "Audio Source")]
+        [ExposeProperty(101, "Source", "Audio Source")]
         public AudioSource Source { get { return _Source; } set { _Source = value; } }
 
-        [ExposeProperty(12, "Clip", "The Audio Clip to play.")]
+        [ExposeProperty(102, "Clip", "The Audio Clip to play.")]
         public AudioClip Clip { get { return _Clip; } set { _Clip = value; } }
 
-        [ExposeProperty(13, "Loop", "Should we loop this Audio Clip.")]
+        [ExposeProperty(103, "Loop", "Should we loop this Audio Clip.")]
         public bool Loop { get { return _Loop; } set { _Loop = value; } }
 
-        public override void Fire()
+        public override void FireEvent()
         {
             if (_Source != null && Clip != null)
             {
@@ -196,10 +196,10 @@ namespace Skill.Framework.Sequence
         private AudioSource _Source;
 
 
-        [ExposeProperty(11, "Source", "Audio Source")]
+        [ExposeProperty(101, "Source", "Audio Source")]
         public AudioSource Source { get { return _Source; } set { _Source = value; } }
 
-        public override void Fire()
+        public override void FireEvent()
         {
             if (_Source != null)
                 _Source.Stop();
@@ -220,10 +220,10 @@ namespace Skill.Framework.Sequence
         [SerializeField]
         private string _Message;
 
-        [ExposeProperty(11, "Message", "Log message")]
+        [ExposeProperty(101, "Message", "Log message")]
         public string Message { get { return _Message; } set { _Message = value; } }
 
-        public override void Fire()
+        public override void FireEvent()
         {
             if (!string.IsNullOrEmpty(_Message))
                 Debug.Log(_Message);
@@ -243,102 +243,115 @@ namespace Skill.Framework.Sequence
         [SerializeField]
         private bool _Active = true;
         [SerializeField]
-        private GameObject _Object1;
-        [SerializeField]
-        private GameObject _Object2;
-        [SerializeField]
-        private GameObject _Object3;
-        [SerializeField]
-        private GameObject _Object4;
-        [SerializeField]
-        private GameObject _Object5;
+        private GameObject[] _Objects;
 
-        [ExposeProperty(11, "Active", "Should we acivate, or deactivate this GameObject")]
+        [ExposeProperty(101, "Active", "Should we acivate, or deactivate this GameObject")]
         public bool Active { get { return _Active; } set { _Active = value; } }
 
-        [ExposeProperty(12, "Object1", "Object to toggle")]
-        public GameObject Object1 { get { return _Object1; } set { _Object1 = value; } }
-        [ExposeProperty(13, "Object2", "Object to toggle")]
-        public GameObject Object2 { get { return _Object2; } set { _Object2 = value; } }
-        [ExposeProperty(14, "Object3", "Object to toggle")]
-        public GameObject Object3 { get { return _Object3; } set { _Object3 = value; } }
-        [ExposeProperty(15, "Object4", "Object to toggle")]
-        public GameObject Object4 { get { return _Object4; } set { _Object4 = value; } }
-        [ExposeProperty(16, "Object5", "Object to toggle")]
-        public GameObject Object5 { get { return _Object5; } set { _Object5 = value; } }
+        [ExposeProperty(101, "Objects", "Objects to toggle")]
+        public GameObject[] Objects { get { return _Objects; } set { _Objects = value; } }
 
 
-        public override void Fire()
+        public override void FireEvent()
         {
-            if (_Object1 != null) _Object1.SetActive(_Active);
-            if (_Object2 != null) _Object2.SetActive(_Active);
-            if (_Object3 != null) _Object3.SetActive(_Active);
-            if (_Object4 != null) _Object4.SetActive(_Active);
-            if (_Object5 != null) _Object5.SetActive(_Active);
+            if (_Objects != null)
+            {
+                for (int i = 0; i < _Objects.Length; i++)
+                {
+                    if (_Objects[i] != null)
+                        _Objects[i].SetActive(_Active);
+                }
+            }
         }
     }
     #endregion
 
-    #region ParticleSystem
+    #region Particle
 
     /// <summary>
     /// Add this event when you would like to start or stop emission a Particle System Emitter.
     /// </summary>
-    [CustomEvent("Start/Stop Emitter", "ParticleSystem")]
+    [CustomEvent("StartStop Emitter", "Particle")]
     public class StartStopEmitter : EventKey
     {
         [SerializeField]
-        private ParticleEmitter _Emmiter;
+        private ParticleEmitter[] _Emmiters;
         [SerializeField]
-        private bool _Emit = true;
+        private ParticleSystem[] _Particles;
+        [SerializeField]
+        private bool _Emission = true;
 
-        [ExposeProperty(11, "Emmiter", "Particle Emitter")]
-        public ParticleEmitter Emmiter { get { return _Emmiter; } set { _Emmiter = value; } }
+        [ExposeProperty(101, "Emission", "start emit or stop emit")]
+        public bool Emission { get { return _Emission; } set { _Emission = value; } }
 
-        [ExposeProperty(12, "Emit", "start emit or stop emit")]
-        public bool Emit { get { return _Emit; } set { _Emit = value; } }
+        [ExposeProperty(102, "Particles", "Particles to  enable or disable emission")]
+        public ParticleSystem[] Particles { get { return _Particles; } set { _Particles = value; } }
 
-        public override void Fire()
+        [ExposeProperty(103, "Emmiters", "Emmiters to  enable or disable emission")]
+        public ParticleEmitter[] Emmiters { get { return _Emmiters; } set { _Emmiters = value; } }
+
+        public override void FireEvent()
         {
-            if (_Emmiter != null)
-                _Emmiter.emit = _Emit;
-            else
-                Debug.LogWarning("You must set a valid ParticleEmitter for StartStopEmitter event");
+            if (_Particles != null && _Particles.Length > 0)
+            {
+                for (int i = 0; i < _Particles.Length; i++)
+                {
+                    if (_Particles[i] != null)
+                        _Particles[i].enableEmission = _Emission;
+                }
+            }
+            if (_Emmiters != null && _Emmiters.Length > 0)
+            {
+                for (int i = 0; i < _Particles.Length; i++)
+                {
+                    if (_Emmiters[i] != null)
+                        _Emmiters[i].emit = _Emission;
+                }
+            }
         }
     }
-
 
     /// <summary>
     /// Add this event when you would like to Emit a number of particles.
     /// </summary>
-    [CustomEvent("Emit", "ParticleSystem")]
+    [CustomEvent("Emit", "Particle")]
     public class Emit : EventKey
     {
         [SerializeField]
+        private ParticleSystem _Particle;
+        [SerializeField]
         private ParticleEmitter _Emmiter;
         [SerializeField]
-        private int _Count;          // number of particles.        
+        private int _Count;
         [SerializeField]
         private bool _ClearParticles = false;
 
-
-        [ExposeProperty(11, "Emmiter", "Particle Emitter")]
-        public ParticleEmitter Emmiter { get { return _Emmiter; } set { _Emmiter = value; } }
-        [ExposeProperty(12, "Count", "Number of particles")]
+        [ExposeProperty(101, "Count", "Number of particles")]
         public int Count { get { return _Count; } set { _Count = value; } }
-        [ExposeProperty(13, "Emit", "Removes all particles from the particle emitter before emit.")]
+
+        [ExposeProperty(102, "Clear", "Removes all particles from the particle emitter before emit.")]
         public bool ClearParticles { get { return _ClearParticles; } set { _ClearParticles = value; } }
 
-        public override void Fire()
+        [ExposeProperty(103, "Particle", "Particle System")]
+        public ParticleSystem Particle { get { return _Particle; } set { _Particle = value; } }
+
+        [ExposeProperty(104, "Emmiter", "Particle Emitter")]
+        public ParticleEmitter Emmiter { get { return _Emmiter; } set { _Emmiter = value; } }
+
+        public override void FireEvent()
         {
+            if (_Particle != null)
+            {
+                if (_ClearParticles) _Particle.Clear();
+                if (_Count > 0)
+                    _Particle.Emit(_Count);
+            }
             if (_Emmiter != null)
             {
                 if (_ClearParticles) _Emmiter.ClearParticles();
                 if (_Count > 0)
                     _Emmiter.Emit(_Count);
             }
-            else
-                Debug.LogWarning("You must set a valid ParticleEmitter for Emit event");
         }
     }
 
@@ -346,7 +359,7 @@ namespace Skill.Framework.Sequence
     /// <summary>
     /// Add this event when you would like to Emit a single particle with given parameters.
     /// </summary>
-    [CustomEvent("Emit Single", "ParticleSystem")]
+    [CustomEvent("Emit Single", "Particle")]
     public class EmitSingle : EventKey
     {
         [SerializeField]
@@ -370,29 +383,29 @@ namespace Skill.Framework.Sequence
         private float _AngularVelocity;  //The angular velocity of the particle in degrees per second.
 
 
-        [ExposeProperty(11, "Emmiter", "Particle Emitter")]
+        [ExposeProperty(101, "Emmiter", "Particle Emitter")]
         public ParticleEmitter Emmiter { get { return _Emmiter; } set { _Emmiter = value; } }
-        [ExposeProperty(12, "Position", "The position of the particle.  ")]
+        [ExposeProperty(102, "Position", "The position of the particle.  ")]
         public Transform Position { get { return _Position; } set { _Position = value; } }
-        [ExposeProperty(13, "Velocity", "The velocity of the particle.")]
+        [ExposeProperty(103, "Velocity", "The velocity of the particle.")]
         public Vector3 Velocity { get { return _Velocity; } set { _Velocity = value; } }
-        [ExposeProperty(14, "Size", "The size of the particle.")]
+        [ExposeProperty(104, "Size", "The size of the particle.")]
         public float Size { get { return _Size; } set { _Size = value; } }
-        [ExposeProperty(15, "Energy", "The remaining lifetime of the particle.")]
+        [ExposeProperty(105, "Energy", "The remaining lifetime of the particle.")]
         public float Energy { get { return _Energy; } set { _Energy = value; } }
-        [ExposeProperty(16, "Color", "The color of the particle.")]
+        [ExposeProperty(106, "Color", "The color of the particle.")]
         public Color Color { get { return _Color; } set { _Color = value; } }
 
 
-        [ExposeProperty(17, "Use Rotation", "Use rotation parameters")]
+        [ExposeProperty(107, "Use Rotation", "Use rotation parameters")]
         public bool UseRotation { get { return _UseRotation; } set { _UseRotation = value; } }
-        [ExposeProperty(18, "Rotation", "The initial rotation of the particle in degrees.")]
+        [ExposeProperty(108, "Rotation", "The initial rotation of the particle in degrees.")]
         public float Rotation { get { return _Rotation; } set { _Rotation = value; } }
-        [ExposeProperty(19, "Angular Velocity", "The angular velocity of the particle in degrees per second.")]
+        [ExposeProperty(109, "Angular Velocity", "The angular velocity of the particle in degrees per second.")]
         public float AngularVelocity { get { return _AngularVelocity; } set { _AngularVelocity = value; } }
 
 
-        public override void Fire()
+        public override void FireEvent()
         {
             if (_Emmiter != null)
             {
@@ -436,18 +449,18 @@ namespace Skill.Framework.Sequence
 
 
 
-        [ExposeProperty(11, "Body", "The Rigidbody to apply force")]
+        [ExposeProperty(101, "Body", "The Rigidbody to apply force")]
         public Rigidbody Body { get { return _Body; } set { _Body = value; } }
         [ExposeProperty(12, "Position", "Positon of force(optional)")]
         public Transform Position { get { return _Position; } set { _Position = value; } }
-        [ExposeProperty(13, "Force", "Strength and Direction of force")]
+        [ExposeProperty(103, "Force", "Strength and Direction of force")]
         public Vector3 Force { get { return _Force; } set { _Force = value; } }
-        [ExposeProperty(14, "ForceMode", "Option for how to apply a force")]
+        [ExposeProperty(104, "ForceMode", "Option for how to apply a force")]
         public ForceMode ForceMode { get { return _ForceMode; } set { _ForceMode = value; } }
-        [ExposeProperty(15, "Relative", "apply force relative or not")]
+        [ExposeProperty(105, "Relative", "apply force relative or not")]
         public bool Relative { get { return _Relative; } set { _Relative = value; } }
 
-        public override void Fire()
+        public override void FireEvent()
         {
             if (_Body != null)
             {
@@ -492,20 +505,20 @@ namespace Skill.Framework.Sequence
 
 
 
-        [ExposeProperty(11, "Body", "The Rigidbody to apply force")]
+        [ExposeProperty(101, "Body", "The Rigidbody to apply force")]
         public Rigidbody Body { get { return _Body; } set { _Body = value; } }
-        [ExposeProperty(12, "Position", "Positon of explosion")]
+        [ExposeProperty(102, "Position", "Positon of explosion")]
         public Transform Position { get { return _ExpPosition; } set { _ExpPosition = value; } }
-        [ExposeProperty(13, "Strength", "Strength of force")]
+        [ExposeProperty(103, "Strength", "Strength of force")]
         public float Strength { get { return _Strength; } set { _Strength = value; } }
-        [ExposeProperty(14, "Radius", "Radius of explosion")]
+        [ExposeProperty(014, "Radius", "Radius of explosion")]
         public float Radius { get { return _Radius; } set { _Radius = value; } }
-        [ExposeProperty(15, "_UpwardsModifier", "UpwardsModifier applies the force as if it was applied from beneath the object")]
+        [ExposeProperty(105, "_UpwardsModifier", "UpwardsModifier applies the force as if it was applied from beneath the object")]
         public float UpwardsModifier { get { return _UpwardsModifier; } set { _UpwardsModifier = value; } }
-        [ExposeProperty(16, "ForceMode", "Option for how to apply a force")]
+        [ExposeProperty(106, "ForceMode", "Option for how to apply a force")]
         public ForceMode ForceMode { get { return _ForceMode; } set { _ForceMode = value; } }
 
-        public override void Fire()
+        public override void FireEvent()
         {
             if (_Body != null)
                 _Body.AddExplosionForce(_Strength, _ExpPosition.position, _Radius, _UpwardsModifier, _ForceMode);
@@ -535,16 +548,16 @@ namespace Skill.Framework.Sequence
 
 
 
-        [ExposeProperty(11, "Body", "The Rigidbody to apply force")]
+        [ExposeProperty(101, "Body", "The Rigidbody to apply force")]
         public Rigidbody Body { get { return _Body; } set { _Body = value; } }
-        [ExposeProperty(12, "Torque", "Strength and Direction of force")]
+        [ExposeProperty(102, "Torque", "Strength and Direction of force")]
         public Vector3 Torque { get { return _Torque; } set { _Torque = value; } }
-        [ExposeProperty(13, "ForceMode", "Option for how to apply a force")]
+        [ExposeProperty(103, "ForceMode", "Option for how to apply a force")]
         public ForceMode ForceMode { get { return _ForceMode; } set { _ForceMode = value; } }
-        [ExposeProperty(14, "Relative", "apply torque relative or not")]
+        [ExposeProperty(104, "Relative", "apply torque relative or not")]
         public bool Relative { get { return _Relative; } set { _Relative = value; } }
 
-        public override void Fire()
+        public override void FireEvent()
         {
             if (_Body != null)
             {
@@ -605,26 +618,26 @@ namespace Skill.Framework.Sequence
 
 
 
-        [ExposeProperty(11, "Receiver", " The object to receive this message.")]
+        [ExposeProperty(101, "Receiver", " The object to receive this message.")]
         public GameObject Receiver { get { return _Receiver; } set { _Receiver = value; } }
-        [ExposeProperty(12, "Function Name", "Name of function to call")]
+        [ExposeProperty(102, "Function Name", "Name of function to call")]
         public string FunctionName { get { return _FunctionName; } set { _FunctionName = value; } }
-        [ExposeProperty(13, "MessageOptions", "Options")]
+        [ExposeProperty(103, "MessageOptions", "Options")]
         public SendMessageOptions MessageOptions { get { return _MessageOptions; } set { _MessageOptions = value; } }
-        [ExposeProperty(14, "Parameter Type", "Parameter type")]
+        [ExposeProperty(104, "Parameter Type", "Parameter type")]
         public SendMessageParameter ParameterType { get { return _ParameterType; } set { _ParameterType = value; } }
-        [ExposeProperty(15, "Float", "Float parameter")]
+        [ExposeProperty(105, "Float", "Float parameter")]
         public float FloatParameter { get { return _FloatParameter; } set { _FloatParameter = value; } }
-        [ExposeProperty(16, "Int", "Int parameter")]
+        [ExposeProperty(106, "Int", "Int parameter")]
         public int IntParameter { get { return _IntParameter; } set { _IntParameter = value; } }
-        [ExposeProperty(17, "Bool", "Boolean parameter")]
+        [ExposeProperty(107, "Bool", "Boolean parameter")]
         public bool BoolParameter { get { return _BoolParameter; } set { _BoolParameter = value; } }
-        [ExposeProperty(18, "Object", "Object reference parameter")]
+        [ExposeProperty(108, "Object", "Object reference parameter")]
         public Object ObjectReferenceParameter { get { return _ObjectReferenceParameter; } set { _ObjectReferenceParameter = value; } }
-        [ExposeProperty(19, "String", "String parameter")]
+        [ExposeProperty(109, "String", "String parameter")]
         public string StringParameter { get { return _StringParameter; } set { _StringParameter = value; } }
 
-        public override void Fire()
+        public override void FireEvent()
         {
             if (_Receiver != null)
             {
@@ -659,6 +672,59 @@ namespace Skill.Framework.Sequence
                 Debug.LogWarning("You must specify a valid Receiver for SendMessage event");
         }
     }
+
+
+    [CustomEventAttribute("CameraShake", "Signal")]
+    public class CameraShake : EventKey
+    {
+        public Transform _Source;
+        public Vector3 _Intensity = new Vector3(0.05f, 0.1f, 0.0f);
+        public float _Roll = 0.5f;
+        public float _Duration = 1.0f;
+        public float _Range = 50;
+        public bool _ByDistance = true;
+        public float _TickTime = 0.1f;
+
+
+        [Skill.Framework.ExposeProperty(101, "Source", "Source of shake")]
+        public Transform Source { get { return _Source; } set { _Source = value; } }
+
+        [Skill.Framework.ExposeProperty(102, "Intensity", "Intensity of shake (x in left/right direction), (y in up/down direction), (z in back/forward (zoom) direction)")]
+        public Vector3 Intensity { get { return _Intensity; } set { _Intensity = value; } }
+
+        [Skill.Framework.ExposeProperty(103, "Roll", "Intensity of camera roll")]
+        public float Roll { get { return _Roll; } set { _Roll = value; } }
+
+        [Skill.Framework.ExposeProperty(104, "Duration", "Duration of shake")]
+        public float Duration { get { return _Duration; } set { _Duration = value; } }
+
+        [Skill.Framework.ExposeProperty(105, "Range", "Max distance to camera.")]
+        public float Range { get { return _Range; } set { _Range = value; } }
+
+        [Skill.Framework.ExposeProperty(106, "ByDistance", "The shake will be more stronger near to camera")]
+        public bool ByDistance { get { return _ByDistance; } set { _ByDistance = value; } }
+
+        [Skill.Framework.ExposeProperty(107, "TickTime", "time between shake directions")]
+        public float TickTime { get { return _TickTime; } set { _TickTime = value; } }
+
+
+        public override void FireEvent()
+        {
+            Skill.Framework.CameraShakeParams info = new Skill.Framework.CameraShakeParams();
+
+            info.Intensity = this._Intensity;
+            info.Roll = this._Roll;
+            info.Duration = this._Duration;
+            info.Range = this._Range;
+            info.ByDistance = this._ByDistance;
+            info.TickTime = this._TickTime;
+
+            if (_Source != null)
+                Skill.Framework.Global.RaiseCameraShake(this, info, _Source.position);
+            else
+                Skill.Framework.Global.RaiseCameraShake(this, info, Vector3.zero);
+        }
+    }
     #endregion
 
     #region Spawn
@@ -675,12 +741,12 @@ namespace Skill.Framework.Sequence
         private Transform _Position;
 
 
-        [ExposeProperty(11, "Prefab", "The prefab to spawn")]
+        [ExposeProperty(101, "Prefab", "The prefab to spawn")]
         public GameObject Prefab { get { return _Prefab; } set { _Prefab = value; } }
-        [ExposeProperty(12, "Position", "The transform to use when spawning this prefab.")]
+        [ExposeProperty(102, "Position", "The transform to use when spawning this prefab.")]
         public Transform Position { get { return _Position; } set { _Position = value; } }
 
-        public override void Fire()
+        public override void FireEvent()
         {
             if (_Prefab != null && _Position != null)
             {
@@ -694,6 +760,46 @@ namespace Skill.Framework.Sequence
 
 
     }
+    #endregion
+
+    #region Time
+
+    [CustomEventAttribute("SlowMotion", "Time")]
+    public class CameraSlowMotion : EventKey
+    {
+
+        public float _Freez = 0.0f;
+        public float _SlowMotion = 2.0f;
+        public float _TimeScale = 0.2f;
+        public float _Pitch = 0.5f;
+
+
+        [Skill.Framework.ExposeProperty(101, "Freez", "Lenght of freez time at begining of slow motion.( Freez time is calculated as part of SlowMotion time )")]
+        public float Freez { get { return _Freez; } set { _Freez = value; } }
+
+        [Skill.Framework.ExposeProperty(102, "SlowMotion", "Lenght of slow motion")]
+        public float SlowMotion { get { return _SlowMotion; } set { _SlowMotion = value; } }
+
+        [Skill.Framework.ExposeProperty(103, "TimeScale", "Target TimeScale when slow motion")]
+        public float TimeScale { get { return _TimeScale; } set { _TimeScale = value; } }
+
+        [Skill.Framework.ExposeProperty(104, "Pitch", "Target sound pitch when slow motion")]
+        public float Pitch { get { return _Pitch; } set { _Pitch = value; } }
+
+
+        public override void FireEvent()
+        {
+            Skill.Framework.SlowMotionInfo info = new Skill.Framework.SlowMotionInfo();
+
+            info.Freez = _Freez;
+            info.SlowMotion = _SlowMotion;
+            info.TimeScale = _TimeScale;
+            info.Pitch = _Pitch;
+
+            Skill.Framework.Global.RaiseSlowMotion(this, info);
+        }
+    }
+
     #endregion
 
 }

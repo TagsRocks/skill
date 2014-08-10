@@ -46,16 +46,7 @@ namespace Skill.Editor.Sequence
         void Rollback()
         {
             if (_Matinee != null)
-            {
-                Track[] tracks = _Matinee.GetComponentsInChildren<Track>();
-                if (tracks != null)
-                {
-                    foreach (var t in tracks)
-                    {
-                        t.Rollback();
-                    }
-                }
-            }
+                _Matinee.Rollback();
         }
 
         void OnGUI()
@@ -176,8 +167,13 @@ namespace Skill.Editor.Sequence
 
         void OnFocus()
         {
-            if (_Frame != null)
-                CheckSeleced();
+            if (_Matinee == null)
+            {
+                if (_Frame != null)
+                    Clear();
+            }
+            //if (_Frame != null)
+            //    CheckSeleced();
         }
 
         void OnLostFocus()
@@ -261,12 +257,9 @@ namespace Skill.Editor.Sequence
             {
                 if (_Matinee != value)
                 {
-                    if (_Matinee != null)
-                    {                        
-                        Rollback();
-                        Clear();
-                    }
-                    _Matinee = value;                    
+                    Rollback();
+                    Clear();
+                    _Matinee = value;
                 }
                 Refresh();
             }
@@ -276,10 +269,13 @@ namespace Skill.Editor.Sequence
         {
             _TracksTreeView.Clear();
             _CurveTrackTreeView.RemoveAll(true);
-            _TimeLine.Clear();
-            _TimeLine.MinTime = 0;
-            _TimeLine.MaxTime = 1;
             InspectorProperties.Select(null);
+            _TimeLine.Clear();
+            _TimeLine.StartVisible = 0.0f;
+            _TimeLine.EndVisible = 1.0f;
+            _TimeLine.MinTime = 0.0f;
+            _TimeLine.MaxTime = 1.0f;
+
         }
         #endregion
 
@@ -375,9 +371,9 @@ namespace Skill.Editor.Sequence
         private void _TimeLine_TimePositionChanged(object sender, System.EventArgs e)
         {
             if (_IgnorePosition == 1) return;
-            if (!_IsPlaying)
-                _SeekUpdate = true;
+            if (_IsPlaying) return;
 
+            _SeekUpdate = true;
             _IgnorePosition = 1;
             _CurveEditor.TimeLine.TimePosition = System.Math.Max(0, _TimeLine.TimePosition);
             _IgnorePosition = 0;
@@ -387,6 +383,7 @@ namespace Skill.Editor.Sequence
         void CurveEditorTimeLine_PositionChanged(object sender, System.EventArgs e)
         {
             if (_IgnorePosition == 2) return;
+            if (_IsPlaying) return;
             _IgnorePosition = 2;
             _TimeLine.TimePosition = System.Math.Max(0, _CurveEditor.TimeLine.TimePosition);
             _IgnorePosition = 0;
@@ -635,6 +632,15 @@ namespace Skill.Editor.Sequence
             window.Add(resetLayout);
             resetLayout.Click += resetLayout_Click;
 
+            Skill.Editor.UI.MenuItem mnuRollback = new Skill.Editor.UI.MenuItem("Rollback");
+            edit.Add(mnuRollback);
+            mnuRollback.Click += mnuRollback_Click;
+
+        }
+
+        void mnuRollback_Click(object sender, System.EventArgs e)
+        {
+            Rollback();
         }
 
         void resetLayout_Click(object sender, System.EventArgs e)
@@ -697,7 +703,7 @@ namespace Skill.Editor.Sequence
 
         // refresh editor data to to changes happened to matinee outside of MatineeEditor
         private void Refresh()
-        {            
+        {
             if (_Frame != null)
             {
                 if (_Matinee == null)
@@ -886,6 +892,7 @@ namespace Skill.Editor.Sequence
 
         #region Playback
 
+        private float _PlayStartTime;
         private float _DeltaTime;// delta time since last playback update
         private float _ContinuousPlayTime; // playback time
         private float _PlayTime; // playback time
@@ -909,12 +916,12 @@ namespace Skill.Editor.Sequence
         {
             float speed = (float)_PlaybackSpeed.SelectedValue / 100.0f;
             _DeltaTime += stepTime;
-            _ContinuousPlayTime += stepTime * speed;
+            _ContinuousPlayTime = (Time.realtimeSinceStartup - _PlayStartTime) * speed;
             float fpsTime = 1.0f / _Fps.SelectedValue;
             if (_DeltaTime >= fpsTime) // if we reach fpsTime after last step
             {
                 _DeltaTime -= fpsTime;
-                _PlayTime += fpsTime * speed;
+                _PlayTime = _ContinuousPlayTime;
 
                 if (_TimeLine.SelectionLenght > 0)
                 {
@@ -960,7 +967,7 @@ namespace Skill.Editor.Sequence
             {
                 float fpsTime = 1.0f / _Fps.SelectedValue;
                 _DeltaTime += fpsTime;
-                _PlayTime -= fpsTime * speed;
+                _PlayTime = _ContinuousPlayTime;
 
                 if (_TimeLine.SelectionLenght > 0)
                 {
@@ -1010,7 +1017,12 @@ namespace Skill.Editor.Sequence
                     else if (_StepForward == -1)
                         StepPlaybackBackward(1.0f / _Fps.SelectedValue); // step backward with fpsTime
                     _StepForward = 0;
-                    _TimeLine.TimePosition = _ContinuousPlayTime;
+
+                    if (_ContinuousPlayTime > _TimeLine.MinTime && _ContinuousPlayTime < _TimeLine.MaxTime)
+                    {
+                        _TimeLine.TimePosition = _ContinuousPlayTime;
+                        _CurveEditor.TimeLine.TimePosition = _ContinuousPlayTime;
+                    }
                     if (prePlayTime != _PlayTime)
                         Evaluate();
                 }
@@ -1049,6 +1061,7 @@ namespace Skill.Editor.Sequence
             else
                 _PlayTime = (float)_TimeLine.TimePosition; // we must start at position of timeline selected by user
             _DeltaTime = 0;
+            _PlayStartTime = Time.realtimeSinceStartup;
             foreach (var t in Tracks())
             {
                 t.SortKeys();

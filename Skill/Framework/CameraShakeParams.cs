@@ -17,18 +17,18 @@ namespace Skill.Framework
         /// y in up/down direction
         /// z in back/forward (zoom) direction
         /// </summary>
-        public Vector3 Intensity = new Vector3(0.1f, 0.1f, 0.0f);
+        public Vector3 Intensity = new Vector3(0.05f, 0.08f, 0.0f);
 
         /// <summary> Intensity of camera roll</summary>
-        public float Roll = 0.1f;
+        public float Roll = 0.5f;
         /// <summary> Duration of shake </summary>
-        public float Duration = 0.1f;
+        public float Duration = 1.0f;
         /// <summary> Max distance to camera. </summary>
         public float Range = 50;
         /// <summary> The shake will be more stronger near to camera </summary>
         public bool ByDistance = true;
         /// <summary> time between shake directions </summary>
-        public float TickTime = 0.0f;
+        public float TickTime = 0.08f;
 
         /// <summary> Default constructor </summary>
         public CameraShakeParams() { }

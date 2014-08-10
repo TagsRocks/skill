@@ -32,29 +32,34 @@ namespace Skill.Framework.Sequence
             }
         }
 
+        public override bool IsSingleExecution { get { return true; } }
 
-        public override void ExecuteEvent(EventOrientedTrack track)
+        public override void FireEvent()
         {
-            SoundTrack st = (SoundTrack)track;
-            if (st.Source != null && this.Clip != null)
-            {
+            if (Source != null && this.Clip != null)
+            {                
                 float volume = 1.0f;
                 if (Skill.Framework.Global.Instance != null)
-                    volume = Skill.Framework.Global.Instance.Settings.Audio.GetVolume(st.Category);
-                if (st.PlayOneShot)
+                    volume = Skill.Framework.Global.Instance.Settings.Audio.GetVolume(Category);
+                if (PlayOneShot)
                 {
-                    st.Source.PlayOneShot(this.Clip, volume * this.VolumeFactor);
+                    Source.PlayOneShot(this.Clip, volume * this.VolumeFactor);
                 }
                 else
                 {
-                    if (st.Source.isPlaying) st.Source.Stop();
-                    st.Source.clip = this.Clip;
-                    st.Source.Play();
+                    if (Source.isPlaying)
+                        Source.Stop();
+                    Source.clip = this.Clip;
+                    Source.Play();
                 }
                 if (Audio.AudioSubtitle.Instance != null)
                     Audio.AudioSubtitle.Instance.Show(this.Clip);
             }
         }
+
+        internal AudioSource Source { get; set; }
+        internal bool PlayOneShot { get; set; }
+        internal Skill.Framework.Audio.SoundCategory Category { get; set; }
     }
 
     public class SoundTrack : EventOrientedTrack
@@ -83,11 +88,42 @@ namespace Skill.Framework.Sequence
 
         public override TrackType Type { get { return TrackType.Sound; } }
 
+
+        /// <summary>
+        /// Get maximum time of track
+        /// </summary>
+        public override float MaxTime
+        {
+            get
+            {
+                if (Keys != null && Keys.Length > 0)
+                {
+                    SoundKey k = Keys[Keys.Length - 1] as SoundKey;
+                    if (k != null)
+                    {
+                        if (k.Clip != null)
+                            return k.FireTime + k.Clip.length;
+                        else
+                            return k.FireTime;
+                    }
+                }
+                return base.MaxTime;
+            }
+        }
+
         public override void Stop()
         {
             if (Source != null)
                 Source.Stop();
             Source.clip = null;
+        }
+
+        protected override void InitializeEvent(EventOrientedKey key)
+        {
+            SoundKey sKey = (SoundKey)key;
+            sKey.Source = this.Source;
+            sKey.PlayOneShot = this.PlayOneShot;
+            sKey.Category = this.Category;
         }
     }
 }

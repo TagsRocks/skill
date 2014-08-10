@@ -22,35 +22,38 @@ namespace Skill.Framework.Sequence
         [ExposeProperty(0, "Fire time")]
         public virtual float FireTime { get { return _FireTime; } set { _FireTime = value; } }
 
-        [ExposeProperty(100, "Comment", "Comment")]
+        [ExposeProperty(999999, "Comment", "Comment")]
         public virtual string Comment { get { return _Comment; } set { _Comment = value; } }
 
+
+        /// <summary>
+        /// Is this do all job in single execute event or needs update for a period of time
+        /// </summary>
+        public abstract bool IsSingleExecution { get; }
+
         /// <summary> Lenght of key over time </summary>
-        public virtual float Length { get { return 0.001f; } }
+        public virtual float Length { get { return 0.0f; } }
 
         /// <summary>
-        /// Update key over time
-        /// </summary>        
-        /// <param name="track">EventOrientedTrack</param>
+        /// Update event over time (if IsSingleExecution = false)
+        /// </summary>                
         /// <param name="time">time from matinee started</param>        
-        public virtual void ProcessEvent(EventOrientedTrack track, float time) { }
+        public virtual void UpdateEvent(float time) { }
 
         /// <summary>
-        /// Initialize key before execute
-        /// </summary>
-        /// <param name="track">EventOrientedTrack</param>
-        public virtual void InitializeEvent(EventOrientedTrack track) { }
+        /// Initialize event before execute (if IsSingleExecution = false)
+        /// </summary>        
+        public virtual void StartEvent() { }
 
         /// <summary>
-        /// execute event and submit any changes
-        /// </summary>
-        public abstract void ExecuteEvent(EventOrientedTrack track);
+        /// finish event (if IsSingleExecution = false)
+        /// </summary>        
+        public virtual void FinishEvent() { }
 
         /// <summary>
-        /// Undo event if it is possible
+        /// execute event (if IsSingleExecution = true)
         /// </summary>
-        /// <param name="track">EventOrientedTrack</param>
-        //public virtual void UndoEvent(EventOrientedTrack track) { }
+        public virtual void FireEvent() { }
     }
 
     public abstract class EventOrientedTrack : Track
@@ -62,6 +65,21 @@ namespace Skill.Framework.Sequence
         protected float PreviousTime { get; private set; }
         protected float DeltaTime { get; private set; }
         protected int Index { get { return _Index; } }
+
+        /// <summary>
+        /// Get maximum time of track
+        /// </summary>
+        public override float MaxTime
+        {
+            get
+            {
+                if (Keys != null && Keys.Length > 0)
+                    return Keys[Keys.Length - 1].FireTime;
+                return 0;
+            }
+        }
+
+        protected virtual bool ExecuteInEditMode { get { return true; } }
 
         private int _Index;
         public override void Evaluate(float time)
@@ -82,23 +100,24 @@ namespace Skill.Framework.Sequence
                         {
                             if (t >= PreviousTime)
                             {
-                                if (Application.isPlaying)
+                                if (Application.isPlaying || ExecuteInEditMode)
                                 {
-                                    key.InitializeEvent(this);
-                                    if (key.Length >= 0.01f)
+                                    InitializeEvent(key);
+                                    if (key.IsSingleExecution)
                                     {
-                                        AddUpdatingKey(key);
+                                        key.FireEvent();
                                     }
                                     else
                                     {
-                                        key.ExecuteEvent(this);
+                                        key.StartEvent();
+                                        AddUpdatingKey(key);
                                     }
                                 }
                             }
                             _Index++;
                         }
                         else
-                        {                            
+                        {
                             break;
                         }
                     }
@@ -124,6 +143,12 @@ namespace Skill.Framework.Sequence
             //    }
             //}            
         }
+
+        /// <summary>
+        /// Initialize event before execution
+        /// </summary>
+        /// <param name="key">EventOrientedKey to initialize</param>
+        protected virtual void InitializeEvent(EventOrientedKey key) { }
 
         public override void Seek(float time)
         {
@@ -155,13 +180,13 @@ namespace Skill.Framework.Sequence
                     EventOrientedKey task = _UpdatingKeys[index];
                     if (CurrecntTime >= task.FireTime + task.Length)
                     {
-                        task.ExecuteEvent(this);
+                        task.FinishEvent();
                         _UpdatingKeys.RemoveAt(index);
                         continue;
                     }
                     else if (CurrecntTime > task.FireTime)
                     {
-                        task.ProcessEvent(this, CurrecntTime);
+                        task.UpdateEvent(CurrecntTime);
                     }
                     index++;
                 }

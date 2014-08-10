@@ -80,6 +80,7 @@ namespace Skill.Framework.Dynamics
         protected virtual void OnEnable()
         {
             _ElapsedTime = 0;
+            _HalfGravity = -0.5f * Gravity;
         }
 
         /// <summary>

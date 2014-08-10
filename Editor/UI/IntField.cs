@@ -14,7 +14,12 @@ namespace Skill.Editor.UI
         /// <summary>
         /// Optional label in front of the field.
         /// </summary>
-        public GUIContent Label { get; private set; }      
+        public GUIContent Label { get; private set; }
+
+        /// <summary>
+        /// ValueChanged event occurs when user press Return
+        /// </summary>
+        public bool ChangeOnReturn { get; set; }
 
         /// <summary>
         /// Occurs when Value of IntField changed
@@ -29,6 +34,7 @@ namespace Skill.Editor.UI
         }
 
         private int _Value;
+        private int _ValueBeforChange;
         /// <summary>
         /// int - The value entered by the user.
         /// </summary>
@@ -39,7 +45,7 @@ namespace Skill.Editor.UI
             {
                 if (_Value != value)
                 {
-                    _Value = value;
+                    _ValueBeforChange = _Value = value;
                     OnValueChanged();
                 }
             }
@@ -52,6 +58,7 @@ namespace Skill.Editor.UI
         {
             Label = new GUIContent();
             this.Height = 16;
+            this.ChangeOnReturn = true;
         }
 
         /// <summary>
@@ -59,15 +66,39 @@ namespace Skill.Editor.UI
         /// </summary>
         protected override void Render()
         {
-            //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
             if (Style != null)
             {
-                Value = EditorGUI.IntField(RenderArea, Label, _Value, Style);
+                if (ChangeOnReturn)
+                    _ValueBeforChange = EditorGUI.IntField(RenderArea, Label, _ValueBeforChange, Style);
+                else
+                    Value = EditorGUI.IntField(RenderArea, Label, _Value, Style);
             }
             else
             {
-                Value = EditorGUI.IntField(RenderArea, Label, _Value);
+                if (ChangeOnReturn)
+                    _ValueBeforChange = EditorGUI.IntField(RenderArea, Label, _ValueBeforChange);
+                else
+                    Value = EditorGUI.IntField(RenderArea, Label, _Value);
             }
-        }        
+
+            if (ChangeOnReturn)
+            {
+                if (_Value != _ValueBeforChange)
+                {
+                    Event e = Event.current;
+                    if (e != null && e.isKey)
+                    {
+                        if (e.keyCode == KeyCode.Return)
+                        {
+                            Value = _ValueBeforChange;
+                        }
+                        else if (e.keyCode == KeyCode.Escape)
+                        {
+                            _ValueBeforChange = _Value;
+                        }
+                    }
+                }
+            }
+        }
     }
 }

@@ -11,20 +11,8 @@ namespace Skill.Editor.UI
     /// </summary>
     public class Vector2Field : EditorControl
     {
-        private string _Label;
-        /// <summary>
-        /// Label to display above the field.
-        /// </summary>
-        public String Label
-        {
-            get { return _Label; }
-            set
-            {
-                _Label = value;
-                if (_Label == null)
-                    _Label = string.Empty;
-            }
-        }
+        /// <summary> Label to display above the field. </summary>        
+        public GUIContent Label { get; private set; }
 
         /// <summary>
         /// Occurs when value of Vector2Field changed
@@ -60,7 +48,7 @@ namespace Skill.Editor.UI
         /// </summary>
         public Vector2Field()
         {
-            _Label = string.Empty;
+            Label = new GUIContent();
             this.Height = 38;
         }
 
@@ -70,7 +58,7 @@ namespace Skill.Editor.UI
         protected override void Render()
         {
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
-            Value = EditorGUI.Vector2Field(RenderArea, _Label, _Value);
+            Value = EditorGUI.Vector2Field(RenderArea, Label, _Value);
         }
     }
 }

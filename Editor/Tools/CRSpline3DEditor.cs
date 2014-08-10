@@ -97,7 +97,7 @@ namespace Skill.Editor.Tools
 
             _SelectedPointPropertiesBackground = new Skill.Framework.UI.Box() { Row = 2, Column = 0, ColumnSpan = 2 };
             _PnlPoperties = new Skill.Framework.UI.StackPanel() { Row = 2, Column = 0, ColumnSpan = 2, Orientation = Skill.Framework.UI.Orientation.Vertical, Padding = new Skill.Framework.UI.Thickness(2) };
-            _VFValue = new Vector3Field() { Label = "Position", Height = 20 };
+            _VFValue = new Vector3Field() { Height = 20 }; _VFValue.Label.text = "Position"; 
             _FFTime = new FloatField() { Height = 16, Margin = new Skill.Framework.UI.Thickness(0, 2, 0, 4) }; _FFTime.Label.text = "Time";
 
             _PnlPoperties.Controls.Add(_FFTime);

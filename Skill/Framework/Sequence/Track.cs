@@ -42,8 +42,7 @@ namespace Skill.Framework.Sequence
         protected override void Awake()
         {
             base.Awake();
-            SortKeys();
-            Seek(0);
+            SortKeys();            
         }
 
         /// <summary>
@@ -75,6 +74,10 @@ namespace Skill.Framework.Sequence
         /// </summary>
         public abstract void Stop();
 
+        /// <summary>
+        /// Get maximum time of track
+        /// </summary>
+        public abstract float MaxTime { get; }
 
         /// <summary>
         /// Rollback all changes to start frame

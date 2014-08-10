@@ -27,6 +27,8 @@ namespace Skill.Framework.Sequence
         public float Speed = 1.0f;
         /// <summary> Is game enters cutscene mode? </summary>
         public bool Cutscene = true;
+        /// <summary> Use realtime? </summary>
+        public bool RealTime = false;
 
 
         /// <summary> Is Matinee playing? </summary>
@@ -101,7 +103,10 @@ namespace Skill.Framework.Sequence
         {
             if (!IsPlaying)
             {
-                _LastTime = Time.realtimeSinceStartup;
+                if (RealTime)
+                    _LastTime = Time.realtimeSinceStartup;
+                else
+                    _LastTime = Time.time;
                 Skill.Framework.Global.CutSceneEnable = Cutscene;
                 IsPlaying = true;
                 IsPaused = false;
@@ -130,12 +135,19 @@ namespace Skill.Framework.Sequence
             {
                 if (IsPlaying && !IsPaused)
                 {
-                    float deltaTime = Time.realtimeSinceStartup - _LastTime;
+                    float deltaTime;
+                    if (RealTime)
+                        deltaTime = Time.realtimeSinceStartup - _LastTime;
+                    else
+                        deltaTime = Time.deltaTime;
                     StepForward(deltaTime);
                 }
                 base.Update();
             }
-            _LastTime = Time.realtimeSinceStartup;
+            if (RealTime)
+                _LastTime = Time.realtimeSinceStartup;
+            else
+                _LastTime = Time.time;
         }
 
         private bool _NextStop;
@@ -188,13 +200,14 @@ namespace Skill.Framework.Sequence
             minTime = 0;
             maxTime = 1.0f;
 
-            Track[] tracks = GetComponentsInChildren<Track>();
-            if (tracks.Length > 0)
+            if (!Application.isPlaying)
+                _Tracks = GetComponentsInChildren<Track>();
+            if (_Tracks.Length > 0)
             {
                 minTime = float.MaxValue;
                 maxTime = float.MinValue;
 
-                foreach (var t in tracks)
+                foreach (var t in _Tracks)
                 {
                     float tminTime, tmaxTime;
                     t.GetTimeBounds(out tminTime, out tmaxTime);
@@ -202,6 +215,39 @@ namespace Skill.Framework.Sequence
                     minTime = Mathf.Min(minTime, tminTime);
                     maxTime = Mathf.Max(maxTime, tmaxTime);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Rollback scene to track default values
+        /// </summary>
+        [ContextMenu("Rollback")]
+        public void Rollback()
+        {
+            if (!Application.isPlaying)
+                _Tracks = GetComponentsInChildren<Track>();
+            if (_Tracks != null)
+            {
+                foreach (var t in _Tracks)
+                {
+                    t.Rollback();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Calculate end time of matinee based on tracks
+        /// </summary>
+        [ContextMenu("Cal EndTime")]
+        public void CalEndTime()
+        {
+            if (!Application.isPlaying)
+                _Tracks = GetComponentsInChildren<Track>();
+            if (_Tracks != null)
+            {
+                EndTime = 0.1f;
+                foreach (var t in _Tracks)
+                    EndTime = Mathf.Max(EndTime, t.MaxTime);
             }
         }
     }

@@ -10,547 +10,860 @@ using Skill.Framework;
 namespace Skill.Editor.UI.Extended
 {
 
-
-
     public abstract class ExposeProperties : PropertiesPanel
-    {        
-        class ControlTag
+    {
+        private List<ControlProperties> _Fields;
+        private System.Object _PreObject;
+        protected virtual void CreateCustomFileds() { }
+
+        internal void ReplaceObject(System.Object obj)
         {
-            public Skill.Framework.UI.BaseControl Field;
-            public int Order;
-            public PropertyType Type;
-            public PropertyInfo Info;
-        }
-        class ControlTagComparer : IComparer<ControlTag>
-        {
-            public int Compare(ControlTag x, ControlTag y)
+            if (obj == null)
             {
-                return x.Order.CompareTo(y.Order);
+                _Fields.Clear();
+                Controls.Clear();
+            }
+            else if (_PreObject != obj)
+            {
+                _PreObject = base.Object = obj;
+                Controls.Clear();
+                CreateCustomFileds();
+                PropertyInfo[] infos = Object.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                Type epaType = typeof(ExposePropertyAttribute);
+
+                foreach (PropertyInfo info in infos)
+                {
+                    if (!(info.CanRead && info.CanWrite))
+                        continue;
+                    object[] attributes = info.GetCustomAttributes(true);
+
+                    ExposePropertyAttribute exposePropertyAttribute = null;
+                    foreach (object o in attributes)
+                    {
+                        if (o.GetType() == epaType)
+                        {
+                            exposePropertyAttribute = (ExposePropertyAttribute)o;
+                            break;
+                        }
+                    }
+                    if (exposePropertyAttribute == null)
+                        continue;
+
+                    PropertyType type;
+                    if (GetPropertyType(info.PropertyType, out type))
+                    {
+                        ControlProperties control = CreateProperties(type, info, exposePropertyAttribute);
+                        if (control != null)
+                        {
+                            _Fields.Add(control);
+                        }
+                    }
+                }
+
+                if (_Fields.Count > 0)
+                {
+                    _Fields.Sort(new ControlPropertiesComparer());
+                    foreach (var item in _Fields)
+                    {
+                        item.Control.UserData = item;
+                        Controls.Add(item.Control);
+                    }
+                }
             }
         }
-        class PropertyData
-        {
-            public MethodInfo Setter;
-            public MethodInfo Getter;
-        }
-
-        private List<ControlTag> _Fields;
 
         public ExposeProperties(System.Object obj)
             : base(obj)
         {
-            CreateCustomFileds();
-
-            _Fields = new List<ControlTag>();
-            PropertyInfo[] infos = Object.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            Type epaType = typeof(ExposePropertyAttribute);
-
-            foreach (PropertyInfo info in infos)
-            {
-                if (!(info.CanRead && info.CanWrite))
-                    continue;
-                object[] attributes = info.GetCustomAttributes(true);
-
-                ExposePropertyAttribute exposePropertyAttribute = null;
-                foreach (object o in attributes)
-                {
-                    if (o.GetType() == epaType)
-                    {
-                        exposePropertyAttribute = (ExposePropertyAttribute)o;
-                        break;
-                    }
-                }
-                if (exposePropertyAttribute == null)
-                    continue;
-
-                PropertyType type;
-                if (GetPropertyType(info, out type))
-                {
-                    Skill.Framework.UI.BaseControl control = null;
-                    switch (type)
-                    {
-                        case PropertyType.AnimationCurve:
-                            control = CreateAnimationCurve(info, exposePropertyAttribute);
-                            break;
-                        case PropertyType.Boolean:
-                            control = CreateBoolean(info, exposePropertyAttribute);
-                            break;
-                        case PropertyType.Bounds:
-                            control = CreateBounds(info, exposePropertyAttribute);
-                            break;
-                        case PropertyType.Color:
-                            control = CreateColor(info, exposePropertyAttribute);
-                            break;
-                        case PropertyType.Enum:
-                            control = CreateEnum(info, exposePropertyAttribute);
-                            break;
-                        case PropertyType.Float:
-                            control = CreateFloat(info, exposePropertyAttribute);
-                            break;
-                        case PropertyType.Integer:
-                            control = CreateInt(info, exposePropertyAttribute);
-                            break;
-                        case PropertyType.LayerMask:
-                            control = CreateLayerMask(info, exposePropertyAttribute);
-                            break;
-                        case PropertyType.ObjectReference:
-                            control = CreateObjectField(info, exposePropertyAttribute);
-                            break;
-                        case PropertyType.Quaternion:
-                            control = CreateQuaternion(info, exposePropertyAttribute);
-                            break;
-                        case PropertyType.Rect:
-                            control = CreateRect(info, exposePropertyAttribute);
-                            break;
-                        case PropertyType.String:
-                            control = CreateString(info, exposePropertyAttribute);
-                            break;
-                        case PropertyType.Vector2:
-                            control = CreateVector2(info, exposePropertyAttribute);
-                            break;
-                        case PropertyType.Vector3:
-                            control = CreateVector3(info, exposePropertyAttribute);
-                            break;
-                        case PropertyType.Vector4:
-                            control = CreateVector4(info, exposePropertyAttribute);
-                            break;
-                        case PropertyType.SerializableObject:
-                            Debug.Log("SerializableObject peoperties not implemented");
-                            break;
-                    }
-
-                    if (control != null)
-                    {
-                        control.Margin = new Skill.Framework.UI.Thickness(2, 2, 0, 2);
-                        PropertyData pd = new PropertyData();
-                        pd.Getter = info.GetGetMethod();
-                        pd.Setter = info.GetSetMethod();
-                        control.UserData = pd;
-                        ControlTag ct = new ControlTag() { Info = info, Field = control, Order = ((ExposePropertyAttribute)info.GetCustomAttributes(epaType, true)[0]).Order, Type = type };
-                        _Fields.Add(ct);
-                    }
-                }
-            }
-
-            if (_Fields.Count > 0)
-            {
-                _Fields.Sort(new ControlTagComparer());
-                foreach (var item in _Fields)
-                    Controls.Add(item.Field);
-            }
+            _PreObject = null;
+            _Fields = new List<ControlProperties>();
+            ReplaceObject(obj);
         }
 
-        protected virtual void CreateCustomFileds() { }
+        private ControlProperties CreateProperties(PropertyType type, PropertyInfo info, ExposePropertyAttribute attribute)
+        {
+            ControlProperties control = null;
+            switch (type)
+            {
+                case PropertyType.AnimationCurve:
+                    control = new AnimationCurveProperties(this, info, attribute);
+                    break;
+                case PropertyType.Boolean:
+                    control = new BooleanProperties(this, info, attribute);
+                    break;
+                case PropertyType.Bounds:
+                    control = new BoundsProperties(this, info, attribute);
+                    break;
+                case PropertyType.Color:
+                    control = new ColorProperties(this, info, attribute);
+                    break;
+                case PropertyType.Enum:
+                    control = new EnumProperties(this, info, attribute);
+                    break;
+                case PropertyType.Float:
+                    control = new FloatProperties(this, info, attribute);
+                    break;
+                case PropertyType.Integer:
+                    control = new IntegerProperties(this, info, attribute);
+                    break;
+                case PropertyType.LayerMask:
+                    control = new LayerMaskProperties(this, info, attribute);
+                    break;
+                case PropertyType.ObjectReference:
+                    control = new UnityObjectProperties(this, info, attribute);
+                    break;
+                case PropertyType.Quaternion:
+                    control = new QuaternionProperties(this, info, attribute);
+                    break;
+                case PropertyType.Rect:
+                    control = new RectProperties(this, info, attribute);
+                    break;
+                case PropertyType.String:
+                    control = new StringProperties(this, info, attribute);
+                    break;
+                case PropertyType.Vector2:
+                    control = new Vector2Properties(this, info, attribute);
+                    break;
+                case PropertyType.Vector3:
+                    control = new Vector3Properties(this, info, attribute);
+                    break;
+                case PropertyType.Vector4:
+                    control = new Vector4Properties(this, info, attribute);
+                    break;
+                case PropertyType.SerializableObject:
+                    control = new SerializableObjectProperties(this, info, attribute);
+                    break;
+                case PropertyType.Array:
+                    control = new ArrayProperties(this, info, attribute);
+                    break;
+            }
+
+            if (control != null)
+            {
+                var margin = control.Control.Margin;
+                margin.Left += 2;
+                margin.Top += 2;
+                margin.Bottom += 2;
+                control.Control.Margin = margin;
+            }
+            return control;
+        }
 
         protected override void RefreshData()
         {
             foreach (var item in _Fields)
+                item.Refresh();
+        }
+
+        #region ControlProperties
+        protected abstract class ControlProperties
+        {
+            public ExposeProperties Owner { get; private set; }
+            public int Order { get; private set; }
+            public PropertyInfo Info { get; private set; }
+            public abstract PropertyType Type { get; }
+            public abstract Skill.Framework.UI.BaseControl Control { get; }
+            public abstract void Refresh();
+
+            public ControlProperties(ExposeProperties owner, int order, PropertyInfo info)
             {
-                switch (item.Type)
+                this.Owner = owner;
+                this.Order = order;
+                this.Info = info;
+                this.Index = -1;
+            }
+            public int Index { get; set; }
+
+            protected object Value
+            {
+                get
                 {
-                    case PropertyType.AnimationCurve:
-                        RefreshCurveField((Skill.Editor.UI.CurveField)item.Field, item.Info);
-                        break;
-                    case PropertyType.Boolean:
-                        RefreshToggleButton((Skill.Editor.UI.ToggleButton)item.Field, item.Info);
-                        break;
-                    case PropertyType.Bounds:
-                        RefreshBoundsField((Skill.Editor.UI.BoundsField)item.Field, item.Info);
-                        break;
-                    case PropertyType.Color:
-                        RefreshColorField((Skill.Editor.UI.ColorField)item.Field, item.Info);
-                        break;
-                    case PropertyType.Enum:
-                        RefreshEnumMaskField((Skill.Editor.UI.EnumPopup)item.Field, item.Info);
-                        break;
-                    case PropertyType.Float:
-                        RefreshFloatField((Skill.Editor.UI.FloatField)item.Field, item.Info);
-                        break;
-                    case PropertyType.Integer:
-                        RefreshIntField((Skill.Editor.UI.IntField)item.Field, item.Info);
-                        break;
-                    case PropertyType.LayerMask:
-                        RefreshLayerMaskField((Skill.Editor.UI.LayerMaskField)item.Field, item.Info);
-                        break;
-                    case PropertyType.ObjectReference:
-                        RefreshObjectField((Skill.Editor.UI.UntypedObjectField)item.Field, item.Info);
-                        break;
-                    case PropertyType.Quaternion:
-                        RefreshQuaternionField((Skill.Editor.UI.Vector3Field)item.Field, item.Info);
-                        break;
-                    case PropertyType.Rect:
-                        RefreshRectField((Skill.Editor.UI.RectField)item.Field, item.Info);
-                        break;
-                    case PropertyType.String:
-                        RefreshTextField((Skill.Editor.UI.TextField)item.Field, item.Info);
-                        break;
-                    case PropertyType.Vector2:
-                        RefreshVector2Field((Skill.Editor.UI.Vector2Field)item.Field, item.Info);
-                        break;
-                    case PropertyType.Vector3:
-                        RefreshVector3Field((Skill.Editor.UI.Vector3Field)item.Field, item.Info);
-                        break;
-                    case PropertyType.Vector4:
-                        RefreshVector4Field((Skill.Editor.UI.Vector4Field)item.Field, item.Info);
-                        break;
-                    default:
-                        break;
+                    object value = Info.GetValue(Owner.Object, null);
+                    if (Index >= 0)
+                        return ((Array)value).GetValue(Index);
+                    else
+                        return value;
+                }
+                set
+                {
+                    if (Index >= 0)
+                        ((Array)Info.GetValue(Owner.Object, null)).SetValue(value, Index);
+                    else
+                        Info.SetValue(Owner.Object, value, null);
+                }
+            }
+
+        }
+        protected class ControlPropertiesComparer : IComparer<ControlProperties>
+        {
+            public int Compare(ControlProperties x, ControlProperties y)
+            {
+                return x.Order.CompareTo(y.Order);
+            }
+        }
+        #endregion
+
+        #region AnimationCurve
+
+        protected class AnimationCurveProperties : ControlProperties
+        {
+            public override PropertyType Type { get { return PropertyType.AnimationCurve; } }
+
+            private Skill.Editor.UI.CurveField _CurveField;
+            public override Framework.UI.BaseControl Control { get { return _CurveField; } }
+
+            public AnimationCurveProperties(ExposeProperties owner, PropertyInfo info, ExposePropertyAttribute attribute)
+                : base(owner, attribute.Order, info)
+            {
+                _CurveField = new Skill.Editor.UI.CurveField();
+                _CurveField.Label.text = attribute.Name;
+                _CurveField.Label.tooltip = attribute.Description;
+            }
+
+            public override void Refresh()
+            {
+                AnimationCurve curve = Value as AnimationCurve;
+                if (curve == null)
+                {
+                    curve = new AnimationCurve();
+                    Value = curve;
+                }
+                _CurveField.Curve = (AnimationCurve)Value;
+            }
+        }
+        #endregion
+
+        #region Boolean
+
+        protected class BooleanProperties : ControlProperties
+        {
+            public override PropertyType Type { get { return PropertyType.Boolean; } }
+
+            private Skill.Editor.UI.ToggleButton _Field;
+            public override Framework.UI.BaseControl Control { get { return _Field; } }
+
+            public BooleanProperties(ExposeProperties owner, PropertyInfo info, ExposePropertyAttribute attribute)
+                : base(owner, attribute.Order, info)
+            {
+                _Field = new Skill.Editor.UI.ToggleButton();
+                _Field.Label.text = attribute.Name;
+                _Field.Label.tooltip = attribute.Description;
+                _Field.Changed += ToggleButton_Changed;
+            }
+
+            private void ToggleButton_Changed(object sender, EventArgs e)
+            {
+                if (Owner.IgnoreChanges) return;
+                Value = _Field.IsChecked;
+                Owner.SetDirty();
+            }
+
+            public override void Refresh()
+            {
+                _Field.IsChecked = (bool)Value;
+            }
+        }
+
+        #endregion
+
+        #region Bounds
+
+        protected class BoundsProperties : ControlProperties
+        {
+            public override PropertyType Type { get { return PropertyType.Bounds; } }
+            private Skill.Editor.UI.BoundsField _Field;
+            public override Framework.UI.BaseControl Control { get { return _Field; } }
+            public BoundsProperties(ExposeProperties owner, PropertyInfo info, ExposePropertyAttribute attribute)
+                : base(owner, attribute.Order, info)
+            {
+                _Field = new Skill.Editor.UI.BoundsField();
+                _Field.ValueChanged += BoundsField_ValueChanged;
+                _Field.Label.text = attribute.Name;
+                _Field.Label.tooltip = attribute.Description;
+            }
+
+            void BoundsField_ValueChanged(object sender, EventArgs e)
+            {
+                if (Owner.IgnoreChanges) return;
+                Value = _Field.Value;
+                Owner.SetDirty();
+            }
+            public override void Refresh()
+            {
+                _Field.Value = (Bounds)Value;
+            }
+        }
+
+        #endregion
+
+        #region Color
+
+        protected class ColorProperties : ControlProperties
+        {
+            public override PropertyType Type { get { return PropertyType.Color; } }
+
+            private Skill.Editor.UI.ColorField _Field;
+            public override Framework.UI.BaseControl Control { get { return _Field; } }
+            public ColorProperties(ExposeProperties owner, PropertyInfo info, ExposePropertyAttribute attribute)
+                : base(owner, attribute.Order, info)
+            {
+                _Field = new Skill.Editor.UI.ColorField();
+                _Field.ColorChanged += ColorField_ValueChanged;
+                _Field.Label.text = attribute.Name;
+                _Field.Label.tooltip = attribute.Description;
+            }
+
+            void ColorField_ValueChanged(object sender, EventArgs e)
+            {
+                if (Owner.IgnoreChanges) return;
+                Value = _Field.Color;
+                Owner.SetDirty();
+            }
+            public override void Refresh()
+            {
+                _Field.Color = (Color)Value;
+            }
+        }
+        #endregion
+
+        #region Enum
+
+        protected class EnumProperties : ControlProperties
+        {
+            public override PropertyType Type { get { return PropertyType.Enum; } }
+
+            private Skill.Editor.UI.EnumPopup _Field;
+            public override Framework.UI.BaseControl Control { get { return _Field; } }
+            public EnumProperties(ExposeProperties owner, PropertyInfo info, ExposePropertyAttribute attribute)
+                : base(owner, attribute.Order, info)
+            {
+                _Field = new Skill.Editor.UI.EnumPopup();
+                _Field.Label.text = attribute.Name;
+                _Field.Label.tooltip = attribute.Description;
+                _Field.ValueChanged += EnumPopup_ValueChanged;
+            }
+
+            void EnumPopup_ValueChanged(object sender, EventArgs e)
+            {
+                if (Owner.IgnoreChanges) return;
+                Value = _Field.Value;
+                Owner.SetDirty();
+            }
+            public override void Refresh()
+            {
+                _Field.Value = (Enum)Value;
+            }
+        }
+        #endregion
+
+        #region Float
+
+        protected class FloatProperties : ControlProperties
+        {
+            public override PropertyType Type { get { return PropertyType.Float; } }
+
+            private Skill.Editor.UI.FloatField _Field;
+            public override Framework.UI.BaseControl Control { get { return _Field; } }
+            public FloatProperties(ExposeProperties owner, PropertyInfo info, ExposePropertyAttribute attribute)
+                : base(owner, attribute.Order, info)
+            {
+                _Field = new Skill.Editor.UI.FloatField();
+                _Field.ValueChanged += FloatField_ValueChanged;
+                _Field.Label.text = attribute.Name;
+                _Field.Label.tooltip = attribute.Description;
+            }
+
+            void FloatField_ValueChanged(object sender, EventArgs e)
+            {
+                if (Owner.IgnoreChanges) return;
+                Value = _Field.Value;
+                Owner.SetDirty();
+            }
+            public override void Refresh()
+            {
+                _Field.Value = (float)Value;
+            }
+        }
+        #endregion
+
+        #region Integer
+
+        protected class IntegerProperties : ControlProperties
+        {
+            public override PropertyType Type { get { return PropertyType.Integer; } }
+
+            private Skill.Editor.UI.IntField _Field;
+            public override Framework.UI.BaseControl Control { get { return _Field; } }
+            public IntegerProperties(ExposeProperties owner, PropertyInfo info, ExposePropertyAttribute attribute)
+                : base(owner, attribute.Order, info)
+            {
+                _Field = new Skill.Editor.UI.IntField();
+                _Field.ValueChanged += IntField_ValueChanged;
+                _Field.Label.text = attribute.Name;
+                _Field.Label.tooltip = attribute.Description;
+                _Field.ChangeOnReturn = true;
+            }
+
+            void IntField_ValueChanged(object sender, EventArgs e)
+            {
+                if (Owner.IgnoreChanges) return;
+                Value = _Field.Value;
+                Owner.SetDirty();
+            }
+            public override void Refresh()
+            {
+                _Field.Value = (int)Value;
+            }
+        }
+        #endregion
+
+        #region LayerMask
+
+        protected class LayerMaskProperties : ControlProperties
+        {
+            public override PropertyType Type { get { return PropertyType.LayerMask; } }
+
+            private Skill.Editor.UI.LayerMaskField _Field;
+            public override Framework.UI.BaseControl Control { get { return _Field; } }
+            public LayerMaskProperties(ExposeProperties owner, PropertyInfo info, ExposePropertyAttribute attribute)
+                : base(owner, attribute.Order, info)
+            {
+                _Field = new Skill.Editor.UI.LayerMaskField();
+                _Field.LayersChanged += LayerMaskField_ValueChanged;
+                _Field.Label.text = attribute.Name;
+                _Field.Label.tooltip = attribute.Description;
+            }
+
+            void LayerMaskField_ValueChanged(object sender, EventArgs e)
+            {
+                if (Owner.IgnoreChanges) return;
+                Value = new UnityEngine.LayerMask() { value = _Field.Layers };
+                Owner.SetDirty();
+            }
+            public override void Refresh()
+            {
+                _Field.Layers = ((UnityEngine.LayerMask)Value).value;
+            }
+        }
+        #endregion
+
+        #region UnityEngine.Object
+
+        protected class UnityObjectProperties : ControlProperties
+        {
+            public override PropertyType Type { get { return PropertyType.Integer; } }
+
+            private Skill.Editor.UI.UntypedObjectField _Field;
+            public override Framework.UI.BaseControl Control { get { return _Field; } }
+            public UnityObjectProperties(ExposeProperties owner, PropertyInfo info, ExposePropertyAttribute attribute)
+                : base(owner, attribute.Order, info)
+            {
+                _Field = new Skill.Editor.UI.UntypedObjectField(Info.PropertyType.IsArray ? Info.PropertyType.GetElementType() : Info.PropertyType);
+                _Field.ObjectChanged += ObjectField_ValueChanged;
+                _Field.Label.text = attribute.Name;
+                _Field.Label.tooltip = attribute.Description;
+            }
+
+            void ObjectField_ValueChanged(object sender, EventArgs e)
+            {
+                if (Owner.IgnoreChanges) return;
+                Value = _Field.Object;
+                Owner.SetDirty();
+            }
+            public override void Refresh()
+            {
+                _Field.Object = Value as UnityEngine.Object;
+            }
+        }
+        #endregion
+
+        #region Quaternion
+
+        protected class QuaternionProperties : ControlProperties
+        {
+            public override PropertyType Type { get { return PropertyType.Quaternion; } }
+
+            private Skill.Editor.UI.Vector3Field _Field;
+            public override Framework.UI.BaseControl Control { get { return _Field; } }
+            public QuaternionProperties(ExposeProperties owner, PropertyInfo info, ExposePropertyAttribute attribute)
+                : base(owner, attribute.Order, info)
+            {
+                _Field = new Skill.Editor.UI.Vector3Field();
+                _Field.ValueChanged += QuaternionField_ValueChanged;
+                _Field.Label.text = attribute.Name;
+                _Field.Label.tooltip = attribute.Description;
+            }
+
+            void QuaternionField_ValueChanged(object sender, EventArgs e)
+            {
+                if (Owner.IgnoreChanges) return;
+                Value = _Field.Value;
+                Owner.SetDirty();
+            }
+            public override void Refresh()
+            {
+                Quaternion q = (Quaternion)Value;
+                _Field.Value = q.eulerAngles;
+            }
+        }
+
+        #endregion
+
+        #region Rect
+        protected class RectProperties : ControlProperties
+        {
+            public override PropertyType Type { get { return PropertyType.Rect; } }
+
+            private Skill.Editor.UI.RectField _Field;
+            public override Framework.UI.BaseControl Control { get { return _Field; } }
+            public RectProperties(ExposeProperties owner, PropertyInfo info, ExposePropertyAttribute attribute)
+                : base(owner, attribute.Order, info)
+            {
+                _Field = new Skill.Editor.UI.RectField();
+                _Field.ValueChanged += RectField_ValueChanged;
+                _Field.Label.text = attribute.Name;
+                _Field.Label.tooltip = attribute.Description;
+            }
+
+            void RectField_ValueChanged(object sender, EventArgs e)
+            {
+                if (Owner.IgnoreChanges) return;
+                Value = _Field.Value;
+                Owner.SetDirty();
+            }
+            public override void Refresh()
+            {
+                _Field.Value = (Rect)Value;
+            }
+        }
+        #endregion
+
+        #region String
+
+        protected class StringProperties : ControlProperties
+        {
+            public override PropertyType Type { get { return PropertyType.String; } }
+
+            private Skill.Editor.UI.TextField _Field;
+            public override Framework.UI.BaseControl Control { get { return _Field; } }
+            public StringProperties(ExposeProperties owner, PropertyInfo info, ExposePropertyAttribute attribute)
+                : base(owner, attribute.Order, info)
+            {
+                _Field = new Skill.Editor.UI.TextField();
+                _Field.TextChanged += TextField_ValueChanged;
+                _Field.Label.text = attribute.Name;
+                _Field.Label.tooltip = attribute.Description;
+            }
+
+            void TextField_ValueChanged(object sender, EventArgs e)
+            {
+                if (Owner.IgnoreChanges) return;
+                Value = _Field.Text;
+                Owner.SetDirty();
+            }
+            public override void Refresh()
+            {
+                _Field.Text = Value as string;
+            }
+        }
+        #endregion
+
+        #region Vector2
+
+        protected class Vector2Properties : ControlProperties
+        {
+            public override PropertyType Type { get { return PropertyType.Vector2; } }
+
+            private Skill.Editor.UI.Vector2Field _Field;
+            public override Framework.UI.BaseControl Control { get { return _Field; } }
+            public Vector2Properties(ExposeProperties owner, PropertyInfo info, ExposePropertyAttribute attribute)
+                : base(owner, attribute.Order, info)
+            {
+                _Field = new Skill.Editor.UI.Vector2Field();
+                _Field.ValueChanged += Vector2Field_ValueChanged;
+                _Field.Label.text = attribute.Name;
+                _Field.Label.tooltip = attribute.Description;
+            }
+
+            void Vector2Field_ValueChanged(object sender, EventArgs e)
+            {
+                if (Owner.IgnoreChanges) return;
+                Value = _Field.Value;
+                Owner.SetDirty();
+            }
+            public override void Refresh()
+            {
+                _Field.Value = (Vector2)Value;
+            }
+        }
+        #endregion
+
+        #region Vector3
+        protected class Vector3Properties : ControlProperties
+        {
+            public override PropertyType Type { get { return PropertyType.Vector3; } }
+
+            private Skill.Editor.UI.Vector3Field _Field;
+            public override Framework.UI.BaseControl Control { get { return _Field; } }
+            public Vector3Properties(ExposeProperties owner, PropertyInfo info, ExposePropertyAttribute attribute)
+                : base(owner, attribute.Order, info)
+            {
+                _Field = new Skill.Editor.UI.Vector3Field();
+                _Field.ValueChanged += Vector3Field_ValueChanged;
+                _Field.Label.text = attribute.Name;
+                _Field.Label.tooltip = attribute.Description;
+            }
+
+            void Vector3Field_ValueChanged(object sender, EventArgs e)
+            {
+                if (Owner.IgnoreChanges) return;
+                Value = _Field.Value;
+                Owner.SetDirty();
+            }
+            public override void Refresh()
+            {
+                _Field.Value = (Vector3)Value;
+            }
+        }
+
+        #endregion
+
+        #region Vector4
+
+        protected class Vector4Properties : ControlProperties
+        {
+            public override PropertyType Type { get { return PropertyType.Vector4; } }
+
+            private Skill.Editor.UI.Vector4Field _Field;
+            public override Framework.UI.BaseControl Control { get { return _Field; } }
+            public Vector4Properties(ExposeProperties owner, PropertyInfo info, ExposePropertyAttribute attribute)
+                : base(owner, attribute.Order, info)
+            {
+                _Field = new Skill.Editor.UI.Vector4Field();
+                _Field.ValueChanged += Vector4Field_ValueChanged;
+                _Field.Label = attribute.Name;
+            }
+
+            void Vector4Field_ValueChanged(object sender, EventArgs e)
+            {
+                if (Owner.IgnoreChanges) return;
+                Value = _Field.Value;
+                Owner.SetDirty();
+            }
+            public override void Refresh()
+            {
+                _Field.Value = (Vector4)Value;
+            }
+        }
+
+        #endregion
+
+        #region Serializable
+
+        class SerializableObjectExposeProperties : ExposeProperties
+        {
+            private ExposeProperties _Owner;
+            public SerializableObjectExposeProperties(object obj, ExposeProperties owner)
+                : base(obj)
+            {
+                _Owner = owner;
+            }
+            protected override void SetDirty()
+            {
+                _Owner.SetDirty();
+            }
+        }
+
+        protected class SerializableObjectProperties : ControlProperties
+        {
+            public override PropertyType Type { get { return PropertyType.SerializableObject; } }
+            private Skill.Editor.UI.VerticalExpander<Skill.Framework.UI.StackPanel> _Expander;
+            private SerializableObjectExposeProperties _ExposeProperties;
+
+            private object _Object;
+            private string _Name;
+            public override Framework.UI.BaseControl Control { get { return _Expander; } }
+            public SerializableObjectProperties(ExposeProperties owner, PropertyInfo info, ExposePropertyAttribute attribute)
+                : base(owner, attribute.Order, info)
+            {
+                _ExposeProperties = new SerializableObjectExposeProperties(null, Owner);
+                _ExposeProperties.Margin = new Framework.UI.Thickness(4, 0, 0, 0);
+
+                _Expander = new VerticalExpander<Framework.UI.StackPanel>(_ExposeProperties);
+
+                _Name = _Expander.Foldout.Content.text = attribute.Name;
+                _Expander.Foldout.Content.tooltip = attribute.Description;
+            }
+
+            public override void Refresh()
+            {
+                object obj = Value;
+                if (obj == null)
+                {
+                    try
+                    {
+                        if (Info.PropertyType.IsArray)
+                            obj = Activator.CreateInstance(Info.PropertyType.GetElementType());
+                        else
+                            obj = Activator.CreateInstance(Info.PropertyType);
+                        if (obj != null)
+                            Value = obj;
+                    }
+                    catch (Exception)
+                    {
+                        Debug.Log(string.Format("Can not create type of serialized object : {0}", Info.PropertyType.ToString()));
+                        obj = null;
+                    }
+                }
+
+                if (obj != _Object)
+                {
+                    _Object = obj;
+                    _ExposeProperties.ReplaceObject(_Object);
+                    HookName();
+                }
+                _ExposeProperties.Refresh();
+            }
+
+            public void HookName()
+            {
+                if (Info.PropertyType.IsArray)
+                {
+                    foreach (var item in _ExposeProperties.Controls)
+                    {
+                        if (item is Skill.Editor.UI.TextField)
+                        {
+                            StringProperties sp = item.UserData as StringProperties;
+                            if (sp != null && sp.Info.Name.Equals("Name", StringComparison.OrdinalIgnoreCase))
+                            {
+                                UpdateName(sp.Control);
+                                ((Skill.Editor.UI.TextField)item).TextChanged += SerializableObjectProperties_TextChanged;
+                            }
+                        }
+                    }
+                }
+            }
+
+            void SerializableObjectProperties_TextChanged(object sender, EventArgs e)
+            {
+                UpdateName(sender);
+            }
+
+            private void UpdateName(object sender)
+            {
+                Skill.Editor.UI.TextField textField = sender as Skill.Editor.UI.TextField;
+                if (textField != null)
+                {
+                    if (!string.IsNullOrEmpty(textField.Text))
+                        _Expander.Header = textField.Text;
+                    else
+                        _Expander.Header = _Name;
                 }
             }
         }
 
+        #endregion
 
-        #region CurveField
-        private Skill.Editor.UI.CurveField CreateAnimationCurve(PropertyInfo info, ExposePropertyAttribute attribute)
+        #region Array
+
+        protected class ArrayProperties : ControlProperties
         {
-            Skill.Editor.UI.CurveField control = new Skill.Editor.UI.CurveField();
-            control.Label.text = attribute.Name;
-            control.Label.tooltip = attribute.Description;
-            return control;
-        }
-        private void RefreshCurveField(Skill.Editor.UI.CurveField curveField, PropertyInfo info)
-        {
-            AnimationCurve curve = info.GetGetMethod().Invoke(Object, null) as AnimationCurve;
-            if (curve == null)
+            public override PropertyType Type { get { return PropertyType.Array; } }
+
+            private Skill.Framework.UI.StackPanel _Panel;
+            private Skill.Editor.UI.IntField _SizeField;
+            private Skill.Editor.UI.VerticalExpander<Skill.Framework.UI.StackPanel> _Expander;
+            private List<ControlProperties> _Fields;
+            public override Framework.UI.BaseControl Control { get { return _Expander; } }
+            public ArrayProperties(ExposeProperties owner, PropertyInfo info, ExposePropertyAttribute attribute)
+                : base(owner, attribute.Order, info)
             {
-                curve = new AnimationCurve();
-                info.GetSetMethod().Invoke(Object, new object[] { curve });
+                _Fields = new List<ControlProperties>();
+                _SizeField = new IntField() { Value = 0 };
+                _SizeField.ValueChanged += _SizeField_ValueChanged;                
+                _Panel = new Framework.UI.StackPanel() { Orientation = Framework.UI.Orientation.Vertical };
+                _Panel.Margin = new Framework.UI.Thickness(4, 0, 0, 0);
+                _Panel.Controls.Add(_SizeField);
+
+                _Expander = new VerticalExpander<Framework.UI.StackPanel>(_Panel);
+
+                _Expander.Foldout.Content.text = attribute.Name;
+                _Expander.Foldout.Content.tooltip = attribute.Description;
             }
-            curveField.Curve = (AnimationCurve)info.GetGetMethod().Invoke(Object, null);
-        }
-        #endregion
 
-        #region ToggleButton
-        private Skill.Editor.UI.ToggleButton CreateBoolean(PropertyInfo info, ExposePropertyAttribute attribute)
-        {
-            Skill.Editor.UI.ToggleButton control = new Skill.Editor.UI.ToggleButton() { IsChecked = (bool)info.GetGetMethod().Invoke(Object, null) };
-            control.Label.text = attribute.Name;
-            control.Label.tooltip = attribute.Description;
-            control.Changed += ToggleButton_Changed;
-            return control;
-        }
+            void _SizeField_ValueChanged(object sender, EventArgs e)
+            {                
+                if (_SizeField.Value < 0)
+                {
+                    _SizeField.Value = 0;
+                    return;
+                }
+                int fCount = _Fields.Count;
+                int size = _SizeField.Value;
 
-        private void ToggleButton_Changed(object sender, EventArgs e)
-        {
-            if (IgnoreChanges) return;
-            Skill.Editor.UI.ToggleButton control = (Skill.Editor.UI.ToggleButton)sender;
-            ((PropertyData)control.UserData).Setter.Invoke(Object, new object[] { control.IsChecked });
-            SetDirty();
-        }
+                if (fCount != size)
+                {
+                    if (!Owner.IgnoreChanges)
+                    {
+                        Array preArray = Value as Array;
+                        Array newArray = Array.CreateInstance(Info.PropertyType.GetElementType(), size);
 
-        private void RefreshToggleButton(Skill.Editor.UI.ToggleButton toggleButton, PropertyInfo info)
-        {
-            toggleButton.IsChecked = (bool)info.GetGetMethod().Invoke(Object, null);
-        }
-        #endregion
+                        if (preArray != null)
+                        {
+                            for (int i = 0; i < Mathf.Min(preArray.Length, newArray.Length); i++)
+                                newArray.SetValue(preArray.GetValue(i), i);
+                        }
+                        Value = newArray;
+                    }
 
-        #region BoundsField
-        private Skill.Editor.UI.BoundsField CreateBounds(PropertyInfo info, ExposePropertyAttribute attribute)
-        {
-            Skill.Editor.UI.BoundsField control = new Skill.Editor.UI.BoundsField();
-            control.ValueChanged += BoundsField_ValueChanged;
-            control.Label.text = attribute.Name;
-            control.Label.tooltip = attribute.Description;
-            return control;
-        }
+                    System.Type elementType = Info.PropertyType.GetElementType();
+                    PropertyType elemntPropertyType;
+                    if (GetPropertyType(elementType, out elemntPropertyType))
+                    {
+                        if (fCount < size)
+                        {
+                            for (int i = fCount; i < size; i++)
+                            {
+                                var f = Owner.CreateProperties(elemntPropertyType, Info, new ExposePropertyAttribute(i, string.Format("Element {0}", i)));
+                                f.Index = i;
+                                f.Refresh();
+                                _Fields.Add(f);
+                                _Panel.Controls.Add(f.Control);
+                                f.Control.UserData = f;
+                            }
+                        }
+                        else if (fCount > size)
+                        {
+                            for (int i = fCount - 1; i >= size; i--)
+                                _Panel.Controls.Remove(_Fields[i].Control);
+                            _Fields.RemoveRange(size, fCount - size);
+                        }
+                    }
+                    if (!Owner.IgnoreChanges)
+                        Owner.SetDirty();
+                }
+            }
 
-        void BoundsField_ValueChanged(object sender, EventArgs e)
-        {
-            if (IgnoreChanges) return;
-            Skill.Editor.UI.BoundsField control = (Skill.Editor.UI.BoundsField)sender;
-            ((PropertyData)control.UserData).Setter.Invoke(Object, new object[] { control.Value });
-            SetDirty();
-        }
+            public override void Refresh()
+            {
+                ValidateSize();
+                for (int i = 0; i < _Fields.Count; i++)
+                {
+                    _Fields[i].Index = i;
+                    _Fields[i].Refresh();
+                }
 
-        private void RefreshBoundsField(Skill.Editor.UI.BoundsField boundsField, PropertyInfo info)
-        {
-            boundsField.Value = (Bounds)info.GetGetMethod().Invoke(Object, null);
-        }
-        #endregion
+            }
 
-        #region ColorField
-        private Skill.Editor.UI.ColorField CreateColor(PropertyInfo info, ExposePropertyAttribute attribute)
-        {
-            Skill.Editor.UI.ColorField control = new Skill.Editor.UI.ColorField();
-            control.Label.text = attribute.Name;
-            control.Label.tooltip = attribute.Description;
-            control.ColorChanged += ColorField_ValueChanged;
-            return control;
-        }
-
-        void ColorField_ValueChanged(object sender, EventArgs e)
-        {
-            if (IgnoreChanges) return;
-            Skill.Editor.UI.ColorField control = (Skill.Editor.UI.ColorField)sender;
-            ((PropertyData)control.UserData).Setter.Invoke(Object, new object[] { control.Color });
-            SetDirty();
-        }
-
-        private void RefreshColorField(Skill.Editor.UI.ColorField colorField, PropertyInfo info)
-        {
-            colorField.Color = (Color)info.GetGetMethod().Invoke(Object, null);
-        }
-        #endregion
-
-        #region EnumMaskField
-        private Skill.Editor.UI.EnumPopup CreateEnum(PropertyInfo info, ExposePropertyAttribute attribute)
-        {
-            Skill.Editor.UI.EnumPopup control = new Skill.Editor.UI.EnumPopup();
-            control.Label.text = attribute.Name;
-            control.Label.tooltip = attribute.Description;
-            control.ValueChanged += EnumPopup_ValueChanged;
-            return control;
+            private void ValidateSize()
+            {
+                object array = Value;
+                if (array == null)
+                    array = Array.CreateInstance(Info.PropertyType.GetElementType(), 0);
+                _SizeField.Value = ((Array)array).Length;
+            }
         }
 
-        void EnumPopup_ValueChanged(object sender, EventArgs e)
-        {
-            if (IgnoreChanges) return;
-            Skill.Editor.UI.EnumPopup control = (Skill.Editor.UI.EnumPopup)sender;
-            ((PropertyData)control.UserData).Setter.Invoke(Object, new object[] { control.Value });
-            SetDirty();
-        }
-
-        private void RefreshEnumMaskField(Skill.Editor.UI.EnumPopup enumMaskField, PropertyInfo info)
-        {
-            enumMaskField.Value = (Enum)info.GetGetMethod().Invoke(Object, null);
-        }
-        #endregion
-
-        #region FloatField
-        private Skill.Editor.UI.FloatField CreateFloat(PropertyInfo info, ExposePropertyAttribute attribute)
-        {
-            Skill.Editor.UI.FloatField control = new Skill.Editor.UI.FloatField();
-            control.Label.text = attribute.Name;
-            control.Label.tooltip = attribute.Description;
-            control.ValueChanged += FloatField_ValueChanged;
-            return control;
-        }
-
-        void FloatField_ValueChanged(object sender, EventArgs e)
-        {
-            if (IgnoreChanges) return;
-            Skill.Editor.UI.FloatField control = (Skill.Editor.UI.FloatField)sender;
-            ((PropertyData)control.UserData).Setter.Invoke(Object, new object[] { control.Value });
-            SetDirty();
-        }
-
-        private void RefreshFloatField(Skill.Editor.UI.FloatField floatField, PropertyInfo info)
-        {
-            floatField.Value = (float)info.GetGetMethod().Invoke(Object, null);
-        }
-        #endregion
-
-        #region IntField
-        private Skill.Editor.UI.IntField CreateInt(PropertyInfo info, ExposePropertyAttribute attribute)
-        {
-            Skill.Editor.UI.IntField control = new Skill.Editor.UI.IntField();
-            control.Label.text = attribute.Name;
-            control.Label.tooltip = attribute.Description;
-            control.ValueChanged += IntField_ValueChanged;
-            return control;
-        }
-
-        void IntField_ValueChanged(object sender, EventArgs e)
-        {
-            if (IgnoreChanges) return;
-            Skill.Editor.UI.IntField control = (Skill.Editor.UI.IntField)sender;
-            ((PropertyData)control.UserData).Setter.Invoke(Object, new object[] { control.Value });
-            SetDirty();
-        }
-
-        private void RefreshIntField(Skill.Editor.UI.IntField intField, PropertyInfo info)
-        {
-            intField.Value = (int)info.GetGetMethod().Invoke(Object, null);
-        }
-        #endregion
-
-        #region LayerMaskField
-        private Skill.Editor.UI.LayerMaskField CreateLayerMask(PropertyInfo info, ExposePropertyAttribute attribute)
-        {
-            Skill.Editor.UI.LayerMaskField control = new Skill.Editor.UI.LayerMaskField();
-            control.Label.text = attribute.Name;
-            control.Label.tooltip = attribute.Description;
-            control.LayersChanged += LayerMaskField_ValueChanged;
-            return control;
-        }
-
-        void LayerMaskField_ValueChanged(object sender, EventArgs e)
-        {
-            if (IgnoreChanges) return;
-            Skill.Editor.UI.LayerMaskField control = (Skill.Editor.UI.LayerMaskField)sender;
-            ((PropertyData)control.UserData).Setter.Invoke(Object, new object[] { new UnityEngine.LayerMask() { value = control.Layers } });
-            SetDirty();
-        }
-
-        private void RefreshLayerMaskField(Skill.Editor.UI.LayerMaskField layerMaskField, PropertyInfo info)
-        {
-            layerMaskField.Layers = ((UnityEngine.LayerMask)info.GetGetMethod().Invoke(Object, null)).value;
-        }
-        #endregion
-
-        #region ObjectField
-        private UntypedObjectField CreateObjectField(PropertyInfo info, ExposePropertyAttribute attribute)
-        {
-            UntypedObjectField control = new UntypedObjectField(info.PropertyType);
-            control.Label.text = attribute.Name;
-            control.Label.tooltip = attribute.Description;
-            control.ObjectChanged += ObjectField_ValueChanged;
-            return control;
-        }
-
-        void ObjectField_ValueChanged(object sender, EventArgs e)
-        {
-            if (IgnoreChanges) return;
-            UntypedObjectField control = (UntypedObjectField)sender;
-            ((PropertyData)control.UserData).Setter.Invoke(Object, new object[] { control.Object });
-            SetDirty();
-        }
-
-        private void RefreshObjectField(Skill.Editor.UI.UntypedObjectField objectField, PropertyInfo info)
-        {
-            objectField.Object = info.GetGetMethod().Invoke(Object, null) as UnityEngine.Object;
-        }
-        #endregion
-
-        #region QuaternionField
-        private Skill.Editor.UI.Vector3Field CreateQuaternion(PropertyInfo info, ExposePropertyAttribute attribute)
-        {
-            Skill.Editor.UI.Vector3Field control = new Skill.Editor.UI.Vector3Field();
-            control.Label = attribute.Name;
-            control.ValueChanged += QuaternionField_ValueChanged;
-            return control;
-        }
-
-        void QuaternionField_ValueChanged(object sender, EventArgs e)
-        {
-            if (IgnoreChanges) return;
-            Skill.Editor.UI.Vector3Field control = (Skill.Editor.UI.Vector3Field)sender;
-            ((PropertyData)control.UserData).Setter.Invoke(Object, new object[] { Quaternion.Euler(control.Value) });
-            SetDirty();
-        }
-
-        private void RefreshQuaternionField(Skill.Editor.UI.Vector3Field quaternionField, PropertyInfo info)
-        {
-            Quaternion q = (Quaternion)info.GetGetMethod().Invoke(Object, null);
-            quaternionField.Value = q.eulerAngles;
-        }
-        #endregion
-
-        #region RectField
-        private Skill.Editor.UI.RectField CreateRect(PropertyInfo info, ExposePropertyAttribute attribute)
-        {
-            Skill.Editor.UI.RectField control = new Skill.Editor.UI.RectField();
-            control.Label.text = attribute.Name;
-            control.Label.tooltip = attribute.Description;
-            control.ValueChanged += RectField_ValueChanged;
-            return control;
-        }
-
-        void RectField_ValueChanged(object sender, EventArgs e)
-        {
-            if (IgnoreChanges) return;
-            Skill.Editor.UI.RectField control = (Skill.Editor.UI.RectField)sender;
-            ((PropertyData)control.UserData).Setter.Invoke(Object, new object[] { control.Value });
-            SetDirty();
-        }
-
-        private void RefreshRectField(Skill.Editor.UI.RectField rectField, PropertyInfo info)
-        {
-            rectField.Value = (Rect)info.GetGetMethod().Invoke(Object, null);
-        }
-        #endregion
-
-        #region TextField
-        private Skill.Editor.UI.TextField CreateString(PropertyInfo info, ExposePropertyAttribute attribute)
-        {
-            Skill.Editor.UI.TextField control = new Skill.Editor.UI.TextField();
-            control.Label.text = attribute.Name;
-            control.Label.tooltip = attribute.Description;
-            control.TextChanged += TextField_ValueChanged;
-            return control;
-        }
-
-        void TextField_ValueChanged(object sender, EventArgs e)
-        {
-            if (IgnoreChanges) return;
-            Skill.Editor.UI.TextField control = (Skill.Editor.UI.TextField)sender;
-            ((PropertyData)control.UserData).Setter.Invoke(Object, new object[] { control.Text });
-            SetDirty();
-        }
-
-        private void RefreshTextField(Skill.Editor.UI.TextField textField, PropertyInfo info)
-        {
-            textField.Text = info.GetGetMethod().Invoke(Object, null) as string;
-        }
-        #endregion
-
-        #region Vector2Field
-        private Skill.Editor.UI.Vector2Field CreateVector2(PropertyInfo info, ExposePropertyAttribute attribute)
-        {
-            Skill.Editor.UI.Vector2Field control = new Skill.Editor.UI.Vector2Field();
-            control.Label = attribute.Name;
-            control.ValueChanged += Vector2Field_ValueChanged;
-            return control;
-        }
-
-        void Vector2Field_ValueChanged(object sender, EventArgs e)
-        {
-            if (IgnoreChanges) return;
-            Skill.Editor.UI.Vector2Field control = (Skill.Editor.UI.Vector2Field)sender;
-            ((PropertyData)control.UserData).Setter.Invoke(Object, new object[] { control.Value });
-            SetDirty();
-        }
-
-        private void RefreshVector2Field(Skill.Editor.UI.Vector2Field vector2Field, PropertyInfo info)
-        {
-            vector2Field.Value = (Vector2)info.GetGetMethod().Invoke(Object, null);
-        }
-        #endregion
-
-        #region Vector3Field
-        private Skill.Editor.UI.Vector3Field CreateVector3(PropertyInfo info, ExposePropertyAttribute attribute)
-        {
-            Skill.Editor.UI.Vector3Field control = new Skill.Editor.UI.Vector3Field();
-            control.Label = attribute.Name;
-            control.ValueChanged += Vector3Field_ValueChanged;
-            return control;
-        }
-
-        void Vector3Field_ValueChanged(object sender, EventArgs e)
-        {
-            if (IgnoreChanges) return;
-            Skill.Editor.UI.Vector3Field control = (Skill.Editor.UI.Vector3Field)sender;
-            ((PropertyData)control.UserData).Setter.Invoke(Object, new object[] { control.Value });
-            SetDirty();
-        }
-
-        private void RefreshVector3Field(Skill.Editor.UI.Vector3Field vector3Field, PropertyInfo info)
-        {
-            vector3Field.Value = (Vector3)info.GetGetMethod().Invoke(Object, null);
-        }
-        #endregion
-
-        #region Vector4Field
-        private Skill.Editor.UI.Vector4Field CreateVector4(PropertyInfo info, ExposePropertyAttribute attribute)
-        {
-            Skill.Editor.UI.Vector4Field control = new Skill.Editor.UI.Vector4Field();
-            control.Label = attribute.Name;
-            control.ValueChanged += Vector4Field_ValueChanged;
-            return control;
-        }
-
-        void Vector4Field_ValueChanged(object sender, EventArgs e)
-        {
-            if (IgnoreChanges) return;
-            Skill.Editor.UI.Vector4Field control = (Skill.Editor.UI.Vector4Field)sender;
-            ((PropertyData)control.UserData).Setter.Invoke(Object, new object[] { control.Value });
-            SetDirty();
-        }
-
-        private void RefreshVector4Field(Skill.Editor.UI.Vector4Field vector4Field, PropertyInfo info)
-        {
-            vector4Field.Value = (Vector4)info.GetGetMethod().Invoke(Object, null);
-        }
         #endregion
 
         #region GetPropertyType
@@ -574,9 +887,9 @@ namespace Skill.Editor.UI.Extended
             AnimationCurve = 12,
             Bounds = 13,
             Quaternion = 14,
-            SerializableObject = 15
+            SerializableObject = 15,
+            Array = 16
         }
-
 
         private struct TypeTag
         {
@@ -606,18 +919,22 @@ namespace Skill.Editor.UI.Extended
             };
             }
         }
-        public static bool GetPropertyType(PropertyInfo info, out PropertyType propertyType)
+        public static bool GetPropertyType(System.Type type, out PropertyType propertyType)
         {
             CreateTypes();
             propertyType = PropertyType.None;
-            Type type = info.PropertyType;
+
+            if (type.IsArray)
+            {
+                propertyType = PropertyType.Array;
+                return true;
+            }
 
             if (type.IsEnum)
             {
                 propertyType = PropertyType.Enum;
                 return true;
             }
-
 
             if (IsObjectReference(type))
             {
@@ -641,27 +958,18 @@ namespace Skill.Editor.UI.Extended
             return false;
 
         }
-
         private static bool IsObjectReference(Type t)
         {
-            //Type objectType = typeof(object);
             Type unityObjectType = typeof(UnityEngine.Object);
             return t.IsSubclassOf(unityObjectType) || t == unityObjectType;
-
-            //while (t != objectType)
-            //{
-            //    if (t == unityObjectType)
-            //        return true;
-            //    t = t.BaseType;
-            //}
-            //return false;
         }
-
         private static bool IsSerializable(Type t)
         {
             object[] atts = t.GetCustomAttributes(typeof(SerializableAttribute), true);
             return (atts != null && atts.Length > 0);
         }
         #endregion
+
+
     }
 }

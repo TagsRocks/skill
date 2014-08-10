@@ -133,15 +133,14 @@ namespace Skill.Editor.UI.Extended
         /// <summary>
         /// Object to edit it's properties
         /// </summary>
-        public object Object { get; private set; }
+        public object Object { get; protected set; }
 
         /// <summary>
         /// Create a Properties panel
         /// </summary>
         /// <param name="obj"> Object to edit it's properties </param>
         public PropertiesPanel(object obj)
-        {
-            if (obj == null) throw new System.ArgumentNullException("Invalid Owner");
+        {            
             this.Object = obj;
             //this.Padding = new Thickness(0, 0, 16, 0);
         }

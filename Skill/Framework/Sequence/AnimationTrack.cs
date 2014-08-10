@@ -31,6 +31,31 @@ namespace Skill.Framework.Sequence
 
         public override TrackType Type { get { return TrackType.Animation; } }
 
+        /// <summary>
+        /// Get maximum time of track
+        /// </summary>
+        public override float MaxTime
+        {
+            get
+            {
+                if (Keys != null && Keys.Length > 0)
+                {
+                    CrossFadeAnimationKey k = Keys[Keys.Length - 1] as CrossFadeAnimationKey;
+                    if (k != null)
+                    {
+                        if (_Animation != null && !string.IsNullOrEmpty(k._Animation))
+                        {
+                            var state = _Animation[k._Animation];
+                            if (state != null)
+                                return k.FireTime + state.length;
+                        }
+                        return k.FireTime;
+                    }
+                }
+                return base.MaxTime;
+            }
+        }
+
         public override void Evaluate(float time)
         {
             base.Evaluate(time);
@@ -149,6 +174,12 @@ namespace Skill.Framework.Sequence
                 }
             }
         }
+
+        protected override void InitializeEvent(EventOrientedKey key)
+        {
+            AnimationKey aKey = (AnimationKey)key;
+            aKey.AnimationComponent = this._Animation;
+        }
     }
 
 
@@ -156,15 +187,8 @@ namespace Skill.Framework.Sequence
     [System.Serializable]
     public abstract class AnimationKey : EventOrientedKey
     {
-        public override float Length { get { return 0.001f; } }
-        public override void ExecuteEvent(EventOrientedTrack track)
-        {
-            AnimationTrack at = (AnimationTrack)track;
-            if (at._Animation != null)
-                Fire(at._Animation);
-        }
-        protected abstract void Fire(UnityEngine.Animation animation);
-
+        public override bool IsSingleExecution { get { return true; } }
+        internal UnityEngine.Animation AnimationComponent { get; set; }
     }
 
 
@@ -198,15 +222,15 @@ namespace Skill.Framework.Sequence
         [ExposeProperty(8, "WrapMode", "Wrapping mode of the animation.")]
         public WrapMode WrapMode { get { return this._WrapMode; } set { this._WrapMode = value; } }
 
-        protected override void Fire(UnityEngine.Animation animation)
+        public override void FireEvent()
         {
-            if (!string.IsNullOrEmpty(_Animation))
+            if (AnimationComponent != null && !string.IsNullOrEmpty(_Animation))
             {
-                var state = animation[_Animation];
+                var state = AnimationComponent[_Animation];
                 if (state != null)
                 {
                     ApplyStateParameters(state);
-                    animation.CrossFade(_Animation, _FadeLenght, _Mode);
+                    AnimationComponent.CrossFade(_Animation, _FadeLenght, _Mode);
                 }
             }
         }

@@ -11,12 +11,16 @@ namespace Skill.Framework
     public class CameraShake : DynamicBehaviour
     {
         public Transform RelativeTo;
+        public float Smoothing = 50.0f;
 
         private CameraShakeParams _Shake;
         private TimeWatch _ShakeTimeTW;
         private TimeWatch _TickTimeTW;
+        private TimeWatch _DisableTW;
         private Vector3 _DeltaPosition;
+        private Vector3 _CurrentDeltaPosition;
         private float _DeltaRoll;
+        private float _CurrentDeltaRoll;
 
         protected override void Start()
         {
@@ -97,24 +101,35 @@ namespace Skill.Framework
         protected virtual void LateUpdate()
         {
             if (Global.IsGamePaused) return;
+            if (_DisableTW.IsEnabledAndOver)
+            {
+                _DisableTW.End();
+                enabled = false;
+            }
             if (_ShakeTimeTW.IsEnabled)
             {
-                if (_ShakeTimeTW.IsOver)
+                if (_ShakeTimeTW.IsEnabledAndOver)
                 {
                     _ShakeTimeTW.End();
                     _TickTimeTW.End();
-                    enabled = false;
+                    if (Smoothing > 0.001f)
+                        _DisableTW.Begin(1.0f / Smoothing);
+                    else
+                        _DisableTW.Begin(0);
                 }
-                else
-                {
-                    if (_TickTimeTW.IsOver)
-                        Tick();
-                    
-                    _Transform.position += _DeltaPosition;
 
-                    if (_Shake.Roll > 0)
-                        _Transform.rotation = Quaternion.AngleAxis(_DeltaRoll, _Transform.forward) * _Transform.rotation;
+                if (_ShakeTimeTW.IsEnabled && _TickTimeTW.IsOver)
+                    Tick();
+
+                _CurrentDeltaPosition = Vector3.Lerp(_CurrentDeltaPosition, _DeltaPosition, Time.deltaTime * Smoothing);
+                _Transform.position += _CurrentDeltaPosition;
+
+                if (_Shake.Roll > 0)
+                {
+                    _CurrentDeltaRoll = Mathf.Lerp(_CurrentDeltaRoll, _DeltaRoll, Time.deltaTime * Smoothing);
+                    _Transform.rotation = Quaternion.AngleAxis(_CurrentDeltaRoll, _Transform.forward) * _Transform.rotation;
                 }
+
 
             }
         }

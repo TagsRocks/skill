@@ -14,7 +14,12 @@ namespace Skill.Editor.UI
         /// <summary>
         /// Optional label in front of the field.
         /// </summary>
-        public GUIContent Label { get; private set; }        
+        public GUIContent Label { get; private set; }
+
+        /// <summary>
+        /// ValueChanged event occurs when user press Return
+        /// </summary>
+        public bool ChangeOnReturn { get; set; }
 
         /// <summary>
         /// Occurs when value of FloatField changed
@@ -28,6 +33,7 @@ namespace Skill.Editor.UI
             if (ValueChanged != null) ValueChanged(this, EventArgs.Empty);
         }
 
+        private float _ValueBeforChange;
         private float _Value;
         /// <summary>
         /// float - The value entered by the user.
@@ -39,7 +45,7 @@ namespace Skill.Editor.UI
             {
                 if (_Value != value)
                 {
-                    _Value = value;
+                    _ValueBeforChange = _Value = value;
                     OnValueChanged();
                 }
             }
@@ -52,22 +58,46 @@ namespace Skill.Editor.UI
         {
             Label = new GUIContent();
             this.Height = 16;
+            this.ChangeOnReturn = false;
         }
 
         /// <summary>
         /// Render FloatField
         /// </summary>
         protected override void Render()
-        {
-            //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
+        {            
             if (Style != null)
             {
-                Value = EditorGUI.FloatField(RenderArea, Label, _Value, Style);
+                if (ChangeOnReturn)
+                    _ValueBeforChange = EditorGUI.FloatField(RenderArea, Label, _ValueBeforChange, Style);
+                else
+                    Value = EditorGUI.FloatField(RenderArea, Label, _Value, Style);
             }
             else
             {
-                Value = EditorGUI.FloatField(RenderArea, Label, _Value);
+                if (ChangeOnReturn)
+                    _ValueBeforChange = EditorGUI.FloatField(RenderArea, Label, _ValueBeforChange);
+                else
+                    Value = EditorGUI.FloatField(RenderArea, Label, _Value);
             }
-        }        
+            if (ChangeOnReturn)
+            {
+                if (_Value != _ValueBeforChange)
+                {
+                    Event e = Event.current;
+                    if (e != null && e.isKey)
+                    {
+                        if (e.keyCode == KeyCode.Return)
+                        {
+                            Value = _ValueBeforChange;
+                        }
+                        else if (e.keyCode == KeyCode.Escape)
+                        {
+                            _ValueBeforChange = _Value;
+                        }
+                    }
+                }
+            }
+        }
     }
 }

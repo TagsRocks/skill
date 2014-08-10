@@ -17,6 +17,19 @@ namespace Skill.Framework.Sequence
         protected float CurrecntTime { get; private set; }
         private int _Index;
 
+        /// <summary>
+        /// Get maximum time of track
+        /// </summary>
+        public override float MaxTime
+        {
+            get
+            {
+                if (PropertyKeys != null && PropertyKeys.Length > 0)
+                    return PropertyKeys[PropertyKeys.Length - 1].FireTime;
+                return 0;
+            }
+        }
+
         public override void Evaluate(float time)
         {
             int evaluatedIndex = -1;

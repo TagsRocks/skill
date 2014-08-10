@@ -42,7 +42,7 @@ namespace Skill.Editor.Sequence
                 int index = -1;
                 for (int i = 0; i < curve.length; i++)
                 {
-                    if (curve[i].time > time)
+                    if (curve[i].time >= time - 0.001f)
                     {
                         if (index == -1)
                             index = i;
@@ -50,11 +50,11 @@ namespace Skill.Editor.Sequence
                     }
                     else
                         index = i;
-                }
+                }                
 
                 if (index >= 0)
                 {
-                    float neighbor = curve[index].value;
+                    float neighbor = curve[index].value;                    
                     if (angle > neighbor)
                     {
                         float lowerAngle = angle - 360;
@@ -62,7 +62,7 @@ namespace Skill.Editor.Sequence
 
                         if (neighbor - lowerAngle < angle - neighbor)
                         {
-                            angle = lowerAngle;
+                            angle = lowerAngle;                            
                         }
                     }
                     else if (angle < neighbor)
@@ -72,14 +72,14 @@ namespace Skill.Editor.Sequence
 
                         if (upperAngle - neighbor < neighbor - angle)
                         {
-                            angle = upperAngle;
+                            angle = upperAngle;                            
                         }
                     }
                 }
             }
             return angle;
         }
-        
+
         protected override void AddCurveKey(KeyType keyType, float time)
         {
             Vector3 sceneValue = new Vector3();
@@ -93,7 +93,7 @@ namespace Skill.Editor.Sequence
                 sceneValue.x = _QuaternionTrack.CurveX.Evaluate(time);
                 sceneValue.y = _QuaternionTrack.CurveY.Evaluate(time);
                 sceneValue.z = _QuaternionTrack.CurveZ.Evaluate(time);
-            }            
+            }
 
             if ((keyType & Sequence.KeyType.X) == KeyType.X)
             {

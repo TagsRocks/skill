@@ -17,10 +17,29 @@ namespace Skill.Framework.Sequence
         {
             for (int i = 0; i < CurveCount; i++)
             {
-                if (GetCurve(i).length > 0)
+                var curve = GetCurve(i);
+                if (curve != null && curve.length > 0)
                     return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Get maximum time of track
+        /// </summary>
+        public override float MaxTime
+        {
+            get
+            {
+                float maxTime = 0;
+                for (int i = 0; i < CurveCount; i++)
+                {
+                    var curve = GetCurve(i);
+                    if (curve != null && curve.length > 0)
+                        maxTime = Mathf.Max(maxTime, curve[curve.length - 1].time);
+                }
+                return maxTime;
+            }
         }
 
         protected abstract V EvaluateCurves(float time);

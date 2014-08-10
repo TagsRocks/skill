@@ -75,20 +75,22 @@ namespace Skill.Framework.Sequence
                             updateTime = key.FireTime;
                             float deltaTime = updateTime - preTime;
                             if (deltaTime > 0) _Animator.Update(deltaTime);
-                            if (key.Length >= 0.01f && updateTime + key.Length >= time)
+                            InitializeEvent(key);
+                            if (!key.IsSingleExecution && (updateTime + key.Length >= time))
                             {
-                                key.ProcessEvent(this, time);
+                                key.StartEvent();
+                                key.UpdateEvent(time);
                             }
                             else
                             {
-                                key.ExecuteEvent(this);
+                                key.FireEvent();
                             }
                         }
 
                     }
                 }
                 if (time > updateTime)
-                {                    
+                {
                     float deltaTime = (time - updateTime) * 0.5f;
                     _Animator.Update(deltaTime);
                     _Animator.Update(deltaTime);
@@ -128,14 +130,11 @@ namespace Skill.Framework.Sequence
             }
         }
 
-        //public override void BeginPlay()
-        //{
-        //    base.BeginPlay();
-        //    if (CurrecntTime <= 0)
-        //    {
-        //        ResetParameters();
-        //    }
-        //}
+        protected override void InitializeEvent(EventOrientedKey key)
+        {
+            AnimatorKey aKey = (AnimatorKey)key;
+            aKey.Animator = this._Animator;
+        }
     }
 
 
@@ -143,25 +142,10 @@ namespace Skill.Framework.Sequence
     [System.Serializable]
     public abstract class AnimatorKey : EventOrientedKey
     {
-        public override float Length { get { return 0.001f; } }
-
-        public override void ExecuteEvent(EventOrientedTrack track)
-        {
-            AnimatorTrack at = (AnimatorTrack)track;
-            if (at._Animator != null)
-                Fire(at._Animator);
-        }
-
-        //public override void UndoEvent(EventOrientedTrack track)
-        //{
-        //    AnimatorTrack at = (AnimatorTrack)track;
-        //    if (at._Animator != null)
-        //        UndoFire(at._Animator);
-        //}
-
-        protected abstract void Fire(Animator animator);
-        //protected abstract void UndoFire(Animator animator);
+        public override bool IsSingleExecution { get { return true; } }
+        internal Animator Animator { get; set; }
     }
+
     [System.Serializable]
     public abstract class ParameterAnimatorKey : AnimatorKey
     {
@@ -179,17 +163,11 @@ namespace Skill.Framework.Sequence
         [ExposeProperty(3, "Value")]
         public bool BoolValue { get { return this._Value; } set { this._Value = value; } }
 
-        //private bool _PreValue;
-
-        protected override void Fire(Animator animator)
+        public override void FireEvent()
         {
-            //_PreValue = animator.GetBool(_ParameterName);
-            animator.SetBool(_ParameterName, this._Value);
+            if (Animator != null)
+                Animator.SetBool(_ParameterName, this._Value);
         }
-        //protected override void UndoFire(Animator animator)
-        //{
-        //    animator.SetBool(_ParameterName, this._PreValue);
-        //}
     }
 
     [System.Serializable]
@@ -199,18 +177,11 @@ namespace Skill.Framework.Sequence
 
         [ExposeProperty(3, "Value")]
         public int IntValue { get { return this._Value; } set { this._Value = value; } }
-
-        //private int _PreValue;
-        protected override void Fire(Animator animator)
+        public override void FireEvent()
         {
-            //_PreValue = animator.GetInteger(_ParameterName);
-            animator.SetInteger(_ParameterName, this._Value);
+            if (Animator != null)
+                Animator.SetInteger(_ParameterName, this._Value);
         }
-
-        //protected override void UndoFire(Animator animator)
-        //{
-        //    animator.SetInteger(_ParameterName, this._PreValue);
-        //}
     }
 
     [System.Serializable]
@@ -224,55 +195,46 @@ namespace Skill.Framework.Sequence
 
         [ExposeProperty(4, "Duration", "The time allowed to parameter to reach the value.")]
         public float Duration { get { return this._Duration; } set { this._Duration = Mathf.Max(0.001f, value); } }
-
         public override float Length { get { return _Duration; } }
+        public override bool IsSingleExecution { get { return false; } }
 
-        protected override void Fire(Animator animator)
+        public override void FireEvent()
         {
-            animator.SetFloat(_ParameterName, this._Value);
+            FinishEvent();
         }
 
         private float _StartValue;
-        //private float _PreValue;
 
-        public override void InitializeEvent(EventOrientedTrack track)
+        public override void StartEvent()
         {
-            AnimatorTrack at = (AnimatorTrack)track;
-            if (at._Animator != null)
-                _StartValue = at._Animator.GetFloat(ParameterName);
-            else
-                _StartValue = 0;
+            if (Animator != null)
+                _StartValue = Animator.GetFloat(ParameterName);
         }
 
-        public override void ProcessEvent(EventOrientedTrack track, float time)
+        public override void UpdateEvent(float time)
         {
-            AnimatorTrack at = (AnimatorTrack)track;
-            if (at._Animator != null)
+            if (Animator != null)
             {
-                //if (_Duration < 0.01f)
-                //    _PreValue = at._Animator.GetFloat(ParameterName);
                 float value = Mathf.Lerp(_StartValue, _Value, (time - FireTime) / _Duration);
-                at._Animator.SetFloat(_ParameterName, value);
+                Animator.SetFloat(_ParameterName, value);
             }
         }
-        //protected override void UndoFire(Animator animator)
-        //{
-        //    animator.SetFloat(_ParameterName, _PreValue);
-        //}
+
+        public override void FinishEvent()
+        {
+            if (Animator != null)
+                Animator.SetFloat(_ParameterName, this._Value);
+        }
     }
 
     [System.Serializable]
     public class TriggerAnimatorKey : ParameterAnimatorKey
     {
-        protected override void Fire(Animator animator)
+        public override void FireEvent()
         {
-            animator.SetTrigger(_ParameterName);
+            if (Animator != null)
+                Animator.SetTrigger(_ParameterName);
         }
-
-        //protected override void UndoFire(Animator animator)
-        //{
-        //    animator.ResetTrigger(_ParameterName);
-        //}
     }
 
     [System.Serializable]
@@ -291,16 +253,14 @@ namespace Skill.Framework.Sequence
         [ExposeProperty(3, "Weight", "The translative weight")]
         public float Weight { get { return this._Weight; } set { this._Weight = value; } }
 
-        protected override void Fire(Animator animator)
+        public override void FireEvent()
         {
-            animator.SetIKPosition(_Goal, _GoalPosition);
-            animator.SetIKPositionWeight(_Goal, _Weight);
+            if (Animator != null)
+            {
+                Animator.SetIKPosition(_Goal, _GoalPosition);
+                Animator.SetIKPositionWeight(_Goal, _Weight);
+            }
         }
-
-        //protected override void UndoFire(Animator animator)
-        //{
-        //    throw new NotImplementedException();
-        //}
     }
 
     [System.Serializable]
@@ -319,16 +279,14 @@ namespace Skill.Framework.Sequence
         [ExposeProperty(3, "Weight", "The translative weight")]
         public float Weight { get { return this._Weight; } set { this._Weight = value; } }
 
-        protected override void Fire(Animator animator)
+        public override void FireEvent()
         {
-            animator.SetIKRotation(_Goal, Quaternion.Euler(_GoalRotation));
-            animator.SetIKRotationWeight(_Goal, _Weight);
+            if (Animator != null)
+            {
+                Animator.SetIKRotation(_Goal, Quaternion.Euler(_GoalRotation));
+                Animator.SetIKRotationWeight(_Goal, _Weight);
+            }
         }
-
-        //protected override void UndoFire(Animator animator)
-        //{
-        //    throw new NotImplementedException();
-        //}
     }
 
     [System.Serializable]
@@ -359,16 +317,14 @@ namespace Skill.Framework.Sequence
         [ExposeProperty(6, "Clamp Weight", "(0-1) 0.0 means the character is completely unrestrained in motion, 1.0 means he's completely clamped (look at becomes impossible), and 0.5 means he'll be able to move on half of the possible range (180 degrees).")]
         public float ClampWeight { get { return this._ClampWeight; } set { this._ClampWeight = value; } }
 
-        protected override void Fire(Animator animator)
+        public override void FireEvent()
         {
-            animator.SetLookAtPosition(_LookAtPosition);
-            animator.SetLookAtWeight(_Weight, _BodyWeight, _HeadWeight, _EyesWeight, _ClampWeight);
+            if (Animator != null)
+            {
+                Animator.SetLookAtPosition(_LookAtPosition);
+                Animator.SetLookAtWeight(_Weight, _BodyWeight, _HeadWeight, _EyesWeight, _ClampWeight);
+            }
         }
-
-        //protected override void UndoFire(Animator animator)
-        //{
-        //    throw new NotImplementedException();
-        //}
     }
 
     [System.Serializable]
@@ -387,39 +343,35 @@ namespace Skill.Framework.Sequence
         [ExposeProperty(3, "Duration", "Duration of change layer weight")]
         public float Duration { get { return this._Duration; } set { this._Duration = Mathf.Max(0.001f, value); } }
         public override float Length { get { return _Duration; } }
-
+        public override bool IsSingleExecution { get { return false; } }
 
         private float _StartWeight;
 
-        public override void InitializeEvent(EventOrientedTrack track)
+        public override void StartEvent()
         {
-            AnimatorTrack at = (AnimatorTrack)track;
-            if (at._Animator != null)
-                _StartWeight = at._Animator.GetLayerWeight(_LayerIndex);
+            if (Animator != null)
+                _StartWeight = Animator.GetLayerWeight(_LayerIndex);
             else
                 _StartWeight = _Weight > 0.5f ? 0 : 1.0f;
         }
 
-        protected override void Fire(Animator animator)
+        public override void UpdateEvent(float time)
         {
-            animator.SetLayerWeight(_LayerIndex, _Weight);
-        }
 
-        public override void ProcessEvent(EventOrientedTrack track, float time)
-        {
-            AnimatorTrack at = (AnimatorTrack)track;
-            if (at._Animator != null)
+            if (Animator != null)
             {
                 float w = Mathf.Lerp(_StartWeight, _Weight, (time - FireTime) / _Duration);
-                at._Animator.SetLayerWeight(_LayerIndex, w);
+                Animator.SetLayerWeight(_LayerIndex, w);
             }
 
         }
+        public override void FireEvent() { FinishEvent(); }
 
-        //protected override void UndoFire(Animator animator)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        public override void FinishEvent()
+        {
+            if (Animator != null)
+                Animator.SetLayerWeight(_LayerIndex, _Weight);
+        }
     }
 
     [System.Serializable]
@@ -442,14 +394,11 @@ namespace Skill.Framework.Sequence
         [ExposeProperty(5, "Layer", "Layer index containing the destination state.")]
         public int Layer { get { return this._Layer; } set { this._Layer = value; } }
 
-        protected override void Fire(Animator animator)
+        public override void FireEvent()
         {
-            animator.CrossFade(_StateName, _TransitionDuration, _Layer, _NormalizedTime);
+            if (Animator != null)
+                Animator.CrossFade(_StateName, _TransitionDuration, _Layer, _NormalizedTime);
         }
-        //protected override void UndoFire(Animator animator)
-        //{
-        //    throw new NotImplementedException();
-        //}
     }
     #endregion
 

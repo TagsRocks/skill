@@ -15,13 +15,16 @@ namespace Skill.Framework.Sequence
     /// </remarks>
     public abstract class EventKey : EventOrientedKey
     {
-        public override void ExecuteEvent(EventOrientedTrack track) { Fire(); }
-        public abstract void Fire();
+        /// <summary>
+        /// Is this do all job in single execute event or needs update for a period of time
+        /// </summary>
+        public override bool IsSingleExecution { get { return true; } }
     }
 
     public class EventTrack : EventOrientedTrack
     {
         public override TrackType Type { get { return TrackType.Event; } }
+        protected override bool ExecuteInEditMode { get { return false; } }
     }
 
 

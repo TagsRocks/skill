@@ -95,7 +95,7 @@ namespace Skill.Editor.UI
                     if (ds.height > 0)
                         Panel.Height = ds.height;
                     if (IsExpanded)
-                        return Foldout.LayoutHeight + Panel.LayoutHeight;
+                        return Foldout.LayoutHeight + Foldout.Margin.Vertical + Panel.LayoutHeight + Panel.Margin.Vertical;
                     else
                         return Foldout.LayoutHeight;
                 }
@@ -146,11 +146,10 @@ namespace Skill.Editor.UI
         public VerticalExpander(P panel)
         {
             this.Panel = panel;
+            if (this.Panel == null) throw new ArgumentNullException("Invalid Panel for VerticalExpander");
             if (this.Panel.Parent != null)
                 throw new InvalidOperationException("VerticalExpander can not accept the panel that is already child of another Panel");
-            if (this.Panel == null) throw new ArgumentNullException("Invalid Panel for VerticalExpander");
             this.Panel.Parent = this;
-
             this.Foldout = new Skill.Editor.UI.Foldout() { ToggleOnLabelClick = true };
             this.Foldout.StateChanged += new EventHandler(_Foldout_StateChanged);
             this.DefaultHeader();

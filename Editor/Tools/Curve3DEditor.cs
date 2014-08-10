@@ -120,9 +120,9 @@ namespace Skill.Editor.Tools
             _PnlPoperties = new Skill.Framework.UI.StackPanel() { Row = 2, Column = 0, ColumnSpan = 2, Orientation = Skill.Framework.UI.Orientation.Vertical, Padding = new Skill.Framework.UI.Thickness(2) };
 
             _FFTime = new FloatField() { Height = 16, Margin = new Skill.Framework.UI.Thickness(0, 2, 0, 4) }; _FFTime.Label.text = "Time";
-            _VFValue = new Vector3Field() { Label = "Position", Height = 20 };
-            _VFInTangent = new Vector3Field() { Label = "InTangent", Height = 20 };
-            _VFOutTangent = new Vector3Field() { Label = "OutTangent", Height = 20 };
+            _VFValue = new Vector3Field() { Height = 20 }; _VFValue.Label.text = "Position";
+            _VFInTangent = new Vector3Field() { Height = 20 }; _VFInTangent.Label.text = "InTangent";
+            _VFOutTangent = new Vector3Field() { Height = 20 }; _VFOutTangent.Label.text = "OutTangent";
 
             _PnlPoperties.Controls.Add(_FFTime);
             _PnlPoperties.Controls.Add(_VFValue);
@@ -150,7 +150,7 @@ namespace Skill.Editor.Tools
 
             _SliSmoothValue = new Skill.Editor.UI.Slider() { Row = 3, Column = 0, ColumnSpan = 3, MinValue = 0.0f, MaxValue = 1.0f, Value = _Path.SmoothValue }; _SliSmoothValue.Label.text = "Smooth Value";
             _BtnSmoothCurve = new Button() { Row = 4, Column = 0, ColumnSpan = 2, Margin = new Skill.Framework.UI.Thickness(2, 2) }; _BtnSmoothCurve.Content.text = "Smooth Curve"; _BtnSmoothCurve.Content.tooltip = "Smooth the in and out tangents of the keys.";
-            _BtnSmoothPoint = new Button() { Row = 4, Column = 2, Margin = new Skill.Framework.UI.Thickness(2, 2) }; _BtnSmoothPoint.Content.text = "Smooth Point"; _BtnSmoothPoint.Content.tooltip = "Smooth the in and out tangents of the selected key.";            
+            _BtnSmoothPoint = new Button() { Row = 4, Column = 2, Margin = new Skill.Framework.UI.Thickness(2, 2) }; _BtnSmoothPoint.Content.text = "Smooth Point"; _BtnSmoothPoint.Content.tooltip = "Smooth the in and out tangents of the selected key.";
 
             _PnlTools.Controls.Add(_LmGroundLayer);
             _PnlTools.Controls.Add(_BtnGroundSelected);
