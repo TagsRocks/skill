@@ -281,5 +281,34 @@ namespace Skill.Framework
             }
             return magnitude;
         }
+
+
+        /// <summary>
+        /// Returns the horizontal distance between a and b (ignore y).
+        /// </summary>
+        /// <param name="v1">Vector3</param>
+        /// <param name="v2">Vector3</param>
+        /// <returns>horizontal distance between a and b</returns>
+        public static float HorizontalDistance(Vector3 v1, Vector3 v2)
+        {
+            Vector2 v11 = new Vector2(v1.x, v1.z);
+            Vector2 v22 = new Vector2(v2.x, v2.z);
+            return Vector2.Distance(v11, v22);
+        }
+
+
+        /// <summary>
+        /// Returns the horizontal angle between a and b (ignore y).
+        /// </summary>
+        /// <param name="v1">Vector3</param>
+        /// <param name="v2">Vector3</param>
+        /// <returns>horizontal angle between a and b</returns>
+        public static float HorizontalAngle(Vector3 v1, Vector3 v2)
+        {
+            Vector2 v11 = new Vector2(v1.x, v1.z);
+            Vector2 v22 = new Vector2(v2.x, v2.z);
+            return Vector2.Angle(v11, v22);
+        }           
+
     }
 }

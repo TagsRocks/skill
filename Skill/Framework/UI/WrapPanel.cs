@@ -28,9 +28,13 @@ namespace Skill.Framework.UI
         protected override void UpdateLayout()
         {
             if (Orientation == UI.Orientation.Horizontal)
+            {                
                 UpdateLayoutHorizontal();
+            }
             else
+            {                
                 UpdateLayoutVertical();
+            }
         }
 
 

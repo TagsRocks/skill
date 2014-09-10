@@ -34,7 +34,7 @@ namespace Skill.Framework
         public float CursorPlaneHeight = 0;
         /// <summary> If target can move very fast do not allow camera to loose it</summary>
         public bool FastTarget;
-        /// <summary> raycast world if failed to raycast move plane</summary>
+        /// <summary> raycast world </summary>
         public LayerMask WorldRayastLayerMask;
 
         /// <summary>
@@ -44,8 +44,12 @@ namespace Skill.Framework
 
         /// <summary> Prepare a cursor point variable. This is the mouse position on PC and controlled by the thumbstick on mobiles. </summary>
         public Vector3 CursorScreenPosition { get; private set; }
+
         /// <summary> Position of cursur in world on CursorPlane </summary>
-        public Vector3 CursorWorldPosition { get; private set; }
+        public Vector3 CursorPlanePosition { get; private set; }
+        
+        /// <summary> Position of cursur in world </summary>
+        public Vector3 RaycastWorldPosition { get; private set; }
         /// <summary> Screen forward direction</summary>
         public Vector3 ScreenForward { get; private set; }
         /// <summary> Screen right direction</summary>
@@ -58,6 +62,9 @@ namespace Skill.Framework
         public Vector3? PointOfInterest { get; set; }
         /// <summary>  Camera screen space </summary>
         public Quaternion ScreenSpace { get { return _ScreenMovementSpace; } }
+
+        /// <summary> ray to world in cursor screen position </summary>
+        public Ray CursorScreenRay { get; private set; }
 
         /// <summary> Temporarily ignore CustomOffset </summary>
         /// <remarks> you want ignore CustomOffset but do not lose previous value </remarks>
@@ -174,6 +181,20 @@ namespace Skill.Framework
             }
         }
 
+        protected override void Update()
+        {
+            CursorScreenPosition = HandleMousePosition();
+            if (!Global.IsGamePaused)
+            {
+                CursorScreenRay = this.Camera.ScreenPointToRay(CursorScreenPosition);
+                // Set up a ray corresponding to the screen position            
+                RaycastHit hit;
+                if (Physics.Raycast(CursorScreenRay, out hit, float.MaxValue, this.WorldRayastLayerMask.value))
+                    RaycastWorldPosition = hit.point;
+            }
+            base.Update();
+        }
+
         /// <summary>
         /// Allow subclass to handle mouse position in different way
         /// </summary>
@@ -210,12 +231,14 @@ namespace Skill.Framework
             {
                 UpdateScreenSpace();
 
-                _MovementPlane.distance = -Target.position.y + CursorPlaneHeight;
+                _MovementPlane.distance = -Target.position.y + CursorPlaneHeight;                
 
-                CursorScreenPosition = HandleMousePosition();
-
-                // Find out where the mouse ray intersects with the movement plane of the player
-                CursorWorldPosition = ScreenPointToWorldPoint(CursorScreenPosition, _MovementPlane, Camera);
+                Vector3 pos;
+                // Find out where the mouse ray intersects with the movement plane of the player                
+                if (PlaneRayIntersection(this._MovementPlane, CursorScreenRay, out pos))
+                    CursorPlanePosition = pos;
+                else
+                    CursorPlanePosition = RaycastWorldPosition;
 
                 Vector3 cameraAdjustmentVector = Vector3.zero;
 
@@ -286,39 +309,13 @@ namespace Skill.Framework
             _PreTarget = Target;
         }
 
-
-        /// <summary>
-        /// Calculate intersect position of a ray from camera at screenPoint to a plane in world
-        /// </summary>
-        /// <param name="screenPoint">Position of point in screen space (mouse position)</param>
-        /// <param name="plane">Plane in world space</param>
-        /// <param name="camera">Camera to create ray</param>
-        /// <returns> Intersection poitn of ray and plane </returns>
-        private Vector3 ScreenPointToWorldPoint(Vector3 screenPoint, Plane plane, Camera camera)
-        {
-            // Set up a ray corresponding to the screen position
-            Ray ray = camera.ScreenPointToRay(screenPoint);
-
-            Vector3 pos;
-            // Find out where the ray intersects with the plane
-            if (PlaneRayIntersection(plane, ray, out pos))
-                return pos;
-            else
-            {
-                RaycastHit hit;
-                if (Physics.Raycast(ray, out hit, WorldRayastLayerMask))
-                    return hit.point;
-                else
-                    return Vector3.zero;
-            }
-        }
-
         /// <summary>
         /// Find out where the ray intersects with the plane
         /// </summary>
         /// <param name="plane">Plane</param>
-        /// <param name="ray">Ray</param>
-        /// <returns>Intersection poitn of ray and plane</returns>
+        /// <param name="ray">Ray</param>        
+        /// <param name="intersectPosition">Intersection point of ray and plane</param>
+        /// <returns>true if intersection occurs, otherwise false</returns>
         public static bool PlaneRayIntersection(Plane plane, Ray ray, out Vector3 intersectPosition)
         {
             float dist;

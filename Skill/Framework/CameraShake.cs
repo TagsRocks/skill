@@ -11,8 +11,6 @@ namespace Skill.Framework
     public class CameraShake : DynamicBehaviour
     {
         public Transform RelativeTo;
-        public float Smoothing = 50.0f;
-
         private CameraShakeParams _Shake;
         private TimeWatch _ShakeTimeTW;
         private TimeWatch _TickTimeTW;
@@ -56,15 +54,17 @@ namespace Skill.Framework
                     this._Shake = new CameraShakeParams();
 
                 if (RelativeTo == null) RelativeTo = _Transform;
-
-                float distanceToSource = Vector3.Distance(RelativeTo.position, sourceOfShake);
-                if (distanceToSource <= shakeInfo.Range)
+                float distanceToSource = 0;
+                if (shakeInfo.ByDistance)
+                    distanceToSource = Vector3.Distance(RelativeTo.position, sourceOfShake);
+                if (!shakeInfo.ByDistance || distanceToSource <= shakeInfo.Range)
                 {
                     this._Shake.CopyFrom(shakeInfo);
                     if (this._Shake.Range <= Mathf.Epsilon) this._Shake.Range = Mathf.Epsilon;
                     float modifier = (this._Shake.ByDistance) ? (1 - Mathf.Clamp01(distanceToSource / this._Shake.Range)) : 1.0f;
                     this._Shake.Roll *= modifier;
                     this._Shake.Intensity *= modifier;
+                    this._Shake.Smoothing = Mathf.Max(0.1f, this._Shake.Smoothing);
                     if (this._Shake.TickTime < 0) this._Shake.TickTime = 0;
                     this._ShakeTimeTW.Begin(this._Shake.Duration);
                     this.Tick();
@@ -106,27 +106,30 @@ namespace Skill.Framework
                 _DisableTW.End();
                 enabled = false;
             }
-            if (_ShakeTimeTW.IsEnabled)
+            if (_ShakeTimeTW.IsEnabled || _DisableTW.IsEnabled)
             {
                 if (_ShakeTimeTW.IsEnabledAndOver)
                 {
                     _ShakeTimeTW.End();
                     _TickTimeTW.End();
-                    if (Smoothing > 0.001f)
-                        _DisableTW.Begin(1.0f / Smoothing);
+                    if (_Shake.Smoothing > 0.01f)
+                        _DisableTW.Begin(1.0f / _Shake.Smoothing);
                     else
-                        _DisableTW.Begin(0);
+                        _DisableTW.Begin(0.01f);
+
+                    _CurrentDeltaRoll = 0;
+                    _CurrentDeltaPosition = Vector3.zero;
                 }
 
                 if (_ShakeTimeTW.IsEnabled && _TickTimeTW.IsOver)
                     Tick();
 
-                _CurrentDeltaPosition = Vector3.Lerp(_CurrentDeltaPosition, _DeltaPosition, Time.deltaTime * Smoothing);
+                _CurrentDeltaPosition = Vector3.Lerp(_CurrentDeltaPosition, _DeltaPosition, Time.deltaTime * _Shake.Smoothing);
                 _Transform.position += _CurrentDeltaPosition;
 
                 if (_Shake.Roll > 0)
                 {
-                    _CurrentDeltaRoll = Mathf.Lerp(_CurrentDeltaRoll, _DeltaRoll, Time.deltaTime * Smoothing);
+                    _CurrentDeltaRoll = Mathf.Lerp(_CurrentDeltaRoll, _DeltaRoll, Time.deltaTime * _Shake.Smoothing);
                     _Transform.rotation = Quaternion.AngleAxis(_CurrentDeltaRoll, _Transform.forward) * _Transform.rotation;
                 }
 

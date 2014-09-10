@@ -35,6 +35,12 @@ namespace Skill.Framework.UI
         /// <summary> The Size needs for all controls </summary>
         public Rect DesiredSize { get { return _DesiredSize; } }
 
+        /// <summary> Use DesiredSize.Width as Width </summary>
+        public bool AutoWidth { get; set; }
+
+        /// <summary> Use DesiredSize.Height as Height </summary>
+        public bool AutoHeight { get; set; }
+
         /// <summary>
         /// Gets RenderArea that shrinks by Padding.
         /// </summary>
@@ -94,19 +100,39 @@ namespace Skill.Framework.UI
 
         }
 
-        /// <summary>
-        /// Prepare for render
-        /// </summary>
-        protected override void BeginRender()
+        internal void UpdateLayoutRecursive()
         {
-            base.BeginRender();
             if (_Invalidate)
             {
                 UpdateLayout();
+                foreach (var c in Controls)
+                {
+                    if (c.ControlType == UI.ControlType.Panel)
+                        ((Panel)c).UpdateLayoutRecursive();
+                }
+
                 CalcDesiredSize();
+
+                if (AutoWidth) Width = _DesiredSize.width;
+                if (AutoHeight) Height = _DesiredSize.height;
+
                 _Invalidate = false;
             }
         }
+
+        ///// <summary>
+        ///// Prepare for render
+        ///// </summary>
+        //protected override void BeginRender()
+        //{
+        //    base.BeginRender();
+        //    if (_Invalidate)
+        //    {
+        //        UpdateLayout();
+        //        CalcDesiredSize();
+        //        _Invalidate = false;                
+        //    }
+        //}
 
         private void CalcDesiredSize()
         {
@@ -477,6 +503,6 @@ namespace Skill.Framework.UI
                 BaseHandleEvent(e);
             }
 
-        }       
+        }
     }
 }

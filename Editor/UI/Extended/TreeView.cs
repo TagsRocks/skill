@@ -128,9 +128,17 @@ namespace Skill.Editor.UI.Extended
                     Rect ra = RenderAreaShrinksByPadding;
                     if (ra.Contains(localMouse))
                     {
-                        BaseControl select = GetControlAtPoint(mousePos);
-                        if (select != null)
-                            SelectedItem = select;
+                        BaseControl item = null;
+                        foreach (var c in Controls)
+                        {
+                            if (c != null)
+                            {
+                                item = c.GetControlAtPoint(mousePos);
+                                if (item != null)
+                                    break;
+                            }
+                        }
+                        SelectedItem = item;
                     }
                 }
             }

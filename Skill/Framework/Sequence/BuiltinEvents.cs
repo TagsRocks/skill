@@ -620,20 +620,28 @@ namespace Skill.Framework.Sequence
 
         [ExposeProperty(101, "Receiver", " The object to receive this message.")]
         public GameObject Receiver { get { return _Receiver; } set { _Receiver = value; } }
+
         [ExposeProperty(102, "Function Name", "Name of function to call")]
         public string FunctionName { get { return _FunctionName; } set { _FunctionName = value; } }
+
         [ExposeProperty(103, "MessageOptions", "Options")]
         public SendMessageOptions MessageOptions { get { return _MessageOptions; } set { _MessageOptions = value; } }
+
         [ExposeProperty(104, "Parameter Type", "Parameter type")]
         public SendMessageParameter ParameterType { get { return _ParameterType; } set { _ParameterType = value; } }
+
         [ExposeProperty(105, "Float", "Float parameter")]
         public float FloatParameter { get { return _FloatParameter; } set { _FloatParameter = value; } }
+
         [ExposeProperty(106, "Int", "Int parameter")]
         public int IntParameter { get { return _IntParameter; } set { _IntParameter = value; } }
+
         [ExposeProperty(107, "Bool", "Boolean parameter")]
         public bool BoolParameter { get { return _BoolParameter; } set { _BoolParameter = value; } }
+
         [ExposeProperty(108, "Object", "Object reference parameter")]
         public Object ObjectReferenceParameter { get { return _ObjectReferenceParameter; } set { _ObjectReferenceParameter = value; } }
+
         [ExposeProperty(109, "String", "String parameter")]
         public string StringParameter { get { return _StringParameter; } set { _StringParameter = value; } }
 
@@ -684,6 +692,7 @@ namespace Skill.Framework.Sequence
         public float _Range = 50;
         public bool _ByDistance = true;
         public float _TickTime = 0.1f;
+        public float _Smoothing = 50.0f;
 
 
         [Skill.Framework.ExposeProperty(101, "Source", "Source of shake")]
@@ -704,7 +713,10 @@ namespace Skill.Framework.Sequence
         [Skill.Framework.ExposeProperty(106, "ByDistance", "The shake will be more stronger near to camera")]
         public bool ByDistance { get { return _ByDistance; } set { _ByDistance = value; } }
 
-        [Skill.Framework.ExposeProperty(107, "TickTime", "time between shake directions")]
+        [Skill.Framework.ExposeProperty(107, "Smoothing", "Shake smoothing")]
+        public float Smoothing { get { return _Smoothing; } set { _Smoothing = value; } }
+
+        [Skill.Framework.ExposeProperty(108, "TickTime", "time between shake directions")]
         public float TickTime { get { return _TickTime; } set { _TickTime = value; } }
 
 
@@ -718,6 +730,8 @@ namespace Skill.Framework.Sequence
             info.Range = this._Range;
             info.ByDistance = this._ByDistance;
             info.TickTime = this._TickTime;
+            info.Smoothing = this._Smoothing;
+            info.Enable = true;
 
             if (_Source != null)
                 Skill.Framework.Global.RaiseCameraShake(this, info, _Source.position);

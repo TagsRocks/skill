@@ -185,7 +185,7 @@ namespace Skill.Studio.Compiler
                     }
                     if (composite.CompositeType == CompositeType.Priority || composite.CompositeType == CompositeType.Concurrent || composite.CompositeType == CompositeType.State) // check if a Decorator with NeverFaile property is child of PrioritySelector or ConcurrentSelector
                     {
-                        foreach (var child in b)
+                        foreach (var child in composite)
                         {
                             if (child != null && child.BehaviorType == BehaviorType.Decorator)
                             {
@@ -199,7 +199,17 @@ namespace Skill.Studio.Compiler
                                             AddWarning(string.Format("Decorator '{0}' with 'NeverFail' property setted to 'true' is child of ConcurrentSelector '{1}' width 'SuccessPolicy' property setted to 'SucceedOnOne' . This cause ConcurrentSelector never fail.", child.Name, b.Name));
                                     }
                                 }
-                            }
+                            }                            
+                        }
+                    }
+
+                    foreach (var child in composite)
+                    {
+                        if (child != null && child.BehaviorType == BehaviorType.ChangeState)
+                        {
+                            int index = composite.IndexOf(child);
+                            if (index < composite.Count - 1)
+                                AddWarning(string.Format("There are unreachable behaviors in Composite '{0}', after ChangeState '{1}'", composite.Name, child.Name));
                         }
                     }
                 }

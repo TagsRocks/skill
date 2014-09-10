@@ -89,12 +89,12 @@ namespace Skill.Editor.Tools
                 Skill.Framework.UI.Button btn = new Skill.Framework.UI.Button() { Tag = i.ToString(), Margin = new Thickness(4), Style = new GUIStyle(), Column = i };
                 string toolTip = string.Empty;
                 Texture2D background = null;
-                if (i == 0) { background = Skill.Editor.Resources.UITextures.Red; toolTip = "Red"; }
-                else if (i == 1) { background = Skill.Editor.Resources.UITextures.Green; toolTip = "Green"; }
-                else if (i == 2) { background = Skill.Editor.Resources.UITextures.Blue; toolTip = "Blue"; }
-                else if (i == 3) { background = Skill.Editor.Resources.UITextures.Transparent; toolTip = "Alpha"; }
-                else if (i == 4) { background = Skill.Editor.Resources.UITextures.White; toolTip = "White"; }
-                else if (i == 5) { background = Skill.Editor.Resources.UITextures.Black; toolTip = "Black"; }
+                if (i == 0) { background = Skill.Editor.Resources.UITextures.Colors.Red; toolTip = "Red"; }
+                else if (i == 1) { background = Skill.Editor.Resources.UITextures.Colors.Green; toolTip = "Green"; }
+                else if (i == 2) { background = Skill.Editor.Resources.UITextures.Colors.Blue; toolTip = "Blue"; }
+                else if (i == 3) { background = Skill.Editor.Resources.UITextures.Colors.Transparent; toolTip = "Alpha"; }
+                else if (i == 4) { background = Skill.Editor.Resources.UITextures.Colors.White; toolTip = "White"; }
+                else if (i == 5) { background = Skill.Editor.Resources.UITextures.Colors.Black; toolTip = "Black"; }
                 btn.Style.normal.background = btn.Style.focused.background = btn.Style.hover.background = btn.Style.active.background = background;
                 btn.Content.tooltip = toolTip;
                 btn.Click += btn_Click;

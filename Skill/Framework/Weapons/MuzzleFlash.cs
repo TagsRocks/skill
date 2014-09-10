@@ -31,8 +31,9 @@ namespace Skill.Framework.Weapons
         /// <summary>
         /// This function is called when the object becomes enabled and active.
         /// </summary>
-        protected virtual void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             _LifeTimeTW.Begin(LifeTime);
             float randomScale = Random.Range(MinScale, MaxScale);
             transform.localScale = new Vector3(randomScale, randomScale, randomScale);

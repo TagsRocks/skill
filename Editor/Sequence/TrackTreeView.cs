@@ -39,7 +39,7 @@ namespace Skill.Editor.Sequence
             _BtnAddKey.Content.tooltip = "Add key to Selected";
             _Toolbar.Controls.Add(_BtnAddKey);
 
-            _TreeView = new TreeView() { Row = 1, UserData = this, HandleScrollWheel = true, AlwayShowVertical = true, Padding = new Framework.UI.Thickness(0, 0, 0, 16) };
+            _TreeView = new TreeView() { Row = 1, UserData = this, HandleScrollWheel = true, AlwayShowVertical = true, Padding = new Framework.UI.Thickness(0, 0, 0, 16) ,AutoHeight = true };
             _TreeView.DisableFocusable();
             Controls.Add(_TreeView);
 

@@ -54,15 +54,24 @@ namespace Skill.Framework.Dynamics
         }
 
         /// <summary>
+        /// Start simulation
+        /// </summary>
+        public void Go()
+        {
+            // just enable to start simulation
+            enabled = true;
+            _ElapsedTime = 0;
+            _HalfGravity = -0.5f * Gravity;
+        }
+
+        /// <summary>
         /// Notify GameObject is dead
         /// </summary>
         /// <param name="sender"> The source of the event. </param>
         /// <param name="e"> An System.EventArgs that contains no event data. </param>
         protected virtual void Events_Die(object sender, EventArgs e)
         {
-            // just enable to start simulation
-            enabled = true;
-            _HalfGravity = -0.5f * Gravity;
+            Go();
         }
 
         /// <summary>
@@ -77,10 +86,10 @@ namespace Skill.Framework.Dynamics
         /// <summary>
         /// prepare for simulation
         /// </summary>
-        protected virtual void OnEnable()
+        protected override void OnEnable()
         {
-            _ElapsedTime = 0;
-            _HalfGravity = -0.5f * Gravity;
+            base.OnEnable();
+            Go();
         }
 
         /// <summary>

@@ -41,7 +41,7 @@ namespace Skill.DataModels.AI
         public float Weight { get; set; }
 
         /// <summary> User comment for this behavior </summary>
-        public string Comment { get; set; }        
+        public string Comment { get; set; }
 
         /// <summary>
         /// Behavior of node when is child of a ConcurrentSelector
@@ -59,7 +59,7 @@ namespace Skill.DataModels.AI
             _Behaviors = new List<Behavior>();
             _Parameters = new List<ParameterCollection>();
             this.Name = name;
-            this.Weight = 1;            
+            this.Weight = 1;
         }
         #endregion
 
@@ -112,7 +112,7 @@ namespace Skill.DataModels.AI
             behavior.SetAttributeValue("BehaviorType", BehaviorType.ToString());
             behavior.SetAttributeValue("Name", Name);
             behavior.SetAttributeValue("Id", Id);
-            behavior.SetAttributeValue("Weight", Weight);            
+            behavior.SetAttributeValue("Weight", Weight);
             behavior.SetAttributeValue("Concurrency", Concurrency.ToString());
 
             if (!string.IsNullOrEmpty(Comment))
@@ -151,7 +151,7 @@ namespace Skill.DataModels.AI
         {
             Name = e.GetAttributeValueAsString("Name", Name);
             Id = int.Parse(e.GetAttributeValueAsString("Id", "-1"));
-            Weight = e.GetAttributeValueAsFloat("Weight", 1);            
+            Weight = e.GetAttributeValueAsFloat("Weight", 1);
             Concurrency = e.GetAttributeValueAsEnum<ConcurrencyMode>("Concurrency", ConcurrencyMode.Unlimit);
 
             XElement comment = FindChild(e, "Comment");
@@ -271,6 +271,19 @@ namespace Skill.DataModels.AI
         {
             return _Behaviors.Count(b => b == item) > 0;
         }
+
+
+        /// <summary>
+        /// Searches for the specified Behavior and returns the zero-based index of the
+        /// first occurrence within the entire childeren.
+        /// </summary>
+        /// <param name="item"> The Behavior to locate in the children. The value can be null for reference types.</param>
+        /// <returns> The zero-based index of the first occurrence of item within the children, if found; otherwise, –1. </returns>
+        public int IndexOf(Behavior item)
+        {
+            return _Behaviors.IndexOf(item);
+        }
+
 
         /// <summary>
         /// Copy children to an array

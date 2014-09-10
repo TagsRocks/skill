@@ -418,6 +418,8 @@ namespace Skill.Framework.UI
             rect.x += x;
             rect.y += y;
             Grid.RenderArea = rect;
+
+            Grid.UpdateLayoutRecursive();
         }
 
         /// <summary>

@@ -161,9 +161,8 @@ namespace Skill.Framework.Triggers
             }            
        }        
 
-        protected override void OnDrawGizmos()
-        {
-            base.OnDrawGizmos();
+        protected virtual void OnDrawGizmos()
+        {            
             if (DecreaseByDistance)
                 Gizmos.DrawWireSphere(transform.position, Range);
         }

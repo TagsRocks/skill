@@ -19,8 +19,9 @@ namespace Skill.Framework.Managers
         /// <summary>
         /// On Enable
         /// </summary>
-        protected virtual void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             _LifeTimeTW.Begin(LifeTime);
         }
 

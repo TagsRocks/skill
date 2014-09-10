@@ -121,37 +121,50 @@ namespace Skill.Editor
 
         // ********************************* Commands ********************************* 
 
-        [MenuItem("Skill/Commands/Create Empty Child %m", false, 60)] // Ctrl + m
-        static void CreateEmptyChildWithName()
+        //[MenuItem("Skill/Commands/Create Empty Child %m", false, 60)] // Ctrl + m
+        //static void CreateEmptyChildWithName()
+        //{
+        //    Skill.Editor.Tools.Commands.CreateEmptyChild("GameObject");
+        //}
+
+        //[MenuItem("Skill/Commands/Create Empty Child Dialog %#m", false, 61)] // Ctrl + Shift + m
+        //static void CreateEmptyChild()
+        //{
+        //    Skill.Editor.Tools.CreateEmptyChildObjectDialog.Instance.ShowUtility();
+        //}
+
+
+
+        [MenuItem("Skill/Camera/Align MainCamera to Selected", false, 80)]
+        static void AlignMainCameraToSelectedObject()
         {
-            Skill.Editor.Tools.Commands.CreateEmptyChild("GameObject");
+            Skill.Editor.Tools.Commands.AlignMainCameraToSelectedObject();
+        }
+        [MenuItem("Skill/Camera/Align MainCamera to View", false, 81)]
+        static void AlignMainCameraToView()
+        {
+            Skill.Editor.Tools.Commands.AlignMainCameraToView();
         }
 
-        [MenuItem("Skill/Commands/Create Empty Child Dialog %#m", false, 61)] // Ctrl + Shift + m
-        static void CreateEmptyChild()
-        {
-            Skill.Editor.Tools.CreateEmptyChildObjectDialog.Instance.ShowUtility();
-        }
-
-        [MenuItem("Skill/Commands/Group %g", false, 70)] // Ctrl + G
+        [MenuItem("Skill/Edit/Group %g", false, 70)] // Ctrl + G
         static void GroupObjects()
         {
             Skill.Editor.Tools.Commands.GroupObjects("Group");
         }
 
-        [MenuItem("Skill/Commands/Group Dialog %#g", false, 70)] // Ctrl + Shift + G
+        [MenuItem("Skill/Edit/Group Dialog %#g", false, 71)] // Ctrl + Shift + G
         static void GroupObjectsWithName()
         {
             Skill.Editor.Tools.CreateGroupDialog.Instance.ShowUtility();
-        }
+        }        
 
-        [MenuItem("Skill/Commands/Copy Transform", false, 80)]
+        [MenuItem("Skill/Edit/Copy Transform", false, 72)]
         static void CopyTransform()
         {
             Skill.Editor.Tools.Commands.CopyTransform();
         }
 
-        [MenuItem("Skill/Commands/Paste Transform", false, 81)]
+        [MenuItem("Skill/Edit/Paste Transform", false, 73)]
         static void PasteTransform()
         {
             Skill.Editor.Tools.Commands.PasteTransform();

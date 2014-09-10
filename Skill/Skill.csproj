@@ -78,6 +78,7 @@
     <Compile Include="Framework\ExposePropertyAttribute.cs" />
     <Compile Include="Framework\FollowCamera.cs" />
     <Compile Include="Framework\FreeCamera.cs" />
+    <Compile Include="Framework\DrawGizmo.cs" />
     <Compile Include="Framework\GizmosHelper.cs" />
     <Compile Include="Framework\LevelLoadManager.cs" />
     <Compile Include="Framework\Modules\BatchMesh.cs" />

@@ -42,7 +42,7 @@ namespace Skill.Framework
         {
             base.Awake();
             _OffsetTime = 0;
-            if (FadeInOnAwake) FadeIn();
+            if (FadeInOnAwake) FadeIn(true);
         }
 
         /// <summary> Fadeout and fadein  </summary>

@@ -59,8 +59,9 @@ namespace Skill.Framework.Dynamics
         /// <summary>
         /// This function is called when the object becomes enabled and active.
         /// </summary>
-        protected virtual void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             //if (_IgnoreFirst)
             //    _IgnoreFirst = false;
             //else

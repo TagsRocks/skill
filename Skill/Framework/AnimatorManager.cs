@@ -18,20 +18,21 @@ namespace Skill.Framework
 
         private string[] _Layers;
         private Dictionary<string, AnimatorParameter> _Parameters;
-        private List<AnimatorStateGroup> _UpdateGroups;
+        private List<AnimatorStateGroup> _StateGroups;
         private bool[] _IsInTransitions;
 
 
         public Animator Animator { get; private set; }
-        public AnimatorStateInfo[] LayerStates { get; private set; }
+        public AnimatorStateInfo[] CurrentLayerStates { get; private set; }
+        public AnimatorStateInfo[] NextLayerStates { get; private set; }
 
         public string GetActiveGroupNames(int layerIndex)
         {
             string result = string.Empty;
-            for (int i = 0; i < _UpdateGroups.Count; i++)
+            for (int i = 0; i < _StateGroups.Count; i++)
             {
-                var group = _UpdateGroups[i];
-                if (group.LayerIndex == layerIndex && group.IsActive)
+                var group = _StateGroups[i];
+                if (group.LayerIndex == layerIndex && group.IsRelevant)
                 {
                     if (result != string.Empty) result += ", ";
                     result += group.Name;
@@ -46,8 +47,9 @@ namespace Skill.Framework
                 throw new ArgumentNullException("Animator is null");
 
             this.Animator = animator;
-            this.LayerStates = new AnimatorStateInfo[animator.layerCount];
-            _UpdateGroups = new List<AnimatorStateGroup>();
+            this.CurrentLayerStates = new AnimatorStateInfo[animator.layerCount];
+            this.NextLayerStates = new AnimatorStateInfo[animator.layerCount];
+            _StateGroups = new List<AnimatorStateGroup>();
             this._IsInTransitions = new bool[animator.layerCount];
             this._Layers = new string[Animator.layerCount];
             for (int i = 0; i < Animator.layerCount; i++)
@@ -68,40 +70,42 @@ namespace Skill.Framework
         {
             for (int i = 0; i < Animator.layerCount; i++)
             {
-                LayerStates[i] = Animator.GetCurrentAnimatorStateInfo(i);
+                CurrentLayerStates[i] = Animator.GetCurrentAnimatorStateInfo(i);
                 _IsInTransitions[i] = Animator.IsInTransition(i);
+                NextLayerStates[i] = Animator.GetNextAnimatorStateInfo(i);
+
             }
 
-            foreach (var aug in _UpdateGroups)
+            foreach (var aug in _StateGroups)
             {
-                aug.FixedUpdate(ref LayerStates[aug.LayerIndex], _IsInTransitions[aug.LayerIndex]);
+                aug.FixedUpdate(ref CurrentLayerStates[aug.LayerIndex], ref NextLayerStates[aug.LayerIndex], _IsInTransitions[aug.LayerIndex]);
             }
         }
 
         public void Update()
         {
-            for (int i = 0; i < _UpdateGroups.Count; i++)
+            for (int i = 0; i < _StateGroups.Count; i++)
             {
-                _UpdateGroups[i].Update();
+                _StateGroups[i].Update();
             }
         }
 
 
-        public AnimatorStateGroup CreateStateGroup(string name, int layerIndex)
+        public AnimatorStateGroup CreateStateGroup(string name, int layerIndex, bool ignoreTransitions = false)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentException("Invalid group name");
             if (layerIndex < 0 || layerIndex >= Animator.layerCount)
                 throw new IndexOutOfRangeException("Invalid layerIndex");
 
-            for (int i = 0; i < _UpdateGroups.Count; i++)
+            for (int i = 0; i < _StateGroups.Count; i++)
             {
-                if (name == _UpdateGroups[i].Name)
+                if (name == _StateGroups[i].Name)
                     throw new ArgumentException("Group name already exist");
             }
 
-            AnimatorStateGroup group = new AnimatorStateGroup(name, Animator.GetLayerName(layerIndex), layerIndex);
-            _UpdateGroups.Add(group);
+            AnimatorStateGroup group = new AnimatorStateGroup(name, Animator.GetLayerName(layerIndex), layerIndex, ignoreTransitions);
+            _StateGroups.Add(group);
             return group;
         }
 
@@ -164,14 +168,13 @@ namespace Skill.Framework
         private bool _Sorted;
         private List<int> _NameMeshs;
         private string _LayerName;
+        private int _SideEvents;
 
         public int LayerIndex { get; private set; }
         public string Name { get; private set; }
         public bool IsRelevant { get; private set; }
-        public bool IsActive { get; private set; }
-        public bool IsRelevantNoTransition { get; private set; }
-        /// <summary> default is false </summary>
-        public bool OnlyUpdateInRelevantNoTransition { get; set; }
+        public bool IgnoreTransitions { get; set; }
+
 
         public event EventHandler BecameRelevant;
         private void OnBecameRelevant()
@@ -179,33 +182,33 @@ namespace Skill.Framework
             if (BecameRelevant != null) BecameRelevant(this, EventArgs.Empty);
         }
 
-        public event EventHandler BecameRelevantNoTransition;
-        private void OnBecameRelevantNoTransition()
-        {
-            if (BecameRelevantNoTransition != null) BecameRelevantNoTransition(this, EventArgs.Empty);
-        }
-
         public event EventHandler StayRelevant;
         private void OnStayRelevant() { if (StayRelevant != null) StayRelevant(this, EventArgs.Empty); }
         public event EventHandler CeaseRelevant;
         private void OnCeaseRelevant() { if (CeaseRelevant != null) CeaseRelevant(this, EventArgs.Empty); }
 
-        internal AnimatorStateGroup(string name, string layerName, int layerIndex)
+        internal AnimatorStateGroup(string name, string layerName, int layerIndex, bool ignoreTransitions)
         {
             this._NameMeshs = new List<int>();
             this.LayerIndex = layerIndex;
             this.Name = name;
             this._LayerName = layerName;
-            this.OnlyUpdateInRelevantNoTransition = false;
+            this.IgnoreTransitions = ignoreTransitions;
         }
 
         internal void Update()
         {
-            if (IsActive)
+            if (_SideEvents == 2)
+                OnCeaseRelevant();
+            else if (_SideEvents == 1)
+                OnBecameRelevant();
+            _SideEvents = 0;
+
+            if (IsRelevant)
                 OnStayRelevant();
         }
 
-        internal void FixedUpdate(ref AnimatorStateInfo info, bool isInTransition)
+        internal void FixedUpdate(ref AnimatorStateInfo currentState, ref AnimatorStateInfo nextState, bool isInTransition)
         {
             if (!_Sorted)
             {
@@ -213,27 +216,28 @@ namespace Skill.Framework
                 _NameMeshs.Sort();
             }
             bool preRelevant = this.IsRelevant;
-            bool preRelevantNoTransition = this.IsRelevantNoTransition;
 
-            if (this.IsRelevant || (!IsRelevant && !isInTransition))
-                this.IsRelevant = _NameMeshs.BinarySearch(info.nameHash) >= 0;
-            else
-                this.IsRelevant = false;
-
-            IsRelevantNoTransition = IsRelevant && !isInTransition;
-
-            if (preRelevant && !this.IsRelevant) OnCeaseRelevant();
-            else if (!preRelevant && this.IsRelevant) OnBecameRelevant();
-            if (!preRelevantNoTransition && this.IsRelevantNoTransition) OnBecameRelevantNoTransition();
-
-            if (OnlyUpdateInRelevantNoTransition)
+            if (IgnoreTransitions)
             {
-                IsActive = IsRelevantNoTransition;
+                if (isInTransition)
+                    this.IsRelevant = _NameMeshs.BinarySearch(nextState.nameHash) >= 0;
+                else
+                    this.IsRelevant = _NameMeshs.BinarySearch(currentState.nameHash) >= 0;
             }
             else
             {
-                IsActive = IsRelevant;
+                if (isInTransition)
+                    this.IsRelevant = false;
+                else
+                    this.IsRelevant = _NameMeshs.BinarySearch(currentState.nameHash) >= 0;
             }
+
+
+
+            if (preRelevant && !this.IsRelevant)
+                _SideEvents = 2;
+            else if (!preRelevant && this.IsRelevant)
+                _SideEvents = 1;
         }
 
         public void AddState(string stateName)

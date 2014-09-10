@@ -28,7 +28,9 @@ namespace Skill.Editor.UI.Extended
             }
 
             _Instance._SelectedObject = p;
-            UnityEditor.Selection.activeObject = _Instance;
+
+            if (p != null)
+                UnityEditor.Selection.activeObject = _Instance;
         }
 
         public static bool IsSelected(IProperties p)

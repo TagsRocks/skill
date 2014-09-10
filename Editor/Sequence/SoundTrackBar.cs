@@ -38,7 +38,7 @@ namespace Skill.Editor.Sequence
 
         private void AddKey(float time)
         {
-            SoundKey newKey = new SoundKey();
+            SoundKey newKey = ScriptableObject.CreateInstance<SoundKey>();
             newKey.Clip = null;
             newKey.FireTime = time;
 
@@ -93,32 +93,41 @@ namespace Skill.Editor.Sequence
             private AnimationCurve[] _Curves = new AnimationCurve[1];
             protected override void BeginRender()
             {
-                _PreviewImage.Clip = _SoundKey.Clip;
-
                 if (_SoundKey.Clip != null)
                 {
                     _LblClipName.Text = _SoundKey.Clip.name;
-                    CalcCurveRenderArea(ref _CurevRenderAreas, ref _CurevRanges, _Curves);
 
-                    Rect ra = _CurevRenderAreas[0];
-                    Rect ranges = _CurevRanges[0];
+                    if (_SoundKey.Visualize)
+                    {
+                        _PreviewImage.Clip = _SoundKey.Clip;
+                        CalcCurveRenderArea(ref _CurevRenderAreas, ref _CurevRanges, _Curves);
 
-                    ranges.x *= _PreviewImage.Resolution;
-                    ranges.width *= _PreviewImage.Resolution;
+                        Rect ra = _CurevRenderAreas[0];
+                        Rect ranges = _CurevRanges[0];
 
-                    _PreviewImage.RenderArea = ra;
-                    _PreviewImage.Ranges = ranges;
+                        ranges.x *= _PreviewImage.Resolution;
+                        ranges.width *= _PreviewImage.Resolution;
 
-                    _PreviewImage.Visibility = ra.width > 0 ? Framework.UI.Visibility.Visible : Framework.UI.Visibility.Hidden;
+                        _PreviewImage.RenderArea = ra;
+                        _PreviewImage.Ranges = ranges;
+
+                        _PreviewImage.Visibility = ra.width > 0 ? Framework.UI.Visibility.Visible : Framework.UI.Visibility.Hidden;
+                    }
+                    else
+                    {
+                        _PreviewImage.Clip = null;
+                        _PreviewImage.Visibility = Framework.UI.Visibility.Visible;
+                    }
                 }
                 else
                 {
+                    _PreviewImage.Clip = null;
                     _PreviewImage.Visibility = Framework.UI.Visibility.Visible;
                     _PreviewImage.RenderArea = RenderArea;
-                    _LblClipName.Text = string.Empty;
+                    _LblClipName.Text = "Null";
                 }
                 base.BeginRender();
-            }            
+            }
         }
         #endregion
 

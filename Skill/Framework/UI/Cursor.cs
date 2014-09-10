@@ -10,10 +10,12 @@ namespace Skill.Framework.UI
     /// </summary>
     public class Cursor : MonoBehaviour
     {
+        public int GUIDepth = 0;
         /// <summary>
         /// Cursor texture
         /// </summary>
         public Texture2D Normal;
+        public Vector2 Offset = new Vector2(32, 32);
 
         protected virtual Texture2D CursorTexture { get; set; }
         void Awake()
@@ -23,6 +25,7 @@ namespace Skill.Framework.UI
         this.gameObject.SetActive(false);
 #endif
             Screen.showCursor = false;
+            CursorTexture = Normal;
         }
 
         void OnGUI()
@@ -30,10 +33,11 @@ namespace Skill.Framework.UI
             Texture2D cr = CursorTexture;
             if (cr != null)
             {
+                GUI.depth = GUIDepth;
                 var pos = Input.mousePosition;
                 float w = cr.width;
                 float h = cr.height;
-                GUI.DrawTexture(new Rect(pos.x - (w * 0.5f), (Screen.height - pos.y) - (h * 0.5f), w, h), cr);
+                GUI.DrawTexture(new Rect(pos.x + Offset.x, (Screen.height - pos.y) + Offset.y, w, h), cr);
             }
         }
     }

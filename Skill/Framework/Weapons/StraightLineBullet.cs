@@ -45,7 +45,7 @@ namespace Skill.Framework.Weapons
         /// <summary>
         /// Layers to raycast. (should be setted by weapon)
         /// </summary>
-        public int LayerMask { get; internal set; }
+        public LayerMask LayerMask { get; internal set; }
 
         /// <summary>
         /// Amount of damage caused by this bullet.

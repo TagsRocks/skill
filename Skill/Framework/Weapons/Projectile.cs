@@ -76,7 +76,7 @@ namespace Skill.Framework.Weapons
         /// <summary> Curve projectile specific parameters </summary>
         public CurveProjectileParams CurveParams;
         /// <summary> Layer mask to use in raycasting </summary>
-        public int LayerMask = 0xFFFFFFF;
+        public LayerMask LayerMask = 0xFFFFFFF;
         /// <summary> Whether weapon check hit posint of this bullet at spawn time or let bullet check hits itself.</summary>
         public bool HitAtSpawn;
 

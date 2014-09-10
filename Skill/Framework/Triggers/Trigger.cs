@@ -6,12 +6,9 @@ namespace Skill.Framework.Triggers
     /// <summary>
     /// Base class for all triggers
     /// </summary>
+    [RequireComponent(typeof(DrawGizmo))]
     public abstract class Trigger : StaticBehaviour
     {
-        public Color GizmoColor = new Color(0.1f, 0.1f, 0.1f, 0.4f);
-        public GizmosHelper.DrawColliderMode GizmoDrawMode = GizmosHelper.DrawColliderMode.SolidAndWire;
-        public string GizmoFilename = "Trigger.png";
-        public Vector3 GizmoOffset = Vector3.zero;
         /// <summary> Filter other colliders by tags </summary>
         public string[] Tags = new string[] { "Player" };
         /// <summary> How many times execute trigger</summary>
@@ -108,17 +105,6 @@ namespace Skill.Framework.Triggers
         /// </summary>
         /// <param name="other">other Collider</param>        
         protected virtual void OnStay(Collider other) { }
-
-        /// <summary>
-        /// Draw gizmo
-        /// </summary>
-        protected virtual void OnDrawGizmos()
-        {
-            if (!string.IsNullOrEmpty(GizmoFilename))
-                Gizmos.DrawIcon(transform.position + transform.TransformDirection(GizmoOffset), GizmoFilename, false);
-            if (GizmoDrawMode != GizmosHelper.DrawColliderMode.None)
-                GizmosHelper.DrawCollider(collider, GizmoColor, GizmoDrawMode);
-        }
     }
 
 }

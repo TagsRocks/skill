@@ -29,6 +29,8 @@ namespace Skill.Framework
         public bool ByDistance = true;
         /// <summary> time between shake directions </summary>
         public float TickTime = 0.08f;
+        /// <summary> Shake smoothing</summary>
+        public float Smoothing = 50;
 
         /// <summary> Default constructor </summary>
         public CameraShakeParams() { }
@@ -54,6 +56,7 @@ namespace Skill.Framework
             this.Range = other.Range;
             this.ByDistance = other.ByDistance;
             this.TickTime = other.TickTime;
+            this.Smoothing = other.Smoothing;
         }
     }
 

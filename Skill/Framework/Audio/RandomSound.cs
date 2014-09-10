@@ -49,8 +49,9 @@ namespace Skill.Framework.Audio
         /// <summary>
         /// This function is called when the object becomes enabled and active.
         /// </summary>
-        protected virtual void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             PlaySound();
         }
     }

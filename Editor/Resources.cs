@@ -7,104 +7,128 @@ namespace Skill.Editor
 {
     public static class Resources
     {
-        public static string GetUIResourcePath(string resourceFileName)
+        public const string LightSkinPath = "Assets/Skill/Editor/Resources/LightSkin/";
+        public const string ProSkinPath = "Assets/Skill/Editor/Resources/ProSkin/";
+
+        public static string GetUILightSkinResourcePath(string resourceFileName)
         {
-            if (UnityEditor.EditorGUIUtility.isProSkin)
-                return "Assets/Skill/Editor/Resources/ProSkin/" + resourceFileName;
-            else
-                return "Assets/Skill/Editor/Resources/LightSkin/" + resourceFileName;
+            return LightSkinPath + resourceFileName;
         }
-        private static void SetTextureImportType(string path, TextureImporterType type)
+        public static string GetUIProSkinResourcePath(string resourceFileName)
         {
-            TextureImporter textureImporter = AssetImporter.GetAtPath(path) as TextureImporter;
-            textureImporter.textureType = TextureImporterType.GUI;
-            AssetDatabase.ImportAsset(path);
+            return ProSkinPath + resourceFileName;
+        }
+        private static void SetTextureImportType(string assetName, TextureImporterType type)
+        {
+            TextureImporter textureImporter = null;
+            string path = GetUILightSkinResourcePath(assetName);
+            textureImporter = AssetImporter.GetAtPath(path) as TextureImporter;
+            if (textureImporter != null)
+            {
+                textureImporter.textureType = type;
+                AssetDatabase.ImportAsset(path);
+            }
+
+            textureImporter = null;
+            path = GetUIProSkinResourcePath(assetName);
+            textureImporter = AssetImporter.GetAtPath(path) as TextureImporter;
+            if (textureImporter != null)
+            {
+                textureImporter.textureType = type;
+                AssetDatabase.ImportAsset(path);
+            }
         }
         public static void ApplyImportSettings()
         {
-            SetTextureImportType(GetUIResourcePath("Condition.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Action.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Decorator.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Failure.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Success.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Running.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("White.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Plus.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("PlusNext.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Minus.png"), TextureImporterType.GUI);
+            SetTextureImportType("White.png", TextureImporterType.GUI);
+            SetTextureImportType("Plus.png", TextureImporterType.GUI);
+            SetTextureImportType("PlusNext.png", TextureImporterType.GUI);
+            SetTextureImportType("Minus.png", TextureImporterType.GUI);
 
-            SetTextureImportType(GetUIResourcePath("Play.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("PlayOn.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Pause.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("PauseOn.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("StepForward.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("StepForwardOn.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("StepBackward.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("StepBackwardOn.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Loop.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("LoopOn.png"), TextureImporterType.GUI);
+            SetTextureImportType("Play.png", TextureImporterType.GUI);
+            SetTextureImportType("PlayOn.png", TextureImporterType.GUI);
+            SetTextureImportType("Pause.png", TextureImporterType.GUI);
+            SetTextureImportType("PauseOn.png", TextureImporterType.GUI);
+            SetTextureImportType("StepForward.png", TextureImporterType.GUI);
+            SetTextureImportType("StepForwardOn.png", TextureImporterType.GUI);
+            SetTextureImportType("StepBackward.png", TextureImporterType.GUI);
+            SetTextureImportType("StepBackwardOn.png", TextureImporterType.GUI);
+            SetTextureImportType("Loop.png", TextureImporterType.GUI);
+            SetTextureImportType("LoopOn.png", TextureImporterType.GUI);
 
 
-            SetTextureImportType(GetUIResourcePath("RecordOn.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("RecordOff.png"), TextureImporterType.GUI);
+            SetTextureImportType("RecordOn.png", TextureImporterType.GUI);
+            SetTextureImportType("RecordOff.png", TextureImporterType.GUI);
 
-            SetTextureImportType(GetUIResourcePath("Add.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Remove.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Save.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Arrow_Right.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("SelectedEventBorder.png"), TextureImporterType.GUI);
+            SetTextureImportType("Add.png", TextureImporterType.GUI);
+            SetTextureImportType("Remove.png", TextureImporterType.GUI);
+            SetTextureImportType("Save.png", TextureImporterType.GUI);
+            SetTextureImportType("Arrow_Right.png", TextureImporterType.GUI);
+            SetTextureImportType("SelectedEventBorder.png", TextureImporterType.GUI);
 
-            SetTextureImportType(GetUIResourcePath("Paste.png"), TextureImporterType.GUI);
+            SetTextureImportType("Paste.png", TextureImporterType.GUI);
 
-            SetTextureImportType(GetUIResourcePath("TimeFormat.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("SequenceFormat.png"), TextureImporterType.GUI);
+            SetTextureImportType("TimeFormat.png", TextureImporterType.GUI);
+            SetTextureImportType("SequenceFormat.png", TextureImporterType.GUI);
 
-            SetTextureImportType(GetUIResourcePath("Keyframe.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("KeyframeSelected.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("KeyframeEmpty.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Event.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Key.png"), TextureImporterType.GUI);
+            SetTextureImportType("Keyframe.png", TextureImporterType.GUI);
+            SetTextureImportType("KeyframeSelected.png", TextureImporterType.GUI);
+            SetTextureImportType("KeyframeEmpty.png", TextureImporterType.GUI);
+            SetTextureImportType("Event.png", TextureImporterType.GUI);
+            SetTextureImportType("Key.png", TextureImporterType.GUI);
 
-            SetTextureImportType(GetUIResourcePath("Matinee/Folder.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Matinee/Sound.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Matinee/Event.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Matinee/Boolean.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Matinee/Integer.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Matinee/Float.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Matinee/Quaternion.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Matinee/Color.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Matinee/Vector2.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Matinee/Vector3.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Matinee/Vector4.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Matinee/Animator.png"), TextureImporterType.GUI);
-            SetTextureImportType(GetUIResourcePath("Matinee/Animation.png"), TextureImporterType.GUI);
+
+            SetTextureImportType("BTree/Condition.png", TextureImporterType.GUI);
+            SetTextureImportType("BTree/Action.png", TextureImporterType.GUI);
+            SetTextureImportType("BTree/Decorator.png", TextureImporterType.GUI);
+            SetTextureImportType("BTree/AccessLimitDecorator.png", TextureImporterType.GUI);
+            SetTextureImportType("BTree/ChangeState.png", TextureImporterType.GUI);
+            SetTextureImportType("BTree/Concurrent.png", TextureImporterType.GUI);
+            SetTextureImportType("BTree/Loop.png", TextureImporterType.GUI);
+            SetTextureImportType("BTree/Priority.png", TextureImporterType.GUI);
+            SetTextureImportType("BTree/Sequence.png", TextureImporterType.GUI);
+            SetTextureImportType("BTree/Random.png", TextureImporterType.GUI);
+            SetTextureImportType("BTree/Failure.png", TextureImporterType.GUI);
+            SetTextureImportType("BTree/Success.png", TextureImporterType.GUI);
+            SetTextureImportType("BTree/Running.png", TextureImporterType.GUI);
+
+            SetTextureImportType("Matinee/Folder.png", TextureImporterType.GUI);
+            SetTextureImportType("Matinee/Sound.png", TextureImporterType.GUI);
+            SetTextureImportType("Matinee/Event.png", TextureImporterType.GUI);
+            SetTextureImportType("Matinee/Boolean.png", TextureImporterType.GUI);
+            SetTextureImportType("Matinee/Integer.png", TextureImporterType.GUI);
+            SetTextureImportType("Matinee/Float.png", TextureImporterType.GUI);
+            SetTextureImportType("Matinee/Quaternion.png", TextureImporterType.GUI);
+            SetTextureImportType("Matinee/Color.png", TextureImporterType.GUI);
+            SetTextureImportType("Matinee/Vector2.png", TextureImporterType.GUI);
+            SetTextureImportType("Matinee/Vector3.png", TextureImporterType.GUI);
+            SetTextureImportType("Matinee/Vector4.png", TextureImporterType.GUI);
+            SetTextureImportType("Matinee/Animator.png", TextureImporterType.GUI);
+            SetTextureImportType("Matinee/Animation.png", TextureImporterType.GUI);
         }
 
         public static class UITextures
         {
             private static System.Collections.Generic.Dictionary<string, Texture2D> _Textures;
-            private static Texture2D GetTexture(string name)
+            private static Texture2D GetTexture(string textureName)
             {
                 if (_Textures == null) _Textures = new System.Collections.Generic.Dictionary<string, Texture2D>();
                 Texture2D result = null;
-                if (!_Textures.TryGetValue(name, out result))
+                if (!_Textures.TryGetValue(textureName, out result))
                 {
-                    result = AssetDatabase.LoadAssetAtPath(GetUIResourcePath(name), typeof(Texture2D)) as Texture2D;
+                    if (UnityEditor.EditorGUIUtility.isProSkin)
+                        result = AssetDatabase.LoadAssetAtPath(GetUIProSkinResourcePath(textureName), typeof(Texture2D)) as Texture2D;
                     if (result == null)
-                        Debug.LogWarning("Can not load " + name);
+                        result = AssetDatabase.LoadAssetAtPath(GetUILightSkinResourcePath(textureName), typeof(Texture2D)) as Texture2D;
+                    if (result == null)
+                        Debug.LogWarning("Can not load " + textureName);
 
                     if (result != null)
-                        _Textures.Add(name, result);
+                        _Textures.Add(textureName, result);
                 }
                 return result;
             }
 
-            public static Texture2D Condition { get { return GetTexture("Condition.png"); } }
-            public static Texture2D Decorator { get { return GetTexture("Decorator.png"); } }
-            public static Texture2D Action { get { return GetTexture("Action.png"); } }
-            public static Texture2D Failure { get { return GetTexture("Failure.png"); } }
-            public static Texture2D Success { get { return GetTexture("Success.png"); } }
-            public static Texture2D Running { get { return GetTexture("Running.png"); } }
             public static Texture2D Plus { get { return GetTexture("Plus.png"); } }
             public static Texture2D PlusNext { get { return GetTexture("PlusNext.png"); } }
             public static Texture2D Minus { get { return GetTexture("Minus.png"); } }
@@ -122,86 +146,9 @@ namespace Skill.Editor
             public static Texture2D KeyframeSelected { get { return GetTexture("KeyframeSelected.png"); } }
             public static Texture2D KeyframeEmpty { get { return GetTexture("KeyframeEmpty.png"); } }
             public static Texture2D Event { get { return GetTexture("Event.png"); } }
-
             public static Texture2D Key { get { return GetTexture("Key.png"); } }
 
-            #region Color Textures
-            private static Texture2D _Red;
-            public static Texture2D Red
-            {
-                get
-                {
-                    if (_Red == null)
-                        _Red = CreateTexture(Color.red, 2);
-                    return _Red;
-                }
-            }
-            private static Texture2D _Green;
-            public static Texture2D Green
-            {
-                get
-                {
-                    if (_Green == null)
-                        _Green = CreateTexture(Color.green, 2);
-                    return _Green;
-                }
-            }
-
-            private static Texture2D _Blue;
-            public static Texture2D Blue
-            {
-                get
-                {
-                    if (_Blue == null)
-                        _Blue = CreateTexture(Color.blue, 2);
-                    return _Blue;
-                }
-            }
-
-            private static Texture2D _Black;
-            public static Texture2D Black
-            {
-                get
-                {
-                    if (_Black == null)
-                        _Black = CreateTexture(Color.black, 2);
-                    return _Black;
-                }
-            }
-
-            private static Texture2D _White;
-            public static Texture2D White
-            {
-                get
-                {
-                    if (_White == null)
-                        _White = CreateTexture(Color.white, 2);
-                    return _White;
-                }
-            }
-
-            private static Texture2D _Transparent;
-            public static Texture2D Transparent
-            {
-                get
-                {
-                    if (_Transparent == null)
-                        _Transparent = CreateTexture(Color.clear, 2);
-                    return _Transparent;
-                }
-            }
-
-            private static Texture2D _Yellow;
-            public static Texture2D Yellow
-            {
-                get
-                {
-                    if (_Yellow == null)
-                        _Yellow = CreateTexture(Color.yellow, 2);
-                    return _Yellow;
-                }
-            }
-            #endregion
+            
 
             #region Splitter
             private static Texture2D _HorizontalSplitter;
@@ -245,7 +192,6 @@ namespace Skill.Editor
 
             public static Texture2D RecordOn { get { return GetTexture("RecordOn.png"); } }
             public static Texture2D RecordOff { get { return GetTexture("RecordOff.png"); } }
-
             public static Texture2D Play { get { return GetTexture("Play.png"); } }
             public static Texture2D PlayOn { get { return GetTexture("PlayOn.png"); } }
             public static Texture2D Pause { get { return GetTexture("Pause.png"); } }
@@ -256,6 +202,106 @@ namespace Skill.Editor
             public static Texture2D StepBackwardOn { get { return GetTexture("StepBackwardOn.png"); } }
             public static Texture2D Loop { get { return GetTexture("Loop.png"); } }
             public static Texture2D LoopOn { get { return GetTexture("LoopOn.png"); } }
+            #endregion
+
+            #region Colors
+            public static class Colors
+            {
+                private static Texture2D _Red;
+                public static Texture2D Red
+                {
+                    get
+                    {
+                        if (_Red == null)
+                            _Red = CreateTexture(Color.red, 2);
+                        return _Red;
+                    }
+                }
+                private static Texture2D _Green;
+                public static Texture2D Green
+                {
+                    get
+                    {
+                        if (_Green == null)
+                            _Green = CreateTexture(Color.green, 2);
+                        return _Green;
+                    }
+                }
+
+                private static Texture2D _Blue;
+                public static Texture2D Blue
+                {
+                    get
+                    {
+                        if (_Blue == null)
+                            _Blue = CreateTexture(Color.blue, 2);
+                        return _Blue;
+                    }
+                }
+
+                private static Texture2D _Black;
+                public static Texture2D Black
+                {
+                    get
+                    {
+                        if (_Black == null)
+                            _Black = CreateTexture(Color.black, 2);
+                        return _Black;
+                    }
+                }
+
+                private static Texture2D _White;
+                public static Texture2D White
+                {
+                    get
+                    {
+                        if (_White == null)
+                            _White = CreateTexture(Color.white, 2);
+                        return _White;
+                    }
+                }
+
+                private static Texture2D _Transparent;
+                public static Texture2D Transparent
+                {
+                    get
+                    {
+                        if (_Transparent == null)
+                            _Transparent = CreateTexture(Color.clear, 2);
+                        return _Transparent;
+                    }
+                }
+
+                private static Texture2D _Yellow;
+                public static Texture2D Yellow
+                {
+                    get
+                    {
+                        if (_Yellow == null)
+                            _Yellow = CreateTexture(Color.yellow, 2);
+                        return _Yellow;
+                    }
+                }
+            }
+            #endregion
+
+            #region BTree
+            public static class BTree
+            {
+                public static Texture2D Condition { get { return GetTexture("BTree/Condition.png"); } }
+                public static Texture2D Decorator { get { return GetTexture("BTree/Decorator.png"); } }
+                public static Texture2D Action { get { return GetTexture("BTree/Action.png"); } }
+                public static Texture2D AccessLimitDecorator { get { return GetTexture("BTree/AccessLimitDecorator.png"); } }
+                public static Texture2D ChangeState { get { return GetTexture("BTree/ChangeState.png"); } }
+                public static Texture2D Concurrent { get { return GetTexture("BTree/Concurrent.png"); } }
+                public static Texture2D Loop { get { return GetTexture("BTree/Loop.png"); } }
+                public static Texture2D Priority { get { return GetTexture("BTree/Priority.png"); } }
+                public static Texture2D Sequence { get { return GetTexture("BTree/Sequence.png"); } }
+                public static Texture2D Random { get { return GetTexture("BTree/Random.png"); } }
+                public static Texture2D Failure { get { return GetTexture("BTree/Failure.png"); } }
+                public static Texture2D Success { get { return GetTexture("BTree/Success.png"); } }
+                public static Texture2D Running { get { return GetTexture("BTree/Running.png"); } }
+            } 
             #endregion
 
             #region Matinee
@@ -272,7 +318,6 @@ namespace Skill.Editor
                 public static Texture2D Vector2 { get { return GetTexture("Matinee/Vector2.png"); } }
                 public static Texture2D Vector3 { get { return GetTexture("Matinee/Vector3.png"); } }
                 public static Texture2D Vector4 { get { return GetTexture("Matinee/Vector4.png"); } }
-
                 public static Texture2D Animator { get { return GetTexture("Matinee/Animator.png"); } }
                 public static Texture2D Animation { get { return GetTexture("Matinee/Animation.png"); } }
             }
@@ -613,7 +658,7 @@ namespace Skill.Editor
             {
                 get
                 {
-                    if (UnityEditor.EditorGUIUtility.isProSkin) 
+                    if (UnityEditor.EditorGUIUtility.isProSkin)
                         return new Color(1.0f, 0.0f, 1.0f, 1.0f);
                     else
                         return new Color(0.5f, 0.0f, 0.5f, 1.0f);

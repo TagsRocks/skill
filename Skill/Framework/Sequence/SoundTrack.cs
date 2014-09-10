@@ -14,6 +14,12 @@ namespace Skill.Framework.Sequence
         /// <summary> Volume factor </summary>   
         public float VolumeFactor = 1.0f;
 
+        /// <summary> Loop sound </summary>   
+        public bool Loop = false;
+
+        /// <summary> Visualize sound data in Matinee Editor </summary>   
+        public bool Visualize = false;
+
         [ExposeProperty(0, "Play Time", "Time to play audio")]
         public override float FireTime { get { return base.FireTime; } set { base.FireTime = value; } }
 
@@ -22,6 +28,12 @@ namespace Skill.Framework.Sequence
 
         [ExposeProperty(2, "Volume Factor")]
         public float ExVolumeFactor { get { return VolumeFactor; } set { VolumeFactor = value; } }
+
+        [ExposeProperty(3, "Loop")]
+        public bool ExLoop { get { return Loop; } set { Loop = value; } }
+
+        [ExposeProperty(4, "Visualize", "Visualize sound data")]
+        public bool ExVisualize { get { return Visualize; } set { Visualize = value; } }
 
         public override float Length
         {
@@ -36,24 +48,32 @@ namespace Skill.Framework.Sequence
 
         public override void FireEvent()
         {
-            if (Source != null && this.Clip != null)
-            {                
+            if (Source != null)
+            {
+
                 float volume = 1.0f;
                 if (Skill.Framework.Global.Instance != null)
                     volume = Skill.Framework.Global.Instance.Settings.Audio.GetVolume(Category);
                 if (PlayOneShot)
                 {
-                    Source.PlayOneShot(this.Clip, volume * this.VolumeFactor);
+                    if (this.Clip != null)
+                        Source.PlayOneShot(this.Clip, volume * this.VolumeFactor);
                 }
                 else
                 {
                     if (Source.isPlaying)
                         Source.Stop();
+                    Source.volume = volume * this.VolumeFactor;
                     Source.clip = this.Clip;
-                    Source.Play();
+                    if (this.Clip != null)
+                        Source.Play();
                 }
-                if (Audio.AudioSubtitle.Instance != null)
-                    Audio.AudioSubtitle.Instance.Show(this.Clip);
+                Source.loop = this.Loop;
+                if (this.Clip != null)
+                {
+                    if (Audio.AudioSubtitle.Instance != null)
+                        Audio.AudioSubtitle.Instance.Show(this.Clip);
+                }
             }
         }
 

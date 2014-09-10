@@ -53,9 +53,8 @@ namespace Skill.Framework.AI
                 throw new ArgumentException("Invalid state");
 
             if (_CurrentState != null && _CurrentState.Name == destinationState) return;
-
+            if (_NextState != null) return;
             _NextState = null;
-
             if (!_States.TryGetValue(destinationState, out _NextState))
                 throw new ArgumentException("Invalid state");
             Status.Interrupt();
@@ -132,7 +131,7 @@ namespace Skill.Framework.AI
 
             _States = new Dictionary<string, BehaviorTreeState>();
             foreach (var s in States)
-                _States.Add(s.Name, s);            
+                _States.Add(s.Name, s);
             this.Status = new BehaviorTreeStatus(this);
             Reset();
         }
@@ -151,7 +150,7 @@ namespace Skill.Framework.AI
         public void Update()
         {
             Status.Exception = null;
-            if (UpdateTimeInterval > 0)
+            if (UpdateTimeInterval > 0 && _NextState == null)// if state is changed we have to force update and ignore running actions in previous state
             {
                 if (UnityEngine.Time.time < (_LastUpdateTime + UpdateTimeInterval))
                 {
@@ -165,7 +164,7 @@ namespace Skill.Framework.AI
                             if (runningAction.Action.Result != BehaviorResult.Running)
                                 _FinishedActions.Add(runningAction.Action);
                         }
-                        if (_FinishedActions.Count == 0 && _NextState == null) // we does not need to update BehaviorTree
+                        if (_FinishedActions.Count == 0) // we do not need to update BehaviorTree
                         {
                             if (Status.Exception != null)
                             {
@@ -202,6 +201,10 @@ namespace Skill.Framework.AI
 
             if (_NextState != null && _NextState != _CurrentState)
             {
+                foreach (var runningAction in Status.RunningActions)
+                    runningAction.Action.Interrupt();
+                Status.RunningActions.Clear();
+
                 string preState = string.Empty;
                 if (_CurrentState != null)
                 {
@@ -212,6 +215,7 @@ namespace Skill.Framework.AI
                 OnStateChanged(preState, _CurrentState.Name);
             }
             _NextState = null;
+
             Status.Begin();
             CurrentState.Execute(Status);
 
@@ -220,8 +224,7 @@ namespace Skill.Framework.AI
                 UnityEngine.Debug.LogWarning(Status.Exception.ToString());
             }
 
-            CurrentState.ResetBehavior(this.Status);
-
+            CurrentState.ResetBehavior(this.Status);            
             OnUpdated();
         }
 

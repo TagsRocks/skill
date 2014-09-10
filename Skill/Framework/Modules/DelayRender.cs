@@ -16,8 +16,9 @@ namespace Skill.Framework.Modules
         /// <summary>
         /// OnEnable
         /// </summary>
-        protected void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             _StartTW.Begin(Delay);
             if (this.renderer != null)
                 this.renderer.enabled = false;

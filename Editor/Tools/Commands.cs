@@ -136,5 +136,42 @@ namespace Skill.Editor.Tools
 
             Undo.RegisterCreatedObjectUndo(obj, "Create empty GameObject");
         }
+
+
+
+        /// <summary>
+        /// Align camera to selected object
+        /// </summary>
+        public static void AlignMainCameraToSelectedObject()
+        {
+            Transform t = Selection.activeTransform;
+            if (t != null)
+            {
+                if (Camera.main != null)
+                {
+                    Transform cameraT = Camera.main.transform;
+                    Undo.RecordObject(cameraT, "Bring Camera To Selected Object");
+                    cameraT.position = t.position;
+                    cameraT.rotation = t.rotation;
+
+                }
+            }
+        }
+
+        /// <summary>
+        /// Align camera to selected object
+        /// </summary>
+        public static void AlignMainCameraToView()
+        {
+            if (Camera.main != null)
+            {
+                Transform cameraT = Camera.main.transform;
+                Selection.activeTransform = cameraT;
+                Undo.RecordObject(cameraT, "Bring Camera To Selected Object");
+                UnityEditor.SceneView.currentDrawingSceneView.AlignWithView();
+
+            }
+
+        }
     }
 }

@@ -33,8 +33,9 @@ namespace Skill.Framework.Audio
             }
 
         }
-        protected virtual void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             SetVolume();
         }
     }

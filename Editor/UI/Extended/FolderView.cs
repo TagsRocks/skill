@@ -32,6 +32,11 @@ namespace Skill.Editor.UI.Extended
         private void Foldout_StateChanged(object sender, System.EventArgs e)
         {
             OnLayoutChanged();
+            foreach (var item in Controls)
+            {
+                if (item is Panel)
+                    ((Panel)item).Invalidate();
+            }            
         }
 
         /// <summary> OnLayoutChanged </summary>

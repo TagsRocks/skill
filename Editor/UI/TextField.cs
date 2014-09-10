@@ -71,9 +71,7 @@ namespace Skill.Editor.UI
         /// Render TextField
         /// </summary>
         protected override void Render()
-        {
-            string result;
-
+        {            
             if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
 
             if (Style != null)

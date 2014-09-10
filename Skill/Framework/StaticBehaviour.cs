@@ -25,9 +25,17 @@ namespace Skill.Framework
         /// </summary>
         protected virtual void Awake()
         {
-            GetReferences();            
             IsDestroyed = false;
+            GetReferences();                        
             HookEvents();
+        }
+
+        /// <summary>
+        /// This function is called when the object becomes enabled and active.
+        /// </summary>
+        protected virtual void OnEnable()
+        {
+            IsDestroyed = false;
         }
 
         /// <summary>
@@ -71,6 +79,7 @@ namespace Skill.Framework
         public virtual void DestroySelf()
         {            
             Managers.Cache.DestroyCache(this.gameObject);
+            IsDestroyed = true;
         }
     }
 }

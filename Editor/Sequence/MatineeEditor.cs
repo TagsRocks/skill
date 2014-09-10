@@ -27,26 +27,17 @@ namespace Skill.Editor.Sequence
 
         public MatineeEditorWindow()
         {
-            base.wantsMouseMove = true;
+            base.wantsMouseMove = true;            
             base.title = "Matinee Editor";
             base.position = new Rect((Screen.width - 1280) / 2.0f, (Screen.height - 720) / 2.0f, 1280, 720);
             base.minSize = new Vector2(1280 * 0.3f, 720 * 0.3f);
         }
 
-        void OnDestroy()
-        {
-            if (_IsPlaying) Stop();
-            SaveEditorData();
-            Rollback();
-            Clear();
-            _Frame = null;
-        }
-
         // rollback all changes do to preview of editor
         void Rollback()
         {
-            if (_Matinee != null)
-                _Matinee.Rollback();
+            if (Matinee != null)
+                Matinee.Rollback();
         }
 
         void OnGUI()
@@ -167,17 +158,18 @@ namespace Skill.Editor.Sequence
 
         void OnFocus()
         {
-            if (_Matinee == null)
+            if (!EditorApplication.isPlayingOrWillChangePlaymode)
             {
-                if (_Frame != null)
-                    Clear();
+                Undo.undoRedoPerformed += Refresh;
+                FindMatinee();
+                FindSceneMatinees();
+                Refresh();
             }
-            //if (_Frame != null)
-            //    CheckSeleced();
         }
 
         void OnLostFocus()
         {
+            Undo.undoRedoPerformed -= Refresh;
             if (IsAutoKey)
             {
                 foreach (var tb in TrackBars())
@@ -188,40 +180,35 @@ namespace Skill.Editor.Sequence
 
         void OnDisable()
         {
-            if (_IsPlaying) Stop();
-            SaveEditorData();
-            _Frame = null;
-            if (Undo.undoRedoPerformed == Refresh)
-                Undo.undoRedoPerformed = null;
-
-            if (_Instance == this)
-            {
-                _Instance = null;
-            }
-            else if (!this.Equals(_Instance))
-            {
-                throw new System.ApplicationException("_Instance does not equal this");
-            }
+            if (_IsPlaying)
+                Stop();
         }
 
         void OnEnable()
         {
-            Undo.undoRedoPerformed = Refresh;
             _Instance = this;
             _RefreshStyles = true;
-            this.CreateUI();
+            if (_Frame == null)
+                this.CreateUI();
         }
 
-        private void ChangePlayMode()
+        void OnDestroy()
         {
+            if (_IsPlaying) Stop();
+            Rollback();
+            Clear();
+
             _Frame = null;
+            if (_Instance == this)
+                _Instance = null;
+            else if (!this.Equals(_Instance))
+                throw new System.ApplicationException("_Instance does not equal this");
         }
 
         #endregion
 
         #region Variables
-        [SerializeField]
-        private Matinee _Matinee;
+
         private EditorFrame _Frame;
         private TimeLine _TimeLine;
         private Curve.CurveEditor _CurveEditor;
@@ -250,16 +237,44 @@ namespace Skill.Editor.Sequence
             }
         }
 
+
+        [SerializeField]
+        private Matinee _EdittingMatinee;
+
+        [SerializeField]
+        private int _EdittingMatineeId;
+
+        private void FindMatinee()
+        {
+            if (_EdittingMatineeId != 0)
+            {
+                var obj = EditorUtility.InstanceIDToObject(_EdittingMatineeId);
+                if (obj != null)
+                {
+                    if (obj is GameObject)
+                        _EdittingMatinee = ((GameObject)obj).GetComponent<Matinee>();
+                }
+            }
+        }
+
         public Matinee Matinee
         {
-            get { return _Matinee; }
+            get
+            {
+                return _EdittingMatinee;
+            }
             set
             {
-                if (_Matinee != value)
+                if (_EdittingMatinee != value)
                 {
                     Rollback();
                     Clear();
-                    _Matinee = value;
+                    _EdittingMatinee = value;
+                    if (_EdittingMatinee == null)
+                        _EdittingMatineeId = 0;
+                    else
+                        _EdittingMatineeId = _EdittingMatinee.gameObject.GetInstanceID();
+                    UnityEditor.EditorUtility.SetDirty(this);
                 }
                 Refresh();
             }
@@ -602,7 +617,8 @@ namespace Skill.Editor.Sequence
 
         void _SnapTime_OptionChanged(object sender, System.EventArgs e)
         {
-            SetSnap((double)_SnapTime.SelectedOption.UserData);
+            if (_SnapTime.SelectedOption != null)
+                SetSnap((double)_SnapTime.SelectedOption.UserData);
         }
 
 
@@ -611,7 +627,33 @@ namespace Skill.Editor.Sequence
 
         #region MenuBar
 
+        private void FindSceneMatinees()
+        {
+            if (_Frame == null) return;
+            _ItmSceneMatinee.Clear();
+            Matinee[] matinees = GameObject.FindObjectsOfType<Matinee>();
+            if (matinees != null && matinees.Length > 0)
+            {
+                for (int i = 0; i < matinees.Length; i++)
+                {
+                    Skill.Editor.UI.MenuItem item = new UI.MenuItem(matinees[i].gameObject.name);
+                    item.UserData = matinees[i];
+                    item.Click += MatineeItem_Click;
+                    _ItmSceneMatinee.Add(item);
+                }
+            }
+        }
+
+        void MatineeItem_Click(object sender, System.EventArgs e)
+        {
+            Skill.Editor.UI.MenuItem item = (Skill.Editor.UI.MenuItem)sender;
+            if (item != null)
+                Matinee = (Matinee)item.UserData;
+        }
+
         private MenuBar _MenuBar;
+        private Skill.Editor.UI.MenuItem _ItmSceneMatinee;
+        private Skill.Editor.UI.MenuItem _ItmRollBack;
 
         private void CreateMenuBar()
         {
@@ -621,6 +663,9 @@ namespace Skill.Editor.Sequence
             MenuBarItem edit = new MenuBarItem() { Title = "Edit" };
             MenuBarItem view = new MenuBarItem() { Title = "View" };
             MenuBarItem window = new MenuBarItem() { Title = "Window", Width = 54 };
+
+            _ItmSceneMatinee = new UI.MenuItem("Matinees");
+            file.Add(_ItmSceneMatinee);
 
             _MenuBar.Controls.Add(file);
             _MenuBar.Controls.Add(edit);
@@ -632,9 +677,9 @@ namespace Skill.Editor.Sequence
             window.Add(resetLayout);
             resetLayout.Click += resetLayout_Click;
 
-            Skill.Editor.UI.MenuItem mnuRollback = new Skill.Editor.UI.MenuItem("Rollback");
-            edit.Add(mnuRollback);
-            mnuRollback.Click += mnuRollback_Click;
+            _ItmRollBack = new Skill.Editor.UI.MenuItem("Rollback");
+            edit.Add(_ItmRollBack);
+            _ItmRollBack.Click += mnuRollback_Click;
 
         }
 
@@ -649,6 +694,11 @@ namespace Skill.Editor.Sequence
             {
                 _ED.SetDefaultLayout();
                 LoadLayout();
+            }
+            else
+            {
+                _MainGrid.ColumnDefinitions[0].Width = new GridLength(1.0f, GridUnitType.Star); // _CurveTreeView, _TracksTreeView and _PropertyGrid                
+                _MainGrid.ColumnDefinitions[2].Width = new GridLength(2.0f, GridUnitType.Star); // _TimeLine  and _CurveEditor
             }
         }
         #endregion
@@ -701,15 +751,22 @@ namespace Skill.Editor.Sequence
             }
         }
 
+        private void SetEnable(bool enable)
+        {
+            _MainGrid.IsEnabled = enable;
+            _ToolbarPanel.IsEnabled = enable;
+            _ItmRollBack.IsEnabled = enable;
+        }
+
         // refresh editor data to to changes happened to matinee outside of MatineeEditor
         private void Refresh()
         {
             if (_Frame != null)
             {
-                if (_Matinee == null)
+                if (Matinee == null)
                 {
                     Clear();
-                    _Frame.Grid.IsEnabled = false;
+                    SetEnable(false);
                 }
                 else
                 {
@@ -721,7 +778,7 @@ namespace Skill.Editor.Sequence
                         if (bt.IsEditingCurves)
                             EditCurve(bt);
                     }
-                    _Frame.Grid.IsEnabled = true;
+                    SetEnable(true);
                 }
             }
         }
@@ -729,7 +786,7 @@ namespace Skill.Editor.Sequence
         // load timeline state from matinee
         private void LoadEditorData()
         {
-            if (_Matinee != null)
+            if (Matinee != null)
             {
                 _TimeLine.MaxTime = EditorData.MaxTime;
                 _TimeLine.StartVisible = EditorData.StartVisible;
@@ -738,6 +795,7 @@ namespace Skill.Editor.Sequence
                 _TimeLine.SelectTime(EditorData.StartSelection, EditorData.EndSelection);
 
                 _SnapTime.SelectedValue = (int)EditorData.Snap;
+                _SnapTimeBeforePlay = _SnapTime.SelectedValue;
                 _Fps.SelectedValue = (int)EditorData.Fps;
                 _PlaybackSpeed.SelectedValue = (int)EditorData.PlaybackSpeed;
 
@@ -759,7 +817,7 @@ namespace Skill.Editor.Sequence
         // save timeline state to matinee
         private void SaveEditorData()
         {
-            if (_Matinee != null)
+            if (Matinee != null)
             {
                 EditorData.MaxTime = (float)_TimeLine.MaxTime;
                 EditorData.StartVisible = (float)_TimeLine.StartVisible;
@@ -777,7 +835,7 @@ namespace Skill.Editor.Sequence
 
                 SaveLayout();
 
-                EditorUtility.SetDirty(_Matinee);
+                EditorUtility.SetDirty(Matinee);
             }
         }
 
@@ -797,7 +855,7 @@ namespace Skill.Editor.Sequence
                 if (_ED == null)
                     _ED = new MatineeEditorData();
 
-                _ED.Matinee = _Matinee;
+                _ED.Matinee = Matinee;
                 return _ED;
             }
         }
@@ -892,6 +950,7 @@ namespace Skill.Editor.Sequence
 
         #region Playback
 
+        private float _PlayStartOffset;
         private float _PlayStartTime;
         private float _DeltaTime;// delta time since last playback update
         private float _ContinuousPlayTime; // playback time
@@ -916,7 +975,7 @@ namespace Skill.Editor.Sequence
         {
             float speed = (float)_PlaybackSpeed.SelectedValue / 100.0f;
             _DeltaTime += stepTime;
-            _ContinuousPlayTime = (Time.realtimeSinceStartup - _PlayStartTime) * speed;
+            _ContinuousPlayTime = _PlayStartOffset + (Time.realtimeSinceStartup - _PlayStartTime) * speed;
             float fpsTime = 1.0f / _Fps.SelectedValue;
             if (_DeltaTime >= fpsTime) // if we reach fpsTime after last step
             {
@@ -1005,7 +1064,7 @@ namespace Skill.Editor.Sequence
 
         private void UpdatePlayback()
         {
-            if (_Matinee != null)
+            if (Matinee != null)
             {
                 if (_IsPlaying)
                 {
@@ -1061,6 +1120,7 @@ namespace Skill.Editor.Sequence
             else
                 _PlayTime = (float)_TimeLine.TimePosition; // we must start at position of timeline selected by user
             _DeltaTime = 0;
+            _PlayStartOffset = (float)_TimeLine.TimePosition;
             _PlayStartTime = Time.realtimeSinceStartup;
             foreach (var t in Tracks())
             {
@@ -1074,7 +1134,7 @@ namespace Skill.Editor.Sequence
         // play or resume playback
         private void Play()
         {
-            if (_Matinee == null) return;
+            if (Matinee == null) return;
             if (!_IsPlaying)
             {
                 StartPlayback();
@@ -1091,7 +1151,7 @@ namespace Skill.Editor.Sequence
         // stop playback and restore data
         private void Stop()
         {
-            if (_Matinee == null) return;
+            if (Matinee == null) return;
             _IsPlaying = false;
             _IsPause = false;
             UpdatePlayButtonsState(false); // update state of playback buttons
@@ -1108,7 +1168,7 @@ namespace Skill.Editor.Sequence
         // pause playback
         private void Pause()
         {
-            if (_Matinee == null) return;
+            if (Matinee == null) return;
             _IsPause = true;
             SetStepEnable();// enable step buttons
             _StepForward = 0;

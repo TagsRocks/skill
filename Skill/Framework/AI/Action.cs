@@ -154,6 +154,15 @@ namespace Skill.Framework.AI
             }
         }
 
+        internal void Interrupt()
+        {
+            if (Result == BehaviorResult.Running)
+            {
+                OnReset();
+                Result = BehaviorResult.Failure;
+            }
+        }
+
 
         /// <summary>
         /// for internal use when behavior tree let action continue (when result is BehaviorResult.Running)

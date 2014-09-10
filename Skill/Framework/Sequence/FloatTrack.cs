@@ -20,7 +20,7 @@ namespace Skill.Framework.Sequence
 
         [SerializeField]
         [HideInInspector]
-        [CurveEditor(1, 0, 1, "Value")]
+        [CurveEditor(0, 1, 1, "Value")]
         public AnimationCurve Curve;
 
 
