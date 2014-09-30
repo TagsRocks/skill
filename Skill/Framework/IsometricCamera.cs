@@ -47,7 +47,7 @@ namespace Skill.Framework
 
         /// <summary> Position of cursur in world on CursorPlane </summary>
         public Vector3 CursorPlanePosition { get; private set; }
-        
+
         /// <summary> Position of cursur in world </summary>
         public Vector3 RaycastWorldPosition { get; private set; }
         /// <summary> Screen forward direction</summary>
@@ -191,6 +191,8 @@ namespace Skill.Framework
                 RaycastHit hit;
                 if (Physics.Raycast(CursorScreenRay, out hit, float.MaxValue, this.WorldRayastLayerMask.value))
                     RaycastWorldPosition = hit.point;
+                else
+                    RaycastWorldPosition = CursorScreenRay.origin + (CursorScreenRay.direction * Camera.farClipPlane);
             }
             base.Update();
         }
@@ -231,7 +233,7 @@ namespace Skill.Framework
             {
                 UpdateScreenSpace();
 
-                _MovementPlane.distance = -Target.position.y + CursorPlaneHeight;                
+                _MovementPlane.distance = -Target.position.y + CursorPlaneHeight;
 
                 Vector3 pos;
                 // Find out where the mouse ray intersects with the movement plane of the player                

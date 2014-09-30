@@ -8,11 +8,10 @@ using UnityEngine;
 
 namespace Skill.Editor.Tools
 {
-    class SpawnObjectField : EditorControl
+    class SpawnObjectField : Grid
     {
-        private Grid _Panel;
         private ObjectField<GameObject> _PrefabField;
-        private Skill.Editor.UI.Slider _WeightField;        
+        private Skill.Editor.UI.Slider _WeightField;
         private Skill.Framework.UI.Box _Background;
 
         private Skill.Framework.SpawnObject _Object;
@@ -36,18 +35,7 @@ namespace Skill.Editor.Tools
                 }
             }
         }
-        public SpawnAssetEditor Editor { get; private set; }        
-
-        public override float LayoutHeight
-        {
-            get
-            {
-                if (Visibility != Skill.Framework.UI.Visibility.Collapsed)
-                    return _PrefabField.LayoutHeight + _PrefabField.Margin.Vertical +
-                           _WeightField.LayoutHeight + _WeightField.Margin.Vertical + 2;
-                return base.LayoutHeight;
-            }
-        }
+        public SpawnAssetEditor Editor { get; private set; }
 
         public SpawnObjectField(SpawnAssetEditor editor)
         {
@@ -61,21 +49,22 @@ namespace Skill.Editor.Tools
 
             this._Background = new Framework.UI.Box() { Row = 0, Column = 0, RowSpan = 3, ColumnSpan = 2 };
 
-            this._Panel = new Grid() { Parent = this , Padding = new Thickness(2) };
-            this._Panel.RowDefinitions.Add(1, GridUnitType.Star);
-            this._Panel.RowDefinitions.Add(1, GridUnitType.Star);
-            this._Panel.ColumnDefinitions.Add(1, GridUnitType.Star);            
+            this.Padding = new Thickness(2);
+            this.RowDefinitions.Add(1, GridUnitType.Star);
+            this.RowDefinitions.Add(1, GridUnitType.Star);
+            this.ColumnDefinitions.Add(1, GridUnitType.Star);
 
-            this._Panel.Controls.Add(_Background);
-            this._Panel.Controls.Add(_PrefabField);
-            this._Panel.Controls.Add(_WeightField);            
+            this.Controls.Add(_Background);
+            this.Controls.Add(_PrefabField);
+            this.Controls.Add(_WeightField);
 
             this._WeightField.ValueChanged += new EventHandler(_WeightField_ValueChanged);
             this._PrefabField.ObjectChanged += new EventHandler(_PrefabField_ObjectChanged);
-            this._Panel.LayoutChanged += Panel_LayoutChanged;
 
             this.Object = null;
-        }       
+            this.Height = _PrefabField.LayoutHeight + _PrefabField.Margin.Vertical +
+                           _WeightField.LayoutHeight + _WeightField.Margin.Vertical + 2;
+        }
 
         void _PrefabField_ObjectChanged(object sender, EventArgs e)
         {
@@ -88,19 +77,9 @@ namespace Skill.Editor.Tools
             if (_Object != null) _Object.Weight = _WeightField.Value;
         }
 
-        protected override void OnRenderAreaChanged()
-        {
-            this._Panel.RenderArea = RenderArea;
-        }
-
         private void Panel_LayoutChanged(object sender, EventArgs e)
         {
             OnLayoutChanged();
-        }
-
-        protected override void Render()
-        {
-            this._Panel.OnGUI();
         }
     }
 }

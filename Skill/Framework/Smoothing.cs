@@ -40,12 +40,13 @@ namespace Skill.Framework
 
         private float _CurrentVelocity;
         private float _Current;
+        private float _Target;
 
         /// <summary> Last result of call Update function </summary>
         public float Current { get { return _Current; } set { _Current = value; _CurrentVelocity = 0; } }
 
-        /// <summary> The position we are trying to reach. </summary>
-        public float Target { get; set; }
+        /// <summary> The value we are trying to reach. </summary>
+        public float Target { get { return _Target; } set { _Target = value; } }
 
         /// <summary>
         /// Update one step and return result
@@ -59,13 +60,14 @@ namespace Skill.Framework
                 switch (sp.SmoothType)
                 {
                     case SmoothType.Damp:
-                        _Current = Mathf.SmoothDamp(_Current, Target, ref _CurrentVelocity, sp.SmoothTime);
+                        _Current = Mathf.SmoothDamp(_Current, _Target, ref _CurrentVelocity, sp.SmoothTime);
                         break;
                     case SmoothType.DampSpeed:
-                        _Current = Mathf.SmoothDamp(_Current, Target, ref _CurrentVelocity, sp.SmoothTime, sp.MaxSpeed);
+                        _Current = Mathf.SmoothDamp(_Current, _Target, ref _CurrentVelocity, sp.SmoothTime, sp.MaxSpeed);
                         break;
                     case SmoothType.DampSpeedAndTime:
-                        _Current = Mathf.SmoothDamp(_Current, Target, ref _CurrentVelocity, sp.SmoothTime, sp.MaxSpeed, Time.deltaTime * sp.DeltaTimeFactor);
+                        float time = Time.deltaTime * sp.DeltaTimeFactor;
+                        _Current = Mathf.SmoothDamp(_Current, _Target, ref _CurrentVelocity, sp.SmoothTime, sp.MaxSpeed, time);
                         break;
                 }
             }
@@ -78,7 +80,7 @@ namespace Skill.Framework
         /// <param name="value">Value</param>
         public void Reset(float value)
         {
-            Target = value;
+            _Target = value;
             _Current = value;
             _CurrentVelocity = 0;
         }
@@ -112,16 +114,19 @@ namespace Skill.Framework
                 switch (sp.SmoothType)
                 {
                     case SmoothType.Damp:
-                        _CurrentAngle = Mathf.SmoothDampAngle(_CurrentAngle, TargetAngle, ref _CurrentAngleVelocity, sp.SmoothTime);
+                        _CurrentAngle = Mathf.SmoothDampAngle(_CurrentAngle, _TargetAngle, ref _CurrentAngleVelocity, sp.SmoothTime);
                         break;
                     case SmoothType.DampSpeed:
-                        _CurrentAngle = Mathf.SmoothDampAngle(_CurrentAngle, TargetAngle, ref _CurrentAngleVelocity, sp.SmoothTime, sp.MaxSpeed);
+                        _CurrentAngle = Mathf.SmoothDampAngle(_CurrentAngle, _TargetAngle, ref _CurrentAngleVelocity, sp.SmoothTime, sp.MaxSpeed);
                         break;
                     case SmoothType.DampSpeedAndTime:
-                        _CurrentAngle = Mathf.SmoothDampAngle(_CurrentAngle, TargetAngle, ref _CurrentAngleVelocity, sp.SmoothTime, sp.MaxSpeed, Time.deltaTime * sp.DeltaTimeFactor);
+                        float time = Time.deltaTime * sp.DeltaTimeFactor;
+                        _CurrentAngle = Mathf.SmoothDampAngle(_CurrentAngle, _TargetAngle, ref _CurrentAngleVelocity, sp.SmoothTime, sp.MaxSpeed, time);
                         break;
                 }
             }
+
+            _CurrentAngle = MathHelper.ClampAngle(_CurrentAngle);
             return _CurrentAngle;
         }
 
@@ -131,26 +136,27 @@ namespace Skill.Framework
         /// <param name="value">Value</param>
         public void Reset(float value)
         {
-            TargetAngle = value;
+            _TargetAngle = MathHelper.ClampAngle(value);
             _CurrentAngle = value;
             _CurrentAngleVelocity = 0;
         }
     }
 
     /// <summary>
-    /// Simplify using Mathf.SmoothDamp for two value
+    /// Simplify using Mathf.SmoothDamp for 2 value
     /// </summary>
     public struct Smoothing2D
     {
 
         private Vector2 _CurrentVelocity;
         private Vector2 _Current;
+        private Vector2 _Target;
 
         /// <summary> Last result of call Update function </summary>
         public Vector2 Current { get { return _Current; } set { _Current = value; _CurrentVelocity = Vector2.zero; } }
 
-        /// <summary> The position we are trying to reach. </summary>
-        public Vector2 Target { get; set; }
+        /// <summary> The value we are trying to reach. </summary>
+        public Vector2 Target { get { return _Target; } set { _Target = value; } }
 
         /// <summary>
         /// Update one step and return result
@@ -164,16 +170,17 @@ namespace Skill.Framework
                 switch (sp.SmoothType)
                 {
                     case SmoothType.Damp:
-                        _Current.x = Mathf.SmoothDamp(_Current.x, Target.x, ref _CurrentVelocity.x, sp.SmoothTime);
-                        _Current.y = Mathf.SmoothDamp(_Current.y, Target.y, ref _CurrentVelocity.y, sp.SmoothTime);
+                        _Current.x = Mathf.SmoothDamp(_Current.x, _Target.x, ref _CurrentVelocity.x, sp.SmoothTime);
+                        _Current.y = Mathf.SmoothDamp(_Current.y, _Target.y, ref _CurrentVelocity.y, sp.SmoothTime);
                         break;
                     case SmoothType.DampSpeed:
-                        _Current.x = Mathf.SmoothDamp(_Current.x, Target.x, ref _CurrentVelocity.x, sp.SmoothTime, sp.MaxSpeed);
-                        _Current.y = Mathf.SmoothDamp(_Current.y, Target.y, ref _CurrentVelocity.y, sp.SmoothTime, sp.MaxSpeed);
+                        _Current.x = Mathf.SmoothDamp(_Current.x, _Target.x, ref _CurrentVelocity.x, sp.SmoothTime, sp.MaxSpeed);
+                        _Current.y = Mathf.SmoothDamp(_Current.y, _Target.y, ref _CurrentVelocity.y, sp.SmoothTime, sp.MaxSpeed);
                         break;
                     case SmoothType.DampSpeedAndTime:
-                        _Current.x = Mathf.SmoothDamp(_Current.x, Target.x, ref _CurrentVelocity.x, sp.SmoothTime, sp.MaxSpeed, Time.deltaTime * sp.DeltaTimeFactor);
-                        _Current.y = Mathf.SmoothDamp(_Current.y, Target.y, ref _CurrentVelocity.y, sp.SmoothTime, sp.MaxSpeed, Time.deltaTime * sp.DeltaTimeFactor);
+                        float time = Time.deltaTime * sp.DeltaTimeFactor;
+                        _Current.x = Mathf.SmoothDamp(_Current.x, _Target.x, ref _CurrentVelocity.x, sp.SmoothTime, sp.MaxSpeed, time);
+                        _Current.y = Mathf.SmoothDamp(_Current.y, _Target.y, ref _CurrentVelocity.y, sp.SmoothTime, sp.MaxSpeed, time);
                         break;
                 }
             }
@@ -186,25 +193,26 @@ namespace Skill.Framework
         /// <param name="value">Value</param>
         public void Reset(Vector2 value)
         {
-            Target = value;
+            _Target = value;
             _Current = value;
             _CurrentVelocity = Vector2.zero;
         }
     }
 
     /// <summary>
-    /// Simplify using Mathf.SmoothDamp for two value
+    /// Simplify using Mathf.SmoothDamp for 3 value
     /// </summary>
     public struct Smoothing3D
     {
         private Vector3 _CurrentVelocity;
         private Vector3 _Current;
+        private Vector3 _Target;
 
         /// <summary> Last result of call Update function </summary>
         public Vector3 Current { get { return _Current; } set { _Current = value; _CurrentVelocity = Vector3.zero; } }
 
-        /// <summary> The position we are trying to reach. </summary>
-        public Vector3 Target { get; set; }
+        /// <summary> The value we are trying to reach. </summary>
+        public Vector3 Target { get { return _Target; } set { _Target = value; } }
 
         /// <summary>
         /// Update one step and return result
@@ -218,13 +226,14 @@ namespace Skill.Framework
                 switch (sp.SmoothType)
                 {
                     case SmoothType.Damp:
-                        _Current = Vector3.SmoothDamp(_Current, Target, ref _CurrentVelocity, sp.SmoothTime);
+                        _Current = Vector3.SmoothDamp(_Current, _Target, ref _CurrentVelocity, sp.SmoothTime);
                         break;
                     case SmoothType.DampSpeed:
-                        _Current = Vector3.SmoothDamp(_Current, Target, ref _CurrentVelocity, sp.SmoothTime, sp.MaxSpeed);
+                        _Current = Vector3.SmoothDamp(_Current, _Target, ref _CurrentVelocity, sp.SmoothTime, sp.MaxSpeed);
                         break;
                     case SmoothType.DampSpeedAndTime:
-                        _Current = Vector3.SmoothDamp(_Current, Target, ref _CurrentVelocity, sp.SmoothTime, sp.MaxSpeed, Time.deltaTime * sp.DeltaTimeFactor);
+                        float time = Time.deltaTime * sp.DeltaTimeFactor;
+                        _Current = Vector3.SmoothDamp(_Current, _Target, ref _CurrentVelocity, sp.SmoothTime, sp.MaxSpeed, time);
                         break;
                 }
             }
@@ -237,9 +246,71 @@ namespace Skill.Framework
         /// <param name="value">Value</param>
         public void Reset(Vector3 value)
         {
-            Target = value;
+            _Target = value;
             _Current = value;
             _CurrentVelocity = Vector3.zero;
+        }
+    }
+
+    /// <summary>
+    /// Simplify using Mathf.SmoothDamp for 4 value
+    /// </summary>
+    public struct Smoothing4D
+    {
+        private Vector4 _CurrentVelocity;
+        private Vector4 _Current;
+        private Vector4 _Target;
+
+        /// <summary> Last result of call Update function </summary>
+        public Vector4 Current { get { return _Current; } set { _Current = value; _CurrentVelocity = Vector3.zero; } }
+
+        /// <summary> The value we are trying to reach. </summary>
+        public Vector4 Target { get { return _Target; } set { _Target = value; } }
+
+        /// <summary>
+        /// Update one step and return result
+        /// </summary>
+        /// <param name="sp">Parameters of Smoothing ( can be modified in inspector)</param>
+        /// <returns>Smooth result</returns>
+        public Vector4 Update(SmoothingParameters sp)
+        {
+            if (_Current != Target)
+            {
+                switch (sp.SmoothType)
+                {
+                    case SmoothType.Damp:
+                        _Current.x = Mathf.SmoothDamp(_Current.x, _Target.x, ref _CurrentVelocity.x, sp.SmoothTime);
+                        _Current.y = Mathf.SmoothDamp(_Current.y, _Target.y, ref _CurrentVelocity.x, sp.SmoothTime);
+                        _Current.z = Mathf.SmoothDamp(_Current.z, _Target.z, ref _CurrentVelocity.x, sp.SmoothTime);
+                        _Current.w = Mathf.SmoothDamp(_Current.w, _Target.w, ref _CurrentVelocity.x, sp.SmoothTime);
+                        break;
+                    case SmoothType.DampSpeed:
+                        _Current.x = Mathf.SmoothDamp(_Current.x, _Target.x, ref _CurrentVelocity.x, sp.SmoothTime, sp.MaxSpeed);
+                        _Current.y = Mathf.SmoothDamp(_Current.y, _Target.y, ref _CurrentVelocity.x, sp.SmoothTime, sp.MaxSpeed);
+                        _Current.z = Mathf.SmoothDamp(_Current.z, _Target.z, ref _CurrentVelocity.x, sp.SmoothTime, sp.MaxSpeed);
+                        _Current.w = Mathf.SmoothDamp(_Current.w, _Target.w, ref _CurrentVelocity.x, sp.SmoothTime, sp.MaxSpeed);
+                        break;
+                    case SmoothType.DampSpeedAndTime:
+                        float time = Time.deltaTime * sp.DeltaTimeFactor;
+                        _Current.x = Mathf.SmoothDamp(_Current.x, _Target.x, ref _CurrentVelocity.x, sp.SmoothTime, sp.MaxSpeed, time);
+                        _Current.y = Mathf.SmoothDamp(_Current.y, _Target.y, ref _CurrentVelocity.x, sp.SmoothTime, sp.MaxSpeed, time);
+                        _Current.z = Mathf.SmoothDamp(_Current.z, _Target.z, ref _CurrentVelocity.x, sp.SmoothTime, sp.MaxSpeed, time);
+                        _Current.w = Mathf.SmoothDamp(_Current.w, _Target.w, ref _CurrentVelocity.x, sp.SmoothTime, sp.MaxSpeed, time);
+                        break;
+                }
+            }
+            return _Current;
+        }
+
+        /// <summary>
+        /// Reset current and target
+        /// </summary>
+        /// <param name="value">Value</param>
+        public void Reset(Vector4 value)
+        {
+            _Target = value;
+            _Current = value;
+            _CurrentVelocity = Vector4.zero;
         }
     }
 

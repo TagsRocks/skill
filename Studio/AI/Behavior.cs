@@ -654,11 +654,11 @@ namespace Skill.Studio.AI
             }
 
             // ignore it if already have this child. check actual model do to duplication
-            if (Contains(child.Model))
-            {
-                message = "Already contains this child";
-                return false;
-            }
+            //if (Contains(child.Model))
+            //{
+            //    message = "Already contains this child";
+            //    return false;
+            //}
 
             // check to prevent loop in hierarchy. if a node be twise in hierarchy cause too loop in tree
             if (CheckAddCauseLoop(child))

@@ -80,6 +80,7 @@
     <Compile Include="Framework\FreeCamera.cs" />
     <Compile Include="Framework\DrawGizmo.cs" />
     <Compile Include="Framework\GizmosHelper.cs" />
+    <Compile Include="Framework\LerpSmoothing.cs" />
     <Compile Include="Framework\LevelLoadManager.cs" />
     <Compile Include="Framework\Modules\BatchMesh.cs" />
     <Compile Include="Framework\Modules\ChildCounter.cs" />
@@ -108,6 +109,7 @@
     <Compile Include="Framework\Sequence\Vector3Track.cs" />
     <Compile Include="Framework\Sequence\Vector4Track.cs" />
     <Compile Include="Framework\Subtitle.cs" />
+    <Compile Include="Framework\Text\Persian.cs" />
     <Compile Include="Framework\Triggers\ActivateTrigger.cs" />
     <Compile Include="Framework\Triggers\IsometricCameraTrigger.cs" />
     <Compile Include="Framework\Triggers\IsometricCameraMotionTrigger.cs" />
@@ -242,6 +244,7 @@
     <Compile Include="Framework\UI\UICommand.cs" />
     <Compile Include="Framework\UI\UIEvent.cs" />
     <Compile Include="Framework\IO\XmlElement.cs" />
+    <Compile Include="Framework\Utility.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Framework\Controller.cs" />
     <Compile Include="Framework\Managers\Cache.cs" />

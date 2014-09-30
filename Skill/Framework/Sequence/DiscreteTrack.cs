@@ -111,7 +111,7 @@ namespace Skill.Framework.Sequence
         {
             if (PropertyKeys != null && PropertyKeys.Length > 1)
             {
-                Skill.Framework.MathHelper.QuickSort(PropertyKeys, new TrackKeyComparer<IPropertyKey<V>>());
+                Skill.Framework.Utility.QuickSort(PropertyKeys, new TrackKeyComparer<IPropertyKey<V>>());
             }
         }
 

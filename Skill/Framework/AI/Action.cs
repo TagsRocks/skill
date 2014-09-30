@@ -151,7 +151,7 @@ namespace Skill.Framework.AI
                         base.ResetBehavior(status);
                     }
                 }
-            }
+            }            
         }
 
         internal void Interrupt()
@@ -161,6 +161,7 @@ namespace Skill.Framework.AI
                 OnReset();
                 Result = BehaviorResult.Failure;
             }
+            IsBegined = false;
         }
 
 

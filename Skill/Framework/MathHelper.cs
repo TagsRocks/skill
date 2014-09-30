@@ -47,6 +47,28 @@ namespace Skill.Framework
             return angle;
         }
 
+        /// <summary>
+        /// Calc vertical angle rotation relative to -y axis
+        /// </summary>
+        /// <param name="y">Direction.y</param>
+        /// <param name="z">Direction.z</param>
+        /// <returns>Angle</returns>
+        public static float VerticalAngle(float y, float z)
+        {
+            float angle = Mathf.Atan2(z, -y) * Mathf.Rad2Deg;
+            ClampAngle(ref angle);
+            return angle;
+        }
+
+        /// <summary>
+        /// Calc vertical angle rotation relative to -y axis
+        /// </summary>
+        /// <param name="direction">Direction</param>
+        /// <returns>Angle</returns>
+        public static float VerticalAngle(Vector3 direction)
+        {
+            return VerticalAngle(direction.y, direction.z);
+        }
 
         /// <summary>
         /// Keep angle between -180 to 180
@@ -101,56 +123,6 @@ namespace Skill.Framework
             return mps * 3.6f;
         }
 
-        /// <summary>
-        /// Sort array
-        /// </summary>
-        /// <typeparam name="T">Type of array</typeparam>
-        /// <param name="array">Array to sort</param>
-        /// <param name="comparer">Comparer to compare items</param>
-        public static void QuickSort<T>(T[] array, IComparer<T> comparer)
-        {
-            if (array == null)
-                throw new ArgumentNullException("Array is null");
-            if (comparer == null)
-                throw new ArgumentNullException("Comparer is null");
-            if (array.Length > 1)
-                QuickSort(array, 0, array.Length - 1, comparer);
-        }
-
-        private static void QuickSort<T>(T[] array, int left, int right, IComparer<T> comparer)
-        {
-            if (right <= left) return;
-            int pivot = QuickSortPartition2(array, left, right, comparer);
-            QuickSort(array, left, pivot - 1, comparer);
-            QuickSort(array, pivot + 1, right, comparer);
-
-        }
-
-        private static int QuickSortPartition2<T>(T[] array, int left, int right, IComparer<T> comparer)
-        {
-            T pivot = array[left];
-            while (left < right)
-            {
-                while ((left < right) && comparer.Compare(array[right], pivot) > 0) --right;
-                if (left < right)
-                {
-                    array[left] = array[right];
-                    ++left;
-                }
-
-                while ((left < right) && comparer.Compare(array[left], pivot) < 0) ++left;
-                if (left < right)
-                {
-                    array[right] = array[left];
-                    --right;
-                }
-            }
-            array[left] = pivot;
-            return left;
-
-        }
-
-
 
         /// <summary>
         /// calc projection of a point on a line
@@ -162,6 +134,24 @@ namespace Skill.Framework
         public static Vector3 ProjectPointOnLine(Vector3 point, Vector3 lineStart, Vector3 lineDirection)
         {
             return Vector3.Project((point - lineStart), lineDirection) + lineStart;
+        }
+
+        /// <summary>
+        /// returns a point which is a projection from a point to a plane.
+        /// </summary>
+        /// <param name="plane">Plane</param>
+        /// <param name="point">Point</param>
+        /// <returns>Projection of point on plane</returns>
+        public static Vector3 ProjectPointOnPlane(Plane plane, Vector3 point)
+        {
+            //First calculate the distance from the point to the plane:
+            float distance = plane.GetDistanceToPoint(point);
+
+            //Reverse the sign of the distance
+            distance *= -1;
+
+            //Translate the point to form a projection
+            return point + plane.normal * distance;
         }
 
         /// <summary>
@@ -225,6 +215,16 @@ namespace Skill.Framework
         public static float FrustumWidthAtDistance(Camera camera, float distance)
         {
             return FrustumHeightAtDistance(camera, distance) * camera.aspect;
+        }
+
+        /// <summary>
+        /// Calculate width of orthogonal camera
+        /// </summary>
+        /// <param name="camera">orthogonal camera</param>
+        /// <returns> width of camera</returns>
+        public static float OrthographicWidth(Camera camera)
+        {
+            return camera.orthographicSize * Screen.width / Screen.height * 2;
         }
 
 
@@ -308,7 +308,7 @@ namespace Skill.Framework
             Vector2 v11 = new Vector2(v1.x, v1.z);
             Vector2 v22 = new Vector2(v2.x, v2.z);
             return Vector2.Angle(v11, v22);
-        }           
+        }
 
     }
 }

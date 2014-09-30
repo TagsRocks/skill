@@ -165,7 +165,7 @@ namespace Skill.Framework.Sequence
         public override void SortKeys()
         {
             if (Keys != null && Keys.Length > 1)
-                Skill.Framework.MathHelper.QuickSort(Keys, new TrackKeyComparer<EventOrientedKey>());
+                Skill.Framework.Utility.QuickSort(Keys, new TrackKeyComparer<EventOrientedKey>());
         }
         public override void Stop() { }
 

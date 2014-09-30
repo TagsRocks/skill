@@ -199,17 +199,20 @@ namespace Skill.Studio.Compiler
                                             AddWarning(string.Format("Decorator '{0}' with 'NeverFail' property setted to 'true' is child of ConcurrentSelector '{1}' width 'SuccessPolicy' property setted to 'SucceedOnOne' . This cause ConcurrentSelector never fail.", child.Name, b.Name));
                                     }
                                 }
-                            }                            
+                            }
                         }
                     }
 
-                    foreach (var child in composite)
+                    if (composite.CompositeType != CompositeType.Random)
                     {
-                        if (child != null && child.BehaviorType == BehaviorType.ChangeState)
+                        foreach (var child in composite)
                         {
-                            int index = composite.IndexOf(child);
-                            if (index < composite.Count - 1)
-                                AddWarning(string.Format("There are unreachable behaviors in Composite '{0}', after ChangeState '{1}'", composite.Name, child.Name));
+                            if (child != null && child.BehaviorType == BehaviorType.ChangeState)
+                            {
+                                int index = composite.IndexOf(child);
+                                if (index < composite.Count - 1)
+                                    AddWarning(string.Format("There are unreachable behaviors in Composite '{0}', after ChangeState '{1}'", composite.Name, child.Name));
+                            }
                         }
                     }
                 }

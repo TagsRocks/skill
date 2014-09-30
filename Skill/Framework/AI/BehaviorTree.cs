@@ -115,6 +115,9 @@ namespace Skill.Framework.AI
             }
         }
 
+        /// <summary> Let subclass initialize </summary>
+        protected virtual void Initialize() { }
+
         /// <summary>
         /// Create an instance of BehaviorTree
         /// </summary>
@@ -134,6 +137,7 @@ namespace Skill.Framework.AI
                 _States.Add(s.Name, s);
             this.Status = new BehaviorTreeStatus(this);
             Reset();
+            Initialize();
         }
 
         /// <summary> Occurs when Behavior Tree updated </summary>
@@ -224,7 +228,7 @@ namespace Skill.Framework.AI
                 UnityEngine.Debug.LogWarning(Status.Exception.ToString());
             }
 
-            CurrentState.ResetBehavior(this.Status);            
+            CurrentState.ResetBehavior(this.Status);
             OnUpdated();
         }
 

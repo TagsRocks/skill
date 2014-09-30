@@ -8,10 +8,9 @@ namespace Skill.Editor.UI.Extended
     /// <summary>
     /// Make three ToggleButtons for X,Y and Z
     /// </summary>
-    public class XYZComponent : Skill.Editor.UI.EditorControl
+    public class XYZComponent : Skill.Framework.UI.StackPanel
     {
 
-        private Skill.Framework.UI.StackPanel _Panel;
         private Skill.Framework.UI.ToggleButton _TbX, _TbY, _TbZ;
 
         /// <summary> Retrieves ToggleButton used for X component </summary>
@@ -34,7 +33,7 @@ namespace Skill.Editor.UI.Extended
         public XYZComponent()
         {
             this.Height = 16;
-            this._Panel = new Skill.Framework.UI.StackPanel() { Orientation = Skill.Framework.UI.Orientation.Horizontal, Parent = this };
+            this.Orientation = Skill.Framework.UI.Orientation.Horizontal;
 
             this._TbX = new Skill.Framework.UI.ToggleButton() { Margin = new Skill.Framework.UI.Thickness(2, 0, 0, 0), Width = 30 };
             this._TbX.Content.text = "X";
@@ -45,28 +44,10 @@ namespace Skill.Editor.UI.Extended
             this._TbZ = new Skill.Framework.UI.ToggleButton() { Margin = new Skill.Framework.UI.Thickness(2, 0, 0, 0), Width = 30 };
             this._TbZ.Content.text = "Z";
 
-            this._Panel.Controls.Add(this._TbX);
-            this._Panel.Controls.Add(this._TbY);
-            this._Panel.Controls.Add(this._TbZ);
+            this.Controls.Add(this._TbX);
+            this.Controls.Add(this._TbY);
+            this.Controls.Add(this._TbZ);
         }
-
-        /// <summary>
-        /// when RenderArea of control changed
-        /// </summary>
-        protected override void OnRenderAreaChanged()
-        {
-            _Panel.RenderArea = RenderArea;
-            base.OnRenderAreaChanged();
-        }
-
-        /// <summary>
-        /// Render XYZComponent
-        /// </summary>
-        protected override void Render()
-        {
-            this._Panel.OnGUI();
-        }
-
 
         /// <summary>
         /// Is control in hierarchy of this control

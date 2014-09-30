@@ -10,7 +10,7 @@ namespace Skill.Editor.UI.Extended
     /// <summary>
     /// Contains some BaseControl and allow user to select on of them.
     /// </summary>
-    public class SelectionField : EditorControl
+    public class SelectionField : Grid
     {
         /// <summary>
         /// Hold information about fields
@@ -29,7 +29,6 @@ namespace Skill.Editor.UI.Extended
         private Box _Background;
         private Popup _Popup;
         private Label _Label;
-        private Grid _Panel;
         private List<FieldTag> _Fields;
 
         /// <summary> Popup options at top right corner </summary>
@@ -120,15 +119,6 @@ namespace Skill.Editor.UI.Extended
         }
 
         /// <summary>
-        /// Notify that RenderArea changed
-        /// </summary>
-        protected override void OnRenderAreaChanged()
-        {
-            base.OnRenderAreaChanged();
-            this._Panel.RenderArea = RenderArea;
-        }
-
-        /// <summary>
         /// Create an instance of SelectionField
         /// </summary>
         public SelectionField()
@@ -136,30 +126,22 @@ namespace Skill.Editor.UI.Extended
             this._Background = new Box() { RowSpan = 2, ColumnSpan = 3 };
             this._Popup = new Popup() { Position = new Rect(0, 0, 16, 16), Column = 2, Row = 0, VerticalAlignment = Skill.Framework.UI.VerticalAlignment.Center, HorizontalAlignment = Skill.Framework.UI.HorizontalAlignment.Right, Margin = new Thickness(2) };
             this._Label = new Label() { Position = new Rect(0, 0, 100, 16), Column = 0, Row = 0, VerticalAlignment = Skill.Framework.UI.VerticalAlignment.Center, HorizontalAlignment = Skill.Framework.UI.HorizontalAlignment.Left, Margin = new Thickness(2) };
-            this._Panel = new Grid() { Parent = this };
 
-            this._Panel.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Auto) });
-            this._Panel.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
+            this.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Auto) });
+            this.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
 
-            this._Panel.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Auto) });
-            this._Panel.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
-            this._Panel.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(22, GridUnitType.Pixel) });
+            this.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Auto) });
+            this.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
+            this.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(22, GridUnitType.Pixel) });
             this._Fields = new List<FieldTag>();
 
-            this._Panel.Controls.Add(_Background);
-            this._Panel.Controls.Add(_Label);
-            this._Panel.Controls.Add(_Popup);
+            this.Controls.Add(_Background);
+            this.Controls.Add(_Label);
+            this.Controls.Add(_Popup);
 
             this._Popup.OptionChanged += Popup_OptionChanged;
-            this._Panel.LayoutChanged += Panel_LayoutChanged;
-
 
             ShowField(0);
-        }
-
-        private void Panel_LayoutChanged(object sender, EventArgs e)
-        {
-            OnLayoutChanged();
         }
 
         private void Popup_OptionChanged(object sender, EventArgs e)
@@ -213,15 +195,6 @@ namespace Skill.Editor.UI.Extended
             }
         }
 
-        /// <summary>
-        /// Render SelectionGrid
-        /// </summary>
-        protected override void Render()
-        {
-            this._Panel.OnGUI();
-        }
-
-
 
         /// <summary>
         /// Add a field
@@ -242,7 +215,7 @@ namespace Skill.Editor.UI.Extended
             field.Row = 0;
             field.RowSpan = 2;
             field.Column = 1;
-            _Panel.Controls.Add(field);
+            Controls.Add(field);
             if (SelectedField == null)
                 SelectField(field);
             else
@@ -270,7 +243,7 @@ namespace Skill.Editor.UI.Extended
                 FieldTag ft = _Fields[fieldIndex];
                 _Fields.RemoveAt(fieldIndex);
                 _Popup.Options.Remove(ft.Option);
-                _Panel.Controls.Remove(ft.Field);
+                Controls.Remove(ft.Field);
 
                 if (SelectedField == ft.Field)
                     ShowField(fieldIndex > 0 ? fieldIndex - 1 : fieldIndex);

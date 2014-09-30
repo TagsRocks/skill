@@ -127,7 +127,7 @@ namespace Skill.Framework.Audio
                     if (at.Titles.Length > 0)
                     {
                         if (at.Titles.Length > 1)
-                            Skill.Framework.MathHelper.QuickSort(at.Titles, SubtitleComparer.Instance);
+                            Skill.Framework.Utility.QuickSort(at.Titles, SubtitleComparer.Instance);
                         for (int i = 0; i < at.Titles.Length; i++)
                         {
                             SubTime st = new SubTime();

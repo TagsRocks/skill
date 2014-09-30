@@ -91,7 +91,7 @@ namespace Skill.Framework
         }
 
 
-        public AnimatorStateGroup CreateStateGroup(string name, int layerIndex, bool ignoreTransitions = false)
+        public AnimatorStateGroup CreateStateGroup(string name, int layerIndex)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentException("Invalid group name");
@@ -104,7 +104,7 @@ namespace Skill.Framework
                     throw new ArgumentException("Group name already exist");
             }
 
-            AnimatorStateGroup group = new AnimatorStateGroup(name, Animator.GetLayerName(layerIndex), layerIndex, ignoreTransitions);
+            AnimatorStateGroup group = new AnimatorStateGroup(name, Animator.GetLayerName(layerIndex), layerIndex);
             _StateGroups.Add(group);
             return group;
         }
@@ -173,7 +173,6 @@ namespace Skill.Framework
         public int LayerIndex { get; private set; }
         public string Name { get; private set; }
         public bool IsRelevant { get; private set; }
-        public bool IgnoreTransitions { get; set; }
 
 
         public event EventHandler BecameRelevant;
@@ -187,13 +186,12 @@ namespace Skill.Framework
         public event EventHandler CeaseRelevant;
         private void OnCeaseRelevant() { if (CeaseRelevant != null) CeaseRelevant(this, EventArgs.Empty); }
 
-        internal AnimatorStateGroup(string name, string layerName, int layerIndex, bool ignoreTransitions)
+        internal AnimatorStateGroup(string name, string layerName, int layerIndex)
         {
             this._NameMeshs = new List<int>();
             this.LayerIndex = layerIndex;
             this.Name = name;
             this._LayerName = layerName;
-            this.IgnoreTransitions = ignoreTransitions;
         }
 
         internal void Update()
@@ -217,21 +215,10 @@ namespace Skill.Framework
             }
             bool preRelevant = this.IsRelevant;
 
-            if (IgnoreTransitions)
-            {
-                if (isInTransition)
-                    this.IsRelevant = _NameMeshs.BinarySearch(nextState.nameHash) >= 0;
-                else
-                    this.IsRelevant = _NameMeshs.BinarySearch(currentState.nameHash) >= 0;
-            }
+            if (isInTransition)
+                this.IsRelevant = _NameMeshs.BinarySearch(nextState.nameHash) >= 0;
             else
-            {
-                if (isInTransition)
-                    this.IsRelevant = false;
-                else
-                    this.IsRelevant = _NameMeshs.BinarySearch(currentState.nameHash) >= 0;
-            }
-
+                this.IsRelevant = _NameMeshs.BinarySearch(currentState.nameHash) >= 0;
 
 
             if (preRelevant && !this.IsRelevant)

@@ -4,25 +4,14 @@ using System;
 
 namespace Skill.Editor.Tools
 {
-    public class EditorListItem : EditorControl
+    public class EditorListItem : Grid
     {
-        private Grid _Panel;
         private Label _NameField;
         private Button _BtnRemove;
         private Button _BtnAdd;
 
         public IEditor Editor { get; private set; }
         public string ObjectName { get { return _NameField.Text; } set { _NameField.Text = value; } }
-
-        public override float LayoutHeight
-        {
-            get
-            {
-                if (Visibility != Skill.Framework.UI.Visibility.Collapsed)
-                    return _NameField.LayoutHeight + _NameField.Margin.Vertical + 2;
-                return base.LayoutHeight;
-            }
-        }
 
         public EditorListItem(IEditor editor)
         {
@@ -39,20 +28,18 @@ namespace Skill.Editor.Tools
             _BtnRemove.Content.image = Resources.UITextures.Minus;
             _BtnRemove.Content.tooltip = "Remove this";
 
-            this._Panel = new Grid() { Parent = this };
-            this._Panel.RowDefinitions.Add(1, GridUnitType.Star);
-            this._Panel.ColumnDefinitions.Add(1, GridUnitType.Star);
-            this._Panel.ColumnDefinitions.Add(20, GridUnitType.Pixel);
-            this._Panel.ColumnDefinitions.Add(20, GridUnitType.Pixel);
+            this.RowDefinitions.Add(1, GridUnitType.Star);
+            this.ColumnDefinitions.Add(1, GridUnitType.Star);
+            this.ColumnDefinitions.Add(20, GridUnitType.Pixel);
+            this.ColumnDefinitions.Add(20, GridUnitType.Pixel);
 
-            this._Panel.Controls.Add(_NameField);
-            this._Panel.Controls.Add(_BtnRemove);
-            this._Panel.Controls.Add(_BtnAdd);
-
-            this._Panel.LayoutChanged += Panel_LayoutChanged;
+            this.Controls.Add(_NameField);
+            this.Controls.Add(_BtnRemove);
+            this.Controls.Add(_BtnAdd);
 
             this._BtnRemove.Click += _BtnRemove_Click;
             this._BtnAdd.Click += _BtnAdd_Click;
+            this.Height = _NameField.LayoutHeight + _NameField.Margin.Vertical + 2;
         }
 
         void _BtnAdd_Click(object sender, EventArgs e)
@@ -62,21 +49,6 @@ namespace Skill.Editor.Tools
         void _BtnRemove_Click(object sender, EventArgs e)
         {
             Editor.Remove(this);
-        }
-
-        protected override void OnRenderAreaChanged()
-        {
-            this._Panel.RenderArea = RenderArea;
-        }
-
-        private void Panel_LayoutChanged(object sender, EventArgs e)
-        {
-            OnLayoutChanged();
-        }
-
-        protected override void Render()
-        {
-            this._Panel.OnGUI();
         }
     }
 }

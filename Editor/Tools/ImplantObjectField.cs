@@ -8,9 +8,8 @@ using UnityEngine;
 
 namespace Skill.Editor.Tools
 {
-    class ImplantObjectField : EditorControl
+    class ImplantObjectField : StackPanel
     {
-        private StackPanel _Panel;
         private ObjectField<GameObject> _PrefabField;
         private Editor.UI.ToggleButton _TbOverride;
         private ImplantObjectPropertiesField _PropertiesField;
@@ -40,18 +39,6 @@ namespace Skill.Editor.Tools
         }
         public ImplantAssetEditor Editor { get; private set; }
 
-        public override float LayoutHeight
-        {
-            get
-            {
-                if (Visibility != Skill.Framework.UI.Visibility.Collapsed)
-                    return _PrefabField.LayoutHeight + _PrefabField.Margin.Vertical +
-                           _TbOverride.LayoutHeight + _TbOverride.Margin.Vertical +
-                           _PropertiesField.LayoutHeight + _PropertiesField.Margin.Vertical;
-                return base.LayoutHeight;
-            }
-        }
-
         public ImplantObjectField(ImplantAssetEditor editor)
         {
             this.Editor = editor;
@@ -63,18 +50,20 @@ namespace Skill.Editor.Tools
             _TbOverride = new UI.ToggleButton() { IsChecked = false }; _TbOverride.Label.text = "Override properties";
             _PropertiesField = new ImplantObjectPropertiesField();
 
-            this._Panel = new StackPanel() { Orientation = Orientation.Vertical, Parent = this };
-            this._Panel.Controls.Add(_PrefabField);
-            this._Panel.Controls.Add(_TbOverride);
-            this._Panel.Controls.Add(_PropertiesField);
+            this.Orientation = Orientation.Vertical;
+            this.Controls.Add(_PrefabField);
+            this.Controls.Add(_TbOverride);
+            this.Controls.Add(_PropertiesField);
 
 
 
             this._PrefabField.ObjectChanged += _PrefabField_ObjectChanged;
-            this._Panel.LayoutChanged += Panel_LayoutChanged;
             this._TbOverride.Changed += _TbOverride_Changed;
 
             this.Object = null;
+            this.Height = _PrefabField.LayoutHeight + _PrefabField.Margin.Vertical +
+                          _TbOverride.LayoutHeight + _TbOverride.Margin.Vertical +
+                          _PropertiesField.LayoutHeight + _PropertiesField.Margin.Vertical;
         }
 
         void _TbOverride_Changed(object sender, EventArgs e)
@@ -90,27 +79,12 @@ namespace Skill.Editor.Tools
                 _Object.Prefab = _PrefabField.Object;
             Editor.UpdateNames();
         }
-        protected override void OnRenderAreaChanged()
-        {
-            this._Panel.RenderArea = RenderArea;
-        }
-
-        private void Panel_LayoutChanged(object sender, EventArgs e)
-        {
-            OnLayoutChanged();
-        }
-
-        protected override void Render()
-        {
-            this._Panel.OnGUI();
-        }
     }
 
 
 
-    class ImplantObjectPropertiesField : EditorControl
+    class ImplantObjectPropertiesField : StackPanel
     {
-        private StackPanel _Panel;
         private FloatField _MinScaleField;
         private FloatField _MaxScaleField;
         private Skill.Editor.UI.Slider _ChanceField;
@@ -155,20 +129,6 @@ namespace Skill.Editor.Tools
             }
         }
 
-        public override float LayoutHeight
-        {
-            get
-            {
-                if (Visibility != Skill.Framework.UI.Visibility.Collapsed)
-                    return _MinScaleField.LayoutHeight + _MinScaleField.Margin.Vertical +
-                           _MaxScaleField.LayoutHeight + _MaxScaleField.Margin.Vertical +
-                           _ChanceField.LayoutHeight + _ChanceField.Margin.Vertical +
-                           _RotationLabel.LayoutHeight + _RotationLabel.Margin.Vertical +
-                           _RotationSF.LayoutHeight + _RotationSF.Margin.Vertical;
-                return base.LayoutHeight;
-            }
-        }
-
         public ImplantObjectPropertiesField()
         {
             this.Margin = new Thickness(0, 0, 0, 8);
@@ -199,12 +159,12 @@ namespace Skill.Editor.Tools
 
             _RotationLabel = new DropShadowLabel() { Text = "Rotation", Margin = new Thickness(4, 0, 0, 0) };
 
-            this._Panel = new StackPanel() { Orientation = Orientation.Vertical, Parent = this };
-            this._Panel.Controls.Add(_MinScaleField);
-            this._Panel.Controls.Add(_MaxScaleField);
-            this._Panel.Controls.Add(_ChanceField);
-            this._Panel.Controls.Add(_RotationLabel);
-            this._Panel.Controls.Add(_RotationSF);
+            this.Orientation = Orientation.Vertical;
+            this.Controls.Add(_MinScaleField);
+            this.Controls.Add(_MaxScaleField);
+            this.Controls.Add(_ChanceField);
+            this.Controls.Add(_RotationLabel);
+            this.Controls.Add(_RotationSF);
 
             this._MinScaleField.ValueChanged += new EventHandler(_MinScaleField_ValueChanged);
             this._MaxScaleField.ValueChanged += new EventHandler(_MaxScaleField_ValueChanged);
@@ -222,9 +182,12 @@ namespace Skill.Editor.Tools
             this._RandomYaw.Changed += new EventHandler(_RandomYaw_Changed);
 
 
-            this._Panel.LayoutChanged += Panel_LayoutChanged;
-
             this.Object = null;
+            this.Height = _MinScaleField.LayoutHeight + _MinScaleField.Margin.Vertical +
+                          _MaxScaleField.LayoutHeight + _MaxScaleField.Margin.Vertical +
+                          _ChanceField.LayoutHeight + _ChanceField.Margin.Vertical +
+                          _RotationLabel.LayoutHeight + _RotationLabel.Margin.Vertical +
+                          _RotationSF.LayoutHeight + _RotationSF.Margin.Vertical;
         }
 
         void _RandomYaw_Changed(object sender, EventArgs e)
@@ -294,19 +257,9 @@ namespace Skill.Editor.Tools
             }
         }
 
-        protected override void OnRenderAreaChanged()
-        {
-            this._Panel.RenderArea = RenderArea;
-        }
-
         private void Panel_LayoutChanged(object sender, EventArgs e)
         {
             OnLayoutChanged();
-        }
-
-        protected override void Render()
-        {
-            this._Panel.OnGUI();
         }
     }
 }

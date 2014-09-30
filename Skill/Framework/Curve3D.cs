@@ -30,7 +30,7 @@ namespace Skill.Framework
         {
             if (Keys != null && Keys.Length > 0)
             {
-                Skill.Framework.MathHelper.QuickSort(Keys, Keys[0]);
+                Skill.Framework.Utility.QuickSort(Keys, Keys[0]);
                 _Curve = new AnimationCurve3D(Keys) { PostWrapMode = PostWrapMode, PreWrapMode = PreWrapMode };
             }
         }

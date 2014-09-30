@@ -15,6 +15,7 @@ namespace Skill.Framework.Triggers
             public EventManager Events;
             public Collider Collider;
             public TimeWatch DamageTW;
+            public TimeWatch IgnoreTW;
 
             public bool IsDestroyed { get { return Events != null && Events.IsDestroyed; } }
 
@@ -37,8 +38,7 @@ namespace Skill.Framework.Triggers
         /// <summary> Damage Type </summary>
         public int DamageType;
 
-        private List<ColliderInfo> _EnteredColliders;
-        private List<ColliderInfo> _ExitedColliders;
+        private List<ColliderInfo> _Colliders;
 
         /// <summary> User Data </summary>
         public object UserData { get; set; }
@@ -49,8 +49,7 @@ namespace Skill.Framework.Triggers
         protected override void Awake()
         {
             base.Awake();
-            _EnteredColliders = new List<ColliderInfo>();
-            _ExitedColliders = new List<ColliderInfo>();
+            _Colliders = new List<ColliderInfo>(5);
         }
 
         /// <summary>
@@ -60,21 +59,14 @@ namespace Skill.Framework.Triggers
         /// <returns>True if event handled, otherwise false</returns>
         protected override bool OnEnter(Collider other)
         {
-            ColliderInfo cInfo = null;
-            int index = GetIndexOf(other, _ExitedColliders);
-            if (index >= 0)
+            if (!Contains(other))
             {
-                cInfo = _ExitedColliders[index];
-                _ExitedColliders.RemoveAt(index);
-            }
-            if (cInfo != null)
-            {
-                _EnteredColliders.Add(cInfo);
-            }
-            else
-            {
-                if (GetIndexOf(other, _EnteredColliders) < 0)
-                    _EnteredColliders.Add(new ColliderInfo(other));
+                ColliderInfo cInfo = new ColliderInfo(other);
+                if (cInfo.Events != null)
+                {
+                    _Colliders.Add(cInfo);
+                    ApplyDamage(cInfo);
+                }
             }
             return true;
         }
@@ -84,36 +76,38 @@ namespace Skill.Framework.Triggers
         /// <param name="other">other Collider</param>
         protected override void OnExit(Collider other)
         {
-            ColliderInfo cInfo = null;
-            int index = GetIndexOf(other, _EnteredColliders);
+            int index = IndexOf(other);
             if (index >= 0)
-            {
-                cInfo = _EnteredColliders[index];
-                _EnteredColliders.RemoveAt(index);
-            }
-            if (cInfo != null)
-            {
-                _ExitedColliders.Add(cInfo);
-            }
+                _Colliders.RemoveAt(index);
         }
         /// <summary>
         /// called almost all the frames for every Collider other that is touching the trigger.
         /// </summary>
         /// <param name="other">other Collider</param>
-        protected override void OnStay(Collider other) { }
+        protected override void OnStay(Collider other)
+        {
+            int index = IndexOf(other);
+            if (index >= 0)
+                ApplyDamage(_Colliders[index]);
+        }
 
-        private int GetIndexOf(Collider other, List<ColliderInfo> list)
+        private int IndexOf(Collider other)
         {
             int index = -1;
-            for (int i = 0; i < list.Count; i++)
+            for (int i = 0; i < _Colliders.Count; i++)
             {
-                if (list[i].Collider == other)
+                if (_Colliders[i].Collider == other)
                 {
                     index = i;
                     break;
                 }
             }
             return index;
+        }
+
+        private bool Contains(Collider other)
+        {
+            return IndexOf(other) >= 0;
         }
 
         private void ApplyDamage(ColliderInfo cInfo)
@@ -130,9 +124,9 @@ namespace Skill.Framework.Triggers
                         float distance = Vector3.Distance(closestPoint, _Transform.position);
                         d *= (1.0f - Mathf.Min(Range, distance) / Range);
                     }
-
                     em.RaiseDamage(this, new DamageEventArgs(d) { UserData = this.UserData, DamageType = DamageType, Tag = tag });
                     cInfo.DamageTW.Begin(Interval);
+                    cInfo.IgnoreTW.Begin(Interval * 2);
                 }
             }
         }
@@ -141,30 +135,13 @@ namespace Skill.Framework.Triggers
         {
             if (Global.IsGamePaused) return;
             int index = 0;
-            while (index < _ExitedColliders.Count)
+            while (index < _Colliders.Count)
             {
-                if (_ExitedColliders[index].IsDestroyed || _ExitedColliders[index].DamageTW.IsOver)
-                    _ExitedColliders.RemoveAt(index);
+                if (_Colliders[index].IsDestroyed || _Colliders[index].IgnoreTW.IsOver)
+                    _Colliders.RemoveAt(index);
                 else
                     index++;
-            }            
-            while (index < _EnteredColliders.Count)
-            {
-                // check for destroyed
-                if (_EnteredColliders[index].IsDestroyed)
-                    _EnteredColliders.RemoveAt(index);
-                else // or apply damage
-                {
-                    ApplyDamage(_EnteredColliders[index]);
-                    index++;
-                }
-            }            
-       }        
-
-        protected virtual void OnDrawGizmos()
-        {            
-            if (DecreaseByDistance)
-                Gizmos.DrawWireSphere(transform.position, Range);
+            }
         }
     }
 

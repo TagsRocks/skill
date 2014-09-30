@@ -95,7 +95,7 @@ namespace Skill.Framework
         protected override void Start()
         {
             base.Start();
-            MathHelper.QuickSort(this.TimeEvents, new TimeEventComparer());
+            Utility.QuickSort(this.TimeEvents, new TimeEventComparer());
             Reset();
 
         }
