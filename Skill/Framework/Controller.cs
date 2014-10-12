@@ -118,7 +118,7 @@ namespace Skill.Framework
         /// when controller destroyed
         /// </summary>
         protected override void OnDestroy()
-        {
+        {            
             ResetValues();
             Global.UnRegister(this);
             base.OnDestroy();

@@ -16,10 +16,10 @@ namespace Skill.Editor
             Tools.Distance.Instance.Show();
         }
 
-        [MenuItem("Skill/Tools/Animation Copy", false, 1)]
-        static void ShowAnimationAssigner()
+        [MenuItem("Skill/Tools/Copy Component", false, 1)]
+        static void ShowCopyComponentsWindow()
         {
-            Tools.AnimationCopy.Instance.Show();
+            Tools.CopyPaseComponentsWindow.Instance.Show();
         }
 
         [MenuItem("Skill/Matinee Editor", false, 20)]
@@ -156,7 +156,7 @@ namespace Skill.Editor
         static void GroupObjectsWithName()
         {
             Skill.Editor.Tools.CreateGroupDialog.Instance.ShowUtility();
-        }        
+        }
 
         [MenuItem("Skill/Edit/Copy Transform", false, 72)]
         static void CopyTransform()

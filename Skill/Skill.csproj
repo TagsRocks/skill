@@ -61,7 +61,9 @@
     <Compile Include="Framework\Animation\RootMotion.cs" />
     <Compile Include="Framework\AnimatorManager.cs" />
     <Compile Include="Framework\Audio\AudioSubtitle.cs" />
+    <Compile Include="Framework\Audio\MusicPlayer.cs" />
     <Compile Include="Framework\CameraLimit.cs" />
+    <Compile Include="Framework\CheckPoint.cs" />
     <Compile Include="Framework\CurveEditorAttribute.cs" />
     <Compile Include="Framework\Dictionary.cs" />
     <Compile Include="Framework\Audio\SubRendererGUIText.cs" />
@@ -75,6 +77,7 @@
     <Compile Include="Framework\Curve3D.cs" />
     <Compile Include="Framework\Dynamics\Explosion.cs" />
     <Compile Include="Framework\Dynamics\MoveAround.cs" />
+    <Compile Include="Framework\Effects\RainScreen.cs" />
     <Compile Include="Framework\ExposePropertyAttribute.cs" />
     <Compile Include="Framework\FollowCamera.cs" />
     <Compile Include="Framework\FreeCamera.cs" />
@@ -86,7 +89,8 @@
     <Compile Include="Framework\Modules\ChildCounter.cs" />
     <Compile Include="Framework\Modules\ScreenShot.cs" />
     <Compile Include="Framework\Modules\ShowFPS.cs" />
-    <Compile Include="Framework\Rendering\UVShift.cs" />
+    <Compile Include="Framework\Modules\UVShift.cs" />
+    <Compile Include="Framework\ScreenSizeChange.cs" />
     <Compile Include="Framework\Sequence\AnimationTrack.cs" />
     <Compile Include="Framework\Sequence\AnimatorTrack.cs" />
     <Compile Include="Framework\Sequence\BooleanTrack.cs" />
@@ -99,6 +103,7 @@
     <Compile Include="Framework\Sequence\IntegerTrack.cs" />
     <Compile Include="Framework\Sequence\Matinee.cs" />
     <Compile Include="Framework\Sequence\DiscreteTrack.cs" />
+    <Compile Include="Framework\Sequence\MatineeBreak.cs" />
     <Compile Include="Framework\Sequence\PropertyTrack.cs" />
     <Compile Include="Framework\Sequence\QuaternionTrack.cs" />
     <Compile Include="Framework\Sequence\SoundTrack.cs" />
@@ -150,10 +155,10 @@
     <Compile Include="Framework\Modules\PaintColor.cs" />
     <Compile Include="Framework\Path3D.cs" />
     <Compile Include="Framework\Point3D.cs" />
-    <Compile Include="Framework\Rendering\Beam.cs" />
-    <Compile Include="Framework\Rendering\LaserBeam.cs" />
-    <Compile Include="Framework\Rendering\RandomizeBeam.cs" />
-    <Compile Include="Framework\Rendering\WaveBeam.cs" />
+    <Compile Include="Framework\Effects\Beam.cs" />
+    <Compile Include="Framework\Effects\LaserBeam.cs" />
+    <Compile Include="Framework\Effects\RandomizeBeam.cs" />
+    <Compile Include="Framework\Effects\WaveBeam.cs" />
     <Compile Include="Framework\SlowMotionController.cs" />
     <Compile Include="Framework\Audio\SoundVolume.cs" />
     <Compile Include="Framework\SpawnAsset.cs" />

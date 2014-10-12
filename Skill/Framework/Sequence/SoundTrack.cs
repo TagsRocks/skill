@@ -80,6 +80,7 @@ namespace Skill.Framework.Sequence
         internal AudioSource Source { get; set; }
         internal bool PlayOneShot { get; set; }
         internal Skill.Framework.Audio.SoundCategory Category { get; set; }
+
     }
 
     public class SoundTrack : EventOrientedTrack
@@ -136,6 +137,27 @@ namespace Skill.Framework.Sequence
             if (Source != null)
                 Source.Stop();
             Source.clip = null;
+        }
+
+        private bool _IsPaused;
+        public override void Pause()
+        {
+            if (Source != null && Source.isPlaying)
+            {
+                _IsPaused = true;
+                Source.Pause();
+            }
+            base.Pause();
+        }
+
+        public override void Resume()
+        {
+            if (_IsPaused)
+            {
+                _IsPaused = false;
+                Source.Play();
+            }
+            base.Resume();
         }
 
         protected override void InitializeEvent(EventOrientedKey key)

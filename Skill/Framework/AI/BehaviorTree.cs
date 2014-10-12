@@ -74,7 +74,7 @@ namespace Skill.Framework.AI
         public BehaviorTreeState CurrentState { get { return _CurrentState; } }
 
         /// <summary> 
-        /// To enable update time interval set this to more than zero (default is 1.0f). Keep call Update() each frame.
+        /// To enable update time interval set this to more than zero (default is 0.2f). Keep call Update() each frame.
         /// </summary>
         public float UpdateTimeInterval { get; set; }
 
@@ -122,10 +122,9 @@ namespace Skill.Framework.AI
         /// Create an instance of BehaviorTree
         /// </summary>
         public BehaviorTree()
-        {
-            this._Reset = false;
+        {            
             this._LastUpdateTime = 0;
-            this.UpdateTimeInterval = 1.0f;
+            this.UpdateTimeInterval = 0.2f;
             this._FinishedActions = new List<Action>();
 
             States = CreateTree();
@@ -136,7 +135,8 @@ namespace Skill.Framework.AI
             foreach (var s in States)
                 _States.Add(s.Name, s);
             this.Status = new BehaviorTreeStatus(this);
-            Reset();
+            this._Reset = true;
+            ChangeState(DefaultState);
             Initialize();
         }
 

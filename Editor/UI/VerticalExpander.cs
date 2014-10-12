@@ -9,7 +9,7 @@ namespace Skill.Editor.UI
     /// Represents the control that displays a header that has a collapsible window that displays content vertically.
     /// </summary>
     /// <typeparam name="P">Type of Panel that contains controls</typeparam>
-    public class VerticalExpander<P> : Control where P : Panel
+    public class VerticalExpander<P> : Panel where P : Panel
     {
 
         /// <summary>
@@ -109,13 +109,10 @@ namespace Skill.Editor.UI
         /// </summary>
         public P Panel { get; private set; }
 
-        /// <summary>
-        /// Handle RenderArea is changed
-        /// </summary>
-        protected override void OnRenderAreaChanged()
+
+        protected override void UpdateLayout()
         {
-            base.OnRenderAreaChanged();
-            Rect ra = RenderArea;
+            Rect ra = RenderAreaShrinksByPadding;
 
             Thickness foldoutMargin = Foldout.Margin;
             Foldout.RenderArea = new Rect(ra.x + foldoutMargin.Left, ra.y + foldoutMargin.Top, ra.width - foldoutMargin.Horizontal, Foldout.Height);
@@ -148,12 +145,14 @@ namespace Skill.Editor.UI
             this.Panel = panel;
             if (this.Panel == null) throw new ArgumentNullException("Invalid Panel for VerticalExpander");
             if (this.Panel.Parent != null)
-                throw new InvalidOperationException("VerticalExpander can not accept the panel that is already child of another Panel");
-            this.Panel.Parent = this;
+                throw new InvalidOperationException("VerticalExpander can not accept the panel that is already child of another Panel");            
             this.Foldout = new Skill.Editor.UI.Foldout() { ToggleOnLabelClick = true };
             this.Foldout.StateChanged += new EventHandler(_Foldout_StateChanged);
             this.DefaultHeader();
             this.IsExpanded = false;
+
+            this.Controls.Add(Foldout);
+            this.Controls.Add(panel);
         }
 
         /// <summary>

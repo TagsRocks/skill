@@ -5,11 +5,20 @@ using UnityEngine;
 
 namespace Skill.Framework.UI
 {
+    /// <summary>
+    /// Implements functionality required to pause and resume game
+    /// </summary>
     public class PauseMenu : GameMenu
     {
+        /// <summary> Cursor object to be activated on pause and deactivate on resume </summary>
+        public GameObject Cursor;
+        /// <summary> Pause AudioListener</summary>
         public bool PauseAudioListener = true;
+        /// <summary> Pause TimeScale</summary>
         public bool PauseTime = false;
+        /// <summary> Pause when application paused</summary>
         public bool PauseOnApplicationPause = true;
+        /// <summary> Pause when application lost focus</summary>
         public bool PauseOnApplicationLostFocus = false;
 
         private float _SavedTimeScale;
@@ -18,6 +27,7 @@ namespace Skill.Framework.UI
         {
             base.Start();
             Menu.Exit += Menu_Exit;
+            if (Cursor != null) Cursor.SetActive(false);
         }
 
         void Menu_Exit(object sender, System.EventArgs e)
@@ -66,6 +76,8 @@ namespace Skill.Framework.UI
             Global.IsGamePaused = true;
             if (PauseAudioListener)
                 AudioListener.pause = Global.IsGamePaused;
+
+            if (Cursor != null) Cursor.SetActive(true);
             base.Show();
 
         }
@@ -84,6 +96,7 @@ namespace Skill.Framework.UI
             Global.IsGamePaused = false;
             if (PauseAudioListener)
                 AudioListener.pause = Global.IsGamePaused;
+            if (Cursor != null) Cursor.SetActive(false);
             base.Hide();
         }
 

@@ -75,6 +75,7 @@
     <Compile Include="Sequence\EventTrackBar.cs" />
     <Compile Include="Sequence\KeyView.cs" />
     <Compile Include="Tools\AudioClipSubtitleEditor.cs" />
+    <Compile Include="Tools\CopyComponentsWindow.cs" />
     <Compile Include="Tools\DictionaryEditor.cs" />
     <Compile Include="Tools\DictionaryEditorWindow.cs" />
     <Compile Include="Tools\DictionaryTranslateWindow.cs" />

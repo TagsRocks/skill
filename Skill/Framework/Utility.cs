@@ -6,7 +6,7 @@ namespace Skill.Framework
 {
     public static class Utility
     {
-        
+
         /// <summary>
         /// Change specified components of Vector3, null components remains unchanged
         /// </summary>
@@ -33,8 +33,68 @@ namespace Skill.Framework
             return vector;
         }
 
+        /// <summary> Returns rect of entire screen </summary>
+        public static Rect ScreenRect { get { return new Rect(0, 0, Screen.width, Screen.height); } }
 
 
+        /// <summary>
+        /// Activate or deactivate objects
+        /// </summary>
+        /// <param name="objects">list of objects</param>
+        /// <param name="active"> active? </param>
+        public static void Activate(IEnumerable<GameObject> objects, bool active)
+        {
+            if (objects == null) throw new ArgumentNullException("Invalid objects");
+            foreach (var obj in objects)
+            {
+                if (obj != null)
+                    obj.SetActive(active);
+            }
+        }
+
+
+        /// <summary>
+        /// Is specified Transform(child) somewhere in hierarchy of root
+        /// </summary>
+        /// <param name="root">Root transform</param>
+        /// <param name="child">Child transform to search</param>
+        /// <returns> true is is in hierarchy, otherwise false</returns>
+        public static bool IsInHierarchy(Transform root, Transform child)
+        {
+            if (root == child) return true;
+            for (int i = 0; i < root.childCount; i++)
+            {
+                bool result = IsInHierarchy(root.GetChild(i), child);
+                if (result) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Get path os child in hierarchy of root (make sure child is in hierarchy)
+        /// </summary>
+        /// <param name="root">Root transform </param>
+        /// <param name="child"> Child transform in hierarchy </param>
+        /// <returns>Path</returns>
+        public static string GetPath(Transform root, Transform child)
+        {
+            System.Text.StringBuilder path = new System.Text.StringBuilder();
+            path.Insert(0, child.gameObject.name);
+
+            Transform parent = child.parent;
+            while (parent != null)
+            {
+                if (parent == root) break;
+                path.Insert(0, "/");
+                path.Insert(0, parent.gameObject.name);
+                parent = parent.parent;
+            }
+
+            return path.ToString();
+        }
+
+
+        #region QuickSort
         /// <summary>
         /// Sort array
         /// </summary>
@@ -83,5 +143,6 @@ namespace Skill.Framework
             return left;
 
         }
+        #endregion
     }
 }

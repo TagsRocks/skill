@@ -61,6 +61,8 @@ namespace Skill.Framework.IO
         /// <summary> Update </summary>
         protected override void Update()
         {
+            UpdateTouchStates();
+
             if (_GestureDetectors.Count > 0)
                 UpdateGestures();
 
@@ -155,11 +157,8 @@ namespace Skill.Framework.IO
             }
         }
 
-        private void UpdateGestures()
+        private void UpdateTouchStates()
         {
-            if (_NeedToSortGestures)
-                RearrangeGestureDetectors();
-
             if (Application.isEditor)
             {
                 for (int i = 0; i < _TouchStates.Length; i++)
@@ -195,7 +194,13 @@ namespace Skill.Framework.IO
                     _ShouldCheckForLostTouches = false;
                 }
             }
+        }
 
+        private void UpdateGestures()
+        {
+            if (_NeedToSortGestures)
+                RearrangeGestureDetectors();
+            
             // first allow detecting gestures to chance detect
             foreach (var detector in _GestureDetectors)
             {

@@ -35,6 +35,9 @@ namespace Skill.Framework.Sequence
         public bool IsPlaying { get; private set; }
         /// <summary> Is Matinee paused? </summary>
         public bool IsPaused { get; private set; }
+        /// <summary> Time since start of matinee </summary>
+        public float PlaybackTime { get { return _PlayTime; } }
+
 
         private Track[] _Tracks;
         private float _PlayTime;
@@ -87,6 +90,7 @@ namespace Skill.Framework.Sequence
             {
                 if (rollBack)
                     foreach (var t in _Tracks) t.Rollback();
+                foreach (var t in _Tracks) t.Stop();
 
                 IsPlaying = false;
                 IsPaused = false;
@@ -109,6 +113,8 @@ namespace Skill.Framework.Sequence
                     _LastTime = Time.time;
                 Skill.Framework.Global.CutSceneEnable = Cutscene;
                 IsPlaying = true;
+                if (IsPaused)
+                    foreach (var t in _Tracks) t.Resume();
                 IsPaused = false;
                 enabled = true;
                 _NextStop = false;
@@ -121,6 +127,7 @@ namespace Skill.Framework.Sequence
         {
             if (IsPlaying && !IsPaused)
             {
+                foreach (var t in _Tracks) t.Pause();
                 IsPaused = true;
                 enabled = false;
                 _NextStop = false;

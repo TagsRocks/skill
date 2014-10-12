@@ -70,6 +70,16 @@ namespace Skill.Framework.Sequence
         public abstract void SortKeys();
 
         /// <summary>
+        /// Pause evaluation
+        /// </summary>
+        public virtual void Pause() { }
+
+        /// <summary>
+        /// Resume evaluation
+        /// </summary>
+        public virtual void Resume() { }
+
+        /// <summary>
         /// Stop evaluation
         /// </summary>
         public abstract void Stop();

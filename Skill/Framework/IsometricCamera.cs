@@ -12,10 +12,12 @@ namespace Skill.Framework
     {
         /// <summary> Target to follow </summary>
         public Transform Target;
-        /// <summary> How to damp movement of camera when following target</summary>
+        /// <summary> How to damp movement of camera</summary>
         public float Damping = 2.0f;
-        /// <summary> How to damp offset of camera when following target</summary>
+        /// <summary> How to damp offset of camera</summary>
         public float OffsetDamping = 1.0f;
+        /// <summary> How to damp zooming of camera</summary>
+        public float ZoomDamping = 3.0f;
         /// <summary> Camera moves by mouse when mouse position gets far from center of screen. </summary>
         public float CameraPreview = 2.0f;
         /// <summary> Rotation angle around target ( 0 - 360) </summary>
@@ -174,7 +176,7 @@ namespace Skill.Framework
                 if (ZoomOut < ZoomIn) ZoomOut = ZoomIn;
 
                 float zoomFactor = _LengthOffset / Mathf.Max(0.01f, MaxOffset);
-                _Zoom = Mathf.Lerp(ZoomIn, ZoomOut, zoomFactor);
+                _Zoom = Mathf.Lerp(_Zoom, Mathf.Lerp(ZoomIn, ZoomOut, zoomFactor), ZoomDamping * Time.deltaTime);
 
                 // update position of camera
                 UpdateCamera();

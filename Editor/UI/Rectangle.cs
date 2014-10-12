@@ -6,7 +6,10 @@ using UnityEngine;
 
 namespace Skill.Editor.UI
 {
-    class Rectangle : EditorControl
+    /// <summary>
+    /// Draw a fill rectangle
+    /// </summary>
+    public class Rectangle : EditorControl
     {
         public Color Color { get; set; }
 

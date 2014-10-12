@@ -298,6 +298,34 @@ namespace Skill.Framework
 
 
         /// <summary>
+        /// Returns the horizontal direction of v2 - v1 (ignore y).
+        /// </summary>
+        /// <param name="v1">Vector3</param>
+        /// <param name="v2">Vector3</param>
+        /// <returns>horizontal direction of v2 - v1</returns>
+        public static Vector3 HorizontalDirection(Vector3 v1, Vector3 v2)
+        {
+            Vector3 dir = v2 - v1;
+            dir.y = 0;
+            return dir;
+        }
+
+        /// <summary>
+        /// Returns the normalized horizontal direction of v2 - v1 (ignore y).
+        /// </summary>
+        /// <param name="v1">Vector3</param>
+        /// <param name="v2">Vector3</param>
+        /// <returns>normalized horizontal direction of v2 - v1</returns>
+        public static Vector3 HorizontalDirectionNormalized(Vector3 v1, Vector3 v2)
+        {
+            Vector2 v11 = new Vector2(v1.x, v1.z);
+            Vector2 v22 = new Vector2(v2.x, v2.z);
+            Vector2 dir = v22 - v11;
+            dir.Normalize();
+            return new Vector3(dir.x, 0, dir.y);
+        }
+
+        /// <summary>
         /// Returns the horizontal angle between a and b (ignore y).
         /// </summary>
         /// <param name="v1">Vector3</param>

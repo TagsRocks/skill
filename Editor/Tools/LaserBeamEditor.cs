@@ -3,7 +3,7 @@ using UnityEditor;
 using System.Collections;
 using Skill.Framework.UI;
 using Skill.Editor.UI;
-using Skill.Framework.Rendering;
+using Skill.Framework.Effects;
 
 namespace Skill.Editor.Tools
 {
