@@ -15,8 +15,18 @@ namespace Skill.Framework
         /// </summary>
         public static Global Instance { get; private set; }
 
+
+        private Settings _Settings;
         /// <summary> Settings </summary>
-        public Settings Settings { get; private set; }
+        public Settings Settings
+        {
+            get
+            {
+                if (_Settings == null)
+                    _Settings = CreateSettings();
+                return _Settings;
+            }
+        }
 
         /// <summary>
         /// Awake
@@ -27,7 +37,7 @@ namespace Skill.Framework
             if (Instance != null)
                 Debug.LogWarning("More thn on instance of Skill.Global object found");
             Instance = this;
-            Settings = CreateSettings();
+            IsGamePaused = false;
             if (Settings == null)
                 throw new Exception("Invalid Settings. you have to return valid setting by CreateSettings() mthod");
         }

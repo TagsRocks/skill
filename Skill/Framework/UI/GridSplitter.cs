@@ -125,6 +125,7 @@ namespace Skill.Framework.UI
 
         public override void HandleEvent(Event e)
         {
+            if (!IsEnabled) return;
             if (e != null && e.type != EventType.Used)
             {
                 if (_IsMouseDown)

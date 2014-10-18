@@ -79,6 +79,7 @@
     <Compile Include="Tools\DictionaryEditor.cs" />
     <Compile Include="Tools\DictionaryEditorWindow.cs" />
     <Compile Include="Tools\DictionaryTranslateWindow.cs" />
+    <Compile Include="Tools\MoveWindow.cs" />
     <Compile Include="Tools\PasteTextField.cs" />
     <Compile Include="Tools\PickTextWindow.cs" />
     <Compile Include="UI\Extended\AudioClipCurveData.cs" />

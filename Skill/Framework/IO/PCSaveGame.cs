@@ -235,6 +235,7 @@ namespace Skill.Framework.IO
             if (string.IsNullOrEmpty(keyString)) throw new ArgumentException("Invalid key.");
             string xmlContent = SaveToXmlContent(savable);
             UnityEngine.PlayerPrefs.SetString(keyString, xmlContent);
+            UnityEngine.PlayerPrefs.Save();
         }
 
         private static byte[] ConvertStringToBytes(string str)
@@ -286,6 +287,7 @@ namespace Skill.Framework.IO
 
             string saveData = SaveToBinaryString(savable);
             UnityEngine.PlayerPrefs.SetString(keyString, saveData);
+            UnityEngine.PlayerPrefs.Save();
         }
 
         /// <summary>

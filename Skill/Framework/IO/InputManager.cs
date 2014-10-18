@@ -182,7 +182,6 @@ namespace Skill.Framework.IO
             {
                 if (_ShouldCheckForLostTouches)
                 {
-
                     for (int i = 0; i < _TouchStates.Length; i++)
                     {
                         if (_TouchStates[i].Phase != TouchPhase.Ended)

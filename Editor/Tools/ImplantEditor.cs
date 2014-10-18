@@ -325,7 +325,7 @@ namespace Skill.Editor.Tools
         {
             Event e = Event.current;
             Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
-            if (Physics.Raycast(ray, out _ReferenceHit, 1000, _Layers.Layers))
+            if (Physics.Raycast(ray, out _ReferenceHit, float.MaxValue, _Layers.Layers))
                 _ReferenceEnable = true;
             else
                 _ReferenceEnable = false;
@@ -414,7 +414,7 @@ namespace Skill.Editor.Tools
             else
             {
                 ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
-                if (Physics.Raycast(ray, out _ReferenceHit, 1000, _Layers.Layers))
+                if (Physics.Raycast(ray, out _ReferenceHit, float.MaxValue, _Layers.Layers))
                 {
                     valid = true;
                 }
@@ -428,7 +428,7 @@ namespace Skill.Editor.Tools
                 for (int i = 0; i < _Implant.Points.Length; i++)
                 {
                     ray.origin = center + _Rotation * _Implant.Points[i];
-                    if (Physics.Raycast(ray, out hit, 1000, _Layers.Layers))
+                    if (Physics.Raycast(ray, out hit, float.MaxValue, _Layers.Layers))
                     {
                         ImplantObject randomObj = GetRandomImplantObject();
                         if (randomObj != null && randomObj.Prefab != null)
@@ -458,7 +458,7 @@ namespace Skill.Editor.Tools
             else
             {
                 ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
-                if (Physics.Raycast(ray, out _ReferenceHit, 1000, _Layers.Layers))
+                if (Physics.Raycast(ray, out _ReferenceHit, float.MaxValue, _Layers.Layers))
                     valid = true;
             }
 
@@ -481,7 +481,7 @@ namespace Skill.Editor.Tools
                 for (int i = 0; i < _Implant.Points.Length; i++)
                 {
                     ray.origin = center + (_Rotation * _Implant.Points[i]);
-                    if (Physics.Raycast(ray, out hit, 1000, _Layers.Layers))
+                    if (Physics.Raycast(ray, out hit, float.MaxValue, _Layers.Layers))
                         Handles.ArrowCap(0, hit.point + (hit.normal * _Implant.OffsetY), Quaternion.LookRotation(hit.normal), handleSize * 0.5f);
                 }
 

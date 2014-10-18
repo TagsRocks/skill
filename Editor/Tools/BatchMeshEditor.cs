@@ -45,6 +45,8 @@ namespace Skill.Editor.Tools
         #endregion
 
         private BatchMesh _Data;
+        private List<GameObject> _Meshes;
+        private System.Type[] _MeshCompoentns;
 
         void OnEnable()
         {
@@ -104,11 +106,14 @@ namespace Skill.Editor.Tools
                 Debug.LogError("Root is null");
                 return;
             }
-            if (_Data.UnitLength.x < 1.0f || _Data.UnitLength.y < 1.0f || _Data.UnitLength.z < 1.0f)
+            if (_Data.UnitLength < 0.2f)
             {
                 Debug.LogError("UnitLength is too small, please define larger UnitLength");
                 return;
             }
+
+            _Data.MaxPolyCount = Mathf.Max(_Data.MaxPolyCount, 100);
+
 
             List<MeshFilter> filters = new List<MeshFilter>(10000);
             foreach (var root in _Data.Roots)
@@ -132,11 +137,11 @@ namespace Skill.Editor.Tools
                 CheckMinMax(ref min, ref max, boundMin);
                 CheckMinMax(ref min, ref max, boundMax);
             }
-            
+
             //seprate world to squares
-            int unitX = (int)((max.x - min.x) / _Data.UnitLength.x) + 1;
-            int unitY = (int)((max.y - min.y) / _Data.UnitLength.y) + 1;
-            int unitZ = (int)((max.z - min.z) / _Data.UnitLength.z) + 1;
+            int unitX = (int)((max.x - min.x) / _Data.UnitLength) + 1;
+            int unitY = (int)((max.y - min.y) / _Data.UnitLength) + 1;
+            int unitZ = (int)((max.z - min.z) / _Data.UnitLength) + 1;
 
             MeshGroup[, ,] units = new MeshGroup[unitX, unitY, unitZ];
             for (int ix = 0; ix < unitX; ix++)
@@ -148,29 +153,30 @@ namespace Skill.Editor.Tools
             foreach (MeshFilter mf in filters)
             {
                 Vector3 pos = mf.transform.position;
-                int ix = Mathf.FloorToInt((pos.x - min.x) / _Data.UnitLength.x);
-                int iy = Mathf.FloorToInt((pos.y - min.y) / _Data.UnitLength.y);
-                int iz = Mathf.FloorToInt((pos.z - min.z) / _Data.UnitLength.z);
+                int ix = Mathf.FloorToInt((pos.x - min.x) / _Data.UnitLength);
+                int iy = Mathf.FloorToInt((pos.y - min.y) / _Data.UnitLength);
+                int iz = Mathf.FloorToInt((pos.z - min.z) / _Data.UnitLength);
                 units[ix, iy, iz].Meshes.Add(mf);
             }
 
-            List<GameObject> meshes = new List<GameObject>();
+            if (_Meshes == null) _Meshes = new List<GameObject>();
+            _Meshes.Clear();
             if (_Data.ChildMeshes != null)
-                meshes.AddRange(_Data.ChildMeshes);
+                _Meshes.AddRange(_Data.ChildMeshes);
 
 
             foreach (MeshGroup wu in units)
             {
                 if (wu.Meshes.Count > 0)
-                    GenerateGroups(wu.Meshes, ref meshes);
+                    GenerateGroups(wu.Meshes);
             }
 
 
-            _Data.ChildMeshes = meshes.ToArray();
+            _Data.ChildMeshes = _Meshes.ToArray();
             EditorUtility.SetDirty(_Data);
         }
 
-        private void GenerateGroups(List<MeshFilter> filters, ref List<GameObject> meshes)
+        private void GenerateGroups(List<MeshFilter> filters)
         {
             if (_Data.SeprateByMesh)
             {
@@ -196,68 +202,199 @@ namespace Skill.Editor.Tools
                 }
 
                 foreach (MeshGroup g in groups)
-                    GenerateMesh(g.Meshes, ref meshes);
+                    GenerateMesh(g.Meshes);
             }
             else
             {
-                GenerateMesh(filters, ref meshes);
+                GenerateMesh(filters);
             }
         }
 
-        private void GenerateMesh(List<MeshFilter> filters, ref List<GameObject> meshes)
+
+
+
+        class MeshData
         {
-            int maxSubmesh = 1;
-            if (_Data.SeprateBySubmesh)
+            public Mesh Mesh;
+            public int SubMeshIndex;
+            public Matrix4x4 Transform;
+            public Vector3 Min;
+            public Vector3 Max;
+            public Vector3 Center;
+            public int PolyCount;
+            public int VertexCount;
+
+            public CombineInstance CI
             {
-                foreach (MeshFilter mf in filters)
-                    maxSubmesh = Mathf.Max(maxSubmesh, mf.sharedMesh.subMeshCount);
+                get
+                {
+                    CombineInstance ci = new CombineInstance();
+                    ci.subMeshIndex = SubMeshIndex;
+                    ci.mesh = Mesh;
+                    ci.transform = Transform;
+                    return ci;
+                }
+            }
+        }
+        class MeshMaterial
+        {
+
+            private List<MeshData> _Meshes;
+            public Material Material { get; private set; }
+            public int Count { get { return _Meshes.Count; } }
+            public MeshData this[int index] { get { return _Meshes[index]; } }
+
+
+
+            public void Add(MeshFilter mf, int subMeshIndex)
+            {
+                MeshData md = new MeshData();
+                md.Mesh = mf.sharedMesh;
+                md.SubMeshIndex = subMeshIndex;
+                md.Transform = mf.transform.localToWorldMatrix;
+                md.PolyCount = mf.sharedMesh.GetIndices(subMeshIndex).Length / 3;
+                md.VertexCount = mf.sharedMesh.vertexCount;
+                md.Min = mf.transform.TransformPoint(mf.sharedMesh.bounds.min);
+                md.Max = mf.transform.TransformPoint(mf.sharedMesh.bounds.max);
+                md.Center = (md.Min + md.Max) * 0.5f;
+
+                _Meshes.Add(md);
             }
 
-            Material[] materials = new Material[maxSubmesh];
-            List<CombineInstance>[] instances = new List<CombineInstance>[maxSubmesh];
-            for (int i = 0; i < maxSubmesh; i++)
+            public MeshMaterial(Material material)
             {
-                instances[i] = new List<CombineInstance>();
+                this.Material = material;
+                this._Meshes = new List<MeshData>();
+            }
+        }
+
+        private MeshMaterial FindMeshMaterial(List<MeshMaterial> meshMaterials, Material mat)
+        {
+            foreach (var mm in meshMaterials)
+                if (mm.Material == mat)
+                    return mm;
+
+            return null;
+        }
+
+        private void GenerateMesh(List<MeshFilter> filters)
+        {
+            List<MeshMaterial> meshMaterials = new List<MeshMaterial>();
+            if (_Data.SeprateByMaterial)
+            {
+                foreach (MeshFilter mf in filters)
+                {
+                    MeshRenderer renderer = mf.GetComponent<MeshRenderer>();
+                    if (renderer != null && renderer.sharedMaterials != null)
+                    {
+                        for (int i = 0; i < mf.sharedMesh.subMeshCount; i++)
+                        {
+                            if (renderer.sharedMaterials.Length > i)
+                            {
+                                MeshMaterial mm = FindMeshMaterial(meshMaterials, renderer.sharedMaterials[i]);
+                                if (mm == null)
+                                {
+                                    mm = new MeshMaterial(renderer.sharedMaterials[i]);
+                                    meshMaterials.Add(mm);
+                                }
+                                mm.Add(mf, i);
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // just find a material
+                Material mat = null;
                 foreach (MeshFilter mf in filters)
                 {
                     MeshRenderer renderer = mf.GetComponent<MeshRenderer>();
                     if (renderer != null)
                     {
-                        if (renderer.sharedMaterials.Length > i)
+                        if (renderer.sharedMaterials.Length > 0)
                         {
-                            materials[i] = renderer.sharedMaterials[i];
+                            mat = renderer.sharedMaterials[0];
                             break;
                         }
                     }
                 }
-            }
 
-            foreach (MeshFilter mf in filters)
-            {
-                for (int i = 0; i < mf.sharedMesh.subMeshCount; i++)
+                MeshMaterial mm = new MeshMaterial(mat);
+                foreach (MeshFilter mf in filters) // combine all submesh
                 {
-                    CombineInstance ci = new CombineInstance();
-                    ci.subMeshIndex = i;
-                    ci.mesh = mf.sharedMesh;
-                    ci.transform = mf.transform.localToWorldMatrix;
-                    instances[Mathf.Min(i, maxSubmesh - 1)].Add(ci);
+                    for (int i = 0; i < mf.sharedMesh.subMeshCount; i++)
+                        mm.Add(mf, i);
                 }
+                meshMaterials.Add(mm);
             }
 
-            System.Type[] compoentns = new System.Type[] { typeof(MeshRenderer), typeof(MeshFilter) };
-            for (int i = 0; i < instances.Length; i++)
+            for (int i = 0; i < meshMaterials.Count; i++)
+                CreateMesh(meshMaterials[i]);
+        }
+
+
+        private void CreateMesh(MeshMaterial mm)
+        {
+            if (mm.Count < 1) return;
+
+            List<CombineInstance> instances = new List<CombineInstance>();
+            int polyCount = 0;
+            int vertexCount = 0;
+            for (int i = 0; i < mm.Count; i++)
             {
-                Mesh mesh = new Mesh();
-                mesh.CombineMeshes(instances[i].ToArray(), true, true);
+                if (instances.Count > 0 && (((polyCount + mm[i].PolyCount) > _Data.MaxPolyCount) || ((vertexCount + mm[i].VertexCount) >= ushort.MaxValue)))
+                {
+                    CreateMesh(instances.ToArray(), mm.Material);
+                    instances.Clear();
+                    polyCount = 0;
+                    vertexCount = 0;
+                }
 
-                GameObject obj = EditorUtility.CreateGameObjectWithHideFlags(string.Format("Mesh{0}", meshes.Count), HideFlags.None, compoentns);
-                obj.GetComponent<MeshFilter>().mesh = mesh;
-                obj.transform.parent = _Data.transform;
-                obj.GetComponent<MeshRenderer>().materials = materials;
-
-                meshes.Add(obj);
-
+                instances.Add(mm[i].CI);
+                polyCount += mm[i].PolyCount;
+                vertexCount += mm[i].VertexCount;
             }
+
+            if (instances.Count > 0)
+            {
+                CreateMesh(instances.ToArray(), mm.Material);
+                instances.Clear();
+                polyCount = 0;
+            }
+        }
+
+        //private void SortBasedOnMinimum(List<MeshData> meshes)
+        //{
+        //    Vector3 min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+        //    foreach (var item in meshes)
+        //    {
+        //        min.x = Mathf.Min(min.x, item.Min.x);
+        //        min.y = Mathf.Min(min.y, item.Min.y);
+        //        min.z = Mathf.Min(min.z, item.Min.z);
+        //    }
+
+        //    foreach (var item in meshes)
+        //        item.Distance = Vector3.Distance(item.Center, min);
+
+        //    if (meshes.Count > 1)
+        //        meshes.Sort((IComparer<MeshData>)meshes[0]);
+        //}
+
+        private void CreateMesh(CombineInstance[] cis, Material mat)
+        {
+            if (_MeshCompoentns == null)
+                _MeshCompoentns = new System.Type[] { typeof(MeshRenderer), typeof(MeshFilter) };
+
+            Mesh mesh = new Mesh();
+            mesh.CombineMeshes(cis, true, true);
+
+            GameObject obj = EditorUtility.CreateGameObjectWithHideFlags(string.Format("Mesh{0}", _Meshes.Count), HideFlags.None, _MeshCompoentns);
+            obj.GetComponent<MeshFilter>().mesh = mesh;
+            obj.transform.parent = _Data.transform;
+            obj.GetComponent<MeshRenderer>().materials = new Material[] { mat };
+
+            _Meshes.Add(obj);
         }
     }
 }

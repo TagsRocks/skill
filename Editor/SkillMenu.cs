@@ -22,6 +22,12 @@ namespace Skill.Editor
             Tools.CopyPaseComponentsWindow.Instance.Show();
         }
 
+        [MenuItem("Skill/Tools/Move", false, 2)]
+        static void ShowMoveWindow()
+        {
+            Tools.MoveWindow.Instance.Show();
+        }
+
         [MenuItem("Skill/Matinee Editor", false, 20)]
         static void ShowMatineeEditor()
         {

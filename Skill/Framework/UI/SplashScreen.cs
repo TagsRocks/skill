@@ -1,4 +1,8 @@
-﻿using System;
+﻿#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_XBOX360 || UNITY_PS3
+    #define SUPPORTMOVIE
+#endif
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -65,6 +69,7 @@ namespace Skill.Framework.UI
         {
             base.GetReferences();
             _Fading = GetComponent<Fading>();
+            _Fading.Alpha = 1.0f;
         }
 
         /// <summary>
@@ -73,6 +78,8 @@ namespace Skill.Framework.UI
         protected override void Start()
         {
             base.Start();
+            useGUILayout = false;
+            Time.timeScale = 1;
             _Frame = new Frame("SplashFrame");
 
             for (int i = 0; i < 3; i++)
@@ -113,16 +120,16 @@ namespace Skill.Framework.UI
 
         private void ShowNext()
         {
-            if (_Fading != null)
+            if (_CurrentSplashIndex >= 0 && _Fading != null)
             {
                 // fadeout
                 _Fading.FadeOut();
 
                 //prepare to change texture after fadeout                
-                _NextSplashTW.Begin(_Fading.FadeOutTime);
+                _NextSplashTW.Begin(_Fading.FadeOutTime + 0.2f);
             }
             else
-                _NextSplashTW.Begin(0.1f);
+                _NextSplashTW.Begin(0.2f);
         }
 
 
@@ -143,6 +150,7 @@ namespace Skill.Framework.UI
                 {
                     if (_NextSplashTW.IsOver) // fadeout is complete and times to change splash
                     {
+                        _NextSplashTW.End();
                         MoveNext();// show next and fadein
                     }
                 }
@@ -153,17 +161,17 @@ namespace Skill.Framework.UI
                         _SplashTW.End();
                         ShowNext();
                     }
-                }
-                if (_SplashTW.ElapsedTime > AllowEscapeAfter)
-                {
-                    if (Escape())// if user press escape button
+                    else if (_SplashTW.ElapsedTime > AllowEscapeAfter)
                     {
-                        if (FastEscape)
-                            MoveNext();
-                        else
-                            ShowNext();
-                    }
+                        if (Escape())// if user press escape button
+                        {
+                            if (FastEscape)
+                                MoveNext();
+                            else
+                                ShowNext();
+                        }
 
+                    }
                 }
                 _Frame.Update();
             }
@@ -174,6 +182,7 @@ namespace Skill.Framework.UI
         {
             _NextSplashTW.End();
             // stop previous movie
+#if SUPPORTMOVIE
             if (_CurrentSplashIndex >= 0)
             {
                 if (SplashImages[_CurrentSplashIndex] is MovieTexture)
@@ -186,11 +195,13 @@ namespace Skill.Framework.UI
                         audio.clip = null;
                     }
                 }
-            }
+            } 
+#endif
 
             _CurrentSplashIndex++;// go next splash
             if (_CurrentSplashIndex < SplashImages.Length) // if another splash exist
             {
+#if SUPPORTMOVIE
                 if (SplashImages[_CurrentSplashIndex] is MovieTexture)
                 {
                     MovieTexture movie = (MovieTexture)SplashImages[_CurrentSplashIndex];
@@ -214,16 +225,19 @@ namespace Skill.Framework.UI
                         _SplashTW.Begin(Mathf.Max(movie.duration - 0.1f, SplashTime - 0.1f, 0.1f));
                 }
                 else
+                { 
+#endif
+                SetSize(this.Size);
+                if (_Fading != null)
                 {
-                    SetSize(this.Size);
-                    if (_Fading != null)
-                    {
-                        _Fading.FadeIn(true);
-                        _SplashTW.Begin(Mathf.Max(SplashTime - _Fading.FadeOutTime, _Fading.FadeOutTime + 0.1f));
-                    }
-                    else
-                        _SplashTW.Begin(Mathf.Max(SplashTime - 0.1f, 0.1f));
+                    _Fading.FadeIn(true);
+                    _SplashTW.Begin(Mathf.Max(SplashTime - _Fading.FadeOutTime, _Fading.FadeOutTime + 0.1f));
                 }
+                else
+                    _SplashTW.Begin(Mathf.Max(SplashTime - 0.1f, 0.1f));
+#if SUPPORTMOVIE
+                }  
+#endif
 
                 _ImgSplash.Texture = SplashImages[_CurrentSplashIndex];// change texture
             }

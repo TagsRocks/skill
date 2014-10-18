@@ -58,7 +58,7 @@ namespace Skill.Editor.UI
         {
             Label = new GUIContent();
             this.Height = 16;
-            this.ChangeOnReturn = true;
+            this.ChangeOnReturn = false;
         }
 
         /// <summary>
