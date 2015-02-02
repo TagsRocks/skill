@@ -1,3 +1,0 @@
-﻿1- Add EventNode in BehaviorTree
-2- Variable binding in AnimationTree
-3- Multithread building

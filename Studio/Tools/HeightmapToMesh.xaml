@@ -1,9 +1,0 @@
-﻿<Window x:Class="Skill.Studio.Tools.HeightmapToMesh"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:view="clr-namespace:Skill.Studio.Tools.HToMesh.View"
-        Title="HeightmapTo Mesh" Height="600" Width="800" WindowStartupLocation="CenterOwner" >
-    <Grid>
-        <view:TSWizardView/>
-    </Grid>
-</Window>
