@@ -47,7 +47,8 @@ namespace Skill.Framework.AI
                 if (status.IsInterrupted) break;
                 BehaviorContainer node = this[i];
                 status.Parameters = node.Parameters;
-                result = node.Behavior.Execute(status);
+                node.Execute(status);
+                result = node.Result;
                 if (result == BehaviorResult.Running)
                 {
                     RunningChildIndex = i;

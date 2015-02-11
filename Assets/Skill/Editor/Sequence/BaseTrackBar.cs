@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Skill.Editor.UI.Extended;
+using Skill.Editor.UI;
 using Skill.Framework.Sequence;
 
 namespace Skill.Editor.Sequence
@@ -10,7 +10,7 @@ namespace Skill.Editor.Sequence
     /// <summary>
     ///  Base class for TrackBar in Matinee editor
     /// </summary>
-    public abstract class BaseTrackBar : Skill.Editor.UI.Extended.TrackBar
+    public abstract class BaseTrackBar : Skill.Editor.UI.TrackBar
     {
         protected static float BaseHeight = 18;
 

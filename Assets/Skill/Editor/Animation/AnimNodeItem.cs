@@ -6,14 +6,14 @@ using System.Collections.Generic;
 
 namespace Skill.Editor.Animation
 {
-    public class AnimNodeItem : Grid, Skill.Editor.UI.Extended.IProperties, Skill.Editor.UI.ISelectable
+    public class AnimNodeItem : Grid, Skill.Editor.UI.IProperties, Skill.Editor.UI.ISelectable
     {
         private const float TitleHeight = 30;
 
         private Box _Border;
         private Label _LblTitle;
         private AnimNodeItemDragThumb _Drag;
-        private Skill.Editor.UI.Extended.Connector _OutputConnector;
+        private Skill.Editor.UI.Connector _OutputConnector;
         private StackPanel _PnlItems;
         private bool _RecalcSize = true;
 
@@ -112,7 +112,7 @@ namespace Skill.Editor.Animation
         private void CreateOutputConnector()
         {
             if (_OutputConnector != null) return;
-            _OutputConnector = new UI.Extended.Connector(UI.Extended.ConnectorType.Output)
+            _OutputConnector = new UI.Connector(UI.ConnectorType.Output)
             {
                 Row = 1,
                 Column = 0,
@@ -138,7 +138,7 @@ namespace Skill.Editor.Animation
             _PnlItems.Controls.Add(lbl);
             return lbl;
         }
-        public int GetConnectorIndex(Skill.Editor.UI.Extended.IConnector connector)
+        public int GetConnectorIndex(Skill.Editor.UI.IConnector connector)
         {
             int index = -1;
             foreach (var item in _PnlItems.Controls)
@@ -153,7 +153,7 @@ namespace Skill.Editor.Animation
 
             return -1;
         }
-        public Skill.Editor.UI.Extended.IConnector GetInputConnector(int connectorIndex)
+        public Skill.Editor.UI.IConnector GetInputConnector(int connectorIndex)
         {
             var item = GetInputConnectorItem(connectorIndex);
             if (item != null)
@@ -178,7 +178,7 @@ namespace Skill.Editor.Animation
         public void RemoveInputConnector(int connectorIndex)
         {
             InputConnectorItem connector = GetInputConnectorItem(connectorIndex);
-            List<Skill.Editor.UI.Extended.Connection> connections = new List<UI.Extended.Connection>();
+            List<Skill.Editor.UI.Connection> connections = new List<UI.Connection>();
             if (connector != null)
             {
                 _PnlItems.Controls.Remove(connector);
@@ -192,7 +192,7 @@ namespace Skill.Editor.Animation
         }
         public void RemoveAllConnections()
         {
-            List<Skill.Editor.UI.Extended.Connection> connections = new List<UI.Extended.Connection>();
+            List<Skill.Editor.UI.Connection> connections = new List<UI.Connection>();
             foreach (var item in _PnlItems.Controls)
             {
                 if (item is InputConnectorItem)
@@ -205,7 +205,7 @@ namespace Skill.Editor.Animation
                 c.Break();
             connections.Clear();
         }
-        public Skill.Editor.UI.Extended.IConnector OutConnector { get { return _OutputConnector; } }
+        public Skill.Editor.UI.IConnector OutConnector { get { return _OutputConnector; } }
 
         public string GetInputName(int index)
         {
@@ -258,7 +258,7 @@ namespace Skill.Editor.Animation
 
         protected virtual ItemProperties CreateProperties() { return new ItemProperties(this); }
 
-        protected class ItemProperties : UI.Extended.ExposeProperties
+        protected class ItemProperties : UI.ExposeProperties
         {
             AnimNodeItem _Item;
             public ItemProperties(AnimNodeItem item)
@@ -274,7 +274,7 @@ namespace Skill.Editor.Animation
         }
 
         private ItemProperties _Properties;
-        public UI.Extended.PropertiesPanel Properties
+        public UI.PropertiesPanel Properties
         {
             get
             {
@@ -290,7 +290,7 @@ namespace Skill.Editor.Animation
 
         #region DragThum
         internal Vector2 StartDrag;
-        class AnimNodeItemDragThumb : Skill.Editor.UI.Extended.DragThumb
+        class AnimNodeItemDragThumb : Skill.Editor.UI.DragThumb
         {
             private AnimNodeItem _Item;
 
@@ -444,9 +444,9 @@ namespace Skill.Editor.Animation
             }
 
             private Label _LblHeader;
-            private Skill.Editor.UI.Extended.Connector _Connector;
+            private Skill.Editor.UI.Connector _Connector;
             public string Header { get { return _LblHeader.Text; } set { _LblHeader.Text = value; } }
-            public Skill.Editor.UI.Extended.IConnector Connector { get { return _Connector; } }
+            public Skill.Editor.UI.IConnector Connector { get { return _Connector; } }
             public AnimNodeItem Node { get; private set; }
             public InputConnectorItem(AnimNodeItem node)
             {
@@ -455,7 +455,7 @@ namespace Skill.Editor.Animation
                 _LblHeader = new Label();
                 this.Controls.Add(_LblHeader);
 
-                _Connector = new UI.Extended.Connector(UI.Extended.ConnectorType.Input)
+                _Connector = new UI.Connector(UI.ConnectorType.Input)
                 {
                     VerticalAlignment = Framework.UI.VerticalAlignment.Center,
                     HorizontalAlignment = Framework.UI.HorizontalAlignment.Right,
@@ -497,7 +497,7 @@ namespace Skill.Editor.Animation
 
 
             private AnimNodeItem _Item;
-            private Skill.Framework.UI.Extended.ListBox _LbItems;
+            private Skill.Framework.UI.ListBox _LbItems;
             private Skill.Framework.UI.Grid _PnlButtons;
             private Skill.Framework.UI.Button _BtnAdd;
             private Skill.Framework.UI.Button _BtnRemove;
@@ -509,7 +509,7 @@ namespace Skill.Editor.Animation
                 this.RowDefinitions.Add(20, GridUnitType.Pixel); // buttons
                 this.Controls.Add(CreateHeader());
 
-                _LbItems = new Framework.UI.Extended.ListBox() { Row = 1 };
+                _LbItems = new Framework.UI.ListBox() { Row = 1 };
                 _LbItems.DisableFocusable();
                 _LbItems.BackgroundVisible = true;
                 _LbItems.Background.Style = (GUIStyle)"RL Background";

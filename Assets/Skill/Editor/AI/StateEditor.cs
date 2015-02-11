@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Linq;
 using Skill.Framework.UI;
-using Skill.Framework.UI.Extended;
 
 namespace Skill.Editor.AI
 {
@@ -91,7 +90,7 @@ namespace Skill.Editor.AI
         {
             OnSelectedStateChanged();
             SetButtonsEnable();
-            Skill.Editor.UI.Extended.InspectorProperties.Select((StateItem)_StateList.SelectedItem);
+            Skill.Editor.UI.InspectorProperties.Select((StateItem)_StateList.SelectedItem);
             Skill.Editor.UI.EditorFrame.RepaintParentEditorWindow(this);
         }
         private void SetButtonsEnable()
@@ -156,7 +155,7 @@ namespace Skill.Editor.AI
                 Add(state);
             }
 
-            SelectDefaultState();
+            //SelectDefaultState();
         }
         private void Add(BehaviorTreeStateData state)
         {
@@ -277,8 +276,8 @@ namespace Skill.Editor.AI
 
         public void DeselectInspector()
         {
-            if (Skill.Editor.UI.Extended.InspectorProperties.GetSelected() is StateItem)
-                Skill.Editor.UI.Extended.InspectorProperties.Select(null);
+            if (Skill.Editor.UI.InspectorProperties.GetSelected() is StateItem)
+                Skill.Editor.UI.InspectorProperties.Select(null);
         }
 
         public void RefreshContents()
@@ -290,7 +289,7 @@ namespace Skill.Editor.AI
         }
 
 
-        private class StateItem : Label, Skill.Editor.UI.Extended.IProperties
+        private class StateItem : Label, Skill.Editor.UI.IProperties
         {
             private StateEditor _Owner;
             public BehaviorTreeStateData State { get; private set; }
@@ -320,7 +319,7 @@ namespace Skill.Editor.AI
 
             public bool IsSelectedProperties { get; set; }
             private StateItemProperties _Properties;
-            public Skill.Editor.UI.Extended.PropertiesPanel Properties
+            public Skill.Editor.UI.PropertiesPanel Properties
             {
                 get
                 {
@@ -331,7 +330,7 @@ namespace Skill.Editor.AI
             }
             public string Title { get { return "BehaviorTreeState"; } }
 
-            class StateItemProperties : Skill.Editor.UI.Extended.ExposeProperties
+            class StateItemProperties : Skill.Editor.UI.ExposeProperties
             {
                 private StateItem _Item;
                 public StateItemProperties(StateItem item)

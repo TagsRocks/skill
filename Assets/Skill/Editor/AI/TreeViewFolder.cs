@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Skill.Editor.AI
 {
-    public class TreeViewFolder : Skill.Editor.UI.Extended.FolderView, IBehaviorItem, Skill.Editor.UI.Extended.IProperties
+    public class TreeViewFolder : Skill.Editor.UI.FolderView, IBehaviorItem, Skill.Editor.UI.IProperties
     {
         public BehaviorTreeEditorWindow Editor
         {
@@ -28,9 +28,8 @@ namespace Skill.Editor.AI
             base.Foldout.Content.image = Data.GetIcon();
         }
 
-        public virtual void RefreshContent()
+        private string AppendParameters(string name)
         {
-            string name = Data.Name;
             if (Data is IParameterData)
             {
                 if (Parent != null)
@@ -48,11 +47,32 @@ namespace Skill.Editor.AI
                     }
                 }
             }
-            base.Foldout.Content.text = name;
+            return name;
+        }
+        public virtual void RefreshContent()
+        {
+            base.Foldout.Content.text = AppendParameters(Data.Name);
             foreach (IBehaviorItem item in this.Controls)
                 item.RefreshContent();
         }
 
+        public virtual void RefreshSameContent(IBehaviorItem bi)
+        {
+            if (this.Data == bi.Data)
+                base.Foldout.Content.text = AppendParameters(Data.Name);
+            foreach (IBehaviorItem item in this.Controls)
+            {
+                if (item is TreeViewItem)
+                {
+                    if (item.Data == bi.Data)
+                        item.RefreshContent();
+                }
+                else if (item is TreeViewFolder)
+                {
+                    ((TreeViewFolder)item).RefreshSameContent(bi);
+                }
+            }
+        }
         protected override void BeginRender()
         {
             if (Foldout.Style == null)
@@ -464,7 +484,7 @@ namespace Skill.Editor.AI
         #region IProperties members
         public virtual bool IsSelectedProperties { get; set; }
         private ItemProperties _Properties;
-        public virtual Skill.Editor.UI.Extended.PropertiesPanel Properties
+        public virtual Skill.Editor.UI.PropertiesPanel Properties
         {
             get
             {
@@ -473,7 +493,7 @@ namespace Skill.Editor.AI
             }
         }
         public virtual string Title { get { return Data.BehaviorType.ToString(); } }
-        protected class ItemProperties : Skill.Editor.UI.Extended.ExposeProperties
+        protected class ItemProperties : Skill.Editor.UI.ExposeProperties
         {
             private TreeViewFolder _Item;
             private ParameterEditor _Editor;

@@ -3,7 +3,6 @@ using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 using Skill.Framework.UI;
-using Skill.Framework.UI.Extended;
 using Skill.Editor.Animation;
 
 namespace Skill.Editor.Animation
@@ -59,7 +58,7 @@ namespace Skill.Editor.Animation
         private Skill.Editor.UI.EditorFrame _Frame;
 
         private Skill.Framework.UI.TextField _TxtSearch;
-        private Skill.Framework.UI.Extended.ListBox _AnimationList;
+        private Skill.Framework.UI.ListBox _AnimationList;
         private Skill.Framework.UI.Button _BtnSelect;
         private Skill.Framework.UI.Button _BtnCancel;
 
@@ -95,9 +94,28 @@ namespace Skill.Editor.Animation
             _BtnCancel.Click += _BtnCancel_Click;
             _BtnSelect.Click += _BtnSelect_Click;
             _AnimationList.SelectionChanged += _AnimationList_SelectionChanged;
+            _AnimationList.SelectedDoubleClick += _AnimationList_SelectionDoubleClick;
             _TxtSearch.TextChanged += _TxtSearch_TextChanged;
 
             _FocuseText = true;
+        }
+
+
+        private void Select()
+        {
+            if (_AnimationList.SelectedItem != null)
+            {
+                if (SequenceNode != null)
+                {
+                    _SequenceNode.AnimationName = ((Label)_AnimationList.SelectedItem).Text;
+                    Close();
+                }
+            }
+        }
+
+        void _AnimationList_SelectionDoubleClick(object sender, System.EventArgs e)
+        {
+            Select();
         }
 
         void _TxtSearch_TextChanged(object sender, System.EventArgs e)
@@ -133,14 +151,7 @@ namespace Skill.Editor.Animation
 
         void _BtnSelect_Click(object sender, System.EventArgs e)
         {
-            if (_AnimationList.SelectedItem != null)
-            {
-                if (SequenceNode != null)
-                {
-                    _SequenceNode.AnimationName = ((Label)_AnimationList.SelectedItem).Text;
-                    Close();
-                }
-            }
+            Select();
         }
 
         void _BtnCancel_Click(object sender, System.EventArgs e)
@@ -153,7 +164,7 @@ namespace Skill.Editor.Animation
             {
                 RefreshStyles();
 
-                if(_FocuseText)
+                if (_FocuseText)
                 {
                     _FocuseText = false;
                     _Frame.FocusControl(_TxtSearch);

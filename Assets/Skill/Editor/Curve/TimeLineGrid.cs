@@ -2,7 +2,7 @@
 using System.Collections;
 using Skill.Framework.UI;
 using System.Collections.Generic;
-using Skill.Editor.UI.Extended;
+using Skill.Editor.UI;
 
 namespace Skill.Editor.Curve
 {

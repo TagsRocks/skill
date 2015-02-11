@@ -6,7 +6,6 @@ using Skill.Editor.UI;
 using UnityEngine;
 using Skill.Editor;
 using Skill.Framework;
-using Skill.Framework.UI.Extended;
 
 
 namespace Skill.Editor
@@ -37,7 +36,7 @@ namespace Skill.Editor
         private const float ButtonRowHeight = 26;
 
         private Skill.Editor.UI.ChangeCheck _MainPanel;
-        private Skill.Framework.UI.Extended.ListBox _ItemsList;
+        private Skill.Framework.UI.ListBox _ItemsList;
         private Skill.Framework.UI.Button _BtnAdd;
         private Skill.Framework.UI.Frame _Frame;
         private CacheObjectField _ObjectField;

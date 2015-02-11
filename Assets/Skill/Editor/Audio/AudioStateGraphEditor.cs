@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Skill.Framework.UI;
 using System.Linq;
 using Skill.Framework.Audio;
-using Skill.Editor.UI.Extended;
+using Skill.Editor.UI;
 
 namespace Skill.Editor.Audio
 {
@@ -13,7 +13,7 @@ namespace Skill.Editor.Audio
         private AudioControllerEditorWindow _Editor;
         private Skill.Framework.UI.Box _Background;
         private AudioConnectionHost _ConnectionHost;
-        private Skill.Editor.UI.Extended.ZoomPanel _Panel;
+        private Skill.Editor.UI.ZoomPanel _Panel;
         private Skill.Editor.UI.MultiSelector<Skill.Editor.UI.ISelectable> _MultiSelector;
 
         public Skill.Editor.UI.SelectableCollection<Skill.Editor.UI.ISelectable> Selection { get; private set; }
@@ -30,7 +30,7 @@ namespace Skill.Editor.Audio
             _ConnectionHost = new AudioConnectionHost(this) { Row = 0 };
             this.Controls.Add(_ConnectionHost);
 
-            _Panel = new Skill.Editor.UI.Extended.ZoomPanel() { Row = 0, MinZoomFactor = 0.6f, MaxZoomFactor = 1.0f };
+            _Panel = new Skill.Editor.UI.ZoomPanel() { Row = 0, MinZoomFactor = 0.6f, MaxZoomFactor = 1.0f };
             this.Controls.Add(_Panel);
 
             this._MultiSelector = new Skill.Editor.UI.MultiSelector<Skill.Editor.UI.ISelectable>(this, Selection) { Row = 1 };
@@ -45,17 +45,17 @@ namespace Skill.Editor.Audio
             Skill.Editor.UI.ISelectable selected = this.Selection.SelectedItem;
             if (selected != null)
             {
-                Skill.Editor.UI.Extended.InspectorProperties.Select((Skill.Editor.UI.Extended.IProperties)selected);
+                Skill.Editor.UI.InspectorProperties.Select((Skill.Editor.UI.IProperties)selected);
             }
             else
             {
-                var s = Skill.Editor.UI.Extended.InspectorProperties.GetSelected();
+                var s = Skill.Editor.UI.InspectorProperties.GetSelected();
                 if (s != null)
                 {
                     if (s is AudioStateNode)
-                        Skill.Editor.UI.Extended.InspectorProperties.Select(null);
+                        Skill.Editor.UI.InspectorProperties.Select(null);
                     if (s is AudioConnection)
-                        Skill.Editor.UI.Extended.InspectorProperties.Select(null);
+                        Skill.Editor.UI.InspectorProperties.Select(null);
                 }
             }
             StopPreview();
@@ -75,10 +75,10 @@ namespace Skill.Editor.Audio
 
         public void DeselectInspector()
         {
-            if (Skill.Editor.UI.Extended.InspectorProperties.GetSelected() is AudioStateNode)
-                Skill.Editor.UI.Extended.InspectorProperties.Select(null);
-            else if (Skill.Editor.UI.Extended.InspectorProperties.GetSelected() is AudioConnection)
-                Skill.Editor.UI.Extended.InspectorProperties.Select(null);
+            if (Skill.Editor.UI.InspectorProperties.GetSelected() is AudioStateNode)
+                Skill.Editor.UI.InspectorProperties.Select(null);
+            else if (Skill.Editor.UI.InspectorProperties.GetSelected() is AudioConnection)
+                Skill.Editor.UI.InspectorProperties.Select(null);
         }
 
         private AudioStateNode Find(AudioState state)
@@ -553,7 +553,7 @@ namespace Skill.Editor.Audio
             }
         }
 
-        private class AudioConnection : DirectConnection, Skill.Editor.UI.Extended.IProperties
+        private class AudioConnection : DirectConnection, Skill.Editor.UI.IProperties
         {
             public AudioTransition Transition { get; private set; }
 
@@ -621,7 +621,7 @@ namespace Skill.Editor.Audio
             public bool IsSelectedProperties { get; set; }
 
             private AudioConnectionProperties _Properties;
-            public Skill.Editor.UI.Extended.PropertiesPanel Properties
+            public Skill.Editor.UI.PropertiesPanel Properties
             {
                 get
                 {
@@ -639,7 +639,7 @@ namespace Skill.Editor.Audio
                 base.Render();
             }
 
-            class AudioConnectionProperties : Skill.Editor.UI.Extended.ExposeProperties
+            class AudioConnectionProperties : Skill.Editor.UI.ExposeProperties
             {
                 private Skill.Editor.UI.IntPopup _Triggers;
 

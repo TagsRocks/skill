@@ -120,7 +120,8 @@ namespace Skill.Framework.AI
             BehaviorResult result = BehaviorResult.Failure;
             BehaviorContainer node = this[RunningChildIndex];
             status.Parameters = node.Parameters;
-            result = node.Behavior.Execute(status);
+            node.Execute(status);
+            result = node.Result;
             if (result != BehaviorResult.Running)
                 RunningChildIndex = -1;
             return result;

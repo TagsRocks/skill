@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Skill.Framework.Sequence;
-using Skill.Editor.UI.Extended;
+using Skill.Editor.UI;
 
 namespace Skill.Editor.Sequence
 {

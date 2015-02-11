@@ -21,16 +21,34 @@ namespace Skill.Framework.AI
         public Behavior Behavior { get; private set; }
 
         /// <summary>
+        /// Last ecexution result of behavior - (setter is for internal use - do not change this manually)
+        /// </summary>
+        public BehaviorResult Result { get; set; }
+
+        /// <summary>
+        /// parent of Behavior node
+        /// </summary>
+        public Behavior Parent { get; private set; }
+
+        /// <summary>
         /// Create an instance of BehaviorContainer
         /// </summary>
         /// <param name="behavior">Behavior node</param>
         /// <param name="parameters">Parameters of behavior at this position of tree</param>
-        public BehaviorContainer(Behavior behavior, BehaviorParameterCollection parameters)
+        public BehaviorContainer(Behavior parent, Behavior behavior, BehaviorParameterCollection parameters)
         {
+            this.Parent = parent;
             if (behavior == null)
                 throw new ArgumentNullException("Behavior is null.");
+            this.Result = BehaviorResult.Failure;
             this.Behavior = behavior;
             this.Parameters = parameters;
+        }
+
+        public void Execute(BehaviorTreeStatus status)
+        {
+            status.RegisterForExecution(this); // register in execution sequence
+            Result = Behavior.Execute(status);
         }
     }
     #endregion
@@ -79,7 +97,7 @@ namespace Skill.Framework.AI
         {
             if (child != null)
             {
-                _Children.Add(new BehaviorContainer(child, parameters));
+                _Children.Add(new BehaviorContainer(this, child, parameters));
             }
         }
 

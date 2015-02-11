@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Linq;
 using Skill.Framework.UI;
-using Skill.Framework.UI.Extended;
 
 namespace Skill.Editor.Animation
 {
@@ -13,8 +12,8 @@ namespace Skill.Editor.Animation
         private ListBox _ParameterList;
         private UniformGrid _ParameterToolbar;
 
-        private Skill.Editor.UI.Extended.MenuBar _MnuParameter;
-        private Skill.Editor.UI.Extended.MenuBarItem _MnuAddParameter;
+        private Skill.Editor.UI.MenuBar _MnuParameter;
+        private Skill.Editor.UI.MenuBarItem _MnuAddParameter;
         private Skill.Editor.UI.MenuItem _MnuAddFloatParameter;
         private Skill.Editor.UI.MenuItem _MnuAddIntegerParameter;
         private Button _BtnRemoveParameter;
@@ -56,9 +55,9 @@ namespace Skill.Editor.Animation
             _ParameterToolbar = new UniformGrid() { Row = 0, Column = 1, Rows = 1, Columns = 2 };
             this.Controls.Add(_ParameterToolbar);
 
-            _MnuParameter = new UI.Extended.MenuBar() { Column = 0 };
+            _MnuParameter = new UI.MenuBar() { Column = 0 };
             _ParameterToolbar.Controls.Add(_MnuParameter);
-            _MnuAddParameter = new UI.Extended.MenuBarItem();
+            _MnuAddParameter = new UI.MenuBarItem();
             _MnuParameter.Controls.Add(_MnuAddParameter);
             _MnuAddFloatParameter = new UI.MenuItem("Float") { UserData = AnimationTreeParameterType.Float };
             _MnuAddParameter.Add(_MnuAddFloatParameter);
@@ -91,7 +90,7 @@ namespace Skill.Editor.Animation
         {
             OnSelectedParameterChanged();
             SetButtonsEnable();
-            Skill.Editor.UI.Extended.InspectorProperties.Select((ParameterItem)_ParameterList.SelectedItem);
+            Skill.Editor.UI.InspectorProperties.Select((ParameterItem)_ParameterList.SelectedItem);
             Skill.Editor.UI.EditorFrame.RepaintParentEditorWindow(this);
         }
         private void SetButtonsEnable()
@@ -198,8 +197,8 @@ namespace Skill.Editor.Animation
 
         public void DeselectInspector()
         {
-            if (Skill.Editor.UI.Extended.InspectorProperties.GetSelected() is ParameterItem)
-                Skill.Editor.UI.Extended.InspectorProperties.Select(null);
+            if (Skill.Editor.UI.InspectorProperties.GetSelected() is ParameterItem)
+                Skill.Editor.UI.InspectorProperties.Select(null);
         }
 
         public void RefreshContents()
@@ -210,7 +209,7 @@ namespace Skill.Editor.Animation
             }
         }
 
-        private class ParameterItem : Label, Skill.Editor.UI.Extended.IProperties
+        private class ParameterItem : Label, Skill.Editor.UI.IProperties
         {
             private ParameterEditor _Editor;
             public AnimationTreeParameter Data { get; private set; }
@@ -261,7 +260,7 @@ namespace Skill.Editor.Animation
 
             public bool IsSelectedProperties { get; set; }
             private ParameterItemProperties _Properties;
-            public Skill.Editor.UI.Extended.PropertiesPanel Properties
+            public Skill.Editor.UI.PropertiesPanel Properties
             {
                 get
                 {
@@ -281,7 +280,7 @@ namespace Skill.Editor.Animation
                 }
             }
 
-            class ParameterItemProperties : Skill.Editor.UI.Extended.ExposeProperties
+            class ParameterItemProperties : Skill.Editor.UI.ExposeProperties
             {
                 private Skill.Editor.UI.FloatField _FloatField;
                 private Skill.Editor.UI.IntField _IntField;

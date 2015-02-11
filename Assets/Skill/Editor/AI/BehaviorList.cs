@@ -15,7 +15,7 @@ namespace Skill.Editor.AI
         private ToolbarButton _BtnDecorators;
         private ToolbarButton _BtnComposites;
 
-        private Skill.Framework.UI.Extended.ListBox _LbItems;
+        private Skill.Framework.UI.ListBox _LbItems;
         private BehaviorTreeEditorWindow _Editor;
 
         public BehaviorList(BehaviorTreeEditorWindow editor)
@@ -48,7 +48,7 @@ namespace Skill.Editor.AI
             _BtnComposites.Content.text = "Composites";
             _BehaviorTabs.Items.Add(_BtnComposites);
 
-            _LbItems = new Framework.UI.Extended.ListBox() { Row = 1, Column = 0, ColumnSpan = 2, BackgroundVisible = true };
+            _LbItems = new Framework.UI.ListBox() { Row = 1, Column = 0, ColumnSpan = 2, BackgroundVisible = true };
             _LbItems.DisableFocusable();
             this.Controls.Add(_LbItems);
 
@@ -65,9 +65,9 @@ namespace Skill.Editor.AI
         void _LbItems_SelectionChanged(object sender, System.EventArgs e)
         {
             if (_LbItems.SelectedItem == null)
-                Skill.Editor.UI.Extended.InspectorProperties.Select(null);
+                Skill.Editor.UI.InspectorProperties.Select(null);
             else
-                Skill.Editor.UI.Extended.InspectorProperties.Select(_LbItems.SelectedItem as ListItem);
+                Skill.Editor.UI.InspectorProperties.Select(_LbItems.SelectedItem as ListItem);
             _Editor.Repaint();
         }
 
@@ -97,8 +97,8 @@ namespace Skill.Editor.AI
 
         public void DeselectInspector()
         {
-            if (Skill.Editor.UI.Extended.InspectorProperties.GetSelected() is ListItem)
-                Skill.Editor.UI.Extended.InspectorProperties.Select(null);
+            if (Skill.Editor.UI.InspectorProperties.GetSelected() is ListItem)
+                Skill.Editor.UI.InspectorProperties.Select(null);
         }
 
         public void Rebuild()
@@ -139,7 +139,7 @@ namespace Skill.Editor.AI
         }
 
 
-        class ListItem : Skill.Framework.UI.Grid, Skill.Editor.UI.Extended.IProperties
+        class ListItem : Skill.Framework.UI.Grid, Skill.Editor.UI.IProperties
         {
             private Image _ImgIcon;
             private Label _LblName;
@@ -191,7 +191,7 @@ namespace Skill.Editor.AI
             public bool IsSelectedProperties { get; set; }
 
             private ListItemProperties _Properties;
-            public UI.Extended.PropertiesPanel Properties
+            public UI.PropertiesPanel Properties
             {
                 get
                 {
@@ -202,7 +202,7 @@ namespace Skill.Editor.AI
             }
 
 
-            class ListItemProperties : UI.Extended.PropertiesPanel
+            class ListItemProperties : UI.PropertiesPanel
             {
                 private Button _BtnRemove;
 
@@ -243,7 +243,7 @@ namespace Skill.Editor.AI
                 private ParameterDataCollection _Data;
                 private Skill.Framework.UI.Box _HeaderBg;
                 private Skill.Framework.UI.Grid _Header;
-                private Skill.Framework.UI.Extended.ListBox _LbItems;
+                private Skill.Framework.UI.ListBox _LbItems;
                 private Skill.Framework.UI.Grid _PnlButtons;
                 private Skill.Framework.UI.Button _BtnAdd;
                 private Skill.Framework.UI.Button _BtnRemove;
@@ -271,7 +271,7 @@ namespace Skill.Editor.AI
                     this.Controls.Add(_Header);
 
 
-                    _LbItems = new Framework.UI.Extended.ListBox() { Row = 2 };
+                    _LbItems = new Framework.UI.ListBox() { Row = 2 };
                     _LbItems.DisableFocusable();
                     _LbItems.BackgroundVisible = true;
                     _LbItems.Background.Style = (GUIStyle)"RL Background";

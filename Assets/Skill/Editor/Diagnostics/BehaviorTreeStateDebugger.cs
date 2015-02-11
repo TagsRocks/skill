@@ -56,7 +56,7 @@ namespace Skill.Editor.Diagnostics
 
         private EditorFrame _Frame;
         private ObjectField<Skill.Framework.Controller> _ControllerField;
-        private Editor.UI.Extended.TreeView _TreeView;
+        private Editor.UI.TreeView _TreeView;
         private StackPanel _InfoPanel;
         private Label _SuccessState, _FailurState, _RunningState;
         private GUIStyle _SuccessStyle, _FailurStyle, _RunningStyle;
@@ -77,7 +77,7 @@ namespace Skill.Editor.Diagnostics
             _ControllerField = new ObjectField<Skill.Framework.Controller>() { Row = 0, Column = 0, ColumnSpan = 3, VerticalAlignment = VerticalAlignment.Center, Height = 18 };
             _ControllerField.ObjectChanged += new EventHandler(_ControllerField_ObjectChanged);
 
-            _TreeView = new UI.Extended.TreeView() { Row = 1, Column = 0 };
+            _TreeView = new UI.TreeView() { Row = 1, Column = 0 };
             _TreeView.DisableFocusable();
             _TreeView.AutoHeight = true;
             _TreeView.AutoWidth = true;
@@ -120,22 +120,26 @@ namespace Skill.Editor.Diagnostics
 
         class BehaviorTag
         {
+            public Skill.Framework.AI.BehaviorContainer Container { get; private set; }
             public Skill.Framework.AI.Behavior Behavior { get; private set; }
             public Label Label { get; private set; }
 
-            public BehaviorTag(Skill.Framework.AI.Behavior behavior, Label label)
+            public BehaviorTag(Skill.Framework.AI.Behavior behavior, Skill.Framework.AI.BehaviorContainer container, Label label)
             {
+                this.Container = container;
                 this.Behavior = behavior;
                 this.Label = label;
             }
         }
         class CompositeTag
         {
+            public Skill.Framework.AI.BehaviorContainer Container { get; private set; }
             public Skill.Framework.AI.Behavior Behavior { get; private set; }
-            public Skill.Editor.UI.Extended.FolderView Folder { get; private set; }
+            public Skill.Editor.UI.FolderView Folder { get; private set; }
 
-            public CompositeTag(Skill.Framework.AI.Behavior behavior, Skill.Editor.UI.Extended.FolderView folder)
+            public CompositeTag(Skill.Framework.AI.Behavior behavior, Skill.Framework.AI.BehaviorContainer container, Skill.Editor.UI.FolderView folder)
             {
+                this.Container = container;
                 this.Behavior = behavior;
                 this.Folder = folder;
             }
@@ -172,55 +176,52 @@ namespace Skill.Editor.Diagnostics
             }
         }
 
-        private bool IsInExecutionSequence(Skill.Framework.AI.Behavior behavior)
+        private bool IsInExecutionSequence(Skill.Framework.AI.BehaviorContainer container)
         {
             if (_BehaviorTree == null) return false;
             for (int i = 0; i < _BehaviorTree.Status.SequenceCount; i++)
             {
-                if (_BehaviorTree.Status.ExecutionSequence[i] == behavior)
+                if (_BehaviorTree.Status.ExecutionSequence[i] == container)
                     return true;
             }
             return false;
         }
 
+
+        private GUIStyle GetStyle(Framework.AI.BehaviorResult behaviorResult)
+        {
+            switch (behaviorResult)
+            {
+                case Skill.Framework.AI.BehaviorResult.Success:
+                    return _SuccessStyle;
+                case Skill.Framework.AI.BehaviorResult.Running:
+                    return _RunningStyle;
+                default:
+                    return _FailurStyle;
+            }
+        }
+        private GUIStyle GetStyle(Skill.Framework.AI.Behavior behavior, Skill.Framework.AI.BehaviorContainer container)
+        {
+            if (container != null)
+                return GetStyle(container.Result);
+            else
+                return GetStyle(behavior.Result);
+        }
+
         private void ValidateStyle(BehaviorTag bt)
         {
-            if (IsInExecutionSequence(bt.Behavior))
-            {
-                switch (bt.Behavior.Result)
-                {
-                    case Skill.Framework.AI.BehaviorResult.Success:
-                        bt.Label.Style = _SuccessStyle;
-                        break;
-                    case Skill.Framework.AI.BehaviorResult.Running:
-                        bt.Label.Style = _RunningStyle;
-                        break;
-                    default:
-                        bt.Label.Style = _FailurStyle;
-                        break;
-                }
-            }
+            if (IsInExecutionSequence(bt.Container))
+                bt.Label.Style = GetStyle(bt.Behavior, bt.Container);
             else
                 bt.Label.Style = null;
         }
 
         private void ValidateStyle(CompositeTag ct)
         {
-            if (IsInExecutionSequence(ct.Behavior))
-            {
-                switch (ct.Behavior.Result)
-                {
-                    case Skill.Framework.AI.BehaviorResult.Success:
-                        ct.Folder.Foldout.Style = _SuccessStyle;
-                        break;
-                    case Skill.Framework.AI.BehaviorResult.Running:
-                        ct.Folder.Foldout.Style = _RunningStyle;
-                        break;
-                    default:
-                        ct.Folder.Foldout.Style = _FailurStyle;
-                        break;
-                }
-            }
+            if (ct.Container == null)
+                ct.Folder.Foldout.Style = GetStyle(ct.Behavior, null);
+            else if (IsInExecutionSequence(ct.Container))
+                ct.Folder.Foldout.Style = GetStyle(ct.Behavior, ct.Container);
             else
                 ct.Folder.Foldout.Style = null;
         }
@@ -242,25 +243,25 @@ namespace Skill.Editor.Diagnostics
             _Composites.Clear();
 
             if (BehaviorTree != null && BehaviorTree.CurrentState != null)
-                RebuildTree(BehaviorTree.CurrentState, _TreeView);
+                RebuildTree(BehaviorTree.CurrentState, null, _TreeView);
         }
 
-        private void RebuildTree(Skill.Framework.AI.Behavior behavior, Panel parent)
+        private void RebuildTree(Skill.Framework.AI.Behavior behavior, Skill.Framework.AI.BehaviorContainer container, Panel parent)
         {
             if (behavior == null) return;
-            BaseControl control = CreateNode(behavior);
+            BaseControl control = CreateNode(behavior, container);
             parent.Controls.Add(control);
             switch (behavior.Type)
             {
                 case Skill.Framework.AI.BehaviorType.Composite:
                     Skill.Framework.AI.Composite composite = (Skill.Framework.AI.Composite)behavior;
                     foreach (var b in composite)
-                        RebuildTree(b.Behavior, (Panel)control);
+                        RebuildTree(b.Behavior, b, (Panel)control);
                     break;
                 case Skill.Framework.AI.BehaviorType.Decorator:
                     Skill.Framework.AI.Decorator decorator = (Skill.Framework.AI.Decorator)behavior;
                     if (decorator.Child != null)
-                        RebuildTree(decorator.Child.Behavior, (Panel)control);
+                        RebuildTree(decorator.Child.Behavior, decorator.Child, (Panel)control);
                     break;
                 default:
                     break;
@@ -268,7 +269,7 @@ namespace Skill.Editor.Diagnostics
         }
 
 
-        private BaseControl CreateNode(Skill.Framework.AI.Behavior behavior)
+        private BaseControl CreateNode(Skill.Framework.AI.Behavior behavior, Skill.Framework.AI.BehaviorContainer container)
         {
             BaseControl control = null;
             switch (behavior.Type)
@@ -279,7 +280,7 @@ namespace Skill.Editor.Diagnostics
                     Label lbl = new Label();
                     lbl.Style = _FailurStyle;
                     lbl.Content.text = behavior.Name;
-                    BehaviorTag bt = new BehaviorTag(behavior, lbl);
+                    BehaviorTag bt = new BehaviorTag(behavior, container, lbl);
                     _Behaviors.Add(bt);
                     control = lbl;
 
@@ -291,11 +292,11 @@ namespace Skill.Editor.Diagnostics
                 case Skill.Framework.AI.BehaviorType.Decorator:
                 case Skill.Framework.AI.BehaviorType.Composite:
 
-                    Skill.Editor.UI.Extended.FolderView fw = new UI.Extended.FolderView();
+                    Skill.Editor.UI.FolderView fw = new UI.FolderView();
                     fw.Foldout.Style = _FailurStyle;
                     fw.Foldout.Content.text = behavior.Name;
                     fw.Foldout.IsOpen = true;
-                    CompositeTag ct = new CompositeTag(behavior, fw);
+                    CompositeTag ct = new CompositeTag(behavior, container, fw);
                     _Composites.Add(ct);
                     control = fw;
 

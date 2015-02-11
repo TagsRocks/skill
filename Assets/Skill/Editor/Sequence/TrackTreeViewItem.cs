@@ -4,7 +4,7 @@ using Skill.Framework.UI;
 
 
 using Skill.Framework.Sequence;
-using Skill.Editor.UI.Extended;
+using Skill.Editor.UI;
 
 namespace Skill.Editor.Sequence
 {

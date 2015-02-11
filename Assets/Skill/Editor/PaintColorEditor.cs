@@ -13,6 +13,7 @@ namespace Skill.Editor
     [CustomEditor(typeof(PaintColor))]
     public class PaintColorEditor : UnityEditor.Editor
     {
+        const float StrengthFactor = 0.002f;
 
         #region UI
         private StackPanel _Panel;
@@ -25,9 +26,9 @@ namespace Skill.Editor
         private Skill.Editor.UI.Slider _SliStrength;
         private Skill.Editor.UI.Slider _SliFalloff;
 
-        private Editor.UI.Extended.TabHeader _TbChannels;
+        private Editor.UI.TabHeader _TbChannels;
 
-        private Editor.UI.Extended.TabHeader _TbModes;
+        private Editor.UI.TabHeader _TbModes;
 
         private Skill.Editor.UI.Popup _PUV;
         private HelpBox _HelpBox;
@@ -43,7 +44,7 @@ namespace Skill.Editor
             _TextureField = new Skill.Editor.UI.ObjectField<Texture2D>() { Object = _PaintColor.Texture, HorizontalAlignment = Skill.Framework.UI.HorizontalAlignment.Center, Width = 80, Height = 80, Margin = new Skill.Framework.UI.Thickness(2) };            
 
             #region _TbChannels
-            _TbChannels = new UI.Extended.TabHeader(4, true) { Margin = new Thickness(0, 2, 0, 10), HorizontalAlignment = HorizontalAlignment.Center, Width = 200, Height = 20 };
+            _TbChannels = new UI.TabHeader(4, true) { Margin = new Thickness(0, 2, 0, 10), HorizontalAlignment = HorizontalAlignment.Center, Width = 200, Height = 20 };
             _TbChannels[0].text = "R";
             _TbChannels[1].text = "G";
             _TbChannels[2].text = "B";
@@ -57,7 +58,7 @@ namespace Skill.Editor
 
             #region _TbModes
 
-            _TbModes = new UI.Extended.TabHeader(2, false) { Margin = new Thickness(0, 2, 0, 10), HorizontalAlignment = HorizontalAlignment.Center, Width = 200 };
+            _TbModes = new UI.TabHeader(2, false) { Margin = new Thickness(0, 2, 0, 10), HorizontalAlignment = HorizontalAlignment.Center, Width = 200 };
 
             _TbModes[0].text = "Paint";
             _TbModes[1].text = "Erase";
@@ -104,7 +105,7 @@ namespace Skill.Editor
 
             _ColorField = new ColorField() { Color = _PaintColor.EraseEnable ? _PaintColor.Erase : _PaintColor.Paint, Margin = new Thickness(2) };
             _SliRadius = new Skill.Editor.UI.Slider() { Value = _PaintColor.Radius, MinValue = 1, MaxValue = 128, Margin = new Thickness(2), Height = 16 }; _SliRadius.Label.text = "Radius"; _SliRadius.Label.tooltip = "Shift + (A/D)";
-            _SliStrength = new Skill.Editor.UI.Slider() { Value = _PaintColor.Strength, MinValue = 0.001f, MaxValue = 0.5f, Margin = new Thickness(2), Height = 16 }; _SliStrength.Label.text = "Strength";
+            _SliStrength = new Skill.Editor.UI.Slider() { Value = _PaintColor.Strength, MinValue = 1f, MaxValue = 100f, Margin = new Thickness(2), Height = 16 }; _SliStrength.Label.text = "Strength";
             _SliFalloff = new Skill.Editor.UI.Slider() { Value = _PaintColor.Falloff, MinValue = 0.0f, MaxValue = 1.0f, Margin = new Thickness(2), Height = 16 }; _SliFalloff.Label.text = "Falloff";
             _HelpBox = new HelpBox() { Height = 60, Message = "Hold CTRL and drag with Right Click to paint.\nTexture must be read/write enable\nValid texture format:\n    ARGB32, RGBA32, RGB24 and Alpha8" };
 
@@ -271,6 +272,20 @@ namespace Skill.Editor
             _Brush = new TextureBrush(brushTexture, 64);
             _BrushProjector = new BrushProjector();
             _BrushProjector.Brush = _Brush;
+        }
+
+        void OnDisable()
+        {
+            if (_Brush != null)
+            {
+                _Brush.Destroy();
+                _Brush = null;
+            }
+            if (this._BrushProjector != null)
+            {
+                this._BrushProjector.Destroy();
+                this._BrushProjector = null;
+            }
         }
 
         void OnDestroy()
@@ -461,7 +476,7 @@ namespace Skill.Editor
                                 float deltaX = Mathf.Abs(centerX - j);
                                 float deltaY = Mathf.Abs(centerY - i);
                                 float distance = Mathf.Sqrt((deltaX * deltaX) + (deltaY * deltaY));
-                                float blendFactor = _PaintColor.Strength;
+                                float blendFactor = _PaintColor.Strength * StrengthFactor;
 
                                 if (distance < maxDistance)
                                 {

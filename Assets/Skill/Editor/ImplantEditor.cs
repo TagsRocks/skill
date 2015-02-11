@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEditor;
 using Skill.Framework.UI;
 using Skill.Framework.Modules;
-using Skill.Editor.UI.Extended;
 using Skill.Editor.UI;
 
 namespace Skill.Editor

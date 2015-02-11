@@ -67,9 +67,8 @@ namespace Skill.Framework.AI
         /// <param name="status">Status of BehaviorTree</param>
         /// <returns>Result of execution</returns>
         public BehaviorResult Execute(BehaviorTreeStatus status)
-        {            
-            LastUpdateId = status.UpdateId;
-            status.RegisterForExecution(this); // register in execution sequence
+        {
+            LastUpdateId = status.UpdateId;            
             try
             {
                 Result = Behave(status);// let subclass behave
@@ -78,7 +77,7 @@ namespace Skill.Framework.AI
             {
                 status.Exception = e;// store exception
                 Result = BehaviorResult.Failure; // set result to failure
-            }
+            }            
             return Result;
         }
 

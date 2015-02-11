@@ -7,7 +7,7 @@ using Skill.Framework.Audio;
 namespace Skill.Editor.Audio
 {
 
-    public class AudioStateNode : Grid, Skill.Editor.UI.Extended.IProperties, Skill.Editor.UI.ISelectable
+    public class AudioStateNode : Grid, Skill.Editor.UI.IProperties, Skill.Editor.UI.ISelectable
     {
 
         private List<AudioTransition> _Transitions = new List<AudioTransition>();
@@ -173,13 +173,13 @@ namespace Skill.Editor.Audio
 
         #region IProperties members
 
-        protected class ItemProperties : Skill.Editor.UI.Extended.ExposeProperties, AudioPreviewHandler
+        protected class ItemProperties : Skill.Editor.UI.ExposeProperties, AudioPreviewHandler
         {
             private AudioStateNode _Node;
             private Skill.Editor.UI.IntPopup _NextStateOptions;
             private BreakPointsEditor _BreakPointsEditor;
             private Skill.Editor.UI.UntypedObjectField _ClipField;
-            private Skill.Editor.UI.Extended.MediaButton _BtnPreview;
+            private Skill.Editor.UI.MediaButton _BtnPreview;
 
             public ItemProperties(AudioStateNode node)
                 : base(node)
@@ -203,7 +203,7 @@ namespace Skill.Editor.Audio
                 _BreakPointsEditor = new BreakPointsEditor(this, ((AudioStateNode)Object).State);
                 Controls.Add(_BreakPointsEditor);
 
-                _BtnPreview = new Skill.Editor.UI.Extended.MediaButton() { TogglePressed = false, Height = 20 };
+                _BtnPreview = new Skill.Editor.UI.MediaButton() { TogglePressed = false, Height = 20 };
                 _BtnPreview.Content.text = "Preview";
                 _BtnPreview.Content.image = UnityEditor.EditorGUIUtility.FindTexture("d_PlayButton");
                 _BtnPreview.SetStyle(UnityEditor.EditorStyles.miniButton);
@@ -314,8 +314,8 @@ namespace Skill.Editor.Audio
             class BreakPointsEditor : Grid
             {
                 private bool _RefreshStyle;
-                private Skill.Framework.UI.Extended.ListBox _BreakPointsList;
-                private Skill.Editor.UI.Extended.AudioPreviewCurve _AudioPreview;
+                private Skill.Framework.UI.ListBox _BreakPointsList;
+                private Skill.Editor.UI.AudioPreviewCurve _AudioPreview;
 
                 private Skill.Framework.UI.Label _Title;
                 private Skill.Framework.UI.Grid _ButtonsPanel;
@@ -391,7 +391,7 @@ namespace Skill.Editor.Audio
                     _Title = new Label { Row = 0, Text = "Break Points" };
                     this.Controls.Add(_Title);
 
-                    _BreakPointsList = new Skill.Framework.UI.Extended.ListBox() { Row = 1 };
+                    _BreakPointsList = new Skill.Framework.UI.ListBox() { Row = 1 };
                     _BreakPointsList.DisableFocusable();
                     _BreakPointsList.BackgroundVisible = true;
                     this.Controls.Add(_BreakPointsList);
@@ -408,7 +408,7 @@ namespace Skill.Editor.Audio
                     _BtnRemove = new Button() { Column = 2, IsEnabled = false };
                     _ButtonsPanel.Controls.Add(_BtnRemove);
 
-                    _AudioPreview = new Skill.Editor.UI.Extended.AudioPreviewCurve() { Row = 3 };
+                    _AudioPreview = new Skill.Editor.UI.AudioPreviewCurve() { Row = 3 };
                     this.Controls.Add(_AudioPreview);
 
                     _BreakPointsList.SelectionChanged += _BreakPointsList_SelectionChanged;
@@ -535,7 +535,7 @@ namespace Skill.Editor.Audio
         }
 
         private ItemProperties _Properties;
-        public Skill.Editor.UI.Extended.PropertiesPanel Properties
+        public Skill.Editor.UI.PropertiesPanel Properties
         {
             get
             {
@@ -551,7 +551,7 @@ namespace Skill.Editor.Audio
 
         #region DragThumb
         internal Vector2 StartDrag;
-        class AudioStateNodeDragThumb : Skill.Editor.UI.Extended.DragThumb
+        class AudioStateNodeDragThumb : Skill.Editor.UI.DragThumb
         {
             private AudioStateNode _Node;
 

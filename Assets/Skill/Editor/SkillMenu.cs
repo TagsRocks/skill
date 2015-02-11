@@ -134,6 +134,12 @@ namespace Skill.Editor
         }
 
 
+        [MenuItem("Assets/Create/Skill/BrowserStyle", false, 49)]
+        static void CreateBrowserStyle()
+        {
+            ScriptableObjectUtility.CreateAsset<Skill.Framework.UI.BrowserStyles>("BrowserStyle");
+        }
+
 
         // ********************************* Commands ********************************* 
 

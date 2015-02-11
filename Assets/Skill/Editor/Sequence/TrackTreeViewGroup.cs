@@ -4,11 +4,10 @@ using UnityEditor;
 using Skill.Framework.UI;
 using Skill.Editor.UI;
 using Skill.Framework.Sequence;
-using Skill.Editor.UI.Extended;
 
 namespace Skill.Editor.Sequence
 {
-    public class TrackTreeViewGroup : Skill.Editor.UI.Extended.FolderView, IProperties
+    public class TrackTreeViewGroup : Skill.Editor.UI.FolderView, IProperties
     {
         public PropertiesPanel Properties { get; private set; }
         public bool IsSelectedProperties { get; set; }

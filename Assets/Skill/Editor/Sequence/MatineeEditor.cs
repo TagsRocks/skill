@@ -2,7 +2,6 @@
 using System.Collections;
 using UnityEditor;
 using Skill.Editor.UI;
-using Skill.Editor.UI.Extended;
 using Skill.Framework.UI;
 using System.Collections.Generic;
 using Skill.Framework.Sequence;
@@ -657,7 +656,7 @@ namespace Skill.Editor.Sequence
 
         private void CreateMenuBar()
         {
-            _MenuBar = new Skill.Editor.UI.Extended.MenuBar() { Dock = Skill.Framework.UI.Dock.Top };
+            _MenuBar = new Skill.Editor.UI.MenuBar() { Dock = Skill.Framework.UI.Dock.Top };
 
             MenuBarItem file = new MenuBarItem() { Title = "File" };
             MenuBarItem edit = new MenuBarItem() { Title = "Edit" };

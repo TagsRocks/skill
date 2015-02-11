@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Skill.Framework.UI;
-using Skill.Editor.UI.Extended;
+using Skill.Editor.UI;
 using System.Collections.Generic;
 using Skill.Editor;
 using Skill.Framework.Audio;
@@ -292,7 +292,7 @@ namespace Skill.Editor
 
             public void SetDirty()
             {
-                Invalidate();
+                OnLayoutChanged();
             }
 
             public override void GetTimeBounds(out double minTime, out double maxTime)

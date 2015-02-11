@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Skill.Framework.UI;
-using Skill.Editor.UI.Extended;
+using Skill.Editor.UI;
 
 namespace Skill.Editor.AI
 {
@@ -51,12 +51,12 @@ namespace Skill.Editor.AI
             this.ColumnDefinitions.Add(90, GridUnitType.Pixel);
             this.ColumnDefinitions.Add(1, GridUnitType.Star);
 
-            _TreeView = new Skill.Editor.UI.Extended.TreeView() { Row = 1, Column = 0, ColumnSpan = 4 };
+            _TreeView = new Skill.Editor.UI.TreeView() { Row = 1, Column = 0, ColumnSpan = 4 };
             _TreeView.DisableFocusable();
             _TreeView.Background.Visibility = Visibility.Visible;
             this.Controls.Add(_TreeView);
 
-            _TreeViewMenuBar = new Skill.Editor.UI.Extended.MenuBar() { Row = 0, Column = 0 };
+            _TreeViewMenuBar = new Skill.Editor.UI.MenuBar() { Row = 0, Column = 0 };
             this.Controls.Add(_TreeViewMenuBar);
 
             #region Add menu
@@ -108,7 +108,7 @@ namespace Skill.Editor.AI
             #endregion
 
             #region Insert menu
-            _InsertBehaviorMenuItem = new Skill.Editor.UI.Extended.MenuBarItem();
+            _InsertBehaviorMenuItem = new Skill.Editor.UI.MenuBarItem();
             _TreeViewMenuBar.Controls.Add(_InsertBehaviorMenuItem);
 
             _InsertActions = new Skill.Editor.UI.MenuItem("Actions");
@@ -172,13 +172,13 @@ namespace Skill.Editor.AI
             CheckMenuAvailable();
             if (_TreeView.SelectedItem != null)
             {
-                Skill.Editor.UI.Extended.InspectorProperties.Select(_TreeView.SelectedItem as Skill.Editor.UI.Extended.IProperties);
+                Skill.Editor.UI.InspectorProperties.Select(_TreeView.SelectedItem as Skill.Editor.UI.IProperties);
             }
             else
             {
-                var selected = Skill.Editor.UI.Extended.InspectorProperties.GetSelected();
+                var selected = Skill.Editor.UI.InspectorProperties.GetSelected();
                 if (selected != null && (selected is TreeViewFolder || selected is TreeViewItem))
-                    Skill.Editor.UI.Extended.InspectorProperties.Select(null);
+                    Skill.Editor.UI.InspectorProperties.Select(null);
             }
             _Editor.Repaint();
         }
@@ -315,8 +315,8 @@ namespace Skill.Editor.AI
 
         public void DeselectInspector()
         {
-            if (Skill.Editor.UI.Extended.InspectorProperties.GetSelected() is IBehaviorItem)
-                Skill.Editor.UI.Extended.InspectorProperties.Select(null);
+            if (Skill.Editor.UI.InspectorProperties.GetSelected() is IBehaviorItem)
+                Skill.Editor.UI.InspectorProperties.Select(null);
         }
 
         internal void RefresTree()
@@ -329,6 +329,12 @@ namespace Skill.Editor.AI
         {
             foreach (TreeViewFolder item in _TreeView.Controls)
                 item.RefreshContent();
+        }
+
+        internal void RefreshSameContent(IBehaviorItem item)
+        {
+            foreach (TreeViewFolder tvf in _TreeView.Controls)
+                tvf.RefreshSameContent(item);
         }
 
         private void ApplyInsertChanges()
@@ -555,5 +561,7 @@ namespace Skill.Editor.AI
             tvf.RemoveBehavior(item);
             SelectItem(null);
         }
+
+        
     }
 }

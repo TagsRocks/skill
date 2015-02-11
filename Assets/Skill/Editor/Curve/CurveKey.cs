@@ -4,9 +4,9 @@ using Skill.Framework.UI;
 
 namespace Skill.Editor.Curve
 {
-    public class CurveKey : CanvasPanel, Skill.Editor.UI.Extended.IProperties, Skill.Editor.UI.ISelectable
+    public class CurveKey : CanvasPanel, Skill.Editor.UI.IProperties, Skill.Editor.UI.ISelectable
     {
-        class CurveKeyDragThumb : Skill.Editor.UI.Extended.DragThumb
+        class CurveKeyDragThumb : Skill.Editor.UI.DragThumb
         {
             private CurveKey _Key;
 
@@ -214,8 +214,8 @@ namespace Skill.Editor.Curve
         #region IProperties members
         public bool IsSelectedProperties { get; set; }
 
-        private Skill.Editor.UI.Extended.PropertiesPanel _Properties;
-        public Skill.Editor.UI.Extended.PropertiesPanel Properties
+        private Skill.Editor.UI.PropertiesPanel _Properties;
+        public Skill.Editor.UI.PropertiesPanel Properties
         {
             get
             {

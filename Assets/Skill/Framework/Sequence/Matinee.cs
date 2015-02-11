@@ -163,10 +163,10 @@ namespace Skill.Framework.Sequence
         {
             _PlayTime += stepTime * Speed;
 
-            if (_NextStop)
+            if (Application.isPlaying && _NextStop)
                 Stop();
 
-            if (_PlayTime >= EndTime)
+            if (_PlayTime >= EndTime && Speed > 0)
             {
                 if (Loop)
                 {
@@ -181,7 +181,7 @@ namespace Skill.Framework.Sequence
                     _NextStop = true;
                 }
             }
-            else if (_PlayTime <= 0)
+            else if (_PlayTime <= 0 && Speed < 0)
             {
                 if (Loop)
                 {

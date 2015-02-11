@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Skill.Editor.UI.Extended;
+using Skill.Editor.UI;
 using System.Collections.Generic;
 using Skill.Framework.Sequence;
 
@@ -71,7 +71,7 @@ namespace Skill.Editor.Sequence
         class SoundKeyView : EventOrientedKeyView
         {
             private Skill.Framework.UI.Label _LblClipName;
-            private Skill.Editor.UI.Extended.AudioPreviewCurve _PreviewImage;
+            private Skill.Editor.UI.AudioPreviewCurve _PreviewImage;
             public override string Title { get { return "Sound Event"; } }
             public override float MinWidth { get { return 20; } }
 

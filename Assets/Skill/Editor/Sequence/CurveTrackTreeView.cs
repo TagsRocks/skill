@@ -1,5 +1,5 @@
 ﻿using Skill.Editor.Curve;
-using Skill.Editor.UI.Extended;
+using Skill.Editor.UI;
 using Skill.Framework.UI;
 using System;
 using System.Collections.Generic;

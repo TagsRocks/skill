@@ -1,10 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Skill.Editor.UI.Extended;
+using Skill.Editor.UI;
 using System.Collections.Generic;
 using Skill.Framework.Sequence;
 using System;
-using Skill.Editor.UI;
 
 namespace Skill.Editor.Sequence
 {

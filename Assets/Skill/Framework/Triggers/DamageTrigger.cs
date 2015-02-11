@@ -143,6 +143,11 @@ namespace Skill.Framework.Triggers
                     index++;
             }
         }
+
+        protected virtual void OnDisable()
+        {
+            _Colliders.Clear();
+        }
     }
 
 }

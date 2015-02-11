@@ -80,7 +80,7 @@ namespace Skill.Framework.AI
         /// Reset _ChildrenResults array
         /// </summary>
         private void ResetChildrenExecution()
-        {            
+        {
             for (int i = 0; i < _ChildrenFirstExecution.Length; i++)
             {
                 _ChildrenFirstExecution[i] = false;
@@ -128,7 +128,7 @@ namespace Skill.Framework.AI
             _FailureCount = 0;
             CreateChildrenExecution(); // make sure the  _ChildrenResults array is valid
             BehaviorResult result = BehaviorResult.Running; // by default running
-            
+
             // iterate throw children an execute them
             for (int i = 0; i < ChildCount; i++)
             {
@@ -156,8 +156,8 @@ namespace Skill.Framework.AI
                 // if this node executed first ignore it
                 //if (FirstConditions && node.Behavior.Type == BehaviorType.Condition) continue;
 
-                BehaviorResult childResult = node.Behavior.Execute(status);// execute child node
-
+                node.Execute(status);// execute child node
+                BehaviorResult childResult = node.Result;
                 if (childResult == BehaviorResult.Failure)
                 {
                     if (BreakOnConditionFailure && node.Behavior.Type == BehaviorType.Condition)
@@ -209,8 +209,8 @@ namespace Skill.Framework.AI
 
                 if (node.Behavior.Type == BehaviorType.Condition)
                 {
-                    BehaviorResult r = node.Behavior.Execute(status);
-
+                    node.Execute(status);
+                    BehaviorResult r = node.Result;
                     if (r == BehaviorResult.Failure)
                     {
                         if (BreakOnConditionFailure && node.Behavior.Type == BehaviorType.Condition)

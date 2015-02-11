@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Skill.Framework.AI
-{    
+{
     #region DecoratorType
     /// <summary>
     /// Defines type of  Decorator
@@ -28,7 +28,7 @@ namespace Skill.Framework.AI
     /// or how often it can be executed without a pause.(none leaf node)
     /// </summary>
     public class Decorator : Behavior
-    {        
+    {
         private ConditionHandler _Handler = null;// handler
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Skill.Framework.AI
         {
             if (child != null)
             {
-                Child = new BehaviorContainer(child, parameters);
+                Child = new BehaviorContainer(this,child, parameters);
             }
         }
 
@@ -87,7 +87,7 @@ namespace Skill.Framework.AI
                     {
                         result = TraceChild(status);
                     }
-                    else if (_Handler(this,status.Parameters))
+                    else if (_Handler(this, status.Parameters))
                     {
                         result = TraceChild(status);
                     }
@@ -110,12 +110,14 @@ namespace Skill.Framework.AI
         /// <returns></returns>
         protected virtual BehaviorResult TraceChild(BehaviorTreeStatus status)
         {
+            BehaviorResult result = BehaviorResult.Failure;
             if (Child != null)
             {
                 status.Parameters = Child.Parameters;
-                return Child.Behavior.Execute(status);
+                Child.Execute(status);
+                result = Child.Result;
             }
-            return BehaviorResult.Failure;
+            return result;
         }
 
 

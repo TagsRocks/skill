@@ -13,7 +13,7 @@ namespace Skill.Editor.AI
         public override string Title { get { return "AccessLimitDecorator"; } }
 
         private ALProperties _ALProperties;
-        public override Skill.Editor.UI.Extended.PropertiesPanel Properties
+        public override Skill.Editor.UI.PropertiesPanel Properties
         {
             get
             {

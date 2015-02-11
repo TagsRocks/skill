@@ -2,7 +2,7 @@
 using System.Collections;
 using Skill.Framework.UI;
 using System.Reflection;
-using Skill.Editor.UI.Extended;
+using Skill.Editor.UI;
 using System.Collections.Generic;
 using Skill.Editor;
 
@@ -38,6 +38,8 @@ namespace Skill.Editor.Curve
                 Background = new Color(0.15f, 0.15f, 0.15f, 1.0f);
             else
                 Background = new Color(0.55f, 0.55f, 0.55f, 1.0f);
+
+            this.Selection = new UI.SelectableCollection<CurveKey>();
             _CurveView = new TimeLineCurveView(this);
             _TimeLine = new TimeLine(_CurveView) { SelectionEnable = false };
             _TimeLine.TimeBar.ShowTimePosition = false;
@@ -46,8 +48,7 @@ namespace Skill.Editor.Curve
             _Grid.Margin = new Thickness(0, 0, 0, _TimeLine.View.ScrollbarThickness);
             _TimeLine.Controls.Add(_Grid);
             _Grid.BringToBack();
-
-            this.Selection = new UI.SelectableCollection<CurveKey>();
+            
             this.Selection.SelectionChanged += Selection_SelectionChanged;
             this.Controls.Add(_TimeLine);
         }
@@ -231,13 +232,13 @@ namespace Skill.Editor.Curve
             Skill.Editor.UI.ISelectable selected = this.Selection.SelectedItem;
             if (selected != null)
             {
-                Skill.Editor.UI.Extended.InspectorProperties.Select((CurveKey)selected);
+                Skill.Editor.UI.InspectorProperties.Select((CurveKey)selected);
             }
             else
             {
-                var s = Skill.Editor.UI.Extended.InspectorProperties.GetSelected();
+                var s = Skill.Editor.UI.InspectorProperties.GetSelected();
                 if (s != null && s is CurveKey)
-                    Skill.Editor.UI.Extended.InspectorProperties.Select(null);
+                    Skill.Editor.UI.InspectorProperties.Select(null);
             }
         }
         internal void RemoveSelection()

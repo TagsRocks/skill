@@ -271,7 +271,7 @@ namespace Skill.Framework.AI
             if (_Lock && Result == BehaviorResult.Running)
             {
                 if (LastUpdateId != status.UpdateId)
-                {
+                {                    
                     AccessKey.Unlock();
                     _Lock = false;
                 }

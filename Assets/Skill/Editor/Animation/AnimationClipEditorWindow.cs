@@ -3,7 +3,6 @@ using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 using Skill.Framework.UI;
-using Skill.Framework.UI.Extended;
 using Skill.Editor.Animation;
 
 namespace Skill.Editor.Animation
@@ -51,9 +50,9 @@ namespace Skill.Editor.Animation
 
         void OnDestroy()
         {
-            var selected = Skill.Editor.UI.Extended.InspectorProperties.GetSelected();
+            var selected = Skill.Editor.UI.InspectorProperties.GetSelected();
             if (selected != null && selected is AnimationClipListItem)
-                Skill.Editor.UI.Extended.InspectorProperties.Select(null);
+                Skill.Editor.UI.InspectorProperties.Select(null);
         }
 
         #endregion
@@ -62,8 +61,8 @@ namespace Skill.Editor.Animation
         private bool _RefreshStyles = true;
         private Skill.Editor.UI.EditorFrame _Frame;
         private Skill.Editor.UI.GridSplitter _VSplitter;
-        private Skill.Framework.UI.Extended.ListBox _AnimationList;
-        private Skill.Editor.UI.Extended.TreeView _TransformTree;
+        private Skill.Framework.UI.ListBox _AnimationList;
+        private Skill.Editor.UI.TreeView _TransformTree;
 
         private Skill.Editor.UI.DropShadowLabel _LblAnimations;
         private Skill.Editor.UI.DropShadowLabel _LblHierarchy;
@@ -92,7 +91,7 @@ namespace Skill.Editor.Animation
             _VSplitter = new Skill.Editor.UI.GridSplitter() { Row = 0, RowSpan = 2, Column = 1, Orientation = Orientation.Vertical };
             _Frame.Controls.Add(_VSplitter);
 
-            _TransformTree = new UI.Extended.TreeView() { Row = 1, Column = 2, Margin = new Thickness(2), IsEnabled = false };
+            _TransformTree = new UI.TreeView() { Row = 1, Column = 2, Margin = new Thickness(2), IsEnabled = false };
             _TransformTree.DisableFocusable();
             _TransformTree.Background.Visibility = Visibility.Visible;
             _TransformTree.SelectedStyle = new GUIStyle();
@@ -106,7 +105,7 @@ namespace Skill.Editor.Animation
         {
             _TransformTree.IsEnabled = _AnimationList.SelectedItem != null;
             if (_AnimationList.SelectedItem != null)
-                Skill.Editor.UI.Extended.InspectorProperties.Select((AnimationClipListItem)_AnimationList.SelectedItem);
+                Skill.Editor.UI.InspectorProperties.Select((AnimationClipListItem)_AnimationList.SelectedItem);
             RefreshTree();
         }
 
@@ -368,7 +367,7 @@ namespace Skill.Editor.Animation
         }
     }
 
-    class TreeViewFolder : Skill.Editor.UI.Extended.FolderView
+    class TreeViewFolder : Skill.Editor.UI.FolderView
     {
         public Skill.Editor.UI.ToggleButton Toggle { get; private set; }
 
@@ -396,7 +395,7 @@ namespace Skill.Editor.Animation
         }
     }
 
-    class AnimationClipListItem : Label, Skill.Editor.UI.Extended.IProperties
+    class AnimationClipListItem : Label, Skill.Editor.UI.IProperties
     {
         public AnimationClipData Data { get; private set; }
 
@@ -431,7 +430,7 @@ namespace Skill.Editor.Animation
         public string Title { get { return "AnimationClip"; } }
 
         private AnimProperties _Properties;
-        public UI.Extended.PropertiesPanel Properties
+        public UI.PropertiesPanel Properties
         {
             get
             {
@@ -442,7 +441,7 @@ namespace Skill.Editor.Animation
         }
 
         public bool IsSelectedProperties { get; set; }
-        class AnimProperties : Skill.Editor.UI.Extended.ExposeProperties
+        class AnimProperties : Skill.Editor.UI.ExposeProperties
         {
             public AnimProperties(AnimationClipListItem item)
                 : base(item)

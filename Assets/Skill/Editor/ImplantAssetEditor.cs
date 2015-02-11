@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEditor;
 using Skill.Framework.UI;
-using Skill.Framework.UI.Extended;
 using Skill.Editor.UI;
 using UnityEngine;
 using Skill.Editor;
@@ -41,7 +40,7 @@ namespace Skill.Editor
 
         private Skill.Editor.UI.DropShadowLabel _LblDefaultProperties;
         private ImplantObjectPropertiesField _PropertiesField;
-        private Skill.Framework.UI.Extended.ListBox _ItemsList;
+        private Skill.Framework.UI.ListBox _ItemsList;
         private Skill.Framework.UI.Button _BtnAdd;
         private Skill.Editor.UI.ChangeCheck _MainPanel;
         private Skill.Framework.UI.Frame _Frame;

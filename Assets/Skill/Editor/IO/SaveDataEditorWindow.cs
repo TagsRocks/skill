@@ -3,7 +3,6 @@ using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 using Skill.Framework.UI;
-using Skill.Framework.UI.Extended;
 
 namespace Skill.Editor.IO
 {
@@ -53,9 +52,9 @@ namespace Skill.Editor.IO
 
         void OnDestroy()
         {
-            var selected = Skill.Editor.UI.Extended.InspectorProperties.GetSelected();
+            var selected = Skill.Editor.UI.InspectorProperties.GetSelected();
             if (selected is IListItem)
-                Skill.Editor.UI.Extended.InspectorProperties.Select(null);
+                Skill.Editor.UI.InspectorProperties.Select(null);
         }
 
         void OnEnable()
@@ -202,14 +201,14 @@ namespace Skill.Editor.IO
             _Frame.Owner.Repaint();
             CheckControlsEnable();
             if (_PropertyList.SelectedItem != null)
-                Skill.Editor.UI.Extended.InspectorProperties.Select(_PropertyList.SelectedItem as Skill.Editor.UI.Extended.IProperties);
+                Skill.Editor.UI.InspectorProperties.Select(_PropertyList.SelectedItem as Skill.Editor.UI.IProperties);
         }
         void _ClassList_SelectionChanged(object sender, System.EventArgs e)
         {
             _Frame.Owner.Repaint();
             CheckControlsEnable();
             if (_ClassList.SelectedItem != null)
-                Skill.Editor.UI.Extended.InspectorProperties.Select(_ClassList.SelectedItem as Skill.Editor.UI.Extended.IProperties);
+                Skill.Editor.UI.InspectorProperties.Select(_ClassList.SelectedItem as Skill.Editor.UI.IProperties);
             RefreshPropertyList();
         }
         void OnGUI()
@@ -252,7 +251,7 @@ namespace Skill.Editor.IO
         #endregion
 
         #region ListItems
-        interface IListItem : Skill.Editor.UI.Extended.IProperties
+        interface IListItem : Skill.Editor.UI.IProperties
         {
             SaveDataEditorWindow Editor { get; }
             void UpdateText();
@@ -268,7 +267,7 @@ namespace Skill.Editor.IO
             bool MoveDown(PropertyDataListItem item);
         }
 
-        class Properties : Skill.Editor.UI.Extended.ExposeProperties
+        class Properties : Skill.Editor.UI.ExposeProperties
         {
             private IListItem _Item;
             public Properties(IListItem item)
@@ -341,7 +340,7 @@ namespace Skill.Editor.IO
             }
 
             private Properties _PropertiesPanel;
-            public Skill.Editor.UI.Extended.PropertiesPanel Properties
+            public Skill.Editor.UI.PropertiesPanel Properties
             {
                 get
                 {
@@ -507,7 +506,7 @@ namespace Skill.Editor.IO
             }
 
             private Properties _PropertiesPanel;
-            public virtual Skill.Editor.UI.Extended.PropertiesPanel Properties
+            public virtual Skill.Editor.UI.PropertiesPanel Properties
             {
                 get
                 {
@@ -580,7 +579,7 @@ namespace Skill.Editor.IO
             }
 
             private ClassProperties _ClassPropertiesPanel;
-            public override Skill.Editor.UI.Extended.PropertiesPanel Properties
+            public override Skill.Editor.UI.PropertiesPanel Properties
             {
                 get
                 {

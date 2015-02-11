@@ -6,12 +6,12 @@ using System.Collections.Generic;
 
 namespace Skill.Editor.Animation
 {
-    public class GraphEditor : UI.Extended.ConnectionHost, IEnumerable<AnimNodeItem>
+    public class GraphEditor : UI.ConnectionHost, IEnumerable<AnimNodeItem>
     {
         private AnimationTreeEditorWindow _Editor;
         private Skill.Framework.UI.Box _Background;
         private Skill.Framework.UI.Grid _MainPanel;
-        private Skill.Editor.UI.Extended.ZoomPanel _Panel;
+        private Skill.Editor.UI.ZoomPanel _Panel;
         private Skill.Editor.UI.MultiSelector<AnimNodeItem> _MultiSelector;
 
         private Skill.Framework.UI.Grid _ToolbarPanel;
@@ -41,7 +41,7 @@ namespace Skill.Editor.Animation
             _Background = new Box() { Row = 1 };
             this._MainPanel.Controls.Add(_Background);
 
-            _Panel = new UI.Extended.ZoomPanel() { Row = 1 };
+            _Panel = new UI.ZoomPanel() { Row = 1 };
             this._MainPanel.Controls.Add(_Panel);
 
             this._MultiSelector = new UI.MultiSelector<AnimNodeItem>(this, Selection) { Row = 1 };
@@ -134,13 +134,13 @@ namespace Skill.Editor.Animation
             Skill.Editor.UI.ISelectable selected = this.Selection.SelectedItem;
             if (selected != null)
             {
-                Skill.Editor.UI.Extended.InspectorProperties.Select((AnimNodeItem)selected);
+                Skill.Editor.UI.InspectorProperties.Select((AnimNodeItem)selected);
             }
             else
             {
-                var s = Skill.Editor.UI.Extended.InspectorProperties.GetSelected();
+                var s = Skill.Editor.UI.InspectorProperties.GetSelected();
                 if (s != null && s is AnimNodeItem)
-                    Skill.Editor.UI.Extended.InspectorProperties.Select(null);
+                    Skill.Editor.UI.InspectorProperties.Select(null);
             }
 
             EnableToolbar();
@@ -160,8 +160,8 @@ namespace Skill.Editor.Animation
 
         public void DeselectInspector()
         {
-            if (Skill.Editor.UI.Extended.InspectorProperties.GetSelected() is AnimNodeItem)
-                Skill.Editor.UI.Extended.InspectorProperties.Select(null);
+            if (Skill.Editor.UI.InspectorProperties.GetSelected() is AnimNodeItem)
+                Skill.Editor.UI.InspectorProperties.Select(null);
         }
 
         private AnimNodeItem Find(AnimNodeData data)
@@ -195,12 +195,12 @@ namespace Skill.Editor.Animation
                         AnimNodeItem endNode = Find(connection.End);
                         if (startNode != null && endNode != null)
                         {
-                            Skill.Editor.UI.Extended.IConnector startConnector = startNode.OutConnector;
-                            Skill.Editor.UI.Extended.IConnector endConnector = endNode.GetInputConnector(connection.EndConnectorIndex);
+                            Skill.Editor.UI.IConnector startConnector = startNode.OutConnector;
+                            Skill.Editor.UI.IConnector endConnector = endNode.GetInputConnector(connection.EndConnectorIndex);
 
                             if (startConnector != null && endConnector != null)
                             {
-                                Skill.Editor.UI.Extended.Connection c = new UI.Extended.Connection(startConnector, endConnector);
+                                Skill.Editor.UI.Connection c = new UI.Connection(startConnector, endConnector);
                                 this.Controls.Add(c);
                             }
                         }
@@ -256,21 +256,21 @@ namespace Skill.Editor.Animation
                 }
             }
 
-            List<Skill.Editor.UI.Extended.Connection> connections = new List<UI.Extended.Connection>();
+            List<Skill.Editor.UI.Connection> connections = new List<UI.Connection>();
             foreach (var item in this.Controls)
             {
-                if (item is Skill.Editor.UI.Extended.Connection)
-                    connections.Add((Skill.Editor.UI.Extended.Connection)item);
+                if (item is Skill.Editor.UI.Connection)
+                    connections.Add((Skill.Editor.UI.Connection)item);
             }
 
             _Editor.Tree.Connections = new ConnectionData[connections.Count];
             for (int i = 0; i < connections.Count; i++)
             {
-                Skill.Editor.UI.Extended.Connection c = connections[i];
+                Skill.Editor.UI.Connection c = connections[i];
                 AnimNodeItem start = (AnimNodeItem)c.Start.UserData;
                 AnimNodeItem end = (AnimNodeItem)c.End.UserData;
 
-                if (c.Start.ConnectorType == UI.Extended.ConnectorType.Output)
+                if (c.Start.ConnectorType == UI.ConnectorType.Output)
                     _Editor.Tree.Connections[i] = new ConnectionData(start.Data, end.Data, end.GetConnectorIndex(c.End));
                 else
                     _Editor.Tree.Connections[i] = new ConnectionData(end.Data, start.Data, start.GetConnectorIndex(c.Start));
@@ -306,7 +306,7 @@ namespace Skill.Editor.Animation
             _BtnAlignCenteredHorizontal.Content.image = Skill.Editor.Resources.UITextures.AlignCenteredHorizontal;
             _BtnAlignCenteredVertical.Content.image = Skill.Editor.Resources.UITextures.AlignCenteredVertical;
         }
-        protected override bool CanConnect(UI.Extended.IConnector from, UI.Extended.IConnector to)
+        protected override bool CanConnect(UI.IConnector from, UI.IConnector to)
         {
             if (from.UserData != to.UserData)
                 return true;
@@ -335,12 +335,12 @@ namespace Skill.Editor.Animation
         {
             _Panel.Controls.Remove(item);
             item.RemoveAllConnections();
-            List<Skill.Editor.UI.Extended.Connection> connectionList = new List<UI.Extended.Connection>();
+            List<Skill.Editor.UI.Connection> connectionList = new List<UI.Connection>();
             foreach (var c in Controls)
             {
-                if (c is Skill.Editor.UI.Extended.Connection)
+                if (c is Skill.Editor.UI.Connection)
                 {
-                    Skill.Editor.UI.Extended.Connection connection = (Skill.Editor.UI.Extended.Connection)c;
+                    Skill.Editor.UI.Connection connection = (Skill.Editor.UI.Connection)c;
                     if (connection.Start.UserData == item || connection.End.UserData == item)
                         connectionList.Add(connection);
                 }

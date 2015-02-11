@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Skill.Editor.UI.Extended;
+using Skill.Editor.UI;
 using Skill.Framework.UI;
 using System.Collections.Generic;
 using Skill.Editor;

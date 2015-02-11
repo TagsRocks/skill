@@ -27,19 +27,30 @@ namespace Skill.Editor
             AssetDatabase.SaveAssets();
             EditorUtility.FocusProjectWindow();
             Selection.activeObject = asset;
-        }
-
+        }        
 
         public static string GetNewAssetPath(string assetName)
-        {                        
-            string path = AssetDatabase.GetAssetPath(Selection.activeObject);
-            if (path == "")
+        {               
+            //string path = AssetDatabase.GetAssetPath(Selection.activeObject);
+            //if (path == "")
+            //{
+            //    path = "Assets";
+            //}
+            //else if (System.IO.Path.GetExtension(path) != "")
+            //{
+            //    Debug.Log(path);
+            //    path = path.Replace(System.IO.Path.GetFileName(AssetDatabase.GetAssetPath(Selection.activeObject)), "");
+            //}
+            
+            string path = "Assets";
+            foreach (UnityEngine.Object obj in Selection.GetFiltered(typeof(UnityEngine.Object), SelectionMode.Assets))
             {
-                path = "Assets";
-            }
-            else if (System.IO.Path.GetExtension(path) != "")
-            {
-                path = path.Replace(System.IO.Path.GetFileName(AssetDatabase.GetAssetPath(Selection.activeObject)), "");
+                path = AssetDatabase.GetAssetPath(obj);
+                if (!string.IsNullOrEmpty(path) && System.IO.File.Exists(path))
+                {
+                    path = System.IO.Path.GetDirectoryName(path);
+                    break;
+                }
             }
 
             string assetPathAndName = System.IO.Path.Combine(path, string.Format("New{0}.asset", assetName));

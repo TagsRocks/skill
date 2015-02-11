@@ -20,12 +20,6 @@ namespace Skill.Framework.Animation
     [RequireComponent(typeof(UnityEngine.Animation))]
     public abstract class AnimationTree : DynamicBehaviour
     {
-
-        //RootMotion disabled(make private) because not works correctlly
-        private UnityEngine.Transform RootBone = null;                
-        /// <summary> Apply root motion (root bone must be valid) </summary>                
-        private bool ApplyRootMotion = false;
-
         private class AnimationTreeProfile
         {
             public string Name { get; private set; }
@@ -38,12 +32,13 @@ namespace Skill.Framework.Animation
             }
         }
 
-        private UnityEngine.Rigidbody _Rigidbody;
+        public bool ApplyRootMotion = false;
+
+        private Rigidbody _Rigidbody;
+        private bool _RootMotionChanged;
         private UnityEngine.Vector3 _DeltaPosition;
         private UnityEngine.Vector3 _DeltaRotation;
 
-        UnityEngine.Vector3 _PreRootPosition;
-        private bool _RootMotionChanged;
         private List<AnimationTreeProfile> _Profiles;// list of profiles
         public UnityEngine.Animation Animation { get; private set; }
 
@@ -113,10 +108,10 @@ namespace Skill.Framework.Animation
         }
 
         /// <summary> Delta root position since previous update </summary>
-        public UnityEngine.Vector3 DeltaPosition { get { return _DeltaPosition; } }
+        public UnityEngine.Vector3 DeltaPosition { get { return _DeltaPosition; } set { _DeltaPosition = value; } }
 
         /// <summary> Delta root rotation since previous update </summary>
-        public UnityEngine.Vector3 DeltaRotation { get { return _DeltaRotation * Mathf.Rad2Deg; } }
+        public UnityEngine.Vector3 DeltaRotation { get { return _DeltaRotation * Mathf.Rad2Deg; } set { _DeltaRotation = value * Mathf.Deg2Rad; } }
 
         /// <summary>
         /// Override by subclass to create hierarchy of AnimNodes and return root node
@@ -196,7 +191,6 @@ namespace Skill.Framework.Animation
         /// </summary>
         protected override void Update()
         {
-
             foreach (var layer in LayerManager.Layers)
                 layer.BeginUpdate();
 
@@ -205,15 +199,13 @@ namespace Skill.Framework.Animation
 
             if (ApplyRootMotion)
             {
-                _PreRootPosition = RootBone.localPosition;
-                _RootMotionChanged = true;
-                _DeltaRotation = _DeltaPosition = UnityEngine.Vector3.zero;
                 foreach (var layer in LayerManager.Layers)
                 {
                     layer.Update();
                     _DeltaPosition += layer.DeltaPosition;
                     _DeltaRotation += layer.DeltaRotation;
                 }
+                _RootMotionChanged = true;
             }
 
             Apply(this.Animation);
@@ -221,37 +213,21 @@ namespace Skill.Framework.Animation
             base.Update();
         }
 
-
         protected virtual void FixedUpdate()
         {
             if (ApplyRootMotion && _RootMotionChanged)
             {
-                if (RootBone != null)
+                if (_Rigidbody != null)
                 {
-                    if (_Rigidbody != null)
-                    {
-                        UnityEngine.Vector3 deltaPos = this.DeltaPosition;
-                        if (deltaPos.sqrMagnitude > 0.001f)
-                            _Rigidbody.MovePosition(_Transform.position + _Transform.TransformDirection(deltaPos));
-                    }
-                    else
-                    {
-                        _Transform.position += this.DeltaPosition;
-                    }
+                    _Rigidbody.MovePosition(_Transform.position + _Transform.TransformDirection(_DeltaPosition));
                 }
-                _RootMotionChanged = false;
-            }
-        }
-
-        protected virtual void LateUpdate()
-        {
-            if (ApplyRootMotion && _RootMotionChanged)
-            {
-                if (RootBone != null)
+                else
                 {
-                    RootBone.localPosition = _PreRootPosition;
+                    _Transform.position += _DeltaPosition;
                 }
             }
+            _DeltaRotation = _DeltaPosition = UnityEngine.Vector3.zero;
+            _RootMotionChanged = false;
         }
 
         /// <summary>

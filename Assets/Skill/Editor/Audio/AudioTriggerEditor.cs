@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Linq;
 using Skill.Framework.UI;
-using Skill.Framework.UI.Extended;
 using Skill.Framework.Audio;
 
 namespace Skill.Editor.Audio
@@ -71,7 +70,7 @@ namespace Skill.Editor.Audio
         {
             OnSelectedTriggerChanged();
             SetButtonsEnable();
-            Skill.Editor.UI.Extended.InspectorProperties.Select((TriggerItem)_TriggerList.SelectedItem);
+            Skill.Editor.UI.InspectorProperties.Select((TriggerItem)_TriggerList.SelectedItem);
             Skill.Editor.UI.EditorFrame.RepaintParentEditorWindow(this);
         }
         private void SetButtonsEnable()
@@ -178,8 +177,8 @@ namespace Skill.Editor.Audio
 
         public void DeselectInspector()
         {
-            if (Skill.Editor.UI.Extended.InspectorProperties.GetSelected() is TriggerItem)
-                Skill.Editor.UI.Extended.InspectorProperties.Select(null);
+            if (Skill.Editor.UI.InspectorProperties.GetSelected() is TriggerItem)
+                Skill.Editor.UI.InspectorProperties.Select(null);
         }
 
         public void RefreshContents()
@@ -190,7 +189,7 @@ namespace Skill.Editor.Audio
             }
         }
 
-        private class TriggerItem : Label, Skill.Editor.UI.Extended.IProperties
+        private class TriggerItem : Label, Skill.Editor.UI.IProperties
         {
             public int TriggerIndex { get; private set; }
 
@@ -219,7 +218,7 @@ namespace Skill.Editor.Audio
 
             public bool IsSelectedProperties { get; set; }
             private TriggerItemProperties _Properties;
-            public Skill.Editor.UI.Extended.PropertiesPanel Properties
+            public Skill.Editor.UI.PropertiesPanel Properties
             {
                 get
                 {
@@ -230,7 +229,7 @@ namespace Skill.Editor.Audio
             }
             public string Title { get { return "Audio Tigger"; } }
 
-            class TriggerItemProperties : Skill.Editor.UI.Extended.ExposeProperties
+            class TriggerItemProperties : Skill.Editor.UI.ExposeProperties
             {
                 private TriggerItem _Item;
                 public TriggerItemProperties(TriggerItem item)

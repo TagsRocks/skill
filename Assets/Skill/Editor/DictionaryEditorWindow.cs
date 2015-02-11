@@ -4,7 +4,7 @@ using Skill.Framework.UI;
 using UnityEditor;
 using Skill.Framework;
 using System.Collections.Generic;
-using Skill.Editor.UI.Extended;
+using Skill.Editor.UI;
 using System;
 
 
@@ -13,7 +13,7 @@ namespace Skill.Editor
     public class DictionaryEditorWindow : UnityEditor.EditorWindow
     {
         #region AudioField
-        class AudioField : Skill.Framework.UI.Grid, Skill.Editor.UI.Extended.IProperties
+        class AudioField : Skill.Framework.UI.Grid, Skill.Editor.UI.IProperties
         {
             private static GUIStyle _ButtonStyle;
 
@@ -37,6 +37,7 @@ namespace Skill.Editor
                 this.ColumnDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star);
                 this.ColumnDefinitions.Add(18, Skill.Framework.UI.GridUnitType.Pixel);
                 this.ColumnDefinitions.Add(18, Skill.Framework.UI.GridUnitType.Pixel);
+                this.ColumnDefinitions.Add(16, Skill.Framework.UI.GridUnitType.Pixel);
 
                 //this._Bg = new Skill.Framework.UI.Box() { Column = 0, ColumnSpan = 3 };
                 //this.Controls.Add(_Bg);
@@ -174,7 +175,6 @@ namespace Skill.Editor
             base.position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);
             base.minSize = new Vector2(Size.x * 0.5f, Size.y * 0.5f);
             CreateUI();
-            HookEvents();
             EnableUI();
         }
         void OnDestroy()
@@ -231,7 +231,7 @@ namespace Skill.Editor
         private Skill.Editor.UI.GridSplitter _PanelSplitter;
 
         private Skill.Editor.UI.ObjectField<Dictionary> _ObjectField;
-        private Skill.Framework.UI.Extended.ListBox _ListBox;
+        private Skill.Framework.UI.ListBox _ListBox;
 
         private Skill.Framework.UI.Grid _EditPanel;
 
@@ -247,8 +247,8 @@ namespace Skill.Editor
 
         private Skill.Framework.UI.Box _NameCaption;
         private Skill.Framework.UI.Box _ValueCaption;
-        
-        private Skill.Framework.UI.Extended.ListBox _AudioList;
+
+        private Skill.Framework.UI.ListBox _AudioList;
         private Skill.Framework.UI.Button _BtnNew;
         private List<AudioField> _Fields;
         private AudioClipSubtitleEditor _AudioClipEditor;
@@ -275,6 +275,11 @@ namespace Skill.Editor
             _Frame.Grid.Controls.Add(_PanelSplitter);
             _Frame.Grid.Controls.Add(_TextPanel);
 
+
+
+
+
+
         }
 
         private void CreateAudioPanel()
@@ -291,7 +296,7 @@ namespace Skill.Editor
             Skill.Framework.UI.Grid pnl = new Skill.Framework.UI.Grid() { Row = 1, Column = 0 };
 
             _Fields = new List<AudioField>();
-            _AudioList = new Skill.Framework.UI.Extended.ListBox() { Row = 0, Column = 0, AlwayShowVertical = true };
+            _AudioList = new Skill.Framework.UI.ListBox() { Row = 0, Column = 0, AlwayShowVertical = true };
             _AudioList.BackgroundVisible = true;
             _AudioList.DisableFocusable();
             pnl.Controls.Add(_AudioList);
@@ -312,7 +317,6 @@ namespace Skill.Editor
 
             _AudioPanel.Controls.Add(pnl);
 
-
             _BtnNew.Click += _BtnNew_Click;
             _AudioList.SelectionChanged += _AudioList_SelectionChanged;
         }
@@ -326,6 +330,8 @@ namespace Skill.Editor
             _ObjectField = new Skill.Editor.UI.ObjectField<Dictionary>() { Margin = new Thickness(2), VerticalAlignment = VerticalAlignment.Top };
             _ObjectField.Label.text = "Dictionary";
             _FieldPanel.Controls.Add(_ObjectField);
+
+            _ObjectField.ObjectChanged += _ObjectField_ObjectChanged;
         }
 
         private void CreateTextPanel()
@@ -352,7 +358,7 @@ namespace Skill.Editor
             _NameCaption = new Box() { Row = 0, Column = 0 }; _NameCaption.Content.text = "Key";
             _ValueCaption = new Box() { Row = 0, Column = 1 }; _ValueCaption.Content.text = "Value";
 
-            _ListBox = new Skill.Framework.UI.Extended.ListBox() { Row = 1, RowSpan = 3, Column = 0, ColumnSpan = 3, Margin = new Thickness(2) };
+            _ListBox = new Skill.Framework.UI.ListBox() { Row = 1, RowSpan = 3, Column = 0, ColumnSpan = 3, Margin = new Thickness(2) };
             _ListBox.BackgroundVisible = true;
             _ListBox.DisableFocusable();
             _ListBox.AlwayShowVertical = true;
@@ -400,6 +406,15 @@ namespace Skill.Editor
             _EditPanel.Controls.Add(_TxtComment);
 
             _TextPanel.Controls.Add(_EditPanel);
+
+            _BtnSave.Click += _BtnSave_Click;
+            _BtnAdd.Click += _BtnAdd_Click;
+            _BtnRemove.Click += _BtnRemove_Click;
+            _ListBox.SelectionChanged += _ListBox_SelectionChanged;
+
+            _TxtName.TextField.TextChanged += _TextChanged;
+            _TxtValue.TextField.TextChanged += _TextChanged;
+            _TxtComment.TextField.TextChanged += _TextChanged;
         }
 
         private void RefreshStyles()
@@ -414,7 +429,7 @@ namespace Skill.Editor
             _LblComment.Style.alignment = TextAnchor.MiddleCenter;
 
             _AudioClipEditor.RefreshStyles();
-            _AudioList.SelectedStyle = Skill.Editor.Resources.Styles.SelectedItem;            
+            _AudioList.SelectedStyle = Skill.Editor.Resources.Styles.SelectedItem;
 
             _RefreshStyles = false;
         }
@@ -461,22 +476,6 @@ namespace Skill.Editor
                 if (_BtnSave != null)
                     _BtnSave.IsEnabled = _IsChanged;
             }
-        }
-
-        private void HookEvents()
-        {
-            _ObjectField.ObjectChanged += _ObjectField_ObjectChanged;
-            _BtnSave.Click += _BtnSave_Click;
-            _BtnAdd.Click += _BtnAdd_Click;
-            _BtnRemove.Click += _BtnRemove_Click;
-            _ListBox.SelectionChanged += _ListBox_SelectionChanged;
-
-            _TxtName.TextField.TextChanged += _TextChanged;
-            _TxtValue.TextField.TextChanged += _TextChanged;
-            _TxtComment.TextField.TextChanged += _TextChanged;
-
-            _BtnNew.Click += _BtnNew_Click;
-            _AudioList.SelectionChanged += _AudioList_SelectionChanged;
         }
 
         void _AudioList_SelectionChanged(object sender, EventArgs e)
@@ -576,9 +575,6 @@ namespace Skill.Editor
                         _ListBox.Controls.Add(view);
                     }
                 }
-
-                if (_Dictionary.Subtitles == null)
-                    _Dictionary.Subtitles = new AudioClipSubtitle[0];
 
                 // search for new AudioClipSubtitles in AudioSubtitle that we didn't create AudioField for them 
                 foreach (var t in _Dictionary.Subtitles)
@@ -687,9 +683,10 @@ namespace Skill.Editor
         {
             if (_Dictionary != null && _IsChanged)
             {
-                _Dictionary.Keys = new TextKey[_ListBox.Controls.Count];
+                TextKey[] keys = new TextKey[_ListBox.Controls.Count];
                 for (int i = 0; i < _ListBox.Controls.Count; i++)
-                    _Dictionary.Keys[i] = ((TextKeyView)_ListBox.Controls[i]).Key;
+                    keys[i] = ((TextKeyView)_ListBox.Controls[i]).Key;
+                _Dictionary.SetKeys(keys);
                 UnityEditor.EditorUtility.SetDirty(_Dictionary);
                 SetChanged(false);
             }
@@ -705,9 +702,10 @@ namespace Skill.Editor
         {
             if (_Dictionary != null)
             {
-                _Dictionary.Subtitles = new AudioClipSubtitle[_Fields.Count];
+                AudioClipSubtitle[] subtitles = new AudioClipSubtitle[_Fields.Count];
                 for (int i = 0; i < _Fields.Count; i++)
-                    _Dictionary.Subtitles[i] = _Fields[i].Subtitle;
+                    subtitles[i] = _Fields[i].Subtitle;
+                _Dictionary.SetSubtitles(subtitles);
                 SetDirty2();
             }
         }
@@ -717,7 +715,10 @@ namespace Skill.Editor
             if (_Dictionary != null && pickTarget != null)
             {
                 if (_Dictionary != null)
-                    PickTextWindow.Instance.Show(_Dictionary, pickTarget);
+                {
+                    Save();
+                    PickTextWindow.Instance.Show(_Dictionary, pickTarget);                    
+                }
                 else
                     UnityEditor.EditorUtility.DisplayDialog("Dictionary not found", "You must assign a valid Dictionary for AudioSubtitle", "Ok");
             }

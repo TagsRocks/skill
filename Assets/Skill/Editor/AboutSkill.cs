@@ -48,7 +48,7 @@ namespace Skill.Editor
             _Frame.Grid.RowDefinitions.Add(new Skill.Framework.UI.RowDefinition() { Height = new Skill.Framework.UI.GridLength(20, Skill.Framework.UI.GridUnitType.Pixel) });
 
             _LblAbout = new UI.LabelField() { Row = 0, Column = 0 };
-            _LblAbout.Label2.text = "Skill is a Visual Code Generator for Unity";
+            _LblAbout.Label2.text = "A middle-ware for Unity3D, Skill implements useful AI scripts and algorithms to be used in games.";
 
             _BtnClose = new Framework.UI.Button() { Row = 1, Column = 0 };
             _BtnClose.Content.text = "Close";

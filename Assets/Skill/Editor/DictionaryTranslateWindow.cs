@@ -150,7 +150,7 @@ namespace Skill.Editor
 
         private Skill.Editor.UI.ObjectField<Dictionary> _SourceField;
         private Skill.Editor.UI.ObjectField<Dictionary> _TranslateField;
-        private Skill.Framework.UI.Extended.ListBox _ListBox;
+        private Skill.Framework.UI.ListBox _ListBox;
         private Skill.Framework.UI.Panel _PnlItems;
 
         private Skill.Framework.UI.Button _BtnCopyKeys;
@@ -217,7 +217,7 @@ namespace Skill.Editor
             _SourceCaption = new Box() { Row = 1, Column = 0 }; _SourceCaption.Content.text = "Source";
             _TranslateCaption = new Box() { Row = 1, Column = 1 }; _TranslateCaption.Content.text = "Translate";
 
-            _ListBox = new Skill.Framework.UI.Extended.ListBox() { Row = 2, Column = 0, ColumnSpan = 2, Margin = new Thickness(2) };
+            _ListBox = new Skill.Framework.UI.ListBox() { Row = 2, Column = 0, ColumnSpan = 2, Margin = new Thickness(2) };
             _ListBox.BackgroundVisible = true;
             _ListBox.DisableFocusable();
             _ListBox.AlwayShowVertical = true;
@@ -394,7 +394,7 @@ namespace Skill.Editor
                         }
                     }
                 }
-                _Translate.Keys = textList.ToArray();
+                _Translate.SetKeys(textList.ToArray());
                 Rebuild();
                 if (change)
                     SetChanged(true);
@@ -421,14 +421,8 @@ namespace Skill.Editor
         private AudioClipSubtitle GetSubtitleInSource(AudioClip clip) { return GetSubtitle(_Source, clip); }
         private AudioClipSubtitle GetSubtitle(Dictionary dictionary, AudioClip clip)
         {
-            if (dictionary != null && dictionary.Subtitles != null)
-            {
-                foreach (var item in dictionary.Subtitles)
-                {
-                    if (item.Clip == clip)
-                        return item;
-                }
-            }
+            if (dictionary != null)
+                return dictionary.GetSubtitle(clip);
             return null;
         }
 
@@ -439,9 +433,11 @@ namespace Skill.Editor
                 if (_SelectedView != null)
                     _SelectedView.Selected = false;
 
-                _Translate.Keys = new TextKey[_ListBox.Controls.Count];
+                TextKey[] keys = new TextKey[_ListBox.Controls.Count];
                 for (int i = 0; i < _ListBox.Controls.Count; i++)
-                    _Translate.Keys[i] = ((TextKeyTranslateView)_ListBox.Controls[i]).TranslateKey;
+                    keys[i] = ((TextKeyTranslateView)_ListBox.Controls[i]).TranslateKey;
+
+                _Translate.SetKeys(keys);
                 UnityEditor.EditorUtility.SetDirty(_Translate);
 
                 if (_SelectedView != null)

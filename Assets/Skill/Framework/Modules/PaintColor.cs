@@ -16,7 +16,7 @@ namespace Skill.Framework.Modules
         public float Radius = 32;
         public bool UV2 = false;
         public bool EraseEnable = false;
-        public float Strength = 0.5f;
+        public float Strength = 50f;
         public float Falloff = 0.8f;
         public bool ChannelR = true, ChannelG = false, ChannelB = false, ChannelA = false;
         public bool EnableBrushFlow = false;

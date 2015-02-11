@@ -24,70 +24,93 @@ namespace Skill.Framework
         public TextAlignment Alignment = TextAlignment.Center;
 
         [HideInInspector]
-        public TextKey[] Keys;
+        [SerializeField]
+        private TextKey[] _Keys;
         [HideInInspector]
-        public AudioClipSubtitle[] Subtitles;               
+        [SerializeField]
+        private AudioClipSubtitle[] _Subtitles;
+
+        public IEnumerable<TextKey> Keys { get { if (_Keys == null) _Keys = new TextKey[0]; return _Keys; } }
+        public IEnumerable<AudioClipSubtitle> Subtitles { get { if (_Subtitles == null) _Subtitles = new AudioClipSubtitle[0]; return _Subtitles; } }
+
+        public void SetKeys(TextKey[] keys)
+        {
+            if (keys == null) keys = new TextKey[0];
+            this._Keys = keys;
+            ReloadKeys();
+        }
+
+        public void SetSubtitles(AudioClipSubtitle[] subtitles)
+        {
+            if (subtitles == null) subtitles = new AudioClipSubtitle[0];
+            this._Subtitles = subtitles;
+            ReloadSubtitles();
+        }
 
 
         private System.Collections.Generic.Dictionary<int, AudioClipSubtitle> _AudioMap;
         private System.Collections.Generic.Dictionary<string, TextKey> _TextsMap;
 
-        public bool IsLoaded { get; private set; }
-        public void Reload()
+        void OnEnable()
+        {
+            ReloadKeys();
+            ReloadSubtitles();
+        }
+
+        void OnDestroy()
         {
             if (_TextsMap != null)
                 _TextsMap.Clear();
-            _TextsMap = null;
-            if (Keys != null && Keys.Length > 0)
+            if (_AudioMap != null)
+                _AudioMap.Clear();
+        }
+
+        private void ReloadKeys()
+        {
+            if (_Keys == null) _Keys = new TextKey[0];
+
+            if (_TextsMap == null)
+                _TextsMap = new Dictionary<string, TextKey>(_Keys.Length);
+            _TextsMap.Clear();
+
+            foreach (var key in _Keys)
             {
-                _TextsMap = new Dictionary<string, TextKey>(Keys.Length);
-                foreach (var key in Keys)
-                {
 #if DEBUG
-                        if (_TextsMap.ContainsKey(key.Key))
-                            Debug.LogWarning(string.Format("An element with the same key '{0}' already exists in the Dictionary", key.Key));
-                        else
+                if (_TextsMap.ContainsKey(key.Key))
+                    Debug.LogWarning(string.Format("An element with the same key '{0}' already exists in the Dictionary", key.Key));
+                else
 #endif
                     _TextsMap.Add(key.Key, key);
-                }
             }
-            else
-            {
-                _TextsMap = new Dictionary<string, TextKey>();
-            }
+        }
+        private void ReloadSubtitles()
+        {
+            if (_Subtitles == null) _Subtitles = new AudioClipSubtitle[0];
 
-            _AudioMap = new System.Collections.Generic.Dictionary<int, AudioClipSubtitle>();
-            if (Subtitles != null)
+            if (_AudioMap == null)
+                _AudioMap = new System.Collections.Generic.Dictionary<int, AudioClipSubtitle>();
+            _AudioMap.Clear();
+            foreach (var item in _Subtitles)
             {
-                foreach (var item in Subtitles)
-                {
-                    if (item.Clip != null && item.Titles != null)
-                        _AudioMap.Add(item.Clip.GetInstanceID(), item);
-                }
+                if (item.Clip != null && item.Titles != null)
+                    _AudioMap.Add(item.Clip.GetInstanceID(), item);
             }
-            IsLoaded = true;
         }
 
         public AudioClipSubtitle this[AudioClip clip] { get { return GetSubtitle(clip); } }
         public string this[string key] { get { return GetValue(key); } }
         public string GetValue(string key)
         {
-            if (IsLoaded)
-            {
-                TextKey value;
-                if (_TextsMap.TryGetValue(key, out value))
-                    return value.Value;
-            }
+            TextKey value;
+            if (_TextsMap.TryGetValue(key, out value))
+                return value.Value;
             return string.Empty;
         }
         public string GetComment(string key)
         {
-            if (IsLoaded)
-            {
-                TextKey value;
-                if (_TextsMap.TryGetValue(key, out value))
-                    return value.Comment;
-            }
+            TextKey value;
+            if (_TextsMap.TryGetValue(key, out value))
+                return value.Comment;
             return string.Empty;
         }
         public AudioClipSubtitle GetSubtitle(AudioClip clip)
@@ -96,12 +119,12 @@ namespace Skill.Framework
         }
         public AudioClipSubtitle GetSubtitle(int instanceId)
         {
-            if (IsLoaded)
-            {
-                AudioClipSubtitle at;
-                if (_AudioMap.TryGetValue(instanceId, out at))
-                    return at;
-            }
+            AudioClipSubtitle at;
+            if (_AudioMap == null)
+                Debug.Log("_AudioMap is null");
+            if (_AudioMap.TryGetValue(instanceId, out at))
+                return at;
+
             return null;
         }
     }

@@ -26,10 +26,28 @@ namespace Skill.Framework.Animation
         public UnityEngine.AnimationBlendMode BlendMode { get; private set; }
 
         /// <summary> delta position  of Sequences in this layer </summary>
-        public UnityEngine.Vector3 DeltaPosition { get { return _DeltaPosition; } }
+        public UnityEngine.Vector3 DeltaPosition
+        {
+            get
+            {
+                if (float.IsNaN(_DeltaPosition.x)) _DeltaPosition.x = 0;
+                if (float.IsNaN(_DeltaPosition.y)) _DeltaPosition.y = 0;
+                if (float.IsNaN(_DeltaPosition.z)) _DeltaPosition.z = 0;
+                return _DeltaPosition;
+            }
+        }
 
         /// <summary> delta rotation result of Sequences in this layer </summary>
-        public UnityEngine.Vector3 DeltaRotation { get { return _DeltaRotation; } }
+        public UnityEngine.Vector3 DeltaRotation
+        {
+            get
+            {
+                if (float.IsNaN(_DeltaRotation.x)) _DeltaRotation.x = 0;
+                if (float.IsNaN(_DeltaRotation.y)) _DeltaRotation.y = 0;
+                if (float.IsNaN(_DeltaRotation.z)) _DeltaRotation.z = 0;
+                return _DeltaRotation;
+            }
+        }
 
         /// <summary>
         /// Create an instance of AnimationLayer

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using Skill.Framework.UI;
-using Skill.Framework.UI.Extended;
 
 namespace Skill.Editor.AI
 {
@@ -386,7 +385,11 @@ namespace Skill.Editor.AI
             if (_BehaviorTree.DefaultState == oldStateName)
                 _BehaviorTree.DefaultState = newStateName;
         }
+        
 
-
+        internal void RefreshSameContent(IBehaviorItem item)
+        {
+            _TreeViewEditor.RefreshSameContent(item);
+        }
     }
 }

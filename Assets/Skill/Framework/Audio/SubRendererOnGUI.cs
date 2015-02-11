@@ -5,16 +5,18 @@ namespace Skill.Framework.Audio
     public class SubRendererOnGUI : SubtitleRenderer
     {
         public int GUIDepth;
-        public Font Font;
-        public int FontSize;
+        public Font Font;        
+        public float FontSizeFactor = 0.24f;
         public RectOffset ScreenBorder;
 
         private Skill.Framework.TimeWatch _ShowTW;
         private string _Text;
         private GUIStyle _Style;
+        private Skill.Framework.ScreenSizeChange _ScreenSizeChange;
+        private int _FontSize;
         protected override void Awake()
         {
-            base.Awake();            
+            base.Awake();
             _Style = new GUIStyle();
         }
 
@@ -32,7 +34,13 @@ namespace Skill.Framework.Audio
             else this._Style.alignment = TextAnchor.LowerRight;
 
             this._Style.font = Font;
-            this._Style.fontSize = FontSize;
+
+            if (_ScreenSizeChange.IsChanged)
+            {
+                float factor = (_ScreenSizeChange.Width + _ScreenSizeChange.Height) * 0.1f;
+                _FontSize = Mathf.FloorToInt(factor * FontSizeFactor);
+            }
+            this._Style.fontSize = _FontSize;
 
             _ShowTW.Begin(duration);
         }

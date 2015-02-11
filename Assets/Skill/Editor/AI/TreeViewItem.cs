@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace Skill.Editor.AI
 {
-    public class TreeViewItem : Skill.Framework.UI.Label, IBehaviorItem, Skill.Editor.UI.Extended.IProperties
+    public class TreeViewItem : Skill.Framework.UI.Label, IBehaviorItem, Skill.Editor.UI.IProperties
     {
         public BehaviorTreeEditorWindow Editor
         {
@@ -69,6 +69,7 @@ namespace Skill.Editor.AI
                     //Tree.History.Insert(new ChangePropertyUnDoRedo(this, "Name", value, Model.Name));
                     Data.Name = value;
                     RefreshContent();
+                    Editor.RefreshSameContent(this);
                 }
             }
         }
@@ -161,7 +162,7 @@ namespace Skill.Editor.AI
         #region IProperties members
         public bool IsSelectedProperties { get; set; }
         private ItemProperties _Properties;
-        public Skill.Editor.UI.Extended.PropertiesPanel Properties
+        public Skill.Editor.UI.PropertiesPanel Properties
         {
             get
             {
@@ -170,7 +171,7 @@ namespace Skill.Editor.AI
             }
         }
         public string Title { get { return Data.BehaviorType.ToString(); } }
-        protected class ItemProperties : Skill.Editor.UI.Extended.ExposeProperties
+        protected class ItemProperties : Skill.Editor.UI.ExposeProperties
         {
             private TreeViewItem _Item;
             private ParameterEditor _Editor;

@@ -39,7 +39,7 @@ namespace Skill.Framework.AI
         /// <remarks>
         /// This Property is for additional info and debug, do not modify this manually.
         /// </remarks>
-        public Behavior[] ExecutionSequence { get { return _ExecutionSequence; } }
+        public BehaviorContainer[] ExecutionSequence { get { return _ExecutionSequence; } }
 
         /// <summary> Number of valid Behaviors in ExecutionSequence</summary>
         public int SequenceCount { get { return _CurrnetExecutionIndex + 1; } }
@@ -88,7 +88,7 @@ namespace Skill.Framework.AI
             this.Exception = null;
             this.RunningActions = new RunningActionCollection();
         }
-        private Behavior[] _ExecutionSequence = new Behavior[MaxSequenceLength];// 200 is maximum node trace in tree (i hope).
+        private BehaviorContainer[] _ExecutionSequence = new BehaviorContainer[MaxSequenceLength];// 200 is maximum node trace in tree (i hope).
         private int _CurrnetExecutionIndex = -1;
 
 
@@ -106,7 +106,7 @@ namespace Skill.Framework.AI
         /// <summary>
         /// each behavior before execution call this method to register in execution sequence.
         /// </summary>
-        /// <param name="behavior">Behavior to register</param>
+        /// <param name="container">Behavior to register</param>
         /// <returns>Return registerd index</returns>
         /// <remarks>
         /// we need to keep last execution sequenece to aviod some mistakes in tree
@@ -114,12 +114,12 @@ namespace Skill.Framework.AI
         /// if the result be Running then it hold the key until next update (at least)
         /// if in next update a branch before that be executed we lost the key and never unlock it        
         /// </remarks>
-        internal void RegisterForExecution(Behavior behavior)
+        internal void RegisterForExecution(BehaviorContainer container)
         {
             _CurrnetExecutionIndex++;// move to next place  
             if (_CurrnetExecutionIndex >= _ExecutionSequence.Length)
                 throw new IndexOutOfRangeException("ExecutionSequence buffer is low. to avoid this error set higher value to 'BehaviorStatus.MaxSequenceLength'.");
-            _ExecutionSequence[_CurrnetExecutionIndex] = behavior;
+            _ExecutionSequence[_CurrnetExecutionIndex] = container;
         }
 
         private string GetTabSpace(int tabCount)
@@ -157,7 +157,7 @@ namespace Skill.Framework.AI
         private void LogExecutionSequenceTree(Behavior b, ref int sqIndex, int tabCount)
         {
             if (b == null || _ExecutionSequence[sqIndex] == null || sqIndex >= _CurrnetExecutionIndex) return;
-            if (b == _ExecutionSequence[sqIndex])
+            if (b == _ExecutionSequence[sqIndex].Behavior)
             {
                 string log = string.Format("{0} - {1}{2} : {3}", sqIndex, GetTabSpace(tabCount), b.ToString(), b.Result);
                 UnityEngine.Debug.Log(log);

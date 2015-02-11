@@ -2,7 +2,6 @@
 using UnityEditor;
 using System.Collections;
 using Skill.Editor.UI;
-using Skill.Editor.UI.Extended;
 using System.Reflection;
 using System;
 using System.Collections.Generic;

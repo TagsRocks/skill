@@ -124,24 +124,20 @@ namespace Skill.Framework.Sequence
                 }
                 UpdateKeys();
             }
-            //else if (DeltaTime < 0)
-            //{
-            //    if (Keys != null)
-            //    {
-            //        if (_Index >= Keys.Length) _Index = Keys.Length - 1;
-            //        while (_Index >= 0)
-            //        {
-            //            float t = Keys[_Index].FireTime;
-            //            if (t < CurrecntTime)
-            //                break;
-            //            else if (t >= CurrecntTime && t < PreviousTime)
-            //            {
-            //                Keys[_Index].UndoEvent(this);
-            //            }
-            //            _Index--;
-            //        }
-            //    }
-            //}            
+            else
+            {
+                if (Keys != null)
+                {
+                    if (_Index >= Keys.Length) _Index = Keys.Length - 1;
+                    while (_Index >= 0)
+                    {
+                        float t = Keys[_Index].FireTime;
+                        if (t < CurrecntTime)
+                            break;
+                        _Index--;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -167,7 +163,10 @@ namespace Skill.Framework.Sequence
             if (Keys != null && Keys.Length > 1)
                 Skill.Framework.Utility.QuickSort(Keys, new TrackKeyComparer<EventOrientedKey>());
         }
-        public override void Stop() { }
+        public override void Stop()
+        {
+            PreviousTime = CurrecntTime;
+        }
 
         private List<EventOrientedKey> _UpdatingKeys;
         private void UpdateKeys()

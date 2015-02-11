@@ -35,7 +35,7 @@ namespace Skill.Editor.AI
         private const float ButtonRowHeight = 26;
 
         private Skill.Framework.UI.Frame _Frame;
-        private Skill.Framework.UI.Extended.ListBox _ItemsList;
+        private Skill.Framework.UI.ListBox _ItemsList;
         private Skill.Framework.UI.Button _BtnAddCounterLimit;
         private Skill.Framework.UI.Button _BtnAddTimeLimit;
         private Skill.Editor.UI.TextField _BuildPathField;
@@ -70,7 +70,7 @@ namespace Skill.Editor.AI
             _BtnAddCounterLimit.Content.tooltip = "add counterlimit accessy key";
             _BtnAddCounterLimit.Click += _BtnAddCounterLimit_Click;
 
-            _ItemsList = new Skill.Framework.UI.Extended.ListBox() { Row = 1, Column = 0, ColumnSpan = 2, Margin = new Thickness(2) };
+            _ItemsList = new Skill.Framework.UI.ListBox() { Row = 1, Column = 0, ColumnSpan = 2, Margin = new Thickness(2) };
             _ItemsList.BackgroundVisible = true;
             _ItemsList.DisableFocusable();
 

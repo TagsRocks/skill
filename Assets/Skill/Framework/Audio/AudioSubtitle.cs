@@ -11,13 +11,10 @@ namespace Skill.Framework.Audio
     public class AudioSubtitle : Skill.Framework.DynamicBehaviour
     {
         public static AudioSubtitle Instance { get; private set; }
-
+        
         public Dictionary[] Dictionaries;
         public SubtitleRenderer SubRenderer;
-
-        private Color _FontColor = Color.white;
-        private FontStyle _FontStyle = FontStyle.Normal;
-        private TextAlignment _Alignment = TextAlignment.Center;
+        
         private System.Collections.Generic.Queue<SubTime> _Queue;
 
 
@@ -34,17 +31,17 @@ namespace Skill.Framework.Audio
             Instance = this;
             base.Awake();
             _Queue = new System.Collections.Generic.Queue<SubTime>(100);
-            if (Dictionaries != null && Dictionaries.Length > 0)
-            {
-                foreach (var dictionary in Dictionaries)
-                {
-                    if (dictionary != null)
-                    {
-                        if (!dictionary.IsLoaded)
-                            dictionary.Reload();
-                    }
-                }
-            }
+            //if (Dictionaries != null && Dictionaries.Length > 0)
+            //{
+            //    foreach (var dictionary in Dictionaries)
+            //    {
+            //        if (dictionary != null)
+            //        {
+            //            if (!dictionary.IsLoaded)
+            //                dictionary.Reload();
+            //        }
+            //    }
+            //}
         }
         /// <summary>
         /// GetReferences
@@ -55,7 +52,7 @@ namespace Skill.Framework.Audio
             if (SubRenderer == null)
                 SubRenderer = GetComponent<SubtitleRenderer>();
         }
-        
+
         private AudioClipSubtitle GetSubtitle(AudioClip clip, out  Dictionary dictionary)
         {
             if (Dictionaries != null && Dictionaries.Length > 0)
@@ -65,9 +62,6 @@ namespace Skill.Framework.Audio
                 {
                     if (d != null)
                     {
-                        if (!d.IsLoaded)
-                            d.Reload();
-
                         AudioClipSubtitle subtitle = d.GetSubtitle(instanceID);
                         if (subtitle != null)
                         {
@@ -96,9 +90,6 @@ namespace Skill.Framework.Audio
                 {
                     if (dictionary != null)
                     {
-                        if (!dictionary.IsLoaded)
-                            dictionary.Reload();
-
                         string text = dictionary.GetValue(key);
                         if (text != null) return text;
                     }
@@ -119,11 +110,7 @@ namespace Skill.Framework.Audio
                 Dictionary dictionary = null;
                 AudioClipSubtitle at = GetSubtitle(clip, out dictionary);
                 if (at != null)
-                {
-                    this._FontColor = dictionary.FontColor;
-                    this._FontStyle = dictionary.FontStyle;
-                    this._Alignment = dictionary.Alignment;
-
+                {                    
                     if (at.Titles.Length > 0)
                     {
                         if (at.Titles.Length > 1)
@@ -157,7 +144,7 @@ namespace Skill.Framework.Audio
                         if (st.Title.OverrideStyle)
                             SubRenderer.ShowTitle(valueText, st.Title.Duration, st.Title.FontColor, st.Title.FontStyle, st.Title.Alignment);
                         else
-                            SubRenderer.ShowTitle(valueText, st.Title.Duration, this._FontColor, this._FontStyle, this._Alignment);
+                            SubRenderer.ShowTitle(valueText, st.Title.Duration);
                     }
                 }
             }

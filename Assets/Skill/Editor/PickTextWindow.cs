@@ -31,6 +31,7 @@ namespace Skill.Editor
         void OnDisable()
         {
             _Browser.SelectionChanged -= _Browser_SelectionChanged;
+            _Browser.SelectedDoubleClick -= _Browser_SelectedDoubleClick;
             _Frame.Controls.Remove(_Browser);
             _Instance = null;
         }
@@ -73,7 +74,11 @@ namespace Skill.Editor
             _ButtonsPanel = new Skill.Framework.UI.StackPanel() { Row = 4, Orientation = Skill.Framework.UI.Orientation.Horizontal };
             _Frame.Controls.Add(_ButtonsPanel);
 
-            _BtnSelect = new Skill.Framework.UI.Button() { Width = 100, Margin = new Skill.Framework.UI.Thickness(2), HorizontalAlignment = Skill.Framework.UI.HorizontalAlignment.Left, IsEnabled = false };
+            if (_Browser == null)
+                _Browser = new TextKeyBrowser() { Row = 3 };            
+            _Frame.Controls.Add(_Browser);
+
+            _BtnSelect = new Skill.Framework.UI.Button() { Width = 100, Margin = new Skill.Framework.UI.Thickness(2), HorizontalAlignment = Skill.Framework.UI.HorizontalAlignment.Left, IsEnabled = _Browser.SelectedItem != null };
             _BtnSelect.Content.text = "Select";
             _ButtonsPanel.Controls.Add(_BtnSelect);
 
@@ -81,14 +86,18 @@ namespace Skill.Editor
             _BtnCancel.Content.text = "Cancel";
             _ButtonsPanel.Controls.Add(_BtnCancel);
 
-            if (_Browser == null)
-                _Browser = new TextKeyBrowser() { Row = 3 };
-            _Frame.Controls.Add(_Browser);
 
+
+            _Browser.SelectedDoubleClick += _Browser_SelectedDoubleClick;
             _TxtFilter.TextChanged += _TxtFilter_TextChanged;
             _BtnSelect.Click += _BtnSelect_Click;
             _BtnCancel.Click += _BtnCancel_Click;
             _Browser.SelectionChanged += _Browser_SelectionChanged;
+        }
+
+        void _Browser_SelectedDoubleClick(object sender, System.EventArgs e)
+        {
+            OnSelect();
         }
 
         void _TxtFilter_TextChanged(object sender, System.EventArgs e)
@@ -109,9 +118,16 @@ namespace Skill.Editor
 
         void _BtnSelect_Click(object sender, System.EventArgs e)
         {
+            OnSelect();
+        }
+
+        private void OnSelect()
+        {
             if (_Browser.SelectedItem != null && _TextPickTarget != null)
+            {
                 _TextPickTarget.Pick(((TextKeyView)_Browser.SelectedItem).Key);
-            this.Close();
+                this.Close();
+            }
         }
 
         private ITextPickTarget _TextPickTarget;
@@ -123,7 +139,7 @@ namespace Skill.Editor
         }
     }
 
-    class TextKeyBrowser : Skill.Framework.UI.Extended.ListBox
+    class TextKeyBrowser : Skill.Framework.UI.ListBox
     {
         private List<TextKeyView> _List;
         private Dictionary _Dictionary;
@@ -192,7 +208,7 @@ namespace Skill.Editor
                 if (k == item.Key) return true;
             return false;
         }
-        private bool KeyExist(TextKeyView view, TextKey[] keys)
+        private bool KeyExist(TextKeyView view, IEnumerable<TextKey> keys)
         {
             foreach (var k in keys)
                 if (view.Key == k) return true;

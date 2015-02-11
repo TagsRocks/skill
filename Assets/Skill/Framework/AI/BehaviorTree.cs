@@ -61,7 +61,7 @@ namespace Skill.Framework.AI
         }
 
         /// <summary>
-        /// If true, the tree updates 'running actions' everyframe and update whole tree if required
+        /// If true, the tree updates 'running actions' everyframe and update whole tree if required (default is true)
         /// </summary>
         public bool ContinuousUpdate { get; set; }
 
@@ -122,9 +122,10 @@ namespace Skill.Framework.AI
         /// Create an instance of BehaviorTree
         /// </summary>
         public BehaviorTree()
-        {            
+        {
             this._LastUpdateTime = 0;
             this.UpdateTimeInterval = 0.2f;
+            this.ContinuousUpdate = true;
             this._FinishedActions = new List<Action>();
 
             States = CreateTree();
@@ -212,6 +213,7 @@ namespace Skill.Framework.AI
                 string preState = string.Empty;
                 if (_CurrentState != null)
                 {
+                    Status.Begin();
                     _CurrentState.ResetBehavior(this.Status);
                     preState = _CurrentState.Name;
                 }
@@ -225,7 +227,7 @@ namespace Skill.Framework.AI
 
             if (Status.Exception != null)
             {
-                UnityEngine.Debug.LogWarning(Status.Exception.ToString());
+                UnityEngine.Debug.LogException(Status.Exception);
             }
 
             CurrentState.ResetBehavior(this.Status);

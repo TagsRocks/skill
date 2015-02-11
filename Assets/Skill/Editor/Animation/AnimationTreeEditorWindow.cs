@@ -3,7 +3,6 @@ using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 using Skill.Framework.UI;
-using Skill.Framework.UI.Extended;
 using Skill.Editor.Animation;
 
 namespace Skill.Editor.Animation

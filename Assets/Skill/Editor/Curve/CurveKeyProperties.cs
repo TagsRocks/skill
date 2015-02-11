@@ -4,7 +4,7 @@ using Skill.Framework.UI;
 
 namespace Skill.Editor.Curve
 {
-    public class CurveKeyProperties : Skill.Editor.UI.Extended.ExposeProperties
+    public class CurveKeyProperties : Skill.Editor.UI.ExposeProperties
     {
         public CurveKeyProperties(CurveKey key)
             : base(key)

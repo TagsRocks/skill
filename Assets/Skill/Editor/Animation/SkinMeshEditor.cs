@@ -15,6 +15,7 @@ namespace Skill.Editor.Animation
         private Skill.Framework.UI.Frame _Frame;
 
         private Skill.Editor.UI.ObjectField<UnityEngine.Animation> _AnimationField;
+        private Skill.Editor.UI.ObjectField<UnityEngine.Animation> _RootMotionAnimationField;
         private Skill.Editor.UI.ObjectField<UnityEngine.Transform> _RootField;
 
         private Skill.Framework.UI.Button _BtnRebuildSkeleton;
@@ -35,6 +36,7 @@ namespace Skill.Editor.Animation
             _Frame.Grid.RowDefinitions.Add(20, Skill.Framework.UI.GridUnitType.Pixel); // _RootField
             _Frame.Grid.RowDefinitions.Add(30, Skill.Framework.UI.GridUnitType.Pixel); // _BtnRebuildSkeleton
             _Frame.Grid.RowDefinitions.Add(20, Skill.Framework.UI.GridUnitType.Pixel); // _AnimationField
+            _Frame.Grid.RowDefinitions.Add(20, Skill.Framework.UI.GridUnitType.Pixel); // _RootMotionAnimationField
             _Frame.Grid.RowDefinitions.Add(30, Skill.Framework.UI.GridUnitType.Pixel); // _BtnRebuildAnimations
             _Frame.Grid.RowDefinitions.Add(30, Skill.Framework.UI.GridUnitType.Pixel); // _BtnEdit
             _Frame.Grid.RowDefinitions.Add(30, Skill.Framework.UI.GridUnitType.Pixel); // _BtnBuild
@@ -49,22 +51,27 @@ namespace Skill.Editor.Animation
             _Frame.Controls.Add(_BtnRebuildSkeleton);
 
             _AnimationField = new ObjectField<UnityEngine.Animation>() { Row = 2, Column = 0, Margin = new Skill.Framework.UI.Thickness(0, 2) };
-            _AnimationField.Label.text = "Animation";
+            _AnimationField.Label.text = "Animations";
             _Frame.Controls.Add(_AnimationField);
 
-            _BtnImportAnimations = new Framework.UI.Button() { Row = 3, Column = 0, Margin = new Skill.Framework.UI.Thickness(0, 2), IsEnabled = false };
+            _RootMotionAnimationField = new ObjectField<UnityEngine.Animation>() { Row = 3, Column = 0, Margin = new Skill.Framework.UI.Thickness(0, 2) };
+            _RootMotionAnimationField.Label.text = "Override RootMotion";
+            _Frame.Controls.Add(_RootMotionAnimationField);
+
+            _BtnImportAnimations = new Framework.UI.Button() { Row = 4, Column = 0, Margin = new Skill.Framework.UI.Thickness(0, 2), IsEnabled = false };
             _BtnImportAnimations.Content.text = "Import Animations";
             _Frame.Controls.Add(_BtnImportAnimations);
 
-            _BtnEdit = new Skill.Framework.UI.Button() { Row = 4, Column = 0, Margin = new Skill.Framework.UI.Thickness(0, 2) };
+
+            _BtnEdit = new Skill.Framework.UI.Button() { Row = 5, Column = 0, Margin = new Skill.Framework.UI.Thickness(0, 2) };
             _BtnEdit.Content.text = "Edit Imported Animations";
             _Frame.Controls.Add(_BtnEdit);
 
-            _BtnBuild = new Skill.Framework.UI.Button() { Row = 5, Column = 0, Margin = new Skill.Framework.UI.Thickness(0, 2) };
+            _BtnBuild = new Skill.Framework.UI.Button() { Row = 6, Column = 0, Margin = new Skill.Framework.UI.Thickness(0, 2) };
             _BtnBuild.Content.text = "Build";
             _Frame.Controls.Add(_BtnBuild);
 
-            _BuildPathField = new TextField() { Row = 6, Column = 0, Margin = new Skill.Framework.UI.Thickness(0, 2) };
+            _BuildPathField = new TextField() { Row = 7, Column = 0, Margin = new Skill.Framework.UI.Thickness(0, 2) };
             _BuildPathField.Text = _Data.BuildPath;
             _BuildPathField.Label.text = "Path";
             _Frame.Controls.Add(_BuildPathField);
@@ -118,7 +125,7 @@ namespace Skill.Editor.Animation
         public override void OnInspectorGUI()
         {
             _Frame.Update();
-            _Frame.OnInspectorGUI(180);
+            _Frame.OnInspectorGUI(200);
         }
 
 
@@ -264,26 +271,32 @@ namespace Skill.Editor.Animation
                             anims.Add(clip);
                         }
                         clip.Length = state.length;
+                        AnimationState rootState = state;
+                        if (_RootMotionAnimationField.Object != null)
+                        {
+                            var s = _RootMotionAnimationField.Object[state.name];
+                            if (s != null)
+                                rootState = s;
+                        }
 
                         EditorCurveBinding binding = new EditorCurveBinding() { path = skin.Root.Name, type = typeof(Transform) };
                         binding.propertyName = "m_LocalPosition.x";
-                        var xCurve = AnimationUtility.GetEditorCurve(state.clip, binding);
+                        var xCurve = AnimationUtility.GetEditorCurve(rootState.clip, binding);
                         binding.propertyName = "m_LocalPosition.y";
-                        var yCurve = AnimationUtility.GetEditorCurve(state.clip, binding);
+                        var yCurve = AnimationUtility.GetEditorCurve(rootState.clip, binding);
                         binding.propertyName = "m_LocalPosition.z";
-                        var zCurve = AnimationUtility.GetEditorCurve(state.clip, binding);
+                        var zCurve = AnimationUtility.GetEditorCurve(rootState.clip, binding);
 
                         AddKeys(xCurve, clip.RootMotion.XKeys);
                         AddKeys(yCurve, clip.RootMotion.YKeys);
                         AddKeys(zCurve, clip.RootMotion.ZKeys);
 
-
                         binding.propertyName = "m_LocalRotation.x";
-                        var rxCurve = AnimationUtility.GetEditorCurve(state.clip, binding);
+                        var rxCurve = AnimationUtility.GetEditorCurve(rootState.clip, binding);
                         binding.propertyName = "m_LocalRotation.y";
-                        var ryCurve = AnimationUtility.GetEditorCurve(state.clip, binding);
+                        var ryCurve = AnimationUtility.GetEditorCurve(rootState.clip, binding);
                         binding.propertyName = "m_LocalRotation.z";
-                        var rzCurve = AnimationUtility.GetEditorCurve(state.clip, binding);
+                        var rzCurve = AnimationUtility.GetEditorCurve(rootState.clip, binding);
 
                         AddKeys(rxCurve, clip.RootMotion.RXKeys);
                         AddKeys(ryCurve, clip.RootMotion.RYKeys);

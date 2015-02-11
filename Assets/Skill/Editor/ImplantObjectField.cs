@@ -89,8 +89,8 @@ namespace Skill.Editor
         private FloatField _MaxScaleField;
         private Skill.Editor.UI.Slider _ChanceField;
         private Skill.Editor.UI.DropShadowLabel _RotationLabel;
-        private Skill.Editor.UI.Extended.SelectionField _RotationSF;
-        private Skill.Editor.UI.Extended.XYZComponent _RandomRotation;
+        private Skill.Editor.UI.SelectionField _RotationSF;
+        private Skill.Editor.UI.XYZComponent _RandomRotation;
         private Skill.Editor.UI.Vector3Field _CustomRotation;
         private Skill.Framework.UI.ToggleButton _RandomYaw;
 
@@ -143,13 +143,13 @@ namespace Skill.Editor
             this._ChanceField = new Skill.Editor.UI.Slider() { MinValue = 0.1f, MaxValue = 1.0f, Margin = new Thickness(2, 2, 2, 2) };
             this._ChanceField.Label.text = "Chance";
 
-            _RandomRotation = new Skill.Editor.UI.Extended.XYZComponent();
+            _RandomRotation = new Skill.Editor.UI.XYZComponent();
             _CustomRotation = new Skill.Editor.UI.Vector3Field();
 
             _RandomYaw = new Skill.Framework.UI.ToggleButton() { HorizontalAlignment = Skill.Framework.UI.HorizontalAlignment.Left, Margin = new Thickness(20, 0, 0, 0) };
             _RandomYaw.Content.text = "Random Yaw";
 
-            _RotationSF = new Skill.Editor.UI.Extended.SelectionField() { Margin = new Thickness(2) };
+            _RotationSF = new Skill.Editor.UI.SelectionField() { Margin = new Thickness(2) };
             _RotationSF.Label.Width = 110;
             _RotationSF.Background.Visibility = Skill.Framework.UI.Visibility.Hidden;
 

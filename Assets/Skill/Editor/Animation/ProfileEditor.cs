@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Linq;
 using Skill.Framework.UI;
-using Skill.Framework.UI.Extended;
 
 namespace Skill.Editor.Animation
 {
@@ -79,7 +78,7 @@ namespace Skill.Editor.Animation
         {
             OnSelectedProfileChanged();
             SetButtonsEnable();
-            Skill.Editor.UI.Extended.InspectorProperties.Select((ProfileItem)_ProfileList.SelectedItem);
+            Skill.Editor.UI.InspectorProperties.Select((ProfileItem)_ProfileList.SelectedItem);
             Skill.Editor.UI.EditorFrame.RepaintParentEditorWindow(this);
         }
         private void SetButtonsEnable()
@@ -186,8 +185,8 @@ namespace Skill.Editor.Animation
 
         public void DeselectInspector()
         {
-            if (Skill.Editor.UI.Extended.InspectorProperties.GetSelected() is ProfileItem)
-                Skill.Editor.UI.Extended.InspectorProperties.Select(null);
+            if (Skill.Editor.UI.InspectorProperties.GetSelected() is ProfileItem)
+                Skill.Editor.UI.InspectorProperties.Select(null);
         }
 
         public void RefreshContents()
@@ -198,7 +197,7 @@ namespace Skill.Editor.Animation
             }
         }
 
-        private class ProfileItem : Label, Skill.Editor.UI.Extended.IProperties
+        private class ProfileItem : Label, Skill.Editor.UI.IProperties
         {
             //private ProfileEditor _Editor;
             public AnimationTreeProfileData Data { get; private set; }
@@ -238,7 +237,7 @@ namespace Skill.Editor.Animation
 
             public bool IsSelectedProperties { get; set; }
             private ProfileItemProperties _Properties;
-            public Skill.Editor.UI.Extended.PropertiesPanel Properties
+            public Skill.Editor.UI.PropertiesPanel Properties
             {
                 get
                 {
@@ -249,7 +248,7 @@ namespace Skill.Editor.Animation
             }
             public string Title { get { return "AnimationTreeProfile"; } }
 
-            class ProfileItemProperties : Skill.Editor.UI.Extended.ExposeProperties
+            class ProfileItemProperties : Skill.Editor.UI.ExposeProperties
             {
                 private ProfileItem _Item;
                 public ProfileItemProperties(ProfileItem item)
