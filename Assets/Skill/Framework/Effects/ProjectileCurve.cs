@@ -35,7 +35,7 @@ namespace Skill.Framework.Effects
             {
                 Vector3 position;
                 if (_LineRenderer.useWorldSpace)
-                    position = _Transform.position + offset;
+                    position = transform.position + offset;
                 else
                     position = offset;
 
@@ -48,7 +48,7 @@ namespace Skill.Framework.Effects
                 Vector3 xzDirection;
                 if (!_LineRenderer.useWorldSpace)
                 {
-                    _Transform.rotation = Quaternion.Euler(0, Skill.Framework.MathHelper.HorizontalAngle(direction), 0);
+                    transform.rotation = Quaternion.Euler(0, Skill.Framework.MathHelper.HorizontalAngle(direction), 0);
                     xzDirection = Vector3.forward;
                 }
                 else
@@ -82,7 +82,7 @@ namespace Skill.Framework.Effects
             {
                 Vector3 position;
                 if (_LineRenderer.useWorldSpace)
-                    position = _Transform.position + offset;
+                    position = transform.position + offset;
                 else
                     position = offset;
 
@@ -96,7 +96,7 @@ namespace Skill.Framework.Effects
                 Vector3 xzDirection;
                 if (!_LineRenderer.useWorldSpace)
                 {
-                    _Transform.rotation = Quaternion.Euler(0, yaw, 0);
+                    transform.rotation = Quaternion.Euler(0, yaw, 0);
                     xzDirection = Vector3.forward;
                 }
                 else

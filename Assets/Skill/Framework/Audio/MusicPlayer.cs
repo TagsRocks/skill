@@ -32,7 +32,7 @@ namespace Skill.Framework.Audio
         protected override void GetReferences()
         {
             base.GetReferences();
-            Audio = audio;
+            Audio = GetComponent<AudioSource>();
         }
 
 

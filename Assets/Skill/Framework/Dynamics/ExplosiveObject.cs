@@ -7,10 +7,11 @@ namespace Skill.Framework.Dynamics
 
     /// <summary>
     /// Defines base class for ExplosiveObjects. usually this object has a Health and an exploded mesh. When Health dies, explodedMesh will be visible and an explosion effect spawned
-    /// </summary>
-    [RequireComponent(typeof(Health))]
+    /// </summary>    
     public class ExplosiveObject : Explosive
     {
+        /// <summary> Health </summary>
+        public Health Health;
         /// <summary> Active after explosion </summary>
         public GameObject[] ExplodedObjects;
         /// <summary> to spread around after explosion </summary>
@@ -34,9 +35,6 @@ namespace Skill.Framework.Dynamics
         /// <summary> speed of self-destruction when fire starts </summary>
         public float FireDamageSpeed = 5;
 
-        /// <summary> Health </summary>
-        public Health Health { get; private set; }
-
         private GameObject[] _DamageFireInstances;
         private bool _ReachThreshold;
 
@@ -46,7 +44,8 @@ namespace Skill.Framework.Dynamics
         protected override void GetReferences()
         {
             base.GetReferences();
-            Health = GetComponent<Health>();
+            if (Health == null)
+                Health = GetComponent<Health>();
             if (Health == null)
                 Debug.LogWarning("ExplosiveObject should have Health component in same GameObject to work correctlly");
         }
@@ -65,7 +64,7 @@ namespace Skill.Framework.Dynamics
             }
 
             if (FirePositions == null)
-                FirePositions = new Transform[] { _Transform };
+                FirePositions = new Transform[] { transform };
 
             if (ExplodedObjects != null)
             {
@@ -162,10 +161,12 @@ namespace Skill.Framework.Dynamics
         /// <param name="prefab"> SpreadObject to spawn from </param>        
         protected virtual void SpawnSpreadObject(GameObject prefab)
         {
-            Vector3 pos = _Transform.position + SpreadOffset * Random.onUnitSphere;
+            Vector3 pos = transform.position + SpreadOffset * Random.onUnitSphere;
             GameObject so = Cache.Spawn(prefab, pos, prefab.transform.rotation);
-            if (so.rigidbody != null)
-                so.rigidbody.AddExplosionForce(ExplosionForce, _Transform.position, ExplosionRadius, UpwardsModifier);
+
+            Rigidbody crb = so.GetComponent<Rigidbody>();
+            if (crb != null)
+                crb.AddExplosionForce(ExplosionForce, transform.position, ExplosionRadius, UpwardsModifier);
         }
     }
 

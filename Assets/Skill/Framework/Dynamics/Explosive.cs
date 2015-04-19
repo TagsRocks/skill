@@ -7,6 +7,7 @@ namespace Skill.Framework.Dynamics
     /// <summary>
     /// Base class for explosive objects. it explode OnDie.
     /// </summary>    
+    [RequireComponent(typeof(EventManager))]
     public class Explosive : DynamicBehaviour
     {
         /// <summary> The GameObject to spawn on explosion </summary>
@@ -83,7 +84,7 @@ namespace Skill.Framework.Dynamics
         {
             base.Awake();
             if (ExpPositions == null || ExpPositions.Length == 0)
-                ExpPositions = new Transform[] { _Transform };
+                ExpPositions = new Transform[] { transform };
             enabled = false;
         }
 

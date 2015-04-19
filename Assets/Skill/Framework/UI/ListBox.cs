@@ -447,6 +447,7 @@ namespace Skill.Framework.UI
             this.DoubleClickInterval = 0.4f;
         }
 
+
         /// <summary> Begin render control's content </summary>
         protected override void BeginRender()
         {
@@ -504,6 +505,22 @@ namespace Skill.Framework.UI
                 }
             }
 
+            if (Input.touchCount > 0)
+            {
+                Touch touch = Input.touches[0];
+                if (touch.phase == TouchPhase.Moved)
+                {
+                    _ScrollPosition += touch.deltaPosition;
+                    _SingleSelectedDeltaTouchMove.x += Mathf.Abs(touch.deltaPosition.x);
+                    _SingleSelectedDeltaTouchMove.y += Mathf.Abs(touch.deltaPosition.y);
+                    if ((Orientation == UI.Orientation.Vertical && _SingleSelectedDeltaTouchMove.y > 5) ||
+                        (Orientation == UI.Orientation.Horizontal && _SingleSelectedDeltaTouchMove.x > 5))
+                    {
+                        _SingleSelectedCandidate = null;
+                    }
+                }
+            }
+
             _KeyHandled = false;
 
             if (HorizontalScrollbarStyle != null && VerticalScrollbarStyle != null)
@@ -539,6 +556,11 @@ namespace Skill.Framework.UI
             return selectionChanged;
         }
 
+
+        private int _SingleSelectedCandidateIndex;
+        private BaseControl _SingleSelectedCandidate;
+        private Vector2 _SingleSelectedCandidateMousePosition;
+        private Vector2 _SingleSelectedDeltaTouchMove;
         /// <summary>
         /// Render ListBox
         /// </summary>
@@ -567,21 +589,21 @@ namespace Skill.Framework.UI
                                 {
                                     if (!_SelectedItems.Contains(c))
                                     {
-                                        _SelectedItems.Clear();
-                                        _SelectedItems.Add(c);
-                                        _SelectedIndex = i;
-                                        selectionChange = true;
-                                        _DoubleClickTW.Begin(DoubleClickInterval, true);                                        
+                                        _SingleSelectedCandidateIndex = i;
+                                        _SingleSelectedCandidateMousePosition = mousePos;
+                                        _SingleSelectedCandidate = c;
+                                        _SingleSelectedDeltaTouchMove = Vector2.zero;
+                                        _DoubleClickTW.Begin(DoubleClickInterval, true);
                                     }
                                     else
                                     {
                                         if (_DoubleClickTW.IsEnabledButNotOver)
-                                        {                                            
-                                            OnSelectedDoubleClick();                                            
+                                        {
+                                            OnSelectedDoubleClick();
                                         }
                                         else
                                         {
-                                            _DoubleClickTW.Begin(DoubleClickInterval , true);
+                                            _DoubleClickTW.Begin(DoubleClickInterval, true);
                                         }
                                     }
                                 }
@@ -668,6 +690,24 @@ namespace Skill.Framework.UI
                         }
                     }
                 }
+                else if (SelectionMode == UI.SelectionMode.Single)
+                {
+                    if (e.isMouse && e.type == EventType.mouseUp && e.button == 0)
+                    {
+                        if (_SingleSelectedCandidate != null)
+                        {
+                            if ((Orientation == UI.Orientation.Vertical && Mathf.Abs(e.mousePosition.y - _SingleSelectedCandidateMousePosition.y) < _SingleSelectedCandidate.Height * 0.5f) ||
+                                (Orientation == UI.Orientation.Horizontal && Mathf.Abs(e.mousePosition.x - _SingleSelectedCandidateMousePosition.x) < _SingleSelectedCandidate.Width * 0.5f))
+                            {
+                                _SelectedItems.Clear();
+                                _SelectedItems.Add(_SingleSelectedCandidate);
+                                _SelectedIndex = _SingleSelectedCandidateIndex;
+                                selectionChange = true;
+                            }
+                        }
+                        _SingleSelectedCandidate = null;
+                    }
+                }
             }
 
             if (selectionChange)
@@ -717,7 +757,7 @@ namespace Skill.Framework.UI
                     GUI.Box(cRA, string.Empty, SelectedStyle);
                 }
             }
-
+            
             base.Render();
         }
 

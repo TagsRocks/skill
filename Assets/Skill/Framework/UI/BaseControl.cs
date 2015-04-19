@@ -94,7 +94,7 @@ namespace Skill.Framework.UI
         {
             get
             {
-                if (Parent != null && Parent.ControlType != UI.ControlType.Frame && !Parent.IsEnabled) // if we reach frame break operation                
+                if (Parent != null && !Parent.IsEnabled) // if we reach frame break operation                
                     return false;
                 else
                     return _IsEnabled;
@@ -761,7 +761,7 @@ namespace Skill.Framework.UI
         /// <summary> Begin Render control's content </summary>
         protected virtual void BeginRender()
         {
-            if (Parent != null && Parent.ControlType != UI.ControlType.Frame)
+            if (Parent != null)
             {
                 if (Parent.IsEnabled && !_IsEnabled)
                 {

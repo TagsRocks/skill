@@ -24,7 +24,9 @@ namespace Skill.Framework.UI
             }
         }
 
-        /// <summary> Optional pattern for filtering selectable files/folders. See:</summary>
+
+        private FilterSpec[] _FilterItems;
+        /// <summary> Optional pattern for filtering selectable files</summary>
         public string Filter
         {
             get
@@ -38,6 +40,10 @@ namespace Skill.Framework.UI
                 if (value != this._Filter)
                 {
                     this._Filter = value;
+                    if (string.IsNullOrEmpty(this._Filter))
+                        _FilterItems = new FilterSpec[] { new FilterSpec() { Name = "all files", Spec = "*.*" } };
+                    else
+                        _FilterItems = GetFilterItems(value);
                     ReadDirectoryContents();
                 }
             }
@@ -67,16 +73,16 @@ namespace Skill.Framework.UI
         }
 
         /// <summary> Height of items </summary>
-        public float ItemHeight
+        public float ItemScale
         {
-            get { return _ItemHeight; }
+            get { return _ItemScale; }
             set
             {
-                if (_ItemHeight != value)
+                if (_ItemScale != value)
                 {
-                    _ItemHeight = value;
-                    foreach (var item in _List.Items)
-                        item.Height = _ItemHeight;
+                    _ItemScale = value;
+                    _UpdateItemSize = true;
+                    _ItemHeight = _ItemScale * _DynamicFontSize.Factor;
                 }
             }
         }
@@ -139,7 +145,9 @@ namespace Skill.Framework.UI
         private GUIStyle _PathDividerStyle;
         private GUIStyle _BackgroundStyle;
         private string[] _CurrentDirectoryParts;
+        private float _ItemScale;
         private float _ItemHeight;
+        private bool _UpdateItemSize;
         private string[] _Files;
         private string[] _Directories;
 
@@ -157,18 +165,20 @@ namespace Skill.Framework.UI
 
         private bool _UpdatePathWidth;
         private float _PathWidth;
+        private DynamicFontSize _DynamicFontSize;
 
 
         public FileBrowser()
         {
-            this.ColumnDefinitions.Add(1, GridUnitType.Star);
+            this.ColumnDefinitions.Add(5, GridUnitType.Star);
             this.ColumnDefinitions.Add(2, GridUnitType.Pixel);
-            this.ColumnDefinitions.Add(30, GridUnitType.Pixel);
+            this.ColumnDefinitions.Add(1, GridUnitType.Star);
 
-            this.RowDefinitions.Add(30, GridUnitType.Pixel); // path parts
-            this.RowDefinitions.Add(1, GridUnitType.Star); // list        
-            this.RowDefinitions.Add(30, GridUnitType.Pixel); // buttons
+            this.RowDefinitions.Add(2, GridUnitType.Star); // path parts
+            this.RowDefinitions.Add(30, GridUnitType.Star); // list        
+            this.RowDefinitions.Add(3, GridUnitType.Star); // buttons
 
+            _DynamicFontSize = new DynamicFontSize();
 
             this._Background = new Box() { Row = 0, Column = 0, RowSpan = 4, ColumnSpan = 3 };
             this.Controls.Add(_Background);
@@ -184,11 +194,12 @@ namespace Skill.Framework.UI
 
             this._List = new ListBox() { Row = 1, Column = 0, ColumnSpan = 3 };
             this._List.DisableFocusable();
+            this._List.DoubleClickInterval = 0.7f;
             this.Controls.Add(_List);
 
             this._PnlButtons = new Grid() { Row = 2, Column = 0, ColumnSpan = 3 };
             this._PnlButtons.ColumnDefinitions.Add(1, GridUnitType.Star); // extra button
-            this._PnlButtons.ColumnDefinitions.Add(3, GridUnitType.Star);
+            this._PnlButtons.ColumnDefinitions.Add(1, GridUnitType.Star);
             this._PnlButtons.ColumnDefinitions.Add(1, GridUnitType.Star);
             this._PnlButtons.ColumnDefinitions.Add(1, GridUnitType.Star);
             this.Controls.Add(_PnlButtons);
@@ -200,7 +211,7 @@ namespace Skill.Framework.UI
             this._PnlButtons.Controls.Add(_BtnCancel);
 
             this._Icons = new Dictionary<string, Texture2D>();
-            this._ItemHeight = 20;
+            this.ItemScale = 0.6f;
             this.CurrentDirectory = Directory.GetCurrentDirectory();
 
 
@@ -212,6 +223,13 @@ namespace Skill.Framework.UI
             this._BtnSelect.Click += _BtnSelect_Click;
             this._BtnCancel.Click += _BtnCancel_Click;
             this._BtnUp.Click += _BtnUp_Click;
+
+            _DynamicFontSize.Changed += _DynamicFontSize_Changed;
+        }
+
+        void _DynamicFontSize_Changed(object sender, EventArgs e)
+        {
+            _UpdateItemSize = true;
         }
 
         void _BtnUp_Click(object sender, EventArgs e)
@@ -256,12 +274,24 @@ namespace Skill.Framework.UI
             if (_List.SelectedItem != null)
             {
                 ListItem li = (ListItem)_List.SelectedItem;
-                _BtnSelect.IsEnabled = !li.IsDirectory;
+                if (li.IsDirectory)
+                    CurrentDirectory = Path.Combine(CurrentDirectory, li.Text);
+                _BtnSelect.IsEnabled = true;
             }
             else
             {
                 _BtnSelect.IsEnabled = false;
             }
+        }
+
+        protected virtual bool IsFileAccepted(FileAttributes att)
+        {
+            return ((att & FileAttributes.Hidden) == 0) && ((att & FileAttributes.System) == 0);
+        }
+        protected virtual bool IsDirectoryAccepted(FileAttributes att)
+        {
+            return ((att & FileAttributes.Hidden) == 0) && ((att & FileAttributes.System) == 0);
+
         }
 
         private void ReadDirectoryContents()
@@ -271,17 +301,40 @@ namespace Skill.Framework.UI
             else
                 _CurrentDirectoryParts = _CurrentDirectory.Split(Path.DirectorySeparatorChar);
 
-            string filter = Filter;
-            if (string.IsNullOrEmpty(filter))
-                filter = "*.*";
+            DirectoryInfo directory = new DirectoryInfo(_CurrentDirectory);
 
-            _Directories = Directory.GetDirectories(_CurrentDirectory);
+            List<string> directoreis = new List<string>();
+            DirectoryInfo[] dirInfoes = directory.GetDirectories("*.*", SearchOption.TopDirectoryOnly);
+            if (dirInfoes != null)
+            {
+                foreach (var d in dirInfoes)
+                {
+                    if (IsDirectoryAccepted(d.Attributes))
+                        directoreis.Add(d.FullName);
+                }
+            }
 
+            _Directories = directoreis.ToArray();
             for (int i = 0; i < _Directories.Length; ++i)
                 _Directories[i] = _Directories[i].Substring(_Directories[i].LastIndexOf(Path.DirectorySeparatorChar) + 1);
             Array.Sort(_Directories);
 
-            _Files = Directory.GetFiles(_CurrentDirectory, filter);
+            if (_FilterItems == null)
+                _FilterItems = new FilterSpec[] { new FilterSpec() { Name = "all files", Spec = "*.*" } };
+            List<string> files = new List<string>();
+            for (int i = 0; i < _FilterItems.Length; i++)
+            {
+                FileInfo[] fileIndoes = directory.GetFiles(_FilterItems[i].Spec, SearchOption.TopDirectoryOnly);
+                if (fileIndoes != null)
+                {
+                    foreach (var f in fileIndoes)
+                    {
+                        if (IsFileAccepted(f.Attributes))
+                            files.Add(f.FullName);
+                    }
+                }
+            }
+            _Files = files.ToArray();
             for (int i = 0; i < _Files.Length; ++i)
                 _Files[i] = Path.GetFileName(_Files[i]);
 
@@ -310,8 +363,8 @@ namespace Skill.Framework.UI
                     Button btn = new Button() { Margin = new Thickness(2, 2, 0, 2), Style = _PathButtonStyle };
                     btn.Content.text = _CurrentDirectoryParts[i];
                     btn.UserData = i;
-                    if (_PathButtonStyle != null)
-                        btn.Width = _PathButtonStyle.CalcSize(btn.Content).x + 4;
+                    if (this._PathButtonStyle != null)
+                        btn.Width = _PathButtonStyle.CalcSize(btn.Content).x;
                     _PnlPathParts.Controls.Add(btn);
 
                     if (i < _CurrentDirectoryParts.Length - 1)
@@ -341,7 +394,7 @@ namespace Skill.Framework.UI
             CurrentDirectory = parentDirectoryName;
         }
 
-        protected override void Render()
+        protected override void BeginRender()
         {
             if (_UpdatePathWidth)
             {
@@ -352,9 +405,22 @@ namespace Skill.Framework.UI
                 _PnlPathParts.Margin = margin;
             }
 
+            _DynamicFontSize.Update();
+            if (_UpdateItemSize)
+            {
+                _ItemHeight = _ItemScale * _DynamicFontSize.Factor;
+                foreach (ListItem item in _List.Items)
+                    item.Height = _ItemHeight;
+                _UpdateItemSize = false;
+            }
+            base.BeginRender();
+        }
+        protected override void Render()
+        {
             GUISkin savedSkin = GUI.skin;
             if (this.Skin != null)
-                GUI.skin = this.Skin;
+                GUI.skin = this.Skin;            
+
             base.Render();
 
             if (this.Skin != null)
@@ -368,7 +434,7 @@ namespace Skill.Framework.UI
             {
                 foreach (var dir in _Directories)
                 {
-                    ListItem item = new ListItem(true) { Text = dir, Height = ItemHeight };
+                    ListItem item = new ListItem(true) { Text = dir, Height = _ItemHeight };
                     _List.Items.Add(item);
                 }
             }
@@ -377,7 +443,7 @@ namespace Skill.Framework.UI
             {
                 foreach (var file in _Files)
                 {
-                    ListItem item = new ListItem(false) { Text = file, Height = ItemHeight };
+                    ListItem item = new ListItem(false) { Text = file, Height = _ItemHeight };
                     _List.Items.Add(item);
                 }
             }
@@ -426,11 +492,6 @@ namespace Skill.Framework.UI
         public virtual void ImportStyles(BrowserStyles styles)
         {
             if (styles == null) return;
-            this._ItemHeight = styles.ItemHeight;
-
-            this.ColumnDefinitions[2].Width = new GridLength(styles.UpWidth, GridUnitType.Pixel);
-            this.RowDefinitions[0].Height = new GridLength(styles.UpHeigth, GridUnitType.Pixel);
-            this.RowDefinitions[2].Height = new GridLength(styles.ButtonHeigth, GridUnitType.Pixel);
 
             this._List.BackgroundVisible = styles.ListBackgroundStyle != null;
             this._List.Background.Style = styles.ListBackgroundStyle;
@@ -442,12 +503,19 @@ namespace Skill.Framework.UI
             this._BtnUp.Content.image = styles.UpIcon;
 
             this._Separator.Style = styles.DividerStyle;
-            this._BtnUp.Style = styles.PathButtonStyle;
+            this._BtnUp.Style = new GUIStyle(styles.PathButtonStyle);
             this._BackgroundStyle = styles.BackgroundStyle;
-            this._DirectoryStyle = styles.DirectoryStyle;
-            this._FileStyle = styles.FileStyle;
-            this._PathButtonStyle = styles.PathButtonStyle;
+            this._DirectoryStyle = new GUIStyle(styles.DirectoryStyle);
+            this._FileStyle = new GUIStyle(styles.FileStyle);
+            this._PathButtonStyle = new GUIStyle(styles.PathButtonStyle);
             this._List.SelectedStyle = styles.SelectedItemStyle;
+
+            _DynamicFontSize.Clear();
+            _DynamicFontSize.Add(this._DirectoryStyle, styles.ItemFontSize);
+            _DynamicFontSize.Add(this._FileStyle, styles.ItemFontSize);
+            _DynamicFontSize.Add(this._PathButtonStyle, styles.PathFontSize);
+            _DynamicFontSize.Add(this._BtnUp.Style, styles.PathFontSize);
+            _DynamicFontSize.ForceUpdate();
 
             this._Icons.Clear();
             if (styles.FileTypeIcons != null)
@@ -466,30 +534,30 @@ namespace Skill.Framework.UI
             ReBuildDirectoryParts();
         }
 
-        //private static FilterSpec[] GetFilterItems(string filter)
-        //{
-        //    List<FilterSpec> list = new List<FilterSpec>();
-        //    if (!string.IsNullOrEmpty(filter))
-        //    {
-        //        string[] strArray = filter.Split(new char[] { '|' });
-        //        if ((strArray.Length % 2) == 0)
-        //        {
-        //            for (int i = 1; i < strArray.Length; i += 2)
-        //            {
-        //                FilterSpec comdlg_filterspec;
-        //                comdlg_filterspec.Spec = strArray[i];
-        //                comdlg_filterspec.Name = strArray[i - 1];
-        //                list.Add(comdlg_filterspec);
-        //            }
-        //        }
-        //    }
-        //    return list.ToArray();
-        //}
-        //struct FilterSpec
-        //{
-        //    public string Name;
-        //    public string Spec;
-        //}
+        private static FilterSpec[] GetFilterItems(string filter)
+        {
+            List<FilterSpec> list = new List<FilterSpec>();
+            if (!string.IsNullOrEmpty(filter))
+            {
+                string[] strArray = filter.Split(new char[] { '|' });
+                if ((strArray.Length % 2) == 0)
+                {
+                    for (int i = 1; i < strArray.Length; i += 2)
+                    {
+                        FilterSpec comdlg_filterspec;
+                        comdlg_filterspec.Spec = strArray[i];
+                        comdlg_filterspec.Name = strArray[i - 1];
+                        list.Add(comdlg_filterspec);
+                    }
+                }
+            }
+            return list.ToArray();
+        }
+        struct FilterSpec
+        {
+            public string Name;
+            public string Spec;
+        }
         private class ListItem : Label
         {
             public bool IsDirectory { get; private set; }

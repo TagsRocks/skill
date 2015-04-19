@@ -12,6 +12,12 @@ namespace Skill.Framework.Triggers
     {
         /// <summary> reference to IsometricCameraMotion attached to camera </summary>
         public IsometricCamera Camera;
+        /// <summary> How to damp movement of camera</summary>
+        public float Damping = 2.0f;
+        /// <summary> How to damp offset of camera</summary>
+        public float OffsetDamping = 1.0f;
+        /// <summary> How to damp zooming of camera</summary>
+        public float ZoomDamping = 3.0f;
         /// <summary> Camera moves by mouse when mouse position gets far from center of screen. </summary>
         public float Preview = 2.0f;
         /// <summary> Minimum distance to target when PointOfIntrest is close to target</summary>
@@ -53,6 +59,10 @@ namespace Skill.Framework.Triggers
 
         public void Apply()
         {
+
+            Camera.Damping = this.Damping;
+            Camera.OffsetDamping = this.OffsetDamping;
+            Camera.ZoomDamping = this.ZoomDamping;
             Camera.CameraPreview = this.Preview;
             Camera.ZoomIn = this.ZoomIn;
             Camera.ZoomOut = this.ZoomOut;

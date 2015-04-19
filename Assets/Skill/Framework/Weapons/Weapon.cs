@@ -143,7 +143,7 @@ namespace Skill.Framework.Weapons
         /// <summary> Current equipped projectile </summary>
         public int SelectedProjectileIndex { get { return _SelectedProjectileIndex; } }
         /// <summary> Can fire immediately? </summary>
-        public virtual bool CanFire { get { return State == WeaponState.Ready && (SelectedProjectile.ClipAmmo > 0 || SelectedProjectile.InfinitAmmo || SelectedProjectile.InfinitClip); } }        
+        public virtual bool CanFire { get { return State == WeaponState.Ready && (SelectedProjectile.ClipAmmo > 0 || SelectedProjectile.InfinitAmmo || SelectedProjectile.InfinitClip); } }
         /// <summary> Target of weapon. can be setted by Controller </summary>
         public Vector3? Target { get; set; }
         /// <summary> Gets or set damage factor  </summary>
@@ -326,6 +326,7 @@ namespace Skill.Framework.Weapons
         // variables
 
         private AudioSource _AudioSource;
+        private Collider _Collider;
         private int _SelectedProjectileIndex = 0;
 
         private TimeWatch _BusyTW;
@@ -340,7 +341,8 @@ namespace Skill.Framework.Weapons
         protected override void GetReferences()
         {
             base.GetReferences();
-            _AudioSource = audio;
+            _AudioSource = GetComponent<AudioSource>();
+            _Collider = GetComponent<Collider>();
             if (_AudioSource == null)
                 Debug.LogWarning("Can not find AudioSource of weapon");
         }
@@ -671,13 +673,13 @@ namespace Skill.Framework.Weapons
             switch (SelectedProjectile.CurveParams.InitialRotation)
             {
                 case InitialCurveProjectileRotation.Forward:
-                    Quaternion.LookRotation(SelectedProjectile.SpawnPoint.forward, _Transform.up);
+                    Quaternion.LookRotation(SelectedProjectile.SpawnPoint.forward, transform.up);
                     break;
                 case InitialCurveProjectileRotation.AbsoluteCustom:
                     iniRotation = SelectedProjectile.CurveParams.Rotation;
                     break;
                 case InitialCurveProjectileRotation.RelativeCustom:
-                    iniRotation = SelectedProjectile.CurveParams.Rotation * _Transform.rotation;
+                    iniRotation = SelectedProjectile.CurveParams.Rotation * transform.rotation;
                     break;
             }
 
@@ -695,12 +697,13 @@ namespace Skill.Framework.Weapons
                     bullet.Speed = SelectedProjectile.InitialSpeed;
                 }
 
-                Rigidbody rb = go.rigidbody;
+                Rigidbody rb = go.GetComponent<Rigidbody>();
                 if (rb != null)
                 {
-                    if (rb.collider != null)
+                    Collider rbc = go.GetComponent<Collider>();
+                    if (rbc != null)
                     {
-                        IgnoreBulletColliders(rb.collider);
+                        IgnoreBulletColliders(rbc);
                     }
 
                     float speed = SelectedProjectile.InitialSpeed;
@@ -713,7 +716,7 @@ namespace Skill.Framework.Weapons
                         if (range < 0) range = 0.0f;
 
                         Vector3 target = Target.Value;
-                        Vector3 position = _Transform.position;
+                        Vector3 position = transform.position;
                         dir = target - position;  // get target direction
                         float h = dir.y;  // get height difference
                         dir.y = 0;  // retain only the horizontal direction
@@ -794,12 +797,13 @@ namespace Skill.Framework.Weapons
 
                 // spawn a bullet but inactive
                 GameObject go = Cache.Spawn(SelectedProjectile.BulletPrefab, SelectedProjectile.SpawnPosition, bulletRotation) as GameObject;
-                Rigidbody rb = go.rigidbody;
+                Rigidbody rb = go.GetComponent<Rigidbody>();
                 if (rb != null && !rb.isKinematic)
                 {
-                    if (rb.collider != null)
+                    Collider rbc = go.GetComponent<Collider>();
+                    if (rbc != null)
                     {
-                        IgnoreBulletColliders(rb.collider);
+                        IgnoreBulletColliders(rbc);
                     }
 
                     if (rb.useGravity)
@@ -829,9 +833,8 @@ namespace Skill.Framework.Weapons
 
         protected void IgnoreBulletColliders(Collider bulletCollider)
         {
-            Rigidbody weaponRB = this.rigidbody;
-            if (weaponRB != null && weaponRB.collider != null && weaponRB.collider.enabled)
-                Physics.IgnoreCollision(weaponRB.collider, bulletCollider);
+            if (this._Rigidbody != null && this._Collider != null && this._Collider.enabled)
+                Physics.IgnoreCollision(this._Collider, bulletCollider);
             if (_IgnoreColliders != null && _IgnoreColliders.Count > 0)
             {
                 for (int cIndex = 0; cIndex < _IgnoreColliders.Count; cIndex++)

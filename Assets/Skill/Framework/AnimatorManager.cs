@@ -216,9 +216,9 @@ namespace Skill.Framework
             bool preRelevant = this.IsRelevant;
 
             if (isInTransition)
-                this.IsRelevant = _NameMeshs.BinarySearch(nextState.nameHash) >= 0;
+                this.IsRelevant = _NameMeshs.BinarySearch(nextState.fullPathHash) >= 0;
             else
-                this.IsRelevant = _NameMeshs.BinarySearch(currentState.nameHash) >= 0;
+                this.IsRelevant = _NameMeshs.BinarySearch(currentState.fullPathHash) >= 0;
 
 
             if (preRelevant && !this.IsRelevant)

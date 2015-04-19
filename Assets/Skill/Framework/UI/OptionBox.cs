@@ -14,14 +14,16 @@ namespace Skill.Framework.UI
         // content to show
         private GUIContent[] _Options;
 
+        public Orientation Orientation { get; private set; }
+
         /// <summary> Border and Background to use when OptionBox is focused.</summary>                
         public Box FocusedBackground { get; private set; }
         /// <summary> The box that use as background  </summary>
         public Box Background { get; private set; }
-        /// <summary> Left Button to select previous option </summary>
-        public Button LeftButton { get; private set; }
-        /// <summary> Right Button to select next option  </summary>
-        public Button RightButton { get; private set; }
+        /// <summary> Left or down Button to select previous option </summary>
+        public Button DownButton { get; private set; }
+        /// <summary> Right or up Button to select next option  </summary>
+        public Button UpButton { get; private set; }
         /// <summary> Middle lable to show contents </summary>
         public Label OptionLabel { get; private set; }
 
@@ -30,23 +32,50 @@ namespace Skill.Framework.UI
         /// </summary>
         public bool FillBackground
         {
-            get { return Background.ColumnSpan == 3 && Background.Column == 0; }
+            get
+            {
+                if (Orientation == UI.Orientation.Horizontal)
+                    return Background.ColumnSpan == 3 && Background.Column == 0;
+                else
+                    return Background.RowSpan == 3 && Background.Row == 0;
+            }
             set
             {
-                if (value != (Background.ColumnSpan == 3 && Background.Column == 0))
+                if (Orientation == UI.Orientation.Horizontal)
                 {
-                    if (value)
+                    if (value != (Background.ColumnSpan == 3 && Background.Column == 0))
                     {
-                        Background.ColumnSpan = 3;
-                        Background.Column = 0;
+                        if (value)
+                        {
+                            Background.ColumnSpan = 3;
+                            Background.Column = 0;
 
+                        }
+                        else
+                        {
+                            Background.ColumnSpan = 1;
+                            Background.Column = 1;
+                        }
+                        OnLayoutChanged();
                     }
-                    else
+                }
+                else
+                {
+                    if (value != (Background.RowSpan == 3 && Background.Row == 0))
                     {
-                        Background.ColumnSpan = 1;
-                        Background.Column = 1;
+                        if (value)
+                        {
+                            Background.RowSpan = 3;
+                            Background.Row = 0;
+
+                        }
+                        else
+                        {
+                            Background.RowSpan = 1;
+                            Background.Row = 1;
+                        }
+                        OnLayoutChanged();
                     }
-                    OnLayoutChanged();
                 }
             }
         }
@@ -124,15 +153,30 @@ namespace Skill.Framework.UI
         /// <remarks>
         /// Percent of OptionLabel : 100 - (ButtonWidthPercent * 2)
         /// </remarks>
-        public float ButtonWidthPercent
+        public float ButtonPercent
         {
-            get { return this.ColumnDefinitions[0].Width.Value; }
+            get
+            {
+                if (Orientation == UI.Orientation.Horizontal)
+                    return this.ColumnDefinitions[0].Width.Value;
+                else
+                    return this.RowDefinitions[0].Height.Value;
+            }
             set
             {
                 if (value < 0) value = 0;
                 else if (value > 50) value = 50;
-                this.ColumnDefinitions[0].Width = this.ColumnDefinitions[2].Width = new GridLength(value, GridUnitType.Star);
-                this.ColumnDefinitions[1].Width = new GridLength(100 - (value * 2), GridUnitType.Star);
+
+                if (Orientation == UI.Orientation.Horizontal)
+                {
+                    this.ColumnDefinitions[0].Width = this.ColumnDefinitions[2].Width = new GridLength(value, GridUnitType.Star);
+                    this.ColumnDefinitions[1].Width = new GridLength(100 - (value * 2), GridUnitType.Star);
+                }
+                else
+                {
+                    this.RowDefinitions[0].Height = this.RowDefinitions[2].Height = new GridLength(value, GridUnitType.Star);
+                    this.RowDefinitions[1].Height = new GridLength(100 - (value * 2), GridUnitType.Star);
+                }
             }
         }
 
@@ -140,8 +184,8 @@ namespace Skill.Framework.UI
         /// Create an OptionBox
         /// </summary>
         /// <param name="options">Options as array of string</param>
-        public OptionBox(string[] options)
-            : this()
+        public OptionBox(Orientation orientation, params string[] options)
+            : this(orientation)
         {
             if (options == null || options.Length < 2)
                 throw new ArgumentException("Invalid options");
@@ -157,8 +201,8 @@ namespace Skill.Framework.UI
         /// Create an OptionBox
         /// </summary>
         /// <param name="options">Options as array of GUIContent</param>
-        public OptionBox(GUIContent[] options)
-            : this()
+        public OptionBox(Orientation orientation, GUIContent[] options)
+            : this(orientation)
         {
             if (options == null || options.Length < 2)
                 throw new ArgumentException("Invalid options");
@@ -166,27 +210,50 @@ namespace Skill.Framework.UI
             UpdateLabel();
         }
 
-        private OptionBox()
+        private OptionBox(Orientation orientation)
         {
-            this.Height = 32;
-            this.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30, GridUnitType.Star) });
-            this.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(40, GridUnitType.Star) });
-            this.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30, GridUnitType.Star) });
+            this.Orientation = orientation;
 
-            Background = new Box() { Row = 0, Column = 0, ColumnSpan = 3 };
-            FocusedBackground = new Box() { Row = 0, Column = 0, ColumnSpan = 3, Visibility = UI.Visibility.Hidden };
-            LeftButton = new Button() { Row = 0, Column = 0 };
-            OptionLabel = new Label() { Row = 0, Column = 1 };
-            RightButton = new Button() { Row = 0, Column = 2 };
+            Background = new Box() { Row = 0, Column = 0 };
+            FocusedBackground = new Box() { Row = 0, RowSpan = 3, Column = 0, ColumnSpan = 3, Visibility = UI.Visibility.Hidden };
+            DownButton = new Button();
+            OptionLabel = new Label();
+            UpButton = new Button();
+
+            if (orientation == UI.Orientation.Horizontal)
+            {
+                this.Height = 32;
+                this.ColumnDefinitions.Add(30, GridUnitType.Star);
+                this.ColumnDefinitions.Add(40, GridUnitType.Star);
+                this.ColumnDefinitions.Add(30, GridUnitType.Star);
+
+                Background.ColumnSpan = 3;
+                DownButton.Row = 0; DownButton.Column = 0;
+                OptionLabel.Row = 0; OptionLabel.Column = 1;
+                UpButton.Row = 0; UpButton.Column = 2;
+            }
+            else
+            {
+                this.Width = 32;
+                this.RowDefinitions.Add(30, GridUnitType.Star);
+                this.RowDefinitions.Add(40, GridUnitType.Star);
+                this.RowDefinitions.Add(30, GridUnitType.Star);
+
+                Background.RowSpan = 3;
+                DownButton.Row = 2; DownButton.Column = 0;
+                OptionLabel.Row = 1; Column = 0;
+                UpButton.Row = 0; Column = 0;
+            }
+
 
             this.Controls.Add(Background);
             this.Controls.Add(FocusedBackground);
-            this.Controls.Add(LeftButton);
+            this.Controls.Add(DownButton);
             this.Controls.Add(OptionLabel);
-            this.Controls.Add(RightButton);
+            this.Controls.Add(UpButton);
 
-            LeftButton.Click += _BtnLeft_Click;
-            RightButton.Click += _BtnRight_Click;
+            DownButton.Click += _BtnLeft_Click;
+            UpButton.Click += _BtnRight_Click;
         }
 
         private void SelectLeftOption()
@@ -320,7 +387,7 @@ namespace Skill.Framework.UI
         {
             if (OwnerFrame != null)
                 OwnerFrame.FocusControl(this);
-        }        
+        }
         #endregion
     }
 }

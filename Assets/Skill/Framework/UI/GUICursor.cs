@@ -8,7 +8,7 @@ namespace Skill.Framework.UI
     /// <summary>
     /// Simple cursor
     /// </summary>
-    public class Cursor : MonoBehaviour
+    public class GUICursor : MonoBehaviour
     {
         public int GUIDepth = 0;
         /// <summary>
@@ -24,7 +24,7 @@ namespace Skill.Framework.UI
 #if UNITY_IPHONE || UNITY_ANDROID && !UNITY_EDITOR
         this.gameObject.SetActive(false);
 #endif
-            Screen.showCursor = false;
+            Cursor.visible  = false;
             CursorTexture = Normal;
         }
 

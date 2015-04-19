@@ -26,12 +26,27 @@ namespace Skill.Framework.Modules
         /// <summary> Scale of screenshot relative to screen size </summary>
         [HideInInspector]
         public float Scale = 1;
+        /// <summary> name of image </summary>
+        public string ImageName = "Screen";
+        /// <summary> Create jpg image </summary>
+        public bool Jpg = true;
 
         private bool _TakeShot = false;
         private bool _ShotTaked = false;
         private RenderTexture _RenderTexture;
         private Texture2D _ScreenShot;
+        private Camera _Camera;
         private int _PreWidth, _PreHeight;
+
+
+        public string LastShotFileName { get; private set; }
+
+        public event System.EventHandler Shot;
+        private void OnShot()
+        {
+            Debug.Log(string.Format("Took screenshot to: {0}", LastShotFileName));
+            if (Shot != null) Shot(this, System.EventArgs.Empty);
+        }
 
         /// <summary>
         /// Create new png file path to save new screenshot
@@ -41,7 +56,9 @@ namespace Skill.Framework.Modules
         /// <returns>new png file path</returns>
         protected virtual string GetNewFilePath(int width, int height)
         {
-            return System.IO.Path.Combine(Directory, string.Format("screen_{0}x{1}_{2}.png", width, height, System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")));
+            if (string.IsNullOrEmpty(ImageName))
+                ImageName = "Screen";
+            return System.IO.Path.Combine(Directory, string.Format("{0}_{1}x{2}_{3}.{4}", ImageName, width, height, System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"), Jpg ? "jpg" : "png"));
         }
 
         public void TakeShot()
@@ -61,6 +78,12 @@ namespace Skill.Framework.Modules
                 _RenderTexture = new RenderTexture(_PreWidth, _PreHeight, 24);
                 _ScreenShot = new Texture2D(_PreWidth, _PreHeight, TextureFormat.RGB24, false);
             }
+        }
+
+        protected override void GetReferences()
+        {
+            base.GetReferences();
+            _Camera = GetComponent<Camera>();
         }
 
         void LateUpdate()
@@ -94,38 +117,42 @@ namespace Skill.Framework.Modules
                     }
                     else
                     {
-                        width = (int)(camera.pixelWidth * Scale);
-                        height = (int)(camera.pixelHeight * Scale);
+                        width = (int)(_Camera.pixelWidth * Scale);
+                        height = (int)(_Camera.pixelHeight * Scale);
                     }
 
                     ValidateRenderTexture(width, height);
 
-                    camera.targetTexture = _RenderTexture;
-                    camera.Render();
+                    _Camera.targetTexture = _RenderTexture;
+                    _Camera.Render();
                     RenderTexture.active = _RenderTexture;
                     _ScreenShot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
-                    camera.targetTexture = null;
+                    _Camera.targetTexture = null;
                     RenderTexture.active = null;
 
-                    byte[] bytes = _ScreenShot.EncodeToPNG();
-                    string filename = GetNewFilePath(width, height);
+                    byte[] bytes = null;
+                    if (Jpg)
+                        bytes = _ScreenShot.EncodeToJPG();
+                    else
+                        bytes = _ScreenShot.EncodeToPNG();
+                    LastShotFileName = GetNewFilePath(width, height);
 
-                    string dir = System.IO.Path.GetDirectoryName(filename);
+                    string dir = System.IO.Path.GetDirectoryName(LastShotFileName);
                     if (!System.IO.Directory.Exists(dir))
                         System.IO.Directory.CreateDirectory(dir);
 
-                    if (System.IO.File.Exists(filename))
-                        System.IO.File.Delete(filename);
+                    if (System.IO.File.Exists(LastShotFileName))
+                        System.IO.File.Delete(LastShotFileName);
 
-                    System.IO.FileStream fileStream = new System.IO.FileStream(filename, System.IO.FileMode.Create, System.IO.FileAccess.Write);
+                    System.IO.FileStream fileStream = new System.IO.FileStream(LastShotFileName, System.IO.FileMode.Create, System.IO.FileAccess.Write);
                     System.IO.BinaryWriter writer = new System.IO.BinaryWriter(fileStream);
                     writer.Write(bytes);
                     writer.Close();
                     fileStream.Close();
-
-                    Debug.Log(string.Format("Took screenshot to: {0}", filename));
+                    
                     _TakeShot = false;
                     _ShotTaked = true;
+                    OnShot();
                 }
             }
         }

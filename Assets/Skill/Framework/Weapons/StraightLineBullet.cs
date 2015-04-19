@@ -40,14 +40,7 @@ namespace Skill.Framework.Weapons
         private Vector3 _PrePosition;
         private float _StartY;
         private float _Time;
-        private Vector3 _XZDirection;
-        private Rigidbody _Rigidbody;
-
-        protected override void GetReferences()
-        {
-            base.GetReferences();
-            _Rigidbody = rigidbody;
-        }
+        private Vector3 _XZDirection;                
 
         /// <summary>
         /// Layers to raycast. (should be setted by weapon)
@@ -88,16 +81,16 @@ namespace Skill.Framework.Weapons
                 {
                     _Time += Time.deltaTime;
 
-                    Vector3 pos = _Transform.position + (_XZDirection * deltaMove);
+                    Vector3 pos = transform.position + (_XZDirection * deltaMove);
                     pos.y = _StartY + ((0.5f * Gravity * _Time) + _V0SinAlpha) * _Time;
 
-                    _Transform.position = pos;
-                    _Transform.forward = Direction = Vector3.RotateTowards(_Transform.forward, (pos - _PrePosition).normalized, RotationFactor, 1);
+                    transform.position = pos;
+                    transform.forward = Direction = Vector3.RotateTowards(transform.forward, (pos - _PrePosition).normalized, RotationFactor, 1);
                     _PrePosition = pos;
                 }
                 else
                 {
-                    _Transform.position += Direction * deltaMove;
+                    transform.position += Direction * deltaMove;
                 }
             }
 
@@ -120,7 +113,7 @@ namespace Skill.Framework.Weapons
             _PrePosition = transform.position;
             _StartY = _PrePosition.y;
 
-            if ((rigidbody == null || rigidbody.isKinematic) && Gravity != 0)
+            if ((_Rigidbody == null || _Rigidbody.isKinematic) && Gravity != 0)
             {
                 _XZDirection = Direction;
                 _XZDirection.y = 0;

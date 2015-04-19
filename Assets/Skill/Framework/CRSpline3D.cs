@@ -25,7 +25,7 @@ namespace Skill.Framework
         /// <summary> Rebuild path after modify keys </summary>
         public override void Rebuild()
         {
-            if (Keys == null) Keys = new Vector3[] { _Transform.position, _Transform.position + Vector3.forward };
+            if (Keys == null) Keys = new Vector3[] { transform.position, transform.position + Vector3.forward };
             else if (Keys.Length == 1) Keys = new Vector3[] { Keys[0], Keys[0] + Vector3.forward };
 
             if (Times == null) Times = new float[] { 0, 1 };
@@ -44,7 +44,7 @@ namespace Skill.Framework
             time = ConvertToInterpolationTime(time);
             Vector3 result = Interpolate(_PathControlPoints, time);
             if (!UseWorldSpace)
-                result = _Transform.TransformPoint(result);
+                result = transform.TransformPoint(result);
             return result;
         }
 
@@ -57,9 +57,36 @@ namespace Skill.Framework
         {            
             Vector3 result = Interpolate(_PathControlPoints, time);
             if (!UseWorldSpace)
-                result = _Transform.TransformPoint(result);
+                result = transform.TransformPoint(result);
             return result;
         }
+
+        /// <summary>
+        /// Get direction along path at specified time (0.0f - 1.0f)
+        /// </summary>
+        /// <param name="time">time</param>
+        /// <param name="deltaTime">deltaTime</param>
+        /// <returns>Direction</returns>
+        public Vector3 GetDirection01(float time, float deltaTime = 0.001f)
+        {
+            Vector3 direction;
+            GetDirection01(time, deltaTime, out direction);
+            return direction;
+        }
+        /// <summary>
+        /// Get direction along path at specified time (0.0f - 1.0f)
+        /// </summary>
+        /// <param name="time">time</param>
+        /// <param name="deltaTime">deltaTime</param>    
+        /// <param name="direction">Direction</param>
+        public void GetDirection01(float time, float deltaTime, out Vector3 direction)
+        {
+            time = Mathf.Clamp01(time);
+            if (deltaTime < 0.0001f) deltaTime = 0.00001f;
+            direction = (Evaluate01(time + deltaTime) - Evaluate01(time)).normalized;
+
+        }
+
 
         private float ValidateTime(float time)
         {

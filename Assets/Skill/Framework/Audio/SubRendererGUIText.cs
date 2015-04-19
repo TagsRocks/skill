@@ -12,7 +12,7 @@ namespace Skill.Framework.Audio
         protected override void GetReferences()
         {
             base.GetReferences();
-            _GUIText = guiText;
+            _GUIText = GetComponent<GUIText>();
         }
 
         public override void ShowTitle(string text, float duration, Color color, FontStyle style, TextAlignment alignment)

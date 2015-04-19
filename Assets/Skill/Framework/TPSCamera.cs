@@ -136,8 +136,8 @@ namespace Skill.Framework
                     float desiredAngle = GetTargetRotation();
                     Quaternion rotation = Quaternion.Euler(pitch, desiredAngle, 0);
 
-                    _Transform.position = targetPosition - (rotation * dir);
-                    _Transform.rotation = rotation;
+                    transform.position = targetPosition - (rotation * dir);
+                    transform.rotation = rotation;
 
                 }
             }

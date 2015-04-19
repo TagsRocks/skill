@@ -10,8 +10,6 @@ namespace Skill.Framework.IO
     /// </summary>
     public class ScaleGestureEventArgs : GestureEventArgs
     {
-        /// <summary> Delta scale relative to previous scale</summary>
-        public float DeltaScale { get; private set; }
         /// <summary> Total scale relative to initial scale</summary>
         public float TotalScale { get; private set; }
 
@@ -19,13 +17,11 @@ namespace Skill.Framework.IO
         /// Create a HoldGestureEventArgs
         /// </summary>
         /// <param name="fingerCount">Number of fingers</param>
-        /// <param name="positions"> Position of touches </param>
-        /// <param name="deltaScale"> Delta scale relative to previous scale </param>
+        /// <param name="positions"> Position of touches </param>        
         /// <param name="totalScale"> Total scale relative to initial scale </param>
-        public ScaleGestureEventArgs(int fingerCount, Vector2[] positions, float deltaScale, float totalScale)
+        public ScaleGestureEventArgs(int fingerCount, Vector2[] positions, float totalScale)
             : base(fingerCount, positions)
         {
-            this.DeltaScale = deltaScale;
             this.TotalScale = totalScale;
         }
     }
@@ -42,7 +38,6 @@ namespace Skill.Framework.IO
     /// </summary>
     public class ScaleGestureDetector : LockerGestureDetector
     {
-        private float _DeltaScale;
         private float _TotalScale;
         private float _IntialDistance;
         private float _PreviousDistance;
@@ -61,15 +56,26 @@ namespace Skill.Framework.IO
         /// <summary> Occurs when scale event detected </summary>
         protected virtual void OnScale()
         {
-            if (Scale != null) Scale(this, new ScaleGestureEventArgs(FingerCount, GetPositionOfTrackingTouches(), _DeltaScale, _TotalScale));
+            if (Scale != null) Scale(this, new ScaleGestureEventArgs(FingerCount, GetPositionOfTrackingTouches(), _TotalScale));
+        }
+
+        /// <summary> Occurs when a scale gesture started </summary>
+        public event GestureEventHandler ScaleStart;
+        /// <summary> Occurs when a scale gesture started </summary>
+        protected virtual void OnScaleStart()
+        {
+            if (ScaleStart != null)
+            {
+                Vector2[] positions = GetPositionOfTrackingTouches();
+                ScaleStart(this, new GestureEventArgs(FingerCount, positions));
+            }
         }
 
         /// <summary>
         /// Create a ScaleGestureDetector
         /// </summary>        
-        public ScaleGestureDetector()            
+        public ScaleGestureDetector()
         {
-            _DeltaScale = 0;
             _TotalScale = 0;
             _IntialDistance = 0;
             _PreviousDistance = 0;
@@ -82,6 +88,7 @@ namespace Skill.Framework.IO
         {
             _IntialDistance = DistanceBetweenTrackedTouches(0, 1);
             _PreviousDistance = _IntialDistance;
+            OnScaleStart();
         }
 
         /// <summary>
@@ -95,16 +102,19 @@ namespace Skill.Framework.IO
                 return GestureDetectionResult.Failed;
 
 
-            if (IsAnyTrackingTouchesMoved())
+            bool scaleChanged = false;
+
+            if (_IntialDistance >= 1 && IsAnyTrackingTouchesMoved())
             {
                 // find delta rotation at currect frame
                 float currentDistance = DistanceBetweenTrackedTouches(0, 1);
-                _DeltaScale = (currentDistance - _PreviousDistance) / _IntialDistance;
-                _TotalScale += _DeltaScale;
-                _PreviousDistance = currentDistance;
+                if (currentDistance != _PreviousDistance)
+                {
+                    _TotalScale = currentDistance / _IntialDistance;
+                    _PreviousDistance = currentDistance;
+                    scaleChanged = true;
+                }
             }
-            else
-                _DeltaScale = 0;
 
             if (IsAnyTrackingTouchesEnded())
             {
@@ -114,7 +124,7 @@ namespace Skill.Framework.IO
                     return GestureDetectionResult.Failed;
             }
 
-            if (_DeltaScale != 0)
+            if (scaleChanged)
                 OnScale();
             if (_TotalScale != 0)
                 return GestureDetectionResult.Detecting;
@@ -127,7 +137,7 @@ namespace Skill.Framework.IO
         /// </summary>
         public override void Reset()
         {
-            _TotalScale = _DeltaScale = 0;
+            _TotalScale = 0;
             base.Reset();
         }
     }

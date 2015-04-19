@@ -120,8 +120,8 @@ namespace Skill.Framework.Triggers
                     float d = Damage;
                     if (DecreaseByDistance)
                     {
-                        Vector3 closestPoint = cInfo.Collider.ClosestPointOnBounds(_Transform.position);
-                        float distance = Vector3.Distance(closestPoint, _Transform.position);
+                        Vector3 closestPoint = cInfo.Collider.ClosestPointOnBounds(transform.position);
+                        float distance = Vector3.Distance(closestPoint, transform.position);
                         d *= (1.0f - Mathf.Min(Range, distance) / Range);
                     }
                     em.RaiseDamage(this, new DamageEventArgs(d) { UserData = this.UserData, DamageType = DamageType, Tag = tag });

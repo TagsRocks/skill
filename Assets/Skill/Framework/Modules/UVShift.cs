@@ -21,6 +21,7 @@ namespace Skill.Framework.Modules
         public bool V;
 
         private Material _Material;
+        private Renderer _Renderer;
         private Vector2 _Offset;
 
 
@@ -30,7 +31,9 @@ namespace Skill.Framework.Modules
         protected override void Awake()
         {
             base.Awake();
-            _Material = renderer.material;
+            _Renderer = GetComponent<Renderer>();
+            if (_Renderer != null)
+                _Material = _Renderer.material;
         }
 
         /// <summary>
@@ -39,7 +42,7 @@ namespace Skill.Framework.Modules
         protected override void Update()
         {
             if (Global.IsGamePaused) return;
-            if (Speed != 0)
+            if (Speed != 0 && _Material != null)
             {
                 float speed = Speed * Time.deltaTime;
                 if (U)

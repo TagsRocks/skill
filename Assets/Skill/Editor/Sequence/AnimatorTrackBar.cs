@@ -57,26 +57,27 @@ namespace Skill.Editor.Sequence
             {
                 if (_AnimatorTrack._Animator.runtimeAnimatorController != null)
                 {
-                    UnityEditorInternal.AnimatorController ac = _AnimatorTrack._Animator.runtimeAnimatorController as UnityEditorInternal.AnimatorController;
+                    UnityEditor.Animations.AnimatorController ac = _AnimatorTrack._Animator.runtimeAnimatorController as UnityEditor.Animations.AnimatorController;
                     if (ac != null)
                     {
-                        AnimatorTrack.Parameter[] parameters = new AnimatorTrack.Parameter[ac.parameterCount];
-                        for (int i = 0; i < ac.parameterCount; i++)
+                        var acParams = ac.parameters;
+                        AnimatorTrack.Parameter[] parameters = new AnimatorTrack.Parameter[acParams.Length];
+                        for (int i = 0; i < acParams.Length; i++)
                         {
                             AnimatorTrack.Parameter ap = new AnimatorTrack.Parameter();
-                            var p = ac.GetParameter(i);
+                            var p = acParams[i];
                             ap.Name = p.name;
                             ap.ParameterType = (Framework.AnimatorParameterType)p.type;
 
                             switch (p.type)
                             {
-                                case UnityEditorInternal.AnimatorControllerParameterType.Bool:
+                                case UnityEngine.AnimatorControllerParameterType.Bool:
                                     ap.DefaultBool = p.defaultBool;
                                     break;
-                                case UnityEditorInternal.AnimatorControllerParameterType.Float:
+                                case UnityEngine.AnimatorControllerParameterType.Float:
                                     ap.DefaultFloat = p.defaultFloat;
                                     break;
-                                case UnityEditorInternal.AnimatorControllerParameterType.Int:
+                                case UnityEngine.AnimatorControllerParameterType.Int:
                                     ap.DefaultInt = p.defaultInt;
                                     break;
                             }

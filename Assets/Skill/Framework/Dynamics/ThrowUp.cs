@@ -80,7 +80,7 @@ namespace Skill.Framework.Dynamics
         protected override void Start()
         {
             base.Start();
-            _HeightOnExplosion = _Transform.position.y;
+            _HeightOnExplosion = transform.position.y;
         }
 
         /// <summary>

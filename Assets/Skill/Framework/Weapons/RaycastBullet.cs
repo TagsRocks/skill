@@ -20,13 +20,13 @@ namespace Skill.Framework.Weapons
         {
             if (Global.IsGamePaused) return;
 
-            Vector3 prePosition = _Transform.position;
+            Vector3 prePosition = transform.position;
             // update to move bullet forward
             base.Update();
 
             _Ray.direction = Direction;
             _Ray.origin = prePosition;
-            float distance = Vector3.Distance(_Transform.position, prePosition);
+            float distance = Vector3.Distance(transform.position, prePosition);
 
             if (distance > Mathf.Epsilon)
             {

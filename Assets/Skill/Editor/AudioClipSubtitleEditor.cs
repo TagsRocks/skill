@@ -346,7 +346,7 @@ namespace Skill.Editor
             this.Editor = editor;
             GameObject obj = UnityEditor.EditorUtility.CreateGameObjectWithHideFlags("AudioPreview", HideFlags.HideAndDontSave | HideFlags.HideInHierarchy,
                new System.Type[] { typeof(AudioSource) });
-            _Audio = obj.audio;
+            _Audio = obj.GetComponent<AudioSource>() ;
 
             _Events = new List<SubtitleEvent>();
 

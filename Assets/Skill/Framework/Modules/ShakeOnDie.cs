@@ -40,7 +40,7 @@ namespace Skill.Framework.Modules
         /// <param name="e"> EventArgs </param>
         protected virtual void Events_Die(object sender, EventArgs e)
         {
-            Global.RaiseCameraShake(this, Shake, _Transform.position);
+            Global.RaiseCameraShake(this, Shake, transform.position);
         }
     }
 }

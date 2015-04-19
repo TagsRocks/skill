@@ -65,6 +65,7 @@ namespace Skill.Framework.UI
         private int _CurrentSplashIndex;
         private Fading _Fading;
         private bool _IsCompleted;
+        private AudioSource _Audio;
 
         /// <summary> Occurs when SplashScreen is completed </summary>
         public event EventHandler Completed;
@@ -82,6 +83,7 @@ namespace Skill.Framework.UI
         protected override void GetReferences()
         {
             base.GetReferences();
+            _Audio = GetComponent<AudioSource>();
             _Fading = GetComponent<Fading>();
             _Fading.Alpha = 1.0f;
         }
@@ -208,10 +210,10 @@ namespace Skill.Framework.UI
                 {
                     MovieTexture movie = (MovieTexture)Images[_CurrentSplashIndex].Image;
                     movie.Stop();
-                    if (audio != null && movie.audioClip != null)
+                    if (_Audio != null && movie.audioClip != null)
                     {
-                        audio.Stop();
-                        audio.clip = null;
+                        _Audio.Stop();
+                        _Audio.clip = null;
                     }
                 }
             }
@@ -225,10 +227,10 @@ namespace Skill.Framework.UI
                 {
                     MovieTexture movie = (MovieTexture)Images[_CurrentSplashIndex].Image;
                     movie.Play();
-                    if (audio != null && movie.audioClip != null)
+                    if (_Audio != null && movie.audioClip != null)
                     {
-                        audio.clip = movie.audioClip;
-                        audio.Play();
+                        _Audio.clip = movie.audioClip;
+                        _Audio.Play();
                     }
                     if (FullScreenMovies)
                         SetSize(1.0f, 1.0f, Images[_CurrentSplashIndex].Scale);

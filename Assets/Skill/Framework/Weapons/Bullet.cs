@@ -31,6 +31,11 @@ namespace Skill.Framework.Weapons
         public UnityEngine.GameObject Shooter { get; set; }
 
         /// <summary>
+        /// Collider of bullet if available
+        /// </summary>
+        public UnityEngine.Collider Collider { get; private set; }
+
+        /// <summary>
         /// Amount of damage caused by this bullet.
         /// </summary>
         public virtual float Damage { get; set; }
@@ -61,7 +66,11 @@ namespace Skill.Framework.Weapons
         private TimeWatch _LifeTimeTW;
         private bool _IsDead;
 
-
+        protected override void GetReferences()
+        {
+            base.GetReferences();
+            this.Collider = GetComponent<Collider>();
+        }
 
         /// <summary>
         /// Called by weapon when initialize bullet
@@ -98,9 +107,9 @@ namespace Skill.Framework.Weapons
                 if (!IsCollisionAccepted(collision)) return;
                 ContactPoint cp = collision.contacts[0];
                 EventManager eventManager = cp.otherCollider.GetComponent<EventManager>();
-                if (eventManager != null)
+                if (eventManager != null && this.Collider != null)
                 {
-                    eventManager.RaiseHit(this, new HitEventArgs(this.Shooter, HitType.Bullet, collider) { UserData = this.UserData, DamageType = DamageType, Tag = tag, Damage = this.Damage, Normal = cp.normal, Point = cp.point, CauseParticle = CauseParticle });
+                    eventManager.RaiseHit(this, new HitEventArgs(this.Shooter, HitType.Bullet, this.Collider) { UserData = this.UserData, DamageType = DamageType, Tag = tag, Damage = this.Damage, Normal = cp.normal, Point = cp.point, CauseParticle = CauseParticle });
                 }
                 OnDie(cp.otherCollider);
             }
@@ -118,9 +127,9 @@ namespace Skill.Framework.Weapons
             {
                 if (!IsCollisionAccepted(other)) return;
                 EventManager eventManager = other.GetComponent<EventManager>();
-                if (eventManager != null)
+                if (eventManager != null && this.Collider != null)
                 {
-                    eventManager.RaiseHit(this, new HitEventArgs(this.Shooter, HitType.Bullet, collider) { UserData = this.UserData, DamageType = DamageType, Tag = tag, Damage = this.Damage, Normal = -Direction, Point = _Transform.position, CauseParticle = CauseParticle });
+                    eventManager.RaiseHit(this, new HitEventArgs(this.Shooter, HitType.Bullet, this.Collider) { UserData = this.UserData, DamageType = DamageType, Tag = tag, Damage = this.Damage, Normal = -Direction, Point = transform.position, CauseParticle = CauseParticle });
                 }
                 OnDie(other);
             }
@@ -181,14 +190,14 @@ namespace Skill.Framework.Weapons
             Damage = 0;
             Target = null;
 
-            if (rigidbody != null && !rigidbody.isKinematic)
-                rigidbody.velocity = Vector3.zero;
+            if (_Rigidbody != null && !_Rigidbody.isKinematic)
+                _Rigidbody.velocity = Vector3.zero;
 
             _IsDead = true;
 
             var exp = GetExplosion(collider);
             if (exp != null)
-                Skill.Framework.Managers.Cache.Spawn(exp, (ExplosionPos != null) ? ExplosionPos.position : _Transform.position, exp.transform.rotation);
+                Skill.Framework.Managers.Cache.Spawn(exp, (ExplosionPos != null) ? ExplosionPos.position : transform.position, exp.transform.rotation);
             if (Events != null)
                 Events.RaiseDie(this, System.EventArgs.Empty);
             Target = null;

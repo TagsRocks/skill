@@ -57,12 +57,12 @@ namespace Skill.Framework.IO
         public XmlElement FirstChild { get { if (_Elements.Count > 0)return _Elements[0]; else return null; } }
 
         /// <summary>
-        /// Gets the qualified name of the node.
+        /// Gets or sets the qualified name of the node.
         /// </summary>
         /// <returns>
         /// The qualified name of the node. For XmlElement nodes, this is the tag name of the element.
         /// </returns>
-        public string Name { get; private set; }
+        public string Name { get; set; }
 
 
 

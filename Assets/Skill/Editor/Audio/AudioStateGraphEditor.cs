@@ -423,6 +423,7 @@ namespace Skill.Editor.Audio
         #region Preview
 
         private GameObject _PreviewObject = null;
+        private AudioSource _PreviewObjectAudio = null;
         private float _EndPreviewTime;
         private AudioPreviewHandler _PreviewHandler;
         private void ValidatePreviewObject()
@@ -431,6 +432,8 @@ namespace Skill.Editor.Audio
             {
                 System.Type[] types = new System.Type[] { typeof(AudioSource) };
                 _PreviewObject = UnityEditor.EditorUtility.CreateGameObjectWithHideFlags("Preview", HideFlags.HideAndDontSave | HideFlags.HideInHierarchy, types);
+                if (_PreviewObject != null)
+                    _PreviewObjectAudio = _PreviewObject.GetComponent<AudioSource>();
             }
             _PreviewObject.transform.position = _Editor.Controller.transform.position;
             _PreviewObject.transform.rotation = _Editor.Controller.transform.rotation;
@@ -443,13 +446,14 @@ namespace Skill.Editor.Audio
                 GameObject.DestroyImmediate(_PreviewObject);
             }
             _PreviewObject = null;
+            _PreviewObjectAudio = null;
         }
         public void StopPreview()
         {
             if (_PreviewHandler != null)
                 _PreviewHandler.PreviewStopped();
-            if (_PreviewObject != null)
-                _PreviewObject.audio.Stop();
+            if (_PreviewObjectAudio != null)
+                _PreviewObjectAudio.Stop();
 
         }
 
@@ -467,9 +471,9 @@ namespace Skill.Editor.Audio
                     endTime = Mathf.Clamp(endTime, 0, clip.length);
                     if (endTime > startTime)
                     {
-                        _PreviewObject.audio.clip = clip;
-                        _PreviewObject.audio.time = startTime;
-                        _PreviewObject.audio.Play();
+                        _PreviewObjectAudio.clip = clip;
+                        _PreviewObjectAudio.time = startTime;
+                        _PreviewObjectAudio.Play();
                         _EndPreviewTime = Time.realtimeSinceStartup + endTime - startTime;
                     }
                     _PreviewHandler.PreviewStarted();
@@ -489,7 +493,7 @@ namespace Skill.Editor.Audio
                 else
                 {
                     if (_PreviewHandler != null)
-                        _PreviewHandler.UpdatePreview(_PreviewObject.audio.time);
+                        _PreviewHandler.UpdatePreview(_PreviewObjectAudio.time);
                 }
             }
         }

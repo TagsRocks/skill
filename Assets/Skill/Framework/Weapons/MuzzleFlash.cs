@@ -10,6 +10,8 @@ namespace Skill.Framework.Weapons
     {
         /// <summary> Weapon that own's this muzzle flash </summary>
         public Weapon Weapon;
+        /// <summary> Optional particle to spawn  </summary>
+        public GameObject Particle;
         /// <summary> Time of muzzle flash </summary>
         public float LifeTime = 0.2f;
         /// <summary> Minmum value of random scale </summary>
@@ -17,7 +19,7 @@ namespace Skill.Framework.Weapons
         /// <summary> Maxmum value of random scale </summary>
         public float MaxScale = 1.1f;
 
-        
+
 
 
         private TimeWatch _LifeTimeTW;
@@ -37,6 +39,8 @@ namespace Skill.Framework.Weapons
             _LifeTimeTW.Begin(LifeTime);
             float randomScale = Random.Range(MinScale, MaxScale);
             transform.localScale = new Vector3(randomScale, randomScale, randomScale);
+            if (Particle != null)
+                Managers.Cache.Spawn(Particle, transform.position, transform.rotation);
         }
 
         /// <summary>
@@ -57,7 +61,7 @@ namespace Skill.Framework.Weapons
         protected override void HookEvents()
         {
             base.HookEvents();
-            if(Weapon != null) Weapon.Shoot += Weapon_Shoot;
+            if (Weapon != null) Weapon.Shoot += Weapon_Shoot;
         }
 
         /// <summary>

@@ -71,11 +71,11 @@ namespace Skill.Framework.Modules
                     if (MaterialColor)
                     {
                         if (fps < 10)
-                            guiText.material.color = Color.red;
+                            _Text.material.color = Color.red;
                         else if (fps < 30)
-                            guiText.material.color = Color.yellow;
+                            _Text.material.color = Color.yellow;
                         else
-                            guiText.material.color = Color.green;
+                            _Text.material.color = Color.green;
                     }
                     _Timeleft = UpdateInterval;
                     _Accum = 0.0F;

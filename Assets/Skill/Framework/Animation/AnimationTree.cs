@@ -33,8 +33,7 @@ namespace Skill.Framework.Animation
         }
 
         public bool ApplyRootMotion = false;
-
-        private Rigidbody _Rigidbody;
+        
         private bool _RootMotionChanged;
         private UnityEngine.Vector3 _DeltaPosition;
         private UnityEngine.Vector3 _DeltaRotation;
@@ -121,8 +120,7 @@ namespace Skill.Framework.Animation
 
 
         protected override void GetReferences()
-        {
-            this._Rigidbody = rigidbody;
+        {            
             this.Animation = GetComponent<UnityEngine.Animation>();
             if (this.Animation == null)
                 UnityEngine.Debug.Log("AnimationTree needs a UnityEngine.Animation component");
@@ -219,11 +217,11 @@ namespace Skill.Framework.Animation
             {
                 if (_Rigidbody != null)
                 {
-                    _Rigidbody.MovePosition(_Transform.position + _Transform.TransformDirection(_DeltaPosition));
+                    _Rigidbody.MovePosition(transform.position + transform.TransformDirection(_DeltaPosition));
                 }
                 else
                 {
-                    _Transform.position += _DeltaPosition;
+                    transform.position += _DeltaPosition;
                 }
             }
             _DeltaRotation = _DeltaPosition = UnityEngine.Vector3.zero;

@@ -143,19 +143,6 @@ namespace Skill.Editor
 
         // ********************************* Commands ********************************* 
 
-        //[MenuItem("Skill/Commands/Create Empty Child %m", false, 60)] // Ctrl + m
-        //static void CreateEmptyChildWithName()
-        //{
-        //    Commands.CreateEmptyChild("GameObject");
-        //}
-
-        //[MenuItem("Skill/Commands/Create Empty Child Dialog %#m", false, 61)] // Ctrl + Shift + m
-        //static void CreateEmptyChild()
-        //{
-        //    CreateEmptyChildObjectDialog.Instance.ShowUtility();
-        //}
-
-
 
         [MenuItem("Skill/Camera/Align MainCamera to Selected", false, 200)]
         static void AlignMainCameraToSelectedObject()
@@ -180,16 +167,28 @@ namespace Skill.Editor
             CreateGroupDialog.Instance.ShowUtility();
         }
 
-        [MenuItem("Skill/Edit/Copy Transform", false, 102)]
-        static void CopyTransform()
+        [MenuItem("Skill/Edit/Copy Transform Hierarchy", false, 102)]
+        static void CopyHierarchyTransform()
         {
-            Commands.CopyTransform();
+            Skill.Editor.Commands.CopyTransformHierarchy();
         }
 
-        [MenuItem("Skill/Edit/Paste Transform", false, 103)]
-        static void PasteTransform()
+        [MenuItem("Skill/Edit/Copy Transform Hierarchy", true)]
+        static bool ValidateCopyHierarchyTransform()
         {
-            Commands.PasteTransform();
+            return Skill.Editor.Commands.ValidateCopyTransformHierarchy();
+        }
+
+        [MenuItem("Skill/Edit/Paste Transform Hierarchy", false, 103)]
+        static void PasteHierarchyTransform()
+        {
+            Skill.Editor.Commands.PasteTransformHierarchy();
+        }
+
+        [MenuItem("Skill/Edit/Paste Transform Hierarchy", true)]
+        static bool ValidatePasteTransformHierarchy()
+        {
+            return Skill.Editor.Commands.ValidatePasteTransformHierarchy();
         }
 
 

@@ -37,8 +37,9 @@ namespace Skill.Framework.Text
         /// Whether convert لا and الله to one equivalent character. (default true)
         /// </summary>
         public bool ConvertLigature { get; set; }
-        
+
         private CharInfo[] _SourceChars;
+        private List<Ligature> _Ligatures;
 
         /// <summary>
         /// Create a PersianTextConverter
@@ -55,6 +56,15 @@ namespace Skill.Framework.Text
             this.RightToLeft = false;
             this.MaxLength = 0;
             EnsureCharSize(Math.Max(10, maxLength));
+            this._Ligatures = new List<Ligature>();
+            AddDefaultLigatures();
+        }
+
+        private void AddDefaultLigatures()
+        {
+            AddLigature("\uFE8E\uFEDF", "\uFEFB");
+            AddLigature("\uFE8E\uFEE0", "\uFEFC");
+            AddLigature("\uFEEA\uFEE0\uFEDF\uFE8D", "\uFDF2");
         }
 
         private void EnsureCharSize(int textLength)
@@ -189,11 +199,9 @@ namespace Skill.Framework.Text
 
                 if (ConvertLigature)
                 {
-                    result.Replace("\uFE8E\uFEDF", "\uFEFB");
-                    result.Replace("\uFE8E\uFEE0", "\uFEFC");
-                    result.Replace("\uFEEA\uFEE0\uFEDF\uFE8D", "\uFDF2");
+                    foreach (var li in _Ligatures)
+                        result.Replace(li.Source, li.Replace);
                 }
-
                 return result.ToString();
             }
         }
@@ -211,5 +219,16 @@ namespace Skill.Framework.Text
             }
         }
 
+
+        public void AddLigature(string source, string replace)
+        {
+            _Ligatures.Add(new Ligature { Source = source, Replace = replace });
+        }
+
+        class Ligature
+        {
+            public string Source { get; set; }
+            public string Replace { get; set; }
+        }
     }
 }

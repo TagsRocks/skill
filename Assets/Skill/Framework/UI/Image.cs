@@ -6,7 +6,7 @@ namespace Skill.Framework.UI
 {
     public interface IImage
     {
-         Texture Texture { get; set; }
+        Texture Texture { get; set; }
         bool AlphaBlend { get; set; }
         Color TintColor { get; set; }
     }
@@ -44,6 +44,7 @@ namespace Skill.Framework.UI
         /// If not null Image use alpha value of referenced Fading
         /// </summary>
         public Fading AlphaFading { get; set; }
+        public float? Rotation { get; set; }
 
         /// <summary>
         /// Create an instance of Image
@@ -63,6 +64,10 @@ namespace Skill.Framework.UI
         {
             if (Texture != null)
             {
+                Matrix4x4 savedMatrix = GUI.matrix;
+                if (Rotation != null && Rotation.HasValue)
+                    GUIUtility.RotateAroundPivot(Rotation.Value, RenderArea.center);
+
                 Color preCoor = GUI.color;
                 if (AlphaFading != null)
                     GUI.color = AlphaFading.ApplyAlpha(TintColor);
@@ -71,6 +76,7 @@ namespace Skill.Framework.UI
                 GUI.DrawTexture(RenderArea, Texture, Scale, AlphaBlend, ImageAspect);
 
                 GUI.color = preCoor;
+                GUI.matrix = savedMatrix;
             }
         }
 

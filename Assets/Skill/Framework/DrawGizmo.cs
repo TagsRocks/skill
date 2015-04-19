@@ -18,12 +18,16 @@ namespace Skill.Framework
         public Vector3 Offset = Vector3.zero;
 
 
+        private Collider _Collider;
+
         protected virtual void OnDrawGizmos()
         {
             if (!string.IsNullOrEmpty(Filename))
                 Gizmos.DrawIcon(transform.position + transform.TransformDirection(Offset), Filename, false);
-            if (collider != null && DrawMode != GizmosHelper.DrawColliderMode.None)
-                GizmosHelper.DrawCollider(collider, Color, DrawMode);
+            if (_Collider == null)
+                _Collider = GetComponent<Collider>();
+            if (_Collider != null && DrawMode != GizmosHelper.DrawColliderMode.None)
+                GizmosHelper.DrawCollider(_Collider, Color, DrawMode);
         }
     }
 }

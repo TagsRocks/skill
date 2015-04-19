@@ -36,7 +36,7 @@ namespace Skill.Framework.Modules
             //if (_IgnoreFirst)
             //    _IgnoreFirst = false;
             //else
-                Global.RaiseCameraShake(this, Shake, _Transform.position);
+            Global.RaiseCameraShake(this, Shake, transform.position);
         }
     }
 }

@@ -228,38 +228,12 @@ namespace Skill.Editor.UI
         {
             return Color.Lerp(_MiddleColor, _SideColor, (float)Mathf.Abs(_HalfHeight - y) / _HalfHeight);
         }
-
-
         public static Texture2D CreateAudioWaveform(AudioClip aud, int width, int height, Color color)
         {
             width = Mathf.Max(width, 16);
             height = Mathf.Max(height, 16);
 
-            float[] samples = new float[aud.samples * aud.channels];
-
-            string path = AssetDatabase.GetAssetPath(aud);
-            AudioImporter audioImporter = AssetImporter.GetAtPath(path) as AudioImporter;
-
-            //workaround to prevent the error in the function getData
-            //when Audio Importer loadType is "compressed in memory"
-            if (audioImporter.loadType != AudioImporterLoadType.StreamFromDisc)
-            {
-                AudioImporterLoadType audioLoadTypeBackup = audioImporter.loadType;
-                audioImporter.loadType = AudioImporterLoadType.StreamFromDisc;
-                AssetDatabase.ImportAsset(path);
-
-                //getData after the loadType changed
-                aud.GetData(samples, 0);
-
-                //restore the loadType (end of workaround)
-                audioImporter.loadType = audioLoadTypeBackup;
-                AssetDatabase.ImportAsset(path);
-            }
-            else
-            {
-                //getData after the loadType changed
-                aud.GetData(samples, 0);
-            }
+            float[] samples = Skill.Editor.Audio.AudioUtility.GetAudioClipData(aud);            
 
             Texture2D img = new Texture2D(width, height, TextureFormat.RGBA32, false);
 

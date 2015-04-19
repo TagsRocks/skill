@@ -12,7 +12,13 @@ namespace Skill.Framework.Modules
         public float Delay = 0.05f;
 
         private TimeWatch _StartTW;
+        private Renderer _Renderer;
 
+        protected override void GetReferences()
+        {
+            base.GetReferences();
+            _Renderer = GetComponent<Renderer>();
+        }
         /// <summary>
         /// OnEnable
         /// </summary>
@@ -20,8 +26,8 @@ namespace Skill.Framework.Modules
         {
             base.OnEnable();
             _StartTW.Begin(Delay);
-            if (this.renderer != null)
-                this.renderer.enabled = false;
+            if (this._Renderer != null)
+                this._Renderer.enabled = false;
         }
 
         /// <summary>
@@ -31,8 +37,8 @@ namespace Skill.Framework.Modules
         {
             if (_StartTW.IsEnabledAndOver)
             {
-                if (this.renderer != null)
-                    this.renderer.enabled = true;
+                if (this._Renderer != null)
+                    this._Renderer.enabled = true;
                 enabled = false;
                 _StartTW.End();
             }

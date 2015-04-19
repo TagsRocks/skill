@@ -45,7 +45,7 @@ namespace Skill.Framework.Dynamics
         public bool UseRaycast = false;
 
         /// <summary> use raycast to sure there is something between collider and explosion that block explosion</summary>
-        [HideInInspector]        
+        [HideInInspector]
         public int LayerMask = 0;
 
         //private bool _IgnoreFirst;
@@ -65,7 +65,7 @@ namespace Skill.Framework.Dynamics
             //if (_IgnoreFirst)
             //    _IgnoreFirst = false;
             //else
-                ApplyExplision();
+            ApplyExplision();
         }
 
         protected virtual void ApplyExplision()
@@ -75,7 +75,7 @@ namespace Skill.Framework.Dynamics
 
             float deltaRadius = FalloffRadius - Radius;
 
-            Vector3 explosionPos = _Transform.position + Offset;
+            Vector3 explosionPos = transform.position + Offset;
             Collider[] colliders = Physics.OverlapSphere(explosionPos, FalloffRadius);
             float distance = 0;
 
@@ -132,9 +132,10 @@ namespace Skill.Framework.Dynamics
                                 manager.RaiseDamage(this, new DamageEventArgs(dmg) { Tag = tag, DamageType = DamageType });
                             }
 
-                            if (Force > 0 && collider.rigidbody != null && IsUsedForForce(collider.tag))
+                            Rigidbody crb = collider.GetComponent<Rigidbody>();
+                            if (Force > 0 && crb != null && IsUsedForForce(collider.tag))
                             {
-                                collider.rigidbody.AddForceAtPosition((Force * percent) * dir, colliderPos, ForceMode);
+                                crb.AddForceAtPosition((Force * percent) * dir, colliderPos, ForceMode);
                             }
                         }
                     }

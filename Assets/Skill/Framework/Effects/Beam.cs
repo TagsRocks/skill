@@ -109,7 +109,7 @@ namespace Skill.Framework.Effects
                 if (StartPivot != null)
                     _StartPosition = StartPivot.position;
                 else
-                    _StartPosition = _Transform.position;
+                    _StartPosition = transform.position;
 
                 if (IsHit)
                     _EndPosition = HitPoint;
@@ -117,7 +117,7 @@ namespace Skill.Framework.Effects
                     _EndPosition = EndPivot.position;
                 else
                 {
-                    _EndPosition = _StartPosition + (_Transform.forward * Length);
+                    _EndPosition = _StartPosition + (transform.forward * Length);
                     updateLength = false;
                 }
             }
@@ -175,7 +175,7 @@ namespace Skill.Framework.Effects
                         if (Billboard && Camera.main != null)
                             sideDirection = Vector3.Cross(Camera.main.transform.forward, _Direction).normalized;
                         else
-                            sideDirection = _Transform.right;
+                            sideDirection = transform.right;
 
 
                         Vector3 step = _Direction * (Length / (VertexCount - 1));

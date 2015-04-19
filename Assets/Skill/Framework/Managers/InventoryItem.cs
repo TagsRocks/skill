@@ -20,16 +20,16 @@ namespace Skill.Framework.Managers
 
         public virtual void AttachTo(Transform slot)
         {
-            _Transform.parent = slot;
-            _Transform.localPosition = SlotLocalPosition;
-            _Transform.localRotation = Quaternion.Euler(SlotLocalRotation);
-            if (rigidbody != null) rigidbody.isKinematic = true;
+            transform.parent = slot;
+            transform.localPosition = SlotLocalPosition;
+            transform.localRotation = Quaternion.Euler(SlotLocalRotation);
+            if (_Rigidbody != null) _Rigidbody.isKinematic = true;
         }
 
         public virtual void DeAttach()
         {
-            _Transform.parent = null;
-            if (rigidbody != null) rigidbody.isKinematic = false;
+            transform.parent = null;
+            if (_Rigidbody != null) _Rigidbody.isKinematic = false;
         }
         public abstract void AddAmmo(InventoryItem sameItem);
         public abstract void Equip();

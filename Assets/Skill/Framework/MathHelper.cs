@@ -47,27 +47,17 @@ namespace Skill.Framework
             return angle;
         }
 
-        /// <summary>
-        /// Calc vertical angle rotation relative to -y axis
-        /// </summary>
-        /// <param name="y">Direction.y</param>
-        /// <param name="z">Direction.z</param>
-        /// <returns>Angle</returns>
-        public static float VerticalAngle(float y, float z)
-        {
-            float angle = Mathf.Atan2(z, -y) * Mathf.Rad2Deg;
-            ClampAngle(ref angle);
-            return angle;
-        }
 
         /// <summary>
-        /// Calc vertical angle rotation relative to -y axis
+        /// Calc vertical angle rotation relative to y axis (relative to xz plane)
         /// </summary>
         /// <param name="direction">Direction</param>
         /// <returns>Angle</returns>
         public static float VerticalAngle(Vector3 direction)
         {
-            return VerticalAngle(direction.y, direction.z);
+            Vector3 flat = direction;
+            flat.y = 0;
+            return Mathf.Abs(Vector3.Angle(direction, flat)) * Mathf.Sign(direction.y);
         }
 
         /// <summary>
@@ -613,5 +603,63 @@ namespace Skill.Framework
             else
                 return new Vector2(pointOnRayLocal.x * edgeToRayRatios.y + rect.center.x, pointOnRayLocal.y > 0 ? rect.yMax : rect.yMin);
         }
+
+
+        /// <summary>
+        /// Creates a Rect defining the area where one rect overlaps another rect.
+        /// </summary>
+        /// <param name="rect1">Rect 1</param>
+        /// <param name="rect2">Rect 2</param>
+        /// <returns>intersection rect</returns>
+        public static Rect Intersect(Rect rect1, Rect rect2)
+        {
+            Rect rectangle = new Rect();
+            float num8 = rect1.x + rect1.width;
+            float num7 = rect2.x + rect2.width;
+            float num6 = rect1.y + rect1.height;
+            float num5 = rect2.y + rect2.height;
+            float num2 = (rect1.x > rect2.x) ? rect1.x : rect2.x;
+            float num = (rect1.y > rect2.y) ? rect1.y : rect2.y;
+            float num4 = (num8 < num7) ? num8 : num7;
+            float num3 = (num6 < num5) ? num6 : num5;
+            if ((num4 > num2) && (num3 > num))
+            {
+                rectangle.x = num2;
+                rectangle.y = num;
+                rectangle.width = num4 - num2;
+                rectangle.height = num3 - num;
+                return rectangle;
+            }
+            rectangle.x = 0;
+            rectangle.y = 0;
+            rectangle.width = 0;
+            rectangle.height = 0;
+            return rectangle;
+        }
+
+        /// <summary>
+        /// Creates a new Rect that exactly contains two other rects.
+        /// </summary>
+        /// <param name="rect1">Rect 1</param>
+        /// <param name="rect2">Rect 2</param>
+        /// <returns>Union rect</returns>
+        public static Rect Union(Rect rect1, Rect rect2)
+        {
+            Rect rectangle = new Rect();
+            float num6 = rect1.x + rect1.width;
+            float num5 = rect2.x + rect2.width;
+            float num4 = rect1.y + rect1.height;
+            float num3 = rect2.y + rect2.height;
+            float num2 = (rect1.x < rect2.x) ? rect1.x : rect2.x;
+            float num = (rect1.y < rect2.y) ? rect1.y : rect2.y;
+            float num8 = (num6 > num5) ? num6 : num5;
+            float num7 = (num4 > num3) ? num4 : num3;
+            rectangle.x = num2;
+            rectangle.y = num;
+            rectangle.width = num8 - num2;
+            rectangle.height = num7 - num;
+            return rectangle;
+        }
+
     }
 }

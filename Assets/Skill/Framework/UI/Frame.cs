@@ -21,10 +21,9 @@ namespace Skill.Framework.UI
         public ControlType ControlType { get { return UI.ControlType.Frame; } }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this element is enabled in the user interface (UI).
-        /// </summary>
-        /// <returns>  true if the element is enabled; otherwise, false. The default value is true. </returns>
-        public virtual bool IsEnabled { get { return Grid.IsEnabled; } set { Grid.IsEnabled = value; } }
+        /// Set Frame.Grid.IsEnabled  (not working)
+        /// </summary>        
+        public virtual bool IsEnabled { get { return true; } set { } }
 
         private Rect _Position;
         /// <summary>

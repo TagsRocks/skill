@@ -15,6 +15,8 @@ namespace Skill.Framework.UI
         /// <summary>  Type of Control : Panel </summary>
         public override ControlType ControlType { get { return ControlType.Panel; } }
 
+
+        private Thickness _Padding;
         /// <summary>
         /// Gets or sets the padding inside a control.
         /// </summary>
@@ -23,7 +25,7 @@ namespace Skill.Framework.UI
         /// and its Margin or Border.
         /// The default is a thickness of 0 on all four sides.
         /// </returns>
-        public virtual Thickness Padding { get; set; }
+        public virtual Thickness Padding { get { return _Padding; } set { _Padding = value; Invalidate(); } }
 
 
         /// <summary>

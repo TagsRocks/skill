@@ -22,7 +22,7 @@ namespace Skill.Framework.Audio
         protected override void Awake()
         {
             base.Awake();
-            _Audio = audio;
+            _Audio = GetComponent<AudioSource>();
             if (_Audio == null)
                 Debug.LogWarning(string.Format("Can not find AudioSource for RandomSound behaviour : {0}", gameObject.name));
         }

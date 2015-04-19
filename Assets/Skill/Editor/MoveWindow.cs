@@ -38,18 +38,20 @@ namespace Skill.Editor
                 _XYZStep.Value = _SerializedStep;
                 _IntInstance.Value = _SerializedInstances;
                 _TbDuplicate.IsChecked = _SerializedDuplicate;
+                _BtnLocal.Content.text = _SerializedLocal ? "Local" : "Global";
+                _RefreshStyles = true;
             }
         }
 
-        void OnLostFocus()
-        {
-            if (_Frame != null)
-            {
-                _SerializedStep = _XYZStep.Value;
-                _SerializedInstances = _IntInstance.Value;
-                _SerializedDuplicate = _TbDuplicate.IsChecked;
-            }
-        }
+        //void OnLostFocus()
+        //{
+        //    if (_Frame != null)
+        //    {
+        //        _SerializedStep = _XYZStep.Value;
+        //        _SerializedInstances = _IntInstance.Value;
+        //        _SerializedDuplicate = _TbDuplicate.IsChecked;
+        //    }
+        //}
 
         #endregion
 
@@ -135,18 +137,21 @@ namespace Skill.Editor
         void _XYZStep_ValueChanged(object sender, System.EventArgs e)
         {
             _SerializedStep = _XYZStep.Value;
+            UnityEditor.EditorUtility.SetDirty(this);
         }
 
         void _IntInstance_ValueChanged(object sender, System.EventArgs e)
         {
             if (_IntInstance.Value < 1) _IntInstance.Value = 1;
             _SerializedInstances = _IntInstance.Value;
+            UnityEditor.EditorUtility.SetDirty(this);
         }
         void _TbDuplicate_Changed(object sender, System.EventArgs e)
         {
             SetMoveText();
             _IntInstance.IsEnabled = _TbDuplicate.IsChecked;
             _SerializedDuplicate = _TbDuplicate.IsChecked;
+            UnityEditor.EditorUtility.SetDirty(this);
         }
 
         private void SetMoveText()

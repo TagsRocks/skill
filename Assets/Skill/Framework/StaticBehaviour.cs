@@ -17,8 +17,8 @@ namespace Skill.Framework
         /// <summary> Is GameObject destroyed? </summary>
         public bool IsDestroyed { get; private set; }
 
-        /// <summary> a rederence to transform for better performance</summary>
-        protected Transform _Transform;
+        /// <summary> a rederence to transform for better performance</summary>        
+        protected Rigidbody _Rigidbody;
 
         /// <summary>
         /// Awake is called when the script instance is being loaded.
@@ -26,7 +26,7 @@ namespace Skill.Framework
         protected virtual void Awake()
         {
             IsDestroyed = false;
-            GetReferences();                        
+            GetReferences();
             HookEvents();
         }
 
@@ -58,17 +58,17 @@ namespace Skill.Framework
         /// Get compoenet references
         /// </summary>
         protected virtual void GetReferences()
-        {
-            _Transform = transform;
+        {            
+            _Rigidbody = GetComponent<Rigidbody>();
             Events = GetComponent<EventManager>();
-        }      
+        }
 
         /// <summary>
         /// This function is called when the MonoBehaviour will be destroyed.
         /// </summary>
         protected virtual void OnDestroy()
         {
-            if (IsDestroyed) return;            
+            if (IsDestroyed) return;
             UnhookEvents();
             IsDestroyed = true;
         }
@@ -77,7 +77,7 @@ namespace Skill.Framework
         /// Destroy game object
         /// </summary>
         public virtual void DestroySelf()
-        {            
+        {
             Managers.Cache.DestroyCache(this.gameObject);
             IsDestroyed = true;
         }

@@ -72,7 +72,7 @@ namespace Skill.Framework.Effects
                 if (Collision)
                 {
                     //Raycast from the location of the cube forwards
-                    RaycastHit[] hits = Physics.RaycastAll(_Transform.position, _Transform.forward, MaxLength, LayerMask.value);
+                    RaycastHit[] hits = Physics.RaycastAll(transform.position, transform.forward, MaxLength, LayerMask.value);
                     for (int i = 0; i < hits.Length; i++)
                     {
                         //Check to make sure we aren't hitting triggers but colliders

@@ -44,11 +44,11 @@ namespace Skill.Framework
                 if (UseWorldSpace)
                     return _Curve.Evaluate(time);
                 else
-                    return _Transform.TransformPoint(_Curve.Evaluate(time));
+                    return transform.TransformPoint(_Curve.Evaluate(time));
             }
             else
             {
-                return _Transform.position;
+                return transform.position;
             }
         }
 

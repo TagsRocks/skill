@@ -37,7 +37,7 @@ namespace Skill.Framework.Dynamics
             _Points = MathHelper.GetCirclePath(Resolution);
             while (StartTime > Period) StartTime -= Period;
             if (transform.parent == null)
-                Center = _Transform.position;
+                Center = transform.position;
             else
                 Center = Vector3.zero;
             _CirclePos = _Points[0];
@@ -61,7 +61,7 @@ namespace Skill.Framework.Dynamics
                 Vector3 pos2 = _Points[nextIndex];
                 _CirclePos = Vector3.Lerp(pos1, pos2, (_Timer - (index * step)) / step);
             }
-            _Transform.localPosition = Center + (_CirclePos * Radius);
+            transform.localPosition = Center + (_CirclePos * Radius);
             base.Update();
         }
 

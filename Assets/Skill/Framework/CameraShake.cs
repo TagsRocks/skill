@@ -53,7 +53,7 @@ namespace Skill.Framework
                 if (this._Shake == null)
                     this._Shake = new CameraShakeParams();
 
-                if (RelativeTo == null) RelativeTo = _Transform;
+                if (RelativeTo == null) RelativeTo = transform;
                 float distanceToSource = 0;
                 if (shakeInfo.ByDistance)
                     distanceToSource = Vector3.Distance(RelativeTo.position, sourceOfShake);
@@ -75,9 +75,9 @@ namespace Skill.Framework
 
         private void Tick()
         {
-            Vector3 right = _Transform.right;
-            Vector3 up = _Transform.up;
-            Vector3 forward = _Transform.forward;
+            Vector3 right = transform.right;
+            Vector3 up = transform.up;
+            Vector3 forward = transform.forward;
 
             _DeltaPosition = Vector3.zero;
             if (_Shake.Intensity.x > 0)
@@ -123,12 +123,12 @@ namespace Skill.Framework
                     Tick();
 
                 _CurrentDeltaPosition = Vector3.Lerp(_CurrentDeltaPosition, _DeltaPosition, Time.deltaTime * _Shake.Smoothing);
-                _Transform.position += _CurrentDeltaPosition;
+                transform.position += _CurrentDeltaPosition;
 
                 if (_Shake.Roll > 0)
                 {
                     _CurrentDeltaRoll = Mathf.Lerp(_CurrentDeltaRoll, _DeltaRoll, Time.deltaTime * _Shake.Smoothing);
-                    _Transform.rotation = Quaternion.AngleAxis(_CurrentDeltaRoll, _Transform.forward) * _Transform.rotation;
+                    transform.rotation = Quaternion.AngleAxis(_CurrentDeltaRoll, transform.forward) * transform.rotation;
                 }
 
 

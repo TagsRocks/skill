@@ -21,7 +21,8 @@ namespace Skill.Framework.UI
         /// <summary> Start </summary>
         protected override void Start()
         {
-            base.Start();            
+            base.Start();
+
             MenuFrame[] pages = GetComponentsInChildren<MenuFrame>();
             if (pages != null && pages.Length > 0)
             {
@@ -44,6 +45,13 @@ namespace Skill.Framework.UI
 
         /// <summary> Is GameMenu visible? </summary>
         public bool IsVisible { get; private set; }
+
+        /// <summary> Show Game Menu </summary>
+        protected void JustShow()
+        {
+            if (IsVisible) return;
+            IsVisible = true;
+        }
 
         /// <summary> Show Game Menu </summary>
         protected virtual void Show()
@@ -82,5 +90,5 @@ namespace Skill.Framework.UI
                 Menu.OnGUI();
             }
         }
-    }    
+    }
 }

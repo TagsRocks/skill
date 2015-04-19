@@ -213,7 +213,18 @@ namespace Skill.Editor
         {
             this.X = e.GetAttributeValueAsFloat("X", 0.0f);
             this.Y = e.GetAttributeValueAsFloat("Y", 0.0f);
-        }        
+        }
+
+        public void Import(Vector2 v2)
+        {
+            this.X = v2.x;
+            this.Y = v2.y;            
+        }
+
+        public Vector2 ToVector2()
+        {
+            return new Vector2(this.X, this.Y);
+        }
     }
 
     public struct PlaneData : IXmlElementSerializable, IPrimitiveData
@@ -267,6 +278,19 @@ namespace Skill.Editor
             this.X = e.GetAttributeValueAsFloat("X", 0.0f);
             this.Y = e.GetAttributeValueAsFloat("Y", 0.0f);
             this.Z = e.GetAttributeValueAsFloat("Z", 0.0f);
+        }
+
+        public void Import(Quaternion q)
+        {
+            this.X = q.x;
+            this.Y = q.y;
+            this.Z = q.z;
+            this.W = q.w;
+        }
+
+        public Quaternion ToQuaternion()
+        {
+            return new Quaternion(this.X, this.Y, this.Z, this.W);
         }
     }
 
@@ -362,6 +386,19 @@ namespace Skill.Editor
             this.Y = e.GetAttributeValueAsFloat("Y", 0.0f);
             this.Z = e.GetAttributeValueAsFloat("Z", 0.0f);
         }
+
+
+        public void Import(Vector3 v3)
+        {
+            this.X = v3.x;
+            this.Y = v3.y;
+            this.Z = v3.z;
+        }
+
+        public Vector3 ToVector3()
+        {
+            return new Vector3(this.X, this.Y, this.Z);
+        }
     }
 
     public struct Vector4Data : IXmlElementSerializable, IPrimitiveData
@@ -388,6 +425,19 @@ namespace Skill.Editor
             this.W = e.GetAttributeValueAsFloat("W", 0.0f);
         }
 
+
+        public void Import(Vector4 v4)
+        {
+            this.X = v4.x;
+            this.Y = v4.y;
+            this.Z = v4.z;
+            this.W = v4.w;
+        }
+
+        public Vector4 ToVector3()
+        {
+            return new Vector4(this.X, this.Y, this.Z, this.W);
+        }
 
     }
 }

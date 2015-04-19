@@ -53,7 +53,7 @@ namespace Skill.Framework.Effects
             else
             {
                 if (_StickedTransform != null)
-                    _Transform.position = _StickedTransform.position + StickOffset;
+                    transform.position = _StickedTransform.position + StickOffset;
                 UpdateIndicator();
             }
             base.Update();

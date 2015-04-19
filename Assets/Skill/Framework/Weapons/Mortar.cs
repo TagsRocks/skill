@@ -31,7 +31,7 @@ namespace Skill.Framework.Weapons
         {
             base.GetReferences();
             if (AudioSource == null)
-                AudioSource = audio;
+                AudioSource = GetComponent<AudioSource>();
             if (AudioSource != null)
             {
                 AudioSource.playOnAwake = false;
@@ -58,9 +58,9 @@ namespace Skill.Framework.Weapons
             if (BulletPrefab != null && _Clip != null)
             {
                 _MoveTimeTW.Begin(LifeTime);
-                _BulletDirection = -_Transform.forward;
+                _BulletDirection = -transform.forward;
 
-                _BulletStartPosition = _Transform.position + _Transform.forward * BulletDistance;
+                _BulletStartPosition = transform.position + transform.forward * BulletDistance;
 
                 if (BulletPrefab != null)
                 {
@@ -70,7 +70,7 @@ namespace Skill.Framework.Weapons
 
                 if (IndicatorPrefab != null)
                 {
-                    GameObject go = Skill.Framework.Managers.Cache.Spawn(IndicatorPrefab, _Transform.position, IndicatorPrefab.transform.rotation);
+                    GameObject go = Skill.Framework.Managers.Cache.Spawn(IndicatorPrefab, transform.position, IndicatorPrefab.transform.rotation);
                     Skill.Framework.Effects.ExplosionIndicator indicator = go.GetComponent<Skill.Framework.Effects.ExplosionIndicator>();
                     if (indicator != null)
                     {
@@ -92,7 +92,7 @@ namespace Skill.Framework.Weapons
         protected virtual void ShowExplosion()
         {
             if (ExplosionPrefab != null)
-                Skill.Framework.Managers.Cache.Spawn(ExplosionPrefab, _Transform.position + ExplosionOffset, ExplosionPrefab.transform.rotation);
+                Skill.Framework.Managers.Cache.Spawn(ExplosionPrefab, transform.position + ExplosionOffset, ExplosionPrefab.transform.rotation);
 
             if (_BulletObject != null)
                 Skill.Framework.Managers.Cache.DestroyCache(_BulletObject.gameObject);
@@ -109,7 +109,7 @@ namespace Skill.Framework.Weapons
                     DestroySelf();
                 }
                 else
-                    _BulletObject.position = Vector3.Lerp(_BulletStartPosition, _Transform.position, _MoveTimeTW.Percent);
+                    _BulletObject.position = Vector3.Lerp(_BulletStartPosition, transform.position, _MoveTimeTW.Percent);
             }
             base.Update();
         }
