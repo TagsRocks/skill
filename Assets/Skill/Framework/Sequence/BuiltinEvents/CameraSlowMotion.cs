@@ -32,7 +32,7 @@ namespace Skill.Framework.Sequence
             Skill.Framework.SlowMotionInfo info = new Skill.Framework.SlowMotionInfo();
 
             info.Freez = _Freez;
-            info.SlowMotion = _SlowMotion;
+            info.Duration = _SlowMotion;
             info.TimeScale = _TimeScale;
             info.Pitch = _Pitch;
 

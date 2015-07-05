@@ -10,10 +10,10 @@ namespace Skill.Framework
     [Serializable]
     public class SlowMotionInfo
     {
-        /// <summary> Lenght of freez time at begining of slow motion.( Freez time is calculated as part of SlowMotion time ) </summary>
+        /// <summary> duration of freez time at begining of slow motion.( Freez time is calculated as part of SlowMotion time ) </summary>
         public float Freez = 0.0f;
-        /// <summary> Lenght of slow motion </summary>
-        public float SlowMotion = 2.0f;
+        /// <summary> duration of slow motion </summary>
+        public float Duration = 2.0f;
         /// <summary> Target TimeScale when slow motion </summary>
         public float TimeScale = 0.2f;
         /// <summary> Target sound pitch when slow motion </summary>
@@ -38,7 +38,7 @@ namespace Skill.Framework
         public void CopyFrom(SlowMotionInfo other)
         {
             this.Freez = other.Freez;
-            this.SlowMotion = other.SlowMotion;
+            this.Duration = other.Duration;
             this.TimeScale = other.TimeScale;
             this.Pitch = other.Pitch;
         }
@@ -89,12 +89,40 @@ namespace Skill.Framework
             if (Instance != null)
                 Debug.LogWarning("More thn on instance of Skill.SlowMotionController object found");
             Instance = this;
+
+            TimeScale = 1.0f;
         }
 
         /// <summary>
         /// Whether game is in slow motion mode or not
         /// </summary>
-        public bool IsSlowingMotion { get { return _FreezeTW.IsEnabled || _MotionTW.IsEnabled; } }
+        public bool IsSlowingMotion { get { return _MotionTW.IsEnabled; } }
+
+        public float TimeScale { get; private set; }
+
+        /// <summary> Time left to end of slow motion </summary>
+        public float TimeLeft
+        {
+            get
+            {
+                if (_MotionTW.IsEnabled)
+                    return _MotionTW.TimeLeft;
+                else
+                    return 0;
+            }
+        }
+
+        /// <summary> percen of slow motion if enabled </summary>
+        public float Percent
+        {
+            get
+            {
+                if (_MotionTW.IsEnabled)
+                    return _MotionTW.Percent;
+                else
+                    return 1.0f;
+            }
+        }
 
         private SlowMotionInfo _Info;
         private TimeWatch _MotionTW;
@@ -104,6 +132,8 @@ namespace Skill.Framework
         private float _FreezTimeLeftWhenPaused;
         private float _PreFixedDeltaTime;
         private float _PreTimeScale;
+
+
         /// <summary>
         /// Hook required events if needed
         /// </summary>
@@ -129,7 +159,10 @@ namespace Skill.Framework
 
             if (_Info == null) _Info = new SlowMotionInfo();
             _Info.CopyFrom(args.Motion);
-            _MotionTW.Begin(_Info.SlowMotion, true);
+            _MotionTW.Begin(_Info.Duration, true);
+
+            if (_Info.Freez > _Info.Duration)
+                _Info.Freez = _Info.Duration;
             if (_Info.Freez > 0)
                 _FreezeTW.Begin(_Info.Freez, true);
             else
@@ -137,6 +170,7 @@ namespace Skill.Framework
             enabled = true;
             _PreFixedDeltaTime = Time.fixedDeltaTime;
             _PreTimeScale = Time.timeScale;
+            TimeScale = _Info.TimeScale;
             OnStartSlowMotion();
         }
 
@@ -167,6 +201,7 @@ namespace Skill.Framework
             if (EndSlowMotion != null)
                 EndSlowMotion(this, EventArgs.Empty);
         }
+
 
         /// <summary>
         /// Update
@@ -203,7 +238,7 @@ namespace Skill.Framework
                     {
                         if (Skill.Framework.Audio.PitchController.Instance != null)
                             Skill.Framework.Audio.PitchController.Instance.Pitch = 1.0f;
-                        Time.timeScale = _PreTimeScale;
+                        TimeScale = Time.timeScale = _PreTimeScale;
                         Time.fixedDeltaTime = _PreFixedDeltaTime;
                         enabled = false;
                         _MotionTW.End();
@@ -221,11 +256,11 @@ namespace Skill.Framework
                             Skill.Framework.Audio.PitchController.Instance.Pitch = _Info.Pitch;
                         if (!_FreezeTW.IsEnabled)
                         {
-                            Time.timeScale = _Info.TimeScale;
+                            TimeScale = Time.timeScale = _Info.TimeScale;
                         }
                         else
                         {
-                            Time.timeScale = 0;
+                            TimeScale = Time.timeScale = 0;
                         }
                     }
                     Time.fixedDeltaTime = 0.02f * Time.timeScale;

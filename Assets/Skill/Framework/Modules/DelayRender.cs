@@ -4,7 +4,7 @@ using System.Collections;
 namespace Skill.Framework.Modules
 {
     /// <summary>
-    /// Object vill be visible at specific time after instantiate
+    /// Object will be visible at specific time after instantiate
     /// </summary>    
     public class DelayRender : DynamicBehaviour
     {
@@ -25,9 +25,15 @@ namespace Skill.Framework.Modules
         protected override void OnEnable()
         {
             base.OnEnable();
+            Reschedule();
+        }
+
+        public void Reschedule()
+        {
             _StartTW.Begin(Delay);
             if (this._Renderer != null)
                 this._Renderer.enabled = false;
+            enabled = true;
         }
 
         /// <summary>
@@ -39,11 +45,10 @@ namespace Skill.Framework.Modules
             {
                 if (this._Renderer != null)
                     this._Renderer.enabled = true;
-                enabled = false;
                 _StartTW.End();
             }
             base.Update();
-        } 
+        }
     }
 
 }

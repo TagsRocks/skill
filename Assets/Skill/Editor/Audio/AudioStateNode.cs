@@ -84,7 +84,7 @@ namespace Skill.Editor.Audio
             //this.Controls.Add(_PreSlot);
 
 
-            _Drag = new AudioStateNodeDragThumb(this) { Row = 0, Column = 0 };
+            _Drag = new AudioStateNodeDragThumb(this) { Row = 0, Column = 0, Style = new GUIStyle() };
             this.Controls.Add(_Drag);
 
 
@@ -164,10 +164,11 @@ namespace Skill.Editor.Audio
         {
             if (_DefaultStyle == null)
             {
+               
                 _DefaultStyle = new GUIStyle((GUIStyle)"flow node 5");
                 _DefaultSelectedStyle = new GUIStyle((GUIStyle)"flow node 5 on");
                 _Style = new GUIStyle((GUIStyle)"flow node 0");
-                _SelectedStyle = new GUIStyle((GUIStyle)"flow node 0 on");
+                _SelectedStyle = new GUIStyle((GUIStyle)"flow node 0 on");                
             }
         }
 
@@ -204,12 +205,17 @@ namespace Skill.Editor.Audio
                 Controls.Add(_BreakPointsEditor);
 
                 _BtnPreview = new Skill.Editor.UI.MediaButton() { TogglePressed = false, Height = 20 };
-                _BtnPreview.Content.text = "Preview";
+                _BtnPreview.Content.text = "Play Preview";
                 _BtnPreview.Content.image = UnityEditor.EditorGUIUtility.FindTexture("d_PlayButton");
                 _BtnPreview.SetStyle(UnityEditor.EditorStyles.miniButton);
                 Controls.Add(_BtnPreview);
 
                 _BtnPreview.Click += _BtnPreview_Changed;
+            }
+
+            void _BtnUpdatePreview_Click(object sender, System.EventArgs e)
+            {
+
             }
 
             void _BtnPreview_Changed(object sender, System.EventArgs e)
@@ -287,13 +293,13 @@ namespace Skill.Editor.Audio
             void StartEnd_ValueChanged(object sender, System.EventArgs e)
             {
                 if (IgnoreChanges) return;
-                _BreakPointsEditor.RefreshAudio();
+                //_BreakPointsEditor.RefreshAudio();
             }
 
             void _ClipField_ObjectChanged(object sender, System.EventArgs e)
             {
                 if (IgnoreChanges) return;
-                _BreakPointsEditor.RefreshAudio();
+                //_BreakPointsEditor.RefreshAudio();
             }
 
             public void PreviewStarted()
@@ -316,6 +322,7 @@ namespace Skill.Editor.Audio
                 private bool _RefreshStyle;
                 private Skill.Framework.UI.ListBox _BreakPointsList;
                 private Skill.Editor.UI.AudioPreviewCurve _AudioPreview;
+                private Skill.Framework.UI.Button _BtnUpdatePreview;
 
                 private Skill.Framework.UI.Label _Title;
                 private Skill.Framework.UI.Grid _ButtonsPanel;
@@ -334,7 +341,7 @@ namespace Skill.Editor.Audio
 
                 public void RefreshData()
                 {
-                    RefreshAudio();
+                    //RefreshAudio();
 
                     if (State.BreakPoints == null)
                         State.BreakPoints = new float[0];
@@ -373,7 +380,7 @@ namespace Skill.Editor.Audio
                 {
                     get
                     {
-                        return Mathf.Max(40, _BreakPointsList.Items.Count * 20) + 16 + 16 + 60 + 4;
+                        return Mathf.Max(40, _BreakPointsList.Items.Count * 20) + 16 + 16 + 60 + 24 + 4;
                     }
                 }
 
@@ -387,6 +394,7 @@ namespace Skill.Editor.Audio
                     this.RowDefinitions.Add(1, GridUnitType.Star); // list
                     this.RowDefinitions.Add(16, GridUnitType.Pixel); // buttons
                     this.RowDefinitions.Add(60, GridUnitType.Pixel); // Audio Preview
+                    this.RowDefinitions.Add(24, GridUnitType.Pixel); // _BtnUpdatePreview                                        
 
                     _Title = new Label { Row = 0, Text = "Break Points" };
                     this.Controls.Add(_Title);
@@ -411,9 +419,19 @@ namespace Skill.Editor.Audio
                     _AudioPreview = new Skill.Editor.UI.AudioPreviewCurve() { Row = 3 };
                     this.Controls.Add(_AudioPreview);
 
+                    _BtnUpdatePreview = new Button() { Row = 4, Margin = new Thickness(0, 2) };
+                    _BtnUpdatePreview.Content.text = "Update Preview Image";
+                    this.Controls.Add(_BtnUpdatePreview);
+
                     _BreakPointsList.SelectionChanged += _BreakPointsList_SelectionChanged;
                     _BtnAdd.Click += _BtnAdd_Click;
                     _BtnRemove.Click += _BtnRemove_Click;
+                    _BtnUpdatePreview.Click += _BtnUpdatePreview_Click;
+                }
+
+                void _BtnUpdatePreview_Click(object sender, System.EventArgs e)
+                {
+                    RefreshAudio();
                 }
 
                 void _BtnRemove_Click(object sender, System.EventArgs e)

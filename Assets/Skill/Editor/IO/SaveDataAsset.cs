@@ -7,6 +7,7 @@ namespace Skill.Editor.IO
     /// Defines serializable data asset required for Implant tool
     /// </summary>
     [System.Serializable]
+    [CreateAssetMenu(fileName = "NewSaveData", menuName = "Skill/SaveData", order = 45)]
     public class SaveDataAsset : ScriptableObject
     {
         public string XmlData;

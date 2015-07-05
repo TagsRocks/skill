@@ -7,6 +7,7 @@ namespace Skill.Framework
     /// Defines serializable data asset required for Spawner
     /// </summary>
     [System.Serializable]
+    [CreateAssetMenu(fileName = "NewSpawnAsset", menuName = "Skill/Spawn Asset", order = 47)]
     public class SpawnAsset : ScriptableObject
     {
         /// <summary>

@@ -70,75 +70,7 @@ namespace Skill.Editor
         static void ShowAbout()
         {
             AboutSkill.Instance.ShowUtility();
-        }
-
-
-        // ********************************* Create Menu ********************************* 
-
-        [UnityEditor.MenuItem("Assets/Create/Skill/BehaviorTree", false, 41)]
-        static void CreateBehaviorTreeDataAsset()
-        {
-            Skill.Editor.ScriptableObjectUtility.CreateAsset<AI.BehaviorTreeAsset>("BehaviorTree");
-        }
-
-        [UnityEditor.MenuItem("Assets/Create/Skill/SharedAccessKeys", false, 42)]
-        static void CreateSharedAccessKeysDataAsset()
-        {
-            Skill.Editor.ScriptableObjectUtility.CreateAsset<AI.SharedAccessKeysAsset>("SharedAccessKeys");
-        }
-
-        [UnityEditor.MenuItem("Assets/Create/Skill/AnimationTree", false, 43)]
-        static void CreateAnimationTreeDataAsset()
-        {
-            Skill.Editor.ScriptableObjectUtility.CreateAsset<Animation.AnimationTreeAsset>("AnimationTree");
-        }
-
-        [UnityEditor.MenuItem("Assets/Create/Skill/SkinMesh", false, 44)]
-        static void CreateSkinMeshDataAsset()
-        {
-            Skill.Editor.ScriptableObjectUtility.CreateAsset<Animation.SkinMeshAsset>("SkinMesh");
-        }
-
-        [UnityEditor.MenuItem("Assets/Create/Skill/SaveData", false, 45)]
-        static void CreateSaveDataAsset()
-        {
-            Skill.Editor.ScriptableObjectUtility.CreateAsset<IO.SaveDataAsset>("SaveData");
-        }
-
-        [UnityEditor.MenuItem("Assets/Create/Skill/Dictionary", false, 46)]
-        static void CreateDictionary()
-        {
-            Skill.Editor.ScriptableObjectUtility.CreateAsset<Skill.Framework.Dictionary>("Dictionary");
-        }
-
-        [MenuItem("Assets/Create/Skill/Spawn Asset", false, 47)]
-        static void CreateSpawnData()
-        {
-            ScriptableObjectUtility.CreateAsset<Skill.Framework.SpawnAsset>("SpawnData");
-        }
-
-        [MenuItem("Assets/Create/Skill/Implant Asset", false, 48)]
-        static void CreateImplantAsset()
-        {
-            ScriptableObjectUtility.CreateAsset<Skill.Editor.ImplantAsset>("ImplantAsset", delegate(Skill.Editor.ImplantAsset asset)
-            {
-                if (asset.DefaultObject == null)
-                    asset.DefaultObject = new Skill.Editor.ImplantObject();
-                asset.DefaultObject.Prefab = null;
-                asset.DefaultObject.MinScalePercent = 0.8f;
-                asset.DefaultObject.MaxScalePercent = 1.0f;
-                asset.DefaultObject.Weight = 1.0f;
-                asset.DefaultObject.Rotation = Skill.Editor.ImplantObjectRotation.SurfaceNormal;
-            });
-
-        }
-
-
-        [MenuItem("Assets/Create/Skill/BrowserStyle", false, 49)]
-        static void CreateBrowserStyle()
-        {
-            ScriptableObjectUtility.CreateAsset<Skill.Framework.UI.BrowserStyles>("BrowserStyle");
-        }
+        }        
 
 
         // ********************************* Commands ********************************* 
@@ -161,11 +93,11 @@ namespace Skill.Editor
             Commands.GroupObjects("Group");
         }
 
-        [MenuItem("Skill/Edit/Group Dialog %#g", false, 101)] // Ctrl + Shift + G
-        static void GroupObjectsWithName()
-        {
-            CreateGroupDialog.Instance.ShowUtility();
-        }
+        //[MenuItem("Skill/Edit/Group Dialog %#g", false, 101)] // Ctrl + Shift + G
+        //static void GroupObjectsWithName()
+        //{
+        //    CreateGroupDialog.Instance.ShowUtility();
+        //}
 
         [MenuItem("Skill/Edit/Copy Transform Hierarchy", false, 102)]
         static void CopyHierarchyTransform()
@@ -205,6 +137,15 @@ namespace Skill.Editor
             Transform transform = command.context as Transform;
             if (transform != null)
                 Commands.BringToGround(transform);
+        }
+
+
+        [MenuItem("CONTEXT/Text/ConvertToPersian")]
+        public static void ConvertToPersian(UnityEditor.MenuCommand command)
+        {
+            UnityEngine.UI.Text uit = command.context as UnityEngine.UI.Text;
+            if (uit != null)
+                uit.text = Commands.ConvertToPersian(uit.text);
         }
     }
 }

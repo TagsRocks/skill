@@ -45,7 +45,7 @@ namespace Skill.Framework.IO
             this.TapCount = touch.tapCount;
             this.Phase = touch.phase;
 
-            this.IsUsed = false;
+            this.IsUsed = false;            
         }
 
         /// <summary>

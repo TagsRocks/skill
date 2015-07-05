@@ -8,7 +8,7 @@ namespace Skill.Framework.Weapons
     /// This bullet goes in a straight direction.
     /// </summary>    
     public class StraightLineBullet : Bullet
-    {        
+    {
         /// <summary>
         /// Amount of damage fall of per unit.
         /// </summary>
@@ -40,7 +40,7 @@ namespace Skill.Framework.Weapons
         private Vector3 _PrePosition;
         private float _StartY;
         private float _Time;
-        private Vector3 _XZDirection;                
+        private Vector3 _XZDirection;
 
         /// <summary>
         /// Layers to raycast. (should be setted by weapon)
@@ -65,6 +65,9 @@ namespace Skill.Framework.Weapons
             }
         }
 
+        /// <summary> deltatime to use in bullet movement </summary>
+        public virtual float DeltaTime { get { return Time.deltaTime; } }
+
         /// <summary>
         /// Update
         /// </summary>
@@ -72,14 +75,14 @@ namespace Skill.Framework.Weapons
         {
             if (Global.IsGamePaused) return;
 
-            float deltaMove = _V0CosAlpha * Time.deltaTime;
+            float deltaMove = _V0CosAlpha * DeltaTime;
             _TravelledDistance += deltaMove;
 
             if (_Rigidbody == null || _Rigidbody.isKinematic)
             {
                 if (Gravity != 0)
                 {
-                    _Time += Time.deltaTime;
+                    _Time += DeltaTime;
 
                     Vector3 pos = transform.position + (_XZDirection * deltaMove);
                     pos.y = _StartY + ((0.5f * Gravity * _Time) + _V0SinAlpha) * _Time;

@@ -7,20 +7,29 @@ namespace Skill.Editor
 {
     public class TransformData : IXmlElementSerializable
     {
-
-
         public string Name { get; set; }
         public Vector3Data Position { get { return _Position; } set { _Position = value; } }
         public Vector3Data LocalPosition { get { return _LocalPosition; } set { _LocalPosition = value; } }
         public Vector3Data LocalScale { get { return _LocalScale; } set { _LocalScale = value; } }
         public QuaternionData Rotation { get { return _Rotation; } set { _Rotation = value; } }
         public QuaternionData LocalRotation { get { return _LocalRotation; } set { _LocalRotation = value; } }
+        public RectTransformData RectTransform
+        {
+            get { return _RectTransform; }
+            set
+            {
+                _RectTransform = value;
+                if (_RectTransform != null)
+                    _RectTransform.Owner = this;
+            }
+        }
 
         private Vector3Data _Position;
         private Vector3Data _LocalPosition;
         private Vector3Data _LocalScale;
         private QuaternionData _Rotation;
         private QuaternionData _LocalRotation;
+        private RectTransformData _RectTransform;
         private List<TransformData> _Children;
 
         public void Add(TransformData t)
@@ -55,6 +64,15 @@ namespace Skill.Editor
             this._Rotation.Import(t.rotation);
             this._LocalRotation.Import(t.localRotation);
 
+            RectTransform rt = t.GetComponent<RectTransform>();
+            if (rt != null)
+            {
+                if (_RectTransform == null)
+                    _RectTransform = new RectTransformData(this);
+                _RectTransform.Copy(rt);
+            }
+
+
             _Children.Clear();
             for (int i = 0; i < t.childCount; i++)
             {
@@ -77,6 +95,12 @@ namespace Skill.Editor
                 t.localPosition = _LocalPosition.ToVector3();
                 t.localRotation = _LocalRotation.ToQuaternion();
             }
+
+
+            RectTransform rt = t.GetComponent<RectTransform>();
+            if (rt != null && _RectTransform != null)
+                _RectTransform.Paste(rt);
+
 
             for (int i = 0; i < Count; i++)
             {
@@ -106,6 +130,8 @@ namespace Skill.Editor
             t.AppendChild(r);
             t.AppendChild(lr);
 
+            if(_RectTransform != null)
+                t.AppendChild(_RectTransform.ToXmlElement());
 
 
             if (this._Children.Count > 0)
@@ -138,6 +164,15 @@ namespace Skill.Editor
             if (ls != null) _LocalScale.Load(ls);
             if (r != null) _Rotation.Load(r);
             if (lr != null) _LocalRotation.Load(lr);
+
+
+            XmlElement rt = e["RectTransform"];
+            if (rt != null)
+            {
+                if (_RectTransform == null)
+                    _RectTransform = new RectTransformData(this);
+                _RectTransform.Load(rt);
+            }
 
 
             _Children.Clear();

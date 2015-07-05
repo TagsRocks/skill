@@ -7,6 +7,7 @@ namespace Skill.Editor.AI
     /// Defines serializable data asset required for Implant tool
     /// </summary>
     [System.Serializable]
+    [CreateAssetMenu(fileName = "NewSharedAccessKeys", menuName = "Skill/SharedAccessKeys", order = 42)]
     public class SharedAccessKeysAsset : ScriptableObject
     {
         public string XmlData;

@@ -65,7 +65,7 @@ namespace Skill.Editor.Curve
         {
             hideFlags = HideFlags.DontSave;
 
-            title = "Curve Editor";
+            titleContent =  new GUIContent("Curve Editor");
             base.position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);
             base.minSize = new Vector2(Size.x, Size.y);
 

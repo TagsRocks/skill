@@ -18,7 +18,8 @@ namespace Skill.Editor
         #region UI
         private StackPanel _Panel;
         private Skill.Framework.UI.Frame _Frame;
-        private Skill.Editor.UI.ObjectField<Texture2D> _TextureField;        
+        private Skill.Editor.UI.ObjectField<Texture2D> _TextureField;
+        private Skill.Editor.UI.ToggleButton _TbBrush;
 
         private Skill.Editor.UI.ColorField _ColorField;
 
@@ -27,8 +28,7 @@ namespace Skill.Editor
         private Skill.Editor.UI.Slider _SliFalloff;
 
         private Editor.UI.TabHeader _TbChannels;
-
-        private Editor.UI.TabHeader _TbModes;
+        private Editor.UI.LayerMaskField _LayersField;
 
         private Skill.Editor.UI.Popup _PUV;
         private HelpBox _HelpBox;
@@ -41,7 +41,8 @@ namespace Skill.Editor
         private void CreateUI()
         {
             _Panel = new StackPanel() { Padding = new Skill.Framework.UI.Thickness(2, 4, 2, 0) };
-            _TextureField = new Skill.Editor.UI.ObjectField<Texture2D>() { Object = _PaintColor.Texture, HorizontalAlignment = Skill.Framework.UI.HorizontalAlignment.Center, Width = 80, Height = 80, Margin = new Skill.Framework.UI.Thickness(2) };            
+            _TextureField = new Skill.Editor.UI.ObjectField<Texture2D>() { Object = _PaintColor.Texture, HorizontalAlignment = Skill.Framework.UI.HorizontalAlignment.Center, Width = 80, Height = 80, Margin = new Skill.Framework.UI.Thickness(2) };
+            
 
             #region _TbChannels
             _TbChannels = new UI.TabHeader(4, true) { Margin = new Thickness(0, 2, 0, 10), HorizontalAlignment = HorizontalAlignment.Center, Width = 200, Height = 20 };
@@ -56,24 +57,38 @@ namespace Skill.Editor
             _TbChannels.SetTabSelected(3, _PaintColor.ChannelA);
             #endregion
 
-            #region _TbModes
+            #region _LayersField and _PUV and _TbBrush
 
-            _TbModes = new UI.TabHeader(2, false) { Margin = new Thickness(0, 2, 0, 10), HorizontalAlignment = HorizontalAlignment.Center, Width = 200 };
+            Grid layersPanel = new Grid() { Height = 32, Padding = new Thickness(2, 6) };
+            layersPanel.ColumnDefinitions.Add(90, GridUnitType.Pixel);                        
+            layersPanel.ColumnDefinitions.Add(50, GridUnitType.Pixel);
+            layersPanel.ColumnDefinitions.Add(10, GridUnitType.Pixel);
+            layersPanel.ColumnDefinitions.Add(45, GridUnitType.Pixel);
+            layersPanel.ColumnDefinitions.Add(1, GridUnitType.Star);
 
-            _TbModes[0].text = "Paint";
-            _TbModes[1].text = "Erase";
-            _TbModes.SelectedTab = _PaintColor.EraseEnable ? 1 : 0;
 
-            _TbModes.ColumnDefinitions.Add(4, GridUnitType.Pixel);
-            _TbModes.ColumnDefinitions.Add(1, GridUnitType.Star);
+            _TbBrush = new UI.ToggleButton() { Column = 0,  IsChecked = _PaintColor.Brush , Left = true };
+            _TbBrush.Label.text = "Brush View";
+            layersPanel.Controls.Add(_TbBrush);           
 
-            _PUV = new Popup() { Row = 0, Column = 3 };
+            _PUV = new Popup() { Row = 0, Column = 1 };
             PopupOption uv1 = new PopupOption(0) { Name = "UV1" }; uv1.Content.text = "UV 1";
             PopupOption uv2 = new PopupOption(1) { Name = "UV2" }; uv2.Content.text = "UV 2";
             _PUV.Options.Add(uv1);
             _PUV.Options.Add(uv2);
-            _PUV.SelectedIndex = _PaintColor.EraseEnable ? 1 : 0;
-            _TbModes.Controls.Add(_PUV);
+            _PUV.SelectedIndex = _PaintColor.UV2 ? 1 : 0;
+            layersPanel.Controls.Add(_PUV);
+
+            Label lbl = new Label() { Text = "Layers", Column = 3 };
+            layersPanel.Controls.Add(lbl);
+
+
+            _LayersField = new LayerMaskField() { Row = 0, Column = 4 };
+            _LayersField.Layers = _PaintColor.LayerMask;
+            _LayersField.Label.text = string.Empty;
+            layersPanel.Controls.Add(_LayersField);
+
+            
             #endregion
 
             _PnlFavoriteColors = new Grid() { Height = 22, Margin = new Thickness(0, 2) };
@@ -103,20 +118,20 @@ namespace Skill.Editor
             }
 
 
-            _ColorField = new ColorField() { Color = _PaintColor.EraseEnable ? _PaintColor.Erase : _PaintColor.Paint, Margin = new Thickness(2) };
-            _SliRadius = new Skill.Editor.UI.Slider() { Value = _PaintColor.Radius, MinValue = 1, MaxValue = 128, Margin = new Thickness(2), Height = 16 }; _SliRadius.Label.text = "Radius"; _SliRadius.Label.tooltip = "Shift + (A/D)";
+            _ColorField = new ColorField() { Color = _PaintColor.Color, Margin = new Thickness(2) };
+            _SliRadius = new Skill.Editor.UI.Slider() { Value = _PaintColor.Radius, MinValue = 1, MaxValue = 40, Margin = new Thickness(2), Height = 16 }; _SliRadius.Label.text = "Radius"; _SliRadius.Label.tooltip = "Shift + (A/D)";
             _SliStrength = new Skill.Editor.UI.Slider() { Value = _PaintColor.Strength, MinValue = 1f, MaxValue = 100f, Margin = new Thickness(2), Height = 16 }; _SliStrength.Label.text = "Strength";
             _SliFalloff = new Skill.Editor.UI.Slider() { Value = _PaintColor.Falloff, MinValue = 0.0f, MaxValue = 1.0f, Margin = new Thickness(2), Height = 16 }; _SliFalloff.Label.text = "Falloff";
             _HelpBox = new HelpBox() { Height = 60, Message = "Hold CTRL and drag with Right Click to paint.\nTexture must be read/write enable\nValid texture format:\n    ARGB32, RGBA32, RGB24 and Alpha8" };
 
             _BtnSaveTexture = new Skill.Framework.UI.Button() { Margin = new Thickness(2), Height = 40 }; _BtnSaveTexture.Content.text = "Save Texture";
 
-
-            _Panel.Controls.Add(_TextureField);            
+            
+            _Panel.Controls.Add(_TextureField);
             _Panel.Controls.Add(_TbChannels);
-            _Panel.Controls.Add(_TbModes);
             _Panel.Controls.Add(_PnlFavoriteColors);
             _Panel.Controls.Add(_ColorField);
+            _Panel.Controls.Add(layersPanel);
             _Panel.Controls.Add(_SliRadius);
             _Panel.Controls.Add(_SliStrength);
             _Panel.Controls.Add(_SliFalloff);
@@ -127,18 +142,21 @@ namespace Skill.Editor
             _Frame.Grid.Controls.Add(_Panel);
 
             _TextureField.ObjectChanged += _TextureField_ObjectChanged;
+            _TbBrush.Changed += _TbBrush_Changed;
 
             _TbChannels.TabChanged += Channel_Changed;
 
-            _TbModes.SelectedTabChanged += PaintMode_Changed;
+            _LayersField.LayersChanged += _LayersField_LayersChanged;
             _PUV.OptionChanged += _PUV_OptionChanged;
             _ColorField.ColorChanged += _ColorField_ColorChanged;
 
             _SliRadius.ValueChanged += _SliRadius_ValueChanged;
             _SliStrength.ValueChanged += _SliStrength_ValueChanged;
             _SliFalloff.ValueChanged += _SliFalloff_ValueChanged;
-            _BtnSaveTexture.Click += _BtnSaveTexture_Click;            
+            _BtnSaveTexture.Click += _BtnSaveTexture_Click;
         }
+
+
 
         private int TabCount
         {
@@ -151,7 +169,7 @@ namespace Skill.Editor
                 if (_PaintColor.ChannelA) count++;
                 return count;
             }
-        }        
+        }
 
         void _BtnSaveTexture_Click(object sender, EventArgs e)
         {
@@ -178,12 +196,13 @@ namespace Skill.Editor
             Skill.Framework.UI.Button btn = (Skill.Framework.UI.Button)sender;
             int index;
             if (int.TryParse(btn.Tag, out index))
-            {
-                if (_PaintColor.EraseEnable)
-                    _ColorField.Color = _PaintColor.Erase = _FavoriteColors[index];
-                else
-                    _ColorField.Color = _PaintColor.Paint = _FavoriteColors[index];
-            }
+                _ColorField.Color = _FavoriteColors[index];
+        }
+
+        void _TbBrush_Changed(object sender, EventArgs e)
+        {
+            _PaintColor.Brush = _TbBrush.IsChecked;
+            EditorUtility.SetDirty(_PaintColor);
         }
 
         void _SliFalloff_ValueChanged(object sender, EventArgs e)
@@ -206,10 +225,7 @@ namespace Skill.Editor
 
         void _ColorField_ColorChanged(object sender, EventArgs e)
         {
-            if (_PaintColor.EraseEnable)
-                _PaintColor.Erase = _ColorField.Color;
-            else
-                _PaintColor.Paint = _ColorField.Color;
+            _PaintColor.Color = _ColorField.Color;
             EditorUtility.SetDirty(_PaintColor);
         }
 
@@ -219,10 +235,9 @@ namespace Skill.Editor
             EditorUtility.SetDirty(_PaintColor);
         }
 
-        void PaintMode_Changed(object sender, EventArgs e)
+        void _LayersField_LayersChanged(object sender, EventArgs e)
         {
-            _PaintColor.EraseEnable = _TbModes.SelectedTab == 1;
-            _ColorField.Color = _PaintColor.EraseEnable ? _PaintColor.Erase : _PaintColor.Paint;
+            _PaintColor.LayerMask = _LayersField.Layers;
             EditorUtility.SetDirty(_PaintColor);
         }
 
@@ -231,7 +246,7 @@ namespace Skill.Editor
             _PaintColor.ChannelR = _TbChannels.IsTabSelected(0);
             _PaintColor.ChannelG = _TbChannels.IsTabSelected(1);
             _PaintColor.ChannelB = _TbChannels.IsTabSelected(2);
-            _PaintColor.ChannelA = _TbChannels.IsTabSelected(3);            
+            _PaintColor.ChannelA = _TbChannels.IsTabSelected(3);
             EditorUtility.SetDirty(_PaintColor);
         }
         void _TextureField_ObjectChanged(object sender, System.EventArgs e)
@@ -253,7 +268,7 @@ namespace Skill.Editor
 
         public override void OnInspectorGUI()
         {
-            _Frame.OnInspectorGUI(356);
+            _Frame.OnInspectorGUI(368);
         }
         #endregion
 
@@ -263,32 +278,37 @@ namespace Skill.Editor
         private BrushProjector _BrushProjector;
         private TextureBrush _Brush;
 
+
         void OnEnable()
         {
             _PaintColor = target as PaintColor;
             CreateUI();
-
-            Texture2D brushTexture = EditorGUIUtility.Load("Brushes/builtin_brush_1.png") as Texture2D;
-            _Brush = new TextureBrush(brushTexture, 64);
-            _BrushProjector = new BrushProjector();
-            _BrushProjector.Brush = _Brush;
         }
+
+        private void LoadBrush()
+        {
+            if (_BrushProjector == null)
+            {
+                Texture2D brushTexture = EditorGUIUtility.Load("Brushes/builtin_brush_1.png") as Texture2D;
+                _Brush = new TextureBrush(brushTexture, 64);
+                _BrushProjector = new BrushProjector();
+                _BrushProjector.Brush = _Brush;
+            }
+        }
+
 
         void OnDisable()
         {
-            if (_Brush != null)
-            {
-                _Brush.Destroy();
-                _Brush = null;
-            }
-            if (this._BrushProjector != null)
-            {
-                this._BrushProjector.Destroy();
-                this._BrushProjector = null;
-            }
+            DestroyBrushes();            
         }
 
         void OnDestroy()
+        {
+            DestroyBrushes();            
+        }
+
+
+        private void DestroyBrushes()
         {
             if (_Brush != null)
             {
@@ -342,8 +362,35 @@ namespace Skill.Editor
                         break;
                 }
 
-                if (_BrushProjector != null)
+
+                if (_PaintColor.Brush)
+                {
+                    if (_BrushProjector == null)
+                        LoadBrush();
                     UpdatePreviewBrush();
+                }
+                else
+                {
+                    DrawHandle();
+                }
+            }
+        }
+
+        private void DrawHandle()
+        {
+            Vector2 newMousePostion = Event.current.mousePosition;
+            newMousePostion.y = Screen.height - (Event.current.mousePosition.y + 35);
+            Ray ray = Camera.current.ScreenPointToRay(newMousePostion);
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit, 1000f, _PaintColor.LayerMask))
+            {
+                Handles.color = new Color(0.2f, 0.7f, 1.0f);
+
+                Quaternion rotation = Quaternion.LookRotation(hit.normal);
+
+                Handles.CircleCap(0, hit.point, rotation, _PaintColor.Radius);
+                Handles.ArrowCap(0, hit.point, rotation, HandleUtility.GetHandleSize(hit.point));
             }
         }
 
@@ -352,6 +399,7 @@ namespace Skill.Editor
             // also must checked for editable in importsetting
             return format == TextureFormat.RGBA32 || format == TextureFormat.ARGB32 || format == TextureFormat.RGB24 || format == TextureFormat.Alpha8;
         }
+
 
         private void UpdatePreviewBrush()
         {
@@ -376,7 +424,7 @@ namespace Skill.Editor
             Ray ray = Camera.current.ScreenPointToRay(newMousePostion);
             RaycastHit hit;
 
-            if (Physics.Raycast(ray, out hit, 1000f))
+            if (Physics.Raycast(ray, out hit, 1000f, _PaintColor.LayerMask))
             {
                 vector2 = hit.point;
                 hitPos = hit.point;
@@ -419,6 +467,8 @@ namespace Skill.Editor
             _BrushProjector.Projector.orthographicSize = num / num2;
             _BrushProjector.Projector.aspectRatio = num2;
 
+            _BrushProjector.Projector.ignoreLayers = ~_PaintColor.LayerMask;
+
         }
 
         private void PaintOnTexture()
@@ -455,11 +505,7 @@ namespace Skill.Editor
                         int width = num7 - x;
                         int height = num8 - y;
                         Color[] srcPixels = _PaintColor.Texture.GetPixels(x, y, width, height, 0);
-                        Color targetColor;
-                        if (e.shift)
-                            targetColor = _PaintColor.EraseEnable ? _PaintColor.Paint : _PaintColor.Erase;
-                        else
-                            targetColor = _PaintColor.EraseEnable ? _PaintColor.Erase : _PaintColor.Paint;
+                        Color targetColor = _PaintColor.Color;
 
 
                         int centerX = width / 2;
@@ -494,7 +540,7 @@ namespace Skill.Editor
                                 if (_PaintColor.ChannelG) c.g = Mathf.Lerp(c.g, targetColor.g, blendFactor);
                                 if (_PaintColor.ChannelB) c.b = Mathf.Lerp(c.b, targetColor.b, blendFactor);
                                 if (_PaintColor.ChannelA) c.a = Mathf.Lerp(c.a, targetColor.a, blendFactor);
-                                
+
                                 srcPixels[index] = c;
                             }
                         }
@@ -505,7 +551,7 @@ namespace Skill.Editor
 
                 }
             }
-        }        
+        }
     }
 
 }

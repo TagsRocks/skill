@@ -32,6 +32,22 @@ namespace Skill.Framework.Triggers
         public Vector3 CustomOffset = Vector3.zero;
 
 
+        protected override void Awake()
+        {
+            base.Awake();
+            if (Camera == null)
+            {
+                Camera[] allCameras = UnityEngine.Camera.allCameras;
+                foreach (var c in allCameras)
+                {
+                    Camera = c.GetComponent<IsometricCamera>();
+                    if (Camera != null)
+                        break;
+                }                
+            }
+        }
+
+
         private static IsometricCameraTrigger _LastTrigger;
         /// <summary>
         /// On enter trigger
@@ -59,16 +75,18 @@ namespace Skill.Framework.Triggers
 
         public void Apply()
         {
-
-            Camera.Damping = this.Damping;
-            Camera.OffsetDamping = this.OffsetDamping;
-            Camera.ZoomDamping = this.ZoomDamping;
-            Camera.CameraPreview = this.Preview;
-            Camera.ZoomIn = this.ZoomIn;
-            Camera.ZoomOut = this.ZoomOut;
-            Camera.MaxOffset = this.MaxOffset;
-            Camera.FastTarget = this.FastTarget;
-            Camera.CustomOffset = this.CustomOffset;
+            if (Camera != null)
+            {
+                Camera.Damping = this.Damping;
+                Camera.OffsetDamping = this.OffsetDamping;
+                Camera.ZoomDamping = this.ZoomDamping;
+                Camera.CameraPreview = this.Preview;
+                Camera.ZoomIn = this.ZoomIn;
+                Camera.ZoomOut = this.ZoomOut;
+                Camera.MaxOffset = this.MaxOffset;
+                Camera.FastTarget = this.FastTarget;
+                Camera.CustomOffset = this.CustomOffset;
+            }
         }
     }
 }

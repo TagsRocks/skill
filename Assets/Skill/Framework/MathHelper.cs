@@ -661,5 +661,17 @@ namespace Skill.Framework
             return rectangle;
         }
 
+
+
+        /// <summary>
+        /// Calculate distance between a ray and a point
+        /// </summary>
+        /// <param name="ray">ray</param>
+        /// <param name="point">point</param>
+        /// <returns>distance</returns>
+        public static float DistanceToLine(Ray ray, Vector3 point)
+        {
+            return Vector3.Cross(ray.direction, point - ray.origin).magnitude;
+        }
     }
 }

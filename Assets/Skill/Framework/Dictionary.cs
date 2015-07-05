@@ -15,6 +15,7 @@ namespace Skill.Framework
     #endregion
 
     [System.Serializable]
+    [CreateAssetMenu(fileName = "NewDictionary", menuName = "Skill/Dictionary", order = 46)]
     public class Dictionary : ScriptableObject
     {
         public Font Font;
@@ -22,6 +23,9 @@ namespace Skill.Framework
         public Color FontColor = Color.white;
         public FontStyle FontStyle = FontStyle.Normal;
         public TextAlignment Alignment = TextAlignment.Center;
+
+        [HideInInspector]
+        public int LayoutType; // used by editor window
 
         [HideInInspector]
         [SerializeField]

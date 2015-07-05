@@ -33,13 +33,27 @@ namespace Skill.Framework
         /// </summary>
         protected override void Awake()
         {
-            base.Awake();
             if (Instance != null)
-                Debug.LogWarning("More thn on instance of Skill.Global object found");
-            Instance = this;
-            IsGamePaused = false;
-            if (Settings == null)
-                throw new Exception("Invalid Settings. you have to return valid setting by CreateSettings() mthod");
+            {
+                Destroy(this.gameObject);
+            }
+            else
+            {
+                base.Awake();
+                Instance = this;
+                IsGamePaused = false;
+                if (Settings == null)
+                    throw new Exception("Invalid Settings. you have to return valid setting by CreateSettings() method");
+                DontDestroyOnLoad(this.gameObject);
+            }
+        }
+
+        protected override void OnDestroy()
+        {
+            if (Instance == this)
+                Instance = null;
+            base.OnDestroy();
+
         }
 
 
@@ -65,11 +79,54 @@ namespace Skill.Framework
         /// <param name="explosive"> Dynamics.Explosive to initialize </param>
         public virtual void Initialize(Skill.Framework.Dynamics.Explosive explosive) { }
 
+        #region Settings
         /// <summary>
         /// Allow subclass to instantiate another custom Settings
         /// </summary>
         /// <returns></returns>
         protected virtual Settings CreateSettings() { return new Settings(); }
+
+        protected virtual string SettingsKey { get { return "KEY_SETTINGS"; } }
+        public void SaveSettingsToPlayerPrefs(string password = null)
+        {
+            Skill.Framework.IO.PCSaveGame.SaveXmlToPlayerPrefs(this.Settings, SettingsKey, password);
+        }
+        public void LoadSettingsFromPlayerPrefs(string password = null)
+        {
+            bool hasKey;
+            if (password == null)
+                hasKey = PlayerPrefs.HasKey(SettingsKey);
+            else
+                hasKey = Skill.Framework.IO.SecurePlayerPrefs.HasKey(SettingsKey);
+            if (hasKey)
+                Skill.Framework.IO.PCSaveGame.LoadXmlFromPlayerPrefs(this.Settings, SettingsKey, password);
+            //else
+            //    Debug.LogWarning("Can not find settings data in PlayerPrefs");
+        }
+
+        protected virtual string SettingsFile { get { return System.IO.Path.Combine(Application.persistentDataPath, "Settings.xml"); } }
+        public void SaveSettingsToFile(string password = null)
+        {
+            Skill.Framework.IO.PCSaveGame.SaveToXmlFile(this.Settings, SettingsFile, password);
+        }
+        public void LoadSettingsFromFile(string password = null)
+        {
+            if (System.IO.File.Exists(SettingsFile))
+            {
+                try
+                {
+                    Skill.Framework.IO.PCSaveGame.LoadFromXmlFile(this.Settings, SettingsFile, password);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                }
+            }
+            //else
+            //    Debug.LogWarning("Can not find settings data in file");
+        }
+        #endregion
+
 
         // ************* Sounds **************
 

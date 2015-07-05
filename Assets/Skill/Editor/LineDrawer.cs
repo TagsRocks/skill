@@ -198,13 +198,8 @@ namespace Skill.Editor
         {
             if (_LineMaterialGL == null)
             {
-                _LineMaterialGL = new Material("Shader \"Lines/Colored Blended\" {" +
-                    "SubShader { Pass { " +
-                    "    Blend SrcAlpha OneMinusSrcAlpha " +
-                    "    ZWrite Off Cull Off Fog { Mode Off } " +
-                    "    BindChannels {" +
-                    "      Bind \"vertex\", vertex Bind \"color\", color }" +
-                    "} } }");
+                Shader shader = Skill.Editor.Resources.GetShader("LineGL");
+                _LineMaterialGL = new Material(shader);
                 _LineMaterialGL.hideFlags = HideFlags.HideAndDontSave;
                 _LineMaterialGL.shader.hideFlags = HideFlags.HideAndDontSave;
             }

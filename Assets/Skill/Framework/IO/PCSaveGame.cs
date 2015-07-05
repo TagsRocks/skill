@@ -37,23 +37,45 @@ namespace Skill.Framework.IO
         /// </summary>
         /// <param name="savable">ISavable to load</param>
         /// <param name="fileName"> full path of file</param>
-        public static void LoadFromBinaryFile(ISavable savable, string fileName)
+        public static void LoadFromBinaryFile(ISavable savable, string fileName, string password = null)
         {
             if (savable == null) throw new ArgumentNullException("Invalid ISavable object.");
             if (!File.Exists(fileName)) throw new FileNotFoundException("Invalie fileName.");
-            PCBinaryLoadStream stream = new PCBinaryLoadStream(fileName);
-            try
-            {
-                LoadFromStream(savable, stream);
-            }
-            catch (Exception)
-            {
 
-                throw;
-            }
-            finally
+            if (password != null)
             {
-                stream.Close();
+                System.IO.FileStream fileStream = new System.IO.FileStream(fileName, System.IO.FileMode.Open, System.IO.FileAccess.Read);
+                System.IO.TextReader reader = new System.IO.StreamReader(fileStream);
+                string content = reader.ReadToEnd();
+
+                string decryptedContent;
+                SecurePlayerPrefs.TryDecrypt(content, password, out decryptedContent);
+
+                byte[] binaryData = ConvertStringToBytes(decryptedContent);
+
+                MemoryStream stream = new MemoryStream(binaryData, false);
+                PCBinaryLoadStream loadStream = new PCBinaryLoadStream(stream);
+                LoadFromStream(savable, loadStream);
+
+                loadStream.Close();
+
+            }
+            else
+            {
+                PCBinaryLoadStream stream = new PCBinaryLoadStream(fileName);
+                try
+                {
+                    LoadFromStream(savable, stream);
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+                finally
+                {
+                    stream.Close();
+                }
             }
         }
 
@@ -62,7 +84,7 @@ namespace Skill.Framework.IO
         /// </summary>
         /// <param name="savable">ISavable to load</param>
         /// <param name="fileName"> full path of file</param>
-        public static void LoadFromXmlFile(ISavable savable, string fileName)
+        public static void LoadFromXmlFile(ISavable savable, string fileName, string password = null)
         {
             if (savable == null) throw new ArgumentNullException("Invalid ISavable object.");
             if (!File.Exists(fileName)) throw new FileNotFoundException("Invalie fileName.");
@@ -70,6 +92,14 @@ namespace Skill.Framework.IO
             System.IO.FileStream fileStream = new System.IO.FileStream(fileName, System.IO.FileMode.Open, System.IO.FileAccess.Read);
             System.IO.TextReader reader = new System.IO.StreamReader(fileStream);
             string xmlContent = reader.ReadToEnd();
+            if (password != null)
+            {
+                string decryptedXmlContent;
+                if (SecurePlayerPrefs.TryDecrypt(xmlContent, password, out decryptedXmlContent))
+                    xmlContent = decryptedXmlContent;
+                else
+                    xmlContent = string.Empty;
+            }
             reader.Close();
             fileStream.Close();
 
@@ -82,12 +112,15 @@ namespace Skill.Framework.IO
         /// </summary>
         /// <param name="savable">ISavable to load</param>
         /// <param name="keyString">key of xmldata in PlayerPrefs</param>
-        public static void LoadXmlFromPlayerPrefs(ISavable savable, string keyString)
+        public static void LoadXmlFromPlayerPrefs(ISavable savable, string keyString, string password = null)
         {
             if (savable == null) throw new ArgumentNullException("Invalid ISavable object.");
             if (string.IsNullOrEmpty(keyString)) throw new ArgumentException("Invalid key.");
-
-            string xmlContent = UnityEngine.PlayerPrefs.GetString(keyString);
+            string xmlContent = null;
+            if (password != null)
+                xmlContent = SecurePlayerPrefs.GetString(keyString, password);
+            else
+                xmlContent = UnityEngine.PlayerPrefs.GetString(keyString);
             LoadFromXmlContent(savable, xmlContent);
         }
 
@@ -96,12 +129,16 @@ namespace Skill.Framework.IO
         /// </summary>
         /// <param name="savable">ISavable to load</param>
         /// <param name="keyString">key of binarydata in PlayerPrefs</param>
-        public static void LoadBinaryFromPlayerPrefs(ISavable savable, string keyString)
+        public static void LoadBinaryFromPlayerPrefs(ISavable savable, string keyString, string password = null)
         {
             if (savable == null) throw new ArgumentNullException("Invalid ISavable object.");
             if (string.IsNullOrEmpty(keyString)) throw new ArgumentException("Invalid key.");
 
-            string binaryAsStringData = UnityEngine.PlayerPrefs.GetString(keyString);
+            string binaryAsStringData = null;
+            if (password != null)
+                binaryAsStringData = SecurePlayerPrefs.GetString(keyString, password);
+            else
+                binaryAsStringData = UnityEngine.PlayerPrefs.GetString(keyString);
             byte[] binaryData = ConvertStringToBytes(binaryAsStringData);
 
             MemoryStream stream = new MemoryStream(binaryData, false);
@@ -152,7 +189,7 @@ namespace Skill.Framework.IO
         /// </summary>
         /// <param name="savable">ISavable to save</param>
         /// <param name="fileName"> full path of destination file</param>
-        public static void SaveToBinaryFile(ISavable savable, string fileName)
+        public static void SaveToBinaryFile(ISavable savable, string fileName, string password = null)
         {
             if (savable == null) throw new ArgumentNullException("Invalid ISavable object.");
 
@@ -171,7 +208,16 @@ namespace Skill.Framework.IO
             PCBinarySaveStream stream = new PCBinarySaveStream(tempFile);
             try
             {
-                SaveToStream(savable, stream);
+                if (password != null)
+                {
+                    string str = SaveToBinaryString(savable);
+                    str = SecurePlayerPrefs.Encrypt(str, password);
+                    stream.Write(str);
+                }
+                else
+                {
+                    SaveToStream(savable, stream);
+                }
             }
             catch (Exception)
             {
@@ -194,7 +240,7 @@ namespace Skill.Framework.IO
         /// </summary>
         /// <param name="savable">ISavable to save</param>        
         /// <param name="fileName"> full path of destination file</param>
-        public static void SaveToXmlFile(ISavable savable, string fileName)
+        public static void SaveToXmlFile(ISavable savable, string fileName, string password = null)
         {
             if (savable == null) throw new ArgumentNullException("Invalid ISavable object.");
 
@@ -211,6 +257,8 @@ namespace Skill.Framework.IO
             }
 
             string xmlContent = SaveToXmlContent(savable);
+            if (password != null)
+                xmlContent = SecurePlayerPrefs.Encrypt(xmlContent, password);
 
             System.IO.FileStream fileStream = new System.IO.FileStream(tempFile, System.IO.FileMode.Create, System.IO.FileAccess.Write);
             System.IO.TextWriter writer = new System.IO.StreamWriter(fileStream);
@@ -229,12 +277,15 @@ namespace Skill.Framework.IO
         /// </summary>
         /// <param name="savable">ISavable to save</param> 
         /// <param name="keyString">key of xmldata in PlayerPrefs</param>
-        public static void SaveXmlToPlayerPrefs(ISavable savable, string keyString)
+        public static void SaveXmlToPlayerPrefs(ISavable savable, string keyString, string password = null)
         {
             if (savable == null) throw new ArgumentNullException("Invalid ISavable object.");
             if (string.IsNullOrEmpty(keyString)) throw new ArgumentException("Invalid key.");
             string xmlContent = SaveToXmlContent(savable);
-            UnityEngine.PlayerPrefs.SetString(keyString, xmlContent);
+            if (password != null)
+                SecurePlayerPrefs.SetString(keyString, xmlContent, password);
+            else
+                UnityEngine.PlayerPrefs.SetString(keyString, xmlContent);
             UnityEngine.PlayerPrefs.Save();
         }
 
@@ -280,13 +331,16 @@ namespace Skill.Framework.IO
         /// </summary>
         /// <param name="savable">ISavable to save</param> 
         /// <param name="keyString">key of binarydata in PlayerPrefs</param>
-        public static void SaveBinaryToPlayerPrefs(ISavable savable, string keyString)
+        public static void SaveBinaryToPlayerPrefs(ISavable savable, string keyString, string password = null)
         {
             if (savable == null) throw new ArgumentNullException("Invalid ISavable object.");
             if (string.IsNullOrEmpty(keyString)) throw new ArgumentException("Invalid key.");
 
             string saveData = SaveToBinaryString(savable);
-            UnityEngine.PlayerPrefs.SetString(keyString, saveData);
+            if (password != null)
+                SecurePlayerPrefs.SetString(keyString, saveData, password);
+            else
+                UnityEngine.PlayerPrefs.SetString(keyString, saveData);
             UnityEngine.PlayerPrefs.Save();
         }
 
@@ -314,7 +368,6 @@ namespace Skill.Framework.IO
             XmlElement root = new XmlElement(RootXmlElementName);
             savable.Save(root, SaveStream);
             SaveStream.Document.AppendChild(root);
-
             return SaveStream.Document.OuterXml;
         }
 

@@ -28,8 +28,8 @@ namespace Skill.Editor.AI
         public BehaviorTreeEditorWindow()
         {
             hideFlags = HideFlags.DontSave;
-
-            base.title = "BehaviorTree";
+            _Instance = this;
+            base.titleContent = new GUIContent("BehaviorTree");
             base.position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);
             base.minSize = MinSize;
             CreateUI();
@@ -56,6 +56,8 @@ namespace Skill.Editor.AI
                 _TreeViewEditor.DeselectInspector();
             if (_BehaviorList != null)
                 _BehaviorList.DeselectInspector();
+
+            _Instance = null;
         }
 
         void OnEnable()
@@ -283,6 +285,12 @@ namespace Skill.Editor.AI
             _States.RefreshContents();
             Repaint();
         }
+
+        internal void BehaviorNameChanged(BehaviorData b)
+        {
+            _TreeViewEditor.BehaviorNameChanged(b);
+        }
+
         private BehaviorData[] GetExtraBehaviors()
         {
             ValidateBehaviors();

@@ -277,9 +277,10 @@ namespace Skill.Editor.AI
                         return;
                     }
 
-                    //Tree.History.Insert(new ChangePropertyUnDoRedo(this, "Name", value, Model.Name));
+                    //Tree.History.Insert(new ChangePropertyUnDoRedo(this, "Name", value, Model.Name));                    
                     Data.Name = value;
                     Editor.RefreshContents();
+                    Editor.BehaviorNameChanged(this.Data);
                 }
             }
         }
@@ -513,8 +514,9 @@ namespace Skill.Editor.AI
                     if (parent != null)
                     {
                         var parameters = parent.Data.GetParameters(parent.Controls.IndexOf(item));
-                        parameters.Match(((IParameterData)item.Data).ParameterDifinition);
-                        _Editor = new ParameterEditor(item, parameters);
+                        var difinition = ((IParameterData)item.Data).ParameterDifinition;
+                        parameters.Match(difinition);
+                        _Editor = new ParameterEditor(item, difinition, parameters);
                         this.Controls.Add(_Editor);
                     }
                 }

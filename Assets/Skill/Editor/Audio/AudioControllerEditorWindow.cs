@@ -25,10 +25,8 @@ namespace Skill.Editor.Audio
         private static Vector2 MinSize = new Vector2(500, 300);
 
         public AudioControllerEditorWindow()
-        {
-            hideFlags = HideFlags.DontSave;
-
-            base.title = "Audio";
+        {            
+            base.titleContent = new GUIContent("Audio");
             base.position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);
             base.minSize = MinSize;
             CreateUI();
@@ -58,6 +56,9 @@ namespace Skill.Editor.Audio
             }
             if (_TriggerEditor != null)
                 _TriggerEditor.DeselectInspector();
+
+            if (_Instance == this)
+                _Instance = null;
         }
 
         void Update()

@@ -13,7 +13,7 @@ namespace Skill.Framework.Animation
 
         private AnimNode[] _Children;// childrens
         private float _PreWeight; // previous amount of weight
-        private bool _ForceUpdate;
+        //private bool _ForceUpdate;
         
 
         /// <summary>

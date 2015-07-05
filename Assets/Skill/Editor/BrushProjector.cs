@@ -11,29 +11,6 @@ namespace Skill.Editor
 {
     public class BrushProjector
     {
-        public const string BrushShader = @"
-        Shader ""Hidden/ColorPaint Brush Preview"" 
-        {
-	        Properties
-	        { 
-		        _MainTex (""Main"", 2D) = ""gray"" { TexGen ObjectLinear }
-		        _CutoutTex (""Cutout"", 2D) = ""black"" { TexGen ObjectLinear }                
-	        }
-	        Subshader
-	        {
-		        ZWrite Off Offset -1, -1
-		        Fog { Mode Off }
-		        AlphaTest Greater 0
-		        ColorMask RGB 
-		        Pass
-		        {  
-			        Blend SrcAlpha OneMinusSrcAlpha  
-			        SetTexture [_MainTex]   {   constantColor (.2,.7,1,.5)   combine constant, texture * constant   Matrix [_Projector]  }
-			        SetTexture [_CutoutTex] {   combine previous, previous * texture   Matrix [_Projector]  }		 
-		        }		  
-	        }
-        }";
-
         private TextureBrush _Brush;
         public TextureBrush Brush
         {
@@ -63,18 +40,19 @@ namespace Skill.Editor
             this._Projector.orthographic = true;
             this._Projector.orthographicSize = 10f;
             obj2.transform.Rotate((float)90f, 0f, (float)180f);
-            Material material = new Material(BrushShader);
+            Material material = new Material(Skill.Editor.Resources.GetShader("BrushPreview"));            
+
             material.shader.hideFlags = HideFlags.HideAndDontSave;
             material.hideFlags = HideFlags.HideAndDontSave;
             this._Projector.material = material;
             this._Projector.enabled = false;
+            
         }
 
         public void Destroy()
         {
             if (this._Projector != null)
             {
-                UnityEngine.Object.DestroyImmediate(this._Projector.material.shader);
                 UnityEngine.Object.DestroyImmediate(this._Projector.material);
                 UnityEngine.Object.DestroyImmediate(this._Projector.gameObject);
                 this._Projector = null;

@@ -40,7 +40,7 @@ namespace Skill.Editor
 
             _Instance = this;
 
-            title = "Distance";
+            titleContent = new GUIContent(  "Distance");
             position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);
             this.minSize = Size;
 

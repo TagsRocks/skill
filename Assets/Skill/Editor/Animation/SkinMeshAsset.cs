@@ -7,6 +7,7 @@ namespace Skill.Editor.Animation
     /// Defines serializable data asset required for Implant tool
     /// </summary>
     [System.Serializable]
+    [CreateAssetMenu(fileName = "NewSkinMesh", menuName = "Skill/SkinMesh", order = 44)]
     public class SkinMeshAsset : ScriptableObject
     {
         public string XmlData;

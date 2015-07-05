@@ -33,7 +33,7 @@ namespace Skill.Editor
             }
             _Instance = this;
 
-            title = "About Skill";
+            titleContent = new GUIContent("About Skill");
             base.position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);
             base.minSize = new Vector2(Size.x, Size.y);
 

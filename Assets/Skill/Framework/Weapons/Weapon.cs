@@ -149,8 +149,9 @@ namespace Skill.Framework.Weapons
         /// <summary> Gets or set damage factor  </summary>
         public float DamageFactor { get; set; }
 
+        private bool _ThrowCurveProjectilesOnTarget = true;
         /// <summary> If true, weapon try to calculate initial speed of curve projectiles to hit Target(if valid) </summary>
-        public bool ThrowCurveProjectilesOnTarget { get; set; }
+        public bool ThrowCurveProjectilesOnTarget { get { return _ThrowCurveProjectilesOnTarget; } set { _ThrowCurveProjectilesOnTarget = value; } }
 
 
         private bool _AutoUpdateSpawnPosition = true;
@@ -354,6 +355,7 @@ namespace Skill.Framework.Weapons
         {
             base.Awake();
             DamageFactor = 1.0f;
+
             if (Projectiles == null || Projectiles.Length == 0)
                 Debug.LogError("A weapon must have at least one projectile.");
 
@@ -833,13 +835,13 @@ namespace Skill.Framework.Weapons
 
         protected void IgnoreBulletColliders(Collider bulletCollider)
         {
-            if (this._Rigidbody != null && this._Collider != null && this._Collider.enabled)
+            if (this._Rigidbody != null && this._Collider != null && this._Collider.enabled && this.gameObject.activeInHierarchy)
                 Physics.IgnoreCollision(this._Collider, bulletCollider);
             if (_IgnoreColliders != null && _IgnoreColliders.Count > 0)
             {
                 for (int cIndex = 0; cIndex < _IgnoreColliders.Count; cIndex++)
                 {
-                    if (_IgnoreColliders[cIndex].enabled)
+                    if (_IgnoreColliders[cIndex].gameObject.activeInHierarchy && _IgnoreColliders[cIndex].enabled)
                         Physics.IgnoreCollision(_IgnoreColliders[cIndex], bulletCollider);
                 }
             }

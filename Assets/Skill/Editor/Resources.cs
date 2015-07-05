@@ -9,6 +9,7 @@ namespace Skill.Editor
     {
         public const string LightSkinPath = "Assets/Skill/Editor/Resources/LightSkin/";
         public const string ProSkinPath = "Assets/Skill/Editor/Resources/ProSkin/";
+        public const string ShaderPath = "Hidden/Skill/";
 
         public static string GetUILightSkinResourcePath(string resourceFileName)
         {
@@ -38,6 +39,16 @@ namespace Skill.Editor
                 AssetDatabase.ImportAsset(path);
             }
         }
+
+
+        public static Shader GetShader(string shaderName)
+        {
+            Shader shader = Shader.Find(ShaderPath + shaderName) as Shader;
+            if (shader == null)
+                Debug.Log("Can not load shader " + shaderName);
+            return shader;
+        }
+
 
         public static class UITextures
         {
@@ -83,8 +94,9 @@ namespace Skill.Editor
             public static Texture2D ArrowUp { get { return GetTexture("ArrowUp.png"); } }
             public static Texture2D ArrowDown { get { return GetTexture("ArrowDown.png"); } }
             public static Texture2D ArrowHead { get { return GetTexture("ArrowHead.png"); } }
-            
 
+
+            public static Texture2D Convert { get { return GetTexture("Convert.png"); } }
 
             public static Texture2D AlignLeft { get { return GetTexture("AlignLeft.png"); } }
             public static Texture2D AlignRight { get { return GetTexture("AlignRight.png"); } }
@@ -281,7 +293,7 @@ namespace Skill.Editor
                 public static Texture2D Override { get { return GetTexture("ATree/Override.png"); } }
                 public static Texture2D Root { get { return GetTexture("ATree/Root.png"); } }
                 public static Texture2D SubTree { get { return GetTexture("ATree/SubTree.png"); } }
-                public static Texture2D MultiLayer { get { return GetTexture("ATree/MultiLayer.png"); } }                
+                public static Texture2D MultiLayer { get { return GetTexture("ATree/MultiLayer.png"); } }
                 public static Texture2D OneD { get { return GetTexture("ATree/Speed.png"); } }
                 public static Texture2D AnimationTree { get { return GetTexture("ATree/AnimationTree.png"); } }
             }

@@ -3,6 +3,7 @@ using System.Collections;
 
 namespace Skill.Framework.UI
 {
+    [CreateAssetMenu(fileName = "NewBrowserStyle", menuName = "Skill/BrowserStyle", order = 59)]
     public class BrowserStyles : ScriptableObject
     {        
         public float PathFontSize = 0.1f;

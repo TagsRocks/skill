@@ -286,128 +286,335 @@ namespace Skill.Editor.AI
     #region ParameterEditor
     public class ParameterEditor : Skill.Framework.UI.Grid
     {
+        private bool _RefreshStyle;
         private ParameterDataCollection _Data;
+        private ParameterDataCollection _DataDifinition;
         private IBehaviorItem _Item;
-        private Skill.Framework.UI.StackPanel _FieldsPanel;
+        private Skill.Framework.UI.ListBox _FieldsList;
+        private Skill.Framework.UI.Label _Title;
+        private Skill.Framework.UI.Grid _ButtonsPanel;
+        private Skill.Editor.UI.IntPopup _BtnAdd;
+        private Skill.Framework.UI.Image _BtnAddImage;
+        private Skill.Framework.UI.Button _BtnRemove;
 
-        public override float LayoutHeight { get { return 24 + _FieldsPanel.LayoutHeight + 4; } }
+        public override float LayoutHeight
+        {
+            get
+            {
+                return UnityEngine.Mathf.Max(44, _FieldsList.Items.Count * 22) + 16 + 16 + 4;
+            }
+        }
 
-        public ParameterEditor(IBehaviorItem item, ParameterDataCollection data)
+        public ParameterEditor(IBehaviorItem item, ParameterDataCollection dataDifinition, ParameterDataCollection data)
         {
             _Item = item;
+            _DataDifinition = dataDifinition;
             _Data = data;
 
-            this.RowDefinitions.Add(24, Framework.UI.GridUnitType.Pixel);
-            this.RowDefinitions.Add(1, Framework.UI.GridUnitType.Star);
+            this._RefreshStyle = true;
 
-            Skill.Editor.UI.DropShadowLabel title = new UI.DropShadowLabel() { Row = 0, Text = "Properties", Height = 20, Margin = new Framework.UI.Thickness(0, 0, 0, 4) };
-            Controls.Add(title);
+            this.RowDefinitions.Add(16, Skill.Framework.UI.GridUnitType.Pixel); // title
+            this.RowDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star); // list
+            this.RowDefinitions.Add(16, Skill.Framework.UI.GridUnitType.Pixel); // buttons
 
-            Skill.Framework.UI.Box bg = new Framework.UI.Box() { Row = 1, Style = (UnityEngine.GUIStyle)"RL Background" };
-            Controls.Add(bg);
+            _Title = new Framework.UI.Label { Row = 0, Text = "Parameters" };
+            this.Controls.Add(_Title);
 
-            _FieldsPanel = new Framework.UI.StackPanel() { Row = 1 };
-            Controls.Add(_FieldsPanel);
+            _FieldsList = new Skill.Framework.UI.ListBox() { Row = 1 };
+            _FieldsList.DisableFocusable();
+            _FieldsList.BackgroundVisible = true;
+            this.Controls.Add(_FieldsList);
+
+            _ButtonsPanel = new Framework.UI.Grid() { Row = 2 };
+            _ButtonsPanel.ColumnDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star);
+            _ButtonsPanel.ColumnDefinitions.Add(20, Skill.Framework.UI.GridUnitType.Pixel);
+            _ButtonsPanel.ColumnDefinitions.Add(20, Skill.Framework.UI.GridUnitType.Pixel);
+            this.Controls.Add(_ButtonsPanel);
+
+            _BtnAddImage = new Framework.UI.Image() { Column = 1 };
+            _ButtonsPanel.Controls.Add(_BtnAddImage);
+
+
+            _BtnAdd = new UI.IntPopup() { Column = 1 };
+            _BtnAdd.Options.Add(new UI.PopupOption(1, "float"));
+            _BtnAdd.Options.Add(new UI.PopupOption(2, "int"));
+            _BtnAdd.Options.Add(new UI.PopupOption(3, "bool"));
+            _BtnAdd.Options.Add(new UI.PopupOption(4, "string"));
+            _ButtonsPanel.Controls.Add(_BtnAdd);
+
+            _BtnRemove = new Framework.UI.Button() { Column = 2, IsEnabled = false };
+            _ButtonsPanel.Controls.Add(_BtnRemove);
+
+
+            _BtnAdd.OptionChanged += _BtnAdd_OptionChanged;
+            _BtnRemove.Click += _BtnRemove_Click;
+            _FieldsList.SelectionChanged += _FieldsList_SelectionChanged;
 
             Rebuild();
         }
 
-        void textField_TextChanged(object sender, EventArgs e)
+        void _BtnAdd_OptionChanged(object sender, EventArgs e)
         {
-            ((ParameterData)((Skill.Editor.UI.TextField)sender).UserData).Value = ((Skill.Editor.UI.TextField)sender).Text;
-            _Item.RefreshContent();
+            if (_BtnAdd.SelectedValue > 0)
+            {
+                if (_BtnAdd.SelectedOption.Content.text == "float")
+                    AddNewParameter(ParameterType.Float);
+                else if (_BtnAdd.SelectedOption.Content.text == "int")
+                    AddNewParameter(ParameterType.Int);
+                else if (_BtnAdd.SelectedOption.Content.text == "bool")
+                    AddNewParameter(ParameterType.Bool);
+                else if (_BtnAdd.SelectedOption.Content.text == "string")
+                    AddNewParameter(ParameterType.String);
+
+                _BtnAdd.SelectedValue = 0;
+            }
         }
 
-        void boolField_Changed(object sender, EventArgs e)
+        void _FieldsList_SelectionChanged(object sender, EventArgs e)
         {
-            ((ParameterData)((Skill.Editor.UI.ToggleButton)sender).UserData).Value = ((Skill.Editor.UI.ToggleButton)sender).IsChecked.ToString();
-            _Item.RefreshContent();
+            _BtnRemove.IsEnabled = _FieldsList.SelectedItem != null;
         }
 
-        void floatField_ValueChanged(object sender, EventArgs e)
+        void _BtnRemove_Click(object sender, System.EventArgs e)
         {
-            ((ParameterData)((Skill.Editor.UI.FloatField)sender).UserData).Value = ((Skill.Editor.UI.FloatField)sender).Value.ToString();
-            _Item.RefreshContent();
+            RemoveSelectedParameter();
         }
 
-        void intField_ValueChanged(object sender, EventArgs e)
+        private void RemoveSelectedParameter()
         {
-            ((ParameterData)((Skill.Editor.UI.IntField)sender).UserData).Value = ((Skill.Editor.UI.IntField)sender).Value.ToString();
-            _Item.RefreshContent();
+            if (_FieldsList.SelectedItem != null)
+            {
+                ParameterData pd = (ParameterData)_FieldsList.SelectedItem.UserData;
+                _Data.Remove(pd);
+                _DataDifinition.Match(_Data);
+                Rebuild();
+                _Item.RefreshContent();
+                _Item.Editor.RefreshSameContent(_Item);
+            }
         }
+
+        private void AddNewParameter(ParameterType type)
+        {
+            ParameterData pd = new ParameterData();
+            pd.Type = type;
+            pd.Name = "new" + type.ToString();
+
+            switch (pd.Type)
+            {
+                case ParameterType.Int:
+                    pd.Value = "0";
+                    break;
+                case ParameterType.Bool:
+                    pd.Value = "false";
+                    break;
+                case ParameterType.Float:
+                    pd.Value = "0";
+                    break;
+                case ParameterType.String:
+                    pd.Value = "";
+                    break;
+            }
+
+
+            int i = 0;
+            string name = pd.Name;
+            while (HasName(_DataDifinition, pd.Name))
+            {
+                pd.Name = name + (i++).ToString();
+            }
+
+
+            _DataDifinition.Add(pd);
+            _Data.Match(_DataDifinition);
+
+            Rebuild();
+            _Item.RefreshContent();
+            _Item.Editor.RefreshSameContent(_Item);
+        }
+
+        private bool HasName(ParameterDataCollection collection, string parameterName)
+        {
+            foreach (var item in collection)
+            {
+                if (item.Name == parameterName)
+                    return true;
+            }
+            return false;
+        }
+        protected override void BeginRender()
+        {
+            if (_RefreshStyle)
+            {
+                _RefreshStyle = false;
+
+                if (_Title.Style == null)
+                {
+                    _Title.Style = new UnityEngine.GUIStyle((UnityEngine.GUIStyle)"RL Header");
+                    _Title.Style.alignment = UnityEngine.TextAnchor.MiddleCenter;
+                }
+
+                _FieldsList.SelectedStyle = Skill.Editor.Resources.Styles.SelectedItem;
+
+                _BtnAddImage.Texture = Skill.Editor.Resources.UITextures.Plus;
+                _BtnRemove.Content.image = Skill.Editor.Resources.UITextures.Minus;
+
+                _BtnAdd.Style = Skill.Editor.Resources.Styles.SmallButton;
+                _BtnRemove.Style = Skill.Editor.Resources.Styles.SmallButton;
+            }
+            base.BeginRender();
+        }
+
+
+
 
         public void Rebuild()
         {
-            foreach (var c in _FieldsPanel.Controls)
-            {
-                if (c is Skill.Editor.UI.IntField) ((Skill.Editor.UI.IntField)c).ValueChanged -= intField_ValueChanged;
-                else if (c is Skill.Editor.UI.FloatField) ((Skill.Editor.UI.FloatField)c).ValueChanged -= floatField_ValueChanged;
-                else if (c is Skill.Editor.UI.ToggleButton) ((Skill.Editor.UI.ToggleButton)c).Changed -= boolField_Changed;
-                else if (c is Skill.Editor.UI.TextField) ((Skill.Editor.UI.TextField)c).TextChanged -= textField_TextChanged;
-            }
-
-            _FieldsPanel.Controls.Clear();
-            Skill.Framework.UI.Thickness margin = new Framework.UI.Thickness(2);
+            _FieldsList.Items.Clear();
             foreach (var pd in _Data)
             {
-                switch (pd.Type)
+                ParameterField field = new ParameterField(this, pd);
+                _FieldsList.Items.Add(field);
+            }
+        }
+
+        private void RenameParameter(ParameterData data)
+        {
+            int index = -1;
+            for (int i = 0; i < _Data.Count; i++)
+            {
+                if (data == _Data[i])
+                {
+                    index = i;
+                    break;
+                }
+            }
+            if (index >= 0)
+            {
+                _DataDifinition[index].Name = data.Name;
+            }
+        }
+
+        class ParameterField : Skill.Framework.UI.Grid
+        {
+            private ParameterEditor _Owner;
+            private ParameterData _Data;
+
+
+            private Skill.Framework.UI.Image _Icon;
+            private Skill.Editor.UI.TextField _ParameterName;
+            private Skill.Framework.UI.BaseControl _ParameterField;
+
+            public ParameterField(ParameterEditor owner, ParameterData data)
+            {
+                this._Owner = owner;
+                this._Data = data;
+                this.UserData = data;
+                this.Height = 22;
+
+                this.ColumnDefinitions.Add(22, Framework.UI.GridUnitType.Pixel);
+                this.ColumnDefinitions.Add(1, Framework.UI.GridUnitType.Star);
+                this.ColumnDefinitions.Add(1, Framework.UI.GridUnitType.Star);
+
+                _Icon = new Framework.UI.Image() { Column = 0, Scale = UnityEngine.ScaleMode.ScaleToFit, Texture = UnityEditor.EditorGUIUtility.FindTexture("Toolbar Minus") };
+                this.Controls.Add(_Icon);
+
+                _ParameterName = new UI.TextField() { Column = 1, Margin = new Framework.UI.Thickness(2), Text = _Data.Name };
+                this.Controls.Add(_ParameterName);
+                _ParameterName.TextChanged += _ParameterName_TextChanged;
+
+                switch (_Data.Type)
                 {
                     case ParameterType.Int:
-                        Skill.Editor.UI.IntField intField = new UI.IntField() { UserData = pd, Margin = margin };
-                        intField.Label.text = pd.Name;
+                        _ParameterField = new UI.IntField();
                         int v = 0;
-                        if (int.TryParse(pd.Value, out v))
+                        if (int.TryParse(_Data.Value, out v))
                         {
-                            intField.Value = v;
+                            ((UI.IntField)_ParameterField).Value = v;
                         }
                         else
                         {
-                            intField.Value = 0;
-                            pd.Value = "0";
+                            ((UI.IntField)_ParameterField).Value = 0;
+                            _Data.Value = "0";
                         }
-                        _FieldsPanel.Controls.Add(intField);
-                        intField.ValueChanged += intField_ValueChanged;
+                        ((UI.IntField)_ParameterField).ValueChanged += intField_ValueChanged;
                         break;
                     case ParameterType.Bool:
-                        Skill.Editor.UI.ToggleButton boolField = new UI.ToggleButton() { UserData = pd, Margin = margin };
-                        boolField.Label.text = pd.Name;
+                        _ParameterField = new UI.ToggleButton();
+
                         bool b = false;
-                        if (bool.TryParse(pd.Value, out b))
+                        if (bool.TryParse(_Data.Value, out b))
                         {
-                            boolField.IsChecked = b;
+                            ((UI.ToggleButton)_ParameterField).IsChecked = b;
                         }
                         else
                         {
-                            boolField.IsChecked = false;
-                            pd.Value = "false";
+                            ((UI.ToggleButton)_ParameterField).IsChecked = false;
+                            _Data.Value = "false";
                         }
-                        _FieldsPanel.Controls.Add(boolField);
-                        boolField.Changed += boolField_Changed;
+                        ((UI.ToggleButton)_ParameterField).Changed += boolField_Changed;
                         break;
                     case ParameterType.Float:
-                        Skill.Editor.UI.FloatField floatField = new UI.FloatField() { UserData = pd, Margin = margin };
-                        floatField.Label.text = pd.Name;
+                        _ParameterField = new UI.FloatField();
+
                         float f = 0;
-                        if (float.TryParse(pd.Value, out f))
+                        if (float.TryParse(_Data.Value, out f))
                         {
-                            floatField.Value = f;
+                            ((UI.FloatField)_ParameterField).Value = f;
                         }
                         else
                         {
-                            floatField.Value = 0;
-                            pd.Value = "0";
+                            ((UI.FloatField)_ParameterField).Value = 0;
+                            _Data.Value = "0";
                         }
-                        _FieldsPanel.Controls.Add(floatField);
-                        floatField.ValueChanged += floatField_ValueChanged;
+                        ((UI.FloatField)_ParameterField).ValueChanged += floatField_ValueChanged;
                         break;
                     case ParameterType.String:
-                        Skill.Editor.UI.TextField textField = new UI.TextField() { UserData = pd, Margin = margin };
-                        textField.Label.text = pd.Name;
-                        textField.Text = pd.Value;
-                        _FieldsPanel.Controls.Add(textField);
-                        textField.TextChanged += textField_TextChanged;
+                        _ParameterField = new UI.TextField();
+                        ((UI.TextField)_ParameterField).Text = _Data.Value;
+                        ((UI.TextField)_ParameterField).TextChanged += textField_TextChanged;
                         break;
                 }
+                if (_ParameterField != null)
+                {
+                    _ParameterField.Column = 2;
+                    _ParameterField.Margin = new Framework.UI.Thickness(2);
+                    this.Controls.Add(_ParameterField);
+                }
+            }
+
+            void _ParameterName_TextChanged(object sender, EventArgs e)
+            {
+                if (!string.IsNullOrEmpty(_ParameterName.Text))
+                {
+                    _Data.Name = _ParameterName.Text;
+                    _Owner.RenameParameter(_Data);
+                    _Owner._Item.RefreshContent();
+                }
+            }
+
+
+            void textField_TextChanged(object sender, EventArgs e)
+            {
+                _Data.Value = ((Skill.Editor.UI.TextField)sender).Text;
+                _Owner._Item.RefreshContent();
+            }
+
+            void boolField_Changed(object sender, EventArgs e)
+            {
+                _Data.Value = ((Skill.Editor.UI.ToggleButton)sender).IsChecked.ToString();
+                _Owner._Item.RefreshContent();
+            }
+
+            void floatField_ValueChanged(object sender, EventArgs e)
+            {
+                _Data.Value = ((Skill.Editor.UI.FloatField)sender).Value.ToString();
+                _Owner._Item.RefreshContent();
+            }
+
+            void intField_ValueChanged(object sender, EventArgs e)
+            {
+                _Data.Value = ((Skill.Editor.UI.IntField)sender).Value.ToString();
+                _Owner._Item.RefreshContent();
             }
         }
     }

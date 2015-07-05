@@ -47,7 +47,7 @@ namespace Skill.Editor
         {
             hideFlags = HideFlags.DontSave;
 
-            title = "Create Empty Child";
+            titleContent = new GUIContent("Create Empty Child");
 
             base.position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);
             base.minSize = new Vector2(Size.x, Size.y);

@@ -18,6 +18,8 @@ namespace Skill.Framework.Weapons
         public float MinScale = 0.9f;
         /// <summary> Maxmum value of random scale </summary>
         public float MaxScale = 1.1f;
+        /// <summary> stay active until weapon is firing</summary>
+        public bool Continues = false;
 
 
 
@@ -36,9 +38,12 @@ namespace Skill.Framework.Weapons
         protected override void OnEnable()
         {
             base.OnEnable();
-            _LifeTimeTW.Begin(LifeTime);
-            float randomScale = Random.Range(MinScale, MaxScale);
-            transform.localScale = new Vector3(randomScale, randomScale, randomScale);
+            if (!Continues)
+            {
+                _LifeTimeTW.Begin(LifeTime);
+                float randomScale = Random.Range(MinScale, MaxScale);
+                transform.localScale = new Vector3(randomScale, randomScale, randomScale);
+            }
             if (Particle != null)
                 Managers.Cache.Spawn(Particle, transform.position, transform.rotation);
         }
@@ -48,7 +53,15 @@ namespace Skill.Framework.Weapons
         /// </summary>
         protected override void Update()
         {
-            if (_LifeTimeTW.IsEnabledAndOver)
+            if (Continues)
+            {
+                if (Weapon != null)
+                {
+                    if (!Weapon.IsFiring)
+                        gameObject.SetActive(false);
+                }
+            }
+            else if (_LifeTimeTW.IsEnabledAndOver)
             {
                 gameObject.SetActive(false);
             }

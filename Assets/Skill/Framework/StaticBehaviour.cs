@@ -78,8 +78,8 @@ namespace Skill.Framework
         /// </summary>
         public virtual void DestroySelf()
         {
-            Managers.Cache.DestroyCache(this.gameObject);
             IsDestroyed = true;
+            Managers.Cache.DestroyCache(this.gameObject);            
         }
     }
 }

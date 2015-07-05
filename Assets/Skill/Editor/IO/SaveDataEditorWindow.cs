@@ -27,7 +27,7 @@ namespace Skill.Editor.IO
         {
             hideFlags = HideFlags.DontSave;
 
-            base.title = "SaveData";
+            base.titleContent = new GUIContent( "SaveData");
             base.position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);
             base.minSize = Size;
             CreateUI();
@@ -417,6 +417,7 @@ namespace Skill.Editor.IO
                     var selected = _Properties[index];
                     _Properties.RemoveAt(index);
                     _Properties.Insert(index - 1, selected);
+                    RebuildProperties();
                     return true;
                 }
                 return false;
@@ -430,6 +431,7 @@ namespace Skill.Editor.IO
                     var selected = _Properties[index];
                     _Properties.RemoveAt(index);
                     _Properties.Insert(index + 1, selected);
+                    RebuildProperties();
                     return true;
                 }
                 return false;

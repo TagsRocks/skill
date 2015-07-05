@@ -54,25 +54,26 @@ namespace Skill.Editor.Audio
             float[] samples = new float[audio.samples * audio.channels];
 
             string path = AssetDatabase.GetAssetPath(audio);
-            AudioImporter audioImporter = AssetImporter.GetAtPath(path) as AudioImporter;
+            AudioImporter audioImporter = AssetImporter.GetAtPath(path) as AudioImporter;            
 
-            Debug.Log("Platform : " + GetCurrentPlatformString());
-
-            AudioImporterSampleSettings sampleSettingsBackup = audioImporter.GetOverrideSampleSettings(GetCurrentPlatformString());
+            //AudioImporterSampleSettings sampleSettingsBackup = audioImporter.GetOverrideSampleSettings(GetCurrentPlatformString());
+            AudioImporterSampleSettings sampleSettingsBackup = audioImporter.defaultSampleSettings;
             //workaround to prevent the error in the function getData
             //when Audio Importer loadType is "compressed in memory"
-            if (sampleSettingsBackup.loadType != AudioClipLoadType.Streaming)
+            if (sampleSettingsBackup.loadType != AudioClipLoadType.DecompressOnLoad)
             {
                 AudioImporterSampleSettings newSampleSettings = sampleSettingsBackup;
-                newSampleSettings.loadType = AudioClipLoadType.Streaming;
-                audioImporter.SetOverrideSampleSettings(GetCurrentPlatformString(), newSampleSettings);
+                newSampleSettings.loadType = AudioClipLoadType.DecompressOnLoad;
+                //audioImporter.SetOverrideSampleSettings(GetCurrentPlatformString(), newSampleSettings);
+                audioImporter.defaultSampleSettings = newSampleSettings;
                 AssetDatabase.ImportAsset(path);
 
                 //getData after the loadType changed
                 audio.GetData(samples, 0);
 
                 //restore the loadType (end of workaround)
-                audioImporter.SetOverrideSampleSettings(GetCurrentPlatformString(), sampleSettingsBackup);
+                //audioImporter.SetOverrideSampleSettings(GetCurrentPlatformString(), sampleSettingsBackup);
+                audioImporter.defaultSampleSettings = sampleSettingsBackup;
                 AssetDatabase.ImportAsset(path);
             }
             else

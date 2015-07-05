@@ -18,7 +18,7 @@ namespace Skill.Editor
 
             private Label _LblSource;
             private Label _LblTranslate;
-            private PasteTextField _TxtTranslate;
+            private Skill.Editor.UI.PasteTextField _TxtTranslate;
 
             private bool _Selected;
             public bool Selected
@@ -60,7 +60,7 @@ namespace Skill.Editor
 
                 _LblSource = new Label() { Column = 0, Text = SourceKey.Value };
                 _LblTranslate = new Label() { Column = 1, Text = TranslateKey.Value };
-                _TxtTranslate = new PasteTextField() { Column = 1, Visibility = Skill.Framework.UI.Visibility.Hidden };
+                _TxtTranslate = new UI.PasteTextField() { Column = 1, Visibility = Skill.Framework.UI.Visibility.Hidden };
                 _TxtTranslate.TextField.Text = TranslateKey.Value;
 
                 this.Controls.Add(_LblSource);
@@ -68,6 +68,8 @@ namespace Skill.Editor
                 this.Controls.Add(_TxtTranslate);
 
                 _TxtTranslate.TextField.TextChanged += _TxtTranslate_TextChanged;
+
+                this.Margin = new Thickness(0, 0, 17, 0);
             }
 
             void _TxtTranslate_TextChanged(object sender, System.EventArgs e)
@@ -108,7 +110,7 @@ namespace Skill.Editor
         {
             hideFlags = HideFlags.DontSave;
 
-            base.title = "Translator";
+            base.titleContent = new GUIContent( "Translator");
             base.position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);
             base.minSize = new Vector2(Size.x * 0.5f, Size.y * 0.5f);
             CreateUI();
@@ -278,9 +280,9 @@ namespace Skill.Editor
             {
                 _IsChanged = changed;
                 if (_IsChanged)
-                    base.title = "Translator*";
+                    base.titleContent.text = "Translator*";
                 else
-                    base.title = "Translator";
+                    base.titleContent.text = "Translator";
 
                 if (_BtnSave != null)
                     _BtnSave.IsEnabled = _IsChanged;

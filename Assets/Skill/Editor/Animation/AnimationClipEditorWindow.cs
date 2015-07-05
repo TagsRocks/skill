@@ -29,7 +29,7 @@ namespace Skill.Editor.Animation
         {
             hideFlags = HideFlags.DontSave;
 
-            base.title = "Animations";
+            base.titleContent = new GUIContent( "Animations");
             base.position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);
             base.minSize = MinSize;
             CreateUI();

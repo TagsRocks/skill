@@ -7,6 +7,7 @@ namespace Skill.Editor.Animation
     /// Defines serializable data asset required for Implant tool
     /// </summary>
     [System.Serializable]
+    [CreateAssetMenu(fileName = "NewAnimationTree", menuName = "Skill/AnimationTree", order = 43)]
     public class AnimationTreeAsset : ScriptableObject
     {
         [HideInInspector]

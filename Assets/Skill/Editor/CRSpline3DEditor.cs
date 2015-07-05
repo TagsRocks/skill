@@ -13,9 +13,9 @@ namespace Skill.Editor
         private CRSpline3D _Path;
 
         private Skill.Framework.UI.Frame _Frame;
-        private ChangeCheck _ChangeCheck;        
-        
-         
+        private ChangeCheck _ChangeCheck;
+
+
         private Button _BtnAdd;
         private Button _BtnRemove;
         private Skill.Framework.UI.ScrollView _PointsScrollView;
@@ -31,6 +31,8 @@ namespace Skill.Editor
         private LayerMaskField _LmGroundLayer;
         private Button _BtnGroundAll;
         private Button _BtnGroundSelected;
+        private Button _BtnSmoothPath;
+        private Skill.Editor.UI.IntSlider _InterpolationsField;
 
         private Button _BtnSetLinearTime;
         private FloatField _FFLinearTime;
@@ -46,6 +48,8 @@ namespace Skill.Editor
         private float _SimulationSpeed;
         private float _SimulationCurrectTime;
 
+        private GUIStyle _LabelStyle;
+
         void OnEnable()
         {
             _Path = serializedObject.targetObject as CRSpline3D;
@@ -55,7 +59,7 @@ namespace Skill.Editor
             {
                 _Path.Times = new float[_Path.Keys.Length];
                 for (int i = 0; i < _Path.Keys.Length; i++)
-                    _Path.Times[i] = i;                
+                    _Path.Times[i] = i;
             }
 
             _Path.ShowPath = false;
@@ -85,8 +89,8 @@ namespace Skill.Editor
 
             _ChangeCheck.RowDefinitions.Add(24, Skill.Framework.UI.GridUnitType.Pixel);// buttons _BtnAdd/_BtnRemove
             _ChangeCheck.RowDefinitions.Add(164, Skill.Framework.UI.GridUnitType.Pixel);// _PointsScrollView
-            _ChangeCheck.RowDefinitions.Add(44, Skill.Framework.UI.GridUnitType.Pixel); // _PnlPoperties
-            _ChangeCheck.RowDefinitions.Add(94, Skill.Framework.UI.GridUnitType.Pixel); // _PnlTools
+            _ChangeCheck.RowDefinitions.Add(64, Skill.Framework.UI.GridUnitType.Pixel); // _PnlPoperties
+            _ChangeCheck.RowDefinitions.Add(154, Skill.Framework.UI.GridUnitType.Pixel); // _PnlTools
 
             _BtnAdd = new Button() { Row = 0, Column = 0 }; _BtnAdd.Content.text = "Add"; _BtnAdd.Content.tooltip = "Add new point the end of the path."; _BtnAdd.Content.image = Resources.UITextures.Plus;
             _BtnRemove = new Button() { Row = 0, Column = 1 }; _BtnRemove.Content.text = "Remove"; _BtnRemove.Content.tooltip = "Remove selected point."; _BtnRemove.Content.image = Resources.UITextures.Minus;
@@ -97,7 +101,7 @@ namespace Skill.Editor
 
             _SelectedPointPropertiesBackground = new Skill.Framework.UI.Box() { Row = 2, Column = 0, ColumnSpan = 2 };
             _PnlPoperties = new Skill.Framework.UI.StackPanel() { Row = 2, Column = 0, ColumnSpan = 2, Orientation = Skill.Framework.UI.Orientation.Vertical, Padding = new Skill.Framework.UI.Thickness(2) };
-            _VFValue = new Vector3Field() { Height = 20 }; _VFValue.Label.text = "Position"; 
+            _VFValue = new Vector3Field() { Height = 20 }; _VFValue.Label.text = "Position";
             _FFTime = new FloatField() { Height = 16, Margin = new Skill.Framework.UI.Thickness(0, 2, 0, 4) }; _FFTime.Label.text = "Time";
 
             _PnlPoperties.Controls.Add(_FFTime);
@@ -110,6 +114,8 @@ namespace Skill.Editor
             _PnlTools.ColumnDefinitions.Add(2, Skill.Framework.UI.GridUnitType.Star);
 
             _PnlTools.RowDefinitions.Add(24, Framework.UI.GridUnitType.Pixel);
+            _PnlTools.RowDefinitions.Add(30, Framework.UI.GridUnitType.Pixel);
+            _PnlTools.RowDefinitions.Add(30, Framework.UI.GridUnitType.Pixel);
             _PnlTools.RowDefinitions.Add(30, Framework.UI.GridUnitType.Pixel);
             _PnlTools.RowDefinitions.Add(30, Framework.UI.GridUnitType.Pixel);
 
@@ -127,6 +133,12 @@ namespace Skill.Editor
             _PnlTools.Controls.Add(_FFLinearTime);
             _PnlTools.Controls.Add(_BtnSetLinearTime);
 
+
+            _InterpolationsField = new UI.IntSlider() { Value = _Path.Interpolations, Row = 3, Column = 0, ColumnSpan = 3, Margin = new Skill.Framework.UI.Thickness(0, 4), MinValue = 2, MaxValue = 20 }; _InterpolationsField.Label.text = "Interpolations";
+            _BtnSmoothPath = new Button() { Row = 4, Column = 0, ColumnSpan = 3, Margin = new Skill.Framework.UI.Thickness(0, 4) }; _BtnSmoothPath.Content.text = "SmoothPath";
+
+            _PnlTools.Controls.Add(_InterpolationsField);
+            _PnlTools.Controls.Add(_BtnSmoothPath);
 
             _ChangeCheck.Controls.Add(_BtnAdd);
             _ChangeCheck.Controls.Add(_BtnRemove);
@@ -152,6 +164,24 @@ namespace Skill.Editor
             _FFLinearTime.ValueChanged += _FFLinearTime_ValueChanged;
             _BtnSetLinearTime.Click += _BtnSetLinearTime_Click;
             _FFTime.ValueChanged += SelectedPoint_ValueChanged;
+
+            _InterpolationsField.ValueChanged += _InterpolationsField_ValueChanged;
+            _BtnSmoothPath.Click += _BtnSmoothPath_Click;
+        }
+
+        void _BtnSmoothPath_Click(object sender, System.EventArgs e)
+        {
+            Undo.RecordObject(_Path, "smooth path");
+
+            _Path.Keys = CRSpline3D.SmoothCurve(_Path.Keys, _Path.Interpolations);
+            RebuildPath();
+            EditorUtility.SetDirty(_Path);
+        }
+
+        void _InterpolationsField_ValueChanged(object sender, System.EventArgs e)
+        {
+            _Path.Interpolations = _InterpolationsField.Value;
+            EditorUtility.SetDirty(_Path);
         }
 
         void _BtnSetLinearTime_Click(object sender, System.EventArgs e)
@@ -189,10 +219,21 @@ namespace Skill.Editor
 
         private void Ground(int pointIndex)
         {
-            Ray ray = new Ray() { origin = _Path.Keys[pointIndex] + new Vector3(0, 99999, 0), direction = Vector3.down };
+            Ray ray = new Ray() { origin = _Path.Keys[pointIndex], direction = Vector3.down };
+
+            if (!_Path.UseWorldSpace)
+                ray.origin = _Path.transform.TransformPoint(ray.origin);
+
+            ray.origin += new Vector3(0, 99999, 0);
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, 999999, _Path.GroundLayer))
-                _Path.Keys[pointIndex] = hit.point;
+            {
+                if (!_Path.UseWorldSpace)
+                    _Path.Keys[pointIndex] = _Path.transform.InverseTransformPoint(hit.point);
+                else
+                    _Path.Keys[pointIndex] = hit.point;
+
+            }
         }
 
         void _LmGroundLayer_LayersChanged(object sender, System.EventArgs e)
@@ -412,6 +453,19 @@ namespace Skill.Editor
                 Handles.color = _Path.Color;
                 if (_RenderPoints != null)
                     Handles.DrawAAPolyLine(3, _RenderPoints);
+
+                if (_LabelStyle == null)
+                    _LabelStyle = new GUIStyle(EditorStyles.largeLabel);
+
+                _LabelStyle.normal.textColor = _Path.Color;
+                for (int i = 1; i < _CurvePoints.Length - 1; i++)
+                {
+                    Vector3 point = _CurvePoints[i];
+                    float handleSize = HandleUtility.GetHandleSize(point);
+                    point.y += _Path.PointRadius + handleSize * 0.25f;
+                    _LabelStyle.fontSize = Mathf.Clamp(Mathf.FloorToInt(handleSize), 10, 100);
+                    Handles.Label(point, (i - 1).ToString(), _LabelStyle);
+                }
             }
 
             int index = _Path.SelectedIndex;
@@ -508,7 +562,7 @@ namespace Skill.Editor
         {
             base.OnInspectorGUI();
             _Frame.Update();
-            _Frame.OnInspectorGUI(330);
+            _Frame.OnInspectorGUI(410);
 
             if (_PreSmoothAmount != _Path.SmoothAmount || _PreUseWorldSpace != _Path.UseWorldSpace)
             {
@@ -530,7 +584,7 @@ namespace Skill.Editor
         private void SetTimeByDistance()
         {
             if (_Path != null)
-            {                
+            {
                 float maxDistance = 0;
                 float[] distances = new float[_Path.Length];
                 distances[0] = 0;

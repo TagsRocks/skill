@@ -11,7 +11,7 @@ namespace Skill.Framework.Sequence
         public class Parameter
         {
             public string Name;
-            public AnimatorParameterType ParameterType;
+            public UnityEngine.AnimatorControllerParameterType ParameterType;
             public bool DefaultBool;
             public int DefaultInt;
             public float DefaultFloat;
@@ -110,16 +110,16 @@ namespace Skill.Framework.Sequence
                     {
                         switch (p.ParameterType)
                         {
-                            case AnimatorParameterType.Float:
+                            case UnityEngine.AnimatorControllerParameterType.Float:
                                 _Animator.SetFloat(p.Name, p.DefaultFloat);
                                 break;
-                            case AnimatorParameterType.Int:
+                            case UnityEngine.AnimatorControllerParameterType.Int:
                                 _Animator.SetInteger(p.Name, p.DefaultInt);
                                 break;
-                            case AnimatorParameterType.Bool:
+                            case UnityEngine.AnimatorControllerParameterType.Bool:
                                 _Animator.SetBool(p.Name, p.DefaultBool);
                                 break;
-                            case AnimatorParameterType.Trigger:
+                            case UnityEngine.AnimatorControllerParameterType.Trigger:
                                 _Animator.ResetTrigger(p.Name);
                                 break;
                         }

@@ -67,7 +67,7 @@ namespace Skill.Editor.Sequence
                             AnimatorTrack.Parameter ap = new AnimatorTrack.Parameter();
                             var p = acParams[i];
                             ap.Name = p.name;
-                            ap.ParameterType = (Framework.AnimatorParameterType)p.type;
+                            ap.ParameterType = p.type;
 
                             switch (p.type)
                             {

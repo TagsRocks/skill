@@ -122,7 +122,7 @@ namespace Skill.Framework.Audio
                 {
                     float deltaTime = _CurrentState.End - _CurrentState.Begin;
                     if (deltaTime > 1)
-                        _ScheduleNextStateTW.Begin(deltaTime - 1);
+                        _ScheduleNextStateTW.Begin(deltaTime);
                     else
                         ScheduleNextState(deltaTime);
                 }
@@ -148,6 +148,7 @@ namespace Skill.Framework.Audio
                 {
                     _UpdateNextStateTW.End();
                     _ScheduleNextStateTW.End();
+                    _NextStateTW.End();
                     if (_ActiveTransition != null)
                     {
                         if (_ActiveTransition.TriggerRef != null)
@@ -163,16 +164,19 @@ namespace Skill.Framework.Audio
                     {
                         float deltaTime = _CurrentState.End - _CurrentState.Begin;
                         if (deltaTime > 1)
-                            _ScheduleNextStateTW.Begin(deltaTime - 1);
+                            _ScheduleNextStateTW.Begin(deltaTime);
                         else
                             ScheduleNextState(deltaTime);
                     }
                 }
             }
-            else if (_ScheduleNextStateTW.IsEnabledAndOver)
+            else if (_ScheduleNextStateTW.IsEnabled)
             {
-                _ScheduleNextStateTW.End();
-                ScheduleNextState(1.0f);
+                if (_ScheduleNextStateTW.TimeLeft < 2)
+                {
+                    ScheduleNextState(_ScheduleNextStateTW.TimeLeft);
+                    _ScheduleNextStateTW.End();
+                }
             }
 
             if (_CurrentState != null)

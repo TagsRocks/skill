@@ -144,5 +144,105 @@ namespace Skill.Framework
 
         }
         #endregion
+
+
+        /// <summary>
+        /// Find index of object in array
+        /// </summary>
+        /// <typeparam name="T">Type of object</typeparam>
+        /// <param name="array">Array</param>
+        /// <param name="obj">Object to find</param>
+        /// <returns>found : index of object in array, else -1</returns>
+        public static int IndexOf<T>(T[] array, T obj) where T : class
+        {
+            int index = -1;
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (array[i] == obj)
+                {
+                    index = i;
+                    break;
+                }
+            }
+            return index;
+        }
+
+        /// <summary>
+        /// Detach and destroy children
+        /// </summary>
+        /// <param name="t">Transform to Detach and destroy it's children</param>
+        public static void DestroyChildren(Transform t)
+        {
+            Transform[] childs = new Transform[t.childCount];
+            for (int i = 0; i < childs.Length; i++)
+                childs[i] = t.GetChild(i);
+            t.DetachChildren();
+
+#if UNITY_EDITOR
+
+            if (Application.isPlaying)
+            {
+                for (int i = 0; i < childs.Length; i++)
+                    GameObject.Destroy(childs[i].gameObject);
+            }
+            else
+            {
+                for (int i = 0; i < childs.Length; i++)
+                    GameObject.DestroyImmediate(childs[i].gameObject);
+            }
+#else
+            for (int i = 0; i < childs.Length; i++)
+                GameObject.Destroy(childs[i].gameObject);
+#endif
+
+
+        }
+
+
+        public class GameObjectNameComparer : IComparer<GameObject>
+        {
+            private static GameObjectNameComparer _Instance;
+            public static GameObjectNameComparer Instance
+            {
+                get
+                {
+                    if (_Instance == null)
+                        _Instance = new GameObjectNameComparer();
+                    return _Instance;
+                }
+            }
+            public bool Descending { get; set; }
+
+            public int Compare(GameObject x, GameObject y)
+            {
+                if (Descending)
+                    return y.name.CompareTo(x.name);
+                else
+                    return x.name.CompareTo(y.name);
+            }
+        }
+
+        public class ComponentNameComparer : IComparer<Component>
+        {
+            private static ComponentNameComparer _Instance;
+            public static ComponentNameComparer Instance
+            {
+                get
+                {
+                    if (_Instance == null)
+                        _Instance = new ComponentNameComparer();
+                    return _Instance;
+                }
+            }
+            public bool Descending { get; set; }
+
+            public int Compare(Component x, Component y)
+            {
+                if (Descending)
+                    return y.name.CompareTo(x.name);
+                else
+                    return x.name.CompareTo(y.name);
+            }
+        }
     }
 }

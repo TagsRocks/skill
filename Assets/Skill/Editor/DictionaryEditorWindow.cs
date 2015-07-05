@@ -171,7 +171,7 @@ namespace Skill.Editor
         {
             hideFlags = HideFlags.DontSave;
 
-            base.title = "Dictionary";
+            base.titleContent = new GUIContent("Dictionary");
             base.position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);
             base.minSize = new Vector2(Size.x * 0.5f, Size.y * 0.5f);
             CreateUI();
@@ -179,6 +179,9 @@ namespace Skill.Editor
         }
         void OnDestroy()
         {
+            if (Skill.Editor.UI.InspectorProperties.GetSelected() is TextKeyView)
+                Skill.Editor.UI.InspectorProperties.Select(null);
+
             _AudioClipEditor.Destroy();
             _Instance = null;
         }
@@ -212,6 +215,8 @@ namespace Skill.Editor
             if (_Frame != null)
             {
                 _RefreshStyles = true;
+                if (this._Dictionary != null)
+                    SetLayout(_Dictionary.LayoutType);
             }
         }
 
@@ -228,19 +233,11 @@ namespace Skill.Editor
         private Skill.Framework.UI.Grid _FieldPanel;
         private Skill.Framework.UI.Grid _AudioPanel;
         private Skill.Framework.UI.Grid _TextPanel;
-        private Skill.Editor.UI.GridSplitter _PanelSplitter;
 
         private Skill.Editor.UI.ObjectField<Dictionary> _ObjectField;
+        private Skill.Editor.UI.TextField _TxtFilter;
         private Skill.Framework.UI.ListBox _ListBox;
 
-        private Skill.Framework.UI.Grid _EditPanel;
-
-        private Skill.Framework.UI.Label _LblName;
-        private Skill.Framework.UI.Label _LblValue;
-        private Skill.Framework.UI.Label _LblComment;
-        private PasteTextField _TxtName;
-        private PasteTextField _TxtValue;
-        private PasteTextField _TxtComment;
         private Skill.Framework.UI.Button _BtnAdd;
         private Skill.Framework.UI.Button _BtnRemove;
         private Skill.Framework.UI.Button _BtnSave;
@@ -253,6 +250,11 @@ namespace Skill.Editor
         private List<AudioField> _Fields;
         private AudioClipSubtitleEditor _AudioClipEditor;
 
+
+        private Toolbar _LayoutButtonsPanel;
+        private ToolbarButton _TBtnAudioPanel;
+        private ToolbarButton _TBtnTextPanel;
+
         private void CreateUI()
         {
             _RefreshStyles = true;
@@ -260,11 +262,7 @@ namespace Skill.Editor
             _Frame.Grid.Padding = new Thickness(2);
 
             _Frame.Grid.RowDefinitions.Add(20, Skill.Framework.UI.GridUnitType.Pixel);
-            _Frame.Grid.RowDefinitions.Add(3, Skill.Framework.UI.GridUnitType.Star);
-            _Frame.Grid.RowDefinitions.Add(2, Skill.Framework.UI.GridUnitType.Pixel);
-            _Frame.Grid.RowDefinitions.Add(2, Skill.Framework.UI.GridUnitType.Star);
-
-            _PanelSplitter = new UI.GridSplitter() { Row = 2, Orientation = Orientation.Horizontal };
+            _Frame.Grid.RowDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star);
 
             CreateAudioPanel();
             CreateFieldPanel();
@@ -272,15 +270,12 @@ namespace Skill.Editor
 
             _Frame.Grid.Controls.Add(_FieldPanel);
             _Frame.Grid.Controls.Add(_AudioPanel);
-            _Frame.Grid.Controls.Add(_PanelSplitter);
             _Frame.Grid.Controls.Add(_TextPanel);
 
-
-
-
-
-
+            SetLayout(0);
         }
+
+
 
         private void CreateAudioPanel()
         {
@@ -324,35 +319,92 @@ namespace Skill.Editor
         private void CreateFieldPanel()
         {
             _FieldPanel = new Grid() { Row = 0, Padding = new Thickness(2) };
-            Box box = new Box() { Row = 0, Column = 0, RowSpan = 10, ColumnSpan = 10 };
+            _FieldPanel.ColumnDefinitions.Add(1, GridUnitType.Star); // object field
+            _FieldPanel.ColumnDefinitions.Add(40, GridUnitType.Pixel); // filter label
+            _FieldPanel.ColumnDefinitions.Add(180, GridUnitType.Pixel); // filter textfiald                        
+            _FieldPanel.ColumnDefinitions.Add(180, GridUnitType.Pixel); // tabs
+
+            Box box = new Box() { Row = 0, Column = 0, RowSpan = 10, ColumnSpan = 3 };
             _FieldPanel.Controls.Add(box);
 
-            _ObjectField = new Skill.Editor.UI.ObjectField<Dictionary>() { Margin = new Thickness(2), VerticalAlignment = VerticalAlignment.Top };
+            _ObjectField = new Skill.Editor.UI.ObjectField<Dictionary>() { Column = 0, Margin = new Thickness(2, 2, 30, 2), VerticalAlignment = VerticalAlignment.Top };
             _ObjectField.Label.text = "Dictionary";
             _FieldPanel.Controls.Add(_ObjectField);
 
             _ObjectField.ObjectChanged += _ObjectField_ObjectChanged;
+
+
+            Label lblFilter = new Label() { Column = 1, Text = "filter :" };
+            _FieldPanel.Controls.Add(lblFilter);
+
+            _TxtFilter = new UI.TextField() { Column = 2 };
+            _FieldPanel.Controls.Add(_TxtFilter);
+            _TxtFilter.TextChanged += _TxtFilter_TextChanged;
+
+            _LayoutButtonsPanel = new Toolbar() { Column = 3 };
+            _TBtnAudioPanel = new ToolbarButton();
+            _TBtnTextPanel = new ToolbarButton();
+
+            _TBtnAudioPanel.Content.text = "Audio"; _TBtnAudioPanel.Content.tooltip = "set subtitles for audio files";
+            _TBtnTextPanel.Content.text = "Text"; _TBtnTextPanel.Content.tooltip = "add text";
+
+
+            _LayoutButtonsPanel.Items.Add(_TBtnTextPanel);
+            _LayoutButtonsPanel.Items.Add(_TBtnAudioPanel);
+            _LayoutButtonsPanel.SelectedIndex = 0;
+
+            _FieldPanel.Controls.Add(_LayoutButtonsPanel);
+
+            _TBtnAudioPanel.Selected += LayoutButtons_Selected;
+            _TBtnTextPanel.Selected += LayoutButtons_Selected;
+        }
+
+        void _TxtFilter_TextChanged(object sender, EventArgs e)
+        {
+            ApplyFilter(_TxtFilter.Text);
+        }
+
+        private void ApplyFilter(string filter)
+        {
+            if (string.IsNullOrEmpty(filter))
+            {
+                foreach (TextKeyView view in _ListBox.Items)
+                    view.Visibility = Skill.Framework.UI.Visibility.Visible;
+            }
+            else
+            {
+                foreach (TextKeyView view in _ListBox.Items)
+                {
+                    if (view.Key.Key.IndexOf(filter, System.StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        view.Visibility = Skill.Framework.UI.Visibility.Visible;
+                    }
+                    else
+                    {
+                        view.Visibility = Skill.Framework.UI.Visibility.Collapsed;
+                        if (_SelectedView == view)
+                            Select(null);
+                    }
+
+                }
+            }
         }
 
         private void CreateTextPanel()
         {
-            _TextPanel = new Grid() { Row = 3, Padding = new Thickness(2) };
-            _TextPanel.RowDefinitions.Add(1, Skill.Framework.UI.GridUnitType.Star);
-            _TextPanel.RowDefinitions.Add(80, Skill.Framework.UI.GridUnitType.Pixel);
+            _TextPanel = new Grid() { Row = 1, Padding = new Thickness(2) };
+            _TextPanel.ColumnDefinitions.Add(1, GridUnitType.Star);
+            _TextPanel.ColumnDefinitions.Add(2, GridUnitType.Star);
+            _TextPanel.ColumnDefinitions.Add(17, GridUnitType.Pixel);
+            _TextPanel.ColumnDefinitions.Add(30, GridUnitType.Pixel);
 
-            Grid viewPanel = new Grid() { Row = 0, Column = 0, Padding = new Thickness(2) };
-            viewPanel.ColumnDefinitions.Add(1, GridUnitType.Star);
-            viewPanel.ColumnDefinitions.Add(2, GridUnitType.Star);
-            viewPanel.ColumnDefinitions.Add(17, GridUnitType.Pixel);
-            viewPanel.ColumnDefinitions.Add(50, GridUnitType.Pixel);
-
-            viewPanel.RowDefinitions.Add(24, GridUnitType.Pixel);
-            viewPanel.RowDefinitions.Add(50, GridUnitType.Pixel);
-            viewPanel.RowDefinitions.Add(50, GridUnitType.Pixel);
-            viewPanel.RowDefinitions.Add(1, GridUnitType.Star);
+            _TextPanel.RowDefinitions.Add(24, GridUnitType.Pixel);
+            _TextPanel.RowDefinitions.Add(30, GridUnitType.Pixel);
+            _TextPanel.RowDefinitions.Add(30, GridUnitType.Pixel);
+            _TextPanel.RowDefinitions.Add(1, GridUnitType.Star);
 
             Box box = new Box() { Row = 0, Column = 0, RowSpan = 10, ColumnSpan = 10 };
-            viewPanel.Controls.Add(box);
+            _TextPanel.Controls.Add(box);
 
 
             _NameCaption = new Box() { Row = 0, Column = 0 }; _NameCaption.Content.text = "Key";
@@ -366,68 +418,28 @@ namespace Skill.Editor
 
             _BtnAdd = new Skill.Framework.UI.Button() { Row = 1, Column = 3, Margin = new Thickness(2) }; _BtnAdd.Content.tooltip = "Add";
             _BtnRemove = new Skill.Framework.UI.Button() { Row = 2, Column = 3, Margin = new Thickness(2) }; _BtnAdd.Content.tooltip = "remove selected";
-            _BtnSave = new Skill.Framework.UI.Button() { Row = 3, Column = 3, Margin = new Thickness(2, 2, 2, 4), VerticalAlignment = VerticalAlignment.Bottom, Height = 46 }; _BtnSave.Content.tooltip = "Save Changes";
+            _BtnSave = new Skill.Framework.UI.Button() { Row = 3, Column = 3, Margin = new Thickness(2, 2, 2, 4), VerticalAlignment = VerticalAlignment.Bottom, Height = 28 }; _BtnSave.Content.tooltip = "Save Changes";
 
-            viewPanel.Controls.Add(_NameCaption);
-            viewPanel.Controls.Add(_ValueCaption);
-            viewPanel.Controls.Add(_BtnAdd);
-            viewPanel.Controls.Add(_BtnRemove);
-            viewPanel.Controls.Add(_BtnSave);
-            viewPanel.Controls.Add(_ListBox);
-
-            _TextPanel.Controls.Add(viewPanel);
-            _EditPanel = new Grid() { Row = 1, Column = 0, Padding = new Thickness(2) };
-            _EditPanel.ColumnDefinitions.Add(60, GridUnitType.Pixel);
-            _EditPanel.ColumnDefinitions.Add(2, GridUnitType.Star);
-            _EditPanel.ColumnDefinitions.Add(60, GridUnitType.Pixel);
-            _EditPanel.ColumnDefinitions.Add(1, GridUnitType.Star);
-
-            _EditPanel.RowDefinitions.Add(1, GridUnitType.Star);
-            _EditPanel.RowDefinitions.Add(2, GridUnitType.Star);
-
-            Box box1 = new Box() { Row = 0, Column = 0, RowSpan = 10, ColumnSpan = 10 };
-            _EditPanel.Controls.Add(box1);
-
-
-            _LblName = new Label() { Row = 0, Column = 0, Margin = new Thickness(2), Text = "Key" };
-            _LblValue = new Label() { Row = 1, Column = 0, Margin = new Thickness(2), Text = "Value" };
-            _LblComment = new Label() { Row = 0, Column = 2, ColumnSpan = 2, Margin = new Thickness(2), Text = "Comment" };
-
-            _TxtName = new PasteTextField() { Row = 0, Column = 1, Margin = new Thickness(2, 2, 20, 2) };
-            _TxtValue = new PasteTextField() { Row = 1, Column = 1, Margin = new Thickness(2, 2, 20, 2) };
-            _TxtComment = new PasteTextField() { Row = 1, Column = 2, ColumnSpan = 2, Margin = new Thickness(2) };
-
-            _EditPanel.Controls.Add(_LblName);
-            _EditPanel.Controls.Add(_LblValue);
-            _EditPanel.Controls.Add(_LblComment);
-
-            _EditPanel.Controls.Add(_TxtName);
-            _EditPanel.Controls.Add(_TxtValue);
-            _EditPanel.Controls.Add(_TxtComment);
-
-            _TextPanel.Controls.Add(_EditPanel);
+            _TextPanel.Controls.Add(_NameCaption);
+            _TextPanel.Controls.Add(_ValueCaption);
+            _TextPanel.Controls.Add(_BtnAdd);
+            _TextPanel.Controls.Add(_BtnRemove);
+            _TextPanel.Controls.Add(_BtnSave);
+            _TextPanel.Controls.Add(_ListBox);
 
             _BtnSave.Click += _BtnSave_Click;
             _BtnAdd.Click += _BtnAdd_Click;
             _BtnRemove.Click += _BtnRemove_Click;
             _ListBox.SelectionChanged += _ListBox_SelectionChanged;
-
-            _TxtName.TextField.TextChanged += _TextChanged;
-            _TxtValue.TextField.TextChanged += _TextChanged;
-            _TxtComment.TextField.TextChanged += _TextChanged;
         }
 
         private void RefreshStyles()
         {
-            _PanelSplitter.Style = Skill.Editor.Resources.Styles.HorizontalSplitter;
+            _LayoutButtonsPanel.Style = Skill.Editor.Resources.Styles.ToolbarButton;
             _ListBox.SelectedStyle = Skill.Editor.Resources.Styles.SelectedItem;
             _BtnAdd.Content.image = Skill.Editor.Resources.UITextures.Add;
             _BtnRemove.Content.image = Skill.Editor.Resources.UITextures.Remove;
             _BtnSave.Content.image = Skill.Editor.Resources.UITextures.Save;
-            if (_LblComment.Style == null)
-                _LblComment.Style = new GUIStyle(UnityEditor.EditorGUIUtility.GetBuiltinSkin(UnityEditor.EditorSkin.Inspector).label);
-            _LblComment.Style.alignment = TextAnchor.MiddleCenter;
-
             _AudioClipEditor.RefreshStyles();
             _AudioList.SelectedStyle = Skill.Editor.Resources.Styles.SelectedItem;
 
@@ -440,9 +452,6 @@ namespace Skill.Editor
                 _TextPanel.IsEnabled = false;
                 _AudioPanel.IsEnabled = false;
                 _BtnSave.IsEnabled = false;
-                _TxtName.TextField.Text = string.Empty;
-                _TxtValue.TextField.Text = string.Empty;
-                _TxtComment.TextField.Text = string.Empty;
             }
             else
             {
@@ -450,6 +459,40 @@ namespace Skill.Editor
                 _AudioPanel.IsEnabled = true;
                 _BtnSave.IsEnabled = _IsChanged;
             }
+        }
+
+
+
+
+        void LayoutButtons_Selected(object sender, System.EventArgs e)
+        {
+            SetLayout(_LayoutButtonsPanel.SelectedIndex);
+        }
+
+        private bool _IgnoreLayout;
+        private void SetLayout(int layoutType)
+        {
+            if (_IgnoreLayout) return;
+            if (_Dictionary != null)
+                _Dictionary.LayoutType = layoutType;
+
+            _IgnoreLayout = true;
+            switch (layoutType)
+            {
+                case 0: // text
+
+                    _TextPanel.Visibility = Visibility.Visible;
+                    _AudioPanel.Visibility = Visibility.Hidden;
+
+                    break;
+                default: // audio
+
+                    _TextPanel.Visibility = Visibility.Hidden;
+                    _AudioPanel.Visibility = Visibility.Visible;
+                    break;
+            }
+            _LayoutButtonsPanel.SelectedIndex = layoutType;
+            _IgnoreLayout = false;
         }
         #endregion
 
@@ -460,18 +503,17 @@ namespace Skill.Editor
         private Dictionary _Dictionary;
         private bool _RefreshStyles;
         private bool _IsChanged;
-        private bool _IgnoreChanges;
         private TextKeyView _SelectedView;
 
-        private void SetChanged(bool changed)
+        public void SetChanged(bool changed)
         {
             if (_IsChanged != changed)
             {
                 _IsChanged = changed;
                 if (_IsChanged)
-                    base.title = "Dictionary*";
+                    base.titleContent.text = "Dictionary*";
                 else
-                    base.title = "Dictionary";
+                    base.titleContent.text = "Dictionary";
 
                 if (_BtnSave != null)
                     _BtnSave.IsEnabled = _IsChanged;
@@ -497,35 +539,23 @@ namespace Skill.Editor
             AddNext(null);
         }
 
-        void _TextChanged(object sender, System.EventArgs e)
-        {
-            if (_IgnoreChanges) return;
-            if (_SelectedView != null)
-            {
-                _SelectedView.Key.Key = _TxtName.TextField.Text;
-                _SelectedView.Key.Value = _TxtValue.TextField.Text;
-                _SelectedView.Key.Comment = _TxtComment.TextField.Text;
-                _SelectedView.UpdateTexts();
-            }
-        }
-
         void _ListBox_SelectionChanged(object sender, System.EventArgs e)
         {
             object item = _ListBox.SelectedItem;
+            Select(item);
+        }
+
+        private void Select(object item)
+        {
             _BtnRemove.IsEnabled = item != null;
-            _EditPanel.IsEnabled = item != null;
             if (item != null)
             {
                 _SelectedView = (TextKeyView)item;
-                _IgnoreChanges = true;
-                _TxtName.TextField.Text = _SelectedView.Key.Key;
-                _TxtValue.TextField.Text = _SelectedView.Key.Value;
-                _TxtComment.TextField.Text = _SelectedView.Key.Comment;
-                _IgnoreChanges = false;
             }
             else
                 _SelectedView = null;
 
+            Skill.Editor.UI.InspectorProperties.Select(_SelectedView);
             Skill.Editor.UI.EditorFrame.RepaintParentEditorWindow(_Frame.Grid);
         }
 
@@ -544,7 +574,7 @@ namespace Skill.Editor
 
         void _BtnAdd_Click(object sender, System.EventArgs e)
         {
-            TextKeyView view = new TextKeyView(new TextKey() { Key = "New" });
+            TextKeyView view = new TextKeyView(new TextKey() { Key = "New" }, this);
             _ListBox.Controls.Add(view);
             _ListBox.SelectedItem = view;
             SetChanged(true);
@@ -571,7 +601,7 @@ namespace Skill.Editor
                 {
                     foreach (var key in _Dictionary.Keys)
                     {
-                        TextKeyView view = new TextKeyView(key);
+                        TextKeyView view = new TextKeyView(key, this);
                         _ListBox.Controls.Add(view);
                     }
                 }
@@ -608,7 +638,6 @@ namespace Skill.Editor
                 _BtnNew.Visibility = Skill.Framework.UI.Visibility.Hidden;
             }
             SetChanged(false);
-            _ListBox.SelectedIndex = 0;
         }
 
         void UpdateBtnNewVisibility()
@@ -717,7 +746,7 @@ namespace Skill.Editor
                 if (_Dictionary != null)
                 {
                     Save();
-                    PickTextWindow.Instance.Show(_Dictionary, pickTarget);                    
+                    PickTextWindow.Instance.Show(_Dictionary, pickTarget);
                 }
                 else
                     UnityEditor.EditorUtility.DisplayDialog("Dictionary not found", "You must assign a valid Dictionary for AudioSubtitle", "Ok");
@@ -739,15 +768,18 @@ namespace Skill.Editor
 
 
     #region TextKeyView
-    class TextKeyView : Grid
+    class TextKeyView : Grid, IProperties
     {
         public TextKey Key { get; private set; }
 
         private Label _LblName;
         private Label _LblValue;
+        private DictionaryEditorWindow _OwnerEditor;
 
-        public TextKeyView(TextKey key)
+
+        public TextKeyView(TextKey key, DictionaryEditorWindow owner)
         {
+            this._OwnerEditor = owner;
             this.Key = key;
             ColumnDefinitions.Add(1, GridUnitType.Star);
             ColumnDefinitions.Add(2, GridUnitType.Star);
@@ -761,10 +793,59 @@ namespace Skill.Editor
             UpdateTexts();
         }
 
-        public void UpdateTexts()
+        private void UpdateTexts()
         {
             _LblName.Text = Key.Key;
             _LblValue.Text = Key.Value;
+        }
+
+        public string Title { get { return "TextKey"; } }
+        public bool IsSelectedProperties { get; set; }
+
+        private MyProperties _Properties;
+        public PropertiesPanel Properties
+        {
+            get
+            {
+                if (_Properties == null)
+                    _Properties = new MyProperties(this);
+                return _Properties;
+            }
+        }
+
+        [ExposeProperty(100, "Key")]
+        public string Key_Key { get { return Key.Key; } set { Key.Key = value; _LblName.Text = value; } }
+
+
+        [ExposeProperty(101, "Value")]
+        [PasteTextField(true)]
+        public string Key_Value { get { return Key.Value; } set { Key.Value = value; _LblValue.Text = value; } }
+
+        [ExposeProperty(102, "Comment")]
+        [PasteTextField(true)]
+        public string Key_Comment { get { return Key.Comment; } set { Key.Comment = value; } }
+
+        class MyProperties : ExposeProperties
+        {
+            public MyProperties(TextKeyView owner)
+                : base(owner)
+            {
+
+            }
+
+            protected override void SetDirty()
+            {
+                TextKeyView owner = (TextKeyView)Object;
+                if (owner._OwnerEditor != null)
+                    owner._OwnerEditor.SetChanged(true);
+            }
+
+            protected override void RefreshData()
+            {
+                base.RefreshData();
+                TextKeyView owner = (TextKeyView)Object;
+                owner.UpdateTexts();
+            }
         }
     }
     #endregion

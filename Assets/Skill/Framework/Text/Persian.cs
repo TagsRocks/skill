@@ -51,5 +51,11 @@ namespace Skill.Framework.Text
             CheckData();
             return _Converter.Convert(text);
         }
+
+        public static string Convert(int i)
+        {
+            CheckData();
+            return _Converter.Convert(i.ToString());
+        }
     }
 }

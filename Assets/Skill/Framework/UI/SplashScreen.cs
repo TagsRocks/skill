@@ -65,7 +65,10 @@ namespace Skill.Framework.UI
         private int _CurrentSplashIndex;
         private Fading _Fading;
         private bool _IsCompleted;
+
+#if SUPPORTMOVIE
         private AudioSource _Audio;
+#endif
 
         /// <summary> Occurs when SplashScreen is completed </summary>
         public event EventHandler Completed;
@@ -83,7 +86,9 @@ namespace Skill.Framework.UI
         protected override void GetReferences()
         {
             base.GetReferences();
+#if SUPPORTMOVIE
             _Audio = GetComponent<AudioSource>();
+#endif
             _Fading = GetComponent<Fading>();
             _Fading.Alpha = 1.0f;
         }
@@ -248,14 +253,14 @@ namespace Skill.Framework.UI
                 else
                 {
 #endif
-                    SetSize(Images[_CurrentSplashIndex].WidthPercent, Images[_CurrentSplashIndex].HeightPercent, Images[_CurrentSplashIndex].Scale);
-                    if (_Fading != null)
-                    {
-                        _Fading.FadeIn(true);
-                        _SplashTW.Begin(Mathf.Max(Images[_CurrentSplashIndex].MaxDuration - _Fading.FadeOutTime, _Fading.FadeOutTime + 0.1f));
-                    }
-                    else
-                        _SplashTW.Begin(Mathf.Max(Images[_CurrentSplashIndex].MaxDuration - 0.1f, 0.1f));
+                SetSize(Images[_CurrentSplashIndex].WidthPercent, Images[_CurrentSplashIndex].HeightPercent, Images[_CurrentSplashIndex].Scale);
+                if (_Fading != null)
+                {
+                    _Fading.FadeIn(true);
+                    _SplashTW.Begin(Mathf.Max(Images[_CurrentSplashIndex].MaxDuration - _Fading.FadeOutTime, _Fading.FadeOutTime + 0.1f));
+                }
+                else
+                    _SplashTW.Begin(Mathf.Max(Images[_CurrentSplashIndex].MaxDuration - 0.1f, 0.1f));
 #if SUPPORTMOVIE
                 }
 #endif

@@ -84,34 +84,44 @@ namespace Skill.Framework
             //else if (collider is CapsuleCollider)
             //    DrawCapsuleCollider((CapsuleCollider)collider, color, drawMode);
         }
-        private static void DrawBoxCollider(BoxCollider collider, Color color, DrawColliderMode drawMode)
+
+
+        public static void DrawBox(Transform transform, Vector3 size, Vector3 center, Color color, DrawColliderMode drawMode)
         {
-            Vector3 Size = collider.size;
             Gizmos.color = color;
             Matrix4x4 savedMatrix = Gizmos.matrix;
-            Gizmos.matrix = collider.transform.localToWorldMatrix;
+            Gizmos.matrix = transform.localToWorldMatrix;
             if ((drawMode & DrawColliderMode.Solid) == DrawColliderMode.Solid)
-                Gizmos.DrawCube(collider.center, Size);
+                Gizmos.DrawCube(center, size);
             if ((drawMode & DrawColliderMode.Wire) == DrawColliderMode.Wire)
             {
                 color.a = 1.0f;
-                Gizmos.DrawWireCube(collider.center, Size);
+                Gizmos.DrawWireCube(center, size);
             }
             Gizmos.matrix = savedMatrix;
         }
 
+        private static void DrawBoxCollider(BoxCollider collider, Color color, DrawColliderMode drawMode)
+        {
+            DrawBox(collider.transform, collider.size, collider.center, color, drawMode);
+        }
+
         private static void DrawSphereCollider(SphereCollider collider, Color color, DrawColliderMode drawMode)
         {
-            float radius = collider.radius;
+            DrawSphere(collider.transform, collider.radius, collider.center, color, drawMode);
+        }
+
+        public static void DrawSphere(Transform transform, float radius, Vector3 center, Color color, DrawColliderMode drawMode)
+        {
             Gizmos.color = color;
             Matrix4x4 savedMatrix = Gizmos.matrix;
-            Gizmos.matrix = collider.transform.localToWorldMatrix;
+            Gizmos.matrix = transform.localToWorldMatrix;
             if ((drawMode & DrawColliderMode.Solid) == DrawColliderMode.Solid)
-                Gizmos.DrawSphere(collider.center, radius);
+                Gizmos.DrawSphere(center, radius);
             if ((drawMode & DrawColliderMode.Wire) == DrawColliderMode.Wire)
             {
                 color.a = 1.0f;
-                Gizmos.DrawWireSphere(collider.center, radius);
+                Gizmos.DrawWireSphere(center, radius);
             }
             Gizmos.matrix = savedMatrix;
         }

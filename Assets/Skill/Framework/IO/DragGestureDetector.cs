@@ -73,10 +73,23 @@ namespace Skill.Framework.IO
             }
         }
 
+
+        /// <summary> Occurs when a drag gesture ended </summary>
+        public event GestureEventHandler DragEnd;
+        /// <summary> Occurs when a drag gesture ended </summary>
+        protected virtual void OnDragEnd()
+        {
+            if (DragEnd != null)
+            {
+                Vector2[] positions = GetPositionOfTrackingTouches();
+                DragEnd(this, new GestureEventArgs(FingerCount, positions));
+            }
+        }
+
         /// <summary>
         /// Create a DragGestureDetector
         /// </summary>        
-        public DragGestureDetector()            
+        public DragGestureDetector()
         {
         }
 
@@ -122,8 +135,10 @@ namespace Skill.Framework.IO
                 if (_IsDragStarted)
                 {
                     _TotalTranslation += _DeltaTranslation;
+                    if (_DeltaTranslation.sqrMagnitude > 0)
+                        draged = true;
                     _PreviousLocation = currentLocation;
-                    draged = true;
+
                 }
             }
             else
@@ -133,7 +148,10 @@ namespace Skill.Framework.IO
             if (IsAnyTrackingTouchesEnded())
             {
                 if (_TotalTranslation != Vector2.zero)
+                {
+                    OnDragEnd();
                     return GestureDetectionResult.Detected;
+                }
                 else
                     return GestureDetectionResult.Failed;
             }

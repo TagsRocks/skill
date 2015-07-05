@@ -4,17 +4,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Skill.Editor
+namespace Skill.Editor.UI
 {
     class PasteTextField : Grid
     {
         private static UnityEngine.GUIStyle _ButtonStyle;
-        private Skill.Framework.UI.TextField _TextField;
+        private Skill.Editor.UI.TextField _TextField;
         private Skill.Framework.UI.Button _BtnPaste;
+        private Skill.Framework.UI.Button _BtnConvertToPersian;
 
-        public Skill.Framework.UI.TextField TextField { get { return _TextField; } }
+        public Skill.Editor.UI.TextField TextField { get { return _TextField; } }
 
-        public PasteTextField()
+        public PasteTextField(bool persian = false)
         {
             if (_ButtonStyle == null)
                 _ButtonStyle = new UnityEngine.GUIStyle();
@@ -23,18 +24,35 @@ namespace Skill.Editor
             this.ColumnDefinitions.Add(16, GridUnitType.Pixel);
 
             this.RowDefinitions.Add(16, GridUnitType.Pixel);
+            this.RowDefinitions.Add(16, GridUnitType.Pixel);
             this.RowDefinitions.Add(1, GridUnitType.Star);
 
-            _TextField = new  TextField() { Row = 0, RowSpan = 2, Column = 0, Margin = new Thickness(0,0,2,0) };
+            _TextField = new Editor.UI.TextField() { Row = 0, RowSpan = 3, Column = 0, Margin = new Thickness(0, 0, 2, 0) };
             _BtnPaste = new Framework.UI.Button() { Row = 0, Column = 1, Style = _ButtonStyle, Margin = new Thickness(1) };
             _BtnPaste.Content.tooltip = "Paste from Clipboard";
-
+            _BtnPaste.Click += _BtnPaste_Click;
 
             this.Controls.Add(_TextField);
             this.Controls.Add(_BtnPaste);
 
-            _BtnPaste.Click += _BtnPaste_Click;
 
+            if (persian)
+            {
+                _BtnConvertToPersian = new Framework.UI.Button() { Row = 1, Column = 1, Style = _ButtonStyle, Margin = new Thickness(1) };
+                _BtnConvertToPersian.Content.tooltip = "Convert to Persian";
+                this.Controls.Add(_BtnConvertToPersian);
+                _BtnConvertToPersian.Click += _BtnConvertToPersian_Click;
+                this.Height += 16;
+            }
+
+
+
+        }
+
+        void _BtnConvertToPersian_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(_TextField.Text))
+                _TextField.Text = Skill.Framework.Text.Persian.Convert(_TextField.Text);
         }
 
         void _BtnPaste_Click(object sender, EventArgs e)
@@ -51,7 +69,11 @@ namespace Skill.Editor
         protected override void Render()
         {
             if (_BtnPaste.Content.image == null)
+            {
                 _BtnPaste.Content.image = Skill.Editor.Resources.UITextures.Paste;
+                if (_BtnConvertToPersian != null)
+                    _BtnConvertToPersian.Content.image = Skill.Editor.Resources.UITextures.Convert;
+            }
             base.Render();
         }
     }

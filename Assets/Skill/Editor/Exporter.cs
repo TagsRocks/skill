@@ -43,7 +43,7 @@ namespace Skill.Editor
 
             _Instance = this;
 
-            title = "Export to Skill Studio";
+            titleContent = new GUIContent( "Export to Skill Studio");
             position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);
             base.minSize = new Vector2(Size.x, Size.y);
 

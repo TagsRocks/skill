@@ -42,10 +42,10 @@ namespace Skill.Editor.Diagnostics
 
             _Instance = this;
 
-            title = "BT State";
+            titleContent = new GUIContent( "BT State");
             position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);
             base.minSize = Size;
-            CreateGUI();
+            CreateUI();
         }
 
         void OnFocus()
@@ -61,12 +61,30 @@ namespace Skill.Editor.Diagnostics
         private Label _SuccessState, _FailurState, _RunningState;
         private GUIStyle _SuccessStyle, _FailurStyle, _RunningStyle;
         private string _State;
+        private bool _RefreshStyles;
 
-        void CreateGUI()
+
+        private void RefreshStyles()
         {
-            _SuccessStyle = new GUIStyle() { normal = new GUIStyleState() { background = Resources.UITextures.BTree.Success } };
-            _FailurStyle = new GUIStyle() { normal = new GUIStyleState() { background = Resources.UITextures.BTree.Failure } };
-            _RunningStyle = new GUIStyle() { normal = new GUIStyleState() { background = Resources.UITextures.BTree.Running } };
+            if (_RefreshStyles)
+            {
+                _SuccessStyle.normal.background = Resources.UITextures.BTree.Success;
+                _FailurStyle.normal.background = Resources.UITextures.BTree.Failure;
+                _RunningStyle.normal.background = Resources.UITextures.BTree.Running;
+
+                _SuccessState.Content.image = Resources.UITextures.BTree.Success;
+                _RunningState.Content.image = Resources.UITextures.BTree.Running;
+                _FailurState.Content.image = Resources.UITextures.BTree.Failure;
+                _RefreshStyles = false;
+            }
+        }
+
+        void CreateUI()
+        {
+            _RefreshStyles = true;
+            _SuccessStyle = new GUIStyle() { normal = new GUIStyleState() };
+            _FailurStyle = new GUIStyle() { normal = new GUIStyleState() };
+            _RunningStyle = new GUIStyle() { normal = new GUIStyleState() };
 
             _Frame = new EditorFrame("Frame", this);
             _Frame.Grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
@@ -85,13 +103,13 @@ namespace Skill.Editor.Diagnostics
 
             _SuccessState = new Label() { Margin = new Thickness(2, 2, 0, 2), Width = 100 };
             _SuccessState.Content.text = "Success";
-            _SuccessState.Content.image = Resources.UITextures.BTree.Success;
+            
             _RunningState = new Label() { Margin = new Thickness(2, 2, 0, 2), Width = 100 };
             _RunningState.Content.text = "Running";
-            _RunningState.Content.image = Resources.UITextures.BTree.Running;
+            
             _FailurState = new Label() { Margin = new Thickness(2, 2, 0, 2), Width = 100 };
             _FailurState.Content.text = "Failure";
-            _FailurState.Content.image = Resources.UITextures.BTree.Failure;
+            
             _InfoPanel = new StackPanel() { Row = 2, Column = 0, ColumnSpan = 3, Orientation = Orientation.Horizontal };
             _InfoPanel.Controls.Add(_SuccessState);
             _InfoPanel.Controls.Add(_RunningState);
@@ -344,6 +362,7 @@ namespace Skill.Editor.Diagnostics
 
         void OnGUI()
         {
+            RefreshStyles();
             _Frame.Update();
             _Frame.OnGUI();
         }

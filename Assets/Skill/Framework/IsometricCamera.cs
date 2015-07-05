@@ -229,10 +229,17 @@ namespace Skill.Framework
             }
         }
 
-        private void UpdateCamera(bool force = false)
+        private void UpdateCamera(bool fast = false)
         {
             if (Target != null)
             {
+
+                if (fast)
+                {
+                    float zoomFactor = _LengthOffset / Mathf.Max(0.01f, MaxOffset);
+                    _Zoom = Mathf.Lerp(ZoomIn, ZoomOut, zoomFactor);
+                }
+
                 UpdateScreenSpace();
 
                 _MovementPlane.distance = -Target.position.y + CursorPlaneHeight;
@@ -272,7 +279,10 @@ namespace Skill.Framework
                 Vector3 off = _Offset;
                 if (!IgnoreCustomOffset)
                     off += (_ScreenMovementSpace * CustomOffset);
-                _SomeOFOffsets = Vector3.Lerp(_SomeOFOffsets, off, OffsetDamping * Time.deltaTime);
+                if (fast)
+                    _SomeOFOffsets = off;
+                else
+                    _SomeOFOffsets = Vector3.Lerp(_SomeOFOffsets, off, OffsetDamping * Time.deltaTime);
                 Vector3 finalOffset = _SomeOFOffsets + offsetToCenter + (cameraAdjustmentVector * CameraPreview);
                 Vector3 finalPosition = Target.position + finalOffset;
 
@@ -285,7 +295,7 @@ namespace Skill.Framework
                         _Limits[i].ApplyLimit(ref finalPosition, _PrePosition.Value);
                 }
 
-                if (!force)
+                if (!fast)
                     finalPosition = Vector3.Lerp(_CameraTransform.position, finalPosition, Damping * Time.deltaTime);
 
 
@@ -333,6 +343,12 @@ namespace Skill.Framework
                 intersectPosition = Vector3.zero;
                 return false;
             }
+        }
+
+
+        public void FastUpdate()
+        {
+            UpdateCamera(true);
         }
     }
 }

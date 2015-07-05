@@ -27,7 +27,7 @@ namespace Skill.Editor.Sequence
         public MatineeEditorWindow()
         {
             base.wantsMouseMove = true;            
-            base.title = "Matinee Editor";
+            base.titleContent = new GUIContent( "Matinee Editor");
             base.position = new Rect((Screen.width - 1280) / 2.0f, (Screen.height - 720) / 2.0f, 1280, 720);
             base.minSize = new Vector2(1280 * 0.3f, 720 * 0.3f);
         }

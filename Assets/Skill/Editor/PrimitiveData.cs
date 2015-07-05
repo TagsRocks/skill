@@ -60,6 +60,19 @@ namespace Skill.Editor
             this.Width = e.GetAttributeValueAsFloat("Width", 0.0f);
             this.Height = e.GetAttributeValueAsFloat("Height", 0.0f);
         }
+
+        public void Import(Rect rect)
+        {
+            this.X = rect.x;
+            this.Y = rect.y;
+            this.Width = rect.width;
+            this.Height = rect.height;
+        }
+
+        public Rect ToRect()
+        {
+            return new Rect(this.X, this.Y, this.Width, this.Height);
+        }
     }
 
     public struct BoundsData : IXmlElementSerializable, IPrimitiveData
@@ -218,7 +231,7 @@ namespace Skill.Editor
         public void Import(Vector2 v2)
         {
             this.X = v2.x;
-            this.Y = v2.y;            
+            this.Y = v2.y;
         }
 
         public Vector2 ToVector2()

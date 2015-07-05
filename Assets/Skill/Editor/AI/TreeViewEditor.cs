@@ -42,6 +42,42 @@ namespace Skill.Editor.AI
             _BehaviorsChanged = true;
         }
 
+
+        internal void BehaviorNameChanged(BehaviorData b)
+        {
+            switch (b.BehaviorType)
+            {
+                case Skill.Framework.AI.BehaviorType.Action:
+                    BehaviorNameChanged(b, _InsertActions);
+                    break;
+                case Skill.Framework.AI.BehaviorType.Condition:
+                    BehaviorNameChanged(b, _InsertConditions);
+                    break;
+                case Skill.Framework.AI.BehaviorType.Decorator:
+                    BehaviorNameChanged(b, _InsertDecorators);
+                    break;
+                case Skill.Framework.AI.BehaviorType.Composite:
+                    BehaviorNameChanged(b, _InsertComposites);
+                    break;
+                case Skill.Framework.AI.BehaviorType.ChangeState:
+                    BehaviorNameChanged(b, _InsertChangeStates);
+                    break;
+                default:
+                    break;
+            }
+        }
+        private void BehaviorNameChanged(BehaviorData b, MenuItem items)
+        {
+            for (int i = 0; i < items.Count; i++)
+            {
+                if (b == items[i].UserData)
+                {
+                    items[i].Name = b.Name;
+                    break;
+                }
+            }
+        }
+
         public TreeViewEditor(BehaviorTreeEditorWindow editor)
         {
             this._Editor = editor;
@@ -562,6 +598,6 @@ namespace Skill.Editor.AI
             SelectItem(null);
         }
 
-        
+
     }
 }

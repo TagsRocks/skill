@@ -261,6 +261,7 @@ namespace Skill.Framework
             private int _PreRefreshRate;
             private bool _PreFullScreen;
             private int _PreQualityLevel;
+            private float _PreScreenQuality;
 
             // Variables
             private AnisotropicFiltering _AnisotropicFiltering;
@@ -287,7 +288,7 @@ namespace Skill.Framework
             private int _RefreshRate;
             private bool _FullScreen;
             private int _QualityLevel;
-
+            private float _ScreenQuality;
             // Properties
             /// <summary>   Global anisotropic filtering mode. </summary>
             public AnisotropicFiltering AnisotropicFiltering { get { return _AnisotropicFiltering; } set { _AnisotropicFiltering = value; } }
@@ -353,6 +354,9 @@ namespace Skill.Framework
                 }
             }
 
+            /// <summary> user defined value between (0.0f , 1.0f) for screen quality. it is not used by unity engine </summary>
+            public float ScreenQuality { get { return _ScreenQuality; } set { _ScreenQuality = Mathf.Clamp01(value); } }
+
             /// <summary> if true, ApplyChanges() will override 'UnityEngine.QualitySettings.anisotropicFiltering'.This value is will saved to file </summary>
             public bool OverrideAnisotropicFiltering { get; set; }
             /// <summary> if true, ApplyChanges() will override 'UnityEngine.QualitySettings.antiAliasing'.This value is will saved to file </summary>
@@ -408,6 +412,7 @@ namespace Skill.Framework
                 _PreRefreshRate = _RefreshRate;
                 _PreFullScreen = _FullScreen;
                 _PreQualityLevel = _QualityLevel;
+                _PreScreenQuality = _ScreenQuality;
             }
             private void CopyOldValues()
             {
@@ -435,6 +440,7 @@ namespace Skill.Framework
                 _RefreshRate = _PreRefreshRate;
                 _FullScreen = _PreFullScreen;
                 _QualityLevel = _PreQualityLevel;
+                _ScreenQuality = _PreScreenQuality;
             }
 
 
@@ -442,13 +448,13 @@ namespace Skill.Framework
             public void AcceptChanges(bool applyExpensiveChanges = true)
             {
                 CopyNewValues();
-                ApplyChanges();
+                ApplyChanges(applyExpensiveChanges);
             }
 
             public void RevertChanges(bool applyExpensiveChanges = true)
             {
                 CopyOldValues();
-                ApplyChanges();
+                ApplyChanges(applyExpensiveChanges);
             }
 
             public void ApplyChanges(bool applyExpensiveChanges = true)
@@ -567,6 +573,8 @@ namespace Skill.Framework
                 e.AppendChild(_FullScreenElement);
                 IO.XmlElement _QualityLevelElement = stream.Create("QualityLevel", _QualityLevel);
                 e.AppendChild(_QualityLevelElement);
+                IO.XmlElement _ScreenQualityElement = stream.Create("ScreenQuality", _ScreenQuality);
+                e.AppendChild(_ScreenQualityElement);
 
             }
             public void Save(Skill.Framework.IO.BinarySaveStream stream)
@@ -595,6 +603,7 @@ namespace Skill.Framework
                 stream.Write(_RefreshRate);
                 stream.Write(_FullScreen);
                 stream.Write(_QualityLevel);
+                stream.Write(_ScreenQuality);
             }
 
             public void Load(IO.XmlElement e, Skill.Framework.IO.XmlLoadStream stream)
@@ -676,6 +685,9 @@ namespace Skill.Framework
                         case "QualityLevel":
                             this._QualityLevel = stream.ReadInt(element);
                             break;
+                        case "ScreenQuality":
+                            this._ScreenQuality = stream.ReadFloat(element);
+                            break;
                     }
                     element = e.GetNextSibling(element);
                 }
@@ -707,6 +719,7 @@ namespace Skill.Framework
                 this._RefreshRate = stream.ReadInt();
                 this.FullScreen = stream.ReadBoolean();
                 this.QualityLevel = stream.ReadInt();
+                this.ScreenQuality = stream.ReadFloat();
                 CopyNewValues();
             }
 
@@ -870,7 +883,7 @@ namespace Skill.Framework
             {
                 if (keys == null || keys.Length == 0)
                     throw new Exception("Invalid Keys");
-                _Keys = keys;                
+                _Keys = keys;
             }
 
             internal void Build(KeyMap[] defaultKeys)
@@ -1100,7 +1113,7 @@ namespace Skill.Framework
             private bool GetKey(KeyMap map)
             {
                 return UnityEngine.Input.GetKey(map.PrimaryKey) || UnityEngine.Input.GetKey(map.SecondaryKey) || UnityEngine.Input.GetKey(map.GamepadKey);
-            } 
+            }
             #endregion
 
             #region GetKeyDown
@@ -1125,7 +1138,7 @@ namespace Skill.Framework
             private bool GetKeyDown(KeyMap map)
             {
                 return UnityEngine.Input.GetKeyDown(map.PrimaryKey) || UnityEngine.Input.GetKeyDown(map.SecondaryKey) || UnityEngine.Input.GetKeyDown(map.GamepadKey);
-            } 
+            }
             #endregion
 
             #region GetKeyUp
@@ -1150,7 +1163,7 @@ namespace Skill.Framework
             private bool GetKeyUp(KeyMap map)
             {
                 return UnityEngine.Input.GetKeyUp(map.PrimaryKey) || UnityEngine.Input.GetKeyUp(map.SecondaryKey) || UnityEngine.Input.GetKeyUp(map.GamepadKey);
-            } 
+            }
             #endregion
         }
 
@@ -1269,6 +1282,7 @@ namespace Skill.Framework
             _Quality.ShadowQuality = 1;
             _Quality.Resolution = new Resolution() { width = 1024, height = 768, refreshRate = 60 };
             _Quality.QualityLevel = 0;
+            _Quality.ScreenQuality = 0.75f;
             _Quality.FullScreen = false;
         }
 

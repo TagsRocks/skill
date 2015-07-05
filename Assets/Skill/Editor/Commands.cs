@@ -28,7 +28,7 @@ namespace Skill.Editor
                 Skill.Framework.IO.XmlDocument document = new Framework.IO.XmlDocument();
                 document.AppendChild(tr.ToXmlElement());
 
-                EditorGUIUtility.systemCopyBuffer = document.ToString();
+                EditorGUIUtility.systemCopyBuffer = document.OuterXml;
                 Debug.Log("Hierarchy Transform copied to clipboard.");
             }
             else
@@ -84,7 +84,7 @@ namespace Skill.Editor
                 else
                     Debug.Log("Invalid Hierarchy Transform data.");
             }
-        }        
+        }
 
 
         /// <summary>
@@ -115,7 +115,13 @@ namespace Skill.Editor
                     Undo.SetTransformParent(t, group.transform, string.Format("Group {0} to {1}", t.name, group.name));
                 }
                 if (parent != null)
+                {
                     Undo.SetTransformParent(group.transform, parent, string.Format("Group {0} to {1}", group.name, parent.name));
+                    if (parent.GetComponent<RectTransform>() != null)
+                        group.AddComponent<RectTransform>();
+                }
+
+                Selection.activeGameObject = group;                
             }
             else
             {
@@ -179,7 +185,7 @@ namespace Skill.Editor
         }
 
 
-        [UnityEditor.MenuItem("CONTEXT/BoxCollider/CenterPivot")]
+
         public static void CenterPivot(BoxCollider collider)
         {
             if (collider != null)
@@ -220,6 +226,15 @@ namespace Skill.Editor
                 position.y += centerY - minY;
                 transform.position = position;
             }
+        }
+
+
+
+        public static string ConvertToPersian(string text)
+        {
+            if (!string.IsNullOrEmpty(text))
+                return Skill.Framework.Text.Persian.Convert(text);
+            return text;
         }
     }
 }

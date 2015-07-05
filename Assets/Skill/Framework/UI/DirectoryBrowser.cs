@@ -105,7 +105,7 @@ namespace Skill.Framework.UI
         }
 
 
-        private string _Filter;
+        //private string _Filter;
         private string _CurrentDirectory;
         private Texture2D _DirectoryImage;
         private GUIStyle _DirectoryStyle;
@@ -117,7 +117,7 @@ namespace Skill.Framework.UI
         private float _ItemHeight;
         private bool _UpdateItemSize;
         private string[] _Directories;
-        private bool _ShowNewFolderButton;
+        //private bool _ShowNewFolderButton;
 
         // UI
         private ListBox _List;
@@ -129,10 +129,10 @@ namespace Skill.Framework.UI
         private Box _Background;
         private Box _Separator;
 
-        private Grid _PnlGetName;
-        private TextField _TxtNewFolderName;
-        private Button _BtnNewFolderOk;
-        private Button _BtnNewFolderCancel;
+        //private Grid _PnlGetName;
+        //private TextField _TxtNewFolderName;
+        //private Button _BtnNewFolderOk;
+        //private Button _BtnNewFolderCancel;
 
         private bool _UpdatePathWidth;
         private float _PathWidth;

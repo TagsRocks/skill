@@ -25,7 +25,7 @@ namespace Skill.Editor
         {
             hideFlags = HideFlags.DontSave;
 
-            base.title = "Copy/Paste";
+            base.titleContent = new GUIContent("Copy Components");
             base.position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);
             base.minSize = new Vector2(Size.x * 0.5f, Size.y * 0.5f);
 
@@ -38,6 +38,15 @@ namespace Skill.Editor
             {
                 _RefreshStyles = true;
             }
+        }        
+
+        void OnDestroy()
+        {
+            _Frame = null;
+            if (_Instance == this)
+                _Instance = null;
+            else if (!this.Equals(_Instance))
+                throw new System.ApplicationException("_Instance does not equal this");
         }
         #endregion
 
@@ -182,6 +191,10 @@ namespace Skill.Editor
 
         private void Rebuild()
         {
+
+            _SourceComponents.Controls.Clear();
+            _DestinationComponents.Controls.Clear();
+
             if (_Source.Object != null && _Destination.Object != null)
             {
                 EnableControls(true);
@@ -219,9 +232,7 @@ namespace Skill.Editor
                 }
             }
             else
-            {
-                _SourceComponents.Controls.Clear();
-                _DestinationComponents.Controls.Clear();
+            {               
                 EnableControls(false);
             }
         }
@@ -272,42 +283,64 @@ namespace Skill.Editor
             System.Reflection.FieldInfo[] fieldInfos = sourceVariable.GetType().GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
             foreach (var field in fieldInfos)
             {
-                object sourceValue = field.GetValue(sourceVariable);
-                if (sourceValue != null)
+                try
                 {
-                    if (field.FieldType.IsSubclassOf(componentType))
+                    object sourceValue = field.GetValue(sourceVariable);
+                    if (sourceValue != null)
                     {
-                        Transform sourceChild = ((Component)sourceValue).transform;
-                        if (Skill.Framework.Utility.IsInHierarchy(sourceRoot, sourceChild))
+                        if (componentType.IsAssignableFrom(field.FieldType))
                         {
-                            string path = Skill.Framework.Utility.GetPath(sourceRoot, sourceChild);
-                            Transform destChild = destRoot.Find(path);
-                            if (destChild != null)
+                            Transform sourceChild = ((Component)sourceValue).transform;
+                            if (Skill.Framework.Utility.IsInHierarchy(sourceRoot, sourceChild))
                             {
-                                Component destValue = destChild.GetComponent(sourceValue.GetType());
-                                if (destValue != null)
-                                    field.SetValue(destVariable, destValue);
+                                string path = Skill.Framework.Utility.GetPath(sourceRoot, sourceChild);
+                                Transform destChild = destRoot.Find(path);
+                                if (destChild != null)
+                                {
+                                    Component destValue = destChild.GetComponent(sourceValue.GetType());
+                                    if (destValue != null)
+                                        field.SetValue(destVariable, destValue);
+                                    else
+                                        field.SetValue(destVariable, null);
+                                }
                                 else
+                                {
                                     field.SetValue(destVariable, null);
-                            }
-                            else
-                            {
-                                field.SetValue(destVariable, null);
+                                }
                             }
                         }
-                    }
-                    else if (field.FieldType.IsClass && field.FieldType.IsSerializable && field.FieldType.IsByRef &&
-                            !field.FieldType.IsPrimitive && !field.FieldType.IsArray && !field.FieldType.Equals(typeof(System.String)))
-                    {
-                        object destValue = field.GetValue(destVariable);
-                        if (destValue != null)
+                        else if (field.FieldType.IsClass && field.FieldType.IsSerializable && field.FieldType.IsByRef &&
+                                !field.FieldType.IsPrimitive && !field.FieldType.IsArray && !field.FieldType.Equals(typeof(System.String)))
                         {
-                            MatchLocalProperties(sourceRoot, destRoot, sourceValue, destValue);
+                            object destValue = field.GetValue(destVariable);
+                            if (destValue != null)
+                            {
+                                MatchLocalProperties(sourceRoot, destRoot, sourceValue, destValue);
+                            }
                         }
                     }
                 }
+                catch (System.Exception ex)
+                {
+                    Debug.LogException(ex);
+                    continue;
+                }
             }
         }
+
+        //private bool IsSubclass(System.Type drived, System.Type baseType)
+        //{
+        //    if (drived.IsSubclassOf(baseType))
+        //        return true;
+        //    else
+        //    {
+        //        System.Type parent = drived.BaseType;
+        //        if (parent == typeof(System.Object))
+        //            return false;
+        //        else
+        //            return IsSubclass(parent, baseType);
+        //    }
+        //}
         #endregion
     }
 }

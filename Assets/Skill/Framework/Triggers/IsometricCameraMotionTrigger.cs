@@ -26,6 +26,22 @@ namespace Skill.Framework.Triggers
 
         private static IsometricCameraMotionTrigger _LastTrigger;
 
+
+        protected override void Awake()
+        {
+            base.Awake();
+            if (Motion == null)
+            {
+                Camera[] allCameras = UnityEngine.Camera.allCameras;
+                foreach (var c in allCameras)
+                {
+                    Motion = c.GetComponent<IsometricCameraMotion>();
+                    if (Motion != null)
+                        break;
+                }
+            }
+        }
+
         /// <summary>
         /// On enter trigger
         /// </summary>
@@ -39,7 +55,7 @@ namespace Skill.Framework.Triggers
                 {
                     _LastTrigger = this;
                     Apply();
-                }                
+                }
                 return true;
             }
             else
@@ -49,12 +65,15 @@ namespace Skill.Framework.Triggers
             return false;
         }
 
-        public void Apply()
+        public void Apply(bool fast = false)
         {
-            if (Relative)
-                Motion.MotionDelta(Fov, AroundAngle, LookAngle, MotionTime);
-            else
-                Motion.Motion(Fov, AroundAngle, LookAngle, MotionTime);
+            if (Motion != null)
+            {
+                if (Relative)
+                    Motion.MotionDelta(Fov, AroundAngle, LookAngle, fast ? 0 : MotionTime);
+                else
+                    Motion.Motion(Fov, AroundAngle, LookAngle, fast ? 0 : MotionTime);
+            }
         }
     }
 }

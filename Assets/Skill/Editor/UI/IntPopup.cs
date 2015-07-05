@@ -76,6 +76,10 @@ namespace Skill.Editor.UI
                     if (Options.Contains(value))
                         SelectedValue = value.Value;
                 }
+                else
+                {
+                    SelectedValue = int.MinValue;
+                }
             }
         }
 

@@ -55,35 +55,7 @@ namespace Skill.Editor.UI
             _MaxCurve = null;
 
             if (_Samples == null)
-            {
-                _Samples = new float[_Clip.samples * _Clip.channels];
-
-                // it worked in unity 3.5f but in 4 not working !!! figure it later
-
-                //string path = AssetDatabase.GetAssetPath(_Clip);
-                ///AudioImporter audioImporter = AssetImporter.GetAtPath(path) as AudioImporter;
-                                
-                //workaround to prevent the error in the function getData
-                //when Audio Importer loadType is "compressed in memory"
-                //if (audioImporter.loadType != AudioImporterLoadType.StreamFromDisc)
-                //{
-                //    AudioImporterLoadType audioLoadTypeBackup = audioImporter.loadType;
-                //    audioImporter.loadType = AudioImporterLoadType.StreamFromDisc;
-                //    AssetDatabase.ImportAsset(path);
-
-                //    //getData after the loadType changed
-                //    _Clip.GetData(_Samples, 0);
-
-                //    //restore the loadType (end of workaround)
-                //    audioImporter.loadType = audioLoadTypeBackup;
-                //    AssetDatabase.ImportAsset(path);
-                //}
-                //else
-                //{
-                //    _Clip.GetData(_Samples, 0);
-                //}
-
-            }
+                _Samples = Audio.AudioUtility.GetAudioClipData(_Clip);
 
 
             float[] _MinBarHeights = new float[_Resolution];

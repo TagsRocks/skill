@@ -41,35 +41,36 @@ namespace Skill.Framework.Dynamics
         public string[] IgnoreRaycast = new string[] { "Glass" };
         /// <summary> tags that filtered to apply force</summary>
         public string[] IgnoreForce;
+        /// <summary> Colliders to ignore on explosion </summary>
+        public Collider[] SelfColliders;
         /// <summary> Use raycast to know if any object is between explosion and collider to block explosion </summary>
         public bool UseRaycast = false;
 
         /// <summary> use raycast to sure there is something between collider and explosion that block explosion</summary>
         [HideInInspector]
-        public int LayerMask = 0;
-
-        //private bool _IgnoreFirst;
-
-        //protected override void Awake()
-        //{
-        //    base.Awake();
-        //    _IgnoreFirst = GetComponent<Managers.CacheBehavior>() != null;
-        //}
+        public int LayerMask = 0;        
 
         /// <summary>
         /// This function is called when the object becomes enabled and active.
         /// </summary>
         protected override void OnEnable()
         {
-            base.OnEnable();
-            //if (_IgnoreFirst)
-            //    _IgnoreFirst = false;
-            //else
-            ApplyExplision();
+            base.OnEnable();            
+            ApplyExplosion();
         }
 
-        protected virtual void ApplyExplision()
+        protected virtual void ApplyExplosion()
         {
+
+            if (SelfColliders == null)
+                SelfColliders = new Collider[0];
+            bool[] colliderStates = new bool[SelfColliders.Length];
+            for (int i = 0; i < SelfColliders.Length; i++)
+            {
+                colliderStates[i] = SelfColliders[i].enabled;
+                SelfColliders[i].enabled = false;
+            }
+
             if (FalloffRadius < Radius)
                 FalloffRadius = Radius;
 
@@ -86,32 +87,13 @@ namespace Skill.Framework.Dynamics
                     if (IsAffectedByExplosion(collider.gameObject.tag))
                     {
                         Vector3 colliderPos = collider.ClosestPointOnBounds(explosionPos);
-                        colliderPos.y += 0.2f;
-                        Vector3 dir = colliderPos - explosionPos;
-                        bool ignore = false;
-
+                        distance = Vector3.Distance(explosionPos, colliderPos);
+                        bool ignore = distance > FalloffRadius;
                         // use raycast if there is something between collider and explosion
-                        if (UseRaycast && IsUsedForRaycast(collider.tag))
+                        if (!ignore && UseRaycast && IsUsedForRaycast(collider.tag))
                         {
-                            RaycastHit hit;
-                            if (Physics.Raycast(explosionPos, dir.normalized, out hit, Radius, LayerMask))
-                            {
-                                if (hit.collider != collider)
-                                    ignore = true;
-                                else
-                                {
-                                    distance = hit.distance;
-                                    colliderPos = hit.point;
-                                }
-                            }
-                            else
-                            {
-                                distance = dir.magnitude;
-                            }
-                        }
-                        else
-                        {
-                            distance = dir.magnitude;
+                            if (Physics.Linecast(explosionPos, colliderPos, LayerMask))
+                                ignore = true;
                         }
 
                         if (!ignore)
@@ -135,12 +117,15 @@ namespace Skill.Framework.Dynamics
                             Rigidbody crb = collider.GetComponent<Rigidbody>();
                             if (Force > 0 && crb != null && IsUsedForForce(collider.tag))
                             {
-                                crb.AddForceAtPosition((Force * percent) * dir, colliderPos, ForceMode);
+                                crb.AddForceAtPosition((Force * percent) * (colliderPos - explosionPos).normalized, colliderPos, ForceMode);
                             }
                         }
                     }
                 }
             }
+
+            for (int i = 0; i < SelfColliders.Length; i++)
+                SelfColliders[i].enabled = colliderStates[i];
         }
 
 

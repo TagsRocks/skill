@@ -14,16 +14,18 @@ namespace Skill.Framework.Weapons
     {
         /// <summary> Object to spawn on collision </summary>
         public GameObject[] Explosions;
-
         /// <summary> Position of explosion </summary>
         public Transform ExplosionPos;
-
         /// <summary>
         /// Lift time of bullet after spawn. A time with this value begins OnEnable and destroy gameobject when timer end. ( zero or negative for infinit lift time)
         /// </summary>
         public float LifeTime = 1.5f;
-
+        public bool IgnoreTriggers = true;
         public bool CauseParticle = true;
+
+
+        public GameObject TrailParticle;
+        public Transform TrailPosition;
 
         /// <summary>
         /// The GameObject that shoots this bullet. usually it is Controller of weapon.
@@ -65,6 +67,9 @@ namespace Skill.Framework.Weapons
 
         private TimeWatch _LifeTimeTW;
         private bool _IsDead;
+        private GameObject _TrailInstance;
+        private Skill.Framework.Managers.CacheLifeTime _TrailLifTime;
+        private ParticleSystem _Particle;
 
         protected override void GetReferences()
         {
@@ -81,6 +86,18 @@ namespace Skill.Framework.Weapons
                 _LifeTimeTW.Begin(LifeTime);
             enabled = true;
             _IsDead = false;
+
+            if (TrailParticle != null && TrailPosition != null)
+            {
+                _TrailInstance = Skill.Framework.Managers.Cache.Spawn(TrailParticle, TrailPosition.position, TrailPosition.rotation);
+                _TrailLifTime = _TrailInstance.GetComponent<Skill.Framework.Managers.CacheLifeTime>();
+                if (_TrailLifTime != null)
+                    _TrailLifTime.enabled = false;
+                _TrailInstance.transform.parent = TrailPosition;
+                _Particle = _TrailInstance.GetComponent<ParticleSystem>();
+                _Particle.Clear(true);
+                _Particle.enableEmission = true;
+            }
         }
 
         /// <summary>
@@ -143,6 +160,7 @@ namespace Skill.Framework.Weapons
         /// <returns>True if accepted, false for rejected</returns>
         protected virtual bool IsCollisionAccepted(Collider other)
         {
+            if (IgnoreTriggers && other.isTrigger) return false;
             if (Shooter != null)
                 return other.tag != Shooter.tag;
             else
@@ -157,6 +175,7 @@ namespace Skill.Framework.Weapons
         /// <returns>True if accepted, false for rejected</returns>
         protected virtual bool IsCollisionAccepted(Collision collision)
         {
+            if (IgnoreTriggers && collision.collider.isTrigger) return false;
             if (Shooter != null)
                 return collision.collider.tag != Shooter.tag;
             else
@@ -201,6 +220,17 @@ namespace Skill.Framework.Weapons
             if (Events != null)
                 Events.RaiseDie(this, System.EventArgs.Empty);
             Target = null;
+
+            if (_TrailInstance != null)
+            {
+                _TrailInstance.transform.parent = null;
+                if (_TrailLifTime != null)
+                    _TrailLifTime.enabled = true;
+                _Particle.enableEmission = false;
+                _TrailLifTime = null;
+            }
+
+
             Cache.DestroyCache(gameObject);
         }
     }

@@ -52,7 +52,7 @@ namespace Skill.Editor
         public PickTextWindow()
         {
             hideFlags = HideFlags.DontSave;
-            title = "Pick Text";
+            titleContent = new GUIContent(  "Pick Text");
             base.position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);
             base.minSize = new Vector2(Size.x, Size.y);
 
@@ -75,7 +75,7 @@ namespace Skill.Editor
             _Frame.Controls.Add(_ButtonsPanel);
 
             if (_Browser == null)
-                _Browser = new TextKeyBrowser() { Row = 3 };            
+                _Browser = new TextKeyBrowser() { Row = 3 };
             _Frame.Controls.Add(_Browser);
 
             _BtnSelect = new Skill.Framework.UI.Button() { Width = 100, Margin = new Skill.Framework.UI.Thickness(2), HorizontalAlignment = Skill.Framework.UI.HorizontalAlignment.Left, IsEnabled = _Browser.SelectedItem != null };
@@ -180,7 +180,7 @@ namespace Skill.Editor
                         {
                             if (!ViewExist(k))
                             {
-                                TextKeyView view = new TextKeyView(k);
+                                TextKeyView view = new TextKeyView(k, null);
                                 this._List.Add(view);
                                 this.Controls.Add(view);
                             }

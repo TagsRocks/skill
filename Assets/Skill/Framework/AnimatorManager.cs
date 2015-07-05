@@ -13,7 +13,8 @@ namespace Skill.Framework
     /// Normally user must inherit from this class and defines AnimatorStateGroups and AnimatorParameters as Properties of class and initialize them
     /// in constructor, then another class can instantiate one and set parameters and hook events of AnimatorStateGroups
     /// </remarks>
-    public class AnimatorManager
+    [RequireComponent(typeof(Animator))]
+    public class AnimatorManager : Skill.Framework.DynamicBehaviour
     {
 
         private string[] _Layers;
@@ -41,23 +42,35 @@ namespace Skill.Framework
             return result;
         }
 
-        public AnimatorManager(Animator animator)
+        protected override void GetReferences()
         {
-            if (animator == null)
+            base.GetReferences();
+            this.Animator = GetComponent<Animator>();
+            if (Animator == null)
                 throw new ArgumentNullException("Animator is null");
+        }
 
-            this.Animator = animator;
-            this.CurrentLayerStates = new AnimatorStateInfo[animator.layerCount];
-            this.NextLayerStates = new AnimatorStateInfo[animator.layerCount];
+        protected override void Awake()
+        {
+            base.Awake();
+
+            this.CurrentLayerStates = new AnimatorStateInfo[Animator.layerCount];
+            this.NextLayerStates = new AnimatorStateInfo[Animator.layerCount];
             _StateGroups = new List<AnimatorStateGroup>();
-            this._IsInTransitions = new bool[animator.layerCount];
+            this._IsInTransitions = new bool[Animator.layerCount];
             this._Layers = new string[Animator.layerCount];
             for (int i = 0; i < Animator.layerCount; i++)
             {
                 this._Layers[i] = Animator.GetLayerName(i);
             }
             this._Parameters = new Dictionary<string, AnimatorParameter>();
+
+            CreateParameters();
+            CreateStates();
         }
+
+        protected virtual void CreateParameters() { }
+        protected virtual void CreateStates() { }
 
         public AnimatorParameter GetParameters(string parameterName)
         {
@@ -66,7 +79,7 @@ namespace Skill.Framework
             return result;
         }
 
-        public void FixedUpdate()
+        protected virtual void FixedUpdate()
         {
             for (int i = 0; i < Animator.layerCount; i++)
             {
@@ -82,12 +95,13 @@ namespace Skill.Framework
             }
         }
 
-        public void Update()
+        protected override void Update()
         {
             for (int i = 0; i < _StateGroups.Count; i++)
             {
                 _StateGroups[i].Update();
             }
+            base.Update();
         }
 
 
@@ -116,7 +130,7 @@ namespace Skill.Framework
             if (_Parameters.ContainsKey(parameterName))
                 throw new ArgumentException("parameter name already exist");
 
-            BooleanParameter parameter = new BooleanParameter(parameterName, Animator);
+            BooleanParameter parameter = new BooleanParameter(parameterName, this);
             _Parameters.Add(parameterName, parameter);
             return parameter;
         }
@@ -128,7 +142,7 @@ namespace Skill.Framework
             if (_Parameters.ContainsKey(parameterName))
                 throw new ArgumentException("parameter name already exist");
 
-            IntegerParameter parameter = new IntegerParameter(parameterName, Animator);
+            IntegerParameter parameter = new IntegerParameter(parameterName, this);
             _Parameters.Add(parameterName, parameter);
             return parameter;
         }
@@ -140,7 +154,7 @@ namespace Skill.Framework
             if (_Parameters.ContainsKey(parameterName))
                 throw new ArgumentException("parameter name already exist");
 
-            FloatParameter parameter = new FloatParameter(parameterName, Animator);
+            FloatParameter parameter = new FloatParameter(parameterName, this);
             _Parameters.Add(parameterName, parameter);
             return parameter;
         }
@@ -152,286 +166,295 @@ namespace Skill.Framework
             if (_Parameters.ContainsKey(parameterName))
                 throw new ArgumentException("parameter name already exist");
 
-            TriggerParameter parameter = new TriggerParameter(parameterName, Animator);
+            TriggerParameter parameter = new TriggerParameter(parameterName, this);
             _Parameters.Add(parameterName, parameter);
             return parameter;
         }
 
-    }
-
-    #region StateGroup
-    /// <summary>
-    /// it groups some states and allow user to do somethings when any of this is states BecameRelevant, CeaseRelevant and StayRelevant
-    /// </summary>
-    public class AnimatorStateGroup
-    {
-        private bool _Sorted;
-        private List<int> _NameMeshs;
-        private string _LayerName;
-        private int _SideEvents;
-
-        public int LayerIndex { get; private set; }
-        public string Name { get; private set; }
-        public bool IsRelevant { get; private set; }
-
-
-        public event EventHandler BecameRelevant;
-        private void OnBecameRelevant()
+        #region StateGroup
+        /// <summary>
+        /// it groups some states and allow user to do somethings when any of this is states BecameRelevant, CeaseRelevant and StayRelevant
+        /// </summary>
+        public class AnimatorStateGroup
         {
-            if (BecameRelevant != null) BecameRelevant(this, EventArgs.Empty);
-        }
+            private bool _Sorted;
+            private List<int> _NameMeshs;
+            private string _LayerName;
+            private int _SideEvents;
 
-        public event EventHandler StayRelevant;
-        private void OnStayRelevant() { if (StayRelevant != null) StayRelevant(this, EventArgs.Empty); }
-        public event EventHandler CeaseRelevant;
-        private void OnCeaseRelevant() { if (CeaseRelevant != null) CeaseRelevant(this, EventArgs.Empty); }
+            public int LayerIndex { get; private set; }
+            public string Name { get; private set; }
+            public bool IsRelevant { get; private set; }
 
-        internal AnimatorStateGroup(string name, string layerName, int layerIndex)
-        {
-            this._NameMeshs = new List<int>();
-            this.LayerIndex = layerIndex;
-            this.Name = name;
-            this._LayerName = layerName;
-        }
 
-        internal void Update()
-        {
-            if (_SideEvents == 2)
-                OnCeaseRelevant();
-            else if (_SideEvents == 1)
-                OnBecameRelevant();
-            _SideEvents = 0;
-
-            if (IsRelevant)
-                OnStayRelevant();
-        }
-
-        internal void FixedUpdate(ref AnimatorStateInfo currentState, ref AnimatorStateInfo nextState, bool isInTransition)
-        {
-            if (!_Sorted)
+            public event EventHandler BecameRelevant;
+            private void OnBecameRelevant()
             {
-                _Sorted = true;
-                _NameMeshs.Sort();
+                if (BecameRelevant != null) BecameRelevant(this, EventArgs.Empty);
             }
-            bool preRelevant = this.IsRelevant;
 
-            if (isInTransition)
-                this.IsRelevant = _NameMeshs.BinarySearch(nextState.fullPathHash) >= 0;
-            else
-                this.IsRelevant = _NameMeshs.BinarySearch(currentState.fullPathHash) >= 0;
+            public event EventHandler StayRelevant;
+            private void OnStayRelevant() { if (StayRelevant != null) StayRelevant(this, EventArgs.Empty); }
+            public event EventHandler CeaseRelevant;
+            private void OnCeaseRelevant() { if (CeaseRelevant != null) CeaseRelevant(this, EventArgs.Empty); }
 
-
-            if (preRelevant && !this.IsRelevant)
-                _SideEvents = 2;
-            else if (!preRelevant && this.IsRelevant)
-                _SideEvents = 1;
-        }
-
-        public void AddState(string stateName)
-        {
-            if (string.IsNullOrEmpty(stateName))
-                throw new ArgumentException("Invalid state name");
-            AddNewState(string.Format("{0}.{1}", _LayerName, stateName));
-        }
-
-        public void AddState(string stateName, string subStateMachineName)
-        {
-            if (string.IsNullOrEmpty(stateName))
-                throw new ArgumentException("Invalid state name");
-            if (string.IsNullOrEmpty(subStateMachineName))
-                throw new ArgumentException("Invalid Sub-State Machine name");
-
-            AddNewState(string.Format("{0}.{1}", subStateMachineName, stateName));
-            _Sorted = false;
-        }
-
-        private void AddNewState(string fullName)
-        {
-            int nameMesh = Animator.StringToHash(fullName);
-            if (_NameMeshs.Contains(nameMesh))
-                throw new ArgumentException("State name already exist");
-
-            _NameMeshs.Add(nameMesh);
-            _Sorted = false;
-        }
-
-        public bool RemoveState(string stateName)
-        {
-            if (string.IsNullOrEmpty(stateName))
-                throw new ArgumentException("Invalid state name");
-
-            int nameMesh = Animator.StringToHash(string.Format("{0}.{1}", _LayerName, stateName));
-            return _NameMeshs.Remove(nameMesh);
-        }
-
-        public bool RemoveState(string stateName, string subStateMachineName)
-        {
-            if (string.IsNullOrEmpty(stateName))
-                throw new ArgumentException("Invalid state name");
-            if (string.IsNullOrEmpty(subStateMachineName))
-                throw new ArgumentException("Invalid Sub-State Machine name");
-
-            int nameMesh = Animator.StringToHash(string.Format("{0}.{1}", subStateMachineName, stateName));
-            return _NameMeshs.Remove(nameMesh);
-        }
-    }
-    #endregion
-
-    #region Parameters
-
-    public enum AnimatorParameterType
-    {
-        Float = 1,
-        Int = 3,
-        Bool = 4,
-        Trigger = 9,
-    }
-
-    public abstract class AnimatorParameter
-    {
-        public string Name { get; private set; }
-        public int Id { get; private set; }
-        public Animator Animator { get; private set; }
-
-        internal AnimatorParameter(string name, Animator animator)
-        {
-            this.Name = name;
-            this.Animator = animator;
-            this.Id = Animator.StringToHash(this.Name);
-        }
-
-        public abstract AnimatorParameterType ParameterType { get; }
-    }
-
-    public class BooleanParameter : AnimatorParameter
-    {
-        private bool _Value;
-        public bool Value
-        {
-            get { return _Value; }
-            set
+            internal AnimatorStateGroup(string name, string layerName, int layerIndex)
             {
+                this._NameMeshs = new List<int>();
+                this.LayerIndex = layerIndex;
+                this.Name = name;
+                this._LayerName = layerName;
+            }
+
+            internal void Update()
+            {
+                if (_SideEvents == 2)
+                    OnCeaseRelevant();
+                else if (_SideEvents == 1)
+                    OnBecameRelevant();
+                _SideEvents = 0;
+
+                if (IsRelevant)
+                    OnStayRelevant();
+            }
+
+            internal void FixedUpdate(ref AnimatorStateInfo currentState, ref AnimatorStateInfo nextState, bool isInTransition)
+            {
+                if (!_Sorted)
+                {
+                    _Sorted = true;
+                    _NameMeshs.Sort();
+                }
+                bool preRelevant = this.IsRelevant;
+
+                if (isInTransition)
+                    this.IsRelevant = _NameMeshs.BinarySearch(nextState.fullPathHash) >= 0;
+                else
+                    this.IsRelevant = _NameMeshs.BinarySearch(currentState.fullPathHash) >= 0;
+
+
+                if (preRelevant && !this.IsRelevant)
+                    _SideEvents = 2;
+                else if (!preRelevant && this.IsRelevant)
+                    _SideEvents = 1;
+            }
+
+            public void AddState(string stateName)
+            {
+                if (string.IsNullOrEmpty(stateName))
+                    throw new ArgumentException("Invalid state name");
+                AddNewState(string.Format("{0}.{1}", _LayerName, stateName));
+            }
+
+            public void AddState(string stateName, string subStateMachineName)
+            {
+                if (string.IsNullOrEmpty(stateName))
+                    throw new ArgumentException("Invalid state name");
+                if (string.IsNullOrEmpty(subStateMachineName))
+                    throw new ArgumentException("Invalid Sub-State Machine name");
+
+                AddNewState(string.Format("{0}.{1}.{2}", _LayerName, subStateMachineName, stateName));// unity 5 needs layername too
+                _Sorted = false;
+            }
+
+            private void AddNewState(string fullName)
+            {
+                int nameMesh = Animator.StringToHash(fullName);
+                if (_NameMeshs.Contains(nameMesh))
+                    throw new ArgumentException("State name already exist");
+
+                _NameMeshs.Add(nameMesh);
+                _Sorted = false;
+            }
+
+            public bool RemoveState(string stateName)
+            {
+                if (string.IsNullOrEmpty(stateName))
+                    throw new ArgumentException("Invalid state name");
+
+                int nameMesh = Animator.StringToHash(string.Format("{0}.{1}", _LayerName, stateName));
+                return _NameMeshs.Remove(nameMesh);
+            }
+
+            public bool RemoveState(string stateName, string subStateMachineName)
+            {
+                if (string.IsNullOrEmpty(stateName))
+                    throw new ArgumentException("Invalid state name");
+                if (string.IsNullOrEmpty(subStateMachineName))
+                    throw new ArgumentException("Invalid Sub-State Machine name");
+
+                int nameMesh = Animator.StringToHash(string.Format("{0}.{1}.{2}", _LayerName, subStateMachineName, stateName));
+                return _NameMeshs.Remove(nameMesh);
+            }
+        }
+        #endregion
+
+        #region Parameters
+
+        public abstract class AnimatorParameter
+        {
+            public string Name { get; private set; }
+            public int Id { get; private set; }
+            public AnimatorManager Owner { get; private set; }
+
+            internal AnimatorParameter(string name, AnimatorManager owner)
+            {
+                this.Name = name;
+                this.Owner = owner;
+                this.Id = Animator.StringToHash(this.Name);
+            }
+
+            public abstract UnityEngine.AnimatorControllerParameterType ParameterType { get; }
+        }
+
+        public class BooleanParameter : AnimatorParameter
+        {
+            private bool _Value;
+            public bool Value
+            {
+                get { return _Value; }
+                set
+                {
+                    if (!Owner.IsDestroyed && _Value != value)
+                    {
+                        _Value = value;
+                        Owner.Animator.SetBool(Id, _Value);
+                        OnChanged();
+                    }
+                }
+            }
+
+            public event EventHandler Changed;
+            protected virtual void OnChanged() { if (Changed != null) Changed(this, EventArgs.Empty); }
+
+            internal BooleanParameter(string name, AnimatorManager owner) : base(name, owner) { }
+
+            public override UnityEngine.AnimatorControllerParameterType ParameterType { get { return UnityEngine.AnimatorControllerParameterType.Bool; } }
+
+            public static implicit operator bool(BooleanParameter b)
+            {
+                return b.Value;
+            }
+        }
+
+        public class IntegerParameter : AnimatorParameter
+        {
+            private int _Value;
+            public int Value
+            {
+                get { return _Value; }
+                set
+                {
+                    if (!Owner.IsDestroyed && _Value != value)
+                    {
+                        _Value = value;
+                        Owner.Animator.SetInteger(Id, _Value);
+                        OnChanged();
+                    }
+                }
+            }
+            public event EventHandler Changed;
+            protected virtual void OnChanged() { if (Changed != null) Changed(this, EventArgs.Empty); }
+            internal IntegerParameter(string name, AnimatorManager owner) : base(name, owner) { }
+            public override UnityEngine.AnimatorControllerParameterType ParameterType { get { return UnityEngine.AnimatorControllerParameterType.Int; } }
+
+            public static implicit operator int(IntegerParameter i) { return i.Value; }
+        }
+
+        public class FloatParameter : AnimatorParameter
+        {
+            private float _Value;
+            public float Value
+            {
+                get
+                {
+                    if (!Owner.IsDestroyed && IsControlledByCurve)
+                        _Value = Owner.Animator.GetFloat(Id);
+                    return _Value;
+                }
+                set
+                {
+                    SetValue(value);
+                }
+            }
+
+            public bool IsControlledByCurve { get; private set; }
+
+            public event EventHandler Changed;
+
+            protected virtual void OnChanged() { if (Changed != null) Changed(this, EventArgs.Empty); }
+
+            internal FloatParameter(string name, AnimatorManager owner)
+                : base(name, owner)
+            {
+                this.IsControlledByCurve = Owner.Animator.IsParameterControlledByCurve(Id);
+            }
+
+            public override UnityEngine.AnimatorControllerParameterType ParameterType { get { return UnityEngine.AnimatorControllerParameterType.Float; } }
+
+            public void UpdateValueFromAnimator(Animator animator)
+            {
+                float value = animator.GetFloat(Id);
                 if (_Value != value)
                 {
                     _Value = value;
-                    Animator.SetBool(Id, _Value);
                     OnChanged();
+                }
+            }
+
+            public static implicit operator float(FloatParameter f)
+            {
+                return f.Value;
+            }
+
+            public void SetValue(float value)
+            {
+                if (!Owner.IsDestroyed)
+                {
+                    if (_Value != value)
+                    {
+                        _Value = value;
+                        OnChanged();
+                    }
+                    Owner.Animator.SetFloat(Id, _Value);
+                }
+            }
+
+            public void SetValue(float value, float dampTime, float deltaTime)
+            {
+                if (!Owner.IsDestroyed)
+                {
+                    if (_Value != value)
+                    {
+                        _Value = value;
+                        OnChanged();
+                    }
+                    Owner.Animator.SetFloat(Id, _Value, dampTime, deltaTime);
                 }
             }
         }
 
-        public event EventHandler Changed;
-        protected virtual void OnChanged() { if (Changed != null) Changed(this, EventArgs.Empty); }
-
-        internal BooleanParameter(string name, Animator animator) : base(name, animator) { }
-
-        public override AnimatorParameterType ParameterType { get { return AnimatorParameterType.Bool; } }
-
-        public static implicit operator bool(BooleanParameter b)
+        public class TriggerParameter : AnimatorParameter
         {
-            return b.Value;
+            internal TriggerParameter(string name, AnimatorManager owner) : base(name, owner) { }
+
+            public override UnityEngine.AnimatorControllerParameterType ParameterType { get { return UnityEngine.AnimatorControllerParameterType.Trigger; } }
+
+            public void Set()
+            {
+                if (!Owner.IsDestroyed)
+                    Owner.Animator.SetTrigger(Id);
+            }
+            public void Reset()
+            {
+                if (!Owner.IsDestroyed)
+                    Owner.Animator.ResetTrigger(Id);
+            }
         }
+        #endregion
     }
 
-    public class IntegerParameter : AnimatorParameter
-    {
-        private int _Value;
-        public int Value
-        {
-            get { return _Value; }
-            set
-            {
-                if (_Value != value)
-                {
-                    _Value = value;
-                    Animator.SetInteger(Id, _Value);
-                    OnChanged();
-                }
-            }
-        }
-        public event EventHandler Changed;
-        protected virtual void OnChanged() { if (Changed != null) Changed(this, EventArgs.Empty); }
-        internal IntegerParameter(string name, Animator animator) : base(name, animator) { }
-        public override AnimatorParameterType ParameterType { get { return AnimatorParameterType.Int; } }
 
-        public static implicit operator int(IntegerParameter i) { return i.Value; }
-    }
 
-    public class FloatParameter : AnimatorParameter
-    {
-        private float _Value;
-        public float Value
-        {
-            get
-            {
-                if (IsControlledByCurve)
-                    _Value = Animator.GetFloat(Id);
-                return _Value;
-            }
-            set
-            {
-                SetValue(value);
-            }
-        }
 
-        public bool IsControlledByCurve { get; private set; }
-
-        public event EventHandler Changed;
-
-        protected virtual void OnChanged() { if (Changed != null) Changed(this, EventArgs.Empty); }
-
-        internal FloatParameter(string name, Animator animator)
-            : base(name, animator)
-        {
-            this.IsControlledByCurve = Animator.IsParameterControlledByCurve(Id);
-        }
-
-        public override AnimatorParameterType ParameterType { get { return AnimatorParameterType.Float; } }
-
-        public void UpdateValueFromAnimator(Animator animator)
-        {
-            float value = animator.GetFloat(Id);
-            if (_Value != value)
-            {
-                _Value = value;
-                OnChanged();
-            }
-        }
-
-        public static implicit operator float(FloatParameter f)
-        {
-            return f.Value;
-        }
-
-        public void SetValue(float value)
-        {
-            if (_Value != value)
-            {
-                _Value = value;
-                OnChanged();
-            }
-            Animator.SetFloat(Id, _Value);
-        }
-
-        public void SetValue(float value, float dampTime, float deltaTime)
-        {
-            if (_Value != value)
-            {
-                _Value = value;
-                OnChanged();
-            }
-            Animator.SetFloat(Id, _Value, dampTime, deltaTime);
-        }
-    }
-
-    public class TriggerParameter : AnimatorParameter
-    {
-        internal TriggerParameter(string name, Animator animator) : base(name, animator) { }
-
-        public override AnimatorParameterType ParameterType { get { return AnimatorParameterType.Trigger; } }
-
-        public void Set() { Animator.SetTrigger(Id); }
-        public void Reset() { Animator.ResetTrigger(Id); }
-    }
-    #endregion
 }

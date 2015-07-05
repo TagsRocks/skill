@@ -7,11 +7,12 @@ namespace Skill.Editor.AI
     /// Defines serializable data asset required for Implant tool
     /// </summary>
     [System.Serializable]
+    [CreateAssetMenu(fileName = "NewBehaviorTree", menuName = "Skill/BehaviorTree", order = 41)]
     public class BehaviorTreeAsset : ScriptableObject
     {
         [HideInInspector]
         public string XmlData;
-        [HideInInspector]
+
         public string BuildPath = "Scripts/AI";
 
         public SharedAccessKeysAsset[] SharedKeys;
@@ -56,6 +57,13 @@ namespace Skill.Editor.AI
             document.AppendChild(data.ToXmlElement());
             XmlData = document.OuterXml;
             UnityEditor.EditorUtility.SetDirty(this);
+        }
+
+
+        void OnEnable()
+        {
+            if (SharedKeys == null)
+                SharedKeys = new SharedAccessKeysAsset[0];
         }
     }
 

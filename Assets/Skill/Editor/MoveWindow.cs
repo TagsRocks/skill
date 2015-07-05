@@ -25,7 +25,7 @@ namespace Skill.Editor
         {
             hideFlags = HideFlags.DontSave;
 
-            base.title = "Move";
+            base.titleContent = new GUIContent( "Move");
             base.position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);
             base.minSize = Size;
             CreateUI();

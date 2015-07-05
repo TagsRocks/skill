@@ -20,7 +20,7 @@ namespace Skill.Framework.Triggers
         /// <returns>True if event handled, otherwise false</returns>
         protected override bool OnEnter(Collider other)
         {
-            if (Motion.SlowMotion > 0)
+            if (Motion.Duration > 0)
                 Skill.Framework.Global.RaiseSlowMotion(this, Motion);
             return true;
         }        

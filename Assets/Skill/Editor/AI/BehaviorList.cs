@@ -256,7 +256,7 @@ namespace Skill.Editor.AI
                     this.RowDefinitions.Add(1, GridUnitType.Star); // items
                     this.RowDefinitions.Add(20, GridUnitType.Pixel); // buttons
 
-                    Skill.Editor.UI.DropShadowLabel title = new UI.DropShadowLabel() { Text = "Property Difinition", Height = 20, Margin = new Thickness(0, 0, 0, 4) };
+                    Skill.Editor.UI.DropShadowLabel title = new UI.DropShadowLabel() { Text = "Parameter Difinition", Height = 20, Margin = new Thickness(0, 0, 0, 4) };
                     this.Controls.Add(title);
 
                     _HeaderBg = new Box() { Row = 1, Style = (GUIStyle)"RL Header" };

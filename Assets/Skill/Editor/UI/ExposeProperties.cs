@@ -547,11 +547,43 @@ namespace Skill.Editor.UI
             public override PropertyType Type { get { return PropertyType.String; } }
 
             private Skill.Editor.UI.TextField _Field;
-            public override Framework.UI.BaseControl Control { get { return _Field; } }
+            private Skill.Editor.UI.PasteTextField _PasteTextField;
+
+            public override Framework.UI.BaseControl Control
+            {
+                get
+                {
+                    if (_PasteTextField != null)
+                        return _PasteTextField;
+                    else
+                        return _Field;
+                }
+            }
             public StringProperties(ExposeProperties owner, PropertyInfo info, ExposePropertyAttribute attribute)
                 : base(owner, attribute.Order, info)
             {
-                _Field = new Skill.Editor.UI.TextField();
+
+                object[] attributes = info.GetCustomAttributes(true);
+                PasteTextFieldAttribute pasteTextFieldAttribute = null;
+                System.Type ptType = typeof(PasteTextFieldAttribute);
+                foreach (object o in attributes)
+                {
+                    if (o.GetType() == ptType)
+                    {
+                        pasteTextFieldAttribute = (PasteTextFieldAttribute)o;
+                        break;
+                    }
+                }
+                if (pasteTextFieldAttribute != null)
+                {
+                    _PasteTextField = new PasteTextField(pasteTextFieldAttribute.Persian);
+                    _Field = _PasteTextField.TextField;
+                }
+                else
+                {
+                    _Field = new Skill.Editor.UI.TextField();
+                }
+
                 _Field.TextChanged += TextField_ValueChanged;
                 _Field.Label.text = attribute.Name;
                 _Field.Label.tooltip = attribute.Description;
@@ -973,5 +1005,19 @@ namespace Skill.Editor.UI
         #endregion
 
 
+    }
+
+
+
+
+
+    [AttributeUsage(AttributeTargets.Property)]
+    public class PasteTextFieldAttribute : Attribute
+    {
+        public bool Persian { get; private set; }
+        public PasteTextFieldAttribute(bool persian = false)
+        {
+            this.Persian = persian;
+        }
     }
 }
