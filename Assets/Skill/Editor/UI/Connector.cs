@@ -215,10 +215,10 @@ namespace Skill.Editor.UI
         IEnumerator IEnumerable.GetEnumerator() { return (_Connections as IEnumerable).GetEnumerator(); }
 
         /// <summary>
-        /// OnMouseDown
+        /// MouseDownEvent
         /// </summary>
         /// <param name="args">Args</param>
-        protected override void OnMouseDown(MouseClickEventArgs args)
+        protected override void MouseDownEvent(MouseClickEventArgs args)
         {
             if (args.Button == MouseButton.Left)
             {
@@ -229,7 +229,7 @@ namespace Skill.Editor.UI
                         args.Handled = true;
                 }
             }
-            base.OnMouseDown(args);
+            base.MouseDownEvent(args);
         }
 
 

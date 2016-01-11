@@ -90,7 +90,9 @@ namespace Skill.Editor
         private Skill.Editor.UI.Slider _ChanceField;
         private Skill.Editor.UI.DropShadowLabel _RotationLabel;
         private Skill.Editor.UI.SelectionField _RotationSF;
-        private Skill.Editor.UI.XYZComponent _RandomRotation;
+		private Skill.Framework.UI.Grid _RandomRotationPanel;
+        private Skill.Editor.UI.Vector3Field _MinRandomRotation;
+        private Skill.Editor.UI.Vector3Field _MaxRandomRotation;
         private Skill.Editor.UI.Vector3Field _CustomRotation;
         private Skill.Framework.UI.ToggleButton _RandomYaw;
 
@@ -107,16 +109,15 @@ namespace Skill.Editor
                     this._MaxScaleField.Value = _Object.MaxScalePercent;
                     this._ChanceField.Value = _Object.Weight;
 
-                    _RandomRotation.XComponent.IsChecked = _Object.RandomX;
-                    _RandomRotation.YComponent.IsChecked = _Object.RandomY;
-                    _RandomRotation.ZComponent.IsChecked = _Object.RandomZ;
+                    _MinRandomRotation.Value = _Object.MinRandomRotation;
+                    _MaxRandomRotation.Value = _Object.MaxRandomRotation;
 
                     if (_Object.Rotation == ImplantObjectRotation.SurfaceNormal)
                         _RotationSF.SelectField(_RandomYaw);
                     else if (_Object.Rotation == ImplantObjectRotation.Custom)
                         _RotationSF.SelectField(_CustomRotation);
                     else
-                        _RotationSF.SelectField(_RandomRotation);
+                        _RotationSF.SelectField(_RandomRotationPanel);
 
                     this._CustomRotation.Value = _Object.CustomRotation;
                     this._RandomYaw.IsChecked = _Object.RandomYaw;
@@ -143,7 +144,24 @@ namespace Skill.Editor
             this._ChanceField = new Skill.Editor.UI.Slider() { MinValue = 0.1f, MaxValue = 1.0f, Margin = new Thickness(2, 2, 2, 2) };
             this._ChanceField.Label.text = "Chance";
 
-            _RandomRotation = new Skill.Editor.UI.XYZComponent();
+           _RandomRotationPanel = new Grid() { Height = 45 };
+
+            _RandomRotationPanel.ColumnDefinitions.Add(30, GridUnitType.Pixel);
+            _RandomRotationPanel.ColumnDefinitions.Add(1, GridUnitType.Star);
+
+            _RandomRotationPanel.RowDefinitions.Add(1, GridUnitType.Star);
+            _RandomRotationPanel.RowDefinitions.Add(1, GridUnitType.Star);
+
+            _MinRandomRotation = new Vector3Field() { Row = 0, Column = 1 };
+            _MaxRandomRotation = new Vector3Field() { Row = 1, Column = 1 };
+            _RandomRotationPanel.Controls.Add(_MinRandomRotation);
+            _RandomRotationPanel.Controls.Add(_MaxRandomRotation);
+
+            Label lblMin = new Label() { Row = 0, Column = 0, Text = "Min" };
+            Label lblMax = new Label() { Row = 1, Column = 0, Text = "Max" };
+
+            _RandomRotationPanel.Controls.Add(lblMin);
+            _RandomRotationPanel.Controls.Add(lblMax);
             _CustomRotation = new Skill.Editor.UI.Vector3Field();
 
             _RandomYaw = new Skill.Framework.UI.ToggleButton() { HorizontalAlignment = Skill.Framework.UI.HorizontalAlignment.Left, Margin = new Thickness(20, 0, 0, 0) };
@@ -155,7 +173,7 @@ namespace Skill.Editor
 
             _RotationSF.AddField(_RandomYaw, "Surface Normal ");
             _RotationSF.AddField(_CustomRotation, "Custom ");
-            _RotationSF.AddField(_RandomRotation, "Random ");
+            _RotationSF.AddField(_RandomRotationPanel, "Random ");
 
             _RotationLabel = new DropShadowLabel() { Text = "Rotation", Margin = new Thickness(4, 0, 0, 0) };
 
@@ -171,12 +189,8 @@ namespace Skill.Editor
             this._ChanceField.ValueChanged += new EventHandler(_ChanceField_ValueChanged);
             this._RotationSF.SelectedFieldChanged += new EventHandler(_RotationSF_SelectedFieldChanged);
 
-            this._RandomRotation.XComponent.Checked += new EventHandler(RandomXYZComponent_Checked);
-            this._RandomRotation.XComponent.Unchecked += new EventHandler(RandomXYZComponent_Checked);
-            this._RandomRotation.YComponent.Checked += new EventHandler(RandomXYZComponent_Checked);
-            this._RandomRotation.YComponent.Unchecked += new EventHandler(RandomXYZComponent_Checked);
-            this._RandomRotation.ZComponent.Checked += new EventHandler(RandomXYZComponent_Checked);
-            this._RandomRotation.ZComponent.Unchecked += new EventHandler(RandomXYZComponent_Checked);
+            this._MinRandomRotation.ValueChanged += _MinRandomRotation_ValueChanged;
+            this._MaxRandomRotation.ValueChanged += _MaxRandomRotation_ValueChanged;
 
             this._CustomRotation.ValueChanged += new EventHandler(_CustomRotation_ValueChanged);
             this._RandomYaw.Changed += new EventHandler(_RandomYaw_Changed);
@@ -187,8 +201,20 @@ namespace Skill.Editor
                           _MaxScaleField.LayoutHeight + _MaxScaleField.Margin.Vertical +
                           _ChanceField.LayoutHeight + _ChanceField.Margin.Vertical +
                           _RotationLabel.LayoutHeight + _RotationLabel.Margin.Vertical +
-                          _RotationSF.LayoutHeight + _RotationSF.Margin.Vertical;
-        }
+                          _RotationSF.LayoutHeight + _RotationSF.Margin.Vertical + 20;
+						       }
+							   
+							   		void _MaxRandomRotation_ValueChanged(object sender, EventArgs e)
+									       {
+										               if (_Object != null)
+													                   _Object.MaxRandomRotation = _MaxRandomRotation.Value;
+																	           }
+																			   
+																			           void _MinRandomRotation_ValueChanged(object sender, EventArgs e)
+																					           {
+																							               if (_Object != null)
+																										                   _Object.MinRandomRotation = _MinRandomRotation.Value;
+																														           }
 
         void _RandomYaw_Changed(object sender, EventArgs e)
         {
@@ -200,17 +226,7 @@ namespace Skill.Editor
         {
             if (_Object != null)
                 _Object.CustomRotation = _CustomRotation.Value;
-        }
-
-        void RandomXYZComponent_Checked(object sender, EventArgs e)
-        {
-            if (_Object != null)
-            {
-                _Object.RandomX = _RandomRotation.XComponent.IsChecked;
-                _Object.RandomY = _RandomRotation.YComponent.IsChecked;
-                _Object.RandomZ = _RandomRotation.ZComponent.IsChecked;
-            }
-        }
+        }        
 
         void _RotationSF_SelectedFieldChanged(object sender, EventArgs e)
         {

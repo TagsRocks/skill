@@ -13,16 +13,23 @@ namespace Skill.Framework.Triggers
         /// <summary> reference to IsometricCameraMotion attached to camera </summary>
         public IsometricCameraMotion Motion;
 
-        /// <summary> Apply parameters relative to current parameters of camera or set parameters absolutely </summary>
-        public bool Relative = false;
         /// <summary> faild of view </summary>
         public float Fov = 60;
         /// <summary> Rotation angle around target ( 0 - 360) </summary>
         public float AroundAngle = 0;
         /// <summary> Rotation angle behind target( 0 - 90). 0 is completely horizontal to target and 90 is completely vertical to target. </summary>
         public float LookAngle = 0;
+        /// <summary> Camera moves by mouse when mouse position gets far from center of screen. </summary>
+        public float Preview = 2.0f;
+        /// <summary> Minimum distance to target when PointOfIntrest is close to target</summary>
+        public float ZoomIn = 8;
+        /// <summary> Maximum distance to target when PointOfIntrest is far from target</summary>
+        public float ZoomOut = 16;
+        /// <summary> Apply relative custom offset to position of camera </summary>
+        public Vector3 CustomOffset = Vector3.zero;
         /// <summary> length of motion to reach this values</summary>
         public float MotionTime = 0.5f;
+
 
         private static IsometricCameraMotionTrigger _LastTrigger;
 
@@ -69,10 +76,15 @@ namespace Skill.Framework.Triggers
         {
             if (Motion != null)
             {
-                if (Relative)
-                    Motion.MotionDelta(Fov, AroundAngle, LookAngle, fast ? 0 : MotionTime);
-                else
-                    Motion.Motion(Fov, AroundAngle, LookAngle, fast ? 0 : MotionTime);
+                float time = fast ? 0 : MotionTime;
+
+                Motion.MotionFov(this.Fov, time);
+                Motion.MotionAroundAngle(this.AroundAngle, time);
+                Motion.MotionLookAngle(this.LookAngle, time);
+                Motion.MotionPreview(this.Preview, time);
+                Motion.MotionZoomIn(this.ZoomIn, time);
+                Motion.MotionZoomOut(this.ZoomOut, time);
+                Motion.MotionCustomOffset(this.CustomOffset, time);
             }
         }
     }

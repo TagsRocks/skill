@@ -176,7 +176,7 @@ namespace Skill.Framework.IO
             if (att != null) _Attributes.Remove(att);
         }
 
-        internal XmlElement GetNextSibling(XmlElement xmlElement)
+        public XmlElement GetNextSibling(XmlElement xmlElement)
         {
             int index = _Elements.IndexOf(xmlElement);
             if (index >= 0 && index < _Elements.Count - 1)

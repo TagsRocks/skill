@@ -50,12 +50,17 @@ namespace Skill.Framework.IO
         /// <summary> Awake </summary>
         protected override void Awake()
         {
-            Instance = this;
-            base.Awake();
-            if (MaxTouchesToProcess < 1) MaxTouchesToProcess = 1;
-            _TouchStates = new TouchState[MaxTouchesToProcess];
-            for (int i = 0; i < MaxTouchesToProcess; i++)
-                _TouchStates[i] = new TouchState(i);
+            if (Instance == null)
+            {
+                Instance = this;
+                base.Awake();
+                if (MaxTouchesToProcess < 1) MaxTouchesToProcess = 1;
+                _TouchStates = new TouchState[MaxTouchesToProcess];
+                for (int i = 0; i < MaxTouchesToProcess; i++)
+                    _TouchStates[i] = new TouchState(i);
+            }
+            else
+                Destroy(this.gameObject);
         }
 
         /// <summary> Update </summary>
@@ -200,7 +205,7 @@ namespace Skill.Framework.IO
         {
             if (_NeedToSortGestures)
                 RearrangeGestureDetectors();
-            
+
             // first allow detecting gestures to chance detect
             foreach (var detector in _GestureDetectors)
             {
@@ -209,7 +214,7 @@ namespace Skill.Framework.IO
                     detector.LastReslut = detector.Update(this);
                     if (detector.LastReslut != GestureDetectionResult.Detecting)
                     {
-                        if (detector.LastReslut == GestureDetectionResult.Detected)
+                        if (detector.LastReslut == GestureDetectionResult.Detected && detector.UseTouchesOnDetected)
                             detector.UseTouches();
                         if (detector.LastReslut != GestureDetectionResult.None)
                         {
@@ -227,7 +232,7 @@ namespace Skill.Framework.IO
                     detector.LastReslut = detector.Update(this);
                     if (detector.LastReslut != GestureDetectionResult.Detecting)
                     {
-                        if (detector.LastReslut == GestureDetectionResult.Detected)
+                        if (detector.LastReslut == GestureDetectionResult.Detected && detector.UseTouchesOnDetected)
                             detector.UseTouches();
                         if (detector.LastReslut != GestureDetectionResult.None)
                         {
@@ -255,6 +260,7 @@ namespace Skill.Framework.IO
         /// <param name="detector">GestureDetector to add</param>
         public static void Add(GestureDetector detector)
         {
+            if (Instance == null) return;
             // add, then sort and reverse so the higher pPriority items will be on top
             Instance._GestureDetectors.Add(detector);
             Instance._NeedToSortGestures = true;
@@ -268,6 +274,7 @@ namespace Skill.Framework.IO
         /// <returns>True if removed, otherwise false</returns>
         public static bool Remove(GestureDetector detector)
         {
+            if (Instance == null) return false;
             bool result = Instance._GestureDetectors.Remove(detector);
             if (result)
                 detector.Reset();
@@ -279,6 +286,7 @@ namespace Skill.Framework.IO
         /// </summary>
         public static void RemoveAllGestures()
         {
+            if (Instance == null) return;
             foreach (var g in Instance._GestureDetectors)
             {
                 if (g.IsEnabled)
@@ -367,6 +375,13 @@ namespace Skill.Framework.IO
             InputButton btn = new InputButton(name, keys);
             Instance._Buttons.Add(btn);
             return btn;
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            if (Instance == this)
+                Instance = null;
         }
     }
 

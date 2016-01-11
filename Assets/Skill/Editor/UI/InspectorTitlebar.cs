@@ -46,6 +46,11 @@ namespace Skill.Editor.UI
         public UnityEngine.Object Object { get; set; }
 
         /// <summary>
+        /// Whether this editor should display a foldout arrow in order to toggle the display of its properties.
+        /// </summary>
+        public bool Expandable { get; set; }
+
+        /// <summary>
         /// The object (for example a component) or objects that the titlebar is for.
         /// </summary>
         public UnityEngine.Object[] Objects { get; set; }
@@ -66,9 +71,9 @@ namespace Skill.Editor.UI
             //if (!string.IsNullOrEmpty(Name)) GUI.SetNextControlName(Name);
 
             if (Objects != null && Objects.Length > 0)
-                FoldoutState = EditorGUI.InspectorTitlebar(RenderArea, _FoldoutState, Objects);
+                FoldoutState = EditorGUI.InspectorTitlebar(RenderArea, _FoldoutState, Objects, Expandable);
             else //if (Object != null)
-                FoldoutState = EditorGUI.InspectorTitlebar(RenderArea, _FoldoutState, Object);
+                FoldoutState = EditorGUI.InspectorTitlebar(RenderArea, _FoldoutState, Object, Expandable);
             //else
             //    Debug.LogError("Invalid object for InspectorTitlebar");
         }

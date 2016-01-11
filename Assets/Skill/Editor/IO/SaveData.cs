@@ -13,6 +13,12 @@ namespace Skill.Editor.IO
     /// </summary>
     public class SaveData : ClassData
     {
+        public static SaveData GeneratingInstance { get; set; }
+
+
+        /// <summary> Namespace  </summary>
+        public string Namespace { get; set; }
+
         /// <summary>
         /// List of Savable classes
         /// </summary>
@@ -33,6 +39,7 @@ namespace Skill.Editor.IO
         /// <param name="e">Xelement containing data</param>
         protected override void ReadAttributes(XmlElement e)
         {
+            Namespace = e.GetAttributeValueAsString("Namespace", string.Empty);
             XmlElement classes = e["Classes"];
             if (classes != null)
             {
@@ -55,6 +62,7 @@ namespace Skill.Editor.IO
         /// <param name="e">XmlElement to save data</param>
         protected override void WriteAttributes(XmlElement e)
         {
+            e.SetAttributeValue("Namespace", this.Namespace);
             if (Classes != null)
             {
                 XmlElement classes = new XmlElement("Classes");

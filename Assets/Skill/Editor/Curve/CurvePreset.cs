@@ -34,11 +34,11 @@ namespace Skill.Editor.Curve
             UnityEditor.EditorGUIUtility.DrawCurveSwatch(RenderArea, _Curve, null, CurveColor, CurveBGColor);
         }
 
-        protected override void OnMouseDown(MouseClickEventArgs args)
+        protected override void MouseDownEvent(MouseClickEventArgs args)
         {
             if (args.Button == MouseButton.Left)
                 OnClick();
-            base.OnMouseDown(args);
+            base.MouseDownEvent(args);
         }
     }
 

@@ -225,6 +225,22 @@ namespace Skill.Framework.IO
             return array;
         }
 
+
+        /// <summary>
+        /// Read array of SafeInt data from stream
+        /// </summary>
+        /// <returns>array of SafeInt</returns>
+        public SafeInt[] ReadSafeIntArray()
+        {
+            int length = ReadInt();
+            SafeInt[] array = new SafeInt[length];
+            for (int i = 0; i < length; i++)
+            {
+                array[i] = ReadInt();
+            }
+            return array;
+        }
+
         /// <summary>
         /// Read array of float data from stream
         /// </summary>
@@ -241,6 +257,21 @@ namespace Skill.Framework.IO
         }
 
         /// <summary>
+        /// Read array of SafeFloat data from stream
+        /// </summary>
+        /// <returns>array of SafeFloat</returns>
+        public SafeFloat[] ReadSafeFloatArray()
+        {
+            int length = ReadInt();
+            SafeFloat[] array = new SafeFloat[length];
+            for (int i = 0; i < length; i++)
+            {
+                array[i] = ReadFloat();
+            }
+            return array;
+        }
+
+        /// <summary>
         /// Read array of bool data from stream
         /// </summary>
         /// <returns>array of bool</returns>
@@ -248,6 +279,21 @@ namespace Skill.Framework.IO
         {
             int length = ReadInt();
             bool[] array = new bool[length];
+            for (int i = 0; i < length; i++)
+            {
+                array[i] = ReadBoolean();
+            }
+            return array;
+        }
+
+        /// <summary>
+        /// Read array of SafeBool data from stream
+        /// </summary>
+        /// <returns>array of SafeBool</returns>
+        public SafeBool[] ReadSafeBooleanArray()
+        {
+            int length = ReadInt();
+            SafeBool[] array = new SafeBool[length];
             for (int i = 0; i < length; i++)
             {
                 array[i] = ReadBoolean();

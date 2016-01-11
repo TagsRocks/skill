@@ -20,6 +20,7 @@ namespace Skill.Editor
         private Skill.Framework.UI.Frame _Frame;
         private Skill.Editor.UI.ObjectField<Texture2D> _TextureField;
         private Skill.Editor.UI.ToggleButton _TbBrush;
+        private Skill.Editor.UI.ToggleButton _TbShadowMode;
 
         private Skill.Editor.UI.ColorField _ColorField;
 
@@ -42,7 +43,7 @@ namespace Skill.Editor
         {
             _Panel = new StackPanel() { Padding = new Skill.Framework.UI.Thickness(2, 4, 2, 0) };
             _TextureField = new Skill.Editor.UI.ObjectField<Texture2D>() { Object = _PaintColor.Texture, HorizontalAlignment = Skill.Framework.UI.HorizontalAlignment.Center, Width = 80, Height = 80, Margin = new Skill.Framework.UI.Thickness(2) };
-            
+
 
             #region _TbChannels
             _TbChannels = new UI.TabHeader(4, true) { Margin = new Thickness(0, 2, 0, 10), HorizontalAlignment = HorizontalAlignment.Center, Width = 200, Height = 20 };
@@ -60,16 +61,16 @@ namespace Skill.Editor
             #region _LayersField and _PUV and _TbBrush
 
             Grid layersPanel = new Grid() { Height = 32, Padding = new Thickness(2, 6) };
-            layersPanel.ColumnDefinitions.Add(90, GridUnitType.Pixel);                        
+            layersPanel.ColumnDefinitions.Add(90, GridUnitType.Pixel);
             layersPanel.ColumnDefinitions.Add(50, GridUnitType.Pixel);
             layersPanel.ColumnDefinitions.Add(10, GridUnitType.Pixel);
             layersPanel.ColumnDefinitions.Add(45, GridUnitType.Pixel);
             layersPanel.ColumnDefinitions.Add(1, GridUnitType.Star);
 
 
-            _TbBrush = new UI.ToggleButton() { Column = 0,  IsChecked = _PaintColor.Brush , Left = true };
+            _TbBrush = new UI.ToggleButton() { Column = 0, IsChecked = _PaintColor.Brush, Left = true };
             _TbBrush.Label.text = "Brush View";
-            layersPanel.Controls.Add(_TbBrush);           
+            layersPanel.Controls.Add(_TbBrush);
 
             _PUV = new Popup() { Row = 0, Column = 1 };
             PopupOption uv1 = new PopupOption(0) { Name = "UV1" }; uv1.Content.text = "UV 1";
@@ -88,7 +89,7 @@ namespace Skill.Editor
             _LayersField.Label.text = string.Empty;
             layersPanel.Controls.Add(_LayersField);
 
-            
+
             #endregion
 
             _PnlFavoriteColors = new Grid() { Height = 22, Margin = new Thickness(0, 2) };
@@ -125,8 +126,9 @@ namespace Skill.Editor
             _HelpBox = new HelpBox() { Height = 60, Message = "Hold CTRL and drag with Right Click to paint.\nTexture must be read/write enable\nValid texture format:\n    ARGB32, RGBA32, RGB24 and Alpha8" };
 
             _BtnSaveTexture = new Skill.Framework.UI.Button() { Margin = new Thickness(2), Height = 40 }; _BtnSaveTexture.Content.text = "Save Texture";
+            _TbShadowMode = new UI.ToggleButton() { Left = false, Margin = new Thickness(2), Height = 20 }; _TbShadowMode.Label.text = "Shadow Mode";
 
-            
+
             _Panel.Controls.Add(_TextureField);
             _Panel.Controls.Add(_TbChannels);
             _Panel.Controls.Add(_PnlFavoriteColors);
@@ -135,6 +137,7 @@ namespace Skill.Editor
             _Panel.Controls.Add(_SliRadius);
             _Panel.Controls.Add(_SliStrength);
             _Panel.Controls.Add(_SliFalloff);
+            _Panel.Controls.Add(_TbShadowMode);
             _Panel.Controls.Add(_HelpBox);
             _Panel.Controls.Add(_BtnSaveTexture);
 
@@ -143,6 +146,7 @@ namespace Skill.Editor
 
             _TextureField.ObjectChanged += _TextureField_ObjectChanged;
             _TbBrush.Changed += _TbBrush_Changed;
+            _TbShadowMode.Changed += _TbShadowMode_Changed;
 
             _TbChannels.TabChanged += Channel_Changed;
 
@@ -155,6 +159,8 @@ namespace Skill.Editor
             _SliFalloff.ValueChanged += _SliFalloff_ValueChanged;
             _BtnSaveTexture.Click += _BtnSaveTexture_Click;
         }
+
+
 
 
 
@@ -205,6 +211,11 @@ namespace Skill.Editor
             EditorUtility.SetDirty(_PaintColor);
         }
 
+        void _TbShadowMode_Changed(object sender, EventArgs e)
+        {
+            _PaintColor.ShadowMode = _TbShadowMode.IsChecked;
+            EditorUtility.SetDirty(_PaintColor);
+        }
         void _SliFalloff_ValueChanged(object sender, EventArgs e)
         {
             _PaintColor.Falloff = _SliFalloff.Value;
@@ -268,12 +279,13 @@ namespace Skill.Editor
 
         public override void OnInspectorGUI()
         {
-            _Frame.OnInspectorGUI(368);
+            _Frame.OnInspectorGUI(388);
         }
         #endregion
 
 
 
+        private Collider _PaintColorCollider;
         private PaintColor _PaintColor;
         private BrushProjector _BrushProjector;
         private TextureBrush _Brush;
@@ -282,6 +294,7 @@ namespace Skill.Editor
         void OnEnable()
         {
             _PaintColor = target as PaintColor;
+            _PaintColorCollider = _PaintColor.GetComponent<Collider>();
             CreateUI();
         }
 
@@ -299,12 +312,12 @@ namespace Skill.Editor
 
         void OnDisable()
         {
-            DestroyBrushes();            
+            DestroyBrushes();
         }
 
         void OnDestroy()
         {
-            DestroyBrushes();            
+            DestroyBrushes();
         }
 
 
@@ -480,6 +493,15 @@ namespace Skill.Editor
                 Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
                 if (Physics.Raycast(ray, out hit))
                 {
+                    if (_PaintColor.ShadowMode)
+                    {
+                        RaycastHit hit2;
+                        Ray ray2 = new Ray() { origin = hit.point + -1000 * _PaintColor.transform.forward, direction = _PaintColor.transform.forward };
+                        if (_PaintColorCollider.Raycast(ray2, out hit2, 1000))
+                        {
+                            hit = hit2;                            
+                        }
+                    }
                     if (hit.collider.gameObject == _PaintColor.gameObject)
                     {
                         float xCenterNormalized, yCenterNormalized;

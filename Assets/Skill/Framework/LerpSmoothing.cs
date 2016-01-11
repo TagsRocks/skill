@@ -209,7 +209,7 @@ namespace Skill.Framework
         public float CurrentAngle { get { return _CurrentAngle; } set { _CurrentAngle = value; } }
 
         /// <summary> The value we are trying to reach. </summary>
-        public float TargetAngle { get { return _TargetAngle; } set { _TargetAngle = MathHelper.ClampAngle(value); } }
+        public float TargetAngle { get { return _TargetAngle; } set { _TargetAngle = value; } }
 
         /// <summary>
         /// Update one step and return result
@@ -219,7 +219,7 @@ namespace Skill.Framework
         public float Update(float smoothing)
         {
             if (_CurrentAngle != _TargetAngle)
-                _CurrentAngle = MathHelper.ClampAngle(Mathf.LerpAngle(_CurrentAngle, _TargetAngle, smoothing * Time.deltaTime));
+                _CurrentAngle = Mathf.LerpAngle(_CurrentAngle, _TargetAngle, smoothing * Time.deltaTime);
             return _CurrentAngle;
         }
 
@@ -229,7 +229,7 @@ namespace Skill.Framework
         /// <param name="value">Value</param>
         public void Reset(float value)
         {
-            _TargetAngle = MathHelper.ClampAngle(value);
+            _TargetAngle = value;
             _CurrentAngle = value;
         }
     }

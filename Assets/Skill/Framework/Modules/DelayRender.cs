@@ -30,7 +30,7 @@ namespace Skill.Framework.Modules
 
         public void Reschedule()
         {
-            _StartTW.Begin(Delay);
+            _StartTW.Begin(Delay , true);
             if (this._Renderer != null)
                 this._Renderer.enabled = false;
             enabled = true;

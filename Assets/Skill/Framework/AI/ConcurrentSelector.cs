@@ -60,8 +60,9 @@ namespace Skill.Framework.AI
     public class ConcurrentSelector : Composite
     {
 
+        private int _SuccessCount; // number of children that returns BehaviorResult.Failure
         private int _FailureCount; // number of children that returns BehaviorResult.Failure
-        private bool[] _ChildrenFirstExecution; // status of children that finish their jobs and result is not BehaviorResult.Running
+        private bool[] _ChildrenExecution; // status of children that finish their jobs and result is not BehaviorResult.Running
 
 
         /// <summary>
@@ -69,9 +70,9 @@ namespace Skill.Framework.AI
         /// </summary>
         private void CreateChildrenExecution()
         {
-            if (_ChildrenFirstExecution == null || _ChildrenFirstExecution.Length != ChildCount)
+            if (_ChildrenExecution == null || _ChildrenExecution.Length != ChildCount)
             {
-                _ChildrenFirstExecution = new bool[ChildCount];
+                _ChildrenExecution = new bool[ChildCount];
                 ResetChildrenExecution();
             }
         }
@@ -81,9 +82,9 @@ namespace Skill.Framework.AI
         /// </summary>
         private void ResetChildrenExecution()
         {
-            for (int i = 0; i < _ChildrenFirstExecution.Length; i++)
+            for (int i = 0; i < _ChildrenExecution.Length; i++)
             {
-                _ChildrenFirstExecution[i] = false;
+                _ChildrenExecution[i] = false;
             }
         }
 
@@ -126,6 +127,7 @@ namespace Skill.Framework.AI
         protected override BehaviorResult Behave(BehaviorTreeStatus status)
         {
             _FailureCount = 0;
+            _SuccessCount = 0;
             CreateChildrenExecution(); // make sure the  _ChildrenResults array is valid
             BehaviorResult result = BehaviorResult.Running; // by default running
 
@@ -140,15 +142,29 @@ namespace Skill.Framework.AI
                 BehaviorContainer node = this[i];
                 status.Parameters = node.Parameters;
 
-                if (_ChildrenFirstExecution[i])
+                if (_ChildrenExecution[i])
                 {
                     if (node.Behavior.Concurrency == ConcurrencyMode.UntilFailure && node.Behavior.Result == BehaviorResult.Failure)
                     {
                         _FailureCount++;
+                        if ((FailurePolicy == AI.FailurePolicy.FailOnOne && _FailureCount > 0) || (FailurePolicy == AI.FailurePolicy.FailOnAll && _FailureCount == ChildCount))
+                        {
+                            result = BehaviorResult.Failure;
+                            break;
+                        }
                         continue;
                     }
                     else if (node.Behavior.Concurrency == ConcurrencyMode.UntilSuccess && node.Behavior.Result == BehaviorResult.Success)
                     {
+                        _SuccessCount++;
+                        if (SuccessPolicy == AI.SuccessPolicy.SucceedOnAll)
+                        {
+                            if (_SuccessCount == ChildCount)
+                            {
+                                result = BehaviorResult.Success;
+                                break;
+                            }
+                        }
                         continue;
                     }
                 }
@@ -168,6 +184,10 @@ namespace Skill.Framework.AI
                     else
                         _FailureCount++;
                 }
+                else if (childResult == BehaviorResult.Success)
+                {                    
+                        _SuccessCount++;
+                }
                 // check failure policity
                 if ((FailurePolicy == AI.FailurePolicy.FailOnOne && _FailureCount > 0) || (FailurePolicy == AI.FailurePolicy.FailOnAll && _FailureCount == ChildCount))
                 {
@@ -175,17 +195,28 @@ namespace Skill.Framework.AI
                     break;
                 }
                 // check success policity
-                if (SuccessPolicy == AI.SuccessPolicy.SucceedOnOne && childResult == BehaviorResult.Success)
+                if (SuccessPolicy == AI.SuccessPolicy.SucceedOnOne)
                 {
-                    result = BehaviorResult.Success;
-                    break;
+                    if (childResult == BehaviorResult.Success)
+                    {
+                        result = BehaviorResult.Success;
+                        break;
+                    }
+                }
+                else if (SuccessPolicy == AI.SuccessPolicy.SucceedOnAll)
+                {
+                    if (_SuccessCount == ChildCount)
+                    {
+                        result = BehaviorResult.Success;
+                        break;
+                    }
                 }
 
                 //// if result of this node is running or result of any previous node is running, set result to running
                 //if (childResult == BehaviorResult.Running || result != BehaviorResult.Running)
                 //    result = childResult;
 
-                _ChildrenFirstExecution[i] = true;
+                _ChildrenExecution[i] = true;
             }
 
 

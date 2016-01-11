@@ -4,7 +4,7 @@ using System.Text;
 using UnityEngine;
 
 namespace Skill.Framework.Audio
-{    
+{
     /// <summary>
     /// Manage volume of sounds every frame
     /// </summary>
@@ -17,12 +17,15 @@ namespace Skill.Framework.Audio
 
         private AudioSource[] _Audios;
         private Skill.Framework.Smoothing _Volume;
+        public AudioSource Audio { get; private set; }
+        public AudioSource[] Audios { get { return _Audios; } }
 
-        protected override void Awake()
+        public void Relink()
         {
-            base.Awake();
-            _Volume.Reset(0);
+            Audio = GetComponent<AudioSource>();
             _Audios = GetComponents<AudioSource>();
+            
+
             foreach (var audio in _Audios)
             {
                 if (audio != null)
@@ -30,6 +33,13 @@ namespace Skill.Framework.Audio
                     audio.volume = _Volume.Current;
                 }
             }
+        }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            _Volume.Reset(0);
+            Relink();
         }
 
         protected override void Update()

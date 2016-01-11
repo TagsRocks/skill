@@ -10,7 +10,7 @@ namespace Skill.Framework.UI
     /// </summary>
     public class GUICursor : MonoBehaviour
     {
-        public int GUIDepth = 0;
+        public int GUIDepth = 12;
         /// <summary>
         /// Cursor texture
         /// </summary>

@@ -54,7 +54,7 @@ namespace Skill.Framework.UI
         /// </remarks>
         public float MaxLoadProgress = 0.8f;
 
-        public int GUIDepth = 0;
+        public int GUIDepth = 10;
 
         private Frame _Frame;
         private Image _ImgSplash;
@@ -120,9 +120,38 @@ namespace Skill.Framework.UI
         }
 
 
+        private void SetFullScreen()
+        {
+            if (_Frame.Grid.RowDefinitions.Count != 1)
+            {
+                _Frame.Grid.RowDefinitions.Clear();
+                _Frame.Grid.RowDefinitions.Add(1, GridUnitType.Star);
+            }
+            if (_Frame.Grid.ColumnDefinitions.Count != 1)
+            {
+                _Frame.Grid.ColumnDefinitions.Clear();
+                _Frame.Grid.ColumnDefinitions.Add(1, GridUnitType.Star);
+            }
+            _ImgSplash.Column = _ImgSplash.Row = 0;
+        }
 
         private void SetSize(float width, float height, ScaleMode scale)
         {
+            if (_Frame.Grid.RowDefinitions.Count != 3)
+            {
+                _Frame.Grid.RowDefinitions.Clear();
+                for (int i = 0; i < 3; i++)
+                    _Frame.Grid.RowDefinitions.Add(1, GridUnitType.Star);
+            }
+            if (_Frame.Grid.ColumnDefinitions.Count != 3)
+            {
+                _Frame.Grid.ColumnDefinitions.Clear();
+                for (int i = 0; i < 3; i++)
+                    _Frame.Grid.ColumnDefinitions.Add(1, GridUnitType.Star);
+            }
+
+            _ImgSplash.Column = _ImgSplash.Row = 1;
+
             float clampedSizeW = Mathf.Clamp01(width) * 100;
             _Frame.Grid.ColumnDefinitions[0].Width = _Frame.Grid.ColumnDefinitions[2].Width = new GridLength((100 - clampedSizeW) * 0.5f, GridUnitType.Star);
             _Frame.Grid.ColumnDefinitions[1].Width = new GridLength(clampedSizeW, GridUnitType.Star);
@@ -136,10 +165,13 @@ namespace Skill.Framework.UI
 
         private void LoadLevel()
         {
-            if (!string.IsNullOrEmpty(LevelToLoad) && Application.HasProLicense())
+            if (!string.IsNullOrEmpty(LevelToLoad) )
             {
-                _LoadingAsyncOperation = Application.LoadLevelAsync(LevelToLoad);
-                _LoadingAsyncOperation.allowSceneActivation = false;
+                if (Application.CanStreamedLevelBeLoaded(LevelToLoad))
+                {
+                    _LoadingAsyncOperation =  UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(LevelToLoad);
+                    _LoadingAsyncOperation.allowSceneActivation = false;
+                }
             }
         }
 
@@ -149,7 +181,7 @@ namespace Skill.Framework.UI
             if (_CurrentSplashIndex >= 0 && _Fading != null)
             {
                 // fadeout
-                _Fading.FadeOut();
+                _Fading.FadeToOne();
 
                 //prepare to change texture after fadeout                
                 _NextSplashTW.Begin(_Fading.FadeOutTime + 0.2f);
@@ -244,7 +276,7 @@ namespace Skill.Framework.UI
 
                     if (_Fading != null)
                     {
-                        _Fading.FadeIn(true);
+                        _Fading.FadeToZero(true);
                         _SplashTW.Begin(Mathf.Max(movie.duration - _Fading.FadeOutTime, Images[_CurrentSplashIndex].MaxDuration - _Fading.FadeOutTime, _Fading.FadeOutTime + 0.1f));
                     }
                     else
@@ -253,14 +285,14 @@ namespace Skill.Framework.UI
                 else
                 {
 #endif
-                SetSize(Images[_CurrentSplashIndex].WidthPercent, Images[_CurrentSplashIndex].HeightPercent, Images[_CurrentSplashIndex].Scale);
-                if (_Fading != null)
-                {
-                    _Fading.FadeIn(true);
-                    _SplashTW.Begin(Mathf.Max(Images[_CurrentSplashIndex].MaxDuration - _Fading.FadeOutTime, _Fading.FadeOutTime + 0.1f));
-                }
-                else
-                    _SplashTW.Begin(Mathf.Max(Images[_CurrentSplashIndex].MaxDuration - 0.1f, 0.1f));
+                    SetSize(Images[_CurrentSplashIndex].WidthPercent, Images[_CurrentSplashIndex].HeightPercent, Images[_CurrentSplashIndex].Scale);
+                    if (_Fading != null)
+                    {
+                        _Fading.FadeToZero(true);
+                        _SplashTW.Begin(Mathf.Max(Images[_CurrentSplashIndex].MaxDuration - _Fading.FadeOutTime, _Fading.FadeOutTime + 0.1f));
+                    }
+                    else
+                        _SplashTW.Begin(Mathf.Max(Images[_CurrentSplashIndex].MaxDuration - 0.1f, 0.1f));
 #if SUPPORTMOVIE
                 }
 #endif

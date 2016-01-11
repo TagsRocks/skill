@@ -236,6 +236,7 @@ namespace Skill.Editor
 
         private Skill.Editor.UI.ObjectField<Dictionary> _ObjectField;
         private Skill.Editor.UI.TextField _TxtFilter;
+        private Skill.Framework.UI.Label _LblFilter;
         private Skill.Framework.UI.ListBox _ListBox;
 
         private Skill.Framework.UI.Button _BtnAdd;
@@ -319,9 +320,8 @@ namespace Skill.Editor
         private void CreateFieldPanel()
         {
             _FieldPanel = new Grid() { Row = 0, Padding = new Thickness(2) };
-            _FieldPanel.ColumnDefinitions.Add(1, GridUnitType.Star); // object field
-            _FieldPanel.ColumnDefinitions.Add(40, GridUnitType.Pixel); // filter label
-            _FieldPanel.ColumnDefinitions.Add(180, GridUnitType.Pixel); // filter textfiald                        
+            _FieldPanel.ColumnDefinitions.Add(1, GridUnitType.Star); // object field            
+            _FieldPanel.ColumnDefinitions.Add(220, GridUnitType.Pixel); // filter textfiald                        
             _FieldPanel.ColumnDefinitions.Add(180, GridUnitType.Pixel); // tabs
 
             Box box = new Box() { Row = 0, Column = 0, RowSpan = 10, ColumnSpan = 3 };
@@ -334,12 +334,12 @@ namespace Skill.Editor
             _ObjectField.ObjectChanged += _ObjectField_ObjectChanged;
 
 
-            Label lblFilter = new Label() { Column = 1, Text = "filter :" };
-            _FieldPanel.Controls.Add(lblFilter);
-
-            _TxtFilter = new UI.TextField() { Column = 2 };
+            _TxtFilter = new UI.TextField() { Column = 1 };
             _FieldPanel.Controls.Add(_TxtFilter);
             _TxtFilter.TextChanged += _TxtFilter_TextChanged;
+
+            _LblFilter = new Label() { Column = 1, Text = "filter", HorizontalAlignment = HorizontalAlignment.Center, Width = 40 };
+            _FieldPanel.Controls.Add(_LblFilter);
 
             _LayoutButtonsPanel = new Toolbar() { Column = 3 };
             _TBtnAudioPanel = new ToolbarButton();
@@ -361,6 +361,7 @@ namespace Skill.Editor
 
         void _TxtFilter_TextChanged(object sender, EventArgs e)
         {
+            _LblFilter.Visibility = string.IsNullOrEmpty(_TxtFilter.Text) ? Visibility.Visible : Visibility.Collapsed;
             ApplyFilter(_TxtFilter.Text);
         }
 
@@ -442,7 +443,8 @@ namespace Skill.Editor
             _BtnSave.Content.image = Skill.Editor.Resources.UITextures.Save;
             _AudioClipEditor.RefreshStyles();
             _AudioList.SelectedStyle = Skill.Editor.Resources.Styles.SelectedItem;
-
+            _LblFilter.Style = new GUIStyle(UnityEditor.EditorStyles.miniLabel);
+            _LblFilter.Style.normal.textColor = Color.gray;
             _RefreshStyles = false;
         }
         private void EnableUI()
@@ -819,10 +821,12 @@ namespace Skill.Editor
 
         [ExposeProperty(101, "Value")]
         [PasteTextField(true)]
+        [AreaField(40)]
         public string Key_Value { get { return Key.Value; } set { Key.Value = value; _LblValue.Text = value; } }
 
         [ExposeProperty(102, "Comment")]
         [PasteTextField(true)]
+        [AreaField(60)]
         public string Key_Comment { get { return Key.Comment; } set { Key.Comment = value; } }
 
         class MyProperties : ExposeProperties

@@ -31,7 +31,7 @@ namespace Skill.Editor.CodeGeneration
         /// Add a class
         /// </summary>
         /// <param name="cls">class to add</param>
-        void Add(Class cls)
+        public void Add(Class cls)
         {
             _Classes.Add(cls);
         }
@@ -40,7 +40,7 @@ namespace Skill.Editor.CodeGeneration
         /// </summary>
         /// <param name="cls">class to remove</param>
         /// <returns>True if success, otherwise false</returns>
-        bool Remove(Class cls)
+        public bool Remove(Class cls)
         {
             return _Classes.Remove(cls);
         }

@@ -96,7 +96,9 @@ namespace Skill.Framework.Weapons
                 _TrailInstance.transform.parent = TrailPosition;
                 _Particle = _TrailInstance.GetComponent<ParticleSystem>();
                 _Particle.Clear(true);
-                _Particle.enableEmission = true;
+
+                var emission = _Particle.emission;
+                emission.enabled = true;
             }
         }
 
@@ -226,7 +228,9 @@ namespace Skill.Framework.Weapons
                 _TrailInstance.transform.parent = null;
                 if (_TrailLifTime != null)
                     _TrailLifTime.enabled = true;
-                _Particle.enableEmission = false;
+
+                var emission = _Particle.emission;
+                emission.enabled = false;                
                 _TrailLifTime = null;
             }
 

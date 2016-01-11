@@ -11,20 +11,6 @@ namespace Skill.Framework
     public static class MathHelper
     {
         /// <summary>
-        /// Wether given angle is between (sourceAngle) and (sourceAngle - 180)
-        /// </summary>
-        /// <param name="angle">Angle</param>
-        /// <param name="sourceAngle">Source angle</param>
-        /// <returns>True if angle is left side, otherwise false</returns>
-        public static bool IsAngleLeftOf(float angle, float sourceAngle)
-        {
-            float validAngle = ClampAngle(angle);
-            float validSourceAngle = ClampAngle(sourceAngle);
-
-            return Mathf.Abs(validSourceAngle - validAngle) < 180;
-        }
-
-        /// <summary>
         /// Calc angle rotation around y axis
         /// </summary>
         /// <param name="direction">Direction</param>
@@ -43,7 +29,6 @@ namespace Skill.Framework
         public static float HorizontalAngle(float x, float z)
         {
             float angle = Mathf.Atan2(x, z) * Mathf.Rad2Deg;
-            ClampAngle(ref angle);
             return angle;
         }
 
@@ -60,26 +45,26 @@ namespace Skill.Framework
             return Mathf.Abs(Vector3.Angle(direction, flat)) * Mathf.Sign(direction.y);
         }
 
-        /// <summary>
-        /// Keep angle between -180 to 180
-        /// </summary>
-        /// <param name="angle">Angle to validate</param>
-        /// <returns>angle between -180 to 180</returns>
-        public static float ClampAngle(float angle)
-        {
-            ClampAngle(ref angle);// angle is a value copy
-            return angle;
-        }
+        ///// <summary>
+        ///// Keep angle between -180 to 180
+        ///// </summary>
+        ///// <param name="angle">Angle to validate</param>
+        ///// <returns>angle between -180 to 180</returns>
+        //public static float ClampAngle(float angle)
+        //{
+        //    ClampAngle(ref angle);// angle is a value copy
+        //    return angle;
+        //}
 
-        /// <summary>
-        /// Keep angle between -180 to 180
-        /// </summary>
-        /// <param name="angle">Angle to validate</param>        
-        public static void ClampAngle(ref float angle)
-        {
-            while (angle < -180) angle += 360;
-            while (angle > 180) angle -= 360;
-        }
+        ///// <summary>
+        ///// Keep angle between -180 to 180
+        ///// </summary>
+        ///// <param name="angle">Angle to validate</param>        
+        //public static void ClampAngle(ref float angle)
+        //{
+        //    while (angle < -180) angle += 360;
+        //    while (angle > 180) angle -= 360;
+        //}
 
 
         /// <summary>
@@ -672,6 +657,23 @@ namespace Skill.Framework
         public static float DistanceToLine(Ray ray, Vector3 point)
         {
             return Vector3.Cross(ray.direction, point - ray.origin).magnitude;
+        }
+
+
+
+        /// <summary>
+        /// Rotate a point around pivot
+        /// </summary>
+        /// <param name="point">Point to rotate</param>
+        /// <param name="pivot">pivot</param>
+        /// <param name="angles">euler angles</param>
+        /// <returns>rotated point</returns>
+        public static Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Vector3 angles)
+        {
+            Vector3 dir = point - pivot; // get point direction relative to pivot
+            dir = Quaternion.Euler(angles) * dir; // rotate it
+            point = dir + pivot; // calculate rotated point
+            return point; // return it
         }
     }
 }

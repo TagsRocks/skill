@@ -10,6 +10,13 @@ namespace Skill.Editor.CodeGeneration
     /// </summary>
     class Property
     {
+        public enum DirtyMode
+        {
+            None,
+            CheckAndSet,
+            Set
+        }
+
         /// <summary> whether this method is override,virtual or usual </summary>
         public SubMethod SubMethod { get; set; }
         /// <summary> Modifier of property (public, internal, private, protected) </summary>
@@ -29,8 +36,11 @@ namespace Skill.Editor.CodeGeneration
         /// <summary> whether this property is static? </summary>
         public bool IsStatic { get; set; }
 
+        /// <summary> check for dirty or directly set as dirty </summary>
+        public DirtyMode Dirty { get; private set; }
+
         protected string _Get; // allow subclass to change get body code
-        protected string _Set;// allow subclass to change set body code
+        protected string _Set;// allow subclass to change set body code        
 
         /// <summary>
         /// Create a property
@@ -39,8 +49,9 @@ namespace Skill.Editor.CodeGeneration
         /// <param name="name">name of property</param>
         /// <param name="value">Value of property (can be name of variable or other value)</param>
         /// <param name="hasSet">whether this variable settable</param>
-        public Property(string type, string name, string value, bool hasSet = true)
+        public Property(string type, string name, string value, bool hasSet = true, DirtyMode dirty = DirtyMode.None)
         {
+            this.Dirty = dirty;
             this.Modifier = Modifiers.Public;
             this.Type = type;
             this.Name = name;
@@ -48,10 +59,14 @@ namespace Skill.Editor.CodeGeneration
             this.HasSet = hasSet;
 
             _Get = string.Format("return {0};", this.Value); // default get body code
-            _Set = string.Format("{0} = value;", this.Value); // default set body code
+
+            if (this.Dirty == DirtyMode.CheckAndSet)
+                _Set = string.Format("if({0} != value) {{  {0} = value; _IsDirty = true; }}", this.Value); // default set body code
+            else if (this.Dirty == DirtyMode.Set)
+                _Set = string.Format("{0} = value; _IsDirty = true;", this.Value); // default set body code
+            else
+                _Set = string.Format("{0} = value;", this.Value); // default set body code
         }
-
-
         /// <summary>
         /// Write property
         /// </summary>
@@ -123,5 +138,8 @@ namespace Skill.Editor.CodeGeneration
 
             return builder.ToString();
         }
+
+        public void SetGetBody(string body) { _Get = body; }
+        public void SetSetBody(string body) { _Set = body; }
     }
 }

@@ -87,10 +87,16 @@ namespace Skill.Framework
         {
             base.Awake();
             if (Instance != null)
+            {
                 Debug.LogWarning("More thn on instance of Skill.SlowMotionController object found");
-            Instance = this;
-
-            TimeScale = 1.0f;
+                Destroy(this.gameObject);
+                return;
+            }
+            else
+            {
+                Instance = this;
+                TimeScale = 1.0f;
+            }
         }
 
         /// <summary>
@@ -132,6 +138,7 @@ namespace Skill.Framework
         private float _FreezTimeLeftWhenPaused;
         private float _PreFixedDeltaTime;
         private float _PreTimeScale;
+        private float _PrePitch;
 
 
         /// <summary>
@@ -170,6 +177,10 @@ namespace Skill.Framework
             enabled = true;
             _PreFixedDeltaTime = Time.fixedDeltaTime;
             _PreTimeScale = Time.timeScale;
+
+            if (Skill.Framework.Audio.PitchController.Instance != null)
+                _PrePitch = Skill.Framework.Audio.PitchController.Instance.Pitch;
+
             TimeScale = _Info.TimeScale;
             OnStartSlowMotion();
         }
@@ -237,7 +248,7 @@ namespace Skill.Framework
                     if (_MotionTW.IsOver)
                     {
                         if (Skill.Framework.Audio.PitchController.Instance != null)
-                            Skill.Framework.Audio.PitchController.Instance.Pitch = 1.0f;
+                            Skill.Framework.Audio.PitchController.Instance.Pitch = _PrePitch;
                         TimeScale = Time.timeScale = _PreTimeScale;
                         Time.fixedDeltaTime = _PreFixedDeltaTime;
                         enabled = false;
@@ -263,10 +274,17 @@ namespace Skill.Framework
                             TimeScale = Time.timeScale = 0;
                         }
                     }
-                    Time.fixedDeltaTime = 0.02f * Time.timeScale;
+                    Time.fixedDeltaTime = _PreFixedDeltaTime * Time.timeScale;
                 }
             }
             base.Update();
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            if (Instance == this)
+                Instance = null;
         }
     }
 }

@@ -9,7 +9,6 @@ namespace Skill.Framework.Modules
     [ExecuteInEditMode]
     public class PaintColor : MonoBehaviour
     {
-
         public Texture2D Texture = null;
         public Color Color = Color.white;
         public int LayerMask = 0xffffff;
@@ -17,11 +16,8 @@ namespace Skill.Framework.Modules
         public bool UV2 = false;        
         public float Strength = 50f;
         public float Falloff = 0.8f;
-        public bool ChannelR = true, ChannelG = false, ChannelB = false, ChannelA = false;
-        public bool EnableBrushFlow = false;
-        public float FlowAmount = 0.1f;
-        public bool SeamPainting = false;
-        public bool Normalize = false;
+        public bool ChannelR = true, ChannelG = false, ChannelB = false, ChannelA = false;                                
         public bool Brush = false;
+        public bool ShadowMode = false;
     }
 }

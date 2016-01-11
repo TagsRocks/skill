@@ -27,6 +27,8 @@ namespace Skill.Framework.Triggers
             }
         }
 
+        /// <summary> optional to disable trigger if Owner.IsDead </summary>
+        public Health Owner;
         /// <summary> Amount of damage </summary>
         public float Damage = 100;
         /// <summary> Interval between apply damage while stay in collision </summary>
@@ -112,6 +114,7 @@ namespace Skill.Framework.Triggers
 
         private void ApplyDamage(ColliderInfo cInfo)
         {
+            if (Owner != null && Owner.IsDead) return;
             if (cInfo.DamageTW.IsOver)
             {
                 EventManager em = cInfo.Events;

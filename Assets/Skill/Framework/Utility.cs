@@ -199,6 +199,126 @@ namespace Skill.Framework
         }
 
 
+
+        /// <summary>
+        /// Destroy array of objects
+        /// </summary>
+        /// <param name="objects">Objects to destroy</param>
+        public static void Destroy(GameObject[] objects)
+        {
+            if (objects != null)
+            {
+                for (int i = 0; i < objects.Length; i++)
+                {
+                    if (objects[i] != null)
+                    {
+                        StaticBehaviour sb = objects[i].GetComponent<StaticBehaviour>();
+                        if (sb != null && sb.IsDestroyed)
+                            continue;
+                        GameObject.Destroy(objects[i]);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Is specified point inside view area of main camera
+        /// </summary>
+        /// <param name="point">Point in world space</param>
+        /// <returns>true if visible: otherwise false</returns>
+        public static bool IsVisible(Vector3 point)
+        {
+            return IsVisible(point, Camera.main);
+        }
+
+        /// <summary>
+        /// Is specified point inside view area of camera
+        /// </summary>
+        /// <param name="point">Point in world space</param>        
+        /// <param name="camera">Camera</param>
+        /// <returns>true if visible: otherwise false</returns>
+        public static bool IsVisible(Vector3 point, Camera camera)
+        {
+            Vector3 viewPoint = Camera.main.WorldToViewportPoint(point);
+            return (viewPoint.z >= 0) && (viewPoint.x >= 0 && viewPoint.x <= 1.0f) && (viewPoint.y >= 0 && viewPoint.y <= 1.0f);
+        }
+
+        /// <summary>
+        /// This will return true if the renderer is within the camera's view frustrum
+        /// </summary>
+        /// <param name="renderer">renderer</param>
+        /// <param name="camera">camera</param>
+        /// <returns>return true if the renderer is within the camera's view frustrum</returns>
+        public static bool IsVisible(Renderer renderer, Camera camera)
+        {
+            Plane[] planes = GeometryUtility.CalculateFrustumPlanes(camera);
+            return GeometryUtility.TestPlanesAABB(planes, renderer.bounds);
+        }
+
+
+        private static System.Security.Cryptography.MD5CryptoServiceProvider _MD5;
+        private static System.Text.UTF8Encoding _UTF8Encoding;
+        /// <summary>
+        /// Generates an MD5 hash of the given text.
+        /// WARNING. Not safe for storing passwords
+        /// </summary>
+        /// <returns>MD5 Hashed string</returns>
+        /// <param name="text">The text to hash</param>
+        public static string GenerateMD5(string text)
+        {
+            if (_MD5 == null)
+                _MD5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
+            if (_UTF8Encoding == null)
+                _UTF8Encoding = new System.Text.UTF8Encoding();
+
+            byte[] inputBytes = _UTF8Encoding.GetBytes(text);
+            byte[] hash = _MD5.ComputeHash(inputBytes);
+
+            // step 2, convert byte array to hex string
+            var sb = new System.Text.StringBuilder();
+            for (int i = 0; i < hash.Length; i++)
+                sb.Append(hash[i].ToString("X2"));
+            return sb.ToString();
+        }
+
+
+
+        /// <summary>
+        /// select random item by chance
+        /// </summary>
+        /// <param name="weights">weight of each item</param>
+        /// <returns>index of item</returns>
+        public static int RandomByChance(float[] weights)
+        {
+            float totalWeight = 0;
+            for (int i = 0; i < weights.Length; i++)
+            {
+                if (weights[i] < 0.0f)
+                    throw new System.ArgumentOutOfRangeException(string.Format("chances[{0}]", i), "chance must be greater than zero");
+                totalWeight += weights[i];
+            }
+            return RandomByChance(weights, totalWeight);
+        }
+
+        /// <summary>
+        /// select random item by chance
+        /// </summary>
+        /// <param name="weights">weight of each item</param>        
+        /// <param name="totalWeight">precalculated sun of all weights</param>
+        /// <returns>index of item</returns>
+        public static int RandomByChance(float[] weights, float totalWeight)
+        {
+            float rnd = UnityEngine.Random.Range(0.0f, totalWeight);
+            for (int i = 0; i < weights.Length; i++)
+            {
+                if (rnd < weights[i])
+                    return i;
+                rnd -= weights[i];
+            }
+            return -1;
+        }
+
+
         public class GameObjectNameComparer : IComparer<GameObject>
         {
             private static GameObjectNameComparer _Instance;
@@ -221,7 +341,6 @@ namespace Skill.Framework
                     return x.name.CompareTo(y.name);
             }
         }
-
         public class ComponentNameComparer : IComparer<Component>
         {
             private static ComponentNameComparer _Instance;
@@ -242,6 +361,106 @@ namespace Skill.Framework
                     return y.name.CompareTo(x.name);
                 else
                     return x.name.CompareTo(y.name);
+            }
+        }
+
+
+        public static class Array
+        {
+            public static void Add<T>(ref T[] array, T item)
+            {
+                System.Array.Resize(ref array, array.Length + 1);
+                array[array.Length - 1] = item;
+            }
+
+            public static void AddRange<T>(ref T[] array, T[] items)
+            {
+                int length = array.Length;
+                System.Array.Resize(ref array, array.Length + items.Length);
+                for (int i = 0; i < items.Length; i++)
+                {
+                    array[length + i] = items[i];
+                }
+            }
+
+            public static bool ArrayEquals<T>(T[] lhs, T[] rhs)
+            {
+                if (lhs.Length != rhs.Length)
+                {
+                    return false;
+                }
+                for (int i = 0; i < lhs.Length; i++)
+                {
+                    if (!lhs[i].Equals(rhs[i]))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            public static void Clear<T>(ref T[] array)
+            {
+                System.Array.Clear(array, 0, array.Length);
+                System.Array.Resize<T>(ref array, 0);
+            }
+
+            public static bool Contains<T>(T[] array, T item)
+            {
+                List<T> list = new List<T>(array);
+                return list.Contains(item);
+            }
+
+            public static T Find<T>(T[] array, Predicate<T> match)
+            {
+                List<T> list = new List<T>(array);
+                return list.Find(match);
+            }
+
+            public static List<T> FindAll<T>(T[] array, Predicate<T> match)
+            {
+                List<T> list = new List<T>(array);
+                return list.FindAll(match);
+            }
+
+            public static int FindIndex<T>(T[] array, Predicate<T> match)
+            {
+                List<T> list = new List<T>(array);
+                return list.FindIndex(match);
+            }
+
+            public static int IndexOf<T>(T[] array, T value)
+            {
+                List<T> list = new List<T>(array);
+                return list.IndexOf(value);
+            }
+
+            public static void Insert<T>(ref T[] array, int index, T item)
+            {
+                System.Collections.ArrayList list = new System.Collections.ArrayList();
+                list.AddRange(array);
+                list.Insert(index, item);
+                array = list.ToArray(typeof(T)) as T[];
+            }
+
+            public static int LastIndexOf<T>(T[] array, T value)
+            {
+                List<T> list = new List<T>(array);
+                return list.LastIndexOf(value);
+            }
+
+            public static void Remove<T>(ref T[] array, T item)
+            {
+                List<T> list = new List<T>(array);
+                list.Remove(item);
+                array = list.ToArray();
+            }
+
+            public static void RemoveAt<T>(ref T[] array, int index)
+            {
+                List<T> list = new List<T>(array);
+                list.RemoveAt(index);
+                array = list.ToArray();
             }
         }
     }

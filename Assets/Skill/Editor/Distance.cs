@@ -11,7 +11,7 @@ namespace Skill.Editor
         #region Variables
         private static Vector2 Size = new Vector2(340, 220);
         private static Distance _Instance;
-        private Skill.Framework.Modules.Meter _Meter;        
+        private Skill.Framework.Modules.Meter _Meter;
         #endregion
 
         #region Properties
@@ -30,7 +30,7 @@ namespace Skill.Editor
 
         #region Constructor
         public Distance()
-        {            
+        {
             if (_Instance != null)
             {
                 Debug.LogError("Trying to create two instances of singleton. Self destruction in 3...");
@@ -40,7 +40,7 @@ namespace Skill.Editor
 
             _Instance = this;
 
-            titleContent = new GUIContent(  "Distance");
+            titleContent = new GUIContent("Distance");
             position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);
             this.minSize = Size;
 
@@ -221,7 +221,8 @@ namespace Skill.Editor
                     Handles.color = Color.red;
                     Handles.ArrowCap(0, hit.point, Quaternion.LookRotation(hit.normal), size * 0.5f);
                     Handles.SphereCap(0, hit.point, Quaternion.LookRotation(hit.normal), size * 0.1f);
-                    SceneView.currentDrawingSceneView.Repaint();
+                    if (SceneView.lastActiveSceneView != null)
+                        SceneView.lastActiveSceneView.Repaint();
                 }
 
                 if (colide && e.isMouse && e.type == EventType.MouseDown && e.button == 1 && e.modifiers == EventModifiers.Control)
@@ -294,7 +295,7 @@ namespace Skill.Editor
         }
 
         Transform CreatePoint(Transform parent, Vector3 position, int index)
-        {            
+        {
             GameObject obj = new GameObject("Point" + index.ToString());
             obj.AddComponent<Skill.Framework.Point3D>();
             obj.transform.position = position;

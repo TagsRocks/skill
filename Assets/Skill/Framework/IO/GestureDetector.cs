@@ -53,7 +53,7 @@ namespace Skill.Framework.IO
     /// Base definition of gesture detectors
     /// </summary>
     public abstract class GestureDetector
-    {        
+    {
         /// <summary>
         /// User data.
         /// </summary>
@@ -81,6 +81,11 @@ namespace Skill.Framework.IO
         /// <summary> Priority of detector</summary>
         public uint Priority { get; set; }
 
+        /// <summary>
+        /// Use touches OnDetected and avoid other gestures to use my touch (default : true)
+        /// </summary>
+        public bool UseTouchesOnDetected { get; set; }
+
         /// <summary> Number of fingers required to detect gesture </summary>
         public virtual int FingerCount { get; set; }
 
@@ -96,6 +101,7 @@ namespace Skill.Framework.IO
             this._IsEnabled = true;
             this.Priority = 0;
             this.FingerCount = 1;
+            this.UseTouchesOnDetected = true;
             Reset();
         }
 
@@ -278,7 +284,7 @@ namespace Skill.Framework.IO
         /// <summary>
         /// Create a LockerGestureDetector
         /// </summary>        
-        public LockerGestureDetector()            
+        public LockerGestureDetector()
         {
         }
 

@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Skill.Framework.Modules
 {
     /// <summary>
-    /// Attach this to a GUIText to make a frames/second indicator.   
+    /// Attach this to a GUIText or UnityEngine.UI.Text to make a frames/second indicator.   
     /// </summary>
     /// <remarks>
     /// It calculates frames/second over each updateInterval,
@@ -17,21 +17,25 @@ namespace Skill.Framework.Modules
     /// by accumulating FPS for each frame. This way we end up with
     /// correct overall FPS even if the interval renders something like
     /// 5.5 frames.
-    /// </remarks>
-    [RequireComponent(typeof(GUIText))]
+    /// </remarks>    
     public class ShowFPS : Skill.Framework.DynamicBehaviour
     {
         /// <summary> </summary>
-        public float UpdateInterval = 0.5F;
+        public float Frequency = 0.5F;
         /// <summary> Format of fps text </summary>
-        public string Format = "{0:F2} FPS";
-        /// <summary> Change material.color depending of fps </summary>
+        public string Format = "FPS {0:F2}";
+        /// <summary> Change color depending of fps </summary>
         public bool MaterialColor = true;
+        /// <summary> Use coroutine for high precision</summary>
+        public bool Coroutine = true;
 
-        private GUIText _Text;
-        private float _Accum = 0; // FPS accumulated over the interval
-        private int _Frames = 0; // Frames drawn over the interval
-        private float _Timeleft; // Left time for current interval
+        private GUIText _GUIText;
+        private UnityEngine.UI.Text _UIText;
+        private TimeWatch _UpdateTW;
+        private int _LastFrameCount;
+        private float _LastTime;
+
+        public int FPS { get; private set; }
 
         /// <summary>
         /// Get required references
@@ -39,7 +43,8 @@ namespace Skill.Framework.Modules
         protected override void GetReferences()
         {
             base.GetReferences();
-            _Text = GetComponent<GUIText>();
+            _GUIText = GetComponent<GUIText>();
+            _UIText = GetComponent<UnityEngine.UI.Text>();
         }
 
         /// <summary>
@@ -48,7 +53,12 @@ namespace Skill.Framework.Modules
         protected override void Start()
         {
             base.Start();
-            _Timeleft = UpdateInterval;
+            _LastFrameCount = Time.frameCount;
+            _LastTime = Time.realtimeSinceStartup;
+            if (Coroutine)
+                StartCoroutine(FPSCoroutine());
+            else
+                _UpdateTW.Begin(Frequency);
         }
 
         /// <summary>
@@ -57,32 +67,61 @@ namespace Skill.Framework.Modules
         protected override void Update()
         {
             base.Update();
-            if (_Text != null)
-            {
-                _Timeleft -= Time.deltaTime;
-                _Accum += Time.timeScale / Time.deltaTime;
-                ++_Frames;
 
-                // Interval ended - update GUI text and start new interval
-                if (_Timeleft <= 0.0)
-                {
-                    float fps = _Accum / _Frames;
-                    _Text.text = System.String.Format(Format, fps);
-                    if (MaterialColor)
-                    {
-                        if (fps < 10)
-                            _Text.material.color = Color.red;
-                        else if (fps < 30)
-                            _Text.material.color = Color.yellow;
-                        else
-                            _Text.material.color = Color.green;
-                    }
-                    _Timeleft = UpdateInterval;
-                    _Accum = 0.0F;
-                    _Frames = 0;
-                }
+            if (_UpdateTW.IsEnabledAndOver)
+            {
+                float timeSpan = Time.realtimeSinceStartup - _LastTime;
+                int frameCount = Time.frameCount - _LastFrameCount;
+
+                FPS = Mathf.RoundToInt(frameCount / timeSpan);
+
+                _UpdateTW.Begin(Frequency);
+                _LastFrameCount = Time.frameCount;
+                _LastTime = Time.realtimeSinceStartup;
+
+
+                UpdateUI();
             }
         }
 
+        private System.Collections.IEnumerator FPSCoroutine()
+        {
+            for (; ; )
+            {
+                // Capture frame-per-second
+                int lastFrameCount = Time.frameCount;
+                float lastTime = Time.realtimeSinceStartup;
+                yield return new WaitForSeconds(Frequency);
+                float timeSpan = Time.realtimeSinceStartup - lastTime;
+                int frameCount = Time.frameCount - lastFrameCount;
+
+                FPS = Mathf.RoundToInt(frameCount / timeSpan);
+
+                UpdateUI();
+            }
+        }
+
+        private void UpdateUI()
+        {
+            string txt = System.String.Format(Format, FPS);
+
+            if (_GUIText != null) _GUIText.text = txt;
+            if (_UIText != null) _UIText.text = txt;
+
+
+            if (MaterialColor)
+            {
+                Color color = Color.green;
+                if (FPS < 10)
+                    color = Color.red;
+                else if (FPS < 30)
+                    color = Color.yellow;
+
+                if (_GUIText != null && _GUIText.material != null)
+                    _GUIText.material.color = color;
+                if (_UIText != null)
+                    _UIText.color = color;
+            }
+        }
     }
 }

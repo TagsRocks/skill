@@ -67,6 +67,7 @@ namespace Skill.Framework
 
             // Variables
             private bool _Subtitle;
+            private bool _Mute;
             private float _FxVolume;
             private float _VoiceVolume;
             private float _MusicVolume;
@@ -76,14 +77,127 @@ namespace Skill.Framework
             private AudioSpeakerMode _SpeakerMode;
 
             // Properties
-            public bool Subtitle { get { return _Subtitle; } set { _Subtitle = value; } }
-            public float FxVolume { get { return _FxVolume; } set { _FxVolume = Mathf.Clamp01(value); } }
-            public float VoiceVolume { get { return _VoiceVolume; } set { _VoiceVolume = Mathf.Clamp01(value); } }
-            public float MusicVolume { get { return _MusicVolume; } set { _MusicVolume = Mathf.Clamp01(value); } }
-            public float CinematicVolume { get { return _CinematicVolume; } set { _CinematicVolume = Mathf.Clamp01(value); } }
-            public float MasterVolume { get { return _MasterVolume; } set { _MasterVolume = Mathf.Clamp01(value); } }
-            public int OutputSampleRate { get { return _OutputSampleRate; } set { _OutputSampleRate = ValidateSampleRate(value); } }
-            public AudioSpeakerMode SpeakerMode { get { return _SpeakerMode; } set { _SpeakerMode = value; } }
+            public bool Subtitle
+            {
+                get { return _Subtitle; }
+                set
+                {
+                    if (_Subtitle != value)
+                    {
+                        _Subtitle = value;
+                        IsDirty = true;
+                    }
+                }
+            }
+
+            public bool Mute
+            {
+                get { return _Mute; }
+                set
+                {
+                    if (_Mute != value)
+                    {
+                        _Mute = value;
+                        IsDirty = true;
+                    }
+                }
+            }
+            public float FxVolume
+            {
+                get { return _FxVolume; }
+                set
+                {
+                    value = Mathf.Clamp01(value);
+                    if (_FxVolume != value)
+                    {
+                        _FxVolume = value;
+                        IsDirty = true;
+                    }
+                }
+            }
+            public float VoiceVolume
+            {
+                get { return _VoiceVolume; }
+                set
+                {
+                    value = Mathf.Clamp01(value);
+                    if (_VoiceVolume != value)
+                    {
+                        _VoiceVolume = value;
+                        IsDirty = true;
+                    }
+                }
+            }
+            public float MusicVolume
+            {
+                get { return _MusicVolume; }
+                set
+                {
+                    value = Mathf.Clamp01(value);
+                    if (_MusicVolume != value)
+                    {
+                        _MusicVolume = value;
+                        IsDirty = true;
+                    }
+                }
+            }
+            public float CinematicVolume
+            {
+                get { return _CinematicVolume; }
+                set
+                {
+                    value = Mathf.Clamp01(value);
+                    if (_CinematicVolume != value)
+                    {
+                        _CinematicVolume = value;
+                        IsDirty = true;
+                    }
+                }
+            }
+            public float MasterVolume
+            {
+                get { return _MasterVolume; }
+                set
+                {
+                    value = Mathf.Clamp01(value);
+                    if (_MasterVolume != value)
+                    {
+                        _MasterVolume = value;
+                        IsDirty = true;
+                    }
+                }
+            }
+            public int OutputSampleRate
+            {
+                get { return _OutputSampleRate; }
+                set
+                {
+                    value = ValidateSampleRate(value);
+                    if (_OutputSampleRate != value)
+                    {
+                        _OutputSampleRate = value;
+                        IsDirty = true;
+                    }
+                }
+            }
+            public AudioSpeakerMode SpeakerMode
+            {
+                get { return _SpeakerMode; }
+                set
+                {
+                    if (_SpeakerMode != value)
+                    {
+                        _SpeakerMode = value;
+                        IsDirty = true;
+                    }
+                }
+            }
+
+            /// <summary> is any changes happened to savable object </summary>
+            public bool IsDirty { get; private set; }
+
+            /// <summary> set as clean when object saved</summary>
+            public void SetAsClean() { IsDirty = false; }
 
             private int ValidateSampleRate(int sampleRate)
             {
@@ -102,8 +216,9 @@ namespace Skill.Framework
 
             public float GetVolume(Skill.Framework.Audio.SoundCategory category)
             {
-                float volume = 1.0f;
+                if (Mute) return 0;
 
+                float volume = 1.0f;
                 switch (category)
                 {
                     case Skill.Framework.Audio.SoundCategory.FX:
@@ -156,6 +271,8 @@ namespace Skill.Framework
             {
                 IO.XmlElement _SubtitleElement = stream.Create("Subtitle", _Subtitle);
                 e.AppendChild(_SubtitleElement);
+                IO.XmlElement _MuteElement = stream.Create("Mute", _Mute);
+                e.AppendChild(_MuteElement);
                 IO.XmlElement _FxVolumeElement = stream.Create("FxVolume", _FxVolume);
                 e.AppendChild(_FxVolumeElement);
                 IO.XmlElement _VoiceVolumeElement = stream.Create("VoiceVolume", _VoiceVolume);
@@ -175,6 +292,7 @@ namespace Skill.Framework
             public void Save(Skill.Framework.IO.BinarySaveStream stream)
             {
                 stream.Write(_Subtitle);
+                stream.Write(_Mute);
                 stream.Write(_FxVolume);
                 stream.Write(_VoiceVolume);
                 stream.Write(_MusicVolume);
@@ -193,6 +311,9 @@ namespace Skill.Framework
                     {
                         case "Subtitle":
                             this.Subtitle = stream.ReadBoolean(element);
+                            break;
+                        case "Mute":
+                            this.Mute = stream.ReadBoolean(element);
                             break;
                         case "FxVolume":
                             this.FxVolume = stream.ReadFloat(element);
@@ -218,11 +339,12 @@ namespace Skill.Framework
                     }
                     element = e.GetNextSibling(element);
                 }
-
+                SetAsClean();
             }
             public void Load(Skill.Framework.IO.BinaryLoadStream stream)
             {
                 this.Subtitle = stream.ReadBoolean();
+                this.Mute = stream.ReadBoolean();
                 this.FxVolume = stream.ReadFloat();
                 this.VoiceVolume = stream.ReadFloat();
                 this.MusicVolume = stream.ReadFloat();
@@ -230,6 +352,7 @@ namespace Skill.Framework
                 this.MasterVolume = stream.ReadFloat();
                 this.OutputSampleRate = stream.ReadInt();
                 this.SpeakerMode = (AudioSpeakerMode)FilterValue(stream.ReadInt(), (int)AudioSpeakerMode.Stereo, Enum.GetValues(typeof(AudioSpeakerMode)));
+                SetAsClean();
             }
 
         }
@@ -252,6 +375,7 @@ namespace Skill.Framework
             private bool _PreSoftVegetation;
             private VSyncCount _PreVSyncCount;
             private bool _PreBloom;
+            private bool _PreRadialBlur;
             private bool _PreHDR;
             private bool _PreAmbientOcclusion;
             private int _PrePostprocessQuality;
@@ -279,6 +403,7 @@ namespace Skill.Framework
             private bool _SoftVegetation;
             private VSyncCount _VSyncCount;
             private bool _Bloom;
+            private bool _RadialBlur;
             private bool _HDR;
             private bool _AmbientOcclusion;
             private int _PostprocessQuality;
@@ -291,56 +416,300 @@ namespace Skill.Framework
             private float _ScreenQuality;
             // Properties
             /// <summary>   Global anisotropic filtering mode. </summary>
-            public AnisotropicFiltering AnisotropicFiltering { get { return _AnisotropicFiltering; } set { _AnisotropicFiltering = value; } }
+            public AnisotropicFiltering AnisotropicFiltering
+            {
+                get { return _AnisotropicFiltering; }
+                set
+                {
+                    if (_AnisotropicFiltering != value)
+                    {
+                        _AnisotropicFiltering = value;
+                        IsDirty = true;
+                    }
+                }
+            }
             /// <summary> Set The AA Filtering option. </summary>
-            public AntiAliasing AntiAliasing { get { return _AntiAliasing; } set { _AntiAliasing = value; } }
+            public AntiAliasing AntiAliasing
+            {
+                get { return _AntiAliasing; }
+                set
+                {
+                    if (_AntiAliasing != value)
+                    {
+                        _AntiAliasing = value;
+                        IsDirty = true;
+                    }
+                }
+            }
             /// <summary>   Blend weights. </summary>
-            public BlendWeights BlendWeights { get { return _BlendWeights; } set { _BlendWeights = value; } }
+            public BlendWeights BlendWeights
+            {
+                get { return _BlendWeights; }
+                set
+                {
+                    if (_BlendWeights != value)
+                    {
+                        _BlendWeights = value;
+                        IsDirty = true;
+                    }
+                }
+            }
             /// <summary>   Global multiplier for the LOD's switching distance. </summary>
-            public float LodBias { get { return _LodBias; } set { _LodBias = value; } }
+            public float LodBias
+            {
+                get { return _LodBias; }
+                set
+                {
+                    if (_LodBias != value)
+                    {
+                        _LodBias = value;
+                        IsDirty = true;
+                    }
+                }
+            }
             /// <summary>   A texture size limit applied to all textures. </summary>
-            public int MasterTextureLimit { get { return _MasterTextureLimit; } set { if (value < 0) value = 0; _MasterTextureLimit = value; } }
+            public int MasterTextureLimit
+            {
+                get { return _MasterTextureLimit; }
+                set
+                {
+                    if (value < 0) value = 0;
+                    if (_MasterTextureLimit != value)
+                    {
+                        _MasterTextureLimit = value;
+                        IsDirty = true;
+                    }
+                }
+            }
             /// <summary>   A maximum LOD level. All LOD groups </summary>
-            public int MaximumLODLevel { get { return _MaximumLODLevel; } set { if (value < 0) value = 0; _MaximumLODLevel = value; } }
+            public int MaximumLODLevel
+            {
+                get { return _MaximumLODLevel; }
+                set
+                {
+                    if (value < 0) value = 0;
+                    if (_MaximumLODLevel != value)
+                    {
+                        _MaximumLODLevel = value;
+                        IsDirty = true;
+                    }
+                }
+            }
             /// <summary> Maximum number of frames queued up by graphics driver. </summary>
-            public int MaxQueuedFrames { get { return _MaxQueuedFrames; } set { if (value < 0) value = 0; _MaxQueuedFrames = value; } }
+            public int MaxQueuedFrames
+            {
+                get { return _MaxQueuedFrames; }
+                set
+                {
+                    if (value < 0) value = 0;
+                    if (_MaxQueuedFrames != value)
+                    {
+                        _MaxQueuedFrames = value;
+                        IsDirty = true;
+                    }
+                }
+            }
             /// <summary> Budget for how many ray casts can be performed per frame for approximate collision testing. </summary>
-            public int ParticleRaycastBudget { get { return _ParticleRaycastBudget; } set { if (value < 0) value = 0; _ParticleRaycastBudget = value; } }
+            public int ParticleRaycastBudget
+            {
+                get { return _ParticleRaycastBudget; }
+                set
+                {
+                    if (value < 0) value = 0;
+                    if (_ParticleRaycastBudget != value)
+                    {
+                        _ParticleRaycastBudget = value;
+                        IsDirty = true;
+                    }
+                }
+            }
             /// <summary> The maximum number of pixel lights that should affect any object. </summary>
-            public int PixelLightCount { get { return _PixelLightCount; } set { if (value < 0) value = 0; _PixelLightCount = value; } }
+            public int PixelLightCount
+            {
+                get { return _PixelLightCount; }
+                set
+                {
+                    if (value < 0) value = 0;
+                    if (_PixelLightCount != value)
+                    {
+                        _PixelLightCount = value;
+                        IsDirty = true;
+                    }
+                }
+            }
             /// <summary>   Number of cascades to use for directional light shadows. </summary>
-            public ShadowCascades ShadowCascades { get { return _ShadowCascades; } set { _ShadowCascades = value; } }
+            public ShadowCascades ShadowCascades
+            {
+                get { return _ShadowCascades; }
+                set
+                {
+                    if (_ShadowCascades != value)
+                    {
+                        _ShadowCascades = value;
+                        IsDirty = true;
+                    }
+                }
+            }
             /// <summary>   Shadow drawing distance. </summary>
-            public float ShadowDistance { get { return _ShadowDistance; } set { if (value < 0) value = 0; _ShadowDistance = value; } }
+            public float ShadowDistance
+            {
+                get { return _ShadowDistance; }
+                set
+                {
+                    if (value < 0) value = 0;
+                    if (_ShadowDistance != value)
+                    {
+                        _ShadowDistance = value;
+                        IsDirty = true;
+                    }
+                }
+            }
             /// <summary> Directional light shadow projection. </summary>
-            public ShadowProjection ShadowProjection { get { return _ShadowProjection; } set { _ShadowProjection = value; } }
+            public ShadowProjection ShadowProjection
+            {
+                get { return _ShadowProjection; }
+                set
+                {
+                    if (_ShadowProjection != value)
+                    {
+                        _ShadowProjection = value;
+                        IsDirty = true;
+                    }
+                }
+            }
             /// <summary> Use a two-pass shader for the vegetation in the terrain engine. </summary>
-            public bool SoftVegetation { get { return _SoftVegetation; } set { _SoftVegetation = value; } }
+            public bool SoftVegetation
+            {
+                get { return _SoftVegetation; }
+                set
+                {
+                    if (_SoftVegetation != value)
+                    {
+                        _SoftVegetation = value;
+                        IsDirty = true;
+                    }
+                }
+            }
             /// <summary> The VSync Count. </summary>
-            public VSyncCount VSyncCount { get { return _VSyncCount; } set { _VSyncCount = value; } }
+            public VSyncCount VSyncCount
+            {
+                get { return _VSyncCount; }
+                set
+                {
+                    if (_VSyncCount != value)
+                    {
+                        _VSyncCount = value;
+                        IsDirty = true;
+                    }
+                }
+            }
             /// <summary> Enable or disable bloom effect </summary>
-            public bool Bloom { get { return _Bloom; } set { _Bloom = value; } }
+            public bool Bloom
+            {
+                get { return _Bloom; }
+                set
+                {
+                    if (_Bloom != value)
+                    {
+                        _Bloom = value;
+                        IsDirty = true;
+                    }
+                }
+            }
+
+            /// <summary> Enable or disable radial blur effect </summary>
+            public bool RadialBlur
+            {
+                get { return _RadialBlur; }
+                set
+                {
+                    if (_RadialBlur != value)
+                    {
+                        _RadialBlur = value;
+                        IsDirty = true;
+                    }
+                }
+            }
             /// <summary> Enable or disable HDR effect </summary>
-            public bool HDR { get { return _HDR; } set { _HDR = value; } }
+            public bool HDR
+            {
+                get { return _HDR; }
+                set
+                {
+                    if (_HDR != value)
+                    {
+                        _HDR = value;
+                        IsDirty = true;
+                    }
+                }
+            }
             /// <summary> Enable or disable AmbientOcclusion </summary>
-            public bool AmbientOcclusion { get { return _AmbientOcclusion; } set { _AmbientOcclusion = value; } }
+            public bool AmbientOcclusion
+            {
+                get { return _AmbientOcclusion; }
+                set
+                {
+                    if (_AmbientOcclusion != value)
+                    {
+                        _AmbientOcclusion = value;
+                        IsDirty = true;
+                    }
+                }
+            }
             /// <summary> Gets of sets postprocess quality </summary>
-            public int PostprocessQuality { get { return _PostprocessQuality; } set { _PostprocessQuality = value; } }
+            public int PostprocessQuality
+            {
+                get { return _PostprocessQuality; }
+                set
+                {
+                    if (_PostprocessQuality != value)
+                    {
+                        _PostprocessQuality = value;
+                        IsDirty = true;
+                    }
+                }
+            }
             /// <summary> Gets of sets shadow quality </summary>
-            public int ShadowQuality { get { return _ShadowQuality; } set { _ShadowQuality = value; } }
+            public int ShadowQuality
+            {
+                get { return _ShadowQuality; }
+                set
+                {
+                    if (_ShadowQuality != value)
+                    {
+                        _ShadowQuality = value;
+                        IsDirty = true;
+                    }
+                }
+            }
             /// <summary> Gets of sets resolution </summary>
             public Resolution Resolution
             {
                 get { return new UnityEngine.Resolution() { width = _ResolutionWidth, height = _ResolutionHeight, refreshRate = _RefreshRate }; }
                 set
                 {
-                    _ResolutionWidth = value.width;
-                    _ResolutionHeight = value.height;
-                    _RefreshRate = value.refreshRate;
+                    if (_ResolutionWidth != value.width || _ResolutionHeight != value.height || _RefreshRate != value.refreshRate)
+                    {
+                        _ResolutionWidth = value.width;
+                        _ResolutionHeight = value.height;
+                        _RefreshRate = value.refreshRate;
+                        IsDirty = true;
+                    }
                 }
             }
             /// <summary> Gets of sets fullscreen </summary>
-            public bool FullScreen { get { return _FullScreen; } set { _FullScreen = value; } }
+            public bool FullScreen
+            {
+                get { return _FullScreen; }
+                set
+                {
+                    if (_FullScreen != value)
+                    {
+                        _FullScreen = value;
+                        IsDirty = true;
+                    }
+                }
+            }
             /// <summary> Graphics quality level. </summary>
             public int QualityLevel
             {
@@ -350,12 +719,37 @@ namespace Skill.Framework
                     if (value < 0) value = 0;
                     else if (value >= UnityEngine.QualitySettings.names.Length)
                         value = UnityEngine.QualitySettings.names.Length - 1;
-                    _QualityLevel = value;
+                    if (_QualityLevel != value)
+                    {
+                        _QualityLevel = value;
+                        IsDirty = true;
+                    }
                 }
             }
 
             /// <summary> user defined value between (0.0f , 1.0f) for screen quality. it is not used by unity engine </summary>
-            public float ScreenQuality { get { return _ScreenQuality; } set { _ScreenQuality = Mathf.Clamp01(value); } }
+            public float ScreenQuality
+            {
+                get { return _ScreenQuality; }
+                set
+                {
+                    value = Mathf.Clamp01(value);
+                    if (_ScreenQuality != value)
+                    {
+                        _ScreenQuality = value;
+                        IsDirty = true;
+                    }
+                }
+            }
+
+
+
+            /// <summary> is any changes happened to savable object </summary>
+            public bool IsDirty { get; private set; }
+
+            /// <summary> set as clean when object saved</summary>
+            public void SetAsClean() { IsDirty = false; }
+
 
             /// <summary> if true, ApplyChanges() will override 'UnityEngine.QualitySettings.anisotropicFiltering'.This value is will saved to file </summary>
             public bool OverrideAnisotropicFiltering { get; set; }
@@ -403,6 +797,7 @@ namespace Skill.Framework
                 _PreSoftVegetation = _SoftVegetation;
                 _PreVSyncCount = _VSyncCount;
                 _PreBloom = _Bloom;
+                _PreRadialBlur = _RadialBlur;
                 _PreHDR = _HDR;
                 _PreAmbientOcclusion = _AmbientOcclusion;
                 _PrePostprocessQuality = _PostprocessQuality;
@@ -431,6 +826,7 @@ namespace Skill.Framework
                 _SoftVegetation = _PreSoftVegetation;
                 _VSyncCount = _PreVSyncCount;
                 _Bloom = _PreBloom;
+                _RadialBlur = _PreRadialBlur;
                 _HDR = _PreHDR;
                 _AmbientOcclusion = _PreAmbientOcclusion;
                 _PostprocessQuality = _PrePostprocessQuality;
@@ -490,6 +886,9 @@ namespace Skill.Framework
             // Methods
             public QualitySettings()
             {
+                _ResolutionWidth = Screen.currentResolution.width;
+                _ResolutionHeight = Screen.currentResolution.height;
+                _RefreshRate = Screen.currentResolution.refreshRate;
             }
 
             public static QualitySettings CreateQualitySettings()
@@ -555,6 +954,8 @@ namespace Skill.Framework
                 e.AppendChild(_VSyncCountElement);
                 IO.XmlElement _BloomElement = stream.Create("Bloom", _Bloom);
                 e.AppendChild(_BloomElement);
+                IO.XmlElement _RadialBlurElement = stream.Create("RadialBlur", _RadialBlur);
+                e.AppendChild(_RadialBlurElement);
                 IO.XmlElement _HDRElement = stream.Create("HDR", _HDR);
                 e.AppendChild(_HDRElement);
                 IO.XmlElement _AmbientOcclusionElement = stream.Create("AmbientOcclusion", _AmbientOcclusion);
@@ -594,6 +995,7 @@ namespace Skill.Framework
                 stream.Write(_SoftVegetation);
                 stream.Write((int)_VSyncCount);
                 stream.Write(_Bloom);
+                stream.Write(_RadialBlur);
                 stream.Write(_HDR);
                 stream.Write(_AmbientOcclusion);
                 stream.Write(_PostprocessQuality);
@@ -658,6 +1060,9 @@ namespace Skill.Framework
                         case "Bloom":
                             this._Bloom = stream.ReadBoolean(element);
                             break;
+                        case "RadialBlur":
+                            this._RadialBlur = stream.ReadBoolean(element);
+                            break;
                         case "HDR":
                             this._HDR = stream.ReadBoolean(element);
                             break;
@@ -692,6 +1097,7 @@ namespace Skill.Framework
                     element = e.GetNextSibling(element);
                 }
                 CopyNewValues();
+                SetAsClean();
             }
             public void Load(Skill.Framework.IO.BinaryLoadStream stream)
             {
@@ -710,6 +1116,7 @@ namespace Skill.Framework
                 this.SoftVegetation = stream.ReadBoolean();
                 this.VSyncCount = (VSyncCount)FilterValue(stream.ReadInt(), (int)VSyncCount.EveryVBlank, Enum.GetValues(typeof(VSyncCount)));
                 this.Bloom = stream.ReadBoolean();
+                this.RadialBlur = stream.ReadBoolean();
                 this.HDR = stream.ReadBoolean();
                 this.AmbientOcclusion = stream.ReadBoolean();
                 this.PostprocessQuality = stream.ReadInt();
@@ -721,6 +1128,7 @@ namespace Skill.Framework
                 this.QualityLevel = stream.ReadInt();
                 this.ScreenQuality = stream.ReadFloat();
                 CopyNewValues();
+                SetAsClean();
             }
 
         }
@@ -735,14 +1143,63 @@ namespace Skill.Framework
             private string _Name;
 
             // Properties
-            public KeyCode PrimaryKey { get { return _PrimaryKey; } set { _PrimaryKey = value; } }
-            public KeyCode SecondaryKey { get { return _SecondaryKey; } set { _SecondaryKey = value; } }
-            public KeyCode GamepadKey { get { return _GamepadKey; } set { _GamepadKey = value; } }
-            public string Name { get { return _Name; } set { _Name = value; } }
-            /// <summary>
-            /// Index of key
-            /// </summary>
+            public KeyCode PrimaryKey
+            {
+                get { return _PrimaryKey; }
+                set
+                {
+                    if (_PrimaryKey != value)
+                    {
+                        _PrimaryKey = value;
+                        IsDirty = true;
+                    }
+                }
+            }
+            public KeyCode SecondaryKey
+            {
+                get { return _SecondaryKey; }
+                set
+                {
+                    if (_SecondaryKey != value)
+                    {
+                        _SecondaryKey = value;
+                        IsDirty = true;
+                    }
+                }
+            }
+            public KeyCode GamepadKey
+            {
+                get { return _GamepadKey; }
+                set
+                {
+                    if (_GamepadKey != value)
+                    {
+                        _GamepadKey = value;
+                        IsDirty = true;
+                    }
+                }
+            }
+            public string Name
+            {
+                get { return _Name; }
+                set
+                {
+                    if (_Name != value)
+                    {
+                        _Name = value;
+                        IsDirty = true;
+                    }
+                }
+            }
+            /// <summary> Index of key </summary>
             public int Index { get; internal set; }
+
+            /// <summary> is any changes happened to savable object </summary>
+            public bool IsDirty { get; private set; }
+
+            /// <summary> set as clean when object saved</summary>
+            public void SetAsClean() { IsDirty = false; }
+
 
             // Methods
             public KeyMap()
@@ -794,7 +1251,7 @@ namespace Skill.Framework
                     }
                     element = e.GetNextSibling(element);
                 }
-
+                SetAsClean();
             }
             public void Load(Skill.Framework.IO.BinaryLoadStream stream)
             {
@@ -802,6 +1259,7 @@ namespace Skill.Framework
                 this.PrimaryKey = (KeyCode)FilterValue(stream.ReadInt(), (int)KeyCode.None, KeyCodeValues);
                 this.SecondaryKey = (KeyCode)FilterValue(stream.ReadInt(), (int)KeyCode.None, KeyCodeValues);
                 this.GamepadKey = (KeyCode)FilterValue(stream.ReadInt(), (int)KeyCode.None, KeyCodeValues);
+                SetAsClean();
             }
 
         }
@@ -820,13 +1278,120 @@ namespace Skill.Framework
             private Dictionary<string, KeyMap> _KeyDictionary;
 
             // Properties
-            public bool InvertMouseX { get { return _InvertMouseX; } set { _InvertMouseX = value; } }
-            public bool InvertMouseY { get { return _InvertMouseY; } set { _InvertMouseY = value; } }
-            public float MouseSensitivity { get { return _MouseSensitivity; } set { _MouseSensitivity = Mathf.Clamp01(value); } }
-            public bool ToggleCrouch { get { return _ToggleCrouch; } set { _ToggleCrouch = value; } }
-            public bool ToggleRun { get { return _ToggleRun; } set { _ToggleRun = value; } }
-            public bool ToggleAim { get { return _ToggleAim; } set { _ToggleAim = value; } }
-            public bool Vibration { get { return _Vibration; } set { _Vibration = value; } }
+            public bool InvertMouseX
+            {
+                get { return _InvertMouseX; }
+                set
+                {
+                    if (_InvertMouseX != value)
+                    {
+                        _InvertMouseX = value;
+                        _IsDirty = true;
+                    }
+                }
+            }
+            public bool InvertMouseY
+            {
+                get { return _InvertMouseY; }
+                set
+                {
+                    if (_InvertMouseY != value)
+                    {
+                        _InvertMouseY = value;
+                        _IsDirty = true;
+                    }
+                }
+            }
+            public float MouseSensitivity
+            {
+                get { return _MouseSensitivity; }
+                set
+                {
+                    value = Mathf.Clamp01(value);
+                    if (_MouseSensitivity != value)
+                    {
+                        _MouseSensitivity = value;
+                        _IsDirty = true;
+                    }
+                }
+            }
+            public bool ToggleCrouch
+            {
+                get { return _ToggleCrouch; }
+                set
+                {
+                    if (_ToggleCrouch != value)
+                    {
+                        _ToggleCrouch = value;
+                        _IsDirty = true;
+                    }
+                }
+            }
+            public bool ToggleRun
+            {
+                get { return _ToggleRun; }
+                set
+                {
+                    if (_ToggleRun != value)
+                    {
+                        _ToggleRun = value;
+                        _IsDirty = true;
+                    }
+                }
+            }
+            public bool ToggleAim
+            {
+                get { return _ToggleAim; }
+                set
+                {
+                    if (_ToggleAim != value)
+                    {
+                        _ToggleAim = value;
+                        _IsDirty = true;
+                    }
+                }
+            }
+            public bool Vibration
+            {
+                get { return _Vibration; }
+                set
+                {
+                    if (_Vibration != value)
+                    {
+                        _Vibration = value;
+                        _IsDirty = true;
+                    }
+                }
+            }
+
+
+            private bool _IsDirty;
+            /// <summary> is any changes happened to savable object </summary>
+            public bool IsDirty
+            {
+                get
+                {
+                    if (_IsDirty) return _IsDirty;
+                    if (_Keys != null)
+                    {
+                        for (int i = 0; i < _Keys.Length; i++)
+                            if (_Keys[i].IsDirty)
+                                return true;
+                    }
+                    return _IsDirty;
+                }
+            }
+
+            /// <summary> set as clean when object saved</summary>
+            public void SetAsClean()
+            {
+                _IsDirty = false;
+                if (_Keys != null)
+                {
+                    for (int i = 0; i < _Keys.Length; i++)
+                        _Keys[i].SetAsClean();
+                }
+            }
 
             /// <summary>
             /// Get key by name
@@ -879,11 +1444,22 @@ namespace Skill.Framework
                 _KeyDictionary = new Dictionary<string, KeyMap>();
             }
 
-            public void SetKeys(KeyMap[] keys)
+            public void SetKeys(KeyMap[] keys, bool rebuild)
             {
                 if (keys == null || keys.Length == 0)
                     throw new Exception("Invalid Keys");
                 _Keys = keys;
+                if (rebuild)
+                {
+                    _KeyDictionary.Clear();
+                    for (int i = 0; i < _Keys.Length; i++)
+                    {
+                        KeyMap k = _Keys[i];
+                        k.Index = i;
+                        _KeyDictionary.Add(k.Name, k);
+                    }
+                }
+                _IsDirty = true;
             }
 
             internal void Build(KeyMap[] defaultKeys)
@@ -995,7 +1571,7 @@ namespace Skill.Framework
                     }
                     element = e.GetNextSibling(element);
                 }
-
+                SetAsClean();
             }
             public void Load(Skill.Framework.IO.BinaryLoadStream stream)
             {
@@ -1007,7 +1583,7 @@ namespace Skill.Framework
                 this.ToggleAim = stream.ReadBoolean();
                 this.Vibration = stream.ReadBoolean();
                 this._Keys = stream.ReadSavableArray<KeyMap>(KeyMap.CreateKeyMap);
-
+                SetAsClean();
             }
 
 
@@ -1173,9 +1749,23 @@ namespace Skill.Framework
         private InputSettings _Input = null;
 
         // Properties
-        public AudioSettings Audio { get { return _Audio; } set { _Audio = value; } }
-        public QualitySettings Quality { get { return _Quality; } set { _Quality = value; } }
-        public InputSettings Input { get { return _Input; } set { _Input = value; } }
+        public AudioSettings Audio { get { return _Audio; } set { _Audio = value; _IsDirty = true; } }
+        public QualitySettings Quality { get { return _Quality; } set { _Quality = value; _IsDirty = true; } }
+        public InputSettings Input { get { return _Input; } set { _Input = value; _IsDirty = true; } }
+
+        private bool _IsDirty;
+
+        /// <summary> is any changes happened to savable object </summary>
+        public bool IsDirty { get { return _IsDirty || _Audio.IsDirty || _Quality.IsDirty || _Input.IsDirty; } }
+
+        /// <summary> set as clean when object saved</summary>
+        public void SetAsClean()
+        {
+            _IsDirty = false;
+            _Audio.SetAsClean();
+            _Quality.SetAsClean();
+            _Input.SetAsClean();
+        }
 
         // Methods
         public Settings()
@@ -1187,8 +1777,8 @@ namespace Skill.Framework
             SetDefaultAudioSettings();
             SetDefaultQualitySettings();
             SetDefaultInputSettings();
-
             Build();
+            SetAsClean();
         }
 
         private void Build()
@@ -1238,6 +1828,7 @@ namespace Skill.Framework
                 element = e.GetNextSibling(element);
             }
             Build();
+            SetAsClean();
         }
         public void Load(Skill.Framework.IO.BinaryLoadStream stream)
         {
@@ -1245,11 +1836,13 @@ namespace Skill.Framework
             this._Quality = stream.ReadSavable<QualitySettings>(QualitySettings.CreateQualitySettings);
             this._Input = stream.ReadSavable<InputSettings>(InputSettings.CreateInputSettings);
             Build();
+            SetAsClean();
         }
 
         public virtual void SetDefaultAudioSettings()
         {
             _Audio.Subtitle = false;
+            _Audio.Mute = false;
             _Audio.FxVolume = 1.0f;
             _Audio.VoiceVolume = 1.0f;
             _Audio.MusicVolume = 1.0f;
@@ -1257,6 +1850,7 @@ namespace Skill.Framework
             _Audio.MasterVolume = 1.0f;
             _Audio.OutputSampleRate = 44100;
             _Audio.SpeakerMode = AudioSpeakerMode.Stereo;
+            _IsDirty = true;
         }
 
         public virtual void SetDefaultQualitySettings()
@@ -1276,14 +1870,16 @@ namespace Skill.Framework
             _Quality.SoftVegetation = false;
             _Quality.VSyncCount = Settings.VSyncCount.EveryVBlank;
             _Quality.Bloom = true;
+            _Quality.RadialBlur = true;
             _Quality.HDR = false;
             _Quality.AmbientOcclusion = false;
             _Quality.PostprocessQuality = 1;
             _Quality.ShadowQuality = 1;
             _Quality.Resolution = new Resolution() { width = 1024, height = 768, refreshRate = 60 };
             _Quality.QualityLevel = 0;
-            _Quality.ScreenQuality = 0.75f;
+            _Quality.ScreenQuality = 1.0f;
             _Quality.FullScreen = false;
+            _IsDirty = true;
         }
 
         public virtual void SetDefaultInputSettings()
@@ -1294,7 +1890,8 @@ namespace Skill.Framework
             _Input.ToggleCrouch = false;
             _Input.ToggleRun = false;
             _Input.ToggleAim = false;
-            _Input.SetKeys(CreateInputKeys());
+            _Input.SetKeys(CreateInputKeys(), true);
+            _IsDirty = true;
         }
 
         protected virtual KeyMap[] CreateInputKeys()

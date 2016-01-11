@@ -89,12 +89,12 @@ namespace Skill.Net
         public uint ReadUInt32() { CheckForRead(); return _Reader.ReadUInt32(); }
         public ulong ReadUInt64() { CheckForRead(); return _Reader.ReadUInt64(); }
 
-        public System.Xml.Linq.XDocument ReadXml()
+        public Skill.Framework.IO.XmlDocument ReadXml()
         {
             CheckForRead();
-            string xmlData = ReadString();
-            StringReader reader = new StringReader(xmlData);
-            System.Xml.Linq.XDocument document = System.Xml.Linq.XDocument.Load(reader);
+            string xmlData = ReadString();            
+            Skill.Framework.IO.XmlDocument document = new Framework.IO.XmlDocument();
+            document.LoadXml(xmlData);            
             return document;
         }
         #endregion
@@ -209,15 +209,10 @@ namespace Skill.Net
             this.ByteCounter += sizeof(ulong);
         }
 
-        public void Write(System.Xml.Linq.XDocument document)
+        public void Write(Skill.Framework.IO.XmlDocument document)
         {
-            CheckForWrite();
-            var xmlDocument = new System.Xml.XmlDocument();
-            using (var xmlReader = document.CreateReader())
-            {
-                xmlDocument.Load(xmlReader);
-            }
-            Write(xmlDocument.OuterXml);
+            CheckForWrite();            
+            Write(document.OuterXml);
         }
         #endregion
 

@@ -8,23 +8,17 @@ namespace Skill.Framework
 {
     /// <summary>
     /// Use this class to spawn object in scheduled time and with triggers
-    /// </summary>    
+    /// </summary>        
     public class Spawner : DynamicBehaviour
     {
-        /// <summary> GameObject to spawn </summary>
-        public SpawnAsset SpawnObjects;
-        /// <summary> where to spawn objects </summary>
-        public Transform[] Locations;
-        /// <summary> If true, the spawner will cycle through the spawn locations instead of spawning from a randomly chosen one </summary>
-        public bool CycleLocations;
+        /// <summary> Feed to spawn </summary>
+        public SpawnerFeed Feed;
         /// <summary> Delta time between spawns </summary>
         public float Interval = 1f;
         /// <summary> The maximum number of agents alive at one time. If agents are destroyed, more will spawn to meet this number. </summary>
-        public int AliveCount = 2;
+        public int MaxAlive = 2;
         /// <summary> The maximum number of agents to spawn.when number of spawned object reach this value the spawner will not spawn anymore  </summary>
         public int SpawnCount = 1;
-        /// <summary> Radius around spawn location to spawn agents. </summary>
-        public float SpawnRadius = 0;
         /// <summary> If true, only spawn agents if player can't see spawn point </summary>
         public bool OnlySpawnHidden;
         /// <summary> If true, wait Interval after one spawned gameobject is dead </summary>
@@ -39,35 +33,14 @@ namespace Skill.Framework
         /// <summary> Number of dead objects </summary>
         public int NumberOfDeadObjects { get { return _DeadObjects.Count; } }
 
-        // Holds the last SpawnLocation index used
-        private int _LastSpawnLocationIndex;
+
         private TimeWatch _SpawnTW;
         private int _SpawnCounter;
         private int _DeadCounter;
         private float _TotalWeight;
 
-        private SpawnObject[] _SpawnObjects;
         private List<GameObject> _AliveObjects;
         private List<GameObject> _DeadObjects;
-
-        /// <summary>
-        /// Call this method if you change SpawnObjects after the Spawner started.
-        /// </summary>
-        public void RecalculateWeights()
-        {
-            _TotalWeight = 0;
-            if (SpawnObjects != null && SpawnObjects.Objects != null)
-            {
-                foreach (SpawnObject item in SpawnObjects.Objects)
-                {
-                    if (item != null)
-                    {
-                        if (item.Weight < 0.0f) throw new ArgumentOutOfRangeException("weights", "element weight must be greater than or equal to zero");
-                        _TotalWeight += item.Weight;
-                    }
-                }
-            }
-        }
 
         /// <summary>
         /// Subclasses can avoid spawning for some reason at specific times
@@ -78,7 +51,10 @@ namespace Skill.Framework
         /// let inherited class modify spawned object right after spawn time
         /// </summary>
         /// <param name="spawnedObj">Spawned Object</param>
-        protected virtual void InitializeSpawnedObject(GameObject spawnedObj) { }
+        protected virtual void InitializeSpawnedObject(GameObject spawnedObj, object userData) { }
+
+        /// <summary> is spawner spawned all objects? </summary>
+        public bool IsCompleted { get; private set; }
 
         /// <summary>
         /// Occurs when spawner spawned all objects
@@ -89,6 +65,7 @@ namespace Skill.Framework
         /// </summary>
         protected virtual void OnComplete()
         {
+            IsCompleted = true;
             if (Complete != null) Complete(this, EventArgs.Empty);
         }
 
@@ -112,35 +89,20 @@ namespace Skill.Framework
             base.Awake();
             _AliveObjects = new List<GameObject>();
             _DeadObjects = new List<GameObject>();
-            _LastSpawnLocationIndex = -1;
             _SpawnCounter = 0;
             _DeadCounter = 0;
         }
 
-        /// <summary>
-        /// Select a random GameObject from SpawnObjects by chance
-        /// subclass can change this behavior
-        /// </summary>
-        /// <returns>New GameObject from SpawnObjects to instantiate from</returns>
-        protected virtual GameObject GetNextSpawnObject()
+        protected override void OnEnable()
         {
-            if (SpawnObjects == null) return null;
-            if (SpawnObjects.Objects != null)
-            {
-                if (_SpawnObjects != SpawnObjects.Objects)
-                {
-                    RecalculateWeights();
-                    _SpawnObjects = SpawnObjects.Objects;
-                }
-            }
-            float rnd = UnityEngine.Random.Range(0.0f, _TotalWeight);
-            foreach (SpawnObject item in SpawnObjects.Objects)
-            {
-                if (rnd < item.Weight) return item.Prefab;
-                rnd -= item.Weight;
-            }
+            base.OnEnable();
 
-            return null;
+            // reset spawner
+            _AliveObjects.Clear();
+            _DeadObjects.Clear();
+            _SpawnCounter = 0;
+            _DeadCounter = 0;
+            IsCompleted = false;
         }
 
         /// <summary>
@@ -149,26 +111,24 @@ namespace Skill.Framework
         /// <returns>True if success, otherwise false</returns>
         public bool Spawn()
         {
-            if (!CanSpawn) return false;
-            Vector3 position;
-            Quaternion rotation;
-            GetNextLocation(out position, out rotation);
+            if (!CanSpawn || Feed == null) return false;
 
-            if (OnlySpawnHidden && Camera.main != null)
-            {
-                Vector3 screenPoint = Camera.main.WorldToScreenPoint(position);
-                bool isHidden = screenPoint.x < 0 || screenPoint.x > Screen.width || screenPoint.y < 0 || screenPoint.y > Screen.height;
-                if (!isHidden)
-                    return false;
-            }
-
-            var sp = GetNextSpawnObject();
+            var sp = Feed.GetNextSpawnObjectFor(this);
             if (sp == null)
             {
                 Debug.LogError("invalid object to spawn(No SpawnObject exist).");
                 return false;
             }
-            GameObject spawnedObj = Cache.Spawn(sp, position, rotation);
+
+            if (OnlySpawnHidden && Camera.main != null)
+            {
+                if (Utility.IsVisible(sp.Position))
+                    return false;
+            }
+
+
+
+            GameObject spawnedObj = Cache.Spawn(sp.Prefab, sp.Position, sp.Rotation);
             _AliveObjects.Add(spawnedObj);
             _DeadObjects.Remove(spawnedObj);
 
@@ -178,7 +138,7 @@ namespace Skill.Framework
 
             _SpawnTW.Begin(Interval);
             _SpawnCounter++;
-            InitializeSpawnedObject(spawnedObj);
+            InitializeSpawnedObject(spawnedObj, sp.UserData);
 
             if (_SpawnCounter >= SpawnCount)
             {
@@ -187,37 +147,7 @@ namespace Skill.Framework
             return true;
         }
 
-        /// <summary>
-        /// Get next location to spawn object
-        /// </summary>
-        /// <param name="position">Position of spawn object</param>
-        /// <param name="rotation">Rotation of spawn object</param>
-        protected virtual void GetNextLocation(out Vector3 position, out Quaternion rotation)
-        {
-            if (Locations != null && Locations.Length > 0) // get position and rotation from one of spawne locations
-            {
-                if (CycleLocations) // move to next spawn location
-                    _LastSpawnLocationIndex = (_LastSpawnLocationIndex + 1) % Locations.Length;
-                else // pick random spawn location
-                    _LastSpawnLocationIndex = UnityEngine.Random.Range(0, Locations.Length);
 
-                Transform location = Locations[_LastSpawnLocationIndex];
-                rotation = location.rotation;
-                position = location.position;
-            }
-            else
-            {
-                rotation = transform.rotation;
-                position = transform.position;
-            }
-
-            if (SpawnRadius > 0)
-            {
-                Vector3 rndPosition = new Vector3();
-                rndPosition.x = UnityEngine.Random.Range(0, SpawnRadius);
-                position += rotation * rndPosition;
-            }
-        }
 
 
 
@@ -228,8 +158,8 @@ namespace Skill.Framework
         {
             if ((_SpawnCounter < SpawnCount) && _SpawnTW.IsOver)
             {
-                _SpawnTW.End();
-                if (CanSpawn && _AliveObjects.Count < AliveCount)
+                _SpawnTW.Begin(Interval);
+                if (CanSpawn && _AliveObjects.Count < MaxAlive)
                 {
                     Spawn();
                 }

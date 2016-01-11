@@ -304,7 +304,7 @@ namespace Skill.Editor.Animation
                 if (editor != null)
                     editor.ItemDrag(_Item, delta);
             }
-            protected override void OnMouseDown(MouseClickEventArgs args)
+            protected override void MouseDownEvent(MouseClickEventArgs args)
             {
                 if (args.Button == MouseButton.Left)
                 {
@@ -329,7 +329,7 @@ namespace Skill.Editor.Animation
                         }
                     }
                 }
-                base.OnMouseDown(args);
+                base.MouseDownEvent(args);
             }
         }
         #endregion

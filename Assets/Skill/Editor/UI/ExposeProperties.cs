@@ -546,7 +546,7 @@ namespace Skill.Editor.UI
         {
             public override PropertyType Type { get { return PropertyType.String; } }
 
-            private Skill.Editor.UI.TextField _Field;
+            private Skill.Editor.UI.TextField _TextField;
             private Skill.Editor.UI.PasteTextField _PasteTextField;
 
             public override Framework.UI.BaseControl Control
@@ -556,7 +556,9 @@ namespace Skill.Editor.UI
                     if (_PasteTextField != null)
                         return _PasteTextField;
                     else
-                        return _Field;
+                    {
+                        return _TextField;
+                    }
                 }
             }
             public StringProperties(ExposeProperties owner, PropertyInfo info, ExposePropertyAttribute attribute)
@@ -565,39 +567,48 @@ namespace Skill.Editor.UI
 
                 object[] attributes = info.GetCustomAttributes(true);
                 PasteTextFieldAttribute pasteTextFieldAttribute = null;
+                AreaFieldAttribute areaAtt = null;
                 System.Type ptType = typeof(PasteTextFieldAttribute);
+                System.Type aType = typeof(AreaFieldAttribute);
                 foreach (object o in attributes)
                 {
                     if (o.GetType() == ptType)
-                    {
                         pasteTextFieldAttribute = (PasteTextFieldAttribute)o;
-                        break;
-                    }
+                    if (o.GetType() == aType)
+                        areaAtt = (AreaFieldAttribute)o;
                 }
+
+
+
                 if (pasteTextFieldAttribute != null)
                 {
-                    _PasteTextField = new PasteTextField(pasteTextFieldAttribute.Persian);
-                    _Field = _PasteTextField.TextField;
+                    _PasteTextField = new PasteTextField(pasteTextFieldAttribute.Persian, areaAtt != null);
+                    _TextField = _PasteTextField.TextField;
+                    if (areaAtt != null)
+                        _PasteTextField.Height = Mathf.Max(18, areaAtt.Height);
                 }
                 else
                 {
-                    _Field = new Skill.Editor.UI.TextField();
+                    _TextField = new Skill.Editor.UI.TextField();
+                    if (areaAtt != null)
+                    {
+                        _TextField.Height = Mathf.Max(18, areaAtt.Height);
+                    }
                 }
-
-                _Field.TextChanged += TextField_ValueChanged;
-                _Field.Label.text = attribute.Name;
-                _Field.Label.tooltip = attribute.Description;
+                _TextField.TextChanged += TextField_ValueChanged;
+                _TextField.Label.text = attribute.Name;
+                _TextField.Label.tooltip = attribute.Description;
             }
 
             void TextField_ValueChanged(object sender, EventArgs e)
             {
                 if (Owner.IgnoreChanges) return;
-                Value = _Field.Text;
+                Value = _TextField.Text;
                 Owner.SetDirty();
             }
             public override void Refresh()
             {
-                _Field.Text = Value as string;
+                _TextField.Text = Value as string;
             }
         }
         #endregion
@@ -1018,6 +1029,17 @@ namespace Skill.Editor.UI
         public PasteTextFieldAttribute(bool persian = false)
         {
             this.Persian = persian;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Property)]
+    public class AreaFieldAttribute : Attribute
+    {
+        public float Height { get; private set; }
+
+        public AreaFieldAttribute(float height)
+        {
+            this.Height = height;
         }
     }
 }

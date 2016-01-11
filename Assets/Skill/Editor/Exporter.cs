@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEditor;
-using System.Xml.Linq;
+using Skill.Framework.IO;
 
 namespace Skill.Editor
 {
@@ -43,7 +43,7 @@ namespace Skill.Editor
 
             _Instance = this;
 
-            titleContent = new GUIContent( "Export to Skill Studio");
+            titleContent = new GUIContent("Export to Skill Studio");
             position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);
             base.minSize = new Vector2(Size.x, Size.y);
 
@@ -144,8 +144,8 @@ namespace Skill.Editor
                 try
                 {
                     Skill.Editor.Animation.BoneData root = CreateBone(_RootBone.Object);
-                    XDocument document = new XDocument();
-                    document.Add(root.ToXmlElement());
+                    XmlDocument document = new XmlDocument();
+                    document.AppendChild(root.ToXmlElement());
                     CopyToClipboard(document);
                     Debug.Log("Skeleton copied to clipboard");
                 }
@@ -182,8 +182,8 @@ namespace Skill.Editor
             {
                 if (_Animations.Object != null)
                 {
-                    XDocument document = new XDocument();
-                    XElement animationsElement = new XElement("Animations");
+                    XmlDocument document = new XmlDocument();
+                    XmlElement animationsElement = new XmlElement("Animations");
                     List<string> animNames = new List<string>();
                     foreach (AnimationState state in _Animations.Object)
                     {
@@ -221,11 +221,11 @@ namespace Skill.Editor
                         AddKeys(ryCurve, clip.RootMotion.RYKeys);
                         AddKeys(rzCurve, clip.RootMotion.RZKeys);
 
-                        animationsElement.Add(clip.ToXmlElement());
+                        animationsElement.AppendChild(clip.ToXmlElement());
                     }
                     if (animNames.Count > 0)
                     {
-                        document.Add(animationsElement);
+                        document.AppendChild(animationsElement);
                         CopyToClipboard(document);
                         Debug.Log("AnimationClips copied to clipboard");
                     }
@@ -247,11 +247,9 @@ namespace Skill.Editor
             }
         }
 
-        private void CopyToClipboard(XDocument document)
+        private void CopyToClipboard(XmlDocument document)
         {
-            //System.Windows.Forms.Clipboard.Clear();
-            //System.Windows.Forms.Clipboard.SetText(document.ToString());
-            EditorGUIUtility.systemCopyBuffer = document.ToString();
+            EditorGUIUtility.systemCopyBuffer = document.OuterXml;
         }
 
     }

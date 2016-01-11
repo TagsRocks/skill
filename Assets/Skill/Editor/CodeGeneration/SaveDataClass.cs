@@ -11,7 +11,7 @@ namespace Skill.Editor.CodeGeneration
     /// </summary>
     class SaveDataClass : ClassDataClass
     {
-        private SaveData _SaveData;
+        private SaveData _SaveData;        
 
         /// <summary>
         /// Create an instance of SaveData
@@ -34,6 +34,6 @@ namespace Skill.Editor.CodeGeneration
                 ClassDataClass saveClass = new ClassDataClass(item);                
                 Add(saveClass);
             }
-        }
+        }        
     }
 }

@@ -26,8 +26,9 @@ namespace Skill.Framework.Audio
         [SerializeField]
         public float PanY = 0;
 
-
         public float VolumeFactor = 1.0f;
+        public float BufferTime = 2.0f;        
+        public float NextStateFix = 0.02f;
 
         public class Trigger
         {
@@ -115,13 +116,13 @@ namespace Skill.Framework.Audio
                 if (_CurrentState.Clip != null)
                 {
                     _CurrentState.Initialize(false);
-                    _CurrentState.StartTime(0, 0);
+                    _CurrentState.StartTime(1, 0);
                 }
 
                 if (_CurrentState.NextState != null)
                 {
-                    float deltaTime = _CurrentState.End - _CurrentState.Begin;
-                    if (deltaTime > 1)
+                    float deltaTime = _CurrentState.End - _CurrentState.Begin + 1;
+                    if (deltaTime > BufferTime)
                         _ScheduleNextStateTW.Begin(deltaTime);
                     else
                         ScheduleNextState(deltaTime);
@@ -163,7 +164,7 @@ namespace Skill.Framework.Audio
                     if (_CurrentState.NextState != null)
                     {
                         float deltaTime = _CurrentState.End - _CurrentState.Begin;
-                        if (deltaTime > 1)
+                        if (deltaTime > BufferTime)
                             _ScheduleNextStateTW.Begin(deltaTime);
                         else
                             ScheduleNextState(deltaTime);
@@ -172,9 +173,9 @@ namespace Skill.Framework.Audio
             }
             else if (_ScheduleNextStateTW.IsEnabled)
             {
-                if (_ScheduleNextStateTW.TimeLeft < 2)
+                if (_ScheduleNextStateTW.TimeLeft < BufferTime)
                 {
-                    ScheduleNextState(_ScheduleNextStateTW.TimeLeft);
+                    ScheduleNextState(_CurrentState.EndDspTime - AudioSettings.dspTime);
                     _ScheduleNextStateTW.End();
                 }
             }
@@ -204,19 +205,20 @@ namespace Skill.Framework.Audio
                 _NextState.Update(this.VolumeFactor);
         }
 
-        private void ScheduleNextState(float deltaTime)
+        private void ScheduleNextState(double deltaTime)
         {
             if (_CurrentState != null)
             {
-                _CurrentState.EndTime(deltaTime, 0);
+                float fdeltaTime = System.Convert.ToSingle(deltaTime);
+                _CurrentState.EndTime(System.Math.Max(0, deltaTime - NextStateFix), 0);                
                 _NextState = FindState(_CurrentState.NextState);
                 if (_NextState != null)
                 {
-                    _NextStateTW.Begin(deltaTime);
+                    _NextStateTW.Begin(fdeltaTime);
                     if (_NextState.Clip != null)
                     {
                         _NextState.Initialize(false);
-                        _NextState.StartTime(deltaTime, 0);
+                        _NextState.StartTime(fdeltaTime, 0);
                     }
                 }
             }
@@ -227,7 +229,7 @@ namespace Skill.Framework.Audio
             {
                 _ActiveTransition = transition;
 
-                float deltaTime = 0;
+                double deltaTime = 0;
                 bool isPlaying = _CurrentState.IsPlaying;
                 if (isPlaying)
                 {
@@ -248,17 +250,21 @@ namespace Skill.Framework.Audio
 
                 _InTransition = true;
                 _NextState = FindState(transition.Destination);
-                _NextStateTW.Begin(deltaTime);
+
+                float fdeltaTime = System.Convert.ToSingle(deltaTime);
+                _NextStateTW.Begin(fdeltaTime);
 
                 if (isPlaying)
+                {
                     _CurrentState.EndTime(deltaTime, _ActiveTransition.FadeOut);
+                }
 
                 if (_NextState.Clip != null)
                 {
                     _NextState.Initialize(_ActiveTransition.FadeIn > AudioState.MINFADETIME);
                     if (_ActiveTransition.CrossFade)
                     {
-                        _UpdateNextStateTW.Begin(Mathf.Max(0, deltaTime - _ActiveTransition.FadeIn));
+                        _UpdateNextStateTW.Begin(Mathf.Max(0, fdeltaTime - _ActiveTransition.FadeIn));
                         _NextState.StartTime(_UpdateNextStateTW.Length, _ActiveTransition.FadeIn);
                     }
                     else

@@ -135,10 +135,10 @@ namespace Skill.Editor.UI
         }
 
         /// <summary>
-        /// OnMouseDown
+        /// MouseDownEvent
         /// </summary>
         /// <param name="args">args</param>
-        protected override void OnMouseDown(MouseClickEventArgs args)
+        protected override void MouseDownEvent(MouseClickEventArgs args)
         {
             if (_MouseButton == -1 && Parent != null && (args.Button == MouseButton.Right || args.Button == MouseButton.Middle) && args.Alt)
             {
@@ -151,7 +151,7 @@ namespace Skill.Editor.UI
                 _MousePivot = args.MousePosition;
                 _MouseButton = args.Button == MouseButton.Right ? 1 : 2;
             }
-            base.OnMouseDown(args);
+            base.MouseDownEvent(args);
         }
 
         public override void HandleEvent(Event e)

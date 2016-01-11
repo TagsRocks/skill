@@ -44,7 +44,7 @@ namespace Skill.Editor.IO
             XmlElement p = new XmlElement("Property");
             p.SetAttributeValue("PropertyType", (int)Type);
             p.SetAttributeValue("Name", Name);
-            p.SetAttributeValue("IsArray", IsArray);            
+            p.SetAttributeValue("IsArray", IsArray);
             if (!string.IsNullOrEmpty(Comment))
             {
                 XmlElement comment = new XmlElement("Comment");
@@ -92,6 +92,9 @@ namespace Skill.Editor.IO
         /// <summary> PrimitiveType </summary>
         public PrimitiveDataType PrimitiveType { get; set; }
 
+        /// <summary>  Whether this property is safe in memory (works for float,int,bool)</summary>
+        public bool SafeMemory { get; set; }
+
         /// <summary>
         /// Create a PrimitiveProperty
         /// </summary>
@@ -104,13 +107,29 @@ namespace Skill.Editor.IO
         protected override void WriteAttributes(XmlElement e)
         {
             e.SetAttributeValue("PrimitiveType", (int)this.PrimitiveType);
+            e.SetAttributeValue("SafeMemory", SafeMemory);
             base.WriteAttributes(e);
         }
 
         protected override void ReadAttributes(XmlElement e)
         {
             this.PrimitiveType = (PrimitiveDataType)e.GetAttributeValueAsInt("PrimitiveType", 0);
+            this.SafeMemory = e.GetAttributeValueAsBoolean("SafeMemory", false);
             base.ReadAttributes(e);
+        }
+
+        public string GetCast()
+        {
+            if (SafeMemory && !IsArray)
+            {
+                if (PrimitiveType == PrimitiveDataType.Integer)
+                    return "(int)";
+                else if (PrimitiveType == PrimitiveDataType.Float)
+                    return "(float)";
+                else if (PrimitiveType == PrimitiveDataType.Boolean)
+                    return "(bool)";
+            }
+            return string.Empty;
         }
     }
 

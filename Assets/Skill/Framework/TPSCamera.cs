@@ -5,6 +5,7 @@ using System.Collections;
 
 namespace Skill.Framework
 {
+    [RequireComponent(typeof(Camera))]
     public class TPSCamera : DynamicBehaviour
     {
         [System.Serializable]
@@ -29,6 +30,8 @@ namespace Skill.Framework
         private TPSMode _PreSelectedMode;
         private TimeWatch _ChangeModeTW;
         private Camera _Camera;
+        private CameraLimit[] _Limits;
+        private Vector3? _PrePosition;
 
         public bool InvertY { get; set; }
         public bool InvertX { get; set; }
@@ -88,6 +91,7 @@ namespace Skill.Framework
         {
             base.GetReferences();
             _Camera = GetComponent<Camera>();
+            _Limits = GetComponents<CameraLimit>();
         }
 
 
@@ -109,6 +113,7 @@ namespace Skill.Framework
                     if (_ChangeModeTW.IsEnabledAndOver)
                     {
                         _PreSelectedMode = _SelectedMode;
+                        _PrePosition = null;
                         _ChangeModeTW.End();
                     }
 
@@ -136,9 +141,19 @@ namespace Skill.Framework
                     float desiredAngle = GetTargetRotation();
                     Quaternion rotation = Quaternion.Euler(pitch, desiredAngle, 0);
 
-                    transform.position = targetPosition - (rotation * dir);
+                    Vector3 finalPosition = targetPosition - (rotation * dir); 
+
+                    // apply camera limits
+                    if (_Limits != null && _Limits.Length > 0 && _PrePosition != null)
+                    {
+                        for (int i = 0; i < _Limits.Length; i++)
+                            _Limits[i].ApplyLimit(ref finalPosition, _PrePosition.Value);
+                    }
+
+                    transform.position = finalPosition;
                     transform.rotation = rotation;
 
+                    _PrePosition = finalPosition;
                 }
             }
         }

@@ -406,6 +406,28 @@ namespace Skill.Framework.IO
         /// <param name="propertyName">Name of property (XmlElement)</param>
         /// <param name="primitives">data to save</param>
         /// <returns>XmlElement containig data</returns>
+        public XmlElement Create(string propertyName, SafeInt[] primitives)
+        {
+            XmlElement e = new XmlElement(propertyName);
+            int length = 0;
+            if (primitives != null) length = primitives.Length;
+            e.SetAttributeValue("Lenght", length.ToString());
+
+            for (int i = 0; i < length; i++)
+            {
+                XmlElement element = Create("Element" + i, primitives[i].Value);
+                e.AppendChild(element);
+            }
+
+            return e;
+        }
+
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="primitives">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, float[] primitives)
         {
             XmlElement e = new XmlElement(propertyName);
@@ -428,6 +450,28 @@ namespace Skill.Framework.IO
         /// <param name="propertyName">Name of property (XmlElement)</param>
         /// <param name="primitives">data to save</param>
         /// <returns>XmlElement containig data</returns>
+        public XmlElement Create(string propertyName, SafeFloat[] primitives)
+        {
+            XmlElement e = new XmlElement(propertyName);
+            int length = 0;
+            if (primitives != null) length = primitives.Length;
+            e.SetAttributeValue("Lenght", length.ToString());
+
+            for (int i = 0; i < length; i++)
+            {
+                XmlElement element = Create("Element" + i, primitives[i].Value);
+                e.AppendChild(element);
+            }
+
+            return e;
+        }
+
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="primitives">data to save</param>
+        /// <returns>XmlElement containig data</returns>
         public XmlElement Create(string propertyName, bool[] primitives)
         {
             XmlElement e = new XmlElement(propertyName);
@@ -438,6 +482,28 @@ namespace Skill.Framework.IO
             for (int i = 0; i < length; i++)
             {
                 XmlElement element = Create("Element" + i, primitives[i]);
+                e.AppendChild(element);
+            }
+
+            return e;
+        }
+
+        /// <summary>
+        /// Create an XmlElement containing property data
+        /// </summary>
+        /// <param name="propertyName">Name of property (XmlElement)</param>
+        /// <param name="primitives">data to save</param>
+        /// <returns>XmlElement containig data</returns>
+        public XmlElement Create(string propertyName, SafeBool[] primitives)
+        {
+            XmlElement e = new XmlElement(propertyName);
+            int length = 0;
+            if (primitives != null) length = primitives.Length;
+            e.SetAttributeValue("Lenght", length.ToString());
+
+            for (int i = 0; i < length; i++)
+            {
+                XmlElement element = Create("Element" + i, primitives[i].Value);
                 e.AppendChild(element);
             }
 

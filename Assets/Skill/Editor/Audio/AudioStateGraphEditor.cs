@@ -592,7 +592,7 @@ namespace Skill.Editor.Audio
                 this.ContextMenu = AudioConnectionContextMenu.Instance;
             }
 
-            protected override void OnMouseDown(MouseClickEventArgs args)
+            protected override void MouseDownEvent(MouseClickEventArgs args)
             {
                 if (Start != null && args.Button == MouseButton.Left)
                 {
@@ -618,7 +618,7 @@ namespace Skill.Editor.Audio
                         args.Handled = true;
                     }
                 }
-                base.OnMouseDown(args);
+                base.MouseDownEvent(args);
             }
 
             public string Title { get { return "AudioConnection"; } }

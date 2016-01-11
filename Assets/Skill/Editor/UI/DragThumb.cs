@@ -36,10 +36,10 @@ namespace Skill.Editor.UI
         }
 
         /// <summary>
-        /// OnMouse down
+        /// MouseDownEvent
         /// </summary>
         /// <param name="args">args</param>
-        protected override void OnMouseDown(MouseClickEventArgs args)
+        protected override void MouseDownEvent(MouseClickEventArgs args)
         {
             if (Parent != null && args.Button == MouseButton.Left)
             {
@@ -50,7 +50,7 @@ namespace Skill.Editor.UI
                     args.Handled = true;
                 }
             }
-            base.OnMouseDown(args);
+            base.MouseDownEvent(args);
         }
 
         public event DragEventHandler Drag;

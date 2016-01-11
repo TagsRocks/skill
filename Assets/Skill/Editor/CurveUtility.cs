@@ -159,7 +159,7 @@ namespace Skill.Editor
             {
                 float f = 6.283185f * (name.GetHashCode() % 0x3e8);
                 f -= Mathf.Floor(f);
-                white = GetBalancedColor(EditorGUIUtility.HSVToRGB(f, 1f, 1f));
+                white = GetBalancedColor(Color.HSVToRGB(f, 1f, 1f));
             }
             white.a = 1f;
             return white;

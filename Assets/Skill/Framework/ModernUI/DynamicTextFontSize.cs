@@ -9,9 +9,17 @@ namespace Skill.Framework.ModernUI
     [ExecuteInEditMode]
     public class DynamicTextFontSize : MonoBehaviour
     {
+        [System.Serializable]
+        public class LanguageOverride
+        {
+            public string Language;
+            public float ScaleFactor;
+        }
+
         public float ScreenFactor = 0.2f;
         public float ScreenWidthFactor = 1.0f;
         public float ScreenHeightFactor = 1.0f;
+        public LanguageOverride[] Overrides;
 
         private UnityEngine.UI.Text _Text;
         private ScreenSizeChange _ScreenSizeChange;
@@ -41,6 +49,20 @@ namespace Skill.Framework.ModernUI
                 if (_Text != null)
                 {
                     float factor = ((Screen.width * ScreenWidthFactor) + (Screen.height * ScreenHeightFactor)) * 0.1f;
+                    if (Overrides != null && Overrides.Length > 0)
+                    {
+                        if (Localization.Instance != null)
+                        {
+                            foreach (var o in Overrides)
+                            {
+                                if (Localization.Instance.SelectedLanguage.Name == o.Language)
+                                {
+                                    factor *= o.ScaleFactor;
+                                    break;
+                                }
+                            }
+                        }
+                    }
                     _Text.fontSize = Mathf.FloorToInt(factor * ScreenFactor);
                 }
             }

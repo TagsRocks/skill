@@ -92,17 +92,17 @@ namespace Skill.Editor
             }
 
             /// <summary>
-            /// OnMouseDown
+            /// MouseDownEvent
             /// </summary>
             /// <param name="args">MouseClickEventArgs</param>
-            protected override void OnMouseDown(Skill.Framework.UI.MouseClickEventArgs args)
+            protected override void MouseDownEvent(Skill.Framework.UI.MouseClickEventArgs args)
             {
                 // show properties when used select this event 
                 if (args.Button == Skill.Framework.UI.MouseButton.Left)
                 {
                     InspectorProperties.Select(this);
                 }
-                base.OnMouseDown(args);
+                base.MouseDownEvent(args);
             }
 
             private bool _SelectedProperties;

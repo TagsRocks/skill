@@ -70,7 +70,7 @@ namespace Skill.Editor
         static void ShowAbout()
         {
             AboutSkill.Instance.ShowUtility();
-        }        
+        }
 
 
         // ********************************* Commands ********************************* 
@@ -92,12 +92,6 @@ namespace Skill.Editor
         {
             Commands.GroupObjects("Group");
         }
-
-        //[MenuItem("Skill/Edit/Group Dialog %#g", false, 101)] // Ctrl + Shift + G
-        //static void GroupObjectsWithName()
-        //{
-        //    CreateGroupDialog.Instance.ShowUtility();
-        //}
 
         [MenuItem("Skill/Edit/Copy Transform Hierarchy", false, 102)]
         static void CopyHierarchyTransform()
@@ -121,6 +115,56 @@ namespace Skill.Editor
         static bool ValidatePasteTransformHierarchy()
         {
             return Skill.Editor.Commands.ValidatePasteTransformHierarchy();
+        }
+
+
+        [MenuItem("Skill/Edit/Export to Wavefront .obj", false, 104)]
+        static void ExportToWavefrontObject()
+        {
+            if (Selection.gameObjects.Length == 0)
+                return;
+
+            string fileName = EditorUtility.SaveFilePanel("Export to Wavefront .obj", "", "Object", "obj");
+            if (!string.IsNullOrEmpty(fileName))
+            {
+                List<MeshFilter> meshes = new List<MeshFilter>();
+                foreach (var g in Selection.gameObjects)
+                    meshes.AddRange(g.GetComponentsInChildren<MeshFilter>());
+                MeshFilter[] ms = meshes.ToArray();
+                if (ms.Length > 0)
+                {
+                    MeshExporter exporter = new MeshExporter();
+
+                    if (Selection.gameObjects.Length == 1)
+                    {
+                        Transform t = Selection.gameObjects[0].transform;
+                        Vector3 originalPosition = t.position;
+                        t.position = Vector3.zero;
+                        exporter.ExportObject(fileName, ms);
+                        t.position = originalPosition;
+                    }
+                    else
+                    {
+                        exporter.ExportObject(fileName, ms);
+                    }
+                }
+
+            }
+        }
+
+        [MenuItem("Skill/Edit/Export to Wavefront .obj", true)]
+        static bool ValidateExportToWavefrontObject()
+        {
+            if (Selection.gameObjects.Length == 0)
+                return false;
+
+            foreach (var g in Selection.gameObjects)
+            {
+                if (g.GetComponentsInChildren<MeshFilter>() != null)
+                    return true;
+            }
+
+            return false;
         }
 
 

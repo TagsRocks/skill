@@ -42,9 +42,12 @@ namespace Skill.Framework
                 base.Awake();
                 Instance = this;
                 IsGamePaused = false;
+                CutSceneEnable = false;
+                Time.timeScale = 1.0f;                
                 if (Settings == null)
                     throw new Exception("Invalid Settings. you have to return valid setting by CreateSettings() method");
                 DontDestroyOnLoad(this.gameObject);
+                
             }
         }
 

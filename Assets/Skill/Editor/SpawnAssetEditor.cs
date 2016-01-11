@@ -10,8 +10,10 @@ using Skill.Framework;
 
 namespace Skill.Editor
 {
-    
 
+    // this code could be used for other new datatypes
+    
+    /*
     [UnityEditor.CustomEditor(typeof(Skill.Framework.SpawnAsset))]
     class SpawnAssetEditor : UnityEditor.Editor, IEditor
     {
@@ -174,4 +176,5 @@ namespace Skill.Editor
                 item.UpdateName();
         }
     }
+     */
 }

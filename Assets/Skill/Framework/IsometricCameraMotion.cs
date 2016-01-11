@@ -13,34 +13,17 @@ namespace Skill.Framework
         /// <summary> Isometric Camera </summary>
         public IsometricCamera Camera { get; private set; }
 
+        /// <summary> SmoothStep </summary>
+        public bool SmoothStep = true;
+
         // Private memeber data        
-        private SmoothingAngle _AroundAngle;
-        private SmoothingAngle _LookAngle;
-        private SmoothingAngle _Fov;
-        private SmoothingParameters _AroundAngleSmoothing;
-        private SmoothingParameters _LookAngleSmoothing;
-        private SmoothingParameters _FovSmoothing;
-
-        /// <summary>
-        /// Awake
-        /// </summary>
-        protected override void Awake()
-        {
-            base.Awake();
-            
-            _AroundAngleSmoothing = new SmoothingParameters() { SmoothType = SmoothType.Damp };
-            _LookAngleSmoothing = new SmoothingParameters() { SmoothType = SmoothType.Damp };
-            _FovSmoothing = new SmoothingParameters() { SmoothType = SmoothType.Damp };
-
-            if (Camera != null)
-            {
-                _AroundAngle.Reset(Camera.AroundAngle);
-                _LookAngle.Reset(Camera.LookAngle);
-                _Fov.Reset(Camera.Fov);
-            }
-
-            enabled = false;
-        }
+        private LerpAngle _AroundAngle;
+        private LerpAngle _LookAngle;
+        private LerpAngle _Fov;
+        private Lerp _Preview;
+        private Lerp _ZoomIn;
+        private Lerp _ZoomOut;
+        private Lerp3D _CustomOffset;
 
         protected override void GetReferences()
         {
@@ -53,54 +36,70 @@ namespace Skill.Framework
         public void MotionFov(float finalFov, float motionTime)
         {
             finalFov = Mathf.Repeat(finalFov, 180);
-            _Fov.Reset(Camera.Fov);
-            _Fov.TargetAngle = finalFov;
-            _FovSmoothing.SmoothTime = motionTime;
-            enabled = true;
-        }
-        public void MotionDeltaFov(float deltaFov, float motionTime)
-        {
-            MotionFov(Camera.Fov + deltaFov, motionTime);
+            if (finalFov != Camera.Fov)
+            {
+                _Fov.Begin(Camera.Fov, finalFov, motionTime);
+                enabled = true;
+            }
         }
 
         public void MotionAroundAngle(float finalAroundAngle, float motionTime)
         {
-            finalAroundAngle = Mathf.Repeat(finalAroundAngle, 360);
-            _AroundAngle.Reset(Camera.AroundAngle);
-            _AroundAngle.TargetAngle = finalAroundAngle;
-            _AroundAngleSmoothing.SmoothTime = motionTime;
-            enabled = true;
-        }
-        public void MotionDeltaAroundAngle(float deltaAroundAngle, float motionTime)
-        {
-            MotionAroundAngle(Camera.AroundAngle + deltaAroundAngle, motionTime);
+            //finalAroundAngle = Mathf.Repeat(finalAroundAngle, 360);
+            if (finalAroundAngle != Camera.AroundAngle)
+            {
+                _AroundAngle.Begin(Camera.AroundAngle, finalAroundAngle, motionTime);
+                enabled = true;
+            }
         }
 
         public void MotionLookAngle(float finalLookAngle, float motionTime)
         {
-            finalLookAngle = Mathf.Repeat(finalLookAngle, 90);
-            _LookAngle.Reset(Camera.LookAngle);
-            _LookAngle.TargetAngle = finalLookAngle;
-            _LookAngleSmoothing.SmoothTime = motionTime;
-            enabled = true;
-        }
-        public void MotionDeltaLookAngle(float deltaLookAngle, float motionTime)
-        {
-            MotionLookAngle(Camera.LookAngle + deltaLookAngle, motionTime);
+            //finalLookAngle = Mathf.Repeat(finalLookAngle, 90);
+            if (finalLookAngle != Camera.LookAngle)
+            {
+                _LookAngle.Begin(Camera.LookAngle, finalLookAngle, motionTime);
+                enabled = true;
+            }
         }
 
-        public void Motion(float finalFov, float finalAroundAngle, float finalLookAngle, float motionTime)
+        public void MotionPreview(float finalPreview, float motionTime)
         {
-            MotionFov(finalFov, motionTime);
-            MotionAroundAngle(finalAroundAngle, motionTime);
-            MotionLookAngle(finalLookAngle, motionTime);
+            if (finalPreview != Camera.CameraPreview)
+            {
+                _Preview.SmoothStep = this.SmoothStep;
+                _Preview.Begin(Camera.CameraPreview, finalPreview, motionTime);
+                enabled = true;
+            }
+        }
+        public void MotionZoomIn(float finalZoomIn, float motionTime)
+        {
+            if (finalZoomIn != Camera.ZoomIn)
+            {
+                _ZoomIn.SmoothStep = this.SmoothStep;
+                _ZoomIn.Begin(Camera.ZoomIn, finalZoomIn, motionTime);
+                enabled = true;
+            }
         }
 
-        public void MotionDelta(float deltaFov, float deltaAroundAngle, float deltaLookAngle, float motionTime)
+        public void MotionZoomOut(float finalZoomOut, float motionTime)
         {
-            MotionDeltaFov(deltaFov, motionTime);
-            MotionDeltaAroundAngle(deltaAroundAngle, motionTime);
-            MotionDeltaLookAngle(deltaLookAngle, motionTime);
+            if (finalZoomOut != Camera.ZoomOut)
+            {
+                _ZoomOut.SmoothStep = this.SmoothStep;
+                _ZoomOut.Begin(Camera.ZoomOut, finalZoomOut, motionTime);
+                enabled = true;
+            }
+        }
+
+        public void MotionCustomOffset(Vector3 finalCustomOffset, float motionTime)
+        {
+            if (finalCustomOffset != Camera.CustomOffset)
+            {
+                _CustomOffset.SmoothStep = this.SmoothStep;
+                _CustomOffset.Begin(Camera.CustomOffset, finalCustomOffset, motionTime);
+                enabled = true;
+            }
         }
 
         /// <summary>
@@ -114,48 +113,68 @@ namespace Skill.Framework
             {
                 bool updating = false;
 
-                if (this.Camera.AroundAngle != this._AroundAngle.TargetAngle)
+                if (this._AroundAngle.IsEnabled)
                 {
-                    if (Mathf.Abs(this.Camera.AroundAngle - this._AroundAngle.TargetAngle) < 0.01f)
-                    {
-                        this.Camera.AroundAngle = this._AroundAngle.TargetAngle;
-                    }
+                    if (this._AroundAngle.IsOver)
+                        this._AroundAngle.End();
                     else
-                    {
                         updating = true;
-                        this._AroundAngle.Update(_AroundAngleSmoothing);
-                        this.Camera.AroundAngle = this._AroundAngle.CurrentAngle;
-                    }
+                    this.Camera.AroundAngle = this._AroundAngle.Value;
                 }
 
-                if (this.Camera.LookAngle != this._LookAngle.TargetAngle)
+                if (this._LookAngle.IsEnabled)
                 {
-                    if (Mathf.Abs(this.Camera.LookAngle - this._LookAngle.TargetAngle) < 0.01f)
-                    {
-                        this.Camera.LookAngle = this._LookAngle.TargetAngle;
-                    }
+                    if (this._LookAngle.IsOver)
+                        this._LookAngle.End();
                     else
-                    {
                         updating = true;
-                        this._LookAngle.Update(_LookAngleSmoothing);
-                        this.Camera.LookAngle = this._LookAngle.CurrentAngle;
-                    }
+                    this.Camera.LookAngle = this._LookAngle.Value;
                 }
 
-                if (this.Camera.Fov != this._Fov.TargetAngle)
+                if (this._Fov.IsEnabled)
                 {
-                    if (Mathf.Abs(this.Camera.Fov - this._Fov.TargetAngle) < 0.01f)
-                    {
-                        this.Camera.Fov = this._Fov.TargetAngle;
-                    }
+                    if (this._Fov.IsOver)
+                        this._Fov.End();
                     else
-                    {
                         updating = true;
-                        this._Fov.Update(_FovSmoothing);
-                        this.Camera.Fov = this._Fov.CurrentAngle;
-                    }
+                    this.Camera.Fov = this._Fov.Value;
                 }
 
+                if (this._Preview.IsEnabled)
+                {
+                    if (this._Preview.IsOver)
+                        this._Preview.End();
+                    else
+                        updating = true;
+                    this.Camera.CameraPreview = this._Preview.Value;
+                }
+
+                if (this._ZoomIn.IsEnabled)
+                {
+                    if (this._ZoomIn.IsOver)
+                        this._ZoomIn.End();
+                    else
+                        updating = true;
+                    this.Camera.ZoomIn = this._ZoomIn.Value;
+                }
+
+                if (this._ZoomOut.IsEnabled)
+                {
+                    if (this._ZoomOut.IsOver)
+                        this._ZoomOut.End();
+                    else
+                        updating = true;
+                    this.Camera.ZoomOut = this._ZoomOut.Value;
+                }
+
+                if (this._CustomOffset.IsEnabled)
+                {
+                    if (this._CustomOffset.IsOver)
+                        this._CustomOffset.End();
+                    else
+                        updating = true;
+                    this.Camera.CustomOffset = this._CustomOffset.Value;
+                }
                 enabled = updating;
             }
 

@@ -164,11 +164,11 @@ namespace Skill.Editor.Audio
         {
             if (_DefaultStyle == null)
             {
-               
+
                 _DefaultStyle = new GUIStyle((GUIStyle)"flow node 5");
                 _DefaultSelectedStyle = new GUIStyle((GUIStyle)"flow node 5 on");
                 _Style = new GUIStyle((GUIStyle)"flow node 0");
-                _SelectedStyle = new GUIStyle((GUIStyle)"flow node 0 on");                
+                _SelectedStyle = new GUIStyle((GUIStyle)"flow node 0 on");
             }
         }
 
@@ -541,7 +541,16 @@ namespace Skill.Editor.Audio
 
                     float value = State.Begin;
                     if (preBreakPoints.Length > 0)
-                        value = preBreakPoints[preBreakPoints.Length - 1];
+                    {
+                        if (preBreakPoints.Length > 1)
+                        {
+                            value = preBreakPoints[preBreakPoints.Length - 1] + (preBreakPoints[preBreakPoints.Length - 1] - preBreakPoints[preBreakPoints.Length - 2]);
+                            if (State.Clip != null)
+                                value = Mathf.Min(State.Clip.length, value);
+                        }
+                        else
+                            value = preBreakPoints[preBreakPoints.Length - 1];
+                    }
                     newBreakPoints[newBreakPoints.Length - 1] = value;
                     State.BreakPoints = newBreakPoints;
                     Add(value);
@@ -585,7 +594,7 @@ namespace Skill.Editor.Audio
                     editor.ItemDrag(_Node, delta);
             }
 
-            protected override void OnMouseDown(MouseClickEventArgs args)
+            protected override void MouseDownEvent(MouseClickEventArgs args)
             {
                 if (args.Button == MouseButton.Left)
                 {
@@ -610,7 +619,7 @@ namespace Skill.Editor.Audio
                         }
                     }
                 }
-                base.OnMouseDown(args);
+                base.MouseDownEvent(args);
             }
         }
         #endregion

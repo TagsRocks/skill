@@ -43,10 +43,19 @@ namespace Skill.Framework.IO
         private Vector2 _PreviousLocation;
         private Vector2 _DeltaTranslation;
         private Vector2 _TotalTranslation;
-
         private bool _IsDragStarted;
 
-        /// <summary> Minimum rotation to start detecting </summary>
+        /// <summary> position of pointers when drag started</summary>
+        public Vector2[] DragStartPoints { get; private set; }
+
+        /// <summary> the time when drag started</summary>
+        public float DragStartTime { get; private set; }
+
+        /// <summary> the time when drag ended</summary>
+        public float DragEndTime { get; private set; }
+
+
+        /// <summary> Minimum drag to start detecting </summary>
         public float MinimumDrag { get; set; }
 
         public override int FingerCount { get { return base.FingerCount; } set { base.FingerCount = Math.Max(1, value); } }
@@ -64,12 +73,13 @@ namespace Skill.Framework.IO
         /// <summary> Occurs when a drag gesture started </summary>
         protected virtual void OnDragStart()
         {
+            DragStartTime = Time.time;
+            DragStartPoints = GetPositionOfTrackingTouches();
             if (DragStart != null)
             {
-                Vector2[] positions = GetPositionOfTrackingTouches();
-                for (int i = 0; i < positions.Length; i++)// find start positions before drag 
-                    positions[i] -= _DeltaTranslation;
-                DragStart(this, new GestureEventArgs(FingerCount, positions));
+                for (int i = 0; i < DragStartPoints.Length; i++)// find start positions before drag 
+                    DragStartPoints[i] -= _DeltaTranslation;
+                DragStart(this, new GestureEventArgs(FingerCount, DragStartPoints));
             }
         }
 
@@ -79,6 +89,7 @@ namespace Skill.Framework.IO
         /// <summary> Occurs when a drag gesture ended </summary>
         protected virtual void OnDragEnd()
         {
+            DragEndTime = Time.time;
             if (DragEnd != null)
             {
                 Vector2[] positions = GetPositionOfTrackingTouches();

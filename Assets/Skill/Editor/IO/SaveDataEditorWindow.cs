@@ -27,7 +27,7 @@ namespace Skill.Editor.IO
         {
             hideFlags = HideFlags.DontSave;
 
-            base.titleContent = new GUIContent( "SaveData");
+            base.titleContent = new GUIContent("SaveData");
             base.position = new Rect((Screen.width - Size.x) / 2.0f, (Screen.height - Size.y) / 2.0f, Size.x, Size.y);
             base.minSize = Size;
             CreateUI();
@@ -452,9 +452,21 @@ namespace Skill.Editor.IO
                 else
                     base.Text = string.Format("class {0}", Editor._Asset.name);
             }
-            public new string Name2 { get; set; }
+            public new string Name2 { get; set; }            
 
             public override string Title { get { return "SaveData"; } }
+
+
+            #region Expose Properties
+            [Skill.Framework.ExposeProperty(105, "Namespace", "Namespace")]
+            public string Namespace
+            {
+                get { return ((SaveData)Data).Namespace; }
+                set { ((SaveData)Data).Namespace = value; UpdateText(); }
+            }
+            #endregion
+
+
         }
 
         abstract class PropertyDataListItem : Label, IListItem
@@ -523,6 +535,14 @@ namespace Skill.Editor.IO
 
         class PrimitivePropertyDataListItem : PropertyDataListItem
         {
+
+            [Skill.Framework.ExposeProperty(104, "SafeMemory", "Whether this property is safe in memory (works for float,int,bool)")]
+            public bool SafeMemory
+            {
+                get { return ((PrimitivePropertyData)Data).SafeMemory; }
+                set { ((PrimitivePropertyData)Data).SafeMemory = value; UpdateText(); }
+            }
+
             public PrimitivePropertyDataListItem(SaveDataEditorWindow editor, PrimitivePropertyData data)
                 : base(editor, data)
             {
@@ -531,9 +551,9 @@ namespace Skill.Editor.IO
             {
                 PrimitivePropertyData v = (PrimitivePropertyData)Data;
                 string valueStr = v.PrimitiveType.ToString();
-                if (valueStr == "Integer") valueStr = "int";
-                if (valueStr == "Float") valueStr = "float";
-                if (valueStr == "Boolean") valueStr = "bool";
+                if (valueStr == "Integer") valueStr = v.SafeMemory ? "SafeInt" : "int";
+                if (valueStr == "Float") valueStr = v.SafeMemory ? "SafeFloat" : "float";
+                if (valueStr == "Boolean") valueStr = v.SafeMemory ? "SafeBool" : "bool";
                 if (valueStr == "String") valueStr = "string";
 
                 if (v.IsArray)

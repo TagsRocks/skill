@@ -23,5 +23,6 @@ namespace Skill.Framework.Modules
         public float OffsetY = 0;
         public Vector3[] Points;
         public bool IsEnable = true;
+        public bool Uniform = true;
     }
 }

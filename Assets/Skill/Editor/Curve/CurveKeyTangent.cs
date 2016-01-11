@@ -37,7 +37,7 @@ namespace Skill.Editor.Curve
         private Vector2 _EndPosition;
         private Vector2 _DeltaDrag;
         private bool _IsMouseDown;
-        protected override void OnMouseDown(MouseClickEventArgs args)
+        protected override void MouseDownEvent(MouseClickEventArgs args)
         {
             if (Parent != null && args.Button == MouseButton.Left)
             {
@@ -50,7 +50,7 @@ namespace Skill.Editor.Curve
                     args.Handled = true;
                 }
             }
-            base.OnMouseDown(args);
+            base.MouseDownEvent(args);
         }
 
         /// <summary>

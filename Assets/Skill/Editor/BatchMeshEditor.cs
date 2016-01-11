@@ -106,7 +106,7 @@ namespace Skill.Editor
                 Debug.LogError("Root is null");
                 return;
             }
-            if (_Data.UnitLength < 0.2f)
+            if (_Data.UnitLength.x < 1.0f || _Data.UnitLength.y < 1.0f || _Data.UnitLength.z < 1.0f)
             {
                 Debug.LogError("UnitLength is too small, please define larger UnitLength");
                 return;
@@ -114,6 +114,8 @@ namespace Skill.Editor
 
             _Data.MaxPolyCount = Mathf.Max(_Data.MaxPolyCount, 100);
 
+            foreach (var root in _Data.Roots)
+                root.gameObject.SetActive(true);
 
             List<MeshFilter> filters = new List<MeshFilter>(10000);
             foreach (var root in _Data.Roots)
@@ -139,9 +141,9 @@ namespace Skill.Editor
             }
 
             //seprate world to squares
-            int unitX = (int)((max.x - min.x) / _Data.UnitLength) + 1;
-            int unitY = (int)((max.y - min.y) / _Data.UnitLength) + 1;
-            int unitZ = (int)((max.z - min.z) / _Data.UnitLength) + 1;
+            int unitX = (int)((max.x - min.x) / _Data.UnitLength.x) + 1;
+            int unitY = (int)((max.y - min.y) / _Data.UnitLength.y) + 1;
+            int unitZ = (int)((max.z - min.z) / _Data.UnitLength.z) + 1;
 
             MeshGroup[, ,] units = new MeshGroup[unitX, unitY, unitZ];
             for (int ix = 0; ix < unitX; ix++)
@@ -153,9 +155,14 @@ namespace Skill.Editor
             foreach (MeshFilter mf in filters)
             {
                 Vector3 pos = mf.transform.position;
-                int ix = Mathf.FloorToInt((pos.x - min.x) / _Data.UnitLength);
-                int iy = Mathf.FloorToInt((pos.y - min.y) / _Data.UnitLength);
-                int iz = Mathf.FloorToInt((pos.z - min.z) / _Data.UnitLength);
+                int ix = Mathf.FloorToInt((pos.x - min.x) / _Data.UnitLength.x);
+                int iy = Mathf.FloorToInt((pos.y - min.y) / _Data.UnitLength.y);
+                int iz = Mathf.FloorToInt((pos.z - min.z) / _Data.UnitLength.z);
+
+                ix = Mathf.Clamp(ix, 0, unitX - 1);
+                iy = Mathf.Clamp(iy, 0, unitY - 1);
+                iz = Mathf.Clamp(iz, 0, unitZ - 1);
+
                 units[ix, iy, iz].Meshes.Add(mf);
             }
 
@@ -174,6 +181,9 @@ namespace Skill.Editor
 
             _Data.ChildMeshes = _Meshes.ToArray();
             EditorUtility.SetDirty(_Data);
+
+            foreach (var root in _Data.Roots)
+                root.gameObject.SetActive(false);
         }
 
         private void GenerateGroups(List<MeshFilter> filters)
@@ -245,7 +255,6 @@ namespace Skill.Editor
             public MeshData this[int index] { get { return _Meshes[index]; } }
 
 
-
             public void Add(MeshFilter mf, int subMeshIndex)
             {
                 MeshData md = new MeshData();
@@ -265,6 +274,53 @@ namespace Skill.Editor
             {
                 this.Material = material;
                 this._Meshes = new List<MeshData>();
+            }
+
+            public void Sort(BatchMesh.SortAxis axis)
+            {
+                MeshDataAxisComparer.Instance.SortAxis = axis;
+                _Meshes.Sort(MeshDataAxisComparer.Instance);
+            }
+
+            private class MeshDataAxisComparer : IComparer<MeshData>
+            {
+                private static MeshDataAxisComparer _Instance;
+                public static MeshDataAxisComparer Instance
+                {
+                    get
+                    {
+                        if (_Instance == null)
+                            _Instance = new MeshDataAxisComparer();
+                        return _Instance;
+                    }
+                }
+
+                private MeshDataAxisComparer()
+                {
+
+                }
+
+                public BatchMesh.SortAxis SortAxis { get; set; }
+
+                public int Compare(MeshData x, MeshData y)
+                {
+                    switch (SortAxis)
+                    {
+                        case BatchMesh.SortAxis.X:
+                            return x.Center.x.CompareTo(y.Center.x);
+                        case BatchMesh.SortAxis.Y:
+                            return x.Center.y.CompareTo(y.Center.y);
+                        case BatchMesh.SortAxis.Z:
+                            return x.Center.z.CompareTo(y.Center.z);
+                        case BatchMesh.SortAxis.InverseX:
+                            return x.Center.x.CompareTo(y.Center.x) * -1;
+                        case BatchMesh.SortAxis.InverseY:
+                            return x.Center.y.CompareTo(y.Center.y) * -1;
+                        case BatchMesh.SortAxis.InverseZ:
+                            return x.Center.z.CompareTo(y.Center.z) * -1;
+                    }
+                    return 0;
+                }
             }
         }
 
@@ -338,6 +394,10 @@ namespace Skill.Editor
         {
             if (mm.Count < 1) return;
 
+
+            if (_Data.Sort != BatchMesh.SortAxis.None)
+                mm.Sort(_Data.Sort);
+
             List<CombineInstance> instances = new List<CombineInstance>();
             int polyCount = 0;
             int vertexCount = 0;
@@ -396,5 +456,7 @@ namespace Skill.Editor
 
             _Meshes.Add(obj);
         }
+
+
     }
 }

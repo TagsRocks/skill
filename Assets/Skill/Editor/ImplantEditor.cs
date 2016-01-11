@@ -18,6 +18,7 @@ namespace Skill.Editor
         private StackPanel _Panel;
         private Skill.Framework.UI.Frame _Frame;
         private Skill.Editor.UI.ToggleButton _TbEnable;
+        private Skill.Editor.UI.ToggleButton _TbUniform;
         private Skill.Editor.UI.ObjectField<ImplantAsset> _AssetField;
         private Skill.Editor.UI.ObjectField<Transform> _RootField;
         private Skill.Editor.UI.LayerMaskField _Layers;
@@ -38,7 +39,15 @@ namespace Skill.Editor
             _Frame = new Skill.Framework.UI.Frame("Frame");
             _Panel = new StackPanel();
 
-            _TbEnable = new UI.ToggleButton() { IsChecked = _Implant.IsEnable, Margin = margin }; _TbEnable.Label.text = "Enable";
+            Grid pnlToggles = new Grid() { Height = 22 };
+            pnlToggles.ColumnDefinitions.Add(1, GridUnitType.Star);
+            pnlToggles.ColumnDefinitions.Add(1, GridUnitType.Star);
+
+            _TbEnable = new UI.ToggleButton() { IsChecked = _Implant.IsEnable, Margin = margin, Left = true, Column = 0 }; _TbEnable.Label.text = "Enable";
+            _TbUniform = new UI.ToggleButton() { IsChecked = _Implant.Uniform, Margin = margin, Left = true, Column = 1 }; _TbUniform.Label.text = "Uniform";
+
+            pnlToggles.Controls.Add(_TbEnable);
+            pnlToggles.Controls.Add(_TbUniform);
 
             _AssetField = new Skill.Editor.UI.ObjectField<ImplantAsset>() { VerticalAlignment = VerticalAlignment.Center, Margin = margin, AllowSceneObjects = false };
             _AssetField.Label.text = "ImplantAsset";
@@ -68,7 +77,7 @@ namespace Skill.Editor
             _TbModes.SelectedTab = _Implant.BrushMode;
 
 
-            _Panel.Controls.Add(_TbEnable);
+            _Panel.Controls.Add(pnlToggles);
             _Panel.Controls.Add(_AssetField);
             _Panel.Controls.Add(_RootField);
             _Panel.Controls.Add(_Layers);
@@ -98,6 +107,13 @@ namespace Skill.Editor
             _SliRectHeight.ValueChanged += _SliRectHeight_ValueChanged;
             _SliOffsetY.ValueChanged += _SliOffsetY_ValueChanged;
             _TbEnable.Changed += _TbEnable_Changed;
+            _TbUniform.Changed += _TbUniform_Changed;
+        }
+        void _TbUniform_Changed(object sender, EventArgs e)
+        {
+            _Implant.Uniform = _TbUniform.IsChecked;
+            EditorUtility.SetDirty(_Implant);
+            _ShuffleNeeded = true;
         }
 
         void _TbEnable_Changed(object sender, EventArgs e)
@@ -213,6 +229,9 @@ namespace Skill.Editor
         private Quaternion _Rotation;
         private RaycastHit _ReferenceHit;
         private bool _ReferenceEnable;
+        private bool[] _UniformGrid;
+        private int _UniformStepW;
+        private int _UniformStepH;
 
         void OnEnable()
         {
@@ -225,17 +244,87 @@ namespace Skill.Editor
 
         void Shuffle()
         {
+
             if (_Implant.Points == null || _Implant.Points.Length != _Implant.Density)
                 _Implant.Points = new Vector3[_Implant.Density];
-            for (int i = 0; i < _Implant.Density; i++)
-                _Implant.Points[i] = GetRandomPoint();
 
+            if (_Implant.Uniform)
+            {
+                UpdateUniformGrid();
+                for (int i = 0; i < _Implant.Density; i++)
+                    _Implant.Points[i] = GetRandomUniformPoint();
+            }
+            else
+            {
+                for (int i = 0; i < _Implant.Density; i++)
+                    _Implant.Points[i] = GetRandomPoint();
+            }
             EditorUtility.SetDirty(_Implant);
         }
 
+        private void UpdateUniformGrid()
+        {
+            if (_Implant.BrushMode == 1)// rectangle brush        
+            {
+                float sum = Mathf.Max(1, _Implant.RectWidth + _Implant.RectHeight);
+                float wp = _Implant.RectWidth / sum;
+                float hp = _Implant.RectHeight / sum;
+
+                float stepW = _Implant.RectWidth / (_Implant.Density * wp);
+                float stepH = _Implant.RectHeight / (_Implant.Density * hp);
+
+                int countW = 1;
+                int countH = 1;
+                if (stepW > 0)
+                    countW = Mathf.CeilToInt(_Implant.RectWidth / stepW);
+                if (stepH > 0)
+                    countH = Mathf.CeilToInt(_Implant.RectHeight / stepH);
+                _UniformStepW = countW;
+                _UniformStepH = countH;
+
+            }
+            else // circle brush        
+            {
+                _UniformStepW = Mathf.Max(1, _Implant.Density);
+                _UniformStepH = Mathf.Max(1, _Implant.Density);
+            }
+            _UniformGrid = new bool[_UniformStepW * _UniformStepH];
+        }
+
+        private Vector3 GetRandomUniformPoint()
+        {
+            Vector3 point = new Vector3();
+            float stepW = _Implant.RectWidth / _UniformStepW;
+            float stepH = _Implant.RectHeight / _UniformStepH;
+            int index = 0;
+            int tryCount = 50;
+            while (true)
+            {
+                tryCount--;
+                if (tryCount == 0)
+                    return GetRandomPoint();
+
+                index = UnityEngine.Random.Range(0, _UniformGrid.Length);
+                if (!_UniformGrid[index])
+                {
+                    _UniformGrid[index] = true;
+                    point.x = (_Implant.RectWidth * -0.5f) + ((index % _UniformStepW) + 0.5f) * stepW;
+                    point.z = (_Implant.RectHeight * -0.5f) + ((index / _UniformStepW) + 0.5f) * stepH;
+                    if (_Implant.BrushMode == 2)// circle brush        
+                    {
+                        float magnitude = point.magnitude;
+                        if (magnitude <= _Implant.MaxRadius && point.magnitude >= _Implant.MinRadius)
+                            break;
+                    }
+                    else
+                        break;
+                }
+            }
+            return point;
+        }
         private Vector3 GetRandomPoint()
         {
-            Vector3 point;
+            Vector3 point = new Vector3();
             if (_Implant.BrushMode == 1)// rectangle brush        
             {
                 point = new Vector3(UnityEngine.Random.Range(-0.5f, 0.5f) * _Implant.RectWidth, 0, UnityEngine.Random.Range(-0.5f, 0.5f) * _Implant.RectHeight);
@@ -265,28 +354,29 @@ namespace Skill.Editor
                     case EventType.KeyDown:
                         if (!e.functionKey && e.shift)
                         {
-                            if (e.keyCode == KeyCode.A || e.keyCode == KeyCode.D || e.keyCode == KeyCode.S || e.keyCode == KeyCode.W)
-                            {
-                                float angle = _Implant.Rotation;
-                                if (e.keyCode == KeyCode.A)
-                                    angle--;
-                                else if (e.keyCode == KeyCode.D)
-                                    angle++;
+                            //if (e.keyCode == KeyCode.A || e.keyCode == KeyCode.D || e.keyCode == KeyCode.S || e.keyCode == KeyCode.W)
+                            //{
+                            //    float angle = _Implant.Rotation;
+                            //    if (e.keyCode == KeyCode.A)
+                            //        angle--;
+                            //    else if (e.keyCode == KeyCode.D)
+                            //        angle++;
 
-                                while (angle < 0) angle += 360;
-                                while (angle > 360) angle -= 360;
+                            //    while (angle < 0) angle += 360;
+                            //    while (angle > 360) angle -= 360;
 
-                                _SliRotation.Value = _Implant.Rotation = angle;
+                            //    _SliRotation.Value = _Implant.Rotation = angle;
 
-                                if (e.keyCode == KeyCode.W)
-                                    _SliDensity.Value = _Implant.Density = Mathf.Clamp(_Implant.Density + 1, _SliDensity.MinValue, _SliDensity.MaxValue);
-                                else if (e.keyCode == KeyCode.S)
-                                    _SliDensity.Value = _Implant.Density = Mathf.Clamp(_Implant.Density - 1, _SliDensity.MinValue, _SliDensity.MaxValue);
+                            //    if (e.keyCode == KeyCode.W)
+                            //        _SliDensity.Value = _Implant.Density = Mathf.Clamp(_Implant.Density + 1, _SliDensity.MinValue, _SliDensity.MaxValue);
+                            //    else if (e.keyCode == KeyCode.S)
+                            //        _SliDensity.Value = _Implant.Density = Mathf.Clamp(_Implant.Density - 1, _SliDensity.MinValue, _SliDensity.MaxValue);
 
-                                e.Use();
-                                HandleUtility.Repaint();
-                            }
-                            else if (e.keyCode == KeyCode.R)
+                            //    e.Use();
+                            //    HandleUtility.Repaint();
+                            //}
+                            //else
+                            if (e.keyCode == KeyCode.R)
                             {
                                 MakeReference();
                                 e.Use();
@@ -336,25 +426,19 @@ namespace Skill.Editor
             if (_AssetField.Object == null) return null;
             if (_AssetField.Object.Objects == null || _AssetField.Object.Objects.Length == 0) return null;
 
-            float totalWeight = 0;
-            foreach (ImplantObject item in _AssetField.Object.Objects)
+
+            float[] chances = new float[_AssetField.Object.Objects.Length];
+            for (int i = 0; i < chances.Length; i++)
             {
-                if (item.OverrideProperties)
-                    totalWeight += item.Weight;
+                if (_AssetField.Object.Objects[i].OverrideProperties)
+                    chances[i] = _AssetField.Object.Objects[i].Weight;
                 else
-                    totalWeight += _Asset.DefaultObject.Weight;
+                    chances[i] = _Asset.DefaultObject.Weight;
             }
 
-            float rnd = UnityEngine.Random.Range(0.0f, totalWeight);
-            foreach (ImplantObject item in _AssetField.Object.Objects)
-            {
-                float w = _Asset.DefaultObject.Weight;
-                if (item.OverrideProperties)
-                    w = item.Weight;
-
-                if (rnd < w) return item;
-                rnd -= w;
-            }
+            int rnd = Skill.Framework.Utility.RandomByChance(chances);
+            if (rnd >= 0)
+                return _AssetField.Object.Objects[rnd];
             return null;
 
         }
@@ -376,9 +460,9 @@ namespace Skill.Editor
                 if (pr.Rotation == ImplantObjectRotation.Random)
                 {
                     Vector3 euler = obj.transform.eulerAngles;
-                    if (pr.RandomX) euler.x = UnityEngine.Random.Range(0.0f, 360.0f);
-                    if (pr.RandomY) euler.y = UnityEngine.Random.Range(0.0f, 360.0f);
-                    if (pr.RandomZ) euler.z = UnityEngine.Random.Range(0.0f, 360.0f);
+                    euler.x = UnityEngine.Random.Range(pr.MinRandomRotation.x, pr.MaxRandomRotation.x);
+                    euler.y = UnityEngine.Random.Range(pr.MinRandomRotation.y, pr.MaxRandomRotation.y);
+                    euler.z = UnityEngine.Random.Range(pr.MinRandomRotation.z, pr.MaxRandomRotation.z);
                     rotation = Quaternion.Euler(euler);
                 }
                 else if (pr.Rotation == ImplantObjectRotation.Custom)

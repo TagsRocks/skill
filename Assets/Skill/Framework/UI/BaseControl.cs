@@ -541,7 +541,7 @@ namespace Skill.Framework.UI
         /// Occurs when mouse enters control (if WantsMouseEvents = true)
         /// </summary>
         /// <param name="args"> MouseEventArgs </param>
-        protected virtual void OnMouseEnter(MouseEventArgs args)
+        protected virtual void MouseEnterEvent(MouseEventArgs args)
         {
             if (MouseEnter != null)
                 MouseEnter(this, args);
@@ -553,7 +553,7 @@ namespace Skill.Framework.UI
         /// Occurs when mouse leaves control (if WantsMouseEvents = true)
         /// </summary>
         /// <param name="args"> MouseEventArgs </param>
-        protected virtual void OnMouseLeave(MouseEventArgs args)
+        protected virtual void MouseLeaveEvent(MouseEventArgs args)
         {
             if (MouseLeave != null)
                 MouseLeave(this, args);
@@ -565,7 +565,7 @@ namespace Skill.Framework.UI
         /// Occurs when mouse button was pressed.(if WantsMouseEvents = true)
         /// </summary>
         /// <param name="args"> MouseClickEventArgs </param>
-        protected virtual void OnMouseDown(MouseClickEventArgs args)
+        protected virtual void MouseDownEvent(MouseClickEventArgs args)
         {
             if (MouseDown != null)
                 MouseDown(this, args);
@@ -577,7 +577,7 @@ namespace Skill.Framework.UI
         /// Occurs when mouse button was released.(if WantsMouseEvents = true)
         /// </summary>
         /// <param name="args"> MouseClickEventArgs </param>
-        protected virtual void OnMouseUp(MouseClickEventArgs args)
+        protected virtual void MouseUpEvent(MouseClickEventArgs args)
         {
             if (MouseUp != null)
                 MouseUp(this, args);
@@ -589,7 +589,7 @@ namespace Skill.Framework.UI
         /// Occurs when mouse was dragged.(if WantsMouseEvents = true)
         /// </summary>
         /// <param name="args"> MouseMoveEventArgs </param>
-        protected virtual void OnMouseDrag(MouseMoveEventArgs args)
+        protected virtual void MouseDragEvent(MouseMoveEventArgs args)
         {
             if (MouseDrag != null)
                 MouseDrag(this, args);
@@ -602,7 +602,7 @@ namespace Skill.Framework.UI
         /// Occurs when mouse was dragged.(if WantsMouseEvents = true)(works only in EditorWindow with set wantsMouseMove true)
         /// </summary>
         /// <param name="args"> MouseMoveEventArgs </param>
-        protected virtual void OnMouseMove(MouseMoveEventArgs args)
+        protected virtual void MouseMoveEvent(MouseMoveEventArgs args)
         {
             if (MouseMove != null)
                 MouseMove(this, args);
@@ -676,7 +676,7 @@ namespace Skill.Framework.UI
                             if (!IsMouseOver)
                             {
                                 IsMouseOver = true;
-                                OnMouseEnter(new MouseEventArgs(e.mousePosition, e.modifiers));
+                                MouseEnterEvent(new MouseEventArgs(e.mousePosition, e.modifiers));
                             }
 
                             if (type == EventType.MouseDown || type == EventType.MouseUp)
@@ -684,9 +684,9 @@ namespace Skill.Framework.UI
                                 MouseButton mb = ConvertButton(e.button);
                                 MouseClickEventArgs args = new MouseClickEventArgs(e.mousePosition, e.modifiers, mb, e.clickCount);
                                 if (type == EventType.MouseDown)
-                                    OnMouseDown(args);
+                                    MouseDownEvent(args);
                                 else
-                                    OnMouseUp(args);
+                                    MouseUpEvent(args);
                                 if (args.Handled)
                                     e.Use();
                             }
@@ -697,9 +697,9 @@ namespace Skill.Framework.UI
                                 if (type == EventType.ScrollWheel)
                                     OnScrollWheel(args);
                                 else if (type == EventType.MouseMove)
-                                    OnMouseMove(args);
+                                    MouseMoveEvent(args);
                                 else
-                                    OnMouseDrag(args);
+                                    MouseDragEvent(args);
                                 if (args.Handled)
                                     e.Use();
                             }
@@ -710,7 +710,7 @@ namespace Skill.Framework.UI
                             if (IsMouseOver)
                             {
                                 IsMouseOver = false;
-                                OnMouseLeave(new MouseEventArgs(e.mousePosition, e.modifiers));
+                                MouseLeaveEvent(new MouseEventArgs(e.mousePosition, e.modifiers));
                             }
 
                         }

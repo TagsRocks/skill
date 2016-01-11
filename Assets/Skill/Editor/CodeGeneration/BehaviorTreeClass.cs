@@ -313,12 +313,12 @@ namespace Skill.Editor.CodeGeneration
         /// If weight of behavior is not default value write line of code to set value
         /// </summary>
         /// <param name="behavior">behavior</param>
-        private void SetWeight(BehaviorData behavior)
+        private void SetBehaviorParameters(BehaviorData behavior)
         {
-            if (behavior.Weight != 1)
-            {
+            if (behavior.Weight != 1)            
                 _CreateTreeMethodBody.AppendLine(SetProperty(behavior.Name, "Weight", behavior.Weight.ToString() + "f"));
-            }
+            if (behavior.Concurrency != ConcurrencyMode.Unlimit )
+                _CreateTreeMethodBody.AppendLine(SetProperty(behavior.Name, "Concurrency", "Skill.Framework.AI.ConcurrencyMode." + behavior.Concurrency.ToString()));            
         }
 
         private BehaviorData FindOneParent(BehaviorData child)
@@ -366,7 +366,7 @@ namespace Skill.Editor.CodeGeneration
             // new action inside CreateTree method
             _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Framework.AI.Action(\"{1}\", {2}, Skill.Framework.Posture.{3});", Variable.GetName(action.Name), action.Name, GetActionHandlerName(action.Name), action.ChangePosture));
             // set weight
-            SetWeight(action);
+            SetBehaviorParameters(action);
 
 
             Method m = new Method("Skill.Framework.AI.BehaviorResult", GetActionHandlerName(action.Name), string.Empty, ActionHandlerParams) { IsPartial = _Tree.ExpandMethods };
@@ -396,7 +396,7 @@ namespace Skill.Editor.CodeGeneration
             // new condition variable inside CreateTree method
             _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Framework.AI.Condition(\"{1}\",{2});", Variable.GetName(condition.Name), condition.Name, GetConditionHandlerName(condition.Name)));
             // set weight
-            SetWeight(condition);
+            SetBehaviorParameters(condition);
             // create condition handler method
             Method m = new Method("bool", GetConditionHandlerName(condition.Name), string.Empty, ConditionHandlerParams) { IsPartial = _Tree.ExpandMethods };
 
@@ -414,7 +414,7 @@ namespace Skill.Editor.CodeGeneration
             // new condition variable inside CreateTree method
             _CreateTreeMethodBody.AppendLine(string.Format("this.{0} = new Skill.Framework.AI.ChangeState(\"{1}\",\"{2}\");", Variable.GetName(changeState.Name), changeState.Name, changeState.DestinationState));
             // set weight
-            SetWeight(changeState);
+            SetBehaviorParameters(changeState);
         }
 
         private void CreateDecorator(DecoratorData decorator)
@@ -440,7 +440,7 @@ namespace Skill.Editor.CodeGeneration
             if (decorator.NeverFail == true) // default value is false, so it is not necessary to set it
                 _CreateTreeMethodBody.AppendLine(SetProperty(decorator.Name, "NeverFail", decorator.NeverFail.ToString().ToLower()));
             // set weight
-            SetWeight(decorator);
+            SetBehaviorParameters(decorator);
             // create decorator handler method
             Method m = new Method("bool", GetDecoratorHandlerName(decorator.Name), string.Empty, DecoratorHandlerParams) { IsPartial = _Tree.ExpandMethods };
 
@@ -462,7 +462,7 @@ namespace Skill.Editor.CodeGeneration
             if (decorator.NeverFail == true) // default value is false, so it is not necessary to set it
                 _CreateTreeMethodBody.AppendLine(SetProperty(decorator.Name, "NeverFail", decorator.NeverFail.ToString().ToLower()));
             // set weight
-            SetWeight(decorator);
+            SetBehaviorParameters(decorator);
             // create decorator handler method
             Method m = new Method("bool", GetDecoratorHandlerName(decorator.Name), string.Empty, DecoratorHandlerParams) { IsPartial = _Tree.ExpandMethods };
             if (_Tree.ExpandMethods)
@@ -498,7 +498,7 @@ namespace Skill.Editor.CodeGeneration
                     throw new InvalidOperationException("Invalid CompositeType");
             }
             // set weight
-            SetWeight(composite);
+            SetBehaviorParameters(composite);
         }
 
         private void CreateSequenceSelector(SequenceSelectorData sequenceSelector)

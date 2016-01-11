@@ -48,6 +48,16 @@ namespace Skill.Framework.Text
         /// <returns>converted text to persian</returns>
         public static string Convert(string text)
         {
+            if (text.Contains("\n"))
+            {
+                string[] lines = text.Split(new char[] { '\n' }, StringSplitOptions.None);
+                StringBuilder builder = new StringBuilder();
+                for (int i = lines.Length - 1; i >= 0; i--)
+                    builder.AppendLine(lines[i]);
+
+                text = builder.ToString();
+            }
+
             CheckData();
             return _Converter.Convert(text);
         }

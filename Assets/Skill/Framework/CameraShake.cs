@@ -11,6 +11,9 @@ namespace Skill.Framework
     public class CameraShake : DynamicBehaviour
     {
         public Transform RelativeTo;
+        /// <summary> realtime duration </summary>
+        public bool RealTime = true;
+
         private CameraShakeParams _Shake;
         private TimeWatch _ShakeTimeTW;
         private TimeWatch _TickTimeTW;
@@ -66,7 +69,7 @@ namespace Skill.Framework
                     this._Shake.Intensity *= modifier;
                     this._Shake.Smoothing = Mathf.Max(0.1f, this._Shake.Smoothing);
                     if (this._Shake.TickTime < 0) this._Shake.TickTime = 0;
-                    this._ShakeTimeTW.Begin(this._Shake.Duration);
+                    this._ShakeTimeTW.Begin(this._Shake.Duration, RealTime);
                     this.Tick();
                     base.enabled = true;
                 }
@@ -111,9 +114,9 @@ namespace Skill.Framework
                     _ShakeTimeTW.End();
                     _TickTimeTW.End();
                     if (_Shake.Smoothing > 0.01f)
-                        _DisableTW.Begin(1.0f / _Shake.Smoothing);
+                        _DisableTW.Begin(1.0f / _Shake.Smoothing, RealTime);
                     else
-                        _DisableTW.Begin(0.01f);
+                        _DisableTW.Begin(0.01f, RealTime);
 
                     _CurrentDeltaRoll = 0;
                     _CurrentDeltaPosition = Vector3.zero;

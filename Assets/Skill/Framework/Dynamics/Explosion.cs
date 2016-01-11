@@ -44,11 +44,9 @@ namespace Skill.Framework.Dynamics
         /// <summary> Colliders to ignore on explosion </summary>
         public Collider[] SelfColliders;
         /// <summary> Use raycast to know if any object is between explosion and collider to block explosion </summary>
-        public bool UseRaycast = false;
-
-        /// <summary> use raycast to sure there is something between collider and explosion that block explosion</summary>
-        [HideInInspector]
-        public int LayerMask = 0;        
+        public bool Raycast = false;
+        /// <summary> use raycast to sure there is something between collider and explosion that block explosion</summary>        
+        public LayerMask LayerMask = 0;        
 
         /// <summary>
         /// This function is called when the object becomes enabled and active.
@@ -90,7 +88,7 @@ namespace Skill.Framework.Dynamics
                         distance = Vector3.Distance(explosionPos, colliderPos);
                         bool ignore = distance > FalloffRadius;
                         // use raycast if there is something between collider and explosion
-                        if (!ignore && UseRaycast && IsUsedForRaycast(collider.tag))
+                        if (!ignore && Raycast && IsUsedForRaycast(collider.tag))
                         {
                             if (Physics.Linecast(explosionPos, colliderPos, LayerMask))
                                 ignore = true;

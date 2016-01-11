@@ -35,12 +35,10 @@ namespace Skill.Editor
         // ******** Rotation *********
         /// <summary> Rotation of implanted object </summary>
         public ImplantObjectRotation Rotation;
-        /// <summary> if Rotation is Random, whether x value of rotation is random between 0-360 or same as Prefab  </summary>
-        public bool RandomX;
-        /// <summary> if Rotation is Random, whether y value of rotation is random between 0-360 or same as Prefab  </summary>
-        public bool RandomY;
-        /// <summary> if Rotation is Random, whether z value of rotation is random between 0-360 or same as Prefab  </summary>
-        public bool RandomZ;
+        /// <summary> if Rotation is Random</summary>
+        public Vector3 MinRandomRotation;
+        /// <summary> if Rotation is Random</summary>
+        public Vector3 MaxRandomRotation = new Vector3(360, 360, 360);
 
         /// <summary> if Rotation is Custom, Custom rotation value for implanted object</summary>
         public Vector3 CustomRotation;

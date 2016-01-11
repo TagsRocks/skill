@@ -16,7 +16,7 @@ namespace Skill.Framework.UI
         /// <summary> TintColor of texture </summary>
         public Color TintColor = Color.white;
         /// <summary> The sorting depth. </summary>
-        public int Depth = 0;
+        public int GUIDepth = 11;
 
         /// <summary> Fading  component </summary>
         public Fading Fading { get; private set; }
@@ -32,7 +32,7 @@ namespace Skill.Framework.UI
         {
             if (FadeTexture != null && Fading != null && Fading.Alpha > 0.001f)
             {
-                GUI.depth = Depth;
+                GUI.depth = GUIDepth;
                 Color preColor = GUI.color;
                 GUI.color = Fading.ApplyAlpha(TintColor);
                 GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), FadeTexture, ScaleMode.StretchToFill, true);

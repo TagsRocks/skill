@@ -32,6 +32,7 @@ namespace Skill.Editor
         private Button _BtnGroundAll;
         private Button _BtnGroundSelected;
         private Button _BtnSmoothPath;
+        private Button _BtnFrameSelected;
         private Skill.Editor.UI.IntSlider _InterpolationsField;
 
         private Button _BtnSetLinearTime;
@@ -69,6 +70,8 @@ namespace Skill.Editor
             CreateUI();
             ValidateGrid();
             _BtnRemove.IsEnabled = _Path.Keys.Length > 2;
+
+            ValidateSelectedIndex();
             _GridPoints.SelectedIndex = _Path.SelectedIndex;
 
             _SimulationStarted = false;
@@ -135,10 +138,12 @@ namespace Skill.Editor
 
 
             _InterpolationsField = new UI.IntSlider() { Value = _Path.Interpolations, Row = 3, Column = 0, ColumnSpan = 3, Margin = new Skill.Framework.UI.Thickness(0, 4), MinValue = 2, MaxValue = 20 }; _InterpolationsField.Label.text = "Interpolations";
-            _BtnSmoothPath = new Button() { Row = 4, Column = 0, ColumnSpan = 3, Margin = new Skill.Framework.UI.Thickness(0, 4) }; _BtnSmoothPath.Content.text = "SmoothPath";
+            _BtnSmoothPath = new Button() { Row = 4, Column = 0, ColumnSpan = 2, Margin = new Skill.Framework.UI.Thickness(0, 4) }; _BtnSmoothPath.Content.text = "Smooth Path";
+            _BtnFrameSelected = new Button() { Row = 4, Column = 2, ColumnSpan = 1, Margin = new Skill.Framework.UI.Thickness(0, 4) }; _BtnFrameSelected.Content.text = "Frame Selected";
 
             _PnlTools.Controls.Add(_InterpolationsField);
             _PnlTools.Controls.Add(_BtnSmoothPath);
+            _PnlTools.Controls.Add(_BtnFrameSelected);
 
             _ChangeCheck.Controls.Add(_BtnAdd);
             _ChangeCheck.Controls.Add(_BtnRemove);
@@ -167,6 +172,25 @@ namespace Skill.Editor
 
             _InterpolationsField.ValueChanged += _InterpolationsField_ValueChanged;
             _BtnSmoothPath.Click += _BtnSmoothPath_Click;
+            _BtnFrameSelected.Click += _BtnFrameSelected_Click;
+
+
+            ValidateSelectedIndex();
+        }
+
+        private void ValidateSelectedIndex()
+        {
+            _Path.SelectedIndex = Mathf.Clamp(_Path.SelectedIndex, 0, _Path.Keys.Length - 1);
+        }
+
+        void _BtnFrameSelected_Click(object sender, System.EventArgs e)
+        {
+            ValidateSelectedIndex();
+            Vector3 point = _Path.GetPoint(_Path.SelectedIndex);
+            if (!_Path.UseWorldSpace)
+                point = _Path.transform.TransformPoint(point);
+            SceneView.lastActiveSceneView.LookAt(point, SceneView.lastActiveSceneView.camera.transform.rotation, Mathf.Max(_Path.PointRadius * 2, 12));
+
         }
 
         void _BtnSmoothPath_Click(object sender, System.EventArgs e)
@@ -209,12 +233,10 @@ namespace Skill.Editor
 
         void _BtnGroundSelected_Click(object sender, System.EventArgs e)
         {
-            if (_Path.SelectedIndex >= 0)
-            {
-                Ground(_Path.SelectedIndex);
-                RebuildPath();
-                EditorUtility.SetDirty(_Path);
-            }
+            ValidateSelectedIndex();
+            Ground(_Path.SelectedIndex);
+            RebuildPath();
+            EditorUtility.SetDirty(_Path);
         }
 
         private void Ground(int pointIndex)
@@ -245,7 +267,8 @@ namespace Skill.Editor
         private bool _IgnoreChanges;
         void SelectedPoint_ValueChanged(object sender, System.EventArgs e)
         {
-            if (_Path.SelectedIndex >= 0 && !_IgnoreChanges)
+            ValidateSelectedIndex();
+            if (!_IgnoreChanges)
             {
                 _IgnoreChanges = true;
                 int key = _Path.SelectedIndex;
@@ -279,6 +302,7 @@ namespace Skill.Editor
 
         private void ReloadProperties()
         {
+            ValidateSelectedIndex();
             _IgnoreChanges = true;
             _VFValue.Value = _Path.Keys[_Path.SelectedIndex];
             _FFTime.Value = _Path.Times[_Path.SelectedIndex];
@@ -293,7 +317,8 @@ namespace Skill.Editor
 
         void _BtnRemove_Click(object sender, System.EventArgs e)
         {
-            if (_Path.SelectedIndex >= 0 && _Path.Keys.Length > 2)
+            ValidateSelectedIndex();
+            if ( _Path.Keys.Length > 2)
             {
                 int index = _Path.SelectedIndex;
                 Vector3[] prePoints = _Path.Keys;
@@ -455,16 +480,22 @@ namespace Skill.Editor
                     Handles.DrawAAPolyLine(3, _RenderPoints);
 
                 if (_LabelStyle == null)
-                    _LabelStyle = new GUIStyle(EditorStyles.largeLabel);
-
-                _LabelStyle.normal.textColor = _Path.Color;
-                for (int i = 1; i < _CurvePoints.Length - 1; i++)
                 {
-                    Vector3 point = _CurvePoints[i];
-                    float handleSize = HandleUtility.GetHandleSize(point);
-                    point.y += _Path.PointRadius + handleSize * 0.25f;
-                    _LabelStyle.fontSize = Mathf.Clamp(Mathf.FloorToInt(handleSize), 10, 100);
-                    Handles.Label(point, (i - 1).ToString(), _LabelStyle);
+                    _LabelStyle = new GUIStyle(EditorStyles.largeLabel);
+                    _LabelStyle.fontSize = 12;
+                    _LabelStyle.fontStyle = FontStyle.Bold;
+                }
+
+                if (_Path.ShowPoints)
+                {
+                    _LabelStyle.normal.textColor = _Path.Color;
+                    for (int i = 1; i < _CurvePoints.Length - 1; i++)
+                    {
+                        Vector3 point = _CurvePoints[i];
+                        float handleSize = HandleUtility.GetHandleSize(point);
+                        point.y += _Path.PointRadius + handleSize * 0.25f;
+                        Handles.Label(point, (i - 1).ToString(), _LabelStyle);
+                    }
                 }
             }
 
@@ -547,6 +578,7 @@ namespace Skill.Editor
 
         private void StartSimulation()
         {
+            ValidateSelectedIndex();
             if (_Path.SelectedIndex >= 0)
             {
                 _SimulationStarted = true;

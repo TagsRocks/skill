@@ -2,7 +2,7 @@
 using System.Collections;
 namespace Skill.Framework.ModernUI
 {
-    public class ColorBank : MonoBehaviour
+    public class ColorBank : Skill.Framework.StaticBehaviour
     {
         public ColorData[] Colors;
 
@@ -24,17 +24,13 @@ namespace Skill.Framework.ModernUI
         }
 
         /// <summary> Awake </summary>
-        void Awake()
+        protected override void Awake()
         {
-            if (_Instance != null)
-            {
-                if (_Instance != this)
-                    Destroy(this.gameObject);
-            }
-            else
-            {
+            base.Awake();
+            if (_Instance == null)
                 _Instance = this;
-            }
+            else
+                Destroy(this.gameObject);
         }
 
 
@@ -121,6 +117,13 @@ namespace Skill.Framework.ModernUI
                     return colors[i];
             }
             return null;
+        }
+
+        protected override void OnDestroy()
+        {            
+            base.OnDestroy();
+            if (_Instance == this)
+                _Instance = null;   
         }
     }
 }

@@ -68,10 +68,22 @@ namespace Skill.Framework.Modules
 
         private void ValidateRenderTexture(int width, int height)
         {
-            if (_PreWidth != width || _PreHeight != height)
+            if (_PreWidth != width || _PreHeight != height || _RenderTexture == null)
             {
-                if (_RenderTexture != null) Destroy(_RenderTexture);
-                if (_ScreenShot != null) Destroy(_ScreenShot);
+                if (_RenderTexture != null)
+                {
+                    if (Application.isPlaying)
+                        Destroy(_RenderTexture);
+                    else
+                        DestroyImmediate(_RenderTexture);
+                }
+                if (_ScreenShot != null)
+                {
+                    if (Application.isPlaying)
+                        Destroy(_ScreenShot);
+                    else
+                        DestroyImmediate(_ScreenShot);                    
+                }
 
                 _PreWidth = width;
                 _PreHeight = height;
@@ -109,52 +121,58 @@ namespace Skill.Framework.Modules
                 }
                 if (_TakeShot)
                 {
-                    int width, height;
-                    if (CustomSize)
-                    {
-                        width = Width;
-                        height = Height;
-                    }
-                    else
-                    {
-                        width = (int)(_Camera.pixelWidth * Scale);
-                        height = (int)(_Camera.pixelHeight * Scale);
-                    }
+                    SaveShot();
 
-                    ValidateRenderTexture(width, height);
-
-                    _Camera.targetTexture = _RenderTexture;
-                    _Camera.Render();
-                    RenderTexture.active = _RenderTexture;
-                    _ScreenShot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
-                    _Camera.targetTexture = null;
-                    RenderTexture.active = null;
-
-                    byte[] bytes = null;
-                    if (Jpg)
-                        bytes = _ScreenShot.EncodeToJPG();
-                    else
-                        bytes = _ScreenShot.EncodeToPNG();
-                    LastShotFileName = GetNewFilePath(width, height);
-
-                    string dir = System.IO.Path.GetDirectoryName(LastShotFileName);
-                    if (!System.IO.Directory.Exists(dir))
-                        System.IO.Directory.CreateDirectory(dir);
-
-                    if (System.IO.File.Exists(LastShotFileName))
-                        System.IO.File.Delete(LastShotFileName);
-
-                    System.IO.FileStream fileStream = new System.IO.FileStream(LastShotFileName, System.IO.FileMode.Create, System.IO.FileAccess.Write);
-                    System.IO.BinaryWriter writer = new System.IO.BinaryWriter(fileStream);
-                    writer.Write(bytes);
-                    writer.Close();
-                    fileStream.Close();
-                    
                     _TakeShot = false;
                     _ShotTaked = true;
                     OnShot();
                 }
             }
+        }
+
+        private void SaveShot()
+        {
+            int width, height;
+            if (CustomSize)
+            {
+                width = Width;
+                height = Height;
+            }
+            else
+            {
+                width = (int)(_Camera.pixelWidth * Scale);
+                height = (int)(_Camera.pixelHeight * Scale);
+            }
+
+            ValidateRenderTexture(width, height);
+
+            _Camera.targetTexture = _RenderTexture;
+            _Camera.Render();
+            RenderTexture.active = _RenderTexture;
+            _ScreenShot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+            _Camera.targetTexture = null;
+            RenderTexture.active = null;
+
+            byte[] bytes = null;
+            if (Jpg)
+                bytes = _ScreenShot.EncodeToJPG();
+            else
+                bytes = _ScreenShot.EncodeToPNG();
+            LastShotFileName = GetNewFilePath(width, height);
+
+            string dir = System.IO.Path.GetDirectoryName(LastShotFileName);
+            if (!System.IO.Directory.Exists(dir))
+                System.IO.Directory.CreateDirectory(dir);
+
+            if (System.IO.File.Exists(LastShotFileName))
+                System.IO.File.Delete(LastShotFileName);
+
+            System.IO.FileStream fileStream = new System.IO.FileStream(LastShotFileName, System.IO.FileMode.Create, System.IO.FileAccess.Write);
+            System.IO.BinaryWriter writer = new System.IO.BinaryWriter(fileStream);
+            writer.Write(bytes);
+            writer.Close();
+            fileStream.Close();
+
         }
 
         protected override void OnDestroy()
@@ -163,5 +181,18 @@ namespace Skill.Framework.Modules
             if (_ScreenShot != null) Destroy(_ScreenShot);
             base.OnDestroy();
         }
+
+
+#if UNITY_EDITOR
+
+        [ContextMenu("Take a Shot")]
+        public void TakeAShot()
+        {
+            if (_Camera == null)
+                _Camera = GetComponent<Camera>();
+            SaveShot();
+        }
+
+#endif
     }
 }

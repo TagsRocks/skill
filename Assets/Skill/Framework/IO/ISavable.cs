@@ -35,5 +35,11 @@ namespace Skill.Framework.IO
         /// </summary>
         /// <param name="stream">Stream to load data from</param>
         void Load(BinaryLoadStream stream);
+
+        /// <summary> is any changes happened to savable object </summary>
+        bool IsDirty { get;}
+
+        /// <summary> set as clean when object saved</summary>
+        void SetAsClean();
     }
 }

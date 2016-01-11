@@ -130,28 +130,28 @@ namespace Skill.Editor.UI
 
         }
 
-        protected override void OnMouseDown(Skill.Framework.UI.MouseClickEventArgs args)
+        protected override void MouseDownEvent(Skill.Framework.UI.MouseClickEventArgs args)
         {
             if (args.Button == Skill.Framework.UI.MouseButton.Left)
             {
                 if (_MenuBar != null)
                     _MenuBar.ActiveItem = this;
             }
-            base.OnMouseDown(args);
+            base.MouseDownEvent(args);
         }
 
-        protected override void OnMouseEnter(Skill.Framework.UI.MouseEventArgs args)
+        protected override void MouseEnterEvent(Skill.Framework.UI.MouseEventArgs args)
         {
             this.Style = HoverStyle;
             RepaintEditorWindow();
-            base.OnMouseEnter(args);
+            base.MouseEnterEvent(args);
         }
 
-        protected override void OnMouseLeave(Skill.Framework.UI.MouseEventArgs args)
+        protected override void MouseLeaveEvent(Skill.Framework.UI.MouseEventArgs args)
         {
             this.Style = DefaultStyle;
             RepaintEditorWindow();
-            base.OnMouseLeave(args);
+            base.MouseLeaveEvent(args);
         }
 
         private Rect _DropDownRect;

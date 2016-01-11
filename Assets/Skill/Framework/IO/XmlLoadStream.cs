@@ -505,6 +505,30 @@ namespace Skill.Framework.IO
             return array;
         }
 
+
+        /// <summary>
+        /// Read data of given XmlElement as array of SafeInt
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>array of int</returns>
+        public SafeInt[] ReadSafeIntArray(XmlElement e)
+        {
+            string lenghtStr = e.GetAttribute("Lenght");
+            int length = 0;
+            if (!int.TryParse(lenghtStr, out length))
+                length = 0;
+            SafeInt[] array = new SafeInt[length];
+
+            XmlElement element = e.FirstChild as XmlElement;
+            int index = 0;
+            while (element != null)
+            {
+                array[index++] = ReadInt(element);
+                element = e.GetNextSibling(element);
+            }
+            return array;
+        }
+
         /// <summary>
         /// Read data of given XmlElement as array of float
         /// </summary>
@@ -529,6 +553,29 @@ namespace Skill.Framework.IO
         }
 
         /// <summary>
+        /// Read data of given XmlElement as array of SafeFloat
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>array of float</returns>
+        public SafeFloat[] ReadSafeFloatArray(XmlElement e)
+        {
+            string lenghtStr = e.GetAttribute("Lenght");
+            int length = 0;
+            if (!int.TryParse(lenghtStr, out length))
+                length = 0;
+            SafeFloat[] array = new SafeFloat[length];
+
+            XmlElement element = e.FirstChild as XmlElement;
+            int index = 0;
+            while (element != null)
+            {
+                array[index++] = ReadFloat(element);
+                element = e.GetNextSibling(element);
+            }
+            return array;
+        }
+
+        /// <summary>
         /// Read data of given XmlElement as array of boolean
         /// </summary>
         /// <param name="e">XmlElement contains data</param>
@@ -540,6 +587,29 @@ namespace Skill.Framework.IO
             if (!int.TryParse(lenghtStr, out length))
                 length = 0;
             bool[] array = new bool[length];
+
+            XmlElement element = e.FirstChild as XmlElement;
+            int index = 0;
+            while (element != null)
+            {
+                array[index++] = ReadBoolean(element);
+                element = e.GetNextSibling(element);
+            }
+            return array;
+        }
+
+        /// <summary>
+        /// Read data of given XmlElement as array of SafeBool
+        /// </summary>
+        /// <param name="e">XmlElement contains data</param>
+        /// <returns>array of bool</returns>
+        public SafeBool[] ReadSafeBooleanArray(XmlElement e)
+        {
+            string lenghtStr = e.GetAttribute("Lenght");
+            int length = 0;
+            if (!int.TryParse(lenghtStr, out length))
+                length = 0;
+            SafeBool[] array = new SafeBool[length];
 
             XmlElement element = e.FirstChild as XmlElement;
             int index = 0;

@@ -117,6 +117,9 @@ namespace Skill.Framework
         /// <summary> Retrieve tag of last object that caused damage to this health </summary>
         public string LastCausedDamageTag { get; private set; }
 
+        /// <summary> true if all damaged tags are same </summary>
+        public bool SingleDamageTag { get; private set; }
+
         /// <summary> Amount of last damage </summary>
         public float LastDamage { get; private set; }
 
@@ -194,11 +197,19 @@ namespace Skill.Framework
         /// <summary>
         /// Restore health to initial values and alive
         /// </summary>
-        public void Restore()
+        /// <param name="percent"> percent of InitialHealth</param>
+        public void Restore(float percent = 1.0f)
+        {
+            CurrentHealth = InitialHealth * percent;
+            RestoreParams();
+        }
+
+        private void RestoreParams()
         {
             IsDead = false;
-            LastCausedDamage = string.Empty;
-            CurrentHealth = InitialHealth;
+            LastCausedDamage = null;
+            LastCausedDamageTag = string.Empty;
+            SingleDamageTag = true;
             LastDamageType = -1;
         }
 
@@ -216,12 +227,11 @@ namespace Skill.Framework
         protected override void Awake()
         {
             base.Awake();
-
             if (MaxHealth < 0) MaxHealth = 0;
             if (InitialHealth < 0) InitialHealth = 0;
             else if (InitialHealth > MaxHealth) InitialHealth = MaxHealth;
             _CurrentHealth = InitialHealth;
-
+            RestoreParams();
             enabled = RegenerateSpeed != 0.0f && _CurrentHealth < MaxHealth;
         }
 
@@ -231,7 +241,7 @@ namespace Skill.Framework
         /// <param name="sender"> sender </param>
         /// <param name="args"> An HitEventArgs that contains hit event data. </param>        
         protected virtual void Events_Hit(object sender, HitEventArgs args)
-        {            
+        {
             LastHitPoint = args.Point;
             LastHitNormal = args.Normal;
 
@@ -273,7 +283,7 @@ namespace Skill.Framework
                             //}
                             //else
                             //{
-                                Cache.Spawn(decal, args.Collider.ClosestPointOnBounds(args.Point) + (DecalOffset * args.Normal), Quaternion.LookRotation(args.Normal));
+                            Cache.Spawn(decal, args.Collider.ClosestPointOnBounds(args.Point) + (DecalOffset * args.Normal), Quaternion.LookRotation(args.Normal));
                             //}
                         }
                     }
@@ -330,8 +340,18 @@ namespace Skill.Framework
         protected virtual void Events_Damage(object sender, DamageEventArgs args)
         {
             if (IsDead || _CurrentHealth <= 0) return;
+
+            if (SingleDamageTag)
+            {
+                if (LastCausedDamageTag != string.Empty)
+                    SingleDamageTag = LastCausedDamageTag == args.Tag;
+            }            
+
             LastCausedDamage = sender;
             LastCausedDamageTag = args.Tag;
+
+            
+
             LastDamage = args.Damage;
             LastDamageType = args.DamageType;
             // Take no damage if invincible, dead, or if the damage is zero
@@ -366,7 +386,7 @@ namespace Skill.Framework
             base.Update();
         }
 
-        private void OnDie()
+        protected virtual void OnDie()
         {
             IsDead = true;
             enabled = false;

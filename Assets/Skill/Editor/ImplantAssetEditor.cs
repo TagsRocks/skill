@@ -36,7 +36,7 @@ namespace Skill.Editor
         #region CreateUI
 
         const float ButtonRowHeight = 26;
-        private const float FrameHeight = 400;
+        private const float FrameHeight = 440;
 
         private Skill.Editor.UI.DropShadowLabel _LblDefaultProperties;
         private ImplantObjectPropertiesField _PropertiesField;
@@ -54,7 +54,7 @@ namespace Skill.Editor
             _MainPanel = new ChangeCheck();
 
             _MainPanel.RowDefinitions.Add(26, GridUnitType.Pixel); // property lable
-            _MainPanel.RowDefinitions.Add(104, GridUnitType.Pixel); // properties
+            _MainPanel.RowDefinitions.Add(124, GridUnitType.Pixel); // properties
             _MainPanel.RowDefinitions.Add(ButtonRowHeight, GridUnitType.Pixel); // button add
             _MainPanel.RowDefinitions.Add(1, GridUnitType.Star);// object list
             _MainPanel.RowDefinitions.Add(_ObjectField.LayoutHeight, GridUnitType.Pixel);// object filed
@@ -67,7 +67,7 @@ namespace Skill.Editor
             asset.DefaultObject.OverrideProperties = true;
             _PropertiesField = new ImplantObjectPropertiesField() { Row = 1, Column = 0, Object = asset.DefaultObject };
 
-            _ItemsList = new ListBox() { Row = 3, Column = 0, Margin = new Thickness(2) };
+            _ItemsList = new ListBox() { Row = 3, Column = 0, Margin = new Thickness(0,2) };
             _ItemsList.BackgroundVisible = true;
             _ItemsList.DisableFocusable();
 
@@ -128,8 +128,17 @@ namespace Skill.Editor
 
         private ImplantObject CreateNew()
         {
-            return new ImplantObject() { Prefab = null, MinScalePercent = 0.8f, MaxScalePercent = 1.0f, Weight = 1.0f, Rotation = ImplantObjectRotation.SurfaceNormal };
-        }
+            return new ImplantObject()
+            {
+                Prefab = null,
+                MinScalePercent = 0.8f,
+                MaxScalePercent = 1.0f,
+                Weight = 1.0f,
+                Rotation = ImplantObjectRotation.SurfaceNormal,
+                MinRandomRotation = new Vector3(),
+                MaxRandomRotation = new Vector3(360, 360, 360)
+            };
+			        }
 
         void _BtnAdd_Click(object sender, System.EventArgs e)
         {

@@ -9,7 +9,7 @@ namespace Skill.Framework.UI
     public class GameMenu : DynamicBehaviour
     {
         /// <summary> The sorting depth. </summary>
-        public int Depth = 0;
+        public int GUIDepth = 13;
         /// <summary> Skin </summary>
         public GUISkin Skin;
         public string MainFrame = "MainFrame";
@@ -85,7 +85,7 @@ namespace Skill.Framework.UI
         {
             if (IsVisible && Menu != null)
             {
-                GUI.depth = Depth;
+                GUI.depth = GUIDepth;
                 if (Skin != null) GUI.skin = Skin;
                 Menu.OnGUI();
             }

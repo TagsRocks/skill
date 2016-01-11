@@ -118,7 +118,7 @@ namespace Skill.Framework.Weapons
         void OnDrawGizmos()
         {
             Gizmos.color = Color.red;
-            GizmosHelper.DrawArrow(transform.position, transform.position + transform.forward, 0.3f);
+            GizmosHelper.DrawArrow(transform.position + transform.forward * 3, transform.position + transform.forward * 0.35f, 0.3f);
             Gizmos.DrawSphere(transform.position, 0.3f);
         }
     }

@@ -122,7 +122,7 @@ namespace Skill.Framework
     public class DamageEventArgs : EventArgs
     {
         /// <summary> Amount of damage </summary>
-        public float Damage { get; private set; }
+        public float Damage { get; set; }
 
         /// <summary> Tag of object that cause damage </summary>
         public string Tag { get; set; }

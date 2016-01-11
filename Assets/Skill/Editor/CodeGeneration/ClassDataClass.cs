@@ -34,6 +34,10 @@ namespace Skill.Editor.CodeGeneration
                 Add(constructor);
             }
 
+            CreateIsDirtyProperty();
+            CreateSetAsCleanMethod();
+
+
             // create static creator method
             CreateCreatorMethod();
 
@@ -46,6 +50,110 @@ namespace Skill.Editor.CodeGeneration
             CreateXmlLoadMethods();
             CreateBinaryLoadMethod();
         }
+
+        private void CreateIsDirtyProperty()
+        {
+            StringBuilder isDirtyBody = new StringBuilder();
+            bool hasClassProperty = false;
+            foreach (var p in _SaveClass.Properties)
+            {
+                if (p.Type == PropertyType.Class)
+                {
+                    if (!hasClassProperty)
+                    {
+                        isDirtyBody.AppendLine("if(_IsDirty)  return _IsDirty;");
+                        hasClassProperty = true;
+                    }
+                    ClassPropertyData cp = p as ClassPropertyData;
+                    ClassData cd = FindClass(cp.ClassName);
+                    if (cd != null)
+                    {
+                        string pName = Variable.GetName(p.Name);
+                        if (p.IsArray)
+                        {
+                            isDirtyBody.AppendLine(string.Format("if({0} != null) {{", pName));
+                            isDirtyBody.AppendLine(string.Format("for (int i = 0; i < {0}.Length; i++) {{", pName));
+                            if (!cd.IsStruct)
+                                isDirtyBody.AppendLine(string.Format("if({0}[i] != null && {0}[i].IsDirty) return true;", pName));
+                            else
+                                isDirtyBody.AppendLine(string.Format("if({0}[i].IsDirty) return true;", pName));
+                            isDirtyBody.AppendLine("}");
+                            isDirtyBody.AppendLine("}");
+                        }
+                        else
+                        {
+                            if (!cd.IsStruct)
+                                isDirtyBody.AppendLine(string.Format("if({0} != null)", pName));
+                            isDirtyBody.AppendLine(string.Format("if({0}.IsDirty) return true;", pName));
+                        }
+                    }
+                }
+            }
+
+
+
+            isDirtyBody.AppendLine("return _IsDirty;");
+            Property isDirtyProperty = new Property("bool", "IsDirty", Variable.GetName("IsDirty"), false);
+            isDirtyProperty.Comment = "is any changes happened to savable object";
+            isDirtyProperty.SetGetBody(isDirtyBody.ToString());
+            Add(isDirtyProperty);
+            Add(new Variable("bool", "IsDirty"));
+        }
+
+        private void CreateSetAsCleanMethod()
+        {
+            StringBuilder setAsCleanBody = new StringBuilder();
+            setAsCleanBody.AppendLine("_IsDirty = false;");
+
+            foreach (var p in _SaveClass.Properties)
+            {
+                if (p.Type == PropertyType.Class)
+                {
+                    ClassPropertyData cp = p as ClassPropertyData;
+                    ClassData cd = FindClass(cp.ClassName);
+                    if (cd != null)
+                    {
+                        string pName = Variable.GetName(p.Name);
+                        if (p.IsArray)
+                        {
+                            setAsCleanBody.AppendLine(string.Format("if({0} != null) {{", pName));
+                            setAsCleanBody.AppendLine(string.Format("for (int i = 0; i < {0}.Length; i++) {{", pName));
+                            if (!cd.IsStruct)
+                                setAsCleanBody.AppendLine(string.Format("if({0}[i] != null)", pName));
+                            setAsCleanBody.AppendLine(string.Format("{0}[i].SetAsClean();", pName));
+                            setAsCleanBody.AppendLine("}");
+                            setAsCleanBody.AppendLine("}");
+                        }
+                        else
+                        {
+                            if (!cd.IsStruct)
+                                setAsCleanBody.AppendLine(string.Format("if({0} != null)", pName));
+                            setAsCleanBody.AppendLine(string.Format("{0}.SetAsClean();", pName));
+                        }
+                    }
+                }
+            }
+            Add(new Method("void", "SetAsClean", setAsCleanBody.ToString()) { Modifier = Modifiers.Public });
+        }
+
+        /// <summary>
+        /// Find class by name
+        /// </summary>
+        /// <param name="className">name of class</param>
+        /// <returns>class if found , otherwise null</returns>
+        private ClassData FindClass(string className)
+        {
+            if (SaveData.GeneratingInstance != null)
+            {
+                foreach (var c in SaveData.GeneratingInstance.Classes)
+                {
+                    if (c.Name == className)
+                        return c;
+                }
+            }
+            return null;
+        }
+
 
         #region Create static CreatorMethod
         private static string GetStaticCreatorMethodName(string clasName) { return string.Format("Create{0}", clasName); }
@@ -62,15 +170,16 @@ namespace Skill.Editor.CodeGeneration
         /// </summary>
         /// <param name="pt">PrimitiveType to conver</param>
         /// <returns>PrimitiveType in c# code</returns>
-        private string ConvertToString(PrimitiveDataType pt)
+        private string ConvertToString(PrimitiveDataType pt, bool safe)
         {
             switch (pt)
             {
                 case PrimitiveDataType.Integer:
-                    return "int";
+                    return safe ? "Skill.Framework.SafeInt" : "int";
                 case PrimitiveDataType.Boolean:
-                    return "bool";
+                    return safe ? "Skill.Framework.SafeBool" : "bool";
                 case PrimitiveDataType.Float:
+                    return safe ? "Skill.Framework.SafeFloat" : "float";
                 case PrimitiveDataType.String:
                     return pt.ToString().ToLower();
                 default:
@@ -92,13 +201,13 @@ namespace Skill.Editor.CodeGeneration
 
                         if (p.IsArray)
                         {
-                            Add(new Variable(string.Format("{0}[]", ConvertToString(pp.PrimitiveType)), p.Name));
-                            Add(new Property(string.Format("{0}[]", ConvertToString(pp.PrimitiveType)), p.Name, Variable.GetName(p.Name)) { Comment = p.Comment });
+                            Add(new Variable(string.Format("{0}[]", ConvertToString(pp.PrimitiveType, pp.SafeMemory)), p.Name));
+                            Add(new Property(string.Format("{0}[]", ConvertToString(pp.PrimitiveType, pp.SafeMemory)), p.Name, Variable.GetName(p.Name), true, Property.DirtyMode.CheckAndSet) { Comment = p.Comment });
                         }
                         else
                         {
-                            Add(new Variable(ConvertToString(pp.PrimitiveType), p.Name));
-                            Add(new Property(ConvertToString(pp.PrimitiveType), p.Name, Variable.GetName(p.Name)) { Comment = p.Comment });
+                            Add(new Variable(ConvertToString(pp.PrimitiveType, pp.SafeMemory), p.Name));
+                            Add(new Property(ConvertToString(pp.PrimitiveType, pp.SafeMemory), p.Name, Variable.GetName(p.Name), true, Property.DirtyMode.CheckAndSet) { Comment = p.Comment });
                         }
                         break;
                     case PropertyType.Class:
@@ -106,12 +215,13 @@ namespace Skill.Editor.CodeGeneration
                         if (p.IsArray)
                         {
                             Add(new Variable(string.Format("{0}[]", cp.ClassName), p.Name));
-                            Add(new Property(string.Format("{0}[]", cp.ClassName), p.Name, Variable.GetName(p.Name)) { Comment = p.Comment });
+                            Add(new Property(string.Format("{0}[]", cp.ClassName), p.Name, Variable.GetName(p.Name), true, Property.DirtyMode.CheckAndSet) { Comment = p.Comment });
                         }
                         else
                         {
                             Add(new Variable(cp.ClassName, p.Name));
-                            Add(new Property(cp.ClassName, p.Name, Variable.GetName(p.Name)) { Comment = p.Comment });
+                            ClassData cd = FindClass(cp.ClassName);
+                            Add(new Property(cp.ClassName, p.Name, Variable.GetName(p.Name), true, cd.IsStruct ? Property.DirtyMode.Set : Property.DirtyMode.CheckAndSet) { Comment = p.Comment });
                         }
                         break;
                     default:
@@ -130,7 +240,9 @@ namespace Skill.Editor.CodeGeneration
             {
                 variable = string.Format("_{0}Element", p.Name);
                 if (p.Type == PropertyType.Primitive)
-                    toXmlElementBody.AppendLine(string.Format("Skill.Framework.IO.XmlElement {0} = stream.Create(\"{1}\",{2});", variable, p.Name, Variable.GetName(p.Name)));
+                {
+                    toXmlElementBody.AppendLine(string.Format("Skill.Framework.IO.XmlElement {0} = stream.Create(\"{1}\",{3}{2});", variable, p.Name, Variable.GetName(p.Name), ((PrimitivePropertyData)p).GetCast()));
+                }
                 else
                     toXmlElementBody.AppendLine(string.Format("Skill.Framework.IO.XmlElement {0} = stream.Create<{1}>(\"{2}\",{3});", variable, ((ClassPropertyData)p).ClassName, p.Name, Variable.GetName(p.Name)));
                 toXmlElementBody.AppendLine(string.Format("e.AppendChild({0});", variable));
@@ -148,7 +260,7 @@ namespace Skill.Editor.CodeGeneration
             foreach (var p in this._SaveClass.Properties)
             {
                 if (p.Type == PropertyType.Primitive)
-                    saveBinaryBody.AppendLine(string.Format("stream.Write({0});", Variable.GetName(p.Name)));
+                    saveBinaryBody.AppendLine(string.Format("stream.Write({1}{0});", Variable.GetName(p.Name), ((PrimitivePropertyData)p).GetCast()));
                 else
                     saveBinaryBody.AppendLine(string.Format("stream.Write<{0}>({1});", ((ClassPropertyData)p).ClassName, Variable.GetName(p.Name)));
             }
@@ -159,19 +271,19 @@ namespace Skill.Editor.CodeGeneration
         }
 
 
-        private string GetLoadMethodName(PrimitiveDataType primitive, bool isArray)
+        private string GetLoadMethodName(PrimitiveDataType primitive, bool isArray, bool safe)
         {
             string result = "";
             switch (primitive)
             {
                 case PrimitiveDataType.Integer:
-                    result = "ReadInt";
+                    result = safe && isArray ? "ReadSafeInt" : "ReadInt";
                     break;
                 case PrimitiveDataType.Float:
-                    result = "ReadFloat";
+                    result = safe && isArray ? "ReadSafeFloat" : "ReadFloat";
                     break;
                 case PrimitiveDataType.Boolean:
-                    result = "ReadBoolean";
+                    result = safe && isArray ? "ReadSafeBoolean" : "ReadBoolean";
                     break;
                 case PrimitiveDataType.String:
                     result = "ReadString";
@@ -241,7 +353,7 @@ namespace Skill.Editor.CodeGeneration
                 {
                     case PropertyType.Primitive:
                         PrimitivePropertyData pp = (PrimitivePropertyData)p;
-                        loadXmlBody.AppendLine(string.Format("this.{0} = stream.{1}( element );", Variable.GetName(p.Name), GetLoadMethodName(pp.PrimitiveType, pp.IsArray)));
+                        loadXmlBody.AppendLine(string.Format("this.{0} = stream.{1}( element );", Variable.GetName(p.Name), GetLoadMethodName(pp.PrimitiveType, pp.IsArray, pp.SafeMemory)));
                         break;
                     case PropertyType.Class:
                         ClassPropertyData cp = (ClassPropertyData)p;
@@ -256,6 +368,7 @@ namespace Skill.Editor.CodeGeneration
             loadXmlBody.AppendLine("}");
             loadXmlBody.AppendLine("element = e.GetNextSibling(element);");
             loadXmlBody.AppendLine("}");
+            loadXmlBody.AppendLine("SetAsClean();");
 
             Method loadMethod = new Method("void", "Load", loadXmlBody.ToString(), "Skill.Framework.IO.XmlElement e", "Skill.Framework.IO.XmlLoadStream stream");
             loadMethod.Modifier = Modifiers.Public;
@@ -272,7 +385,7 @@ namespace Skill.Editor.CodeGeneration
                 {
                     case PropertyType.Primitive:
                         PrimitivePropertyData pp = (PrimitivePropertyData)p;
-                        loadMethodBody.AppendLine(string.Format("this.{0} = stream.{1}();", Variable.GetName(p.Name), GetLoadMethodName(pp.PrimitiveType, pp.IsArray)));
+                        loadMethodBody.AppendLine(string.Format("this.{0} = stream.{1}();", Variable.GetName(p.Name), GetLoadMethodName(pp.PrimitiveType, pp.IsArray, pp.SafeMemory)));
                         break;
                     case PropertyType.Class:
                         ClassPropertyData cp = (ClassPropertyData)p;
@@ -281,6 +394,8 @@ namespace Skill.Editor.CodeGeneration
                         break;
                 }
             }
+
+            loadMethodBody.AppendLine("SetAsClean();");
 
             Method loadBinaryMethod = new Method("void", "Load", loadMethodBody.ToString(), "Skill.Framework.IO.BinaryLoadStream stream");
             loadBinaryMethod.Modifier = Modifiers.Public;

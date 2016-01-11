@@ -7,8 +7,8 @@ namespace Skill.Editor
 {
     public static class Resources
     {
-        public const string LightSkinPath = "Assets/Skill/Editor/Resources/LightSkin/";
-        public const string ProSkinPath = "Assets/Skill/Editor/Resources/ProSkin/";
+        public const string LightSkinPath = "Assets/Skill/Editor/Res/LightSkin/";
+        public const string ProSkinPath = "Assets/Skill/Editor/Res/ProSkin/";
         public const string ShaderPath = "Hidden/Skill/";
 
         public static string GetUILightSkinResourcePath(string resourceFileName)

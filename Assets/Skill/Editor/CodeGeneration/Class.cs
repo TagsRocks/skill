@@ -86,7 +86,8 @@ namespace Skill.Editor.CodeGeneration
         {
             if (!_Classes.Contains(cl))
                 _Classes.Add(cl);
-        }
+        }        
+
         /// <summary>
         /// Remove specyfied Class
         /// </summary>
@@ -201,7 +202,7 @@ namespace Skill.Editor.CodeGeneration
             CommentWriter.Write(writer, Comment);
             for (int i = 0; i < _Attributes.Count; i++) // write attributes            
                 writer.WriteLine(string.Format("[{0}]", _Attributes[i]));
-            
+
             writer.Write(Modifier.ToString().ToLower());
             writer.Write(" ");
             if (ClassModifier != ClassModifiers.None)

@@ -7,12 +7,12 @@ namespace Skill.Framework.IO
 {
     public static class SecurePlayerPrefs
     {
-        public static string Encrypt(string text , string password)
+        public static string Encrypt(string text, string password)
         {
             if (text == null)
             {
                 throw new ArgumentNullException("text");
-            }            
+            }
 
             // create instance of the DES crypto provider
             var des = new DESCryptoServiceProvider();
@@ -65,7 +65,7 @@ namespace Skill.Framework.IO
 
                     // get the IV
                     byte[] iv = new byte[8];
-                    memoryStream.Read(iv, 0, iv.Length);                    
+                    memoryStream.Read(iv, 0, iv.Length);
 
                     // use derive bytes to generate key from password and IV
                     var rfc2898DeriveBytes = new Rfc2898DeriveBytes(password, iv, 1000);
@@ -92,23 +92,41 @@ namespace Skill.Framework.IO
 
         public static void SetString(string key, string value, string password)
         {
-            string hashedKey = GenerateMD5(key);
+            string hashedKey = Utility.GenerateMD5(key);
             string encryptedValue = Encrypt(value, password);
             PlayerPrefs.SetString(hashedKey, encryptedValue);
+
+            string checksum = Utility.GenerateMD5(encryptedValue);
+            PlayerPrefs.SetString(GetCheckSumKey(hashedKey), checksum);
+
+            PlayerPrefs.Save();
         }
 
         public static string GetString(string key, string password)
         {
-            string hashedKey = GenerateMD5(key);
+            string hashedKey = Utility.GenerateMD5(key);
+            HasBeenEdited = false;
             if (PlayerPrefs.HasKey(hashedKey))
             {
                 string encryptedValue = PlayerPrefs.GetString(hashedKey);
+
+                string checkSumKey = GetCheckSumKey(hashedKey);
+                if (!PlayerPrefs.HasKey(checkSumKey))
+                    HasBeenEdited = true;
+                else
+                {
+                    string checksumSaved = PlayerPrefs.GetString(checkSumKey);
+                    string checksumReal = Utility.GenerateMD5(encryptedValue);
+                    HasBeenEdited = !checksumSaved.Equals(checksumReal);
+                }
+
                 string decryptedValue;
-                TryDecrypt(encryptedValue,password, out decryptedValue);
+                TryDecrypt(encryptedValue, password, out decryptedValue);
                 return decryptedValue;
             }
             else
             {
+                HasBeenEdited = true;
                 return "";
             }
         }
@@ -117,7 +135,7 @@ namespace Skill.Framework.IO
         {
             if (HasKey(key))
             {
-                return GetString(key,password);
+                return GetString(key, password);
             }
             else
             {
@@ -127,30 +145,14 @@ namespace Skill.Framework.IO
 
         public static bool HasKey(string key)
         {
-            string hashedKey = GenerateMD5(key);
+            string hashedKey = Utility.GenerateMD5(key);
             bool hasKey = PlayerPrefs.HasKey(hashedKey);
             return hasKey;
         }
 
-        /// <summary>
-        /// Generates an MD5 hash of the given text.
-        /// WARNING. Not safe for storing passwords
-        /// </summary>
-        /// <returns>MD5 Hashed string</returns>
-        /// <param name="text">The text to hash</param>
-        static string GenerateMD5(string text)
-        {
-            var md5 = MD5.Create();
-            byte[] inputBytes = Encoding.UTF8.GetBytes(text);
-            byte[] hash = md5.ComputeHash(inputBytes);
+        private static string GetCheckSumKey(string key) { return "CHECKSUM" + key; }
 
-            // step 2, convert byte array to hex string
-            var sb = new StringBuilder();
-            for (int i = 0; i < hash.Length; i++)
-            {
-                sb.Append(hash[i].ToString("X2"));
-            }
-            return sb.ToString();
-        }
+        /// <summary> true if last loaded string modified </summary>
+        public static bool HasBeenEdited { get; private set; }
     }
 }

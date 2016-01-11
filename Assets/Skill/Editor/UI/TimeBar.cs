@@ -526,10 +526,10 @@ namespace Skill.Editor.UI
 
 
         /// <summary>
-        /// OnMouseDown
+        /// MouseDownEvent
         /// </summary>
         /// <param name="args">args</param>
-        protected override void OnMouseDown(MouseClickEventArgs args)
+        protected override void MouseDownEvent(MouseClickEventArgs args)
         {
             if (args.Button == MouseButton.Left)
             {
@@ -573,14 +573,14 @@ namespace Skill.Editor.UI
                 }
             }
 
-            base.OnMouseDown(args);
+            base.MouseDownEvent(args);
         }
 
         /// <summary>
         /// Occurs when mouse button was released.(if WantsMouseEvents = true)
         /// </summary>
         /// <param name="args"> MouseClickEventArgs </param>
-        protected override void OnMouseUp(MouseClickEventArgs args)
+        protected override void MouseUpEvent(MouseClickEventArgs args)
         {
             if (args.Button == _MouseButton)
             {
@@ -589,15 +589,15 @@ namespace Skill.Editor.UI
                 _MouseButton = MouseButton.None;
                 args.Handled = true;
             }
-            base.OnMouseUp(args);
+            base.MouseUpEvent(args);
         }
 
 
         /// <summary>
-        /// OnMouseDrag
+        /// MouseDragEvent
         /// </summary>
         /// <param name="args">Args</param>
-        protected override void OnMouseDrag(MouseMoveEventArgs args)
+        protected override void MouseDragEvent(MouseMoveEventArgs args)
         {
             if (args.Button == MouseButton.Left)
             {
@@ -609,7 +609,7 @@ namespace Skill.Editor.UI
                 AddTime(GetTime(args.MousePosition.x));
                 args.Handled = true;
             }
-            base.OnMouseDrag(args);
+            base.MouseDragEvent(args);
         }
 
         public override void HandleEvent(Event e)
@@ -623,7 +623,7 @@ namespace Skill.Editor.UI
                     {
                         MouseButton mb = ConvertButton(e.button);
                         MouseMoveEventArgs args = new MouseMoveEventArgs(e.mousePosition, e.modifiers, mb, e.delta);
-                        OnMouseDrag(args);
+                        MouseDragEvent(args);
                         if (args.Handled)
                             e.Use();
                     }
@@ -639,7 +639,7 @@ namespace Skill.Editor.UI
                     {
                         MouseButton mb = ConvertButton(e.button);
                         MouseClickEventArgs args = new MouseClickEventArgs(e.mousePosition, e.modifiers, mb, e.clickCount);
-                        OnMouseUp(args);
+                        MouseUpEvent(args);
                         if (args.Handled)
                             e.Use();
                     }

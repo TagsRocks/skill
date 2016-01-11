@@ -6,19 +6,20 @@ namespace Skill.Framework
 {
     /// <summary>
     /// a simple class to manage load levels in loading menu
-    /// </summary>
-    [RequireComponent(typeof(FadeScreen))]
+    /// </summary>    
     public class LevelLoadManager : Skill.Framework.DynamicBehaviour
     {
+        public static LevelLoadManager Instance { get; private set; }
+
         /// <summary> Load level in editor mode or just fadeout </summary>
         public bool LoadInEditor;
 
         // next level key
         private const string NextLevelKey = "NLToL";
-        /// <summary> Attached FadeScreen component </summary>
-        public FadeScreen FadeScreen { get { return _FadeScreen; } }
 
-        private FadeScreen _FadeScreen;
+        /// <summary> Attached FadeScreen component </summary>
+        public Fading FadeScreen;
+
         private TimeWatch _QuitTW;
         private TimeWatch _LoadLevelTW;
         private string _TargetLevel;
@@ -26,11 +27,18 @@ namespace Skill.Framework
         /// <summary> Name of loading scene (default : Loading) </summary>
         public virtual string LoadingSceneName { get { return "Loading"; } }
 
+        protected override void Awake()
+        {
+            Instance = this;
+            base.Awake();
+        }
+
         /// <summary> GetReferences </summary>
         protected override void GetReferences()
         {
             base.GetReferences();
-            _FadeScreen = GetComponent<FadeScreen>();
+            if (this.FadeScreen == null)
+                this.FadeScreen = GetComponent<Fading>();
         }
         /// <summary> Update </summary>
         protected override void Update()
@@ -48,7 +56,7 @@ namespace Skill.Framework
                 Time.timeScale = 1.0f;
                 _LoadLevelTW.End();
                 if (!Application.isEditor || LoadInEditor)
-                    Application.LoadLevel(_TargetLevel);
+                    UnityEngine.SceneManagement.SceneManager.LoadScene(_TargetLevel);
                 else
                     Debug.Log(string.Format("Load Level : {0}", _TargetLevel));
             }
@@ -71,23 +79,23 @@ namespace Skill.Framework
                 _TargetLevel = levelName;
             PlayerPrefs.SetString(NextLevelKey, levelName);
             FadeOut();
-            _LoadLevelTW.Begin(_FadeScreen.Fading.FadeOutTime + 1.5f, true);
+            _LoadLevelTW.Begin(this.FadeScreen.FadeOutTime + 1.5f, true);
         }
 
         /// <summary> Quit application after fadeout </summary>
         public virtual void Quit()
         {
             FadeOut();
-            _QuitTW.Begin(_FadeScreen.Fading.FadeOutTime + 1.5f, true);
+            _QuitTW.Begin(this.FadeScreen.FadeOutTime + 1.5f, true);
         }
 
         private void FadeOut()
         {
-            _FadeScreen.Fading.FadeOut();
+            this.FadeScreen.FadeToOne();
             Skill.Framework.Audio.DynamicSoundVolume[] sounds = FindObjectsOfType<Skill.Framework.Audio.DynamicSoundVolume>();
             if (sounds != null)
             {
-                SmoothingParameters fading = new SmoothingParameters() { SmoothTime = _FadeScreen.Fading.FadeOutTime - 0.1f, SmoothType = SmoothType.Damp };
+                SmoothingParameters fading = new SmoothingParameters() { SmoothTime = this.FadeScreen.FadeOutTime - 0.1f, SmoothType = SmoothType.Damp };
                 foreach (var item in sounds)
                 {
                     item.Fading = fading;
@@ -104,7 +112,9 @@ namespace Skill.Framework
             {
                 if (PlayerPrefs.HasKey(NextLevelKey))
                     return PlayerPrefs.GetString(NextLevelKey);
-                return Application.loadedLevelName;
+
+                return UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+                //return Application.loadedLevelName;
             }
         }
     }

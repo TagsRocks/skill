@@ -178,7 +178,8 @@ namespace Skill.Editor
                 Transform cameraT = Camera.main.transform;
                 Selection.activeTransform = cameraT;
                 Undo.RecordObject(cameraT, "Bring Camera To Selected Object");
-                UnityEditor.SceneView.currentDrawingSceneView.AlignWithView();
+                if (SceneView.lastActiveSceneView != null)
+                    SceneView.lastActiveSceneView.AlignWithView();
 
             }
 
@@ -204,8 +205,7 @@ namespace Skill.Editor
         }
 
         public static void BringToGround(Transform transform)
-        {
-
+        {            
             RaycastHit hit;
             Ray ray = new Ray() { origin = transform.position, direction = Vector3.down };
             if (Physics.Raycast(ray, out hit, 10000))

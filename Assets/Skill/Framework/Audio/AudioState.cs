@@ -65,6 +65,10 @@ namespace Skill.Framework.Audio
         private float _FadeEndTime;
         private float _SavedTime;
 
+
+        public double EndDspTime { get; private set; }
+        public double StartDspTime { get; private set; }
+
         public void Validate(AudioSource audio)
         {
             _Audio = audio;
@@ -138,17 +142,20 @@ namespace Skill.Framework.Audio
             }
         }
 
-        public void EndTime(float deltaTime, float fadeOut)
+        public void EndTime(double deltaTime, float fadeOut)
         {
             if (_Audio != null)
             {
                 _Audio.SetScheduledEndTime(AudioSettings.dspTime + deltaTime);
+                EndDspTime = AudioSettings.dspTime + deltaTime;
+
+                float fdeltaTime = System.Convert.ToSingle(deltaTime);
 
                 if (fadeOut > MINFADETIME && IsPlaying)
                 {
-                    _FadeOutTime = Mathf.Max(0, Mathf.Min(deltaTime, fadeOut));
-                    _FadeEndTime = _Audio.time + deltaTime - Begin;
-                    _SavedTime = _Audio.time + deltaTime;
+                    _FadeOutTime = Mathf.Max(0, Mathf.Min(fdeltaTime, fadeOut));
+                    _FadeEndTime = _Audio.time + fdeltaTime - Begin;
+                    _SavedTime = _Audio.time + fdeltaTime;
                 }
                 else
                 {
@@ -158,11 +165,16 @@ namespace Skill.Framework.Audio
             }
         }
 
-        public void StartTime(float deltaTime, float fadeIn)
+        public void StartTime(double deltaTime, float fadeIn)
         {
             if (_Audio != null && Clip != null)
             {
+                _Audio.Stop();
+                _Audio.loop = string.IsNullOrEmpty(NextState);
+                _Audio.clip = Clip;
                 _Audio.PlayScheduled(AudioSettings.dspTime + deltaTime);
+                StartDspTime = AudioSettings.dspTime + deltaTime;
+                EndDspTime = StartDspTime + (End - Begin);
 
                 if (fadeIn > MINFADETIME)
                 {
@@ -180,7 +192,6 @@ namespace Skill.Framework.Audio
             if (_Audio != null)
             {
                 _Audio.clip = Clip;
-                _Audio.loop = false;
 
                 if (SaveTime)
                 {
@@ -210,9 +221,13 @@ namespace Skill.Framework.Audio
                 float vol = GetVolume() * volumeFactor;
                 float time = _Audio.time - Begin;
                 if (_FadeInTime > MINFADETIME && time < _FadeInTime)
+                {
                     _Audio.volume = Mathf.Lerp(0, vol, time / _FadeInTime);
+                }
                 else if (_FadeOutTime > MINFADETIME && time > (_FadeEndTime - _FadeOutTime))
+                {
                     _Audio.volume = Mathf.Lerp(0, vol, (_FadeEndTime - time) / _FadeOutTime);
+                }
                 else
                     _Audio.volume = vol;
             }

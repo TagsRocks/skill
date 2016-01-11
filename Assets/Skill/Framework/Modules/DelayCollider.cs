@@ -46,6 +46,7 @@ namespace Skill.Framework.Modules
                 if (this._Collider != null)
                     this._Collider.enabled = true;                
                 _StartTW.End();
+                enabled = false;
             }
             base.Update();
         }

@@ -8,6 +8,9 @@ using UnityEngine;
 
 namespace Skill.Editor
 {
+    // this code could be used for other new datatypes
+
+    /*
     class SpawnObjectField : Grid
     {
         private ObjectField<GameObject> _PrefabField;
@@ -82,4 +85,6 @@ namespace Skill.Editor
             OnLayoutChanged();
         }
     }
+
+    */
 }

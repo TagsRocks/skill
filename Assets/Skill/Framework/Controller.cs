@@ -11,7 +11,7 @@ namespace Skill.Framework
     /// </summary>
     [RequireComponent(typeof(Skill.Framework.EventManager))]
     public abstract class Controller : DynamicBehaviour, IBehavioural
-    {        
+    {
         private Skill.Framework.AI.BehaviorTree _Behavior;
         /// <summary>
         /// BehaviorTree of controller (should provide by subclass)
@@ -32,10 +32,23 @@ namespace Skill.Framework
         /// </summary>
         public Health Health { get; private set; }
 
+
+        private Spawner _Spawner;
         /// <summary>
         /// Spawner that spawned this controller
-        /// </summary>
-        public Spawner Spawner { get; internal set; }
+        /// </summary>        
+        public Spawner Spawner
+        {
+            get { return _Spawner; }
+            internal set
+            {
+                _Spawner = value;
+                OnSpawned();
+            }
+        }
+
+        /// <summary> called right after object spawned by a Spawner</summary>
+        protected virtual void OnSpawned() { }
 
 
         /// <summary>
@@ -112,7 +125,7 @@ namespace Skill.Framework
         /// when controller destroyed
         /// </summary>
         protected override void OnDestroy()
-        {            
+        {
             ResetValues();
             Global.UnRegister(this);
             base.OnDestroy();

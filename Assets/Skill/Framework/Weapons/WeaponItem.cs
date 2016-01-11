@@ -65,6 +65,7 @@ namespace Skill.Framework.Weapons
                         Weapon.AddIgnoreCollider(c);
                 }
             }
+            EnableCache(false);
         }
 
         public override void Drop()
@@ -82,7 +83,19 @@ namespace Skill.Framework.Weapons
                     foreach (var c in weaponColliders)
                         Weapon.RemoveIgnoreCollider(c);
                 }
+
+                Rigidbody body = Weapon.GetComponent<Rigidbody>();
+                if (body != null)
+                    body.velocity = Vector3.zero;
             }
+            EnableCache(true);
+        }
+
+        private void EnableCache(bool enable)
+        {
+            Skill.Framework.Managers.CacheLifeTime clt = GetComponent<Skill.Framework.Managers.CacheLifeTime>();
+            if (clt != null)
+                clt.enabled = enable;
         }
 
         public override void AddAmmo(Skill.Framework.Managers.InventoryItem sameItem)

@@ -91,7 +91,7 @@ namespace Skill.Framework.Sequence
             if (this.FadeScreen != null)
             {
                 this.FadeScreen.Fading.FadeOutTime = this.Delay - 0.2f;
-                this.FadeScreen.Fading.FadeOut();
+                this.FadeScreen.Fading.FadeToOne();
             }
         }
 
@@ -101,7 +101,7 @@ namespace Skill.Framework.Sequence
             Matinee.Stop();
             _CheckPoint.Apply();
             if (this.FadeScreen != null)
-                this.FadeScreen.Fading.FadeIn();
+                this.FadeScreen.Fading.FadeToZero();
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Skill.Editor.CodeGeneration
     /// </summary>
     [DisplayName("Skill-Unity-CSharp")]
     public class CSharpCodeGenerator : ICodeGenerator
-    {        
+    {
         public bool IsDebuging { get; set; }
 
 
@@ -91,11 +91,26 @@ namespace Skill.Editor.CodeGeneration
         /// <param name="saveGame">SaveData</param>
         public void Generate(Skill.Editor.IO.SaveData saveGame)
         {
-
-            SaveDataClass sgClass = new SaveDataClass(saveGame);
-            _Document.AddUsingSkillIO();
-            _Document.Add(sgClass);
-            HasPartial = false;
+            if (!string.IsNullOrEmpty(saveGame.Namespace))
+            {
+                Skill.Editor.IO.SaveData.GeneratingInstance = saveGame;
+                Namespace ns = new Namespace(saveGame.Namespace);
+                SaveDataClass sgClass = new SaveDataClass(saveGame);
+                ns.Add(sgClass);
+                _Document.AddUsingSkillIO();
+                _Document.Add(ns);
+                HasPartial = false;
+                Skill.Editor.IO.SaveData.GeneratingInstance = null;
+            }
+            else
+            {
+                Skill.Editor.IO.SaveData.GeneratingInstance = saveGame;
+                SaveDataClass sgClass = new SaveDataClass(saveGame);
+                _Document.AddUsingSkillIO();
+                _Document.Add(sgClass);
+                HasPartial = false;
+                Skill.Editor.IO.SaveData.GeneratingInstance = null;
+            }
         }
 
         /// <summary>
@@ -115,6 +130,6 @@ namespace Skill.Editor.CodeGeneration
         public void WritePartial(StreamWriter writer, string oldCode)
         {
             _Document.WritePartial(writer, oldCode);
-        }        
+        }
     }
 }

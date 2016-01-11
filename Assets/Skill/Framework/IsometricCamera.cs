@@ -38,6 +38,8 @@ namespace Skill.Framework
         public bool FastTarget;
         /// <summary> raycast world </summary>
         public LayerMask WorldRayastLayerMask;
+        /// <summary> Ignore time scale when slow motion is enabled </summary>
+        public bool IgnoreTimeScale = false;
 
         /// <summary>
         /// Apply relative custom offset to position of camera
@@ -175,8 +177,9 @@ namespace Skill.Framework
                 if (ZoomIn < 0) ZoomIn = 0;
                 if (ZoomOut < ZoomIn) ZoomOut = ZoomIn;
 
+                float deltaTime = IgnoreTimeScale ? Time.unscaledDeltaTime : Time.deltaTime;
                 float zoomFactor = _LengthOffset / Mathf.Max(0.01f, MaxOffset);
-                _Zoom = Mathf.Lerp(_Zoom, Mathf.Lerp(ZoomIn, ZoomOut, zoomFactor), ZoomDamping * Time.deltaTime);
+                _Zoom = Mathf.Lerp(_Zoom, Mathf.Lerp(ZoomIn, ZoomOut, zoomFactor), ZoomDamping * deltaTime);
 
                 // update position of camera
                 UpdateCamera();
@@ -234,6 +237,8 @@ namespace Skill.Framework
             if (Target != null)
             {
 
+                float deltaTime = IgnoreTimeScale ? Time.unscaledDeltaTime : Time.deltaTime;
+
                 if (fast)
                 {
                     float zoomFactor = _LengthOffset / Mathf.Max(0.01f, MaxOffset);
@@ -282,7 +287,7 @@ namespace Skill.Framework
                 if (fast)
                     _SomeOFOffsets = off;
                 else
-                    _SomeOFOffsets = Vector3.Lerp(_SomeOFOffsets, off, OffsetDamping * Time.deltaTime);
+                    _SomeOFOffsets = Vector3.Lerp(_SomeOFOffsets, off, OffsetDamping * deltaTime);
                 Vector3 finalOffset = _SomeOFOffsets + offsetToCenter + (cameraAdjustmentVector * CameraPreview);
                 Vector3 finalPosition = Target.position + finalOffset;
 
@@ -296,7 +301,7 @@ namespace Skill.Framework
                 }
 
                 if (!fast)
-                    finalPosition = Vector3.Lerp(_CameraTransform.position, finalPosition, Damping * Time.deltaTime);
+                    finalPosition = Vector3.Lerp(_CameraTransform.position, finalPosition, Damping * deltaTime);
 
 
                 if (FastTarget)

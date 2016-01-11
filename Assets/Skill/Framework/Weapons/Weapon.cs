@@ -6,23 +6,6 @@ using Skill.Framework.Managers;
 
 namespace Skill.Framework.Weapons
 {
-    #region ShootMode
-    /// <summary>
-    /// Number of bullet at each fire command
-    /// </summary>
-    public enum ShootMode
-    {
-        /// <summary> Continue shooting until out of ammo or stop command.</summary>
-        Continuous = 0,
-        /// <summary> By each fire command it shoots one bullet.</summary>
-        One = 1,
-        /// <summary> By each fire command it shoots two bullets.</summary>
-        Two = 2,
-        /// <summary> By each fire command it shoots three bullets.</summary>
-        Three = 3
-    }
-    #endregion
-
     #region EventHandlers and EventArgs
     /// <summary>
     /// containing Weapon shoot event data.
@@ -32,13 +15,17 @@ namespace Skill.Framework.Weapons
         /// <summary> Amount of consumed ammo </summary>
         public int ConsumedAmmo { get; private set; }
 
+        /// <summary> index of projectile </summary>
+        public int Projectile { get; private set; }
 
         /// <summary>
         /// Create WeaponShootEventArgs
-        /// </summary>
+        /// </summary>        
+        /// <param name="projectile">index of projectile</param>
         /// <param name="consumedAmmo"> Amount of consumed ammo </param>
-        public WeaponShootEventArgs(int consumedAmmo)
+        public WeaponShootEventArgs(int projectile, int consumedAmmo)
         {
+            this.Projectile = projectile;
             this.ConsumedAmmo = consumedAmmo;
         }
     }
@@ -121,12 +108,14 @@ namespace Skill.Framework.Weapons
         public Projectile[] Projectiles;
         /// <summary> sound to play on empty fire </summary>
         public AudioClip EmptySound;
-        /// <summary> Number of shot in each fire command. </summary>
-        public ShootMode Mode = ShootMode.Continuous;
+        /// <summary> Number of shot in each fire command.(0 or negative for full-auto) </summary>
+        public int Automatic = 0;
         /// <summary> Can player toss his weapon out? Typically false for default inventory. </summary>
         public bool CanThrow = false;
         /// <summary> Reload automatically when clip is empty</summary>
         public bool AutoReload = true;
+        /// <summary> Automatically stop fire when Mode != Continuous</summary>
+        public bool AutoStopFire = true;
         /// <summary> Error in shooting </summary>
         public Vector2 Spread = Vector2.zero;
 
@@ -193,6 +182,11 @@ namespace Skill.Framework.Weapons
                 _IgnoreColliders.Clear();
         }
 
+
+        // events
+        /// <summary> Occurs when a shoot stopped </summary>
+        public event System.EventHandler StopShoot;
+
         // events
         /// <summary> Occurs when a shoot happpened </summary>
         public event WeaponShootEventHandler Shoot;
@@ -224,7 +218,13 @@ namespace Skill.Framework.Weapons
             }
 
             if (Shoot != null)
-                Shoot(this, new WeaponShootEventArgs(consummed));
+                Shoot(this, new WeaponShootEventArgs(SelectedProjectileIndex, consummed));
+        }
+
+        protected virtual void OnStopShoot()
+        {
+            if (StopShoot != null)
+                StopShoot(this, System.EventArgs.Empty);
         }
 
         /// <summary>
@@ -486,7 +486,7 @@ namespace Skill.Framework.Weapons
             {
                 if (!IsFiring)
                 {
-                    if (Mode != ShootMode.Continuous && !_StopFireCommand)
+                    if (Automatic > 0 && !_StopFireCommand)
                     {
                         return;
                     }
@@ -507,9 +507,12 @@ namespace Skill.Framework.Weapons
             _StopFireCommand = true;
             if (IsFiring)
             {
-                int mode = (int)this.Mode;
+                int mode = this.Automatic;
                 if (mode <= 0 || _ShootCount >= mode || SelectedProjectile.ClipAmmo == 0)
+                {
                     IsFiring = false;
+                    OnStopShoot();
+                }
             }
         }
 
@@ -599,9 +602,13 @@ namespace Skill.Framework.Weapons
                             State = WeaponState.Refill;
                         }
                         _ShootCount++;
-                        int mode = (int)this.Mode;
+                        int mode = this.Automatic;
                         if (mode > 0 && _ShootCount >= mode)
+                        {
+                            if (AutoStopFire)
+                                StopFire();
                             IsFiring = false;
+                        }
                     }
                 }
                 else if (AutoReload && SelectedProjectile.ClipAmmo == 0)
@@ -835,14 +842,17 @@ namespace Skill.Framework.Weapons
 
         protected void IgnoreBulletColliders(Collider bulletCollider)
         {
-            if (this._Rigidbody != null && this._Collider != null && this._Collider.enabled && this.gameObject.activeInHierarchy)
-                Physics.IgnoreCollision(this._Collider, bulletCollider);
-            if (_IgnoreColliders != null && _IgnoreColliders.Count > 0)
+            if (bulletCollider.enabled && bulletCollider.gameObject.activeInHierarchy)
             {
-                for (int cIndex = 0; cIndex < _IgnoreColliders.Count; cIndex++)
+                if (this._Rigidbody != null && this._Collider != null && this._Collider.enabled && this.gameObject.activeInHierarchy)
+                    Physics.IgnoreCollision(this._Collider, bulletCollider);
+                if (_IgnoreColliders != null && _IgnoreColliders.Count > 0)
                 {
-                    if (_IgnoreColliders[cIndex].gameObject.activeInHierarchy && _IgnoreColliders[cIndex].enabled)
-                        Physics.IgnoreCollision(_IgnoreColliders[cIndex], bulletCollider);
+                    for (int cIndex = 0; cIndex < _IgnoreColliders.Count; cIndex++)
+                    {
+                        if (_IgnoreColliders[cIndex].gameObject.activeInHierarchy && _IgnoreColliders[cIndex].enabled)
+                            Physics.IgnoreCollision(_IgnoreColliders[cIndex], bulletCollider);
+                    }
                 }
             }
         }

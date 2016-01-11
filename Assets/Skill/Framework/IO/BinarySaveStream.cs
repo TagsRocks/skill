@@ -208,6 +208,22 @@ namespace Skill.Framework.IO
         }
 
         /// <summary>
+        /// Write given array of SafeInt value to stream
+        /// </summary>
+        /// <param name="primitives">array of SafeInt value to write</param>
+        public void Write(SafeInt[] primitives)
+        {
+            int length = 0;
+            if (primitives != null)
+                length = primitives.Length;
+            Write(length);
+            for (int i = 0; i < length; i++)
+            {
+                Write(primitives[i].Value);
+            }
+        }
+
+        /// <summary>
         /// Write given array of float value to stream
         /// </summary>
         /// <param name="primitives">array of int value to write</param>
@@ -224,6 +240,22 @@ namespace Skill.Framework.IO
         }
 
         /// <summary>
+        /// Write given array of SafeFloat value to stream
+        /// </summary>
+        /// <param name="primitives">array of SafeFloat value to write</param>
+        public void Write(SafeFloat[] primitives)
+        {
+            int length = 0;
+            if (primitives != null)
+                length = primitives.Length;
+            Write(length);
+            for (int i = 0; i < length; i++)
+            {
+                Write(primitives[i].Value);
+            }
+        }
+
+        /// <summary>
         /// Write given array of bool value to stream
         /// </summary>
         /// <param name="primitives">array of int value to write</param>
@@ -236,6 +268,22 @@ namespace Skill.Framework.IO
             for (int i = 0; i < length; i++)
             {
                 Write(primitives[i]);
+            }
+        }
+
+        /// <summary>
+        /// Write given array of SafeBool value to stream
+        /// </summary>
+        /// <param name="primitives">array of SafeBool value to write</param>
+        public void Write(SafeBool[] primitives)
+        {
+            int length = 0;
+            if (primitives != null)
+                length = primitives.Length;
+            Write(length);
+            for (int i = 0; i < length; i++)
+            {
+                Write(primitives[i].Value);
             }
         }
 

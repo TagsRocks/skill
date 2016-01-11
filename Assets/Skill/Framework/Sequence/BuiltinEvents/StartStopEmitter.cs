@@ -33,7 +33,10 @@ namespace Skill.Framework.Sequence
                 for (int i = 0; i < _Particles.Length; i++)
                 {
                     if (_Particles[i] != null)
-                        _Particles[i].enableEmission = _Emission;
+                    {
+                        var emission = _Particles[i].emission;
+                        emission.enabled = _Emission;                                        
+                    }
                 }
             }
             if (_Emmiters != null && _Emmiters.Length > 0)

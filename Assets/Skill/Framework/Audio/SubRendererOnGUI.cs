@@ -4,7 +4,7 @@ namespace Skill.Framework.Audio
 {
     public class SubRendererOnGUI : SubtitleRenderer
     {
-        public int GUIDepth;
+        public int GUIDepth = 15;
         public Font Font;        
         public float FontSizeFactor = 0.24f;
         public RectOffset ScreenBorder;
